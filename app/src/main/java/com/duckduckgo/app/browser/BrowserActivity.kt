@@ -348,6 +348,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
+        if (existingTabId != null) {
+            openExistingTab(existingTabId)
+            return
+        }
+
         val sharedText = intent.intentText
         if (sharedText != null) {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
@@ -568,6 +574,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
             isExternal: Boolean = false,
+            openExistingTabId: String? = null,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -576,6 +583,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             return intent
         }
 
@@ -587,6 +595,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
+        const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
