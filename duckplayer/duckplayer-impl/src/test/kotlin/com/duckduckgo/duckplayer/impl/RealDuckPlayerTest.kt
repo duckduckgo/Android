@@ -622,7 +622,11 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(mockAssets).open("duckplayer/index.html")
-        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to "always"))
+        verify(mockPixel).fire(
+            DUCK_PLAYER_DAILY_UNIQUE_VIEW,
+            type = Daily(),
+            parameters = mapOf("setting" to "always", "newtab" to "false"),
+        )
         assertEquals("text/html", result?.mimeType)
     }
 
