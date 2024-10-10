@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">Duck Player jest niedostępny</string>
     <string name="duck_player_unavailable_description">Ostatnie zmiany w serwisie YouTube miały wpływ na działanie Duck Player. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie.</string>
     <string name="duck_player_unavailable_learn_more">Dowiedz się więcej</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Otwieraj Duck Player w nowej karcie, gdy tylko jest to możliwe</string>
 </resources>
