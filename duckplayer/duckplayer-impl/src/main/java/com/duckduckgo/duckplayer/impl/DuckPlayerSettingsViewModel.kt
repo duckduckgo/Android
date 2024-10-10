@@ -21,7 +21,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
@@ -38,7 +37,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ import kotlinx.coroutines.runBlocking
 
 @ContributesViewModel(ActivityScope::class)
 class DuckPlayerSettingsViewModel @Inject constructor(
-    private val duckPlayer: DuckPlayer,
+    private val duckPlayer: DuckPlayerInternal,
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val pixel: Pixel,
 ) : ViewModel() {
@@ -55,18 +54,17 @@ class DuckPlayerSettingsViewModel @Inject constructor(
     val commands = commandChannel.receiveAsFlow()
 
     val viewState: StateFlow<ViewState> = duckPlayer.observeUserPreferences()
-        .map {
+        .combine(duckPlayer.observeShouldOpenInNewTab()) { userPreferences, shouldOpenInNewTab ->
             val helpPageLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()
             if (duckPlayer.getDuckPlayerState() == DISABLED_WIH_HELP_LINK && helpPageLink?.isNotEmpty() == true) {
-                DisabledWithHelpLink(it.privatePlayerMode, helpPageLink)
+                DisabledWithHelpLink(userPreferences.privatePlayerMode, shouldOpenInNewTab, helpPageLink)
             } else {
-                Enabled(it.privatePlayerMode)
+                Enabled(userPreferences.privatePlayerMode, shouldOpenInNewTab)
             }
-        }
-        .stateIn(
+        }.stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = runBlocking { Enabled(duckPlayer.getUserPreferences().privatePlayerMode) },
+            initialValue = runBlocking { Enabled(duckPlayer.getUserPreferences().privatePlayerMode, duckPlayer.shouldOpenDuckPlayerInNewTab()) },
         )
 
     sealed class Command {
@@ -75,9 +73,16 @@ class DuckPlayerSettingsViewModel @Inject constructor(
         data class LaunchDuckPlayerContingencyPage(val helpPageLink: String) : Command()
     }
 
-    sealed class ViewState(open val privatePlayerMode: PrivatePlayerMode = AlwaysAsk) {
-        data class Enabled(override val privatePlayerMode: PrivatePlayerMode) : ViewState(privatePlayerMode)
-        data class DisabledWithHelpLink(override val privatePlayerMode: PrivatePlayerMode, val helpPageLink: String) : ViewState(privatePlayerMode)
+    sealed class ViewState(open val privatePlayerMode: PrivatePlayerMode = AlwaysAsk, open val openDuckPlayerInNewTab: Boolean) {
+        data class Enabled(
+            override val privatePlayerMode: PrivatePlayerMode,
+            override val openDuckPlayerInNewTab: Boolean,
+        ) : ViewState(privatePlayerMode, openDuckPlayerInNewTab)
+        data class DisabledWithHelpLink(
+            override val privatePlayerMode: PrivatePlayerMode,
+            override val openDuckPlayerInNewTab: Boolean,
+            val helpPageLink: String,
+        ) : ViewState(privatePlayerMode, openDuckPlayerInNewTab)
     }
     fun duckPlayerModeSelectorClicked() {
         viewModelScope.launch {
@@ -110,5 +115,9 @@ class DuckPlayerSettingsViewModel @Inject constructor(
                 commandChannel.send(Command.LaunchDuckPlayerContingencyPage(it))
             }
         }
+    }
+
+    fun onOpenDuckPlayerInNewTabToggled(checked: Boolean) {
+        duckPlayer.setOpenInNewTab(checked)
     }
 }

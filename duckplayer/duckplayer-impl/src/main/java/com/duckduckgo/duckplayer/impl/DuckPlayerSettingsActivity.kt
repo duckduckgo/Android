@@ -75,6 +75,9 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
         binding.duckPlayerDisabledLearnMoreButton.setOnClickListener {
             viewModel.onContingencyLearnMoreClicked()
         }
+        binding.openDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onOpenDuckPlayerInNewTabToggled(isChecked)
+        }
     }
 
     private fun observeViewModel() {
@@ -151,6 +154,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             is ViewState.Enabled -> {
                 binding.duckPlayerModeSelector.isEnabled = true
                 binding.duckPlayerDisabledSection.isVisible = false
+                binding.openDuckPlayerInNewTabToggle.isEnabled = viewState.privatePlayerMode != Disabled
+                binding.openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab)
                 setDuckPlayerSectionVisibility(true)
             }
             is ViewState.DisabledWithHelpLink -> {
