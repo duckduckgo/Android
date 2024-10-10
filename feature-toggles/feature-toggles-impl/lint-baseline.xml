@@ -389,11 +389,55 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        var config = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
+            line="3219"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        config = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
+            line="3262"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        config = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
+            line="3298"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        config = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
+            line="3340"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        return getRawStoredState()?.rolloutThreshold"
         errorLine2="               ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3196"
+            line="3367"
             column="16"/>
     </issue>
 
