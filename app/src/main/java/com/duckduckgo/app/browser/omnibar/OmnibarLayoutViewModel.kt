@@ -16,11 +16,8 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.annotation.SuppressLint
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -63,13 +60,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(FragmentScope::class)
 class OmnibarLayoutViewModel @Inject constructor(
     private val tabRepository: TabRepository,
@@ -80,16 +75,10 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
-) : ViewModel(), DefaultLifecycleObserver {
+) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
-
-    val viewState = _viewState.asStateFlow().onStart {
-        tabRepository.flowTabs.onEach { tabs ->
-            Timber.d("Omnibar: tabs $tabs")
-            _viewState.update { ViewState(tabs = tabs) }
-        }
-    }.flowOn(dispatcherProvider.io())
+    val viewState = _viewState.asStateFlow()
 
     private fun currentViewState() = _viewState.value
 
@@ -127,9 +116,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         GLOBE,
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-
+    fun onAttachedToWindow() {
         viewModelScope.launch(dispatcherProvider.io()) {
             tabRepository.flowTabs
                 .onEach { tabs ->
@@ -138,7 +125,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }.flowOn(dispatcherProvider.io())
                 .launchIn(viewModelScope)
         }
-
         logVoiceSearchAvailability()
     }
 

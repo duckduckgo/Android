@@ -228,6 +228,8 @@ class OmnibarLayout @JvmOverloads constructor(
             .onEach { processCommand(it) }
             .launchIn(coroutineScope!!)
 
+        viewModel.onAttachedToWindow()
+
         if (decoration != null) {
             decorateDeferred(decoration!!)
             decoration = null
