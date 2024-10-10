@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">A jelszavak automatikus kitöltése nem érhető el, mert az Android WebView verziója túl régi.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">A jelszavak automatikus kitöltése nem érhető el, mert az Android WebView verziója elavult vagy nem kompatibilis.</string>
 
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
