@@ -277,7 +277,7 @@ class RealDuckPlayer @Inject constructor(
         }
         return null
     }
-    private fun processSimulatedYouTubeNoCookieUri(
+    private suspend fun processSimulatedYouTubeNoCookieUri(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse {
@@ -294,7 +294,13 @@ class RealDuckPlayer @Inject constructor(
         } else {
             val inputStream: InputStream = webView.context.assets.open(DUCK_PLAYER_ASSETS_INDEX_PATH)
             return WebResourceResponse("text/html", "UTF-8", inputStream).also {
-                pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily())
+                when (getUserPreferences().privatePlayerMode) {
+                    Enabled -> "always"
+                    AlwaysAsk -> "default"
+                    else -> null
+                }?.let { setting ->
+                    pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to setting))
+                }
             }
         }
     }
