@@ -2,6 +2,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -10,6 +11,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
+import java.lang.String
+import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -90,5 +93,19 @@ class OmnibarLayoutViewModelTest {
         testee.onAttachedToWindow()
 
         verify(voiceSearchPixelLogger.log(), times(0))
+    }
+
+    @Test
+    fun whenOmnibarFocusedThenCancelTrackersAnimationCommandSent() = runTest {
+        testee.onOmnibarFocusChanged(true, "query")
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun Command.assertCommand(expectedType: KClass<out Command>) {
+        assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }
 }
