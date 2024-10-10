@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <string name="open_duck_player_in_a_new_tab_setting">Open Duck Player in a new tab whenever possible</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Open Duck Player in a new tab whenever possible</string>
 </resources>
