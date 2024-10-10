@@ -639,34 +639,37 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
-        customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            omnibarItemPressedListener?.onCustomTabClosePressed()
+        if (!customTabToolbarContainer.customTabToolbar.isVisible) {
+            customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
+                omnibarItemPressedListener?.onCustomTabClosePressed()
+            }
+
+            customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
+                omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+            }
+
+            omniBarContainer.hide()
+
+            toolbar.background = ColorDrawable(customTab.toolbarColor)
+            toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
+
+            customTabToolbarContainer.customTabToolbar.show()
+
+            customTabToolbarContainer.customTabDomain.text = customTab.domain
+            customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
+            customTabToolbarContainer.customTabDomainOnly.show()
+
+            val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
+            customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+            customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+            customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
+            customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
+            browserMenuImageView.setColorFilter(foregroundColor)
         }
-
-        customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
-        }
-
-        omniBarContainer.hide()
-
-        toolbar.background = ColorDrawable(customTab.toolbarColor)
-        toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
-
-        customTabToolbarContainer.customTabToolbar.show()
-
-        customTabToolbarContainer.customTabDomain.text = customTab.domain
-        customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
-        customTabToolbarContainer.customTabDomainOnly.show()
-
-        val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
-        customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-        customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        browserMenuImageView.setColorFilter(foregroundColor)
     }
 
     private fun updateCustomTabTitle(decoration: ChangeCustomTabTitle) {
+        Timber.d("Omnibar: updateCustomTabTitle $decoration")
         customTabToolbarContainer.customTabTitle.text = decoration.title
 
         decoration.domain?.let {
