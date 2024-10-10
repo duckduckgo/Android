@@ -20,14 +20,15 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -80,19 +81,26 @@ interface AutoComplete {
             override val phrase: String,
         ) : AutoCompleteSuggestion(phrase)
 
-        data class AutoCompleteBookmarkSuggestion(
-            override val phrase: String,
-            val title: String,
-            val url: String,
-            val isFavorite: Boolean = false,
-        ) : AutoCompleteSuggestion(phrase)
+        sealed class AutoCompleteUrlSuggestion(
+            phrase: String,
+            open val title: String,
+            open val url: String,
+        ) : AutoCompleteSuggestion(phrase) {
 
-        data class AutoCompleteSwitchToTabSuggestion(
-            override val phrase: String,
-            val title: String,
-            val url: String,
-            val tabId: String,
-        ) : AutoCompleteSuggestion(phrase)
+            data class AutoCompleteBookmarkSuggestion(
+                override val phrase: String,
+                override val title: String,
+                override val url: String,
+                val isFavorite: Boolean = false,
+            ) : AutoCompleteUrlSuggestion(phrase, title, url)
+
+            data class AutoCompleteSwitchToTabSuggestion(
+                override val phrase: String,
+                override val title: String,
+                override val url: String,
+                val tabId: String,
+            ) : AutoCompleteUrlSuggestion(phrase, title, url)
+        }
 
         sealed class AutoCompleteHistoryRelatedSuggestion(phrase: String) : AutoCompleteSuggestion(phrase) {
             data class AutoCompleteHistorySuggestion(
@@ -124,7 +132,6 @@ class AutoCompleteApi @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : AutoComplete {
 
-    // TODO ANA: Add option to "Switch to tab" in the AutoComplete suggestions
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
         if (query.isBlank()) {
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
@@ -136,26 +143,26 @@ class AutoCompleteApi @Inject constructor(
                 ) { bookmarks, favorites ->
                     (favorites + bookmarks.filter { favorites.none { favorite -> (it.suggestion).url == favorite.suggestion.url } })
                 }.zipWith(
+                    getAutocompleteSwitchToTabResults(query),
+                ) { bookmarksAndFavorites, tabs ->
+                    (tabs + bookmarksAndFavorites) as List<RankedSuggestion<AutoCompleteUrlSuggestion>>
+                }.zipWith(
                     getHistoryResults(query),
-                ) { bookmarksAndFavorites, historyItems ->
+                ) { bookmarksAndFavoritesAndTabs, historyItems ->
                     val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
                     val navigationHistory = historyItems
                         .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
-                    (removeDuplicates(navigationHistory, bookmarksAndFavorites) + searchHistory).sortedByDescending { it.score }.map { it.suggestion }
-                }.zipWith(
-                    getAutocompleteSwitchToTabResults(query),
-                ) { bookmarksAndHistory, tabs ->
-                    // TODO: ANA to handle dedupe, sorting, etc
-                    (tabs.map { it.suggestion } + bookmarksAndHistory)
+                    (removeDuplicates(navigationHistory, bookmarksAndFavoritesAndTabs) + searchHistory)
+                        .sortedByDescending { it.score }
+                        .map { it.suggestion }
                 }
 
         return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndTabsAndHistory, searchResults ->
             val topHits = (searchResults + bookmarksAndTabsAndHistory).filter {
                 when (it) {
-                    // TODO: ANA tabs should also be allowed in top hits
                     is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
-                    is AutoCompleteBookmarkSuggestion -> true
+                    is AutoCompleteUrlSuggestion -> true
                     else -> false
                 }
             }.take(maximumNumberOfTopHits)
@@ -172,8 +179,12 @@ class AutoCompleteApi @Inject constructor(
 
             val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
 
-            val suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase }
-
+            val suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy {
+                Pair<String, Class<out AutoCompleteSuggestion>>(
+                    it.phrase,
+                    it::class.java,
+                )
+            }
             runBlocking(dispatcherProvider.io()) {
                 if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
                     inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
@@ -189,7 +200,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun removeDuplicates(
         historySuggestions: List<RankedSuggestion<AutoCompleteHistorySuggestion>>,
-        bookmarkSuggestions: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
+        bookmarkSuggestions: List<RankedSuggestion<AutoCompleteUrlSuggestion>>,
     ): List<RankedSuggestion<*>> {
         val bookmarkMap = bookmarkSuggestions.associateBy { it.suggestion.phrase.lowercase() }
 
@@ -295,6 +306,7 @@ class AutoCompleteApi @Inject constructor(
     ): List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>> {
         return tabs.asSequence()
             .filter { it.url != null }
+            .distinctBy { it.url }
             .sortTabsByRank(query)
     }
 
@@ -321,7 +333,6 @@ class AutoCompleteApi @Inject constructor(
     }
 
     private fun Sequence<TabEntity>.sortTabsByRank(query: String): List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>> {
-        // TODO: ANA to implement the sorting
         return this.map { tabEntity ->
             RankedSuggestion(
                 AutoCompleteSwitchToTabSuggestion(
@@ -331,7 +342,11 @@ class AutoCompleteApi @Inject constructor(
                     tabId = tabEntity.tabId,
                 ),
             )
-        }.toList()
+        }
+            .map { scoreTitle(it, query) }
+            .map { scoreTokens(it, query) }
+            .filter { it.score > 0 }
+            .toList()
     }
 
     private fun Sequence<SavedSite>.sortByRank(query: String): List<RankedSuggestion<AutoCompleteBookmarkSuggestion>> {
@@ -392,23 +407,23 @@ class AutoCompleteApi @Inject constructor(
             .toList()
     }
 
-    private fun scoreTitle(
-        rankedBookmark: RankedSuggestion<AutoCompleteBookmarkSuggestion>,
+    private fun <T : AutoCompleteUrlSuggestion> scoreTitle(
+        rankedSuggestion: RankedSuggestion<T>,
         query: String,
-    ): RankedSuggestion<AutoCompleteBookmarkSuggestion> {
-        return if (rankedBookmark.suggestion.title.startsWith(query, ignoreCase = true)) {
-            rankedBookmark.copy(score = rankedBookmark.score + 200)
-        } else if (rankedBookmark.suggestion.title.contains(" $query", ignoreCase = true)) {
-            rankedBookmark.copy(score = rankedBookmark.score + 100)
+    ): RankedSuggestion<T> {
+        return if (rankedSuggestion.suggestion.title.startsWith(query, ignoreCase = true)) {
+            rankedSuggestion.copy(score = rankedSuggestion.score + 200)
+        } else if (rankedSuggestion.suggestion.title.contains(" $query", ignoreCase = true)) {
+            rankedSuggestion.copy(score = rankedSuggestion.score + 100)
         } else {
-            rankedBookmark
+            rankedSuggestion
         }
     }
 
-    private fun scoreTokens(
-        rankedBookmark: RankedSuggestion<AutoCompleteBookmarkSuggestion>,
+    private fun <T : AutoCompleteUrlSuggestion> scoreTokens(
+        rankedBookmark: RankedSuggestion<T>,
         query: String,
-    ): RankedSuggestion<AutoCompleteBookmarkSuggestion> {
+    ): RankedSuggestion<T> {
         val suggestion = rankedBookmark.suggestion
         val domain = suggestion.url.toUri().baseHost
         val tokens = query.split(" ")

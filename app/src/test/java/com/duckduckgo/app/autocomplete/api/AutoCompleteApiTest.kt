@@ -20,12 +20,13 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.NEW
@@ -180,6 +181,108 @@ class AutoCompleteApiTest {
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
                 AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsMultipleTabAndBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    favorite(title = "title", url = "https://example.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    bookmark(title = "title", url = "https://bar.com"),
+                    bookmark(title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        whenever(mockTabRepository.getTabsObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "title", url = "https://bar.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "2"),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsDuplicatedTabsAndBookmarkAndFavoriteHitsThenTabSuggestionsAreNotDuplicatedAndFirstTabPositionIsChosen() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    favorite(title = "title", url = "https://example.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    bookmark(title = "title", url = "https://bar.com"),
+                    bookmark(title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        whenever(mockTabRepository.getTabsObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "title", url = "https://bar.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://bar.com"),
+                    TabEntity(tabId = "3", position = 3, title = "title", url = "https://bar.com"),
+                    TabEntity(tabId = "4", position = 4, title = "title", url = "https://baz.com"),
+                    TabEntity(tabId = "5", position = 5, title = "title", url = "https://baz.com"),
+                    TabEntity(tabId = "6", position = 6, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "4"),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
