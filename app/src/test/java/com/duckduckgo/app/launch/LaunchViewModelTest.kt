@@ -22,6 +22,7 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -29,6 +30,7 @@ import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -44,6 +46,9 @@ class LaunchViewModelTest {
 
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
+    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
+        on { it.isHighlightsEnabled() } doReturn false
+    }
 
     private lateinit var testee: LaunchViewModel
 
@@ -57,6 +62,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
+            mockHighlightsOnboardingExperimentManager,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -71,6 +77,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
+            mockHighlightsOnboardingExperimentManager,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -85,6 +92,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockHighlightsOnboardingExperimentManager,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -96,7 +104,11 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runTest {
-        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx"))
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            mockHighlightsOnboardingExperimentManager,
+        )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
@@ -108,6 +120,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
+            mockHighlightsOnboardingExperimentManager,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -120,10 +133,27 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockHighlightsOnboardingExperimentManager,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenIsNewUserAndReferrerDataTimesOutThenAllocateVariants() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockHighlightsOnboardingExperimentManager,
+        )
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.determineViewToShow()
+
+        verify(mockHighlightsOnboardingExperimentManager).setExperimentVariants()
     }
 }

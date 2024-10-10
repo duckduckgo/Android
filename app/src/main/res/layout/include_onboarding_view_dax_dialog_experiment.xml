@@ -28,26 +28,29 @@
         android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
-        tools:background="@drawable/onboarding_background_bitmap_light">
+        tools:background="@drawable/onboarding_experiment_background_bitmap_light"
+        android:clipChildren="false">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/logo"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/cardView"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
+        <com.duckduckgo.common.ui.view.shape.DaxBubbleCardViewExperiment
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/keyline_4"
-            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             app:edgePosition="left"
+            app:arrowHeight="16dp"
+            app:arrowOffsetEnd="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/logo"
@@ -68,8 +71,8 @@
                         android:id="@+id/onboardingDialogTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/keyline_1"
                         android:text="@string/onboardingEndDaxDialogTitle"
+                        android:layout_marginBottom="@dimen/keyline_1"
                         app:typography="h2" />
 
                     <FrameLayout
@@ -213,6 +216,6 @@
 
                 </LinearLayout>
             </FrameLayout>
-        </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
+        </com.duckduckgo.common.ui.view.shape.DaxBubbleCardViewExperiment>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
+import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
@@ -127,6 +128,8 @@ import com.duckduckgo.app.browser.commands.Command.ScreenUnlock
 import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
+import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
+import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
@@ -217,6 +220,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -226,6 +230,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -238,6 +243,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -418,6 +424,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
+    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -959,7 +966,9 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when (currentCtaViewState().cta) {
-            is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
+            is DaxBubbleCta.DaxIntroSearchOptionsCta,
+            is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta,
+            -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -967,6 +976,8 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
+            is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
@@ -2819,6 +2830,11 @@ class BrowserTabViewModel @Inject constructor(
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             }
+            if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
+                pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
+                val updatedCta = ctaViewModel.getEndStaticDialogCta()
+                ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            }
         }
     }
 
@@ -3557,7 +3573,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
-            is OnboardingDaxDialogCta.DaxSerpCta -> {
+            is OnboardingDaxDialogCta.DaxSerpCta, is OnboardingDaxDialogCta.DaxExperimentSerpCta -> {
                 viewModelScope.launch {
                     val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
@@ -3571,6 +3587,9 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
+            is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta,
+            is OnboardingDaxDialogCta.DaxExperimentNoTrackersCta,
+            is OnboardingDaxDialogCta.DaxExperimentMainNetworkCta,
             -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -3585,6 +3604,8 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
+            is OnboardingDaxDialogCta.DaxExperimentFireButtonCta -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
+
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
     }
@@ -3593,7 +3614,7 @@ class BrowserTabViewModel @Inject constructor(
         onUserDismissedCta(cta)
         return when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri())
-            is DaxBubbleCta.DaxEndCta -> {
+            is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
@@ -3607,7 +3628,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
-        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
 
@@ -3617,9 +3638,9 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onFireMenuSelected() {
         val cta = currentCtaViewState().cta
-        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
             onUserDismissedCta(cta)
-            command.value = HideOnboardingDaxDialog(cta)
+            command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
         if (currentBrowserViewState().fireButton.isHighlighted()) {
             viewModelScope.launch {
@@ -3798,6 +3819,25 @@ class BrowserTabViewModel @Inject constructor(
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
+    }
+
+    fun setBrowserExperimentBackground(lightModeEnabled: Boolean) {
+        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
+        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
+        return when {
+            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
+                R.drawable.onboarding_experiment_background_bitmap_light
+            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
+                R.drawable.onboarding_experiment_background_bitmap_dark
+            lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
+            else -> R.drawable.onboarding_background_bitmap_dark
+        }
     }
 
     companion object {

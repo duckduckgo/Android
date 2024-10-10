@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.common.ui.view.shape
 
-package com.duckduckgo.app.onboarding.store
+import com.google.android.material.shape.EdgeTreatment
+import com.google.android.material.shape.ShapePath
 
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+class OffsetEndTreatment(private val other: EdgeTreatment, private val offsetPx: Int) :
+    EdgeTreatment() {
 
-interface OnboardingStore {
-    var onboardingDialogJourney: String?
-    fun getSearchOptions(): List<DaxDialogIntroOption>
-    fun getSitesOptions(): List<DaxDialogIntroOption>
-    fun getExperimentSearchOptions(): List<DaxDialogIntroOption>
+    override fun getEdgePath(
+        length: Float,
+        center: Float,
+        interpolation: Float,
+        shapePath: ShapePath,
+    ) {
+        other.getEdgePath(length, (center * 2) - offsetPx, interpolation, shapePath)
+    }
 }
