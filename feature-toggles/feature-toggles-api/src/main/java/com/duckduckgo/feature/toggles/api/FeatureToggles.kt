@@ -288,13 +288,31 @@ internal class ToggleImpl constructor(
     private val forceDefaultVariant: () -> Unit,
 ) : Toggle {
 
-    private fun Toggle.State.isVariantTreated(variant: String?): Boolean {
-        // if no variants a present, we consider always treated
+    private fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
+        val variant = appVariantProvider.invoke()
+        // no targets then consider always treated
         if (this.targets.isEmpty()) {
             return true
         }
+        // if it's an experiment with target variants then false if they don't match
+        val variantTargets = this.targets.mapNotNull { it.variantKey }
+        if (isExperiment && variantTargets.isNotEmpty()) {
+            if (!variantTargets.contains(variant)) {
+                return false
+            }
+        }
+        // finally, check all other targets
+        val countryTarget = this.targets.mapNotNull { it.localeCountry?.lowercase() }
+        val languageTarget = this.targets.mapNotNull { it.localeLanguage?.lowercase() }
 
-        return this.targets.mapNotNull { it.variantKey }.contains(variant)
+        if (countryTarget.isNotEmpty() && !countryTarget.contains(localeProvider.invoke()?.country?.lowercase())) {
+            return false
+        }
+        if (languageTarget.isNotEmpty() && !languageTarget.contains(localeProvider.invoke()?.language?.lowercase())) {
+            return false
+        }
+
+        return true
     }
 
     override fun featureName(): FeatureName {
@@ -334,10 +352,10 @@ internal class ToggleImpl constructor(
     private fun isRolloutEnabled(): Boolean {
         fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
-            val isVariantTreated = if (isExperiment) state.isVariantTreated(appVariantProvider.invoke()) else true
+            val doTargetsMatch = state.evaluateTargetMatching(isExperiment)
 
             return state.enable &&
-                isVariantTreated &&
+                doTargetsMatch &&
                 appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
         }
         // check if it should always be enabled for internal builds
