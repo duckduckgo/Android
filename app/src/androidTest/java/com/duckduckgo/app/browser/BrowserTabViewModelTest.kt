@@ -192,6 +192,9 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -5054,10 +5057,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabFalseThenNavigate() = runTest {
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOffThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(false)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Off)
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
             "openDuckPlayer",
@@ -5069,10 +5072,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabTrueThenOpenInNewTab() = runTest {
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabUnavailableThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Unavailable)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            { "someUrl" },
+        )
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOnThenOpenInNewTab() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
             "openDuckPlayer",
