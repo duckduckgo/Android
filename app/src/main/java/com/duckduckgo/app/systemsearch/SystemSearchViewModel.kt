@@ -27,6 +27,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -101,6 +102,7 @@ class SystemSearchViewModel @Inject constructor(
         object ClearInputText : Command()
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
+        data class LaunchBrowserAndSwitchToTab(val query: String, val tabId: String) : Command()
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
         data class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
         data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
@@ -295,8 +297,15 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun userSubmittedAutocompleteResult(query: String) {
-        command.value = Command.LaunchBrowser(query)
+    fun userSubmittedAutocompleteResult(suggestion: AutoCompleteSuggestion) {
+        when (suggestion) {
+            is AutoCompleteSwitchToTabSuggestion -> {
+                command.value = Command.LaunchBrowserAndSwitchToTab(suggestion.phrase, suggestion.tabId)
+            }
+            else -> {
+                command.value = Command.LaunchBrowser(suggestion.phrase)
+            }
+        }
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
