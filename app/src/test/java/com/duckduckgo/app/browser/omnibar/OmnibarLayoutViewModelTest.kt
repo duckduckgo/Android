@@ -2,7 +2,12 @@ package com.duckduckgo.app.browser.omnibar
 
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
+import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -11,7 +16,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import java.lang.String
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -19,6 +23,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -53,6 +58,7 @@ class OmnibarLayoutViewModelTest {
         )
 
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
     }
 
     @Test
@@ -103,6 +109,125 @@ class OmnibarLayoutViewModelTest {
             awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryNotBlankThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "query")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.hasFocus)
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.showClearButton)
+            assertFalse(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
+            assertTrue(viewState.showVoiceSearch)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndQueryBlankThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.hasFocus)
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertFalse(viewState.showClearButton)
+            assertTrue(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
+            assertTrue(viewState.showVoiceSearch)
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedAndDDGUrlThenViewStateCorrect() = runTest {
+        givenSiteLoaded("https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web")
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.hasFocus)
+            assertFalse(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.DAX)
+            assertFalse(viewState.showClearButton)
+            assertTrue(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedAndDuckPlayerUrlThenViewStateCorrect() = runTest {
+        givenSiteLoaded("duck://player/21bPE0BJdOA")
+        whenever(duckPlayer.isDuckPlayerUri(any())).thenReturn(true)
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.hasFocus)
+            assertFalse(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.DUCK_PLAYER)
+            assertFalse(viewState.showClearButton)
+            assertTrue(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedAndUrlEmptyThenViewStateCorrect() = runTest {
+        givenSiteLoaded("")
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.hasFocus)
+            assertFalse(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertFalse(viewState.showClearButton)
+            assertTrue(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarNotFocusedAndUrlLoadedThenViewStateCorrect() = runTest {
+        givenSiteLoaded("https://as.com")
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.hasFocus)
+            assertFalse(viewState.expanded)
+            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertFalse(viewState.showClearButton)
+            assertTrue(viewState.showControls)
+            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun givenSiteLoaded(loadedUrl: String) {
+        testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = true,
+                    privacyOn = true,
+                    progress = 100,
+                    url = loadedUrl,
+                ),
+            ) {},
+        )
     }
 
     private fun Command.assertCommand(expectedType: KClass<out Command>) {
