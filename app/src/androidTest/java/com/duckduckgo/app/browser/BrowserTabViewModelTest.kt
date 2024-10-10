@@ -237,9 +237,6 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -1392,8 +1389,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
+    fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
@@ -1452,18 +1449,18 @@ class BrowserTabViewModelTest {
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasBeenShownThenNotifyUserSeenIAM() {
         runTest {
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
             )
-            whenever(mockTabRepository.getTabsObservable()).thenReturn(
-                Single.just(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
+            whenever(mockTabRepository.flowTabs).thenReturn(
+                flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
             )
             doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
 
@@ -1472,7 +1469,7 @@ class BrowserTabViewModelTest {
             whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
 
-            testee.autoCompletePublishSubject.accept("title")
+            testee.autoCompleteStateFlow.value = "title"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
             verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
@@ -1482,16 +1479,16 @@ class BrowserTabViewModelTest {
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasNotBeenShownThenDoNotNotifyUserSeenIAM() {
         runTest {
-            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(Observable.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+            whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
             doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-            testee.autoCompletePublishSubject.accept("query")
+            testee.autoCompleteStateFlow.value = "query"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
             verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
@@ -5870,15 +5867,11 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-        val testObserver = TestObserver.create<String>()
-        testee.autoCompletePublishSubject.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
-        testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
@@ -5887,15 +5880,11 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-        val testObserver = TestObserver.create<String>()
-        testee.autoCompletePublishSubject.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
-        testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 

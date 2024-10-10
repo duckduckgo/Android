@@ -19,7 +19,6 @@ package com.duckduckgo.app.autocomplete.api
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
@@ -44,11 +43,10 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import io.reactivex.Observable
-import io.reactivex.Single
-import java.io.InterruptedIOException
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -95,8 +93,8 @@ class AutoCompleteApiTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        whenever(mockTabRepository.getTabsObservable()).thenReturn(Single.just(listOf(TabEntity("1", position = 1))))
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
+        whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(NEW)
         }
@@ -116,33 +114,31 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenQueryIsBlankThenReturnAnEmptyList() {
-        val result = testee.autoComplete("").test()
-        val value = result.values()[0] as AutoCompleteResult
+    fun whenQueryIsBlankThenReturnAnEmptyList() = runTest {
+        val result = testee.autoComplete("")
+        val value = result.first()
 
         assertTrue(value.suggestions.isEmpty())
     }
 
     @Test
-    fun whenReturnBookmarkSuggestionsThenPhraseIsURLBaseHost() {
-        runTest {
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(bookmarks()))
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+    fun whenReturnBookmarkSuggestionsThenPhraseIsURLBaseHost() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(bookmarks()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
-            assertEquals("example.com", value.suggestions[0].phrase)
-        }
+        assertEquals("example.com", value.suggestions[0].phrase)
     }
 
     @Test
-    fun whenAutoCompleteDoesNotMatchAnySavedSiteReturnDefault() {
-        whenever(mockAutoCompleteService.autoComplete("wrong")).thenReturn(Observable.just(emptyList()))
+    fun whenAutoCompleteDoesNotMatchAnySavedSiteReturnDefault() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("wrong")).thenReturn(emptyList())
 
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(
                         title = "title",
@@ -151,32 +147,30 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(listOf(favorite(title = "title"))))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite(title = "title"))))
 
-        val result = testee.autoComplete("wrong").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("wrong")
+        val value = result.first()
 
         assertEquals(value.suggestions.first(), AutoCompleteDefaultSuggestion("wrong"))
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() {
+    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://example.com"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title", url = "https://bar.com"),
                     bookmark(title = "title", url = "https://baz.com"),
@@ -184,8 +178,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -199,23 +193,21 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleTabAndBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() {
+    fun whenAutoCompleteReturnsMultipleTabAndBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://example.com"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title", url = "https://bar.com"),
                     bookmark(title = "title", url = "https://baz.com"),
@@ -223,8 +215,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        whenever(mockTabRepository.getTabsObservable()).thenReturn(
-            Single.just(
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
                 listOf(
                     TabEntity(tabId = "1", position = 1, title = "title", url = "https://bar.com"),
                     TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
@@ -232,8 +224,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -248,142 +240,146 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicatedTabsAndBookmarkAndFavoriteHitsThenTabSuggestionsAreNotDuplicatedAndFirstTabPositionIsChosen() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
+    fun whenAutoCompleteReturnsDuplicatedTabsAndBookmarkAndFavoriteHitsThenTabSuggestionsAreNotDuplicatedAndFirstTabPositionIsChosen() =
+        runTest {
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
                 listOf(
                     AutoCompleteServiceRawResult("foo", isNav = false),
                 ),
-            ),
-        )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    favorite(title = "title", url = "https://example.com"),
+            )
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(
+                    listOf(
+                        favorite(title = "title", url = "https://example.com"),
+                    ),
                 ),
-            ),
-        )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    bookmark(title = "title", url = "https://bar.com"),
-                    bookmark(title = "title", url = "https://baz.com"),
+            )
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(
+                    listOf(
+                        bookmark(title = "title", url = "https://bar.com"),
+                        bookmark(title = "title", url = "https://baz.com"),
+                    ),
                 ),
-            ),
-        )
+            )
 
-        whenever(mockTabRepository.getTabsObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    TabEntity(tabId = "1", position = 1, title = "title", url = "https://bar.com"),
-                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://bar.com"),
-                    TabEntity(tabId = "3", position = 3, title = "title", url = "https://bar.com"),
-                    TabEntity(tabId = "4", position = 4, title = "title", url = "https://baz.com"),
-                    TabEntity(tabId = "5", position = 5, title = "title", url = "https://baz.com"),
-                    TabEntity(tabId = "6", position = 6, title = "title", url = "https://baz.com"),
+            whenever(mockTabRepository.flowTabs).thenReturn(
+                flowOf(
+                    listOf(
+                        TabEntity(tabId = "1", position = 1, title = "title", url = "https://bar.com"),
+                        TabEntity(tabId = "2", position = 2, title = "title", url = "https://bar.com"),
+                        TabEntity(tabId = "3", position = 3, title = "title", url = "https://bar.com"),
+                        TabEntity(tabId = "4", position = 4, title = "title", url = "https://baz.com"),
+                        TabEntity(tabId = "5", position = 5, title = "title", url = "https://baz.com"),
+                        TabEntity(tabId = "6", position = 6, title = "title", url = "https://baz.com"),
+                    ),
                 ),
-            ),
-        )
+            )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+            val result = testee.autoComplete("title")
+            val value = result.first()
 
-        assertEquals(
-            listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
-                AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
-                AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "4"),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
-            ),
-            value.suggestions,
-        )
-    }
+            assertEquals(
+                listOf(
+                    AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                    AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
+                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "4"),
+                    AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
+                ),
+                value.suggestions,
+            )
+        }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsWithBookmarksAlsoInHistoryThenBookmarksShowBeforeSearchSuggestions() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
+    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsWithBookmarksAlsoInHistoryThenBookmarksShowBeforeSearchSuggestions() =
+        runTest {
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
                 listOf(
                     AutoCompleteServiceRawResult("foo", isNav = false),
                 ),
+            )
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(
+                    listOf(
+                        VisitedPage(
+                            title = "title",
+                            url = "https://bar.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now()),
+                        ),
+                    ),
+                ),
+            )
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(
+                    listOf(
+                        favorite(title = "title", url = "https://example.com"),
+                    ),
+                ),
+            )
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(
+                    listOf(
+                        bookmark(title = "title", url = "https://bar.com"),
+                        bookmark(title = "title", url = "https://baz.com"),
+                    ),
+                ),
+            )
+
+            val result = testee.autoComplete("title")
+            val value = result.first()
+
+            assertEquals(
+                listOf(
+                    AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
+                    AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
+                ),
+                value.suggestions,
+            )
+        }
+
+    @Test
+    fun whenAutoCompleteReturnsHistoryItemsWithLessThan3VisitsButRootPageTheyShowBeforeSuggestions() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
                     VisitedPage(
                         title = "title",
                         url = "https://bar.com".toUri(),
-                        visits = listOf(LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now()),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "title",
+                        url = "https://foo.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
                     ),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://example.com"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    bookmark(title = "title", url = "https://bar.com"),
-                    bookmark(title = "title", url = "https://baz.com"),
-                ),
-            ),
-        )
-
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
-
-        assertEquals(
-            listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
-                AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
-            ),
-            value.suggestions,
-        )
-    }
-
-    @Test
-    fun whenAutoCompleteReturnsHistoryItemsWithLessThan3VisitsButRootPageTheyShowBeforeSuggestions() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
-            ),
-        )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
-                listOf(
-                    VisitedPage(title = "title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                    VisitedPage(title = "title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                ),
-            ),
-        )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    favorite(title = "title", url = "https://example.com"),
-                ),
-            ),
-        )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title", url = "https://baz.com"),
                 ),
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -398,16 +394,14 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicateHistorySerpWithMoreThan3CombinedVisitsTheyShowBeforeSuggestions() {
+    fun whenAutoCompleteReturnsDuplicateHistorySerpWithMoreThan3CombinedVisitsTheyShowBeforeSuggestions() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
                     VisitedSERP(
                         "https://duckduckgo.com?q=query".toUri(),
@@ -424,11 +418,11 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(listOf()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(listOf()))
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -440,27 +434,25 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicateHistorySerpWithLessThan3CombinedVisitsTheyDoNotShowBeforeSuggestions() {
+    fun whenAutoCompleteReturnsDuplicateHistorySerpWithLessThan3CombinedVisitsTheyDoNotShowBeforeSuggestions() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
                     VisitedSERP("https://duckduckgo.com?q=query".toUri(), "title", "query", visits = listOf(LocalDateTime.now())),
                     VisitedSERP("https://duckduckgo.com?q=query&atb=1".toUri(), "title", "query", visits = listOf(LocalDateTime.now())),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(listOf()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(listOf()))
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -472,39 +464,45 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsHistoryItemsWithLessThan3VisitsAndNotRootPageTheyDoNotShowBeforeSuggestions() {
+    fun whenAutoCompleteReturnsHistoryItemsWithLessThan3VisitsAndNotRootPageTheyDoNotShowBeforeSuggestions() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
+                    VisitedPage(
+                        title = "title",
+                        url = "https://bar.com/test".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "title",
+                        url = "https://foo.com/test".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
                 ),
             ),
         )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
-                listOf(
-                    VisitedPage(title = "title", url = "https://bar.com/test".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                    VisitedPage(title = "title", url = "https://foo.com/test".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                ),
-            ),
-        )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://example.com"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title", url = "https://baz.com"),
                 ),
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -519,16 +517,14 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleFavoriteHitsLimitTopHitsTo2() {
+    fun whenAutoCompleteReturnsMultipleFavoriteHitsLimitTopHitsTo2() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://example.com"),
                     favorite(title = "title", url = "https://foo.com"),
@@ -536,14 +532,14 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(),
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -557,10 +553,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleSavedSitesHitsThenShowFavoritesFirst() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenAutoCompleteReturnsMultipleSavedSitesHitsThenShowFavoritesFirst() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title", url = "https://example.com"),
                     bookmark(title = "title", url = "https://foo.com"),
@@ -569,8 +565,8 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title", url = "https://favexample.com"),
                     favorite(title = "title", url = "https://favfoo.com"),
@@ -580,8 +576,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertTrue((value.suggestions[0] as AutoCompleteBookmarkSuggestion).isFavorite)
         assertTrue((value.suggestions[1] as AutoCompleteBookmarkSuggestion).isFavorite)
@@ -591,19 +587,17 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicatedItemsThenDedup() {
+    fun whenAutoCompleteReturnsDuplicatedItemsThenDedup() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("example.com", false),
-                    AutoCompleteServiceRawResult("foo.com", true),
-                    AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("example.com", false),
+                AutoCompleteServiceRawResult("foo.com", true),
+                AutoCompleteServiceRawResult("bar.com", true),
+                AutoCompleteServiceRawResult("baz.com", true),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title example", url = "https://example.com"),
                     bookmark(title = "title foo", url = "https://foo.com/path/to/foo"),
@@ -612,8 +606,8 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(title = "title example", url = "https://example.com"),
                     favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
@@ -623,8 +617,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -659,10 +653,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenReturnOneBookmarkAndOneFavoriteSuggestionsThenShowBothFavoriteFirst() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenReturnOneBookmarkAndOneFavoriteSuggestionsThenShowBothFavoriteFirst() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(
                         title = "title",
@@ -671,8 +665,8 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(
                     favorite(
                         title = "title",
@@ -682,8 +676,8 @@ class AutoCompleteApiTest {
             ),
         )
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -705,19 +699,17 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicatedItemsThenDedupConsideringQueryParams() {
+    fun whenAutoCompleteReturnsDuplicatedItemsThenDedupConsideringQueryParams() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("example.com", false),
-                    AutoCompleteServiceRawResult("foo.com", true),
-                    AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("example.com", false),
+                AutoCompleteServiceRawResult("foo.com", true),
+                AutoCompleteServiceRawResult("bar.com", true),
+                AutoCompleteServiceRawResult("baz.com", true),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title foo", url = "https://foo.com?key=value"),
                     bookmark(title = "title foo", url = "https://foo.com"),
@@ -725,10 +717,10 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -743,10 +735,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenBookmarkTitleStartsWithQueryThenScoresHigher() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenBookmarkTitleStartsWithQueryThenScoresHigher() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "the title example", url = "https://example.com"),
                     bookmark(title = "the title foo", url = "https://foo.com/path/to/foo"),
@@ -755,10 +747,10 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("title")
+        val value = result.first()
 
         assertEquals(AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"), value.suggestions[0])
         assertEquals(
@@ -772,10 +764,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryAndBookmarkDomainStartsWithItThenScoreHigher() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryAndBookmarkDomainStartsWithItThenScoreHigher() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title example", url = "https://example.com"),
                     bookmark(title = "title bar", url = "https://bar.com"),
@@ -784,10 +776,10 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("foo").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("foo")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -798,10 +790,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryAndBookmarkReturnsDuplicatedItemsThenDedup() {
-        whenever(mockAutoCompleteService.autoComplete("cnn")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryAndBookmarkReturnsDuplicatedItemsThenDedup() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("cnn")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "CNN international", url = "https://cnn.com"),
                     bookmark(title = "CNN international", url = "https://cnn.com"),
@@ -809,10 +801,10 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("cnn").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("cnn")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -828,20 +820,20 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryEndsWithSlashThenIgnoreItWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com/")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryEndsWithSlashThenIgnoreItWhileMatching() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "Reddit", url = "https://reddit.com"),
                     bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("reddit.com/").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("reddit.com/")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -857,20 +849,20 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryEndsWithMultipleSlashThenIgnoreThemWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com///")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryEndsWithMultipleSlashThenIgnoreThemWhileMatching() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com///")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "Reddit", url = "https://reddit.com"),
                     bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("reddit.com///").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("reddit.com///")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -886,20 +878,20 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryContainsMultipleSlashThenIgnoreThemWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com/r//")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryContainsMultipleSlashThenIgnoreThemWhileMatching() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/r//")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "Reddit", url = "https://reddit.com"),
                     bookmark(title = "Reddit - duckduckgo", url = "https://reddit.com/r/duckduckgo"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("reddit.com/r//").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("reddit.com/r//")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -914,20 +906,20 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryDomainContainsWwwThenResultMathUrl() {
-        whenever(mockAutoCompleteService.autoComplete("reddit")).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+    fun whenSingleTokenQueryDomainContainsWwwThenResultMathUrl() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("reddit")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "Reddit", url = "https://www.reddit.com"),
                     bookmark(title = "duckduckgo", url = "https://www.reddit.com/r/duckduckgo"),
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete("reddit").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("reddit")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -943,11 +935,11 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenMultipleTokenQueryAndNoTokenMatchThenReturnDefault() {
+    fun whenMultipleTokenQueryAndNoTokenMatchThenReturnDefault() = runTest {
         val query = "example title foo"
-        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
                     bookmark(title = "title example", url = "https://example.com"),
                     bookmark(title = "title bar", url = "https://bar.com"),
@@ -956,75 +948,83 @@ class AutoCompleteApiTest {
                 ),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete(query).test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete(query)
+        val value = result.first()
 
         assertEquals(listOf<AutoCompleteSuggestion>(AutoCompleteDefaultSuggestion("example title foo")), value.suggestions)
     }
 
     @Test
-    fun whenMultipleTokenQueryAndMultipleMatchesThenReturnCorrectScore() {
-        runTest {
-            val query = "title foo"
-            whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(
-                    listOf(
-                        bookmark(title = "title example", url = "https://example.com"),
-                        bookmark(title = "title bar", url = "https://bar.com"),
-                        bookmark(title = "the title foo", url = "https://foo.com"),
-                        bookmark(title = "title foo baz", url = "https://baz.com"),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-
-            val result = testee.autoComplete(query).test()
-            val value = result.values()[0] as AutoCompleteResult
-
-            assertEquals(
+    fun whenMultipleTokenQueryAndMultipleMatchesThenReturnCorrectScore() = runTest {
+        val query = "title foo"
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(
-                    AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
-                    AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
+                    bookmark(title = "title example", url = "https://example.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
                 ),
-                value.suggestions,
-            )
-        }
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete(query)
+        val value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
+            ),
+            value.suggestions,
+        )
     }
 
     @Test
-    fun whenAutoCompleteQueryIsCapitalizedButResultsAreNotThenIgnoreCapitalization() {
+    fun whenAutoCompleteQueryIsCapitalizedButResultsAreNotThenIgnoreCapitalization() = runTest {
         whenever(mockAutoCompleteService.autoComplete("Title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("foo", isNav = false),
-                ),
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
             ),
         )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
                 listOf(),
             ),
         )
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
                 listOf(),
             ),
         )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
-                    VisitedPage(title = "Title", url = "https://example.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                    VisitedPage(title = "Title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                    VisitedPage(title = "Title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://example.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://foo.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://bar.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
                 ),
             ),
         )
 
-        val result = testee.autoComplete("Title").test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete("Title")
+        val value = result.first()
 
         assertEquals(
             listOf(
@@ -1038,48 +1038,56 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteQueryIsNotCapitalizedButResultsAreThenIgnoreCapitalization() {
-        runTest {
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-                Observable.just(
-                    listOf(
-                        AutoCompleteServiceRawResult("foo", isNav = false),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-                Single.just(
-                    listOf(),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(
-                    listOf(),
-                ),
-            )
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(
-                    listOf(
-                        VisitedPage(title = "Title", url = "https://example.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "Title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "Title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                    ),
-                ),
-            )
-
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
-
-            assertEquals(
+    fun whenAutoCompleteQueryIsNotCapitalizedButResultsAreThenIgnoreCapitalization() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("foo", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
                 listOf(
-                    AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
-                    AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
-                    AutoCompleteSearchSuggestion("foo", false),
-                    AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://example.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://foo.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                    VisitedPage(
+                        title = "Title",
+                        url = "https://bar.com".toUri(),
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
                 ),
-                value.suggestions,
-            )
-        }
+            ),
+        )
+
+        val result = testee.autoComplete("title")
+        val value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
+                AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
+            ),
+            value.suggestions,
+        )
     }
 
     @Test
@@ -1087,21 +1095,29 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(
                     listOf(
-                        VisitedPage(title = "title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://bar.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://foo.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
                     ),
                 ),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
 
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
+            val result = testee.autoComplete("title")
+            val value = result.first()
 
             assertEquals(
                 listOf(
@@ -1119,21 +1135,29 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(
                     listOf(
-                        VisitedPage(title = "title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://bar.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://foo.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
                     ),
                 ),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
+            val result = testee.autoComplete("title")
+            val value = result.first()
 
             assertEquals(
                 listOf(
@@ -1150,20 +1174,28 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(3)
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(
                     listOf(
-                        VisitedPage(title = "title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://bar.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://foo.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
                     ),
                 ),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
 
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
+            val result = testee.autoComplete("title")
+            val value = result.first()
 
             assertEquals(
                 listOf(
@@ -1180,20 +1212,28 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(true)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(
                     listOf(
-                        VisitedPage(title = "title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
-                        VisitedPage(title = "title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://bar.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
+                        VisitedPage(
+                            title = "title",
+                            url = "https://foo.com".toUri(),
+                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                        ),
                     ),
                 ),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
 
-            val result = testee.autoComplete("title").test()
-            val value = result.values()[0] as AutoCompleteResult
+            val result = testee.autoComplete("title")
+            val value = result.first()
 
             assertEquals(
                 listOf(
@@ -1215,32 +1255,17 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenInterruptedIOExceptionThenReturnEmptyObservable() {
+    fun whenOtherExceptionThenReturnDefaultSuggestion() = runTest {
         val query = "example title foo"
-        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.error(InterruptedIOException()))
+        whenever(mockAutoCompleteService.autoComplete(query)).thenThrow(RuntimeException())
 
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
 
-        val result = testee.autoComplete(query).test()
-
-        result.assertNoValues()
-        result.assertComplete()
-    }
-
-    @Test
-    fun whenOtherExceptionThenReturnDefaultSuggestion() {
-        val query = "example title foo"
-        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.error(RuntimeException()))
-
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
-
-        val result = testee.autoComplete(query).test()
-        val value = result.values()[0] as AutoCompleteResult
+        val result = testee.autoComplete(query)
+        val value = result.first()
 
         assertEquals(listOf<AutoCompleteSuggestion>(AutoCompleteDefaultSuggestion(query)), value.suggestions)
-        result.assertComplete()
     }
 
     private fun favorite(
