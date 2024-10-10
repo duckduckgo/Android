@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Järgmine</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">All</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Kergesti ligipääsetav</string>
+    <string name="highlightsOnboardingSearchQueryOption4">pardipojad</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati privaatsed.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>

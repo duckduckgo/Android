@@ -802,6 +802,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Naslednji</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodaj</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Preprosto dosegljivo</string>
+    <string name="highlightsOnboardingSearchQueryOption4">račke</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno zasebna.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je iskanje <b>DuckDuckGo Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>

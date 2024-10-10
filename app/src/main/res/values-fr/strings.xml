@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Suivant</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">En bas</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Facile d\'accès</string>
+    <string name="highlightsOnboardingSearchQueryOption4">bébés canetons</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[C\'est <b>DuckDuckGo Search !</b> Privé. Rapide. Moins de publicités.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>

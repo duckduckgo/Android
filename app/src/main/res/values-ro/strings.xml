@@ -800,6 +800,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Următorul</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
+    <string name="highlightsOnboardingSearchQueryOption4">rățuște</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
