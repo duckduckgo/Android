@@ -227,7 +227,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
-        Timber.d("Omnibar: onViewModeChanged $viewMode")
         when (viewMode) {
             is CustomTab -> {
                 _viewState.update {
@@ -396,7 +395,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onExternalStateChange(stateChange: StateChange) {
-        Timber.d("Omnibar: onExternalStateChange $stateChange")
         when (stateChange) {
             is OmnibarStateChange -> onExternalOmnibarStateChanged(stateChange.omnibarViewState)
             is StateChange.LoadingStateChange -> onExternalLoadingStateChanged(stateChange.loadingViewState)
