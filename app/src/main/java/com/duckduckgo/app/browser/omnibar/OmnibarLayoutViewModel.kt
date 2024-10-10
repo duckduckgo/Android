@@ -180,7 +180,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
-    private fun leadingIconState(url: String?): LeadingIconState {
+    private fun leadingIconState(url: String): LeadingIconState {
         return when (_viewState.value.viewMode) {
             Error -> GLOBE
             NewTab -> SEARCH
@@ -191,12 +191,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                 } else if (shouldShowDuckPlayerIcon(url)) {
                     DUCK_PLAYER
                 } else {
-                    if (url != null) {
-                        if (url.isEmpty()) {
-                            SEARCH
-                        } else {
-                            PRIVACY_SHIELD
-                        }
+                    if (url.isEmpty()) {
+                        SEARCH
                     } else {
                         PRIVACY_SHIELD
                     }
