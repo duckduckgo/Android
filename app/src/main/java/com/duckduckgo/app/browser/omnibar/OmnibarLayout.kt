@@ -84,7 +84,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -221,7 +220,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
         viewModel.viewState
             .onEach { render(it) }
-            .distinctUntilChanged()
             .launchIn(coroutineScope!!)
 
         viewModel.commands()
@@ -343,7 +341,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
         renderButtons(viewState)
-        renderLeadingIconState(viewState.leadingIconState)
     }
 
     private fun processCommand(command: OmnibarLayoutViewModel.Command) {
@@ -413,7 +410,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
-        Timber.d("Omnibar: browserMode $viewState")
+        Timber.d("Omnibar: render browserMode $viewState")
         renderOutline(viewState.hasFocus)
         if (viewState.updateOmnibarText) {
             omnibarTextInput.setText(viewState.omnibarText)
@@ -429,6 +426,7 @@ class OmnibarLayout @JvmOverloads constructor(
             renderTabIcon(viewState.tabs)
         }
         renderPulseAnimation(viewState)
+        renderLeadingIconState(viewState.leadingIconState)
     }
 
     private fun renderCustomTabMode(
@@ -496,6 +494,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun reduceDeferred(stateChange: StateChange) {
+        Timber.d("Omnibar: stateChange $stateChange")
         when (stateChange) {
             is StateChange.LoadingStateChange -> {
                 viewModel.onExternalStateChange(stateChange)

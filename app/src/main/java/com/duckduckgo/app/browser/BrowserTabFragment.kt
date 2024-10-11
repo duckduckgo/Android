@@ -898,7 +898,9 @@ class BrowserTabFragment :
     }
 
     private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
-        viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
+        }
         viewModel.triggerAutocomplete(text, hasFocus, true)
     }
 
@@ -2475,7 +2477,9 @@ class BrowserTabFragment :
                 }
 
                 override fun onTouchEvent(event: MotionEvent) {
-                    viewModel.onUserTouchedOmnibarTextInput(event.action)
+                    if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+                        viewModel.onUserTouchedOmnibarTextInput(event.action)
+                    }
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
@@ -2497,7 +2501,9 @@ class BrowserTabFragment :
         hasFocus: Boolean,
         query: String,
     ) {
-        viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
+        }
         viewModel.triggerAutocomplete(query, hasFocus, false)
         if (hasFocus) {
             cancelPendingAutofillRequestsToChooseCredentials()
