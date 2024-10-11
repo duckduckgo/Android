@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>
     <string name="duck_player_unavailable_description">Η λειτουργία του Duck Player έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σας.</string>
     <string name="duck_player_unavailable_learn_more">Μάθετε περισσότερα</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Ανοίξτε το Duck Player σε νέα καρτέλα όποτε είναι εφικτό</string>
 </resources>
