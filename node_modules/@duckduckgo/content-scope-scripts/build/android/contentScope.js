@@ -13,7 +13,6 @@
     const objectDefineProperty = Object.defineProperty;
     const URL$1 = globalThis.URL;
     const Proxy$1 = globalThis.Proxy;
-    const functionToString = Function.prototype.toString;
 
     /* global cloneInto, exportFunction, false */
 
@@ -22,8 +21,6 @@
     let globalObj = typeof window === 'undefined' ? globalThis : window;
     let Error$1 = globalObj.Error;
     let messageSecret;
-
-    const taintSymbol = Symbol('taint');
 
     // save a reference to original CustomEvent amd dispatchEvent so they can't be overriden to forge messages
     const OriginalCustomEvent = typeof CustomEvent === 'undefined' ? null : CustomEvent;
@@ -305,64 +302,6 @@
         return new Error$1().stack
     }
 
-    function getContextId (scope) {
-        if (document?.currentScript && 'contextID' in document.currentScript) {
-            return document.currentScript.contextID
-        }
-        if (scope.contextID) {
-            return scope.contextID
-        }
-        // @ts-expect-error - contextID is a global variable
-        if (typeof contextID !== 'undefined') {
-            // @ts-expect-error - contextID is a global variable
-            // eslint-disable-next-line no-undef
-            return contextID
-        }
-    }
-
-    /**
-     * Returns a set of origins that are tainted
-     * @returns {Set<string> | null}
-     */
-    function taintedOrigins () {
-        return getGlobalObject('taintedOrigins')
-    }
-
-    /**
-     * @param {string} name
-     * @returns {any | null}
-     */
-    function getGlobalObject (name) {
-        if ('duckduckgo' in navigator &&
-            typeof navigator.duckduckgo === 'object' &&
-            navigator.duckduckgo &&
-            name in navigator.duckduckgo &&
-            navigator.duckduckgo[name]) {
-            return navigator.duckduckgo[name]
-        }
-        return null
-    }
-
-    function hasTaintedMethod (scope, shouldStackCheck = false) {
-        if (document?.currentScript?.[taintSymbol]) return true
-        if ('__ddg_taint__' in window) return true
-        if (getContextId(scope)) return true
-        if (!shouldStackCheck || !taintedOrigins()) {
-            return false
-        }
-        const currentTaintedOrigins = taintedOrigins();
-        if (!currentTaintedOrigins || currentTaintedOrigins.size === 0) {
-            return false
-        }
-        const stackOrigins = getStackTraceOrigins(getStack());
-        for (const stackOrigin of stackOrigins) {
-            if (currentTaintedOrigins.has(stackOrigin)) {
-                return true
-            }
-        }
-        return false
-    }
-
     /**
      * @param {*[]} argsArray
      * @returns {string}
@@ -400,7 +339,7 @@
          * @param {string} property
          * @param {ProxyObject<P>} proxyObject
          */
-        constructor (feature, objectScope, property, proxyObject, taintCheck = false) {
+        constructor (feature, objectScope, property, proxyObject) {
             this.objectScope = objectScope;
             this.property = property;
             this.feature = feature;
@@ -408,19 +347,7 @@
             this.camelFeatureName = camelcase(this.featureName);
             const outputHandler = (...args) => {
                 this.feature.addDebugFlag();
-                let isExempt = shouldExemptMethod(this.camelFeatureName);
-                // If taint checking is enabled for this proxy then we should verify that the method is not tainted and exempt if it isn't
-                if (!isExempt && taintCheck) {
-                    // eslint-disable-next-line @typescript-eslint/no-this-alias
-                    let scope = this;
-                    try {
-                        // @ts-expect-error - Caller doesn't match this
-                        // eslint-disable-next-line no-caller
-                        scope = arguments.callee.caller;
-                    } catch {}
-                    const isTainted = hasTaintedMethod(scope);
-                    isExempt = !isTainted;
-                }
+                const isExempt = shouldExemptMethod(this.camelFeatureName);
                 // Keep this here as getStack() is expensive
                 if (debug) {
                     postDebugMessage(this.camelFeatureName, {
@@ -732,7 +659,6 @@
     }
 
     const baseFeatures = /** @type {const} */([
-        'runtimeChecks',
         'fingerprintingAudio',
         'fingerprintingBattery',
         'fingerprintingCanvas',
@@ -856,6 +782,678 @@
         measure () {
             performance.measure(this.name, this.name + 'Start', this.name + 'End');
         }
+    }
+
+    // @ts-nocheck
+        const sjcl = (() => {
+    /*jslint indent: 2, bitwise: false, nomen: false, plusplus: false, white: false, regexp: false */
+    /*global document, window, escape, unescape, module, require, Uint32Array */
+
+    /**
+     * The Stanford Javascript Crypto Library, top-level namespace.
+     * @namespace
+     */
+    var sjcl = {
+      /**
+       * Symmetric ciphers.
+       * @namespace
+       */
+      cipher: {},
+
+      /**
+       * Hash functions.  Right now only SHA256 is implemented.
+       * @namespace
+       */
+      hash: {},
+
+      /**
+       * Key exchange functions.  Right now only SRP is implemented.
+       * @namespace
+       */
+      keyexchange: {},
+      
+      /**
+       * Cipher modes of operation.
+       * @namespace
+       */
+      mode: {},
+
+      /**
+       * Miscellaneous.  HMAC and PBKDF2.
+       * @namespace
+       */
+      misc: {},
+      
+      /**
+       * Bit array encoders and decoders.
+       * @namespace
+       *
+       * @description
+       * The members of this namespace are functions which translate between
+       * SJCL's bitArrays and other objects (usually strings).  Because it
+       * isn't always clear which direction is encoding and which is decoding,
+       * the method names are "fromBits" and "toBits".
+       */
+      codec: {},
+      
+      /**
+       * Exceptions.
+       * @namespace
+       */
+      exception: {
+        /**
+         * Ciphertext is corrupt.
+         * @constructor
+         */
+        corrupt: function(message) {
+          this.toString = function() { return "CORRUPT: "+this.message; };
+          this.message = message;
+        },
+        
+        /**
+         * Invalid parameter.
+         * @constructor
+         */
+        invalid: function(message) {
+          this.toString = function() { return "INVALID: "+this.message; };
+          this.message = message;
+        },
+        
+        /**
+         * Bug or missing feature in SJCL.
+         * @constructor
+         */
+        bug: function(message) {
+          this.toString = function() { return "BUG: "+this.message; };
+          this.message = message;
+        },
+
+        /**
+         * Something isn't ready.
+         * @constructor
+         */
+        notReady: function(message) {
+          this.toString = function() { return "NOT READY: "+this.message; };
+          this.message = message;
+        }
+      }
+    };
+    /** @fileOverview Arrays of bits, encoded as arrays of Numbers.
+     *
+     * @author Emily Stark
+     * @author Mike Hamburg
+     * @author Dan Boneh
+     */
+
+    /**
+     * Arrays of bits, encoded as arrays of Numbers.
+     * @namespace
+     * @description
+     * <p>
+     * These objects are the currency accepted by SJCL's crypto functions.
+     * </p>
+     *
+     * <p>
+     * Most of our crypto primitives operate on arrays of 4-byte words internally,
+     * but many of them can take arguments that are not a multiple of 4 bytes.
+     * This library encodes arrays of bits (whose size need not be a multiple of 8
+     * bits) as arrays of 32-bit words.  The bits are packed, big-endian, into an
+     * array of words, 32 bits at a time.  Since the words are double-precision
+     * floating point numbers, they fit some extra data.  We use this (in a private,
+     * possibly-changing manner) to encode the number of bits actually  present
+     * in the last word of the array.
+     * </p>
+     *
+     * <p>
+     * Because bitwise ops clear this out-of-band data, these arrays can be passed
+     * to ciphers like AES which want arrays of words.
+     * </p>
+     */
+    sjcl.bitArray = {
+      /**
+       * Array slices in units of bits.
+       * @param {bitArray} a The array to slice.
+       * @param {Number} bstart The offset to the start of the slice, in bits.
+       * @param {Number} bend The offset to the end of the slice, in bits.  If this is undefined,
+       * slice until the end of the array.
+       * @return {bitArray} The requested slice.
+       */
+      bitSlice: function (a, bstart, bend) {
+        a = sjcl.bitArray._shiftRight(a.slice(bstart/32), 32 - (bstart & 31)).slice(1);
+        return (bend === undefined) ? a : sjcl.bitArray.clamp(a, bend-bstart);
+      },
+
+      /**
+       * Extract a number packed into a bit array.
+       * @param {bitArray} a The array to slice.
+       * @param {Number} bstart The offset to the start of the slice, in bits.
+       * @param {Number} blength The length of the number to extract.
+       * @return {Number} The requested slice.
+       */
+      extract: function(a, bstart, blength) {
+        // FIXME: this Math.floor is not necessary at all, but for some reason
+        // seems to suppress a bug in the Chromium JIT.
+        var x, sh = Math.floor((-bstart-blength) & 31);
+        if ((bstart + blength - 1 ^ bstart) & -32) {
+          // it crosses a boundary
+          x = (a[bstart/32|0] << (32 - sh)) ^ (a[bstart/32+1|0] >>> sh);
+        } else {
+          // within a single word
+          x = a[bstart/32|0] >>> sh;
+        }
+        return x & ((1<<blength) - 1);
+      },
+
+      /**
+       * Concatenate two bit arrays.
+       * @param {bitArray} a1 The first array.
+       * @param {bitArray} a2 The second array.
+       * @return {bitArray} The concatenation of a1 and a2.
+       */
+      concat: function (a1, a2) {
+        if (a1.length === 0 || a2.length === 0) {
+          return a1.concat(a2);
+        }
+        
+        var last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
+        if (shift === 32) {
+          return a1.concat(a2);
+        } else {
+          return sjcl.bitArray._shiftRight(a2, shift, last|0, a1.slice(0,a1.length-1));
+        }
+      },
+
+      /**
+       * Find the length of an array of bits.
+       * @param {bitArray} a The array.
+       * @return {Number} The length of a, in bits.
+       */
+      bitLength: function (a) {
+        var l = a.length, x;
+        if (l === 0) { return 0; }
+        x = a[l - 1];
+        return (l-1) * 32 + sjcl.bitArray.getPartial(x);
+      },
+
+      /**
+       * Truncate an array.
+       * @param {bitArray} a The array.
+       * @param {Number} len The length to truncate to, in bits.
+       * @return {bitArray} A new array, truncated to len bits.
+       */
+      clamp: function (a, len) {
+        if (a.length * 32 < len) { return a; }
+        a = a.slice(0, Math.ceil(len / 32));
+        var l = a.length;
+        len = len & 31;
+        if (l > 0 && len) {
+          a[l-1] = sjcl.bitArray.partial(len, a[l-1] & 0x80000000 >> (len-1), 1);
+        }
+        return a;
+      },
+
+      /**
+       * Make a partial word for a bit array.
+       * @param {Number} len The number of bits in the word.
+       * @param {Number} x The bits.
+       * @param {Number} [_end=0] Pass 1 if x has already been shifted to the high side.
+       * @return {Number} The partial word.
+       */
+      partial: function (len, x, _end) {
+        if (len === 32) { return x; }
+        return (_end ? x|0 : x << (32-len)) + len * 0x10000000000;
+      },
+
+      /**
+       * Get the number of bits used by a partial word.
+       * @param {Number} x The partial word.
+       * @return {Number} The number of bits used by the partial word.
+       */
+      getPartial: function (x) {
+        return Math.round(x/0x10000000000) || 32;
+      },
+
+      /**
+       * Compare two arrays for equality in a predictable amount of time.
+       * @param {bitArray} a The first array.
+       * @param {bitArray} b The second array.
+       * @return {boolean} true if a == b; false otherwise.
+       */
+      equal: function (a, b) {
+        if (sjcl.bitArray.bitLength(a) !== sjcl.bitArray.bitLength(b)) {
+          return false;
+        }
+        var x = 0, i;
+        for (i=0; i<a.length; i++) {
+          x |= a[i]^b[i];
+        }
+        return (x === 0);
+      },
+
+      /** Shift an array right.
+       * @param {bitArray} a The array to shift.
+       * @param {Number} shift The number of bits to shift.
+       * @param {Number} [carry=0] A byte to carry in
+       * @param {bitArray} [out=[]] An array to prepend to the output.
+       * @private
+       */
+      _shiftRight: function (a, shift, carry, out) {
+        var i, last2=0, shift2;
+        if (out === undefined) { out = []; }
+        
+        for (; shift >= 32; shift -= 32) {
+          out.push(carry);
+          carry = 0;
+        }
+        if (shift === 0) {
+          return out.concat(a);
+        }
+        
+        for (i=0; i<a.length; i++) {
+          out.push(carry | a[i]>>>shift);
+          carry = a[i] << (32-shift);
+        }
+        last2 = a.length ? a[a.length-1] : 0;
+        shift2 = sjcl.bitArray.getPartial(last2);
+        out.push(sjcl.bitArray.partial(shift+shift2 & 31, (shift + shift2 > 32) ? carry : out.pop(),1));
+        return out;
+      },
+      
+      /** xor a block of 4 words together.
+       * @private
+       */
+      _xor4: function(x,y) {
+        return [x[0]^y[0],x[1]^y[1],x[2]^y[2],x[3]^y[3]];
+      },
+
+      /** byteswap a word array inplace.
+       * (does not handle partial words)
+       * @param {sjcl.bitArray} a word array
+       * @return {sjcl.bitArray} byteswapped array
+       */
+      byteswapM: function(a) {
+        var i, v, m = 0xff00;
+        for (i = 0; i < a.length; ++i) {
+          v = a[i];
+          a[i] = (v >>> 24) | ((v >>> 8) & m) | ((v & m) << 8) | (v << 24);
+        }
+        return a;
+      }
+    };
+    /** @fileOverview Bit array codec implementations.
+     *
+     * @author Emily Stark
+     * @author Mike Hamburg
+     * @author Dan Boneh
+     */
+
+    /**
+     * UTF-8 strings
+     * @namespace
+     */
+    sjcl.codec.utf8String = {
+      /** Convert from a bitArray to a UTF-8 string. */
+      fromBits: function (arr) {
+        var out = "", bl = sjcl.bitArray.bitLength(arr), i, tmp;
+        for (i=0; i<bl/8; i++) {
+          if ((i&3) === 0) {
+            tmp = arr[i/4];
+          }
+          out += String.fromCharCode(tmp >>> 8 >>> 8 >>> 8);
+          tmp <<= 8;
+        }
+        return decodeURIComponent(escape(out));
+      },
+
+      /** Convert from a UTF-8 string to a bitArray. */
+      toBits: function (str) {
+        str = unescape(encodeURIComponent(str));
+        var out = [], i, tmp=0;
+        for (i=0; i<str.length; i++) {
+          tmp = tmp << 8 | str.charCodeAt(i);
+          if ((i&3) === 3) {
+            out.push(tmp);
+            tmp = 0;
+          }
+        }
+        if (i&3) {
+          out.push(sjcl.bitArray.partial(8*(i&3), tmp));
+        }
+        return out;
+      }
+    };
+    /** @fileOverview Bit array codec implementations.
+     *
+     * @author Emily Stark
+     * @author Mike Hamburg
+     * @author Dan Boneh
+     */
+
+    /**
+     * Hexadecimal
+     * @namespace
+     */
+    sjcl.codec.hex = {
+      /** Convert from a bitArray to a hex string. */
+      fromBits: function (arr) {
+        var out = "", i;
+        for (i=0; i<arr.length; i++) {
+          out += ((arr[i]|0)+0xF00000000000).toString(16).substr(4);
+        }
+        return out.substr(0, sjcl.bitArray.bitLength(arr)/4);//.replace(/(.{8})/g, "$1 ");
+      },
+      /** Convert from a hex string to a bitArray. */
+      toBits: function (str) {
+        var i, out=[], len;
+        str = str.replace(/\s|0x/g, "");
+        len = str.length;
+        str = str + "00000000";
+        for (i=0; i<str.length; i+=8) {
+          out.push(parseInt(str.substr(i,8),16)^0);
+        }
+        return sjcl.bitArray.clamp(out, len*4);
+      }
+    };
+
+    /** @fileOverview Javascript SHA-256 implementation.
+     *
+     * An older version of this implementation is available in the public
+     * domain, but this one is (c) Emily Stark, Mike Hamburg, Dan Boneh,
+     * Stanford University 2008-2010 and BSD-licensed for liability
+     * reasons.
+     *
+     * Special thanks to Aldo Cortesi for pointing out several bugs in
+     * this code.
+     *
+     * @author Emily Stark
+     * @author Mike Hamburg
+     * @author Dan Boneh
+     */
+
+    /**
+     * Context for a SHA-256 operation in progress.
+     * @constructor
+     */
+    sjcl.hash.sha256 = function (hash) {
+      if (!this._key[0]) { this._precompute(); }
+      if (hash) {
+        this._h = hash._h.slice(0);
+        this._buffer = hash._buffer.slice(0);
+        this._length = hash._length;
+      } else {
+        this.reset();
+      }
+    };
+
+    /**
+     * Hash a string or an array of words.
+     * @static
+     * @param {bitArray|String} data the data to hash.
+     * @return {bitArray} The hash value, an array of 16 big-endian words.
+     */
+    sjcl.hash.sha256.hash = function (data) {
+      return (new sjcl.hash.sha256()).update(data).finalize();
+    };
+
+    sjcl.hash.sha256.prototype = {
+      /**
+       * The hash's block size, in bits.
+       * @constant
+       */
+      blockSize: 512,
+       
+      /**
+       * Reset the hash state.
+       * @return this
+       */
+      reset:function () {
+        this._h = this._init.slice(0);
+        this._buffer = [];
+        this._length = 0;
+        return this;
+      },
+      
+      /**
+       * Input several words to the hash.
+       * @param {bitArray|String} data the data to hash.
+       * @return this
+       */
+      update: function (data) {
+        if (typeof data === "string") {
+          data = sjcl.codec.utf8String.toBits(data);
+        }
+        var i, b = this._buffer = sjcl.bitArray.concat(this._buffer, data),
+            ol = this._length,
+            nl = this._length = ol + sjcl.bitArray.bitLength(data);
+        if (nl > 9007199254740991){
+          throw new sjcl.exception.invalid("Cannot hash more than 2^53 - 1 bits");
+        }
+
+        if (typeof Uint32Array !== 'undefined') {
+    	var c = new Uint32Array(b);
+        	var j = 0;
+        	for (i = 512+ol - ((512+ol) & 511); i <= nl; i+= 512) {
+          	    this._block(c.subarray(16 * j, 16 * (j+1)));
+          	    j += 1;
+        	}
+        	b.splice(0, 16 * j);
+        } else {
+    	for (i = 512+ol - ((512+ol) & 511); i <= nl; i+= 512) {
+          	    this._block(b.splice(0,16));
+          	}
+        }
+        return this;
+      },
+      
+      /**
+       * Complete hashing and output the hash value.
+       * @return {bitArray} The hash value, an array of 8 big-endian words.
+       */
+      finalize:function () {
+        var i, b = this._buffer, h = this._h;
+
+        // Round out and push the buffer
+        b = sjcl.bitArray.concat(b, [sjcl.bitArray.partial(1,1)]);
+        
+        // Round out the buffer to a multiple of 16 words, less the 2 length words.
+        for (i = b.length + 2; i & 15; i++) {
+          b.push(0);
+        }
+        
+        // append the length
+        b.push(Math.floor(this._length / 0x100000000));
+        b.push(this._length | 0);
+
+        while (b.length) {
+          this._block(b.splice(0,16));
+        }
+
+        this.reset();
+        return h;
+      },
+
+      /**
+       * The SHA-256 initialization vector, to be precomputed.
+       * @private
+       */
+      _init:[],
+      /*
+      _init:[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19],
+      */
+      
+      /**
+       * The SHA-256 hash key, to be precomputed.
+       * @private
+       */
+      _key:[],
+      /*
+      _key:
+        [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+         0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+         0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+         0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+         0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+         0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2],
+      */
+
+
+      /**
+       * Function to precompute _init and _key.
+       * @private
+       */
+      _precompute: function () {
+        var i = 0, prime = 2, factor, isPrime;
+
+        function frac(x) { return (x-Math.floor(x)) * 0x100000000 | 0; }
+
+        for (; i<64; prime++) {
+          isPrime = true;
+          for (factor=2; factor*factor <= prime; factor++) {
+            if (prime % factor === 0) {
+              isPrime = false;
+              break;
+            }
+          }
+          if (isPrime) {
+            if (i<8) {
+              this._init[i] = frac(Math.pow(prime, 1/2));
+            }
+            this._key[i] = frac(Math.pow(prime, 1/3));
+            i++;
+          }
+        }
+      },
+      
+      /**
+       * Perform one cycle of SHA-256.
+       * @param {Uint32Array|bitArray} w one block of words.
+       * @private
+       */
+      _block:function (w) {  
+        var i, tmp, a, b,
+          h = this._h,
+          k = this._key,
+          h0 = h[0], h1 = h[1], h2 = h[2], h3 = h[3],
+          h4 = h[4], h5 = h[5], h6 = h[6], h7 = h[7];
+
+        /* Rationale for placement of |0 :
+         * If a value can overflow is original 32 bits by a factor of more than a few
+         * million (2^23 ish), there is a possibility that it might overflow the
+         * 53-bit mantissa and lose precision.
+         *
+         * To avoid this, we clamp back to 32 bits by |'ing with 0 on any value that
+         * propagates around the loop, and on the hash state h[].  I don't believe
+         * that the clamps on h4 and on h0 are strictly necessary, but it's close
+         * (for h4 anyway), and better safe than sorry.
+         *
+         * The clamps on h[] are necessary for the output to be correct even in the
+         * common case and for short inputs.
+         */
+        for (i=0; i<64; i++) {
+          // load up the input word for this round
+          if (i<16) {
+            tmp = w[i];
+          } else {
+            a   = w[(i+1 ) & 15];
+            b   = w[(i+14) & 15];
+            tmp = w[i&15] = ((a>>>7  ^ a>>>18 ^ a>>>3  ^ a<<25 ^ a<<14) + 
+                             (b>>>17 ^ b>>>19 ^ b>>>10 ^ b<<15 ^ b<<13) +
+                             w[i&15] + w[(i+9) & 15]) | 0;
+          }
+          
+          tmp = (tmp + h7 + (h4>>>6 ^ h4>>>11 ^ h4>>>25 ^ h4<<26 ^ h4<<21 ^ h4<<7) +  (h6 ^ h4&(h5^h6)) + k[i]); // | 0;
+          
+          // shift register
+          h7 = h6; h6 = h5; h5 = h4;
+          h4 = h3 + tmp | 0;
+          h3 = h2; h2 = h1; h1 = h0;
+
+          h0 = (tmp +  ((h1&h2) ^ (h3&(h1^h2))) + (h1>>>2 ^ h1>>>13 ^ h1>>>22 ^ h1<<30 ^ h1<<19 ^ h1<<10)) | 0;
+        }
+
+        h[0] = h[0]+h0 | 0;
+        h[1] = h[1]+h1 | 0;
+        h[2] = h[2]+h2 | 0;
+        h[3] = h[3]+h3 | 0;
+        h[4] = h[4]+h4 | 0;
+        h[5] = h[5]+h5 | 0;
+        h[6] = h[6]+h6 | 0;
+        h[7] = h[7]+h7 | 0;
+      }
+    };
+
+
+    /** @fileOverview HMAC implementation.
+     *
+     * @author Emily Stark
+     * @author Mike Hamburg
+     * @author Dan Boneh
+     */
+
+    /** HMAC with the specified hash function.
+     * @constructor
+     * @param {bitArray} key the key for HMAC.
+     * @param {Object} [Hash=sjcl.hash.sha256] The hash function to use.
+     */
+    sjcl.misc.hmac = function (key, Hash) {
+      this._hash = Hash = Hash || sjcl.hash.sha256;
+      var exKey = [[],[]], i,
+          bs = Hash.prototype.blockSize / 32;
+      this._baseHash = [new Hash(), new Hash()];
+
+      if (key.length > bs) {
+        key = Hash.hash(key);
+      }
+      
+      for (i=0; i<bs; i++) {
+        exKey[0][i] = key[i]^0x36363636;
+        exKey[1][i] = key[i]^0x5C5C5C5C;
+      }
+      
+      this._baseHash[0].update(exKey[0]);
+      this._baseHash[1].update(exKey[1]);
+      this._resultHash = new Hash(this._baseHash[0]);
+    };
+
+    /** HMAC with the specified hash function.  Also called encrypt since it's a prf.
+     * @param {bitArray|String} data The data to mac.
+     */
+    sjcl.misc.hmac.prototype.encrypt = sjcl.misc.hmac.prototype.mac = function (data) {
+      if (!this._updated) {
+        this.update(data);
+        return this.digest(data);
+      } else {
+        throw new sjcl.exception.invalid("encrypt on already updated hmac called!");
+      }
+    };
+
+    sjcl.misc.hmac.prototype.reset = function () {
+      this._resultHash = new this._hash(this._baseHash[0]);
+      this._updated = false;
+    };
+
+    sjcl.misc.hmac.prototype.update = function (data) {
+      this._updated = true;
+      this._resultHash.update(data);
+    };
+
+    sjcl.misc.hmac.prototype.digest = function () {
+      var w = this._resultHash.finalize(), result = new (this._hash)(this._baseHash[1]).update(w).finalize();
+
+      this.reset();
+
+      return result;
+    };
+
+        return sjcl;
+      })();
+
+    function getDataKeySync (sessionKey, domainKey, inputData) {
+        // eslint-disable-next-line new-cap
+        const hmac = new sjcl.misc.hmac(sjcl.codec.utf8String.toBits(sessionKey + domainKey), sjcl.hash.sha256);
+        return sjcl.codec.hex.fromBits(hmac.encrypt(inputData))
     }
 
     function _typeof$2(obj) { "@babel/helpers - typeof"; return _typeof$2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof$2(obj); }
@@ -1396,33 +1994,6 @@
             }
             return Reflect.get(target, prop, receiver)
         }
-    }
-
-    /**
-     * Wrap functions to fix toString but also behave as closely to their real function as possible like .name and .length etc.
-     * TODO: validate with firefox non runtimeChecks context and also consolidate with wrapToString
-     * @param {*} functionValue
-     * @param {*} realTarget
-     * @returns {Proxy} a proxy for the function
-     */
-    function wrapFunction (functionValue, realTarget) {
-        return new Proxy(realTarget, {
-            get (target, prop, receiver) {
-                if (prop === 'toString') {
-                    const method = Reflect.get(target, prop, receiver).bind(target);
-                    Object.defineProperty(method, 'toString', {
-                        value: functionToString.bind(functionToString),
-                        enumerable: false
-                    });
-                    return method
-                }
-                return Reflect.get(target, prop, receiver)
-            },
-            apply (target, thisArg, argumentsList) {
-                // This is where we call our real function
-                return Reflect.apply(functionValue, thisArg, argumentsList)
-            }
-        })
     }
 
     /**
@@ -3669,1882 +4240,6 @@
         }
     }
 
-    function generateUniqueID () {
-        return Symbol(undefined)
-    }
-
-    function addTaint () {
-        const contextID = generateUniqueID();
-        if ('duckduckgo' in navigator &&
-            navigator.duckduckgo &&
-            typeof navigator.duckduckgo === 'object' &&
-            'taints' in navigator.duckduckgo &&
-            navigator.duckduckgo.taints instanceof Set) {
-            if (document.currentScript) {
-                // @ts-expect-error - contextID is undefined on currentScript
-                document.currentScript.contextID = contextID;
-            }
-            navigator?.duckduckgo?.taints.add(contextID);
-        }
-        return contextID
-    }
-
-    function createContextAwareFunction (fn) {
-        return function (...args) {
-            // eslint-disable-next-line @typescript-eslint/no-this-alias
-            let scope = this;
-            // Save the previous contextID and set the new one
-            const prevContextID = this?.contextID;
-            // @ts-expect-error - contextID is undefined on window
-            // eslint-disable-next-line no-undef
-            const changeToContextID = getContextId(this) || contextID;
-            if (typeof args[0] === 'function') {
-                args[0].contextID = changeToContextID;
-            }
-            // @ts-expect-error - scope doesn't match window
-            if (scope && scope !== globalThis) {
-                scope.contextID = changeToContextID;
-            } else if (!scope) {
-                scope = new Proxy(scope, {
-                    get (target, prop) {
-                        if (prop === 'contextID') {
-                            return changeToContextID
-                        }
-                        return Reflect.get(target, prop)
-                    }
-                });
-            }
-            // Run the original function with the new contextID
-            const result = Reflect.apply(fn, scope, args);
-
-            // Restore the previous contextID
-            scope.contextID = prevContextID;
-
-            return result
-        }
-    }
-
-    /**
-     * Indent a code block using braces
-     * @param {string} string
-     * @returns {string}
-     */
-    function removeIndent (string) {
-        const lines = string.split('\n');
-        const indentSize = 2;
-        let currentIndent = 0;
-        const indentedLines = lines.map((line) => {
-            if (line.trim().startsWith('}')) {
-                currentIndent -= indentSize;
-            }
-            const indentedLine = ' '.repeat(currentIndent) + line.trim();
-            if (line.trim().endsWith('{')) {
-                currentIndent += indentSize;
-            }
-
-            return indentedLine
-        });
-        return indentedLines.filter(a => a.trim()).join('\n')
-    }
-
-    const lookup = {};
-    function getOrGenerateIdentifier (path) {
-        if (!(path in lookup)) {
-            lookup[path] = generateAlphaIdentifier(Object.keys(lookup).length + 1);
-        }
-        return lookup[path]
-    }
-
-    function generateAlphaIdentifier (num) {
-        if (num < 1) {
-            throw new Error('Input must be a positive integer')
-        }
-        const charCodeOffset = 97;
-        let identifier = '';
-        while (num > 0) {
-            num--;
-            const remainder = num % 26;
-            const charCode = remainder + charCodeOffset;
-            identifier = String.fromCharCode(charCode) + identifier;
-            num = Math.floor(num / 26);
-        }
-        return '_ddg_' + identifier
-    }
-
-    /**
-     * @param {*} scope
-     * @param {Record<string, any>} outputs
-     * @returns {Proxy}
-     */
-    function constructProxy (scope, outputs) {
-        const taintString = '__ddg_taint__';
-        // @ts-expect-error - Expected 2 arguments, but got 1
-        if (Object.is(scope)) {
-            // Should not happen, but just in case fail safely
-            console.error('Runtime checks: Scope must be an object', scope, outputs);
-            return scope
-        }
-        return new Proxy(scope, {
-            get (target, property) {
-                const targetObj = target[property];
-                let targetOut = target;
-                if (typeof property === 'string' && property in outputs) {
-                    targetOut = outputs;
-                }
-                // Reflects functions with the correct 'this' scope
-                if (typeof targetObj === 'function') {
-                    return (...args) => {
-                        return Reflect.apply(targetOut[property], target, args)
-                    }
-                } else {
-                    return Reflect.get(targetOut, property, scope)
-                }
-            },
-            getOwnPropertyDescriptor (target, property) {
-                if (typeof property === 'string' && property === taintString) {
-                    return { configurable: true, enumerable: false, value: true }
-                }
-                return Reflect.getOwnPropertyDescriptor(target, property)
-            }
-        })
-    }
-
-    function valToString (val) {
-        if (typeof val === 'function') {
-            return val.toString()
-        }
-        return JSON.stringify(val)
-    }
-
-    /**
-     * Output scope variable definitions to arbitrary depth
-     */
-    function stringifyScope (scope, scopePath) {
-        let output = '';
-        for (const [key, value] of scope) {
-            const varOutName = getOrGenerateIdentifier([...scopePath, key]);
-            if (value instanceof Map) {
-                const proxyName = getOrGenerateIdentifier(['_proxyFor_', varOutName]);
-                output += `
-            let ${proxyName} = ${scopePath.join('?.')}?.${key} ? ${scopePath.join('.')}.${key} : Object.bind(null);
-            `;
-                const keys = Array.from(value.keys());
-                output += stringifyScope(value, [...scopePath, key]);
-                const proxyOut = keys.map((keyName) => `${keyName}: ${getOrGenerateIdentifier([...scopePath, key, keyName])}`);
-                output += `
-            let ${varOutName} = constructProxy(${proxyName}, {
-                ${proxyOut.join(',\n')}
-            });
-            `;
-                // If we're at the top level, we need to add the window and globalThis variables (Eg: let navigator = parentScope_navigator)
-                if (scopePath.length === 1) {
-                    output += `
-                let ${key} = ${varOutName};
-                `;
-                }
-            } else {
-                output += `
-            let ${varOutName} = ${valToString(value)};
-            `;
-            }
-        }
-        return output
-    }
-
-    /**
-     * Code generates wrapping variables for code that is injected into the page
-     * @param {*} code
-     * @param {*} config
-     * @returns {string}
-     */
-    function wrapScriptCodeOverload (code, config) {
-        const processedConfig = {};
-        for (const [key, value] of Object.entries(config)) {
-            processedConfig[key] = processAttr(value);
-        }
-        // Don't do anything if the config is empty
-        if (Object.keys(processedConfig).length === 0) return code
-
-        let prepend = '';
-        const aggregatedLookup = new Map();
-        let currentScope = null;
-        /* Convert the config into a map of scopePath -> { key: value } */
-        for (const [key, value] of Object.entries(processedConfig)) {
-            const path = key.split('.');
-
-            currentScope = aggregatedLookup;
-            const pathOut = path[path.length - 1];
-            // Traverse the path and create the nested objects
-            path.slice(0, -1).forEach((pathPart) => {
-                if (!currentScope.has(pathPart)) {
-                    currentScope.set(pathPart, new Map());
-                }
-                currentScope = currentScope.get(pathPart);
-            });
-            currentScope.set(pathOut, value);
-        }
-
-        prepend += stringifyScope(aggregatedLookup, ['parentScope']);
-        // Stringify top level keys
-        const keysOut = [...aggregatedLookup.keys()].map((keyName) => `${keyName}: ${getOrGenerateIdentifier(['parentScope', keyName])}`).join(',\n');
-        prepend += `
-    const window = constructProxy(parentScope, {
-        ${keysOut}
-    });
-    // Ensure globalThis === window
-    const globalThis = window
-    `;
-        return removeIndent(`(function (parentScope) {
-        /**
-         * DuckDuckGo Runtime Checks injected code.
-         * If you're reading this, you're probably trying to debug a site that is breaking due to our runtime checks.
-         * Please raise an issues on our GitHub repo: https://github.com/duckduckgo/content-scope-scripts/
-         */
-        ${constructProxy.toString()}
-        ${prepend}
-
-        ${getContextId.toString()}
-        ${generateUniqueID.toString()}
-        ${createContextAwareFunction.toString()}
-        ${addTaint.toString()}
-        const contextID = addTaint()
-        
-        const originalSetTimeout = setTimeout
-        setTimeout = createContextAwareFunction(originalSetTimeout)
-        
-        const originalSetInterval = setInterval
-        setInterval = createContextAwareFunction(originalSetInterval)
-        
-        const originalPromiseThen = Promise.prototype.then
-        Promise.prototype.then = createContextAwareFunction(originalPromiseThen)
-        
-        const originalPromiseCatch = Promise.prototype.catch
-        Promise.prototype.catch = createContextAwareFunction(originalPromiseCatch)
-        
-        const originalPromiseFinally = Promise.prototype.finally
-        Promise.prototype.finally = createContextAwareFunction(originalPromiseFinally)
-
-        ${code}
-    })(globalThis)
-    `)
-    }
-
-    /**
-     * @typedef {object} Sizing
-     * @property {number} height
-     * @property {number} width
-     */
-
-    /**
-     * @param {Sizing[]} breakpoints
-     * @param {Sizing} screenSize
-     * @returns { Sizing | null}
-     */
-    function findClosestBreakpoint (breakpoints, screenSize) {
-        let closestBreakpoint = null;
-        let closestDistance = Infinity;
-
-        for (let i = 0; i < breakpoints.length; i++) {
-            const breakpoint = breakpoints[i];
-            const distance = Math.sqrt(Math.pow(breakpoint.height - screenSize.height, 2) + Math.pow(breakpoint.width - screenSize.width, 2));
-
-            if (distance < closestDistance) {
-                closestBreakpoint = breakpoint;
-                closestDistance = distance;
-            }
-        }
-
-        return closestBreakpoint
-    }
-
-    /* global TrustedScriptURL, TrustedScript */
-
-
-    let stackDomains = [];
-    let matchAllStackDomains = false;
-    let taintCheck = false;
-    let initialCreateElement;
-    let tagModifiers = {};
-    let shadowDomEnabled = false;
-    let scriptOverload = {};
-    let replaceElement = false;
-    let monitorProperties = true;
-    // Ignore monitoring properties that are only relevant once and already handled
-    const defaultIgnoreMonitorList = ['onerror', 'onload'];
-    let ignoreMonitorList = defaultIgnoreMonitorList;
-
-    /**
-     * @param {string} tagName
-     * @param {'property' | 'attribute' | 'handler' | 'listener'} filterName
-     * @param {string} key
-     * @returns {boolean}
-     */
-    function shouldFilterKey (tagName, filterName, key) {
-        if (filterName === 'attribute') {
-            key = key.toLowerCase();
-        }
-        return tagModifiers?.[tagName]?.filters?.[filterName]?.includes(key)
-    }
-
-    // use a module-scoped variable to extract some methods from the class https://github.com/duckduckgo/content-scope-scripts/pull/654#discussion_r1277375832
-    /** @type {RuntimeChecks} */
-    let featureInstance$1;
-
-    let elementRemovalTimeout;
-    const supportedSinks = ['src'];
-    // Store the original methods so we can call them without any side effects
-    const defaultElementMethods = {
-        setAttribute: HTMLElement.prototype.setAttribute,
-        setAttributeNS: HTMLElement.prototype.setAttributeNS,
-        getAttribute: HTMLElement.prototype.getAttribute,
-        getAttributeNS: HTMLElement.prototype.getAttributeNS,
-        removeAttribute: HTMLElement.prototype.removeAttribute,
-        remove: HTMLElement.prototype.remove,
-        removeChild: HTMLElement.prototype.removeChild
-    };
-    const supportedTrustedTypes = 'TrustedScriptURL' in window;
-
-    const jsMimeTypes = [
-        'text/javascript',
-        'text/ecmascript',
-        'application/javascript',
-        'application/ecmascript',
-        'application/x-javascript',
-        'application/x-ecmascript',
-        'text/javascript1.0',
-        'text/javascript1.1',
-        'text/javascript1.2',
-        'text/javascript1.3',
-        'text/javascript1.4',
-        'text/javascript1.5',
-        'text/jscript',
-        'text/livescript',
-        'text/x-ecmascript',
-        'text/x-javascript'
-    ];
-
-    function getTaintFromScope (scope, args, shouldStackCheck = false) {
-        try {
-            scope = args.callee.caller;
-        } catch {}
-        return hasTaintedMethod(scope, shouldStackCheck)
-    }
-
-    class DDGRuntimeChecks extends HTMLElement {
-        #tagName
-        #el
-        #listeners
-        #connected
-        #sinks
-        #debug
-
-        constructor () {
-            super();
-            this.#tagName = null;
-            this.#el = null;
-            this.#listeners = [];
-            this.#connected = false;
-            this.#sinks = {};
-            this.#debug = false;
-            if (shadowDomEnabled) {
-                const shadow = this.attachShadow({ mode: 'open' });
-                const style = createStyleElement(`
-                :host {
-                    display: none;
-                }
-            `);
-                shadow.appendChild(style);
-            }
-        }
-
-        /**
-         * This method is called once and externally so has to remain public.
-         **/
-        setTagName (tagName, debug = false) {
-            this.#tagName = tagName;
-            this.#debug = debug;
-
-            // Clear the method so it can't be called again
-            // @ts-expect-error - error TS2790: The operand of a 'delete' operator must be optional.
-            delete this.setTagName;
-        }
-
-        connectedCallback () {
-            // Solves re-entrancy issues from React
-            if (this.#connected) return
-            this.#connected = true;
-            if (!this._transplantElement) {
-                // Restore the 'this' object with the DDGRuntimeChecks prototype as sometimes pages will overwrite it.
-                Object.setPrototypeOf(this, DDGRuntimeChecks.prototype);
-            }
-            this._transplantElement();
-        }
-
-        _monitorProperties (el) {
-            // Mutation oberver and observedAttributes don't work on property accessors
-            // So instead we need to monitor all properties on the prototypes and forward them to the real element
-            let propertyNames = [];
-            let proto = Object.getPrototypeOf(el);
-            while (proto && proto !== Object.prototype) {
-                propertyNames.push(...Object.getOwnPropertyNames(proto));
-                proto = Object.getPrototypeOf(proto);
-            }
-            const classMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(this));
-            // Filter away the methods we don't want to monitor from our own class
-            propertyNames = propertyNames.filter(prop => !classMethods.includes(prop));
-            propertyNames.forEach(prop => {
-                if (prop === 'constructor') return
-                // May throw, but this is best effort monitoring.
-                try {
-                    Object.defineProperty(this, prop, {
-                        get () {
-                            return el[prop]
-                        },
-                        set (value) {
-                            if (shouldFilterKey(this.#tagName, 'property', prop)) return
-                            if (ignoreMonitorList.includes(prop)) return
-                            el[prop] = value;
-                        }
-                    });
-                } catch { }
-            });
-        }
-
-        computeScriptOverload (el) {
-            // Short circuit if we don't have any script text
-            if (el.textContent === '') return
-            // Short circuit if we're in a trusted script environment
-            // @ts-expect-error TrustedScript is not defined in the TS lib
-            if (supportedTrustedTypes && el.textContent instanceof TrustedScript) return
-
-            // Short circuit if not a script type
-            const scriptType = el.type.toLowerCase();
-            if (!jsMimeTypes.includes(scriptType) &&
-                scriptType !== 'module' &&
-                scriptType !== '') return
-
-            el.textContent = wrapScriptCodeOverload(el.textContent, scriptOverload);
-        }
-
-        /**
-         * The element has been moved to the DOM, so we can now reflect all changes to a real element.
-         * This is to allow us to interrogate the real element before it is moved to the DOM.
-         */
-        _transplantElement () {
-            // Create the real element
-            const el = initialCreateElement.call(document, this.#tagName);
-            if (taintCheck) {
-                // Add a symbol to the element so we can identify it as a runtime checked element
-                Object.defineProperty(el, taintSymbol, { value: true, configurable: false, enumerable: false, writable: false });
-                // Only show this attribute whilst debugging
-                if (this.#debug) {
-                    el.setAttribute('data-ddg-runtime-checks', 'true');
-                }
-                try {
-                    const origin = this.src && new URL(this.src, window.location.href).hostname;
-                    if (origin && taintedOrigins() && getTabHostname() !== origin) {
-                        taintedOrigins()?.add(origin);
-                    }
-                } catch {}
-            }
-
-            // Reflect all attrs to the new element
-            for (const attribute of this.getAttributeNames()) {
-                if (shouldFilterKey(this.#tagName, 'attribute', attribute)) continue
-                defaultElementMethods.setAttribute.call(el, attribute, this.getAttribute(attribute));
-            }
-
-            // Reflect all props to the new element
-            const props = Object.keys(this);
-
-            // Nonce isn't enumerable so we need to add it manually
-            props.push('nonce');
-
-            for (const prop of props) {
-                if (shouldFilterKey(this.#tagName, 'property', prop)) continue
-                el[prop] = this[prop];
-            }
-
-            for (const sink of supportedSinks) {
-                if (this.#sinks[sink]) {
-                    el[sink] = this.#sinks[sink];
-                }
-            }
-
-            // Reflect all listeners to the new element
-            for (const [...args] of this.#listeners) {
-                if (shouldFilterKey(this.#tagName, 'listener', args[0])) continue
-                el.addEventListener(...args);
-            }
-            this.#listeners = [];
-
-            // Reflect all 'on' event handlers to the new element
-            for (const propName in this) {
-                if (propName.startsWith('on')) {
-                    if (shouldFilterKey(this.#tagName, 'handler', propName)) continue
-                    const prop = this[propName];
-                    if (typeof prop === 'function') {
-                        el[propName] = prop;
-                    }
-                }
-            }
-
-            // Move all children to the new element
-            while (this.firstChild) {
-                el.appendChild(this.firstChild);
-            }
-
-            if (this.#tagName === 'script') {
-                this.computeScriptOverload(el);
-            }
-
-            if (replaceElement) {
-                this.replaceElement(el);
-            } else {
-                this.insertAfterAndRemove(el);
-            }
-
-            // TODO pollyfill WeakRef
-            this.#el = new WeakRef(el);
-        }
-
-        replaceElement (el) {
-            // This should be called before this.#el is set
-            // @ts-expect-error - this is wrong node type
-            super.parentElement?.replaceChild(el, this);
-
-            if (monitorProperties) {
-                this._monitorProperties(el);
-            }
-        }
-
-        insertAfterAndRemove (el) {
-            // Move the new element to the DOM
-            try {
-                this.insertAdjacentElement('afterend', el);
-            } catch (e) { console.warn(e); }
-
-            if (monitorProperties) {
-                this._monitorProperties(el);
-            }
-
-            // Delay removal of the custom element so if the script calls removeChild it will still be in the DOM and not throw.
-            setTimeout(() => {
-                try {
-                    super.remove();
-                } catch {}
-            }, elementRemovalTimeout);
-        }
-
-        _getElement () {
-            return this.#el?.deref()
-        }
-
-        /**
-         * Calls a method on the real element if it exists, otherwise calls the method on the DDGRuntimeChecks element.
-         * @template {keyof defaultElementMethods} E
-         * @param {E} method
-         * @param  {...Parameters<defaultElementMethods[E]>} args
-         * @return {ReturnType<defaultElementMethods[E]>}
-         */
-        _callMethod (method, ...args) {
-            const el = this._getElement();
-            if (el) {
-                return defaultElementMethods[method].call(el, ...args)
-            }
-            // @ts-expect-error TS doesn't like the spread operator
-            return super[method](...args)
-        }
-
-        _callSetter (prop, value) {
-            const el = this._getElement();
-            if (el) {
-                el[prop] = value;
-                return
-            }
-            super[prop] = value;
-        }
-
-        _callGetter (prop) {
-            const el = this._getElement();
-            if (el) {
-                return el[prop]
-            }
-            return super[prop]
-        }
-
-        /* Native DOM element methods we're capturing to supplant values into the constructed node or store data for. */
-
-        set src (value) {
-            const el = this._getElement();
-            if (el) {
-                el.src = value;
-                return
-            }
-            this.#sinks.src = value;
-        }
-
-        get src () {
-            const el = this._getElement();
-            if (el) {
-                return el.src
-            }
-            // @ts-expect-error TrustedScriptURL is not defined in the TS lib
-            if (supportedTrustedTypes && this.#sinks.src instanceof TrustedScriptURL) {
-                return this.#sinks.src.toString()
-            }
-            return this.#sinks.src
-        }
-
-        getAttribute (name, value) {
-            if (shouldFilterKey(this.#tagName, 'attribute', name)) return
-            if (supportedSinks.includes(name)) {
-                // Use Reflect to avoid infinite recursion
-                return Reflect$1.get(DDGRuntimeChecks.prototype, name, this)
-            }
-            return this._callMethod('getAttribute', name, value)
-        }
-
-        getAttributeNS (namespace, name, value) {
-            if (namespace) {
-                return this._callMethod('getAttributeNS', namespace, name, value)
-            }
-            return Reflect$1.apply(DDGRuntimeChecks.prototype.getAttribute, this, [name, value])
-        }
-
-        setAttribute (name, value) {
-            if (shouldFilterKey(this.#tagName, 'attribute', name)) return
-            if (supportedSinks.includes(name)) {
-                // Use Reflect to avoid infinite recursion
-                return Reflect$1.set(DDGRuntimeChecks.prototype, name, value, this)
-            }
-            return this._callMethod('setAttribute', name, value)
-        }
-
-        setAttributeNS (namespace, name, value) {
-            if (namespace) {
-                return this._callMethod('setAttributeNS', namespace, name, value)
-            }
-            return Reflect$1.apply(DDGRuntimeChecks.prototype.setAttribute, this, [name, value])
-        }
-
-        removeAttribute (name) {
-            if (shouldFilterKey(this.#tagName, 'attribute', name)) return
-            if (supportedSinks.includes(name)) {
-                delete this[name];
-                return
-            }
-            return this._callMethod('removeAttribute', name)
-        }
-
-        addEventListener (...args) {
-            if (shouldFilterKey(this.#tagName, 'listener', args[0])) return
-            const el = this._getElement();
-            if (el) {
-                return el.addEventListener(...args)
-            }
-            this.#listeners.push([...args]);
-        }
-
-        removeEventListener (...args) {
-            if (shouldFilterKey(this.#tagName, 'listener', args[0])) return
-            const el = this._getElement();
-            if (el) {
-                return el.removeEventListener(...args)
-            }
-            this.#listeners = this.#listeners.filter((listener) => {
-                return listener[0] !== args[0] || listener[1] !== args[1]
-            });
-        }
-
-        toString () {
-            const interfaceName = this.#tagName.charAt(0).toUpperCase() + this.#tagName.slice(1);
-            return `[object HTML${interfaceName}Element]`
-        }
-
-        get tagName () {
-            return this.#tagName.toUpperCase()
-        }
-
-        get nodeName () {
-            return this.tagName
-        }
-
-        remove () {
-            let returnVal;
-            try {
-                returnVal = this._callMethod('remove');
-                super.remove();
-            } catch {}
-            return returnVal
-        }
-
-        // @ts-expect-error TS node return here
-        removeChild (child) {
-            return this._callMethod('removeChild', child)
-        }
-    }
-
-    /**
-     * Overrides the instanceof checks to make the custom element interface pass an instanceof check
-     * @param {Object} elementInterface
-     */
-    function overloadInstanceOfChecks (elementInterface) {
-        const proxy = new Proxy(elementInterface[Symbol.hasInstance], {
-            apply (fn, scope, args) {
-                if (args[0] instanceof DDGRuntimeChecks) {
-                    return true
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        // May throw, but we can ignore it
-        try {
-            Object.defineProperty(elementInterface, Symbol.hasInstance, {
-                value: proxy
-            });
-        } catch {}
-    }
-
-    /**
-     * Returns true if the tag should be intercepted
-     * @param {string} tagName
-     * @returns {boolean}
-     */
-    function shouldInterrogate (tagName) {
-        const interestingTags = ['script'];
-        if (!interestingTags.includes(tagName)) {
-            return false
-        }
-        if (matchAllStackDomains) {
-            isInterrogatingDebugMessage('matchedAllStackDomain');
-            return true
-        }
-        if (taintCheck && document.currentScript?.[taintSymbol]) {
-            isInterrogatingDebugMessage('taintCheck');
-            return true
-        }
-        const stack = getStack();
-        const scriptOrigins = [...getStackTraceOrigins(stack)];
-        const interestingHost = scriptOrigins.find(origin => {
-            return stackDomains.some(rule => matchHostname(origin, rule.domain))
-        });
-        const isInterestingHost = !!interestingHost;
-        if (isInterestingHost) {
-            isInterrogatingDebugMessage('matchedStackDomain', interestingHost, stack, scriptOrigins);
-        }
-        return isInterestingHost
-    }
-
-    function isInterrogatingDebugMessage (matchType, matchedStackDomain, stack, scriptOrigins) {
-        postDebugMessage('runtimeChecks', {
-            documentUrl: document.location.href,
-            matchedStackDomain,
-            matchType,
-            scriptOrigins,
-            stack
-        });
-    }
-
-    function isRuntimeElement (element) {
-        try {
-            return element instanceof DDGRuntimeChecks
-        } catch {}
-        return false
-    }
-
-    function overloadGetOwnPropertyDescriptor () {
-        const capturedDescriptors = {
-            HTMLScriptElement: Object.getOwnPropertyDescriptors(HTMLScriptElement),
-            HTMLScriptElementPrototype: Object.getOwnPropertyDescriptors(HTMLScriptElement.prototype)
-        };
-        /**
-         * @param {any} value
-         * @returns {string | undefined}
-         */
-        function getInterfaceName (value) {
-            let interfaceName;
-            if (value === HTMLScriptElement) {
-                interfaceName = 'HTMLScriptElement';
-            }
-            if (value === HTMLScriptElement.prototype) {
-                interfaceName = 'HTMLScriptElementPrototype';
-            }
-            return interfaceName
-        }
-        // TODO: Consoldiate with wrapProperty code
-        function getInterfaceDescriptor (interfaceValue, interfaceName, propertyName) {
-            const capturedInterface = capturedDescriptors[interfaceName] && capturedDescriptors[interfaceName][propertyName];
-            const capturedInterfaceOut = { ...capturedInterface };
-            if (capturedInterface.get) {
-                capturedInterfaceOut.get = wrapFunction(function () {
-                    let method = capturedInterface.get;
-                    if (isRuntimeElement(this)) {
-                        method = () => this._callGetter(propertyName);
-                    }
-                    return method.call(this)
-                }, capturedInterface.get);
-            }
-            if (capturedInterface.set) {
-                capturedInterfaceOut.set = wrapFunction(function (value) {
-                    let method = capturedInterface;
-                    if (isRuntimeElement(this)) {
-                        method = (value) => this._callSetter(propertyName, value);
-                    }
-                    return method.call(this, [value])
-                }, capturedInterface.set);
-            }
-            return capturedInterfaceOut
-        }
-        const proxy = new DDGProxy(featureInstance$1, Object, 'getOwnPropertyDescriptor', {
-            apply (fn, scope, args) {
-                const interfaceValue = args[0];
-                const interfaceName = getInterfaceName(interfaceValue);
-                const propertyName = args[1];
-                const capturedInterface = capturedDescriptors[interfaceName] && capturedDescriptors[interfaceName][propertyName];
-                if (interfaceName && capturedInterface) {
-                    return getInterfaceDescriptor(interfaceValue, interfaceName, propertyName)
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        proxy.overload();
-        const proxy2 = new DDGProxy(featureInstance$1, Object, 'getOwnPropertyDescriptors', {
-            apply (fn, scope, args) {
-                const interfaceValue = args[0];
-                const interfaceName = getInterfaceName(interfaceValue);
-                const capturedInterface = capturedDescriptors[interfaceName];
-                if (interfaceName && capturedInterface) {
-                    const out = {};
-                    for (const propertyName of Object.getOwnPropertyNames(capturedInterface)) {
-                        out[propertyName] = getInterfaceDescriptor(interfaceValue, interfaceName, propertyName);
-                    }
-                    return out
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        proxy2.overload();
-    }
-
-    function overrideCreateElement (debug) {
-        const proxy = new DDGProxy(featureInstance$1, Document.prototype, 'createElement', {
-            apply (fn, scope, args) {
-                if (args.length >= 1) {
-                    // String() is used to coerce the value to a string (For: ProseMirror/prosemirror-model/src/to_dom.ts)
-                    const initialTagName = String(args[0]).toLowerCase();
-                    if (shouldInterrogate(initialTagName)) {
-                        args[0] = 'ddg-runtime-checks';
-                        const el = Reflect$1.apply(fn, scope, args);
-                        el.setTagName(initialTagName, debug);
-                        return el
-                    }
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        proxy.overload();
-        initialCreateElement = proxy._native;
-    }
-
-    function overloadRemoveChild () {
-        const proxy = new DDGProxy(featureInstance$1, Node.prototype, 'removeChild', {
-            apply (fn, scope, args) {
-                const child = args[0];
-                if (child instanceof DDGRuntimeChecks) {
-                    // Should call the real removeChild method if it's already replaced
-                    const realNode = child._getElement();
-                    if (realNode) {
-                        args[0] = realNode;
-                    }
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        proxy.overloadDescriptor();
-    }
-
-    function overloadReplaceChild () {
-        const proxy = new DDGProxy(featureInstance$1, Node.prototype, 'replaceChild', {
-            apply (fn, scope, args) {
-                const newChild = args[1];
-                if (newChild instanceof DDGRuntimeChecks) {
-                    const realNode = newChild._getElement();
-                    if (realNode) {
-                        args[1] = realNode;
-                    }
-                }
-                return Reflect$1.apply(fn, scope, args)
-            }
-        });
-        proxy.overloadDescriptor();
-    }
-
-    class RuntimeChecks extends ContentFeature {
-        load () {
-            // This shouldn't happen, but if it does we don't want to break the page
-            try {
-                // @ts-expect-error TS node return here
-                globalThis.customElements.define('ddg-runtime-checks', DDGRuntimeChecks);
-            } catch {}
-            // eslint-disable-next-line @typescript-eslint/no-this-alias
-            featureInstance$1 = this;
-        }
-
-        init () {
-            let enabled = this.getFeatureSettingEnabled('matchAllDomains');
-            if (!enabled) {
-                enabled = this.matchDomainFeatureSetting('domains').length > 0;
-            }
-            if (!enabled) return
-
-            taintCheck = this.getFeatureSettingEnabled('taintCheck');
-            matchAllStackDomains = this.getFeatureSettingEnabled('matchAllStackDomains');
-            stackDomains = this.getFeatureSetting('stackDomains') || [];
-            elementRemovalTimeout = this.getFeatureSetting('elementRemovalTimeout') || 1000;
-            tagModifiers = this.getFeatureSetting('tagModifiers') || {};
-            shadowDomEnabled = this.getFeatureSettingEnabled('shadowDom') || false;
-            scriptOverload = this.getFeatureSetting('scriptOverload') || {};
-            ignoreMonitorList = this.getFeatureSetting('ignoreMonitorList') || defaultIgnoreMonitorList;
-            replaceElement = this.getFeatureSettingEnabled('replaceElement') || false;
-            monitorProperties = this.getFeatureSettingEnabled('monitorProperties') || true;
-
-            overrideCreateElement(this.isDebug);
-
-            if (this.getFeatureSettingEnabled('overloadInstanceOf')) {
-                overloadInstanceOfChecks(HTMLScriptElement);
-            }
-
-            if (this.getFeatureSettingEnabled('injectGlobalStyles')) {
-                injectGlobalStyles(`
-                ddg-runtime-checks {
-                    display: none;
-                }
-            `);
-            }
-
-            if (this.getFeatureSetting('injectGenericOverloads')) {
-                this.injectGenericOverloads();
-            }
-            if (this.getFeatureSettingEnabled('overloadRemoveChild')) {
-                overloadRemoveChild();
-            }
-            if (this.getFeatureSettingEnabled('overloadReplaceChild')) {
-                overloadReplaceChild();
-            }
-            if (this.getFeatureSettingEnabled('overloadGetOwnPropertyDescriptor')) {
-                overloadGetOwnPropertyDescriptor();
-            }
-        }
-
-        injectGenericOverloads () {
-            const genericOverloads = this.getFeatureSetting('injectGenericOverloads');
-            if ('Date' in genericOverloads) {
-                this.overloadDate(genericOverloads.Date);
-            }
-            if ('Date.prototype.getTimezoneOffset' in genericOverloads) {
-                this.overloadDateGetTimezoneOffset(genericOverloads['Date.prototype.getTimezoneOffset']);
-            }
-            if ('NavigatorUAData.prototype.getHighEntropyValues' in genericOverloads) {
-                this.overloadHighEntropyValues(genericOverloads['NavigatorUAData.prototype.getHighEntropyValues']);
-            }
-            ['localStorage', 'sessionStorage'].forEach(storageType => {
-                if (storageType in genericOverloads) {
-                    const storageConfig = genericOverloads[storageType];
-                    if (storageConfig.scheme === 'memory') {
-                        this.overloadStorageWithMemory(storageConfig, storageType);
-                    } else if (storageConfig.scheme === 'session') {
-                        this.overloadStorageWithSession(storageConfig, storageType);
-                    }
-                }
-            });
-            const breakpoints = this.getFeatureSetting('breakpoints');
-            const screenSize = { height: screen.height, width: screen.width };
-            ['innerHeight', 'innerWidth', 'outerHeight', 'outerWidth', 'Screen.prototype.height', 'Screen.prototype.width'].forEach(sizing => {
-                if (sizing in genericOverloads) {
-                    const sizingConfig = genericOverloads[sizing];
-                    if (isBeingFramed() && !sizingConfig.applyToFrames) return
-                    this.overloadScreenSizes(sizingConfig, breakpoints, screenSize, sizing, sizingConfig.offset || 0);
-                }
-            });
-        }
-
-        overloadDate (config) {
-            const offset = (new Date()).getTimezoneOffset();
-            globalThis.Date = new Proxy(globalThis.Date, {
-                construct (target, args) {
-                    const constructed = Reflect$1.construct(target, args);
-                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
-                        // Falible in that the page could brute force the offset to match. We should fix this.
-                        if (constructed.getTimezoneOffset() === offset) {
-                            return constructed.getUTCDate()
-                        }
-                    }
-                    return constructed
-                }
-            });
-        }
-
-        overloadDateGetTimezoneOffset (config) {
-            const offset = (new Date()).getTimezoneOffset();
-            this.defineProperty(globalThis.Date.prototype, 'getTimezoneOffset', {
-                configurable: true,
-                enumerable: true,
-                writable: true,
-                value () {
-                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
-                        return 0
-                    }
-                    return offset
-                }
-            });
-        }
-
-        overloadHighEntropyValues (config) {
-            if (!('NavigatorUAData' in globalThis)) {
-                return
-            }
-
-            const originalGetHighEntropyValues = globalThis.NavigatorUAData.prototype.getHighEntropyValues;
-            this.defineProperty(globalThis.NavigatorUAData.prototype, 'getHighEntropyValues', {
-                configurable: true,
-                enumerable: true,
-                writable: true,
-                value (hints) {
-                    let hintsOut = hints;
-                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
-                        // If tainted override with default values (using empty array)
-                        hintsOut = [];
-                    }
-                    return Reflect$1.apply(originalGetHighEntropyValues, this, [hintsOut])
-                }
-            });
-        }
-
-        overloadStorageWithMemory (config, key) {
-            /**
-             * @implements {Storage}
-             */
-            class MemoryStorage {
-                #data = {}
-
-                /**
-                 * @param {Parameters<Storage['setItem']>[0]} id
-                 * @param {Parameters<Storage['setItem']>[1]} val
-                 * @returns {ReturnType<Storage['setItem']>}
-                 */
-                setItem (id, val) {
-                    if (arguments.length < 2) throw new TypeError(`Failed to execute 'setItem' on 'Storage': 2 arguments required, but only ${arguments.length} present.`)
-                    this.#data[id] = String(val);
-                }
-
-                /**
-                 * @param {Parameters<Storage['getItem']>[0]} id
-                 * @returns {ReturnType<Storage['getItem']>}
-                 */
-                getItem (id) {
-                    return Object.prototype.hasOwnProperty.call(this.#data, id) ? this.#data[id] : null
-                }
-
-                /**
-                 * @param {Parameters<Storage['removeItem']>[0]} id
-                 * @returns {ReturnType<Storage['removeItem']>}
-                 */
-                removeItem (id) {
-                    delete this.#data[id];
-                }
-
-                /**
-                 * @returns {ReturnType<Storage['clear']>}
-                 */
-                clear () {
-                    this.#data = {};
-                }
-
-                /**
-                 * @param {Parameters<Storage['key']>[0]} n
-                 * @returns {ReturnType<Storage['key']>}
-                 */
-                key (n) {
-                    const keys = Object.keys(this.#data);
-                    return keys[n]
-                }
-
-                get length () {
-                    return Object.keys(this.#data).length
-                }
-            }
-            /** @satisfies {Storage} */
-            const instance = new MemoryStorage();
-            const storage = new Proxy(instance, {
-                set (target, prop, value) {
-                    Reflect$1.apply(target.setItem, target, [prop, value]);
-                    return true
-                },
-                get (target, prop) {
-                    if (typeof target[prop] === 'function') {
-                        return target[prop].bind(instance)
-                    }
-                    return Reflect$1.get(target, prop, instance)
-                }
-            });
-            this.overrideStorage(config, key, storage);
-        }
-
-        overloadStorageWithSession (config, key) {
-            const storage = globalThis.sessionStorage;
-            this.overrideStorage(config, key, storage);
-        }
-
-        overrideStorage (config, key, storage) {
-            const originalStorage = globalThis[key];
-            this.defineProperty(globalThis, key, {
-                get () {
-                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
-                        return storage
-                    }
-                    return originalStorage
-                },
-                enumerable: true,
-                configurable: true
-            });
-        }
-
-        /**
-         * @typedef {import('./runtime-checks/helpers.js').Sizing} Sizing
-         */
-
-        /**
-         * Overloads the provided key with the closest breakpoint size
-         * @param {Sizing[]} breakpoints
-         * @param {Sizing} screenSize
-         * @param {string} key
-         * @param {number} [offset]
-         */
-        overloadScreenSizes (config, breakpoints, screenSize, key, offset = 0) {
-            const closest = findClosestBreakpoint(breakpoints, screenSize);
-            if (!closest) {
-                return
-            }
-            let returnVal = null;
-            /** @type {object} */
-            let scope = globalThis;
-            let overrideKey = key;
-            let receiver;
-            switch (key) {
-            case 'innerHeight':
-            case 'outerHeight':
-                returnVal = closest.height - offset;
-                break
-            case 'innerWidth':
-            case 'outerWidth':
-                returnVal = closest.width - offset;
-                break
-            case 'Screen.prototype.height':
-                scope = Screen.prototype;
-                overrideKey = 'height';
-                returnVal = closest.height - offset;
-                receiver = globalThis.screen;
-                break
-            case 'Screen.prototype.width':
-                scope = Screen.prototype;
-                overrideKey = 'width';
-                returnVal = closest.width - offset;
-                receiver = globalThis.screen;
-                break
-            }
-            const defaultGetter = Object.getOwnPropertyDescriptor(scope, overrideKey)?.get;
-            // Should never happen
-            if (!defaultGetter) {
-                return
-            }
-            // TODO: inner* and outer* should have a setter too
-            this.defineProperty(scope, overrideKey, {
-                get () {
-                    const defaultVal = Reflect$1.apply(defaultGetter, receiver, []);
-                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
-                        return returnVal
-                    }
-                    return defaultVal
-                },
-                enumerable: true,
-                configurable: true
-            });
-        }
-    }
-
-    // @ts-nocheck
-        const sjcl = (() => {
-    /*jslint indent: 2, bitwise: false, nomen: false, plusplus: false, white: false, regexp: false */
-    /*global document, window, escape, unescape, module, require, Uint32Array */
-
-    /**
-     * The Stanford Javascript Crypto Library, top-level namespace.
-     * @namespace
-     */
-    var sjcl = {
-      /**
-       * Symmetric ciphers.
-       * @namespace
-       */
-      cipher: {},
-
-      /**
-       * Hash functions.  Right now only SHA256 is implemented.
-       * @namespace
-       */
-      hash: {},
-
-      /**
-       * Key exchange functions.  Right now only SRP is implemented.
-       * @namespace
-       */
-      keyexchange: {},
-      
-      /**
-       * Cipher modes of operation.
-       * @namespace
-       */
-      mode: {},
-
-      /**
-       * Miscellaneous.  HMAC and PBKDF2.
-       * @namespace
-       */
-      misc: {},
-      
-      /**
-       * Bit array encoders and decoders.
-       * @namespace
-       *
-       * @description
-       * The members of this namespace are functions which translate between
-       * SJCL's bitArrays and other objects (usually strings).  Because it
-       * isn't always clear which direction is encoding and which is decoding,
-       * the method names are "fromBits" and "toBits".
-       */
-      codec: {},
-      
-      /**
-       * Exceptions.
-       * @namespace
-       */
-      exception: {
-        /**
-         * Ciphertext is corrupt.
-         * @constructor
-         */
-        corrupt: function(message) {
-          this.toString = function() { return "CORRUPT: "+this.message; };
-          this.message = message;
-        },
-        
-        /**
-         * Invalid parameter.
-         * @constructor
-         */
-        invalid: function(message) {
-          this.toString = function() { return "INVALID: "+this.message; };
-          this.message = message;
-        },
-        
-        /**
-         * Bug or missing feature in SJCL.
-         * @constructor
-         */
-        bug: function(message) {
-          this.toString = function() { return "BUG: "+this.message; };
-          this.message = message;
-        },
-
-        /**
-         * Something isn't ready.
-         * @constructor
-         */
-        notReady: function(message) {
-          this.toString = function() { return "NOT READY: "+this.message; };
-          this.message = message;
-        }
-      }
-    };
-    /** @fileOverview Arrays of bits, encoded as arrays of Numbers.
-     *
-     * @author Emily Stark
-     * @author Mike Hamburg
-     * @author Dan Boneh
-     */
-
-    /**
-     * Arrays of bits, encoded as arrays of Numbers.
-     * @namespace
-     * @description
-     * <p>
-     * These objects are the currency accepted by SJCL's crypto functions.
-     * </p>
-     *
-     * <p>
-     * Most of our crypto primitives operate on arrays of 4-byte words internally,
-     * but many of them can take arguments that are not a multiple of 4 bytes.
-     * This library encodes arrays of bits (whose size need not be a multiple of 8
-     * bits) as arrays of 32-bit words.  The bits are packed, big-endian, into an
-     * array of words, 32 bits at a time.  Since the words are double-precision
-     * floating point numbers, they fit some extra data.  We use this (in a private,
-     * possibly-changing manner) to encode the number of bits actually  present
-     * in the last word of the array.
-     * </p>
-     *
-     * <p>
-     * Because bitwise ops clear this out-of-band data, these arrays can be passed
-     * to ciphers like AES which want arrays of words.
-     * </p>
-     */
-    sjcl.bitArray = {
-      /**
-       * Array slices in units of bits.
-       * @param {bitArray} a The array to slice.
-       * @param {Number} bstart The offset to the start of the slice, in bits.
-       * @param {Number} bend The offset to the end of the slice, in bits.  If this is undefined,
-       * slice until the end of the array.
-       * @return {bitArray} The requested slice.
-       */
-      bitSlice: function (a, bstart, bend) {
-        a = sjcl.bitArray._shiftRight(a.slice(bstart/32), 32 - (bstart & 31)).slice(1);
-        return (bend === undefined) ? a : sjcl.bitArray.clamp(a, bend-bstart);
-      },
-
-      /**
-       * Extract a number packed into a bit array.
-       * @param {bitArray} a The array to slice.
-       * @param {Number} bstart The offset to the start of the slice, in bits.
-       * @param {Number} blength The length of the number to extract.
-       * @return {Number} The requested slice.
-       */
-      extract: function(a, bstart, blength) {
-        // FIXME: this Math.floor is not necessary at all, but for some reason
-        // seems to suppress a bug in the Chromium JIT.
-        var x, sh = Math.floor((-bstart-blength) & 31);
-        if ((bstart + blength - 1 ^ bstart) & -32) {
-          // it crosses a boundary
-          x = (a[bstart/32|0] << (32 - sh)) ^ (a[bstart/32+1|0] >>> sh);
-        } else {
-          // within a single word
-          x = a[bstart/32|0] >>> sh;
-        }
-        return x & ((1<<blength) - 1);
-      },
-
-      /**
-       * Concatenate two bit arrays.
-       * @param {bitArray} a1 The first array.
-       * @param {bitArray} a2 The second array.
-       * @return {bitArray} The concatenation of a1 and a2.
-       */
-      concat: function (a1, a2) {
-        if (a1.length === 0 || a2.length === 0) {
-          return a1.concat(a2);
-        }
-        
-        var last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
-        if (shift === 32) {
-          return a1.concat(a2);
-        } else {
-          return sjcl.bitArray._shiftRight(a2, shift, last|0, a1.slice(0,a1.length-1));
-        }
-      },
-
-      /**
-       * Find the length of an array of bits.
-       * @param {bitArray} a The array.
-       * @return {Number} The length of a, in bits.
-       */
-      bitLength: function (a) {
-        var l = a.length, x;
-        if (l === 0) { return 0; }
-        x = a[l - 1];
-        return (l-1) * 32 + sjcl.bitArray.getPartial(x);
-      },
-
-      /**
-       * Truncate an array.
-       * @param {bitArray} a The array.
-       * @param {Number} len The length to truncate to, in bits.
-       * @return {bitArray} A new array, truncated to len bits.
-       */
-      clamp: function (a, len) {
-        if (a.length * 32 < len) { return a; }
-        a = a.slice(0, Math.ceil(len / 32));
-        var l = a.length;
-        len = len & 31;
-        if (l > 0 && len) {
-          a[l-1] = sjcl.bitArray.partial(len, a[l-1] & 0x80000000 >> (len-1), 1);
-        }
-        return a;
-      },
-
-      /**
-       * Make a partial word for a bit array.
-       * @param {Number} len The number of bits in the word.
-       * @param {Number} x The bits.
-       * @param {Number} [_end=0] Pass 1 if x has already been shifted to the high side.
-       * @return {Number} The partial word.
-       */
-      partial: function (len, x, _end) {
-        if (len === 32) { return x; }
-        return (_end ? x|0 : x << (32-len)) + len * 0x10000000000;
-      },
-
-      /**
-       * Get the number of bits used by a partial word.
-       * @param {Number} x The partial word.
-       * @return {Number} The number of bits used by the partial word.
-       */
-      getPartial: function (x) {
-        return Math.round(x/0x10000000000) || 32;
-      },
-
-      /**
-       * Compare two arrays for equality in a predictable amount of time.
-       * @param {bitArray} a The first array.
-       * @param {bitArray} b The second array.
-       * @return {boolean} true if a == b; false otherwise.
-       */
-      equal: function (a, b) {
-        if (sjcl.bitArray.bitLength(a) !== sjcl.bitArray.bitLength(b)) {
-          return false;
-        }
-        var x = 0, i;
-        for (i=0; i<a.length; i++) {
-          x |= a[i]^b[i];
-        }
-        return (x === 0);
-      },
-
-      /** Shift an array right.
-       * @param {bitArray} a The array to shift.
-       * @param {Number} shift The number of bits to shift.
-       * @param {Number} [carry=0] A byte to carry in
-       * @param {bitArray} [out=[]] An array to prepend to the output.
-       * @private
-       */
-      _shiftRight: function (a, shift, carry, out) {
-        var i, last2=0, shift2;
-        if (out === undefined) { out = []; }
-        
-        for (; shift >= 32; shift -= 32) {
-          out.push(carry);
-          carry = 0;
-        }
-        if (shift === 0) {
-          return out.concat(a);
-        }
-        
-        for (i=0; i<a.length; i++) {
-          out.push(carry | a[i]>>>shift);
-          carry = a[i] << (32-shift);
-        }
-        last2 = a.length ? a[a.length-1] : 0;
-        shift2 = sjcl.bitArray.getPartial(last2);
-        out.push(sjcl.bitArray.partial(shift+shift2 & 31, (shift + shift2 > 32) ? carry : out.pop(),1));
-        return out;
-      },
-      
-      /** xor a block of 4 words together.
-       * @private
-       */
-      _xor4: function(x,y) {
-        return [x[0]^y[0],x[1]^y[1],x[2]^y[2],x[3]^y[3]];
-      },
-
-      /** byteswap a word array inplace.
-       * (does not handle partial words)
-       * @param {sjcl.bitArray} a word array
-       * @return {sjcl.bitArray} byteswapped array
-       */
-      byteswapM: function(a) {
-        var i, v, m = 0xff00;
-        for (i = 0; i < a.length; ++i) {
-          v = a[i];
-          a[i] = (v >>> 24) | ((v >>> 8) & m) | ((v & m) << 8) | (v << 24);
-        }
-        return a;
-      }
-    };
-    /** @fileOverview Bit array codec implementations.
-     *
-     * @author Emily Stark
-     * @author Mike Hamburg
-     * @author Dan Boneh
-     */
-
-    /**
-     * UTF-8 strings
-     * @namespace
-     */
-    sjcl.codec.utf8String = {
-      /** Convert from a bitArray to a UTF-8 string. */
-      fromBits: function (arr) {
-        var out = "", bl = sjcl.bitArray.bitLength(arr), i, tmp;
-        for (i=0; i<bl/8; i++) {
-          if ((i&3) === 0) {
-            tmp = arr[i/4];
-          }
-          out += String.fromCharCode(tmp >>> 8 >>> 8 >>> 8);
-          tmp <<= 8;
-        }
-        return decodeURIComponent(escape(out));
-      },
-
-      /** Convert from a UTF-8 string to a bitArray. */
-      toBits: function (str) {
-        str = unescape(encodeURIComponent(str));
-        var out = [], i, tmp=0;
-        for (i=0; i<str.length; i++) {
-          tmp = tmp << 8 | str.charCodeAt(i);
-          if ((i&3) === 3) {
-            out.push(tmp);
-            tmp = 0;
-          }
-        }
-        if (i&3) {
-          out.push(sjcl.bitArray.partial(8*(i&3), tmp));
-        }
-        return out;
-      }
-    };
-    /** @fileOverview Bit array codec implementations.
-     *
-     * @author Emily Stark
-     * @author Mike Hamburg
-     * @author Dan Boneh
-     */
-
-    /**
-     * Hexadecimal
-     * @namespace
-     */
-    sjcl.codec.hex = {
-      /** Convert from a bitArray to a hex string. */
-      fromBits: function (arr) {
-        var out = "", i;
-        for (i=0; i<arr.length; i++) {
-          out += ((arr[i]|0)+0xF00000000000).toString(16).substr(4);
-        }
-        return out.substr(0, sjcl.bitArray.bitLength(arr)/4);//.replace(/(.{8})/g, "$1 ");
-      },
-      /** Convert from a hex string to a bitArray. */
-      toBits: function (str) {
-        var i, out=[], len;
-        str = str.replace(/\s|0x/g, "");
-        len = str.length;
-        str = str + "00000000";
-        for (i=0; i<str.length; i+=8) {
-          out.push(parseInt(str.substr(i,8),16)^0);
-        }
-        return sjcl.bitArray.clamp(out, len*4);
-      }
-    };
-
-    /** @fileOverview Javascript SHA-256 implementation.
-     *
-     * An older version of this implementation is available in the public
-     * domain, but this one is (c) Emily Stark, Mike Hamburg, Dan Boneh,
-     * Stanford University 2008-2010 and BSD-licensed for liability
-     * reasons.
-     *
-     * Special thanks to Aldo Cortesi for pointing out several bugs in
-     * this code.
-     *
-     * @author Emily Stark
-     * @author Mike Hamburg
-     * @author Dan Boneh
-     */
-
-    /**
-     * Context for a SHA-256 operation in progress.
-     * @constructor
-     */
-    sjcl.hash.sha256 = function (hash) {
-      if (!this._key[0]) { this._precompute(); }
-      if (hash) {
-        this._h = hash._h.slice(0);
-        this._buffer = hash._buffer.slice(0);
-        this._length = hash._length;
-      } else {
-        this.reset();
-      }
-    };
-
-    /**
-     * Hash a string or an array of words.
-     * @static
-     * @param {bitArray|String} data the data to hash.
-     * @return {bitArray} The hash value, an array of 16 big-endian words.
-     */
-    sjcl.hash.sha256.hash = function (data) {
-      return (new sjcl.hash.sha256()).update(data).finalize();
-    };
-
-    sjcl.hash.sha256.prototype = {
-      /**
-       * The hash's block size, in bits.
-       * @constant
-       */
-      blockSize: 512,
-       
-      /**
-       * Reset the hash state.
-       * @return this
-       */
-      reset:function () {
-        this._h = this._init.slice(0);
-        this._buffer = [];
-        this._length = 0;
-        return this;
-      },
-      
-      /**
-       * Input several words to the hash.
-       * @param {bitArray|String} data the data to hash.
-       * @return this
-       */
-      update: function (data) {
-        if (typeof data === "string") {
-          data = sjcl.codec.utf8String.toBits(data);
-        }
-        var i, b = this._buffer = sjcl.bitArray.concat(this._buffer, data),
-            ol = this._length,
-            nl = this._length = ol + sjcl.bitArray.bitLength(data);
-        if (nl > 9007199254740991){
-          throw new sjcl.exception.invalid("Cannot hash more than 2^53 - 1 bits");
-        }
-
-        if (typeof Uint32Array !== 'undefined') {
-    	var c = new Uint32Array(b);
-        	var j = 0;
-        	for (i = 512+ol - ((512+ol) & 511); i <= nl; i+= 512) {
-          	    this._block(c.subarray(16 * j, 16 * (j+1)));
-          	    j += 1;
-        	}
-        	b.splice(0, 16 * j);
-        } else {
-    	for (i = 512+ol - ((512+ol) & 511); i <= nl; i+= 512) {
-          	    this._block(b.splice(0,16));
-          	}
-        }
-        return this;
-      },
-      
-      /**
-       * Complete hashing and output the hash value.
-       * @return {bitArray} The hash value, an array of 8 big-endian words.
-       */
-      finalize:function () {
-        var i, b = this._buffer, h = this._h;
-
-        // Round out and push the buffer
-        b = sjcl.bitArray.concat(b, [sjcl.bitArray.partial(1,1)]);
-        
-        // Round out the buffer to a multiple of 16 words, less the 2 length words.
-        for (i = b.length + 2; i & 15; i++) {
-          b.push(0);
-        }
-        
-        // append the length
-        b.push(Math.floor(this._length / 0x100000000));
-        b.push(this._length | 0);
-
-        while (b.length) {
-          this._block(b.splice(0,16));
-        }
-
-        this.reset();
-        return h;
-      },
-
-      /**
-       * The SHA-256 initialization vector, to be precomputed.
-       * @private
-       */
-      _init:[],
-      /*
-      _init:[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19],
-      */
-      
-      /**
-       * The SHA-256 hash key, to be precomputed.
-       * @private
-       */
-      _key:[],
-      /*
-      _key:
-        [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-         0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-         0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-         0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-         0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-         0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2],
-      */
-
-
-      /**
-       * Function to precompute _init and _key.
-       * @private
-       */
-      _precompute: function () {
-        var i = 0, prime = 2, factor, isPrime;
-
-        function frac(x) { return (x-Math.floor(x)) * 0x100000000 | 0; }
-
-        for (; i<64; prime++) {
-          isPrime = true;
-          for (factor=2; factor*factor <= prime; factor++) {
-            if (prime % factor === 0) {
-              isPrime = false;
-              break;
-            }
-          }
-          if (isPrime) {
-            if (i<8) {
-              this._init[i] = frac(Math.pow(prime, 1/2));
-            }
-            this._key[i] = frac(Math.pow(prime, 1/3));
-            i++;
-          }
-        }
-      },
-      
-      /**
-       * Perform one cycle of SHA-256.
-       * @param {Uint32Array|bitArray} w one block of words.
-       * @private
-       */
-      _block:function (w) {  
-        var i, tmp, a, b,
-          h = this._h,
-          k = this._key,
-          h0 = h[0], h1 = h[1], h2 = h[2], h3 = h[3],
-          h4 = h[4], h5 = h[5], h6 = h[6], h7 = h[7];
-
-        /* Rationale for placement of |0 :
-         * If a value can overflow is original 32 bits by a factor of more than a few
-         * million (2^23 ish), there is a possibility that it might overflow the
-         * 53-bit mantissa and lose precision.
-         *
-         * To avoid this, we clamp back to 32 bits by |'ing with 0 on any value that
-         * propagates around the loop, and on the hash state h[].  I don't believe
-         * that the clamps on h4 and on h0 are strictly necessary, but it's close
-         * (for h4 anyway), and better safe than sorry.
-         *
-         * The clamps on h[] are necessary for the output to be correct even in the
-         * common case and for short inputs.
-         */
-        for (i=0; i<64; i++) {
-          // load up the input word for this round
-          if (i<16) {
-            tmp = w[i];
-          } else {
-            a   = w[(i+1 ) & 15];
-            b   = w[(i+14) & 15];
-            tmp = w[i&15] = ((a>>>7  ^ a>>>18 ^ a>>>3  ^ a<<25 ^ a<<14) + 
-                             (b>>>17 ^ b>>>19 ^ b>>>10 ^ b<<15 ^ b<<13) +
-                             w[i&15] + w[(i+9) & 15]) | 0;
-          }
-          
-          tmp = (tmp + h7 + (h4>>>6 ^ h4>>>11 ^ h4>>>25 ^ h4<<26 ^ h4<<21 ^ h4<<7) +  (h6 ^ h4&(h5^h6)) + k[i]); // | 0;
-          
-          // shift register
-          h7 = h6; h6 = h5; h5 = h4;
-          h4 = h3 + tmp | 0;
-          h3 = h2; h2 = h1; h1 = h0;
-
-          h0 = (tmp +  ((h1&h2) ^ (h3&(h1^h2))) + (h1>>>2 ^ h1>>>13 ^ h1>>>22 ^ h1<<30 ^ h1<<19 ^ h1<<10)) | 0;
-        }
-
-        h[0] = h[0]+h0 | 0;
-        h[1] = h[1]+h1 | 0;
-        h[2] = h[2]+h2 | 0;
-        h[3] = h[3]+h3 | 0;
-        h[4] = h[4]+h4 | 0;
-        h[5] = h[5]+h5 | 0;
-        h[6] = h[6]+h6 | 0;
-        h[7] = h[7]+h7 | 0;
-      }
-    };
-
-
-    /** @fileOverview HMAC implementation.
-     *
-     * @author Emily Stark
-     * @author Mike Hamburg
-     * @author Dan Boneh
-     */
-
-    /** HMAC with the specified hash function.
-     * @constructor
-     * @param {bitArray} key the key for HMAC.
-     * @param {Object} [Hash=sjcl.hash.sha256] The hash function to use.
-     */
-    sjcl.misc.hmac = function (key, Hash) {
-      this._hash = Hash = Hash || sjcl.hash.sha256;
-      var exKey = [[],[]], i,
-          bs = Hash.prototype.blockSize / 32;
-      this._baseHash = [new Hash(), new Hash()];
-
-      if (key.length > bs) {
-        key = Hash.hash(key);
-      }
-      
-      for (i=0; i<bs; i++) {
-        exKey[0][i] = key[i]^0x36363636;
-        exKey[1][i] = key[i]^0x5C5C5C5C;
-      }
-      
-      this._baseHash[0].update(exKey[0]);
-      this._baseHash[1].update(exKey[1]);
-      this._resultHash = new Hash(this._baseHash[0]);
-    };
-
-    /** HMAC with the specified hash function.  Also called encrypt since it's a prf.
-     * @param {bitArray|String} data The data to mac.
-     */
-    sjcl.misc.hmac.prototype.encrypt = sjcl.misc.hmac.prototype.mac = function (data) {
-      if (!this._updated) {
-        this.update(data);
-        return this.digest(data);
-      } else {
-        throw new sjcl.exception.invalid("encrypt on already updated hmac called!");
-      }
-    };
-
-    sjcl.misc.hmac.prototype.reset = function () {
-      this._resultHash = new this._hash(this._baseHash[0]);
-      this._updated = false;
-    };
-
-    sjcl.misc.hmac.prototype.update = function (data) {
-      this._updated = true;
-      this._resultHash.update(data);
-    };
-
-    sjcl.misc.hmac.prototype.digest = function () {
-      var w = this._resultHash.finalize(), result = new (this._hash)(this._baseHash[1]).update(w).finalize();
-
-      this.reset();
-
-      return result;
-    };
-
-        return sjcl;
-      })();
-
-    function getDataKeySync (sessionKey, domainKey, inputData) {
-        // eslint-disable-next-line new-cap
-        const hmac = new sjcl.misc.hmac(sjcl.codec.utf8String.toBits(sessionKey + domainKey), sjcl.hash.sha256);
-        return sjcl.codec.hex.fromBits(hmac.encrypt(inputData))
-    }
-
     class FingerprintingAudio extends ContentFeature {
         init (args) {
             const { sessionKey, site } = args;
@@ -7348,9 +6043,7 @@
                         platform: args.platform.name,
                         isDuckDuckGo () {
                             return DDGPromise.resolve(true)
-                        },
-                        taints: new Set(),
-                        taintedOrigins: new Set()
+                        }
                     },
                     enumerable: true,
                     configurable: false,
@@ -14425,7 +13118,6 @@
     }
 
     var platformFeatures = {
-        ddg_feature_runtimeChecks: RuntimeChecks,
         ddg_feature_fingerprintingAudio: FingerprintingAudio,
         ddg_feature_fingerprintingBattery: FingerprintingBattery,
         ddg_feature_fingerprintingCanvas: FingerprintingCanvas,
@@ -14443,8 +13135,6 @@
         ddg_feature_breakageReporting: BreakageReporting,
         ddg_feature_duckPlayer: DuckPlayerFeature
     };
-
-    /* global false */
 
     let initArgs = null;
     const updates = [];
