@@ -18,6 +18,7 @@ package com.duckduckgo.app.autocomplete.api
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -130,6 +131,7 @@ class AutoCompleteApi @Inject constructor(
     private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
     private val dispatcherProvider: DispatcherProvider,
+    private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -247,13 +249,18 @@ class AutoCompleteApi @Inject constructor(
     }
 
     private fun getAutocompleteSwitchToTabResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
-        tabRepository.getTabsObservable()
-            .map { rankTabs(query, it) }
-            .flattenAsObservable { it }
-            .distinctUntilChanged()
-            .toList()
-            .onErrorReturn { emptyList() }
-            .toObservable()
+        // TODO: ANA - Do we want to have this check here, or somewhere else? (note: this is using the RxComputationThreadPool).
+        if (autocompleteTabsFeature.self().isEnabled()) {
+            tabRepository.getTabsObservable()
+                .map { rankTabs(query, it) }
+                .flattenAsObservable { it }
+                .distinctUntilChanged()
+                .toList()
+                .onErrorReturn { emptyList() }
+                .toObservable()
+        } else {
+            Observable.just(mutableListOf())
+        }
 
     private fun getAutoCompleteSearchResults(query: String) =
         autoCompleteService.autoComplete(query)

@@ -18,6 +18,7 @@ package com.duckduckgo.app.autocomplete.api
 
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -35,6 +36,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
 import com.duckduckgo.history.api.NavigationHistory
@@ -79,6 +81,12 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
 
+    @Mock
+    private lateinit var mockAutocompleteTabsFeature: AutocompleteTabsFeature
+
+    @Mock
+    private lateinit var mockToggle: Toggle
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -92,6 +100,8 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(NEW)
         }
+        whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
+        whenever(mockToggle.isEnabled()).thenReturn(true)
         testee = AutoCompleteApi(
             mockAutoCompleteService,
             mockSavedSitesRepository,
@@ -101,6 +111,7 @@ class AutoCompleteApiTest {
             mockTabRepository,
             mockUserStageStore,
             coroutineTestRule.testDispatcherProvider,
+            mockAutocompleteTabsFeature,
         )
     }
 
