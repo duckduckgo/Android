@@ -58,7 +58,8 @@ class RealSavedSitesExporter(
             if (content.isEmpty()) {
                 return ExportSavedSitesResult.NoSavedSitesExported
             }
-            val file = contentResolver.openFileDescriptor(uri, "w")
+            // "w" mode does not truncate on Android 10/11, use "rwt" mode workaround - https://issuetracker.google.com/issues/180526528
+            val file = contentResolver.openFileDescriptor(uri, "rwt")
             if (file != null) {
                 val fileOutputStream = FileOutputStream(file.fileDescriptor)
                 fileOutputStream.write(content.toByteArray())
