@@ -627,7 +627,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == EMPTY_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
         }
     }
 
@@ -638,7 +638,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == RANDOM_URL)
-            assertTrue(viewState.leadingIconState == SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
         }
     }
 
