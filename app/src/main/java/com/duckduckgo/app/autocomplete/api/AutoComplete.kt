@@ -168,23 +168,23 @@ class AutoCompleteApi @Inject constructor(
             }.take(maximumNumberOfTopHits)
 
             val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
-            val filteredBookmarks =
+            val filteredBookmarksAndTabsAndHistory =
                 bookmarksAndTabsAndHistory
                     .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
                     .take(maxBottomSection)
-            val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarks.size)
+            val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarksAndTabsAndHistory.size)
             val filteredSearchResults = searchResults
-                .filter { searchSuggestion -> filteredBookmarks.none { it.phrase == searchSuggestion.phrase } }
+                .filter { searchSuggestion -> filteredBookmarksAndTabsAndHistory.none { it.phrase == searchSuggestion.phrase } }
                 .take(maxSearchResults)
 
             val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
 
-            val suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy {
-                Pair<String, Class<out AutoCompleteSuggestion>>(
-                    it.phrase,
-                    it::class.java,
-                )
+            val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
+            val distinctSearchResults = filteredSearchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }
+            val suggestions = (topHits + distinctSearchResults + filteredBookmarksAndTabsAndHistory).distinctBy {
+                Pair(it.phrase, it::class.java)
             }
+
             runBlocking(dispatcherProvider.io()) {
                 if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
                     inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
