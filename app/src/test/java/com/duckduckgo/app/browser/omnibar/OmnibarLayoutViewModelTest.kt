@@ -1,7 +1,8 @@
 package com.duckduckgo.app.browser.omnibar
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -23,12 +24,15 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class OmnibarLayoutViewModelTest {
 
     @get:Rule
@@ -37,7 +41,7 @@ class OmnibarLayoutViewModelTest {
     private val tabRepository: TabRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl()
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
@@ -89,7 +93,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onAttachedToWindow()
 
-        verify(voiceSearchPixelLogger.log())
+        verify(voiceSearchPixelLogger).log()
     }
 
     @Test
@@ -98,7 +102,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onAttachedToWindow()
 
-        verify(voiceSearchPixelLogger.log(), times(0))
+        verifyNoInteractions(voiceSearchPixelLogger)
     }
 
     @Test
@@ -155,7 +159,7 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.leadingIconState == LeadingIconState.DAX)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showControls)
-            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
             cancelAndIgnoreRemainingEvents()
         }
@@ -174,7 +178,7 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.leadingIconState == LeadingIconState.DUCK_PLAYER)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showControls)
-            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
             cancelAndIgnoreRemainingEvents()
         }
@@ -192,7 +196,7 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showControls)
-            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
             cancelAndIgnoreRemainingEvents()
         }
@@ -210,9 +214,106 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showControls)
-            assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Visible(highlighted = false))
+            assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToCustomTabThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example.com", false))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            assertFalse(viewState.showClearButton)
+            assertFalse(viewState.showVoiceSearch)
+            assertFalse(viewState.showControls)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToSSLWarningThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.SSLWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToNewTabThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToBrowserThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.Browser("example.com"))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToErrorAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "example.com")
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToSSLWarningAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "example.com")
+        testee.onViewModeChanged(ViewMode.SSLWarning)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToNewTabAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "example.com")
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToBrowserAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, "example.com")
+        testee.onViewModeChanged(ViewMode.Browser("example.com"))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
         }
     }
 
