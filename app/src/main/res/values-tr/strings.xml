@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Sonraki</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
+    <string name="highlightsOnboardingSearchQueryOption4">ördek yavruları</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Gizli. Hızlı. Daha az reklam.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>

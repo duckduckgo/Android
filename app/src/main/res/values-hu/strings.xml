@@ -798,6 +798,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Következő</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
+    <string name="highlightsOnboardingSearchQueryOption4">kiskacsák</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>

@@ -802,6 +802,7 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Dalje</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dno</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Lako dostupno</string>
+    <string name="highlightsOnboardingSearchQueryOption4">pačići</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
