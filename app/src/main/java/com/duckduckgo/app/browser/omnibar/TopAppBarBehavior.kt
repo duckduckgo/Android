@@ -29,7 +29,7 @@ import com.google.android.material.appbar.AppBarLayout
  */
 class TopAppBarBehavior(
     context: Context,
-    private val toolbar: LegacyOmnibarView,
+    private val toolbar: View,
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
     override fun onNestedPreScroll(

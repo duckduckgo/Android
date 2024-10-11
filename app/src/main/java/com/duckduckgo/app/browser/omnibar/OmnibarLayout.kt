@@ -531,7 +531,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
         return when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context)
+            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
             OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
         }
     }

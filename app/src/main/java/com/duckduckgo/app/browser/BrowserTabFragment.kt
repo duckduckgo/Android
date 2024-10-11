@@ -823,7 +823,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore, changeOmnibarPositionFeature, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1137,7 +1137,7 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition())) {
+        if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
             return
         }

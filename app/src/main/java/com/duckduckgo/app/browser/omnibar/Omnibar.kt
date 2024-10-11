@@ -58,7 +58,6 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -80,7 +79,7 @@ import timber.log.Timber
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
-    private val settingsDataStore: SettingsDataStore,
+    val omnibarPosition: OmnibarPosition,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val binding: FragmentBrowserTabBinding,
 ) {
@@ -145,12 +144,8 @@ class Omnibar(
         actionBarSize
     }
 
-    fun omnibarPosition(): OmnibarPosition {
-        return settingsDataStore.omnibarPosition
-    }
-
     val newOmnibar: OmnibarLayout by lazy {
-        when (settingsDataStore.omnibarPosition) {
+        when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 Timber.d("Omnibar: using NewOmnibar anchored TOP")
                 binding.rootView.removeView(binding.legacyOmnibarBottom)
@@ -184,7 +179,7 @@ class Omnibar(
     }
 
     val legacyOmnibar: LegacyOmnibarView by lazy {
-        when (settingsDataStore.omnibarPosition) {
+        when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 Timber.d("Omnibar: using LegacyOmnibar anchored TOP")
                 binding.rootView.removeView(binding.newOmnibarBottom)
