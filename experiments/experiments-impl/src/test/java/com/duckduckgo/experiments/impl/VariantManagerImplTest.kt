@@ -43,7 +43,7 @@ class VariantManagerImplTest {
     fun setup() {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
-        whenever(mockExperimentFiltersManager.addFilters(any())).thenReturn { true }
+        whenever(mockExperimentFiltersManager.computeFilters(any())).thenReturn { true }
 
         testee = VariantManagerImpl(
             mockRandomizer,
