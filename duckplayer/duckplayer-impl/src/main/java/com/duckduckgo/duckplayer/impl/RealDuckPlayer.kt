@@ -36,6 +36,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -341,7 +346,11 @@ class RealDuckPlayer @Inject constructor(
             withContext(dispatchers.main()) {
                 webView.loadUrl(createDuckPlayerUriFromYoutube(url))
             }
-            pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+            if (url.getQueryParameter(ORIGIN_QUERY_PARAM) != ORIGIN_QUERY_PARAM_SERP_AUTO) {
+                pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+            } else {
+                pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
+            }
             return WebResourceResponse(null, null, null)
         }
         return null
@@ -388,10 +397,10 @@ class RealDuckPlayer @Inject constructor(
                 withContext(dispatchers.main()) {
                     webView.loadUrl(youtubeUrl)
                 }
-                val origin = url.getQueryParameter("origin")
-                if (origin == "serp") {
+                val origin = url.getQueryParameter(ORIGIN_QUERY_PARAM)
+                if (origin == ORIGIN_QUERY_PARAM_SERP) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
-                } else if (origin != "overlay" && origin != "auto") {
+                } else if (origin != ORIGIN_QUERY_PARAM_OVERLAY && origin != ORIGIN_QUERY_PARAM_AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
             }

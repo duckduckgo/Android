@@ -29,6 +29,11 @@ import kotlinx.coroutines.flow.Flow
 
 const val YOUTUBE_HOST = "youtube.com"
 const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
+const val ORIGIN_QUERY_PARAM = "origin"
+const val ORIGIN_QUERY_PARAM_SERP = "serp"
+const val ORIGIN_QUERY_PARAM_SERP_AUTO = "serp_auto"
+const val ORIGIN_QUERY_PARAM_OVERLAY = "overlay"
+const val ORIGIN_QUERY_PARAM_AUTO = "auto"
 
 /**
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
