@@ -23,6 +23,7 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -43,6 +44,10 @@ abstract class TabsDao {
 
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun flowTabs(): Flow<List<TabEntity>>
+
+    // TODO: ANA to remove this
+    @Query("select * from tabs where deletable is 0 order by position")
+    abstract fun singleTabs(): Single<List<TabEntity>>
 
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun liveTabs(): LiveData<List<TabEntity>>
