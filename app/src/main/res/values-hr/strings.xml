@@ -805,7 +805,7 @@
     <string name="highlightsOnboardingSearchQueryOption4">pačići</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Zapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 

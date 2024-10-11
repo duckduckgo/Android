@@ -801,7 +801,7 @@
     <string name="highlightsOnboardingSearchQueryOption4">anatroccoli</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Questo è <b>DuckDuckGo Search!</b> Privato. Veloce. Meno annunci.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
 

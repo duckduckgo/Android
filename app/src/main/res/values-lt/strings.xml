@@ -805,7 +805,7 @@
     <string name="highlightsOnboardingSearchQueryOption4">kūdikių ančiukai</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
 
