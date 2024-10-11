@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings
 import android.os.Bundle
 import android.view.View.OnClickListener
 import android.widget.CompoundButton
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -29,6 +30,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
@@ -39,9 +41,9 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(GeneralSettingsScreenNoParams::class)
@@ -49,6 +51,9 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var showOnAppLaunchFeature: ShowOnAppLaunchFeature
 
     private val viewModel: GeneralSettingsViewModel by bindViewModel()
     private val binding: ActivityGeneralSettingsBinding by viewBinding()
@@ -74,6 +79,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (!showOnAppLaunchFeature.self().isEnabled()) {
+            binding.showOnAppLaunchButton.isGone = true
+        }
 
         configureUiEventHandlers()
         observeViewModel()
