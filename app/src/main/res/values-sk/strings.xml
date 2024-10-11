@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Odstrániť návrh vyhľadávania?</string>
     <string name="autocompleteRemoveItemCancel">Zrušiť</string>
     <string name="autocompleteRemoveItemRemove">Odstrániť</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Prepnúť na kartu · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvoriť externú aplikáciu</string>

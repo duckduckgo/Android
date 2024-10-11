@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Arama önerisi kaldırılsın mı?</string>
     <string name="autocompleteRemoveItemCancel">Vazgeç</string>
     <string name="autocompleteRemoveItemRemove">Kaldır</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Sekmeye Geç · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Haricî Uygulamayı Aç</string>
