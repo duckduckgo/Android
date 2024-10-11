@@ -277,10 +277,12 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInput.replaceTextChangedListener(
             object : TextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
-                    viewModel.onInputStateChanged(
-                        omnibarTextInput.text.toString(),
-                        omnibarTextInput.hasFocus(),
-                    )
+                    if (isAttachedToWindow) {
+                        viewModel.onInputStateChanged(
+                            omnibarTextInput.text.toString(),
+                            omnibarTextInput.hasFocus(),
+                        )
+                    }
                     omnibarTextListener?.onOmnibarTextChanged(
                         OmnibarTextState(
                             omnibarTextInput.text.toString(),
