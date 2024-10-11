@@ -721,11 +721,7 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(
-                    phrase = "foo.com?key=value",
-                    "title foo",
-                    "https://foo.com?key=value",
-                ),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
                 AutoCompleteSearchSuggestion(phrase = "example.com", false),
                 AutoCompleteSearchSuggestion(phrase = "baz.com", true),
