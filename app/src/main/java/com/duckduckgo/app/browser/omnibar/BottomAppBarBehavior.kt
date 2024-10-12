@@ -40,7 +40,7 @@ import kotlin.math.roundToInt
  */
 class BottomAppBarBehavior<V : View>(
     context: Context,
-    private val toolbar: LegacyOmnibarView,
+    private val omnibar: LegacyOmnibarView,
     attrs: AttributeSet? = null,
 ) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
@@ -57,8 +57,9 @@ class BottomAppBarBehavior<V : View>(
 
         if (dependency.id == R.id.browserLayout) {
             browserLayout = dependency as RelativeLayout
-            offsetBottomByToolbar(browserLayout)
         }
+
+        offsetBottomByToolbar(dependency)
 
         return super.layoutDependsOn(parent, child, dependency)
     }
@@ -89,21 +90,22 @@ class BottomAppBarBehavior<V : View>(
         consumed: IntArray,
         type: Int,
     ) {
-        super.onNestedPreScroll(coordinatorLayout, toolbar, target, dx, dy, consumed, type)
+        if (omnibar.isScrollingEnabled) {
+            super.onNestedPreScroll(coordinatorLayout, toolbar, target, dx, dy, consumed, type)
 
-        // only hide the app bar in the browser layout
-        if (target.id == R.id.browserWebView) {
-            toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
-            offsetBottomByToolbar(browserLayout)
+            // only hide the app bar in the browser layout
+            if (target.id == R.id.browserWebView) {
+                toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
+            }
+
+            offsetBottomByToolbar(target)
         }
-
-        offsetBottomByToolbar(target)
     }
 
     private fun offsetBottomByToolbar(view: View?) {
         if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
             view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                this.bottomMargin = toolbar.measuredHeight - toolbar.translationY.roundToInt()
+                this.bottomMargin = omnibar.measuredHeight - omnibar.translationY.roundToInt()
             }
             view.requestLayout()
         }
@@ -135,12 +137,12 @@ class BottomAppBarBehavior<V : View>(
 
         offsetAnimator?.addUpdateListener { animation ->
             val animatedValue = animation.animatedValue as Float
-            toolbar.translationY = animatedValue
+            omnibar.translationY = animatedValue
             offsetBottomByToolbar(browserLayout)
         }
 
-        val targetTranslation = if (isVisible) 0f else toolbar.height.toFloat()
-        offsetAnimator?.setFloatValues(toolbar.translationY, targetTranslation)
+        val targetTranslation = if (isVisible) 0f else omnibar.height.toFloat()
+        offsetAnimator?.setFloatValues(omnibar.translationY, targetTranslation)
         offsetAnimator?.start()
     }
 

@@ -61,9 +61,9 @@ import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
@@ -138,6 +138,12 @@ class Omnibar(
     val spacer = legacyOmnibar.spacer
     val textInputRootView = legacyOmnibar.omnibarTextInput.rootView
 
+    var isScrollingEnabled: Boolean
+        get() = legacyOmnibar.isScrollingEnabled
+        set(value) {
+            legacyOmnibar.isScrollingEnabled = value
+        }
+
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             Error -> {
@@ -145,7 +151,7 @@ class Omnibar(
                 shieldIcon.isInvisible = true
             }
             NewTab -> {
-                setScrollingEnabled(false)
+                isScrollingEnabled = false
                 setExpanded(true)
             }
             SSLWarning -> {
@@ -404,10 +410,6 @@ class Omnibar(
         onAnimationEnd: (Animator?) -> Unit,
     ) {
         legacyOmnibar.onNewProgress(newProgress, onAnimationEnd)
-    }
-
-    fun setScrollingEnabled(enabled: Boolean) {
-        legacyOmnibar.setScrollingEnabled(enabled)
     }
 
     fun configureCustomTab(

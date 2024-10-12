@@ -76,7 +76,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -141,7 +140,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -301,11 +299,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -319,6 +312,11 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -368,9 +366,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
-
-    @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
@@ -3974,7 +3969,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
-            omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
+            omnibar.isScrollingEnabled = false
             viewModel.onNewTabShown()
         }
 
