@@ -61,9 +61,9 @@ import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
-import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
