@@ -137,6 +137,8 @@ class AutoCompleteApi @Inject constructor(
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
+    private var isAutocompleteTabsFeatureEnabled: Boolean? = null
+
     override fun autoComplete(query: String): Flow<AutoCompleteResult> = flow {
         if (query.isBlank()) {
             return@flow emit(AutoCompleteResult(query = query, suggestions = emptyList()))
@@ -249,7 +251,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
         runCatching {
-            if (autocompleteTabsFeature.self().isEnabled()) {
+            if (autocompleteTabsEnabled) {
                 tabRepository.flowTabs
                     .map { rankTabs(query, it) }
                     .distinctUntilChanged()
@@ -257,6 +259,14 @@ class AutoCompleteApi @Inject constructor(
                 flowOf(emptyList())
             }
         }.getOrElse { flowOf(emptyList()) }
+
+    private val autocompleteTabsEnabled: Boolean by lazy {
+        isAutocompleteTabsFeatureEnabled ?: run {
+            val enabled = autocompleteTabsFeature.self().isEnabled()
+            isAutocompleteTabsFeatureEnabled = enabled
+            enabled
+        }
+    }
 
     private fun getAutoCompleteSearchResults(query: String) = flow {
         val searchSuggestionsList = mutableListOf<AutoCompleteSearchSuggestion>()

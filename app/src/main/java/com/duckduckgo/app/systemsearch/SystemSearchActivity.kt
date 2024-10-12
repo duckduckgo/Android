@@ -28,6 +28,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -41,6 +42,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -243,6 +245,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+        binding.autocompleteSuggestions.addItemDecoration(
+            SuggestionItemDecoration(ContextCompat.getDrawable(this, R.drawable.suggestions_divider)!!),
+        )
 
         binding.results.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->

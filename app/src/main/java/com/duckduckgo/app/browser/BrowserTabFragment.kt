@@ -1732,6 +1732,9 @@ class BrowserTabFragment :
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
             is Command.SwitchToTab -> {
+                binding.focusedView.gone()
+                viewModel.autoCompleteSuggestionsGone()
+                binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
             else -> {
