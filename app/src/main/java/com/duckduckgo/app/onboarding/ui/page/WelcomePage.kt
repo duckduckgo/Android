@@ -222,7 +222,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCtaExperiment.comparisonChart.featureIcon3.show()
                     binding.daxDialogCtaExperiment.comparisonChart.featureIcon4.show()
                     binding.daxDialogCtaExperiment.comparisonChart.featureIcon5.show()
-                    binding.daxDialogCtaExperiment.comparisonChart.feature2.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem2)
                     binding.daxDialogCtaExperiment.comparisonChart.feature3.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem3)
                     binding.daxDialogCtaExperiment.comparisonChart.feature4.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem4)
                     binding.daxDialogCtaExperiment.comparisonChart.feature5.text = it.getString(R.string.highlightsPreOnboardingComparisonChartItem5)
