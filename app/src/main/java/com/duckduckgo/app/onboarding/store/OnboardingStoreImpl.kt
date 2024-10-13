@@ -200,7 +200,7 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
-                link = context.getString(R.string.highlightsOnboardingSearchQueryOption4),
+                link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
             ),
         )
     }
