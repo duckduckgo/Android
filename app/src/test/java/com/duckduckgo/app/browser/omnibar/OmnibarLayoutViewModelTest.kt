@@ -788,9 +788,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
-    @Test
-    fun when
-
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
