@@ -417,7 +417,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     }
 
     private fun setBackgroundRes(backgroundRes: Int) {
-        binding.sceneBg.setBackgroundResource(backgroundRes)
+        binding.sceneBg.setImageResource(backgroundRes)
     }
 
     companion object {
