@@ -801,7 +801,7 @@
     <string name="highlightsOnboardingSearchQueryOption4">patitos</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tus búsquedas en DuckDuckGo son siempre privadas.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[¡Eso es <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anuncios.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Pruébalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Omitir</string>
 
