@@ -68,7 +68,6 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -362,9 +361,11 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderTabIcon(tabs: List<TabEntity>) {
-        tabsMenu.count = tabs.count()
-        tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
+    private fun renderTabIcon(viewState: ViewState) {
+        if (viewState.shouldUpdateTabsCount) {
+            tabsMenu.count = viewState.tabs.count()
+            tabsMenu.hasUnread = viewState.tabs.firstOrNull { !it.viewed } != null
+        }
     }
 
     private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
@@ -435,7 +436,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
-        renderTabIcon(viewState.tabs)
+        renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState.leadingIconState)

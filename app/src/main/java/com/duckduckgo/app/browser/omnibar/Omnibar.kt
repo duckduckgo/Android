@@ -661,18 +661,24 @@ class Omnibar(
     }
 
     fun animateTabsCount() {
-        tabsMenu.animateCount()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            tabsMenu.animateCount()
+        }
     }
 
     fun renderTabIcon(tabs: List<TabEntity>) {
-        tabsMenu.count = tabs.count()
-        tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            tabsMenu.count = tabs.count()
+            tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
+        }
     }
 
     fun incrementTabs(onTabsIncremented: () -> Unit) {
-        setExpanded(true, true)
-        tabsMenu.increment {
-            onTabsIncremented()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            setExpanded(true, true)
+            tabsMenu.increment {
+                onTabsIncremented()
+            }
         }
     }
 

@@ -97,6 +97,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val updateOmnibarText: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
         val tabs: List<TabEntity> = emptyList(),
+        val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
         val showControls: Boolean = true,
@@ -122,7 +123,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             tabRepository.flowTabs
                 .onEach { tabs ->
-                    _viewState.update { it.copy(tabs = tabs) }
+                    _viewState.update {
+                        it.copy(
+                            shouldUpdateTabsCount = tabs.count() != it.tabs.count(),
+                            tabs = tabs,
+                        )
+                    }
                 }.flowOn(dispatcherProvider.io())
                 .launchIn(viewModelScope)
         }
