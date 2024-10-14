@@ -923,9 +923,9 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com", "Reddit", "https://www.reddit.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://www.reddit.com"),
                 AutoCompleteBookmarkSuggestion(
-                    phrase = "www.reddit.com/r/duckduckgo",
+                    phrase = "reddit.com/r/duckduckgo",
                     "duckduckgo",
                     "https://www.reddit.com/r/duckduckgo",
                 ),
@@ -1266,6 +1266,28 @@ class AutoCompleteApiTest {
         val value = result.first()
 
         assertEquals(listOf<AutoCompleteSuggestion>(AutoCompleteDefaultSuggestion(query)), value.suggestions)
+    }
+
+    @Test
+    fun whenFormatIfUrlCalledOnStringThenTheStringHasExpectedPrefixAndSuffixRemoved() {
+        assertEquals("example.com", "example.com".formatIfUrl())
+        assertEquals("example.com", "example.com/".formatIfUrl())
+        assertEquals("example.com", "www.example.com".formatIfUrl())
+        assertEquals("example.com", "www.example.com/".formatIfUrl())
+        assertEquals("example.com", "https://example.com".formatIfUrl())
+        assertEquals("example.com", "https://example.com/".formatIfUrl())
+        assertEquals("example.com", "https://www.example.com/".formatIfUrl())
+        assertEquals("example.com", "https://www.example.com".formatIfUrl())
+        assertEquals("example.com", "http://example.com".formatIfUrl())
+        assertEquals("example.com", "http://example.com/".formatIfUrl())
+        assertEquals("example.com", "http://www.example.com/".formatIfUrl())
+        assertEquals("example.com", "http://www.example.com".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "example.com/path?query1=1&query2=1".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "www.example.com/path?query1=1&query2=1".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "http://example.com/path?query1=1&query2=1".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "http://www.example.com/path?query1=1&query2=1".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "https://example.com/path?query1=1&query2=1".formatIfUrl())
+        assertEquals("example.com/path?query1=1&query2=1", "https://www.example.com/path?query1=1&query2=1".formatIfUrl())
     }
 
     private fun favorite(
