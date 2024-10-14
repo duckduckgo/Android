@@ -25,11 +25,18 @@
     tools:alpha="1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/onboardingDaxDialogBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:background="@drawable/onboarding_experiment_background_bitmap_light"
         android:clipChildren="false">
+
+        <ImageView
+            android:id="@+id/onboardingDaxDialogBackground"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/onboarding_background_small_light" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/logo"
@@ -45,12 +52,12 @@
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_4"
-            app:edgePosition="left"
             app:arrowHeight="16dp"
             app:arrowOffsetEnd="12dp"
+            app:edgePosition="left"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/logo"
@@ -71,8 +78,8 @@
                         android:id="@+id/onboardingDialogTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/onboardingEndDaxDialogTitle"
                         android:layout_marginBottom="@dimen/keyline_1"
+                        android:text="@string/onboardingEndDaxDialogTitle"
                         app:typography="h2" />
 
                     <FrameLayout
