@@ -255,16 +255,20 @@ class SystemSearchViewModel @Inject constructor(
         resultsViewState.postValue(
             when (val currentResultsState = currentResultsState()) {
                 is Suggestions.SystemSearchResultsViewState -> {
+                    println("TAG_ANA getting a SystemSearchResultsViewState and posting a SystemSearchResultsViewState")
                     currentResultsState.copy(
                         autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
                         appResults = updatedApps,
                     )
                 }
 
-                is Suggestions.QuickAccessItems -> Suggestions.SystemSearchResultsViewState(
-                    autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                    appResults = updatedApps,
-                )
+                is Suggestions.QuickAccessItems -> {
+                    println("TAG_ANA getting a QuickAccessItems and posting a SystemSearchResultsViewState")
+                    Suggestions.SystemSearchResultsViewState(
+                        autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+                        appResults = updatedApps,
+                    )
+                }
             },
         )
     }

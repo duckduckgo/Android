@@ -18,6 +18,7 @@ package com.duckduckgo.app.systemsearch
 
 import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
@@ -168,10 +169,14 @@ class SystemSearchViewModelTest {
     fun whenUserUpdatesQueryThenViewStateUpdated() = runTest {
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
+            val newViewState = state as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
+
+        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
@@ -179,11 +184,14 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
-        val newViewState1 = testee.resultsViewState.value as QuickAccessItems
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
+            val newViewState = state as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
+
+        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
@@ -191,10 +199,14 @@ class SystemSearchViewModelTest {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
+            val newViewState = state as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
+
+        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
@@ -574,6 +586,18 @@ class SystemSearchViewModelTest {
             verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val issuedCommand = commandCaptor.allValues.find { it is T }
             assertNull(issuedCommand)
+        }
+    }
+
+    private fun <T> MutableLiveData<T>.observeAndSkipFirstEvent(observer: Observer<T>) {
+        var skipFirstEvent = true
+        observeForever { value ->
+            if (skipFirstEvent) {
+                skipFirstEvent = false
+                return@observeForever
+            }
+            observer.onChanged(value)
+            removeObserver(observer)
         }
     }
 
