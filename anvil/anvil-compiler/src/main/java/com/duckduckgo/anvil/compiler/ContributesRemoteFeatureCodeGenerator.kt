@@ -526,6 +526,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         weight = cohort.weight,
                                     )
                                 } ?: emptyList()
+                                val config = jsonToggle?.config ?: emptyMap()
                                 this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -536,6 +537,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         assignedCohort = previousAssignedCohort,
                                         targets = targets,
                                         cohorts = cohorts,
+                                        config = config,                                        
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -777,6 +779,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "cohorts",
                         List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
                     )
+                    .addParameter(
+                        "config",
+                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()),
+                    )
                     .build(),
             )
             .addProperty(
@@ -807,6 +813,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
                     .initializer("cohorts")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("config", Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()))
+                    .initializer("config")
                     .build(),
             )
             .build()
