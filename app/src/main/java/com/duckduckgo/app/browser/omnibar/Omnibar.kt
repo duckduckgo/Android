@@ -77,13 +77,6 @@ class Omnibar(
         data object NewTab : ViewMode()
     }
 
-    private val actionBarSize: Int by lazy {
-        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-        val actionBarSize = array.getDimensionPixelSize(0, -1)
-        array.recycle()
-        actionBarSize
-    }
-
     val legacyOmnibar: LegacyOmnibarView by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
@@ -98,11 +91,6 @@ class Omnibar(
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedView)
-
-                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
-                binding.includeNewBrowserTab.browserBackground.apply {
-                    setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
-                }
 
                 // prevent the touch event leaking to the webView below
                 binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
