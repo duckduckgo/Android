@@ -363,12 +363,14 @@ class Omnibar(
     var isScrollingEnabled: Boolean
         get() =
             if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                legacyOmnibar.isScrollingEnabled
+                newOmnibar.isScrollingEnabled
             } else {
                 legacyOmnibar.isScrollingEnabled
             }
         set(value) {
-            if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                newOmnibar.isScrollingEnabled = value
+            } else {
                 legacyOmnibar.isScrollingEnabled = value
             }
         }

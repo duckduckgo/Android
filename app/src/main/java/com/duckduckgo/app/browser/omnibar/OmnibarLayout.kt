@@ -131,9 +131,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
-
-    @Inject
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
 
     @Inject
@@ -201,6 +198,12 @@ class OmnibarLayout @JvmOverloads constructor(
     )
 
     var isScrollingEnabled: Boolean = true
+        set(value) {
+            field = value
+            if (!value) {
+                setExpanded(expanded = true, animate = true)
+            }
+        }
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -432,7 +435,8 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarTextInput.setSelection(viewState.omnibarText.length)
         }
 
-        renderScrolling(viewState.scrollingEnabled)
+        isScrollingEnabled = viewState.scrollingEnabled
+
         renderTabIcon(viewState.tabs)
         renderPulseAnimation(viewState)
 
@@ -541,17 +545,6 @@ class OmnibarLayout @JvmOverloads constructor(
         return when (omnibarPosition) {
             OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
             OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
-        }
-    }
-
-    private fun renderScrolling(enabled: Boolean) {
-        if (isAttachedToWindow) {
-            isScrollingEnabled = enabled
-            if (enabled) {
-                omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
-            } else {
-                omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-            }
         }
     }
 
