@@ -17,11 +17,13 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -704,6 +706,78 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenOmnibarFocusedAndLoadingStateChangesThenViewStateCorrect() = runTest {
+        val omnibarState = OmnibarViewState(
+            navigationChange = false,
+            omnibarText = QUERY,
+            forceExpand = false,
+            shouldMoveCaretToEnd = true,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
+        testee.onOmnibarFocusChanged(true, QUERY)
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = true,
+                    privacyOn = true,
+                    progress = 100,
+                    url = SERP_URL,
+                ),
+            ) {},
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == SEARCH)
+            assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
+            assertTrue(viewState.omnibarText == QUERY)
+            assertTrue(viewState.updateOmnibarText)
+            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
+        }
+    }
+
+    @Test
+    fun whenTrackersAnimationStartedAndOmnibarNotFocusedThenCommandAndViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.StartTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTrackersAnimationStartedAndOmnibarFocusedThenCommandAndViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndAnimationPlayingThenAnimationsCanceled() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
@@ -716,6 +790,12 @@ class OmnibarLayoutViewModelTest {
                 ),
             ) {},
         )
+    }
+
+    private fun givenSomeTrackers(): List<Entity> {
+        val network = TestingEntity("Network", "Network", 1.0)
+        val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
+        return listOf(network, majorNetwork)
     }
 
     private fun Command.assertCommand(expectedType: KClass<out Command>) {

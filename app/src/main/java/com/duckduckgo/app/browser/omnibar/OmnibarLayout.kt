@@ -58,6 +58,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTracker
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -347,8 +350,12 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
-            OmnibarLayoutViewModel.Command.CancelTrackersAnimation -> {
+            CancelTrackersAnimation -> {
                 cancelTrackersAnimation()
+            }
+
+            is StartTrackersAnimation -> {
+                startTrackersAnimation(command.entities)
             }
         }
     }
@@ -469,7 +476,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is LaunchTrackersAnimation -> {
-                startTrackersAnimation(decoration.entities)
+                viewModel.onAnimationStarted(decoration)
             }
 
             is LaunchCookiesAnimation -> {
@@ -634,7 +641,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         privacyShieldView.setAnimationView(shieldIcon, privacyShield)
-        cancelTrackersAnimation()
     }
 
     private fun renderOutline(enabled: Boolean) {

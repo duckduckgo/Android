@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DAX
@@ -44,6 +45,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -104,6 +106,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     sealed class Command {
         data object CancelTrackersAnimation : Command()
+        data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
     }
 
     enum class LeadingIconState {
@@ -158,7 +161,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     hasFocus = false,
                     expanded = false,
-                    leadingIconState = leadingIconState(it.url),
+                    leadingIconState = getLeadingIconState(it.url),
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
                     showControls = true,
@@ -177,13 +180,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
-    private fun leadingIconState(url: String): LeadingIconState {
+    private fun getLeadingIconState(url: String): LeadingIconState {
+        val hasFocus = _viewState.value.hasFocus
         return when (_viewState.value.viewMode) {
             Error -> GLOBE
             NewTab -> SEARCH
             SSLWarning -> GLOBE
             else -> {
-                if (shouldShowDaxIcon(url)) {
+                if (hasFocus) {
+                    SEARCH
+                } else if (shouldShowDaxIcon(url)) {
                     DAX
                 } else if (shouldShowDuckPlayerIcon(url)) {
                     DUCK_PLAYER
@@ -369,7 +375,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
-        Timber.d("Omnibar: onHighlightItem $decoration")
         if (decoration.privacyShield) {
             _viewState.update {
                 it.copy(
@@ -409,6 +414,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState) {
+        Timber.d("Omnibar: onExternalOmnibarStateChanged $omnibarViewState")
         if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText)) {
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
@@ -441,10 +447,11 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
+        Timber.d("Omnibar: onExternalLoadingStateChanged $loadingState")
         _viewState.update {
             it.copy(
                 url = loadingState.url,
-                leadingIconState = leadingIconState(loadingState.url),
+                leadingIconState = getLeadingIconState(loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = _viewState.value.hasFocus,
                     query = _viewState.value.omnibarText,
@@ -481,6 +488,20 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.KEYBOARD_GO_SERP_CLICKED,
             AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
         )
+    }
+
+    fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
+        val hasFocus = _viewState.value.hasFocus
+        if (!hasFocus) {
+            _viewState.update {
+                it.copy(
+                    leadingIconState = PRIVACY_SHIELD,
+                )
+            }
+            viewModelScope.launch {
+                command.send(Command.StartTrackersAnimation(decoration.entities))
+            }
+        }
     }
 
     private fun shouldUpdateOmnibarTextInput(
