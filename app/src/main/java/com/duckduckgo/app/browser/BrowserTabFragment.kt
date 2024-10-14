@@ -3896,8 +3896,6 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
             }
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
-
             viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
@@ -3915,10 +3913,6 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
             }
-            newBrowserTab.newTabLayout.setOnClickListener {
-                daxDialogIntroBubbleCtaExperiment.dialogTextCta.finishAnimation()
-            }
-
             viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
@@ -3954,17 +3948,7 @@ class BrowserTabFragment :
                 }
             }
             viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
-            binding.webViewContainer.setOnClickListener {
-                daxDialogOnboardingCta.dialogTextCta.finishAnimation()
-            }
-            binding.webViewContainer.setOnClickListener {
-                daxDialogOnboardingCtaExperiment.dialogTextCta.finishAnimation()
-            }
             viewModel.onCtaShown()
-        }
-
-        private fun removeNewTabLayoutClickListener() {
-            newBrowserTab.newTabLayout.setOnClickListener(null)
         }
 
         private fun showHomeCta(
