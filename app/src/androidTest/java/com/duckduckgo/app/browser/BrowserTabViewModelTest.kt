@@ -5891,6 +5891,7 @@ class BrowserTabViewModelTest {
     fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
         setBrowserShowing(true)
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockDisabledToggle)
         val observer = mock<(OmnibarViewState) -> Unit>()
         testee.omnibarViewState.observeForever { observer(it) }
 
