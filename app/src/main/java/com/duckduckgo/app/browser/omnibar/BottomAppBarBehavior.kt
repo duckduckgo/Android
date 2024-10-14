@@ -57,9 +57,9 @@ class BottomAppBarBehavior<V : View>(
 
         if (dependency.id == R.id.browserLayout) {
             browserLayout = dependency as RelativeLayout
+        } else if (dependency.id == R.id.autoCompleteSuggestionsList) {
+            offsetBottomByToolbar(dependency)
         }
-
-        offsetBottomByToolbar(dependency)
 
         return super.layoutDependsOn(parent, child, dependency)
     }
