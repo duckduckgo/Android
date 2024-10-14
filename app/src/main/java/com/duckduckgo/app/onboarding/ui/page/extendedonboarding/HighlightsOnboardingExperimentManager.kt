@@ -32,12 +32,12 @@ class HighlightsOnboardingExperimentManagerImpl @Inject constructor(
     private val variantManager: VariantManager,
 ) : HighlightsOnboardingExperimentManager {
 
-    private val isExtendedOnboardingEnabled: Boolean = false
+    private val isExtendedOnboardingEnabled: Boolean = true
 
     override fun setExperimentVariants() {
         val variants = listOf(
-            VariantConfig("mw", 0.0, null), // Control variant
-            VariantConfig("mx", 0.0, null), // Experimental variant
+            VariantConfig("mw", 1.0, null), // Control variant
+            VariantConfig("mx", 1.0, null), // Experimental variant
         )
         variantManager.updateVariants(variants)
     }
