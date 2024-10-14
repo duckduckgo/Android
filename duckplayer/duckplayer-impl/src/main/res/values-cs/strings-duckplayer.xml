@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">Duck Player není dostupný</string>
     <string name="duck_player_unavailable_description">Funkčnost přehrávače Duck Player ovlivnily nedávné změny na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
     <string name="duck_player_unavailable_learn_more">Více informací</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Otevřít Duck Player na nové kartě</string>
 </resources>

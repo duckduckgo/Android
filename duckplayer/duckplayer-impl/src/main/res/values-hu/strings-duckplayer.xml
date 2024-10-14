@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">A Duck Player nem érhető el</string>
     <string name="duck_player_unavailable_description">A YouTube legutóbbi módosításai érintik a Duck Player működését. Dolgozunk a problémák megoldásán, és köszönjük a megértésedet.</string>
     <string name="duck_player_unavailable_learn_more">További részletek</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Nyisd meg a Duck Playert egy új lapon</string>
 </resources>
