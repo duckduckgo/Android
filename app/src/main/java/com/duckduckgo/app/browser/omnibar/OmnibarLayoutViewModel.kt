@@ -177,6 +177,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    fun onOmnibarScrollingEnabledChanged(isEnabled: Boolean) {
+        _viewState.update {
+            it.copy(
+                scrollingEnabled = isEnabled,
+                expanded = !isEnabled,
+                expandedAnimated = !isEnabled,
+            )
+        }
+    }
+
     private fun logVoiceSearchAvailability() {
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }

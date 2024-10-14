@@ -197,12 +197,10 @@ class OmnibarLayout @JvmOverloads constructor(
         searchIcon,
     )
 
-    var isScrollingEnabled: Boolean = true
+    var isScrollingEnabled: Boolean
+        get() = viewModel.viewState.value.scrollingEnabled
         set(value) {
-            field = value
-            if (!value) {
-                setExpanded(expanded = true, animate = true)
-            }
+            viewModel.onOmnibarScrollingEnabledChanged(value)
         }
 
     private var coroutineScope: CoroutineScope? = null
