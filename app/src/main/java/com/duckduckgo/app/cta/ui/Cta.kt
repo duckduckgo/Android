@@ -24,7 +24,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -879,7 +878,7 @@ sealed class DaxBubbleCta(
         }
         view.animate().alpha(1f).setDuration(500).setStartDelay(600)
             .withEndAction {
-                ViewCompat.animate(view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle)).alpha(1f).setDuration(500)
+                view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle).animate().alpha(1f).setDuration(500)
                     .withEndAction {
                         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
                             view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
