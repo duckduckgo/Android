@@ -27,7 +27,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -100,9 +99,6 @@ class LegacyOmnibarView @JvmOverloads constructor(
     private val omnibarPosition: OmnibarPosition
 
     @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
-
-    @Inject
     lateinit var privacyShieldView: PrivacyShieldAnimationHelper
 
     @Inject
@@ -139,6 +135,14 @@ class LegacyOmnibarView @JvmOverloads constructor(
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
     private var privacyShield: PrivacyShield? = null
+
+    var isScrollingEnabled: Boolean = true
+        set(value) {
+            field = value
+            if (!value) {
+                setExpanded(expanded = true, animate = true)
+            }
+        }
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
@@ -256,16 +260,6 @@ class LegacyOmnibarView @JvmOverloads constructor(
         }
     }
 
-    fun setScrollingEnabled(enabled: Boolean) {
-        safeCall {
-            if (enabled) {
-                omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
-            } else {
-                omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-            }
-        }
-    }
-
     private fun renderPulseAnimation(viewState: BrowserViewState) {
         val targetView = if (viewState.showMenuButton.isHighlighted()) {
             browserMenuImageView
@@ -279,7 +273,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
 
         // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
-            setScrollingEnabled(false)
+            isScrollingEnabled = false
             doOnLayout {
                 if (this::pulseAnimation.isInitialized) {
                     pulseAnimation.playOn(targetView)
@@ -287,7 +281,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
             }
         } else {
             if (viewState.browserShowing) {
-                setScrollingEnabled(true)
+                isScrollingEnabled = true
             }
             if (this::pulseAnimation.isInitialized) {
                 pulseAnimation.stop()

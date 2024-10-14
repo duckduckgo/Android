@@ -76,7 +76,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -141,7 +140,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -368,9 +366,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
-
-    @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
@@ -3974,7 +3969,7 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
-            omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
+            omnibar.isScrollingEnabled = false
             viewModel.onNewTabShown()
         }
 

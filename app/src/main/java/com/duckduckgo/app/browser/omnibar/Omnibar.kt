@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
@@ -61,7 +60,6 @@ import com.duckduckgo.common.utils.extensions.isDifferent
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
 
@@ -75,13 +73,6 @@ class Omnibar(
         data object Error : ViewMode()
         data object SSLWarning : ViewMode()
         data object NewTab : ViewMode()
-    }
-
-    private val actionBarSize: Int by lazy {
-        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-        val actionBarSize = array.getDimensionPixelSize(0, -1)
-        array.recycle()
-        actionBarSize
     }
 
     val legacyOmnibar: LegacyOmnibarView by lazy {
@@ -98,11 +89,6 @@ class Omnibar(
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedView)
-
-                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
-                binding.includeNewBrowserTab.browserBackground.apply {
-                    setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
-                }
 
                 // prevent the touch event leaking to the webView below
                 binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
@@ -138,6 +124,12 @@ class Omnibar(
     val spacer = legacyOmnibar.spacer
     val textInputRootView = legacyOmnibar.omnibarTextInput.rootView
 
+    var isScrollingEnabled: Boolean
+        get() = legacyOmnibar.isScrollingEnabled
+        set(value) {
+            legacyOmnibar.isScrollingEnabled = value
+        }
+
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             Error -> {
@@ -145,7 +137,7 @@ class Omnibar(
                 shieldIcon.isInvisible = true
             }
             NewTab -> {
-                setScrollingEnabled(false)
+                isScrollingEnabled = false
                 setExpanded(true)
             }
             SSLWarning -> {
@@ -404,10 +396,6 @@ class Omnibar(
         onAnimationEnd: (Animator?) -> Unit,
     ) {
         legacyOmnibar.onNewProgress(newProgress, onAnimationEnd)
-    }
-
-    fun setScrollingEnabled(enabled: Boolean) {
-        legacyOmnibar.setScrollingEnabled(enabled)
     }
 
     fun configureCustomTab(
