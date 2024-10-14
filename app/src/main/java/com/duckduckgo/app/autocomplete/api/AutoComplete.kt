@@ -17,6 +17,7 @@
 package com.duckduckgo.app.autocomplete.api
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
@@ -274,7 +275,7 @@ class AutoCompleteApi @Inject constructor(
             val rawResults = autoCompleteService.autoComplete(query)
             for (rawResult in rawResults) {
                 val searchSuggestion = AutoCompleteSearchSuggestion(
-                    phrase = rawResult.phrase,
+                    phrase = rawResult.phrase.formatIfUrl(),
                     isUrl = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
                 )
                 searchSuggestionsList.add(searchSuggestion)
@@ -340,7 +341,7 @@ class AutoCompleteApi @Inject constructor(
         return this.map { tabEntity ->
             RankedSuggestion(
                 AutoCompleteSwitchToTabSuggestion(
-                    phrase = tabEntity.url?.toUri()?.toStringDropScheme().orEmpty(),
+                    phrase = tabEntity.url?.formatIfUrl().orEmpty(),
                     title = tabEntity.title.orEmpty(),
                     url = tabEntity.url.orEmpty(),
                     tabId = tabEntity.tabId,
@@ -357,7 +358,7 @@ class AutoCompleteApi @Inject constructor(
         return this.map { savedSite ->
             RankedSuggestion(
                 AutoCompleteBookmarkSuggestion(
-                    phrase = savedSite.url.toUri().toStringDropScheme(),
+                    phrase = savedSite.url.formatIfUrl(),
                     title = savedSite.title,
                     url = savedSite.url,
                     isFavorite = savedSite is Favorite,
@@ -392,7 +393,7 @@ class AutoCompleteApi @Inject constructor(
                 when (entry) {
                     is VisitedPage -> {
                         AutoCompleteHistorySuggestion(
-                            phrase = entry.url.toStringDropScheme(),
+                            phrase = entry.url.toString().formatIfUrl(),
                             title = entry.title,
                             url = entry.url.toString(),
                             isAllowedInTopHits = isAllowedInTopHits(entry),
@@ -400,7 +401,7 @@ class AutoCompleteApi @Inject constructor(
                     }
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
-                            phrase = entry.query,
+                            phrase = entry.query.formatIfUrl(),
                             isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
@@ -464,4 +465,16 @@ class AutoCompleteApi @Inject constructor(
         val suggestion: T,
         val score: Int = DEFAULT_SCORE,
     )
+}
+
+@VisibleForTesting
+internal fun String.formatIfUrl(): String {
+    val trimmedUrl = this.trimEnd('/')
+
+    val prefixToRemove = listOf("http://www.", "https://www.", "www.", "http://", "https://")
+    val formattedUrl = prefixToRemove.find { trimmedUrl.startsWith(it, ignoreCase = true) }?.let {
+        trimmedUrl.substring(it.length)
+    } ?: trimmedUrl
+
+    return formattedUrl
 }
