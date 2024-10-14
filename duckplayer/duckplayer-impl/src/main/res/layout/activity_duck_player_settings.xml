@@ -122,7 +122,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/duckPlayerModeSelector"
-                app:primaryText="@string/open_youtube_videos_in_duck_player"
+                app:primaryText="@string/duck_player_open_videos_setting"
                 />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
