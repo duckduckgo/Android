@@ -424,16 +424,13 @@ class OmnibarLayout @JvmOverloads constructor(
         if (viewState.updateOmnibarText) {
             omnibarTextInput.setText(viewState.omnibarText)
         }
-        if (viewState.hasFocus) {
-            if (viewState.expanded) {
-                setExpanded(true, viewState.expandedAnimated)
-            }
-            if (viewState.shouldMoveCaretToEnd) {
-                omnibarTextInput.setSelection(viewState.omnibarText.length)
-            }
-        } else {
-            renderTabIcon(viewState.tabs)
+        if (viewState.expanded) {
+            setExpanded(true, viewState.expandedAnimated)
         }
+        if (viewState.shouldMoveCaretToEnd) {
+            omnibarTextInput.setSelection(viewState.omnibarText.length)
+        }
+        renderTabIcon(viewState.tabs)
         renderPulseAnimation(viewState)
         renderLeadingIconState(viewState.leadingIconState)
     }

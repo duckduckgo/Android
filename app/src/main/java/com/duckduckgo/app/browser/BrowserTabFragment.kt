@@ -3730,7 +3730,7 @@ class BrowserTabFragment :
                 omnibar.renderOmnibarViewState(viewState)
 
                 lastSeenBrowserViewState?.let {
-                    omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
+                    // omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
                 }
             }
         }

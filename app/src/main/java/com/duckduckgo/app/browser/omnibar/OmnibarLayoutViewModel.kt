@@ -491,7 +491,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
-        Timber.d("Omnibar: onAnimationStarted ${decoration.entities}")
+        Timber.d("Omnibar: LaunchTrackersAnimation")
         if (!decoration.entities.isNullOrEmpty()) {
             val hasFocus = _viewState.value.hasFocus
             if (!hasFocus) {
