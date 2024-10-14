@@ -100,6 +100,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
         val showControls: Boolean = true,
+        val scrollingEnabled: Boolean = true,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
     )
@@ -243,6 +244,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             else -> {
+                val scrollingEnabled = viewMode != NewTab
                 val hasFocus = _viewState.value.hasFocus
                 val leadingIcon = if (hasFocus) {
                     LeadingIconState.SEARCH
@@ -258,6 +260,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 _viewState.update {
                     it.copy(
                         leadingIconState = leadingIcon,
+                        scrollingEnabled = scrollingEnabled,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = _viewState.value.hasFocus,
                             query = _viewState.value.omnibarText,
@@ -316,6 +319,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         enabled = true,
                         highlighted = false,
                     ),
+                    scrollingEnabled = true,
                 )
             }
         }
@@ -335,6 +339,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         enabled = true,
                         highlighted = false,
                     ),
+                    scrollingEnabled = true,
                 )
             }
 
@@ -386,6 +391,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         enabled = true,
                         highlighted = false,
                     ),
+                    scrollingEnabled = false,
                 )
             }
         }
@@ -401,6 +407,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         enabled = true,
                         highlighted = true,
                     ),
+                    scrollingEnabled = false,
                 )
             }
         }

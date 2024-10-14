@@ -60,7 +60,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -96,7 +95,7 @@ class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle) {
+) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
 
     sealed class Decoration {
         data class Mode(val viewMode: ViewMode) : Decoration()
@@ -200,6 +199,8 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInput,
         searchIcon,
     )
+
+    var isScrollingEnabled: Boolean = true
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -430,8 +431,11 @@ class OmnibarLayout @JvmOverloads constructor(
         if (viewState.shouldMoveCaretToEnd) {
             omnibarTextInput.setSelection(viewState.omnibarText.length)
         }
+
+        renderScrolling(viewState.scrollingEnabled)
         renderTabIcon(viewState.tabs)
         renderPulseAnimation(viewState)
+
         renderLeadingIconState(viewState.leadingIconState)
     }
 
@@ -540,8 +544,9 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun setScrollingEnabled(enabled: Boolean) {
+    private fun renderScrolling(enabled: Boolean) {
         if (isAttachedToWindow) {
+            isScrollingEnabled = enabled
             if (enabled) {
                 omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
             } else {
@@ -561,7 +566,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
         // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
-            setScrollingEnabled(false)
             if (this::pulseAnimation.isInitialized) {
                 if (pulseAnimation.isActive) {
                     pulseAnimation.stop()
@@ -573,9 +577,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
             }
         } else {
-            if (viewState.viewMode is ViewMode.Browser) {
-                setScrollingEnabled(true)
-            }
             if (this::pulseAnimation.isInitialized) {
                 pulseAnimation.stop()
             }
@@ -704,5 +705,25 @@ class OmnibarLayout @JvmOverloads constructor(
         } else {
             Color.BLACK
         }
+    }
+
+    override fun measuredHeight(): Int {
+        return measuredHeight
+    }
+
+    override fun height(): Int {
+        return height
+    }
+
+    override fun getTranslation(): Float {
+        return translationY
+    }
+
+    override fun setTranslation(y: Float) {
+        translationY = y
+    }
+
+    override fun isOmnibarScrollingEnabled(): Boolean {
+        return isScrollingEnabled
     }
 }

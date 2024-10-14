@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
@@ -52,6 +53,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -162,11 +164,6 @@ class Omnibar(
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedView)
-
-                // add padding to the NTP to prevent the bottom toolbar from overlapping the settings button
-                binding.includeNewBrowserTab.browserBackground.apply {
-                    setPadding(paddingLeft, context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2), paddingRight, actionBarSize)
-                }
 
                 // prevent the touch event leaking to the webView below
                 binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
@@ -364,9 +361,16 @@ class Omnibar(
     }
 
     var isScrollingEnabled: Boolean
-        get() = legacyOmnibar.isScrollingEnabled
+        get() =
+            if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                legacyOmnibar.isScrollingEnabled
+            } else {
+                legacyOmnibar.isScrollingEnabled
+            }
         set(value) {
-            legacyOmnibar.isScrollingEnabled = value
+            if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+                legacyOmnibar.isScrollingEnabled = value
+            }
         }
 
     fun setViewMode(viewMode: ViewMode) {

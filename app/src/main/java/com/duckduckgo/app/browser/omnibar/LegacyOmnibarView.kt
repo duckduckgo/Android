@@ -57,7 +57,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle) {
+) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
 
     private val omnibarPosition: OmnibarPosition
 
@@ -298,5 +298,25 @@ class LegacyOmnibarView @JvmOverloads constructor(
         safeCall {
             smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
         }
+    }
+
+    override fun measuredHeight(): Int {
+        return measuredHeight
+    }
+
+    override fun height(): Int {
+        return height
+    }
+
+    override fun getTranslation(): Float {
+        return translationY
+    }
+
+    override fun setTranslation(y: Float) {
+        translationY = y
+    }
+
+    override fun isOmnibarScrollingEnabled(): Boolean {
+        return isScrollingEnabled
     }
 }
