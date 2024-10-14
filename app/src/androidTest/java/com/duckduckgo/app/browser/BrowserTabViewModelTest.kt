@@ -247,6 +247,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -1470,6 +1471,7 @@ class BrowserTabViewModelTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
 
             testee.autoCompleteStateFlow.value = "title"
+            delay(500)
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
             verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
