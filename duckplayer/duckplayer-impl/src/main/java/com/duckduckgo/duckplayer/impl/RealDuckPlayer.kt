@@ -262,7 +262,8 @@ class RealDuckPlayer @Inject constructor(
 
     private suspend fun createDuckPlayerUriFromYoutube(uri: Uri): String {
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
-        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}?origin=auto"
+        val origin = uri.getQueryParameter(ORIGIN_QUERY_PARAM)?.let { it } ?: ORIGIN_QUERY_PARAM_AUTO
+        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}?$ORIGIN_QUERY_PARAM=$origin"
     }
 
     override suspend fun intercept(
@@ -346,11 +347,6 @@ class RealDuckPlayer @Inject constructor(
             withContext(dispatchers.main()) {
                 webView.loadUrl(createDuckPlayerUriFromYoutube(url))
             }
-            if (url.getQueryParameter(ORIGIN_QUERY_PARAM) != ORIGIN_QUERY_PARAM_SERP_AUTO) {
-                pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
-            } else {
-                pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
-            }
             return WebResourceResponse(null, null, null)
         }
         return null
@@ -398,9 +394,11 @@ class RealDuckPlayer @Inject constructor(
                     webView.loadUrl(youtubeUrl)
                 }
                 val origin = url.getQueryParameter(ORIGIN_QUERY_PARAM)
-                if (origin == ORIGIN_QUERY_PARAM_SERP) {
+                if (origin == ORIGIN_QUERY_PARAM_SERP || origin == ORIGIN_QUERY_PARAM_SERP_AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
-                } else if (origin != ORIGIN_QUERY_PARAM_OVERLAY && origin != ORIGIN_QUERY_PARAM_AUTO) {
+                } else if (origin == ORIGIN_QUERY_PARAM_AUTO) {
+                    pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+                } else if (origin != ORIGIN_QUERY_PARAM_OVERLAY) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
             }

@@ -37,8 +37,10 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -204,7 +206,14 @@ class DuckPlayerJSHelper @Inject constructor(
             }
             "openDuckPlayer" -> {
                 return data?.getString("href")?.let {
-                    Navigate(it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build().toString(), mapOf())
+                    if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        Navigate(it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build().toString(), mapOf())
+                    } else {
+                        Navigate(
+                            it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build().toString(),
+                            mapOf(),
+                        )
+                    }
                 }
             }
             "initialSetup" -> {
