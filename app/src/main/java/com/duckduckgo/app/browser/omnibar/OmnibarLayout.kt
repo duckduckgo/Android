@@ -503,7 +503,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun reduceDeferred(stateChange: StateChange) {
-        Timber.d("Omnibar: stateChange $stateChange")
         when (stateChange) {
             is StateChange.LoadingStateChange -> {
                 viewModel.onExternalStateChange(stateChange)

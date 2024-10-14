@@ -491,15 +491,18 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
-        val hasFocus = _viewState.value.hasFocus
-        if (!hasFocus) {
-            _viewState.update {
-                it.copy(
-                    leadingIconState = PRIVACY_SHIELD,
-                )
-            }
-            viewModelScope.launch {
-                command.send(Command.StartTrackersAnimation(decoration.entities))
+        Timber.d("Omnibar: onAnimationStarted ${decoration.entities}")
+        if (!decoration.entities.isNullOrEmpty()) {
+            val hasFocus = _viewState.value.hasFocus
+            if (!hasFocus) {
+                _viewState.update {
+                    it.copy(
+                        leadingIconState = PRIVACY_SHIELD,
+                    )
+                }
+                viewModelScope.launch {
+                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                }
             }
         }
     }
