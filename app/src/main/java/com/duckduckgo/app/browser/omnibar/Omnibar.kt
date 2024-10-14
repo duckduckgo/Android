@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
@@ -53,7 +52,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -135,13 +133,6 @@ class Omnibar(
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
-    }
-
-    private val actionBarSize: Int by lazy {
-        val array: TypedArray = binding.rootView.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-        val actionBarSize = array.getDimensionPixelSize(0, -1)
-        array.recycle()
-        actionBarSize
     }
 
     val newOmnibar: OmnibarLayout by lazy {
@@ -391,7 +382,6 @@ class Omnibar(
                     newOmnibar.decorate(Mode(viewMode))
                 } else {
                     isScrollingEnabled = false
-                    setExpanded(true)
                 }
             }
 
