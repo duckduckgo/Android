@@ -258,6 +258,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 
@@ -268,6 +269,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 
@@ -278,6 +280,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertFalse(viewState.scrollingEnabled)
         }
     }
 
@@ -288,6 +291,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 
@@ -518,6 +522,8 @@ class OmnibarLayoutViewModelTest {
                     highlighted = false,
                 ),
             )
+
+            assertFalse(viewState.scrollingEnabled)
         }
     }
 
@@ -539,6 +545,8 @@ class OmnibarLayoutViewModelTest {
                     highlighted = true,
                 ),
             )
+
+            assertFalse(viewState.scrollingEnabled)
         }
     }
 
@@ -556,6 +564,7 @@ class OmnibarLayoutViewModelTest {
                     highlighted = false,
                 ),
             )
+            assertTrue(viewState.scrollingEnabled)
         }
 
         verify(pixel).fire(
@@ -578,6 +587,7 @@ class OmnibarLayoutViewModelTest {
                     highlighted = false,
                 ),
             )
+            assertTrue(viewState.scrollingEnabled)
         }
 
         verify(pixel).fire(
@@ -777,6 +787,9 @@ class OmnibarLayoutViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun when
 
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
