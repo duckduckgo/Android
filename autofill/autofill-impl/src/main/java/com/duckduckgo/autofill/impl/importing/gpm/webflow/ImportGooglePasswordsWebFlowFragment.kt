@@ -308,19 +308,14 @@ class ImportGooglePasswordsWebFlowFragment :
 
     override suspend fun onCsvAvailable(csv: String) {
         Timber.i("cdr CSV available %s", csv)
-        val parseResult = csvPasswordImporter.readCsv(csv)
-        when (parseResult) {
+        when (val parseResult = csvPasswordImporter.readCsv(csv)) {
             is Success -> {
-                passwordImporter.importPasswords(parseResult.loginCredentialsToImport)
+                onCsvParsed(parseResult)
             }
-
-            Error -> {
-                Timber.e("cdr Error parsing CSV")
+            is Error -> {
+                onCsvError()
             }
         }
-
-        val resultBundle = Bundle().also { it.putParcelable(RESULT_KEY_DETAILS, parseResult) }
-        setFragmentResult(RESULT_KEY, resultBundle)
 
         /**
          *  val result = csvPasswordImporter.importCsv(csv)
@@ -335,6 +330,17 @@ class ImportGooglePasswordsWebFlowFragment :
          *         val resultBundle = Bundle().also { it.putParcelable(RESULT_KEY_DETAILS, resultDetails) }
          *
          */
+    }
+
+    private suspend fun onCsvParsed(parseResult: Success) {
+        val importResult = passwordImporter.importPasswords(parseResult.loginCredentialsToImport)
+        val resultBundle = Bundle().also {
+            it.putParcelable(
+                RESULT_KEY_DETAILS,
+                Result.Success(importResult.savedCredentialIds.size, importResult.duplicatedPasswords.size),
+            )
+        }
+        setFragmentResult(RESULT_KEY, resultBundle)
     }
 
     override suspend fun onCsvError() {

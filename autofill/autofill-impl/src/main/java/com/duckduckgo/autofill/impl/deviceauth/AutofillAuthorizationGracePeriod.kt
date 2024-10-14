@@ -41,6 +41,11 @@ interface AutofillAuthorizationGracePeriod {
     fun recordSuccessfulAuthorization()
 
     /**
+     * Requests an extended grace period. This may extend the grace period to a longer duration.
+     */
+    fun requestExtendedGracePeriod()
+
+    /**
      * Invalidates the grace period, so that the next call to [isAuthRequired] will return true
      */
     fun invalidate()
@@ -53,10 +58,15 @@ class AutofillTimeBasedAuthorizationGracePeriod @Inject constructor(
 ) : AutofillAuthorizationGracePeriod {
 
     private var lastSuccessfulAuthTime: Long? = null
+    private var extendedGraceTimeRequested: Long? = null
 
     override fun recordSuccessfulAuthorization() {
         lastSuccessfulAuthTime = timeProvider.currentTimeMillis()
         Timber.v("Recording timestamp of successful auth")
+    }
+
+    override fun requestExtendedGracePeriod() {
+        extendedGraceTimeRequested = timeProvider.currentTimeMillis()
     }
 
     override fun isAuthRequired(): Boolean {
@@ -67,17 +77,36 @@ class AutofillTimeBasedAuthorizationGracePeriod @Inject constructor(
                 Timber.v("Within grace period; auth not required")
                 return false
             }
+
+            if (inExtendedGracePeriod()) {
+                Timber.v("Within extended grace period; auth not required")
+                return false
+            }
         }
+
+        extendedGraceTimeRequested = null
         Timber.v("No last auth time recorded or outside grace period; auth required")
 
         return true
     }
 
+    private fun inExtendedGracePeriod(): Boolean {
+        val extendedRequest = extendedGraceTimeRequested
+        if (extendedRequest == null) {
+            return false
+        } else {
+            val timeSinceExtendedGrace = timeProvider.currentTimeMillis() - extendedRequest
+            return timeSinceExtendedGrace <= AUTH_GRACE_EXTENDED_PERIOD_MS
+        }
+    }
+
     override fun invalidate() {
         lastSuccessfulAuthTime = null
+        extendedGraceTimeRequested = null
     }
 
     companion object {
         private const val AUTH_GRACE_PERIOD_MS = 15_000
+        private const val AUTH_GRACE_EXTENDED_PERIOD_MS = 60_000
     }
 }

@@ -20,4 +20,24 @@
 
     <string name="autofillImportGooglePasswordsWebFlowTitle">Import Google Passwords</string>
     <string name="autofillImportGooglePasswordsSuccessMessage">%1$d passwords imported from Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage">%1$d passwords imported from CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Import Passwords from Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Import your Google Passwords</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sync Desktop Passwords</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sync Desktop Passwords</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Import your Google Passwords</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google may require you to login or ask for your password to confirm.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Open Google Passwords</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Choose a CSV file</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Import from Desktop Browser</string>
+
+    <string name="importPasswordsProcessingResultDialogTitle">Import to DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Got It</string>
+    <string name="importPasswordsProcessingResultDialogRetryButtonText">Retry</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Password import failed</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped">Duplicate Passwords Skipped</string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported">Passwords Imported</string>
 </resources>

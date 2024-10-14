@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management
 
+import android.os.Parcelable
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,6 +37,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordsFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -112,6 +114,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -133,6 +136,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val autofillBreakageReportSender: AutofillBreakageReportSender,
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
+    private val importPasswordsFeature: AutofillImportPasswordsFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -690,7 +694,18 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onImportPasswords() {
-        addCommand(LaunchImportPasswords)
+        viewModelScope.launch(dispatchers.io()) {
+            with(importPasswordsFeature) {
+                val csvImport = self().isEnabled() && canImportFromCsvFile().isEnabled()
+                val gpmImport = self().isEnabled() && canImportFromGooglePasswordManager().isEnabled()
+                val importConfig = ImportPasswordConfig(canImportFromCsv = csvImport, canImportFromGooglePasswordManager = gpmImport)
+                addCommand(LaunchImportPasswords(importConfig))
+
+                // addCommand(LaunchImportPasswords(ImportPasswordConfig(canImportFromCsv = false, canImportFromGooglePasswordManager = false)))
+                // addCommand(LaunchImportPasswords(ImportPasswordConfig(canImportFromCsv = false, canImportFromGooglePasswordManager = true)))
+                // addCommand(LaunchImportPasswords(ImportPasswordConfig(canImportFromCsv = true, canImportFromGooglePasswordManager = false)))
+            }
+        }
     }
 
     fun onReportBreakageClicked() {
@@ -702,7 +717,10 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentSite(currentUrl: String?, privacyProtectionEnabled: Boolean?) {
+    fun updateCurrentSite(
+        currentUrl: String?,
+        privacyProtectionEnabled: Boolean?,
+    ) {
         val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(
             currentUrl = currentUrl,
             privacyProtectionEnabled = privacyProtectionEnabled,
@@ -854,11 +872,18 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
-        data object LaunchImportPasswords : ListModeCommand()
+        data class LaunchImportPasswords(val config: ImportPasswordConfig) : ListModeCommand()
+
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()
     }
+
+    @Parcelize
+    data class ImportPasswordConfig(
+        val canImportFromGooglePasswordManager: Boolean,
+        val canImportFromCsv: Boolean,
+    ) : Parcelable
 
     sealed class DuckAddressStatus {
         object NotADuckAddress : DuckAddressStatus()

@@ -24,9 +24,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SYNC_WITH_DESKTOP
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_RESTARTED
@@ -43,6 +41,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -142,8 +142,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_TOGGLED_ON_SEARCH("m_autofill_toggled_on"),
     AUTOFILL_TOGGLED_OFF_SEARCH("m_autofill_toggled_off"),
 
-    AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON("m_autofill_logins_import_no_passwords"),
-    AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU("m_autofill_logins_import"),
+    AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON("m_autofill_logins_import_no_passwords"),
+    AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU("m_autofill_logins_import"),
     AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER("m_autofill_logins_import_get_desktop"),
     AUTOFILL_IMPORT_PASSWORDS_SYNC_WITH_DESKTOP("m_autofill_logins_import_sync"),
     AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION("m_autofill_logins_import_no-action"),
@@ -177,8 +177,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_ENGAGEMENT_ONBOARDED_USER.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_ENGAGEMENT_STACKED_LOGINS.pixelName to PixelParameter.removeAtb(),
 
-            AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON.pixelName to PixelParameter.removeAtb(),
-            AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_SYNC_WITH_DESKTOP.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION.pixelName to PixelParameter.removeAtb(),
