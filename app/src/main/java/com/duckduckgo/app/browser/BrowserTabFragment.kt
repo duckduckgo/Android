@@ -1749,12 +1749,12 @@ class BrowserTabFragment :
     }
 
     private fun setBrowserBackgroundRes(backgroundRes: Int) {
-        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
+        newBrowserTab.browserBackground.setImageResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogOnboardingCta.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
-        daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setBackgroundResource(backgroundRes)
+        daxDialogOnboardingCta.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2689,7 +2689,7 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta() {
-        newBrowserTab.browserBackground.setBackgroundResource(0)
+        newBrowserTab.browserBackground.setImageResource(0)
         daxDialogIntroBubbleCta.root.gone()
         daxDialogIntroBubbleCtaExperiment.root.gone()
     }
