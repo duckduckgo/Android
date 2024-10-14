@@ -280,8 +280,8 @@ class AutoCompleteApi @Inject constructor(
                 )
                 searchSuggestionsList.add(searchSuggestion)
             }
-            emit(searchSuggestionsList)
-        }.getOrElse { emit(searchSuggestionsList) }
+            emit(searchSuggestionsList.toList())
+        }.getOrElse { emit(searchSuggestionsList.toList()) }
     }
 
     private fun getAutoCompleteBookmarkResults(query: String): Flow<List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
