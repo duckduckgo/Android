@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Постижима поверителност</string>
+    <string name="duckDuckGoTagline">Вашата защита е наш приоритет.</string>
     <string name="yes">Да</string>
     <string name="no">Не</string>
     <string name="open">Отваряне</string>

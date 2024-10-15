@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Completarea automată a parolelor nu este disponibilă, deoarece versiunea ta de Android WebView este prea veche.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Completarea automată a parolelor nu este disponibilă, deoarece versiunea ta de Android WebView este învechită sau incompatibilă.</string>
 
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
