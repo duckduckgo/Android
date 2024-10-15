@@ -75,6 +75,14 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
         return uri.getQueryParameter(ParamKey.VERTICAL)
     }
 
+    override fun isDuckDuckGoChatUrl(uri: String): Boolean {
+        return isDuckDuckGoVerticalUrl(uri) && isDuckAIChat(uri)
+    }
+
+    private fun isDuckAIChat(uri: String): Boolean {
+        return uri.toUri().queryParameterNames.contains(ParamKey.DUCK_AI)
+    }
+
     private fun String.toUri(): Uri {
         return Uri.parse(this)
     }

@@ -41,12 +41,14 @@ class AppUrl {
         const val HIDE_SERP = "ko"
         const val VERTICAL = "ia"
         const val VERTICAL_REWRITE = "iar"
+        const val DUCK_AI = "duckai"
     }
 
     object ParamValue {
         const val SOURCE = "ddg_android"
         const val SOURCE_EU_AUCTION = "ddg_androideu"
         const val HIDE_SERP = "-1"
+        const val CHAT_VERTICAL = "chat"
     }
 
     object StaticUrl {
