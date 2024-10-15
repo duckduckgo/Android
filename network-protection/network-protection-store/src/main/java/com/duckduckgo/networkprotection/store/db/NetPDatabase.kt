@@ -21,6 +21,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.squareup.moshi.JsonAdapter
@@ -29,11 +30,12 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 4,
     entities = [
         NetPManuallyExcludedApp::class,
         NetPConfigToggle::class,
         NetPGeoswitchingLocation::class,
+        CategorizedSystemApp::class,
     ],
 )
 @TypeConverters(NetpDatabaseConverters::class)
@@ -41,10 +43,19 @@ abstract class NetPDatabase : RoomDatabase() {
     abstract fun exclusionListDao(): NetPExclusionListDao
     abstract fun configTogglesDao(): NetPConfigTogglesDao
     abstract fun geoswitchingDao(): NetPGeoswitchingDao
+    abstract fun categorizedSystemAppsDao(): CategorizedSystemAppsDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
-            get() = emptyList()
+            get() = listOf(MIGRATION_3_4)
+        private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `netp_system_apps_categories` (`packageName` TEXT NOT NULL," +
+                        " `category` TEXT NOT NULL, PRIMARY KEY(`packageName`))",
+                )
+            }
+        }
     }
 }
 
@@ -63,5 +74,19 @@ object NetpDatabaseConverters {
     @JvmStatic
     fun fromStringList(value: List<String>): String {
         return stringListAdapter.toJson(value)
+    }
+
+    @TypeConverter
+    fun toSystemAppCategory(category: String): SystemAppCategory {
+        return try {
+            SystemAppCategory.valueOf(category)
+        } catch (ex: IllegalArgumentException) {
+            SystemAppCategory.OTHERS
+        }
+    }
+
+    @TypeConverter
+    fun fromStage(stage: SystemAppCategory): String {
+        return stage.name
     }
 }
