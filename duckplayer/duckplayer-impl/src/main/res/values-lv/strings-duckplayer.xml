@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">Duck Player nav pieejams</string>
     <string name="duck_player_unavailable_description">Nesen ieviestās YouTube izmaiņas ir ietekmējušas Duck Player funkcionalitāti. Mēs strādājam, lai novērstu šīs problēmas, un novērtējam tavu sapratni.</string>
     <string name="duck_player_unavailable_learn_more">Uzzināt vairāk</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Atveriet Duck Player jaunā cilnē</string>
 </resources>
