@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl.ParamValue
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -76,10 +77,21 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
     }
 
     override fun isDuckDuckGoChatUrl(uri: String): Boolean {
-        return isDuckDuckGoVerticalUrl(uri) && isDuckAIChat(uri)
+        return isDuckDuckGoUrl(uri) && isDuckAIChat(uri)
     }
 
     private fun isDuckAIChat(uri: String): Boolean {
+        val hasChatVertical = hasChatVertical(uri)
+        val hasChatParameter = hasDuckAI(uri)
+        return hasChatVertical || hasChatParameter
+    }
+
+    private fun hasChatVertical(uri: String): Boolean {
+        val vertical = extractVertical(uri)
+        return vertical == ParamValue.CHAT_VERTICAL
+    }
+
+    private fun hasDuckAI(uri: String): Boolean {
         return uri.toUri().queryParameterNames.contains(ParamKey.DUCK_AI)
     }
 

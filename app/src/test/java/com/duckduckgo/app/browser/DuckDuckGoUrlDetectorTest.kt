@@ -169,8 +169,14 @@ class DuckDuckGoUrlDetectorTest {
     }
 
     @Test
-    fun whenDDGAIChatThenReturnsTrue() {
+    fun whenDDGAIChatVerticalThenReturnsTrue() {
         val url = "https://duckduckgo.com/?q=restaurants+near+me&atb=v451-7ru&ko=-1&t=ddg_android&ia=chat"
+        assertTrue(testee.isDuckDuckGoChatUrl(url))
+    }
+
+    @Test
+    fun whenDDGAIChatParameterThenReturnsTrue() {
+        val url = "https://duckduckgo.com/?q=restaurants+near+me&atb=v451-7ru&ko=-1&t=ddg_android&duckai=1"
         assertTrue(testee.isDuckDuckGoChatUrl(url))
     }
 }
