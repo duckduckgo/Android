@@ -34,4 +34,5 @@
     <string name="duck_player_unavailable">„Duck Player“ nepasiekiamas</string>
     <string name="duck_player_unavailable_description">Neseniai atlikti „YouTube“ pakeitimai turėjo įtakos „Duck Player“ funkcijoms. Stengiamės pašalinti šias triktis ir dėkojame už supratingumą.</string>
     <string name="duck_player_unavailable_learn_more">Sužinoti daugiau</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Atidarykite „Duck Player“ naujame skirtuke</string>
 </resources>
