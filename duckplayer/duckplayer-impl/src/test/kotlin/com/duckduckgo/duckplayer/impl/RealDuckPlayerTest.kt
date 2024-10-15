@@ -550,6 +550,20 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenUriIsDuckPlayerUriWithOriginAuto_interceptProcessesDuckPlayerUri() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("duck://player/12345?origin=auto")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("https://www.youtube-nocookie.com?videoID=12345")
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+        assertNotNull(result)
+    }
+
+    @Test
     fun whenUriIsDuckPlayerUriWithOpenInYouTube_interceptLoadsYouTubeUri() = runTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/openInYouTube?v=12345")
@@ -634,7 +648,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/12345?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 
@@ -677,7 +690,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/123456?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 
