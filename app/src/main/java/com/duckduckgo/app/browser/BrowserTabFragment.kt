@@ -1026,11 +1026,13 @@ class BrowserTabFragment :
     private fun launchPopupMenu() {
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
-            popupMenu.show(binding.rootView, omnibar.toolbar)
-            if (isActiveCustomTab()) {
-                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
-            } else {
-                pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            if (isAdded) {
+                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (isActiveCustomTab()) {
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+                }
             }
         }
     }
