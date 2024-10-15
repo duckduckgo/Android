@@ -21,6 +21,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort.Companion.AnyCohort.ANY_COHORT
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.reflect.Method
@@ -40,6 +41,7 @@ class FeatureToggles private constructor(
     private val appVariantProvider: () -> String?,
     private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
+    private val callback: FeatureTogglesCallback?,
 ) {
 
     private val featureToggleCache = mutableMapOf<Method, Toggle>()
@@ -52,6 +54,7 @@ class FeatureToggles private constructor(
         private var appVariantProvider: () -> String? = { "" },
         private var localeProvider: () -> Locale? = { Locale.getDefault() },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
+        private var callback: FeatureTogglesCallback? = null,
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
@@ -61,6 +64,7 @@ class FeatureToggles private constructor(
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
         fun localeProvider(locale: () -> Locale?) = apply { this.localeProvider = locale }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
+        fun callback(callback: FeatureTogglesCallback) = apply { this.callback = callback }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -80,6 +84,7 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
+                callback = this.callback,
             )
         }
     }
@@ -127,6 +132,7 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
+                callback = callback,
             ).also { featureToggleCache[method] = it }
         }
     }
@@ -292,6 +298,7 @@ internal class ToggleImpl constructor(
     private val appVariantProvider: () -> String?,
     private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
+    private val callback: FeatureTogglesCallback?,
 ) : Toggle {
 
     private fun Toggle.State.isVariantTreated(variant: String?): Boolean {
@@ -323,7 +330,11 @@ internal class ToggleImpl constructor(
         return store.get(key)?.let { state ->
             // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
             val updatedState = if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
-                state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets))
+                state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {
+                    it.assignedCohort?.let { cohort ->
+                        callback?.onCohortAssigned(this.featureName().name, cohort.name, cohort.enrollmentDateET!!)
+                    }
+                }
             } else {
                 state
             }
