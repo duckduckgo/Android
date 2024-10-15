@@ -24,8 +24,8 @@ import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circul
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
-import com.duckduckgo.common.ui.view.text.TextChangedWatcher
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark

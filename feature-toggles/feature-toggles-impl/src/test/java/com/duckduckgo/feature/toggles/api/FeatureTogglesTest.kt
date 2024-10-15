@@ -148,7 +148,7 @@ class FeatureTogglesTest {
         toggleStore.set(
             "test_forcesDefaultVariant",
             State(
-                targets = listOf(Target("na")),
+                targets = listOf(Target("na", localeCountry = null, localeLanguage = null)),
             ),
         )
         assertNull(provider.variantKey)
@@ -420,7 +420,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target("ma")),
+            targets = listOf(Toggle.State.Target("ma", localeCountry = null, localeLanguage = null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -438,7 +438,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target(provider.variantKey!!)),
+            targets = listOf(Toggle.State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -456,7 +456,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target("zz")),
+            targets = listOf(Toggle.State.Target("zz", localeCountry = null, localeLanguage = null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -483,8 +483,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("mb"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
             ),
         )
 
@@ -504,8 +504,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                Toggle.State.Target("ma"),
-                Toggle.State.Target("zz"),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("zz", localeCountry = null, localeLanguage = null),
             ),
         )
 

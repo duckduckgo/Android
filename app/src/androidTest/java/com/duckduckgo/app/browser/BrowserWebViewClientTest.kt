@@ -61,6 +61,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
@@ -74,6 +75,7 @@ import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentM
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
@@ -89,6 +91,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -117,6 +120,7 @@ class BrowserWebViewClientTest {
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
+    private val browserAutofillConfigurator: BrowserAutofill.Configurator = mock()
     private val webResourceRequest: WebResourceRequest = mock()
     private val webResourceError: WebResourceError = mock()
     private val ampLinks: AmpLinks = mock()
@@ -137,6 +141,7 @@ class BrowserWebViewClientTest {
     private val mockDuckPlayer: DuckPlayer = mock()
     private val navigationHistory: NavigationHistory = mock()
     private val loadingBarExperimentManager: LoadingBarExperimentManager = mock()
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     @UiThreadTest
     @Before
@@ -154,6 +159,7 @@ class BrowserWebViewClientTest {
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
+            browserAutofillConfigurator,
             ampLinks,
             printInjector,
             internalTestUserChecker,
@@ -170,6 +176,7 @@ class BrowserWebViewClientTest {
             subscriptions,
             mockDuckPlayer,
             loadingBarExperimentManager,
+            mockDuckDuckGoUrlDetector,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -369,6 +376,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
+        testee.onPageStarted(webView, null, null)
+        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
@@ -383,6 +397,26 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(subscriptions).launchPrivacyPro(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpThenAddQueryParam() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.url).thenReturn("www.youtube.com/watch?v=1234".toUri())
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+        val mockClientProvider: ClientBrandHintProvider = mock()
+        whenever(mockClientProvider.shouldChangeBranding(any())).thenReturn(false)
+        testee.clientProvider = mockClientProvider
+        doNothing().whenever(listener).willOverrideUrl(any())
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
+
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
     }
 
     @UiThreadTest

@@ -798,9 +798,10 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Seuraava</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alareuna</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Helppo tavoittaa</string>
+    <string name="highlightsOnboardingSearchQueryOption4">ankanpoikaset</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
 

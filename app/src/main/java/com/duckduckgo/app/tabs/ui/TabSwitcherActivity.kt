@@ -177,6 +177,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         tabItemDecorator = TabItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabItemDecorator)
+        tabsRecycler.setHasFixedSize(true)
     }
 
     private fun configureObservers() {

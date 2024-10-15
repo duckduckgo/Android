@@ -63,6 +63,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -72,6 +73,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -96,6 +99,7 @@ class BrowserWebViewClient @Inject constructor(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
@@ -112,6 +116,7 @@ class BrowserWebViewClient @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -182,7 +187,9 @@ class BrowserWebViewClient @Inject constructor(
                         This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
                         therefore the Duck Player page is never launched if YouTube comes from a redirect.
                          */
-                        webView.loadUrl(url.toString())
+                        webViewClientListener?.let {
+                            loadUrl(it, webView, url.toString())
+                        }
                         return true
                     } else {
                         shouldOverrideWebRequest(url, webView, isForMainFrame)
@@ -300,6 +307,13 @@ class BrowserWebViewClient @Inject constructor(
                         provider.setOn(webView.settings, url.toString())
                         loadUrl(listener, webView, url.toString())
                         return true
+                    } else if (webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
+                        loadUrl(
+                            listener,
+                            webView,
+                            url.buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_SERP_AUTO).build().toString(),
+                        )
+                        return true
                     } else {
                         return false
                     }
@@ -360,6 +374,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
+        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }

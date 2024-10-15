@@ -104,6 +104,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccess
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -174,7 +175,6 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -469,6 +469,8 @@ class BrowserTabViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
 
+    private val refreshPixelSender: RefreshPixelSender = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -639,6 +641,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             loadingBarExperimentManager = loadingBarExperimentManager,
+            refreshPixelSender = refreshPixelSender,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3791,13 +3794,50 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+        emailStateFlow.emit(false)
+
+        assertCommandIssuedTimes<Command.EmailSignEvent>(2)
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenConsumeAliasThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.usePrivateDuckAddress("", "alias")
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("alias", this.duckAddress)
+        }
+    }
+
+    @Test
+    fun whenUseAddressThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.usePersonalDuckAddress("", "address")
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("address", this.duckAddress)
+        }
+    }
+
+    @Test
     fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
+        testee.showEmailProtectionChooseEmailPrompt()
 
         assertCommandIssued<Command.ShowEmailProtectionChooseEmailPrompt> {
-            assertEquals("address", this.duckAddress)
+            assertEquals("address", this.address)
         }
     }
 
@@ -3805,7 +3845,7 @@ class BrowserTabViewModelTest {
     fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
 
-        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
+        testee.showEmailProtectionChooseEmailPrompt()
 
         assertCommandNotIssued<Command.ShowEmailProtectionChooseEmailPrompt>()
     }
@@ -4404,6 +4444,16 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    @Test
+    fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
+        val url = "originalurl.com"
+        testee.returnNoCredentialsWithPage(url)
+
+        assertCommandIssued<Command.CancelIncomingAutofillRequest> {
+            assertEquals(url, this.url)
+        }
     }
 
     @Test
@@ -5871,6 +5921,27 @@ class BrowserTabViewModelTest {
         testee.omnibarViewState.removeObserver { observer(it) }
     }
 
+    @Test
+    fun whenHandleMenuRefreshActionThenSendMenuRefreshPixels() {
+        testee.handleMenuRefreshAction()
+
+        verify(refreshPixelSender).sendMenuRefreshPixels()
+    }
+
+    @Test
+    fun whenHandlePullToRefreshActionThenSendPullToRefreshPixels() {
+        testee.handlePullToRefreshAction()
+
+        verify(refreshPixelSender).sendPullToRefreshPixels()
+    }
+
+    @Test
+    fun whenFireCustomTabRefreshPixelThenSendCustomTabRefreshPixel() {
+        testee.fireCustomTabRefreshPixel()
+
+        verify(refreshPixelSender).sendCustomTabRefreshPixel()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -5991,8 +6062,6 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
         }
     }
-
-    private fun urlRequest() = AutofillWebMessageRequest("", "", "")
 
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
@@ -6146,6 +6215,10 @@ class BrowserTabViewModelTest {
     fun anyUri(): Uri = any()
 
     class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
-        override suspend fun canAccessCredentialManagementScreen(): Boolean = enabled
+        override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
+        override suspend fun canInjectCredentialsToWebView(url: String) = enabled
+        override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
+        override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
+        override suspend fun canAccessCredentialManagementScreen() = enabled
     }
 }

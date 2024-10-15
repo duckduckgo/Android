@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
@@ -49,7 +49,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
-    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker = mock()
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
@@ -91,7 +91,7 @@ class RealAutofillRuntimeConfigProviderTest {
     @Test
     fun whenAutofillNotEnabledThenConfigurationUserPrefsCredentialsIsFalse() = runTest {
         configureAutofillCapabilities(enabled = false)
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyAutofillCredentialsReturnedAs(false)
     }
 
@@ -99,7 +99,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenAutofillEnabledThenConfigurationUserPrefsCredentialsIsTrue() = runTest {
         configureAutofillCapabilities(enabled = true)
         configureNoShareableLogins()
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyAutofillCredentialsReturnedAs(true)
     }
 
@@ -108,14 +108,14 @@ class RealAutofillRuntimeConfigProviderTest {
         configureAutofillCapabilities(enabled = true)
         configureAutofillAvailableForSite(EXAMPLE_URL)
         configureNoShareableLogins()
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyKeyIconRequestedToShow()
     }
 
     @Test
     fun whenNoCredentialsForUrlThenConfigurationInputTypeCredentialsIsFalse() = runTest {
         configureAutofillEnabledWithNoSavedCredentials(EXAMPLE_URL)
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -139,7 +139,7 @@ class RealAutofillRuntimeConfigProviderTest {
         )
         configureNoShareableLogins()
 
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = true)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -163,7 +163,7 @@ class RealAutofillRuntimeConfigProviderTest {
             ),
         )
 
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = true)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -188,7 +188,7 @@ class RealAutofillRuntimeConfigProviderTest {
         )
         configureNoShareableLogins()
 
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -213,7 +213,7 @@ class RealAutofillRuntimeConfigProviderTest {
         )
         configureNoShareableLogins()
 
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -238,7 +238,7 @@ class RealAutofillRuntimeConfigProviderTest {
         )
         configureNoShareableLogins()
 
-        testee.getRuntimeConfiguration(EXAMPLE_URL)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = true)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -263,7 +263,7 @@ class RealAutofillRuntimeConfigProviderTest {
         )
         configureNoShareableLogins()
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -287,7 +287,7 @@ class RealAutofillRuntimeConfigProviderTest {
             ),
         )
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -311,7 +311,7 @@ class RealAutofillRuntimeConfigProviderTest {
             ),
         )
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
@@ -326,7 +326,7 @@ class RealAutofillRuntimeConfigProviderTest {
         configureAutofillEnabledWithNoSavedCredentials(url)
         whenever(emailManager.isSignedIn()).thenReturn(true)
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
 
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = any(),
@@ -340,7 +340,7 @@ class RealAutofillRuntimeConfigProviderTest {
         configureAutofillEnabledWithNoSavedCredentials(url)
         whenever(emailManager.isSignedIn()).thenReturn(false)
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
 
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = any(),
@@ -352,7 +352,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenSiteNotInNeverSaveListThenCanSaveCredentials() = runTest {
         val url = "example.com"
         configureAutofillEnabledWithNoSavedCredentials(url)
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
         verifyCanSaveCredentialsReturnedAs(true)
     }
 
@@ -362,7 +362,7 @@ class RealAutofillRuntimeConfigProviderTest {
         configureAutofillEnabledWithNoSavedCredentials(url)
         whenever(neverSavedSiteRepository.isInNeverSaveList(url)).thenReturn(true)
 
-        testee.getRuntimeConfiguration(url)
+        testee.getRuntimeConfiguration("", url)
         verifyCanSaveCredentialsReturnedAs(true)
     }
 

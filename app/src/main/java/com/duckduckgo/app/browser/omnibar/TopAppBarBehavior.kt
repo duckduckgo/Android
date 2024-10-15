@@ -20,13 +20,18 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.appbar.AppBarLayout
 
 /*
  * This custom behavior prevents the top omnibar from hiding everywhere except for the browser view (i.e. the autocomplete suggestions)
  */
-class TopAppBarBehavior(context: Context, attrs: AttributeSet? = null) : AppBarLayout.Behavior(context, attrs) {
+class TopAppBarBehavior(
+    context: Context,
+    private val omnibar: LegacyOmnibarView,
+    attrs: AttributeSet? = null,
+) : AppBarLayout.Behavior(context, attrs) {
     override fun onNestedPreScroll(
         coordinatorLayout: CoordinatorLayout,
         child: AppBarLayout,
@@ -36,8 +41,19 @@ class TopAppBarBehavior(context: Context, attrs: AttributeSet? = null) : AppBarL
         consumed: IntArray,
         type: Int,
     ) {
-        if (target.id == R.id.browserWebView) {
+        if (target.id == R.id.browserWebView && omnibar.isScrollingEnabled) {
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        } else {
+            offsetBottomByToolbar(target)
+        }
+    }
+
+    private fun offsetBottomByToolbar(view: View?) {
+        if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
+            view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                this.bottomMargin = omnibar.measuredHeight
+            }
+            view.requestLayout()
         }
     }
 }
