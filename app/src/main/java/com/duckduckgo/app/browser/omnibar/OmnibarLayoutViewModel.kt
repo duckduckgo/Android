@@ -125,7 +125,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 .onEach { tabs ->
                     _viewState.update {
                         it.copy(
-                            shouldUpdateTabsCount = tabs.count() != it.tabs.count(),
+                            shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
                             tabs = tabs,
                         )
                     }

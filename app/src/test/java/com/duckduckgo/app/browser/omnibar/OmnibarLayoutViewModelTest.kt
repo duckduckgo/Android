@@ -103,6 +103,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.tabs.size == 1)
+            assertTrue(viewState.shouldUpdateTabsCount)
         }
     }
 

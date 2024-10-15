@@ -3723,11 +3723,16 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
                 lastSeenOmnibarViewState = viewState
 
-                if (viewState.isEditing) {
-                    omnibar.cancelTrackersAnimation()
-                }
-
                 omnibar.renderOmnibarViewState(viewState)
+
+                if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    lastSeenBrowserViewState?.let {
+                        omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
+                    }
+                    if (viewState.isEditing) {
+                        omnibar.cancelTrackersAnimation()
+                    }
+                }
             }
         }
 
