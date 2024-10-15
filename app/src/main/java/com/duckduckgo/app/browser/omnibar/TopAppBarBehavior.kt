@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
@@ -41,16 +42,18 @@ class TopAppBarBehavior(
         consumed: IntArray,
         type: Int,
     ) {
-        if (target.id == R.id.browserWebView && omnibar.isScrollingEnabled) {
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        if (target.id == R.id.browserWebView) {
+            if (omnibar.isScrollingEnabled) {
+                super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+            }
         } else {
             offsetBottomByToolbar(target)
         }
     }
 
     private fun offsetBottomByToolbar(view: View?) {
-        if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
-            view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+        if (view?.layoutParams is MarginLayoutParams) {
+            view.updateLayoutParams<MarginLayoutParams> {
                 this.bottomMargin = omnibar.measuredHeight
             }
             view.requestLayout()
