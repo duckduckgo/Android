@@ -155,4 +155,22 @@ class DuckDuckGoUrlDetectorTest {
     fun whenUrlHasNoSchemeAndIsFromDuckDuckGoUrlThenReturnsFalse() {
         assertFalse(testee.isDuckDuckGoEmailUrl("duckduckgo.com/email"))
     }
+
+    @Test
+    fun whenDDGUrlContainsChatParameterThenCanBeRecognised() {
+        val vertical = testee.extractVertical("https://duckduckgo.com/?q=new+zealand+images&t=ffab&atb=v218-6&iar=images&iax=images&ia=images")
+        assertEquals("images", vertical)
+    }
+
+    @Test
+    fun whenDDGUrlNonChatThenReturnsFalse() {
+        val url = "https://duckduckgo.com/?q=restaurants+near+me&atb=v451-7ru&ko=-1&t=ddg_android&ia=web"
+        assertFalse(testee.isDuckDuckGoChatUrl(url))
+    }
+
+    @Test
+    fun whenDDGAIChatThenReturnsTrue() {
+        val url = "https://duckduckgo.com/?q=restaurants+near+me&atb=v451-7ru&ko=-1&t=ddg_android&ia=chat"
+        assertTrue(testee.isDuckDuckGoChatUrl(url))
+    }
 }
