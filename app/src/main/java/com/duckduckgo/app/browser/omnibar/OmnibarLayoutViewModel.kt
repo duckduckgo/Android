@@ -120,18 +120,17 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onAttachedToWindow() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            tabRepository.flowTabs
-                .onEach { tabs ->
-                    _viewState.update {
-                        it.copy(
-                            shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
-                            tabs = tabs,
-                        )
-                    }
-                }.flowOn(dispatcherProvider.io())
-                .launchIn(viewModelScope)
-        }
+        tabRepository.flowTabs
+            .onEach { tabs ->
+                _viewState.update {
+                    it.copy(
+                        shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
+                        tabs = tabs,
+                    )
+                }
+            }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
+
         logVoiceSearchAvailability()
     }
 
