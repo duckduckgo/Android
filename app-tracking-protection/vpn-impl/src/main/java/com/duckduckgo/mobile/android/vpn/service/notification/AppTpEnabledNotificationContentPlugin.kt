@@ -79,6 +79,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
         }
 
         return repository.getVpnTrackers({ dateOfLastHour() })
+            .filter { isActive() } // make sure we only emit when this plugin is active
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
                 val isEnabled = appTrackingProtection.isEnabled()
