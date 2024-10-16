@@ -292,6 +292,75 @@ class AutoCompleteApiTest {
         }
 
     @Test
+    fun whenAutoCompleteReturnsMultipleVariousResultsThenOnlyMax12AreShown() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("aaa", isNav = false),
+                AutoCompleteServiceRawResult("bbb", isNav = false),
+                AutoCompleteServiceRawResult("ccc", isNav = false),
+                AutoCompleteServiceRawResult("ddd", isNav = false),
+                AutoCompleteServiceRawResult("eee", isNav = false),
+                AutoCompleteServiceRawResult("fff", isNav = false),
+                AutoCompleteServiceRawResult("ggg", isNav = false),
+                AutoCompleteServiceRawResult("hhh", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(
+                    favorite(title = "title", url = "https://iii.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "title", url = "https://iii.com"),
+                    bookmark(title = "title", url = "https://jjj.com"),
+                    bookmark(title = "title", url = "https://kkk.com"),
+                ),
+            ),
+        )
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "title", url = "https://lll.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://mmm.com"),
+                    TabEntity(tabId = "3", position = 3, title = "title", url = "https://nnn.com"),
+                    TabEntity(tabId = "4", position = 4, title = "title", url = "https://ooo.com"),
+                    TabEntity(tabId = "5", position = 5, title = "title", url = "https://ppp.com"),
+                    TabEntity(tabId = "6", position = 6, title = "title", url = "https://qqq.com"),
+                    TabEntity(tabId = "6", position = 6, title = "title", url = "https://iii.com"),
+                    TabEntity(tabId = "6", position = 6, title = "title", url = "https://jjj.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("title")
+        val value = result.first()
+
+        assertEquals(12, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "iii.com", title = "title", url = "https://iii.com", isFavorite = true),
+                AutoCompleteSwitchToTabSuggestion(phrase = "lll.com", title = "title", url = "https://lll.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "aaa", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "bbb", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "ccc", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "ddd", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "eee", isUrl = false),
+                AutoCompleteSwitchToTabSuggestion(phrase = "mmm.com", title = "title", url = "https://mmm.com", tabId = "2"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "nnn.com", title = "title", url = "https://nnn.com", tabId = "3"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "ooo.com", title = "title", url = "https://ooo.com", tabId = "4"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "ppp.com", title = "title", url = "https://ppp.com", tabId = "5"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "qqq.com", title = "title", url = "https://qqq.com", tabId = "6"),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
     fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsWithBookmarksAlsoInHistoryThenBookmarksShowBeforeSearchSuggestions() =
         runTest {
             whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
