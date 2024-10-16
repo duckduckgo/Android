@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Salva</string>
     <string name="duck_player_cancel">Annulla</string>
     <string name="duck_player_setting_title">Duck Player</string>
@@ -34,5 +34,6 @@
     <string name="duck_player_unavailable">Duck Player non disponibile</string>
     <string name="duck_player_unavailable_description">La funzionalità di Duck Player è stata influenzata dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Ti ringraziamo per la comprensione.</string>
     <string name="duck_player_unavailable_learn_more">Ulteriori informazioni</string>
-    <string name="duck_player_open_in_a_new_tab_setting">Apri Duck Player in una nuova scheda</string>
+    <!-- TODO(cbarreiro): Add missing translations asap -->
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Apri Duck Player in una nuova scheda</string>
 </resources>
