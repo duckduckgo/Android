@@ -28,7 +28,7 @@ jobs:
         app-version: ${{ github.event.inputs.app-version }}
 
     report_error:
-      - name: Create Asana task when workflow failed
+        name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v1.1
