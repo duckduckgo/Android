@@ -240,9 +240,6 @@ platform :android do
     # If release notes are not provided, the default ones will be used
     desc "Tag and release a new app version"
     lane :tag_and_release_version do |options|
-        ensure_git_status_clean
-        ensure_git_branch( branch: 'develop' )
-
         options_release_number = options[:app_version]
         options_release_notes = options[:release_notes]
 
