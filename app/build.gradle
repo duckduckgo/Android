@@ -259,6 +259,7 @@ dependencies {
     internalImplementation project(':vpn-internal')
 
     implementation project(':feature-toggles-api')
+    implementation project(':feature-toggles-internal-api')
     testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
     internalImplementation project(":feature-toggles-internal")

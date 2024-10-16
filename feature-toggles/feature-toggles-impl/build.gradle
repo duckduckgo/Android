@@ -29,6 +29,8 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':feature-toggles-api')
+    implementation project(':feature-toggles-internal-api')
+    implementation project(":statistics-api")
 
     implementation AndroidX.appCompat
     implementation Google.android.material

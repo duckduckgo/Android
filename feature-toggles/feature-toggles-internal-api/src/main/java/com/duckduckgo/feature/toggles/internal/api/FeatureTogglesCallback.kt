@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.feature.toggles.internal.api
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+/**
+ * This interface exists to facilitate the implementation of ToggleImpl which contains logic inside an api module.
+ * This is an internal implementation to thread the need between toggles-api and toggles-impl and should NEVER
+ * be used publicly.
+ */
+interface FeatureTogglesCallback {
+
+    /**
+     * This method is called whenever a cohort is assigned to the FeatureToggle
+     */
+    fun onCohortAssigned(experimentName: String, cohortName: String, enrollmentDate: String)
 }
-
-apply from: "$rootProject.projectDir/code-formatting.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-dependencies {
-    api project(":experiments-api")
-    api project(":feature-toggles-internal-api")
-
-    implementation Google.dagger
-    implementation "org.apache.commons:commons-math3:_"
-}
-
