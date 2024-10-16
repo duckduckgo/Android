@@ -26,16 +26,3 @@ jobs:
       uses: ./.github/workflows/release_create_tag.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
-
-    report_error:
-        name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.1
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Android App Release
-          asana-task-description: Android App Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-          action: 'create-asana-task'
