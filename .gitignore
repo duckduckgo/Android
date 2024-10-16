@@ -50,6 +50,8 @@ captures/
 
 # Fastlane
 fastlane/report.xml
+.bundle/
+vendor/
 
 # NDK files
 **/.cxx
