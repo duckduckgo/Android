@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Saglabāt</string>
     <string name="duck_player_cancel">Atcelt</string>
     <string name="duck_player_setting_title">Duck Player</string>
@@ -34,5 +34,6 @@
     <string name="duck_player_unavailable">Duck Player nav pieejams</string>
     <string name="duck_player_unavailable_description">Nesen ieviestās YouTube izmaiņas ir ietekmējušas Duck Player funkcionalitāti. Mēs strādājam, lai novērstu šīs problēmas, un novērtējam tavu sapratni.</string>
     <string name="duck_player_unavailable_learn_more">Uzzināt vairāk</string>
-    <string name="duck_player_open_in_a_new_tab_setting">Atveriet Duck Player jaunā cilnē</string>
+    <!-- TODO(cbarreiro): Add missing translations asap -->
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Atveriet Duck Player jaunā cilnē</string>
 </resources>
