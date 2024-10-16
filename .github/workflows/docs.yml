@@ -21,8 +21,13 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Prepare fastlane
-        run: bundle install
+      - uses: actions/checkout@v2
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
 
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
