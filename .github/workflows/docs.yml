@@ -18,7 +18,7 @@ concurrency:
 jobs:
   create-tag:
     name: Create and Push git tag for version
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
 
     steps:
       - name: Prepare fastlane
