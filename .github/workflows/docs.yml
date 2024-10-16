@@ -1,60 +1,38 @@
-name: Docs
+name: Android App Production Release
 
 on:
-  push:
-    branches: ["develop"]
-
   workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+  create_release_task:
+    uses: ./.github/workflows/release/release_create_task.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'adopt'
+  create_release_tag:
+    needs: create_release_task
+    uses: ./.github/workflows/release/release_create_tag.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+  launch_release_tests:
+    needs: create_release_tag
+    uses: ./.github/workflows/release/release_tests.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Execute Gradle build
-        run: ./gradlew dokkaHtmlMultiModule
-
-      - name: Copy files
-        run: |
-          mkdir -p docs
-          mv build/dokka/htmlMultiModule/* docs
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: 'docs'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+  report_workflow_failed:
+    if: ${{ failure() }}
+    uses: ./.github/workflows/release/release_report_error.yml
