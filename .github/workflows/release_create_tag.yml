@@ -18,16 +18,24 @@ concurrency:
 jobs:
   create-tag:
     name: Create and Push git tag for version
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest
 
     steps:
-      - name: Prepare fastlane
-        run: bundle install
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
 
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |
-          bundle exec fastlane tag_and_release_version app_version=${{ github.event.inputs.app-version }}
+          bundle exec fastlane android tag_and_release_version app_version=${{ github.event.inputs.app-version }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
