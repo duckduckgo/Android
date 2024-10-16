@@ -6,11 +6,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
+import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -39,11 +41,15 @@ class DefaultAutofillEngagementRepositoryTest {
 
     private val pixel = FakePixel()
     private val autofillStore: InternalAutofillStore = mock()
+    private val secureStorage: SecureStorage = mock()
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     @Before
     fun setup() {
         coroutineTestRule.testScope.runTest {
             whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(0))
+            whenever(secureStorage.canAccessSecureStorage()).thenReturn(true)
+            whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
         }
     }
 
@@ -53,6 +59,8 @@ class DefaultAutofillEngagementRepositoryTest {
         autofillStore = autofillStore,
         engagementBucketing = DefaultAutofillEngagementBucketing(),
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        secureStorage = secureStorage,
+        deviceAuthenticator = deviceAuthenticator,
     )
 
     @Test
@@ -113,6 +121,22 @@ class DefaultAutofillEngagementRepositoryTest {
         givenUserHasAutofillEnabled(false)
         testee.recordSearchedToday()
         AUTOFILL_TOGGLED_OFF_SEARCH.verifySent()
+    }
+
+    @Test
+    fun whenSearchedWithNoDeviceAuthThenToggledPixelNotSent() = runTest {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        testee.recordSearchedToday()
+        AUTOFILL_TOGGLED_ON_SEARCH.verifyNotSent()
+        AUTOFILL_TOGGLED_OFF_SEARCH.verifyNotSent()
+    }
+
+    @Test
+    fun whenSearchedWithSecureStorageUnavailableThenToggledPixelNotSent() = runTest {
+        whenever(secureStorage.canAccessSecureStorage()).thenReturn(false)
+        testee.recordSearchedToday()
+        AUTOFILL_TOGGLED_ON_SEARCH.verifyNotSent()
+        AUTOFILL_TOGGLED_OFF_SEARCH.verifyNotSent()
     }
 
     private fun givenUserHasAutofillEnabled(autofillEnabled: Boolean) {

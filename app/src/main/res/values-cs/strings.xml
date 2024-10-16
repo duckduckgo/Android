@@ -802,9 +802,10 @@
     <string name="highlightsPreOnboardingAddressBarOkButton">Další</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dole</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Vždy po ruce</string>
+    <string name="highlightsOnboardingSearchQueryOption4">malá káčátka</string>
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky soukromé.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
+    <string name="highlightsOnboardingEndDaxDialogDescription">Pamatujte: pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla.</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
 

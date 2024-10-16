@@ -706,6 +706,7 @@ private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
     override fun extractQuery(uriString: String): String? = throw UnsupportedOperationException()
     override fun isDuckDuckGoVerticalUrl(uri: String): Boolean = throw UnsupportedOperationException()
     override fun extractVertical(uriString: String): String? = throw UnsupportedOperationException()
+    override fun isDuckDuckGoChatUrl(uri: String): Boolean = throw UnsupportedOperationException()
 }
 
 private class FakePrivacyProtectionsPopupExperimentVariantRandomizer : PrivacyProtectionsPopupExperimentVariantRandomizer {

@@ -370,7 +370,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsAvailableLocally_isSimulatedYoutubeNoCookieReturnsTrue() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("js/duckplayer.js"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("js/duckplayer.js"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -380,7 +380,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsNotAvailableLocally_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("css/duckplayer.css"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("css/duckplayer.css"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -390,7 +390,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndPathContainsEmbed_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf())
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf())
         val uri = "https://www.youtube-nocookie.com/embed/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -550,6 +550,20 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenUriIsDuckPlayerUriWithOriginAuto_interceptProcessesDuckPlayerUri() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("duck://player/12345?origin=auto")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("https://www.youtube-nocookie.com?videoID=12345")
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+        assertNotNull(result)
+    }
+
+    @Test
     fun whenUriIsDuckPlayerUriWithOpenInYouTube_interceptLoadsYouTubeUri() = runTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/openInYouTube?v=12345")
@@ -599,15 +613,16 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("https://www.youtube-nocookie.com?videoID=12345")
         val webView: WebView = mock()
         val context: Context = mock()
-        val assets: AssetManager = mock()
+        val mockAssets: AssetManager = mock()
         whenever(webView.context).thenReturn(context)
-        whenever(context.assets).thenReturn(assets)
-        whenever(assets.open(any())).thenReturn(mock())
+        whenever(context.assets).thenReturn(mockAssets)
+        whenever(mockAssets.open(any())).thenReturn(mock())
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
 
         val result = testee.intercept(request, url, webView)
 
-        verify(assets).open("duckplayer/index.html")
-        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily())
+        verify(mockAssets).open("duckplayer/index.html")
+        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to "always"))
         assertEquals("text/html", result?.mimeType)
     }
 
@@ -633,7 +648,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/12345?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 
@@ -676,7 +690,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/123456?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 

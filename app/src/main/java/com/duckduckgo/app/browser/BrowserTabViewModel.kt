@@ -180,6 +180,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -416,6 +417,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
+    private val refreshPixelSender: RefreshPixelSender,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -858,6 +860,7 @@ class BrowserTabViewModel @Inject constructor(
                     AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
                 }
             }
+
             is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
             is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
             is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
@@ -897,7 +900,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion, omnibarText: String) {
+    fun onRemoveSearchSuggestionConfirmed(
+        suggestion: AutoCompleteSuggestion,
+        omnibarText: String,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
@@ -906,9 +912,11 @@ class BrowserTabViewModel @Inject constructor(
                 is AutoCompleteHistorySuggestion -> {
                     history.removeHistoryEntryByUrl(suggestion.url)
                 }
+
                 is AutoCompleteHistorySearchSuggestion -> {
                     history.removeHistoryEntryByQuery(suggestion.phrase)
                 }
+
                 else -> {}
             }
             withContext(dispatchers.main()) {
@@ -1192,7 +1200,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun urlUnchangedForExternalLaunchPurposes(oldUrl: String?, newUrl: String): Boolean {
+    fun urlUnchangedForExternalLaunchPurposes(
+        oldUrl: String?,
+        newUrl: String,
+    ): Boolean {
         if (oldUrl == null) return false
         fun normalizeUrl(url: String): String {
             val regex = Regex("^(https?://)?(www\\.)?")
@@ -1204,6 +1215,7 @@ class BrowserTabViewModel @Inject constructor(
 
             return normalizedUrl
         }
+
         val normalizedOldUrl = normalizeUrl(oldUrl)
         val normalizedNewUrl = normalizeUrl(newUrl)
         return normalizedOldUrl == normalizedNewUrl
@@ -1324,6 +1336,7 @@ class BrowserTabViewModel @Inject constructor(
                     }
                 }
             }
+
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
                 val uri = stateChange.url.toUri()
@@ -1341,6 +1354,7 @@ class BrowserTabViewModel @Inject constructor(
                     }
                 }
             }
+
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
             else -> {}
         }
@@ -1572,12 +1586,21 @@ class BrowserTabViewModel @Inject constructor(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                Timber.d("Location Permission: domain $domain site url ${site?.url}")
                 if (!locationPermissionMessages.containsKey(domain)) {
                     setDomainHasLocationPermissionShown(domain)
-                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                    if (shouldShowLocationPermissionMessage()) {
+                        Timber.d("Show location permission for $domain")
+                        command.postValue(ShowDomainHasPermissionMessage(domain))
+                    }
                 }
             }
         }
+    }
+
+    private fun shouldShowLocationPermissionMessage(): Boolean {
+        val url = site?.url ?: return true
+        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
     }
 
     private fun setDomainHasLocationPermissionShown(domain: String) {
@@ -2415,7 +2438,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun addToAllowList(domain: String, clickedFromCustomTab: Boolean) {
+    private suspend fun addToAllowList(
+        domain: String,
+        clickedFromCustomTab: Boolean,
+    ) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
@@ -2430,7 +2456,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun removeFromAllowList(domain: String, clickedFromCustomTab: Boolean) {
+    private suspend fun removeFromAllowList(
+        domain: String,
+        clickedFromCustomTab: Boolean,
+    ) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         if (clickedFromCustomTab) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
@@ -2517,6 +2546,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userFindingInPage(searchTerm: String) {
         val currentViewState = currentFindInPageViewState()
+        if (!currentViewState.visible && searchTerm.isEmpty()) {
+            return
+        }
+
         var findInPage = currentViewState.copy(visible = true, searchTerm = searchTerm)
         if (searchTerm.isEmpty()) {
             findInPage = findInPage.copy(showNumberMatches = false)
@@ -3014,7 +3047,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun sameOrigin(firstUrl: String, secondUrl: String): Boolean {
+    private fun sameOrigin(
+        firstUrl: String,
+        secondUrl: String,
+    ): Boolean {
         return kotlin.runCatching {
             val firstUri = Uri.parse(firstUrl)
             val secondUri = Uri.parse(secondUrl)
@@ -3382,6 +3418,7 @@ class BrowserTabViewModel @Inject constructor(
                     }
                 }
             }
+
             else -> {}
         }
     }
@@ -3473,7 +3510,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onSSLCertificateWarningAction(action: Action, url: String) {
+    fun onSSLCertificateWarningAction(
+        action: Action,
+        url: String,
+    ) {
         when (action) {
             is Action.Shown -> {
                 when (action.errorType) {
@@ -3570,6 +3610,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 null
             }
+
             else -> null
         }
     }
@@ -3665,7 +3706,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy, locationHref: String? = null) {
+    fun saveReplyProxyForBlobDownload(
+        originUrl: String,
+        replyProxy: JavaScriptReplyProxy,
+        locationHref: String? = null,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) { // FF check has disk IO
             if (androidBrowserConfig.fixBlobDownloadWithIframes().isEnabled()) {
                 val frameProxies = fixedReplyProxyMap[originUrl]?.toMutableMap() ?: mutableMapOf()
@@ -3729,7 +3774,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
 
-    private fun firePixelBasedOnCurrentUrl(emptyUrlPixel: AppPixelName, duckDuckGoQueryUrlPixel: AppPixelName, websiteUrlPixel: AppPixelName) {
+    private fun firePixelBasedOnCurrentUrl(
+        emptyUrlPixel: AppPixelName,
+        duckDuckGoQueryUrlPixel: AppPixelName,
+        websiteUrlPixel: AppPixelName,
+    ) {
         val text = url.orEmpty()
         if (text.isEmpty()) {
             pixel.fire(emptyUrlPixel)
@@ -3746,6 +3795,18 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onNewTabShown() {
         newTabPixels.get().fireNewTabDisplayed()
+    }
+
+    fun handleMenuRefreshAction() {
+        refreshPixelSender.sendMenuRefreshPixels()
+    }
+
+    fun handlePullToRefreshAction() {
+        refreshPixelSender.sendPullToRefreshPixels()
+    }
+
+    fun fireCustomTabRefreshPixel() {
+        refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
     companion object {

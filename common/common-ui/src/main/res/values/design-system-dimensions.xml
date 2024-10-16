@@ -40,7 +40,6 @@
     <dimen name="toolbarIconPadding">3dp</dimen>
 
     <!-- Buttons -->
-    <dimen name="legacyButtonSmallHeight">36dp</dimen>
     <dimen name="buttonLargeHeight">60dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
     <dimen name="buttonSmallSidePadding">16dp</dimen>
@@ -71,6 +70,7 @@
     <dimen name="gridItemImageSize">56dp</dimen>
     <dimen name="gridItemIconSize">32dp</dimen>
     <dimen name="gridItemTextWidth">72dp</dimen>
+    <dimen name="gridItemPreviewHeight">170dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>

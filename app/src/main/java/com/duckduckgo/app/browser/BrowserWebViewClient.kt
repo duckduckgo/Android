@@ -73,6 +73,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -114,6 +116,7 @@ class BrowserWebViewClient @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -184,7 +187,9 @@ class BrowserWebViewClient @Inject constructor(
                         This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
                         therefore the Duck Player page is never launched if YouTube comes from a redirect.
                          */
-                        webView.loadUrl(url.toString())
+                        webViewClientListener?.let {
+                            loadUrl(it, webView, url.toString())
+                        }
                         return true
                     } else {
                         shouldOverrideWebRequest(url, webView, isForMainFrame)
@@ -301,6 +306,13 @@ class BrowserWebViewClient @Inject constructor(
                     if (provider.shouldChangeBranding(url.toString())) {
                         provider.setOn(webView.settings, url.toString())
                         loadUrl(listener, webView, url.toString())
+                        return true
+                    } else if (webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
+                        loadUrl(
+                            listener,
+                            webView,
+                            url.buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_SERP_AUTO).build().toString(),
+                        )
                         return true
                     } else {
                         return false

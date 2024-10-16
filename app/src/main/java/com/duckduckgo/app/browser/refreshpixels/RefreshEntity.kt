@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.app.browser.refreshpixels
 
-import android.text.Editable
-import android.text.TextWatcher
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-abstract class TextChangedWatcher : TextWatcher {
-
-    abstract override fun afterTextChanged(editable: Editable)
-
-    override fun beforeTextChanged(
-        p0: CharSequence,
-        p1: Int,
-        p2: Int,
-        p3: Int,
-    ) {
-    }
-
-    override fun onTextChanged(
-        charSequence: CharSequence,
-        start: Int,
-        before: Int,
-        count: Int,
-    ) {
-    }
-}
+@Entity(tableName = "refreshes")
+class RefreshEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val timestamp: Long,
+)

@@ -47,6 +47,7 @@ class AppUrl {
         const val SOURCE = "ddg_android"
         const val SOURCE_EU_AUCTION = "ddg_androideu"
         const val HIDE_SERP = "-1"
+        const val CHAT_VERTICAL = "chat"
     }
 
     object StaticUrl {

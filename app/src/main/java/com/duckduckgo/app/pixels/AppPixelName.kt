@@ -351,11 +351,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED("m_tab_manager_grid_view_button_clicked"),
     TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED("m_tab_manager_list_view_button_clicked"),
 
-    DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duck-player_setting_always_overlay_youtube"),
-    DUCK_PLAYER_SETTING_ALWAYS_SERP("duck-player_setting_always_overlay_serp"),
-    DUCK_PLAYER_SETTING_NEVER_SERP("duck-player_setting_never_overlay_serp"),
-    DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duck-player_setting_never_overlay_youtube"),
-    DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duck-player_setting_always_duck-player"),
+    DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
+    DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
+    DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
@@ -365,5 +365,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     INDONESIA_MESSAGE_DISMISSED("m_indonesia_message_dismissed"),
 
     REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
+    RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
+
     URI_LOADED("m_uri_loaded"),
 }

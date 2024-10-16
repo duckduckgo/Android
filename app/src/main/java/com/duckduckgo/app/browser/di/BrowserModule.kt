@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.refreshpixels.RefreshDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -188,6 +189,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -196,6 +198,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature,
         duckPlayer,
         appCoroutineScope,
+        dispatcherProvider = dispatcherProvider,
     )
 
     @Provides
@@ -364,6 +367,12 @@ class BrowserModule {
     @IndonesiaNewTabSection
     fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
         return context.indonesiaNewTabSectionDataStore
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideRefreshDao(appDatabase: AppDatabase): RefreshDao {
+        return appDatabase.refreshDao()
     }
 }
 
