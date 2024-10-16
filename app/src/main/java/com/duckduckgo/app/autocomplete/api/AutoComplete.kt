@@ -175,19 +175,16 @@ class AutoCompleteApi @Inject constructor(
                 bookmarksAndFavoritesAndTabsAndHistory
                     .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
                     .take(maxBottomSection)
-            val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarksAndTabsAndHistory.size)
-            val filteredSearchResults = searchResults
-                .filter { searchSuggestion -> filteredBookmarksAndTabsAndHistory.none { it.phrase == searchSuggestion.phrase } }
-                .take(maxSearchResults)
-
-            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
 
             val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
-            val distinctSearchResults = filteredSearchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }
+            val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
+            val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
+            val distinctSearchResults = searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
             val suggestions = (topHits + distinctSearchResults + filteredBookmarksAndTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
             }
 
+            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
             if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
                 inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
             }
