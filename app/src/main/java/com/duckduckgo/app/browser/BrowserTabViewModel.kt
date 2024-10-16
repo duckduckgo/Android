@@ -174,6 +174,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
@@ -418,6 +419,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1518,7 +1520,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
         }
     }
 
@@ -1699,7 +1701,7 @@ class BrowserTabViewModel @Inject constructor(
             newProgress
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -2204,8 +2206,6 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
             showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
         )
-
-        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
     }
 
     fun onBookmarkMenuClicked() {
@@ -3666,9 +3666,13 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = true,
         )
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            navigationChange = false,
-        )
+
+        // the new omnibar deals with this properly
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                navigationChange = false,
+            )
+        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {

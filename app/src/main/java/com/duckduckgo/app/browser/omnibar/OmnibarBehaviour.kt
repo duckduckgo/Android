@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.app.browser.omnibar
 
-data class LoadingViewState(
-    val isLoading: Boolean = false,
-    val privacyOn: Boolean = true,
-    val progress: Int = 0,
-    val url: String = "",
-)
+interface OmnibarBehaviour {
+
+    fun measuredHeight(): Int
+
+    fun height(): Int
+
+    fun getTranslation(): Float
+
+    fun setTranslation(y: Float)
+
+    fun isOmnibarScrollingEnabled(): Boolean
+}

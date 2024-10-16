@@ -101,6 +101,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -481,6 +482,7 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
 
     @Before
     fun before() = runTest {
@@ -524,6 +526,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -642,6 +645,7 @@ class BrowserTabViewModelTest {
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             loadingBarExperimentManager = loadingBarExperimentManager,
             refreshPixelSender = refreshPixelSender,
+            changeOmnibarPositionFeature = changeOmnibarPositionFeature,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5887,6 +5891,7 @@ class BrowserTabViewModelTest {
     fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
         setBrowserShowing(true)
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockDisabledToggle)
         val observer = mock<(OmnibarViewState) -> Unit>()
         testee.omnibarViewState.observeForever { observer(it) }
 
