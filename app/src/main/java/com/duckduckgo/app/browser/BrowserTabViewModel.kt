@@ -1586,12 +1586,21 @@ class BrowserTabViewModel @Inject constructor(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                Timber.d("Location Permission: domain $domain site url ${site?.url}")
                 if (!locationPermissionMessages.containsKey(domain)) {
                     setDomainHasLocationPermissionShown(domain)
-                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                    if (shouldShowLocationPermissionMessage()) {
+                        Timber.d("Show location permission for $domain")
+                        command.postValue(ShowDomainHasPermissionMessage(domain))
+                    }
                 }
             }
         }
+    }
+
+    private fun shouldShowLocationPermissionMessage(): Boolean {
+        val url = site?.url ?: return true
+        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
     }
 
     private fun setDomainHasLocationPermissionShown(domain: String) {
