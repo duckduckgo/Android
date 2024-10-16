@@ -77,22 +77,12 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
     }
 
     override fun isDuckDuckGoChatUrl(uri: String): Boolean {
-        return isDuckDuckGoUrl(uri) && isDuckAIChat(uri)
+        return isDuckDuckGoUrl(uri) && hasAIChatVertical(uri)
     }
 
-    private fun isDuckAIChat(uri: String): Boolean {
-        val hasChatVertical = hasChatVertical(uri)
-        val hasChatParameter = hasDuckAI(uri)
-        return hasChatVertical || hasChatParameter
-    }
-
-    private fun hasChatVertical(uri: String): Boolean {
+    private fun hasAIChatVertical(uri: String): Boolean {
         val vertical = extractVertical(uri)
         return vertical == ParamValue.CHAT_VERTICAL
-    }
-
-    private fun hasDuckAI(uri: String): Boolean {
-        return uri.toUri().queryParameterNames.contains(ParamKey.DUCK_AI)
     }
 
     private fun String.toUri(): Uri {

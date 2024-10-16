@@ -41,7 +41,6 @@ class AppUrl {
         const val HIDE_SERP = "ko"
         const val VERTICAL = "ia"
         const val VERTICAL_REWRITE = "iar"
-        const val DUCK_AI = "duckai"
     }
 
     object ParamValue {
