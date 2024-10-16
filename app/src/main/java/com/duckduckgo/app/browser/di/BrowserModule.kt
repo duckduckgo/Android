@@ -189,6 +189,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -197,6 +198,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature,
         duckPlayer,
         appCoroutineScope,
+        dispatcherProvider = dispatcherProvider,
     )
 
     @Provides

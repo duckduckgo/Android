@@ -370,7 +370,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsAvailableLocally_isSimulatedYoutubeNoCookieReturnsTrue() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("js/duckplayer.js"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("js/duckplayer.js"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -380,7 +380,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsNotAvailableLocally_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("css/duckplayer.css"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("css/duckplayer.css"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -390,7 +390,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndPathContainsEmbed_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf())
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf())
         val uri = "https://www.youtube-nocookie.com/embed/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
