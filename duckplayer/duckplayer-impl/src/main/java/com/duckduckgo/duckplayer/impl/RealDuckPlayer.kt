@@ -223,7 +223,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
-        val validPaths = duckPlayerLocalFilesPath.assetsPath
+        val validPaths = duckPlayerLocalFilesPath.assetsPath()
         val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
         return (
             uri.host?.removePrefix("www.") ==
@@ -353,15 +353,8 @@ class RealDuckPlayer @Inject constructor(
     }
 
     private suspend fun doesYoutubeUrlComeFromDuckPlayer(url: Uri, request: WebResourceRequest? = null): Boolean {
-        val referer = request?.requestHeaders?.keys?.firstOrNull { it in duckPlayerFeatureRepository.getYouTubeReferrerHeaders() }
-            ?.let { url.getQueryParameter(it) }
-        val previousUrl = duckPlayerFeatureRepository.getYouTubeReferrerQueryParams()
-            .firstOrNull { url.getQueryParameter(it) != null }
-            ?.let { url.getQueryParameter(it) }
-
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
         val requestedVideoId = url.getQueryParameter(videoIdQueryParam)
-
         val isSimulated: suspend (String?) -> Boolean = { uri ->
             uri?.let { isSimulatedYoutubeNoCookie(it.toUri()) } == true
         }
@@ -370,8 +363,16 @@ class RealDuckPlayer @Inject constructor(
             uri?.toUri()?.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == requestedVideoId
         }
 
-        return isSimulated(referer) && isMatchingVideoId(referer) ||
-            isSimulated(previousUrl) && isMatchingVideoId(previousUrl)
+        val referer = request?.requestHeaders?.keys?.firstOrNull { it in duckPlayerFeatureRepository.getYouTubeReferrerHeaders() }
+            ?.let { url.getQueryParameter(it) }
+
+        if (isSimulated(referer) && isMatchingVideoId(referer)) return true
+
+        val previousUrl = duckPlayerFeatureRepository.getYouTubeReferrerQueryParams()
+            .firstOrNull { url.getQueryParameter(it) != null }
+            ?.let { url.getQueryParameter(it) }
+
+        return isSimulated(previousUrl) && isMatchingVideoId(previousUrl)
     }
 
     private suspend fun processDuckPlayerUri(
@@ -424,8 +425,8 @@ class RealDuckPlayer @Inject constructor(
     ): Boolean {
         return (
             isFeatureEnabled &&
-                isYoutubeWatchUrl(destinationUrl) &&
                 getUserPreferences().privatePlayerMode == Enabled &&
+                isYoutubeWatchUrl(destinationUrl) &&
                 !(shouldForceYTNavigation || doesYoutubeUrlComeFromDuckPlayer(destinationUrl))
             )
     }

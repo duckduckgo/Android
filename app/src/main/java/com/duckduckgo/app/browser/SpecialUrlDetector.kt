@@ -26,6 +26,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -45,6 +46,7 @@ class SpecialUrlDetectorImpl(
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
     private val duckPlayer: DuckPlayer,
     private val scope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -90,9 +92,9 @@ class SpecialUrlDetectorImpl(
 
         val uri = uriString.toUri()
 
-        val willNavigateToDuckPlayerDeferred = scope.async { duckPlayer.willNavigateToDuckPlayer(uri) }
+        val willNavigateToDuckPlayerDeferred = scope.async(dispatcherProvider.io()) { duckPlayer.willNavigateToDuckPlayer(uri) }
 
-        val willNavigateToDuckPlayer = runBlocking { willNavigateToDuckPlayerDeferred.await() }
+        val willNavigateToDuckPlayer = runBlocking(dispatcherProvider.io()) { willNavigateToDuckPlayerDeferred.await() }
 
         if (willNavigateToDuckPlayer) {
             return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
