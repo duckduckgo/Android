@@ -26,3 +26,9 @@ jobs:
       uses: ./.github/workflows/release_create_tag.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
+
+    launch_release_tests:
+      needs: launch_release_tests
+      uses: ./.github/workflows/release_tests.yml
+      with:
+        app-version: ${{ github.event.inputs.app-version }}
