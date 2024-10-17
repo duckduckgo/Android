@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo operētājsistēmai Windows sniedz visu, kas nepieciešams, lai pārlūkotu ar lielāku konfidencialitāti – privātu meklēšanu, izsekošanas bloķēšanu, piespiedu šifrēšanu un sīkfailu uznirstošo logu bloķēšanu, kā arī citas savā klasē labākās aizsardzības iespējas.\n\nSavā Windows datorā dodies uz:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Kopīgot saiti</string>
-    <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\n https://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Vai meklē Mac versiju?</string>
 </resources>

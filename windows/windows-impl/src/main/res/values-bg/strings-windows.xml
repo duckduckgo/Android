@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo за Windows разполага с всичко необходимо за поверително сърфиране — поверително търсене, блокиране на тракери, принудително криптиране и блокиране на изскачащи прозорци с бисквитки, както и много от най-добрите в този клас елементи за защита.\n\nНа Вашия компютър с Windows отидете на:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Споделяне на връзка</string>
-    <string name="windows_share_text">Готови ли сте да започнете поверително сърфиране с Windows?\n\nПосетете този URL адрес на компютър с Windows, за да изтеглите:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Готови ли сте да започнете поверително сърфиране с Windows?\n\nПосетете този URL на компютър с Windows, за да изтеглите:\n https://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Търсите версията за Mac?</string>
 </resources>
