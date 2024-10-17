@@ -17,6 +17,7 @@
 package com.duckduckgo.app.autocomplete.api
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
@@ -52,18 +53,21 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
-import io.reactivex.Observable
-import java.io.InterruptedIOException
 import javax.inject.Inject
 import kotlin.math.max
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
 const val minimumNumberInSuggestionGroup = 5
 
 interface AutoComplete {
-    fun autoComplete(query: String): Observable<AutoCompleteResult>
+    fun autoComplete(query: String): Flow<AutoCompleteResult>
     suspend fun userDismissedHistoryInAutoCompleteIAM()
     suspend fun submitUserSeenHistoryIAM()
 
@@ -134,33 +138,30 @@ class AutoCompleteApi @Inject constructor(
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
-    override fun autoComplete(query: String): Observable<AutoCompleteResult> {
-        if (query.isBlank()) {
-            return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
-        }
-        val savedSitesObservable: Observable<List<AutoCompleteSuggestion>> =
-            getAutoCompleteBookmarkResults(query)
-                .zipWith(
-                    getAutoCompleteFavoritesResults(query),
-                ) { bookmarks, favorites ->
-                    (favorites + bookmarks.filter { favorites.none { favorite -> (it.suggestion).url == favorite.suggestion.url } })
-                }.zipWith(
-                    getAutocompleteSwitchToTabResults(query),
-                ) { bookmarksAndFavorites, tabs ->
-                    (tabs + bookmarksAndFavorites) as List<RankedSuggestion<AutoCompleteUrlSuggestion>>
-                }.zipWith(
-                    getHistoryResults(query),
-                ) { bookmarksAndFavoritesAndTabs, historyItems ->
-                    val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
-                    val navigationHistory = historyItems
-                        .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
-                    (removeDuplicates(navigationHistory, bookmarksAndFavoritesAndTabs) + searchHistory)
-                        .sortedByDescending { it.score }
-                        .map { it.suggestion }
-                }
+    private var isAutocompleteTabsFeatureEnabled: Boolean? = null
 
-        return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndTabsAndHistory, searchResults ->
-            val topHits = (searchResults + bookmarksAndTabsAndHistory).filter {
+    override fun autoComplete(query: String): Flow<AutoCompleteResult> = flow {
+        if (query.isBlank()) {
+            return@flow emit(AutoCompleteResult(query = query, suggestions = emptyList()))
+        }
+        val savedSites = getAutoCompleteBookmarkResults(query)
+            .combine(getAutoCompleteFavoritesResults(query)) { bookmarks, favorites ->
+                (favorites + bookmarks.filter { favorites.none { favorite -> (it.suggestion).url == favorite.suggestion.url } })
+            }.combine(getAutocompleteSwitchToTabResults(query)) { bookmarksAndFavorites, tabs ->
+                (tabs + bookmarksAndFavorites) as List<RankedSuggestion<AutoCompleteUrlSuggestion>>
+            }.combine(getHistoryResults(query)) { bookmarksAndFavoritesAndTabs, historyItems ->
+                val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
+                val navigationHistory = historyItems
+                    .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
+                (removeDuplicates(navigationHistory, bookmarksAndFavoritesAndTabs) + searchHistory)
+                    .sortedByDescending { it.score }
+                    .map { it.suggestion }
+            }.combine(getAutoCompleteSearchResults(query)) { bookmarksAndFavoritesAndTabsAndHistory, searchResults ->
+                Pair(bookmarksAndFavoritesAndTabsAndHistory, searchResults)
+            }
+
+        savedSites.collect { (bookmarksAndFavoritesAndTabsAndHistory, searchResults) ->
+            val topHits = (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
                 when (it) {
                     is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
@@ -171,33 +172,30 @@ class AutoCompleteApi @Inject constructor(
 
             val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
             val filteredBookmarksAndTabsAndHistory =
-                bookmarksAndTabsAndHistory
+                bookmarksAndFavoritesAndTabsAndHistory
                     .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
                     .take(maxBottomSection)
-            val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarksAndTabsAndHistory.size)
-            val filteredSearchResults = searchResults
-                .filter { searchSuggestion -> filteredBookmarksAndTabsAndHistory.none { it.phrase == searchSuggestion.phrase } }
-                .take(maxSearchResults)
-
-            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
 
             val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
-            val distinctSearchResults = filteredSearchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }
+            val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
+            val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
+            val distinctSearchResults = searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
             val suggestions = (topHits + distinctSearchResults + filteredBookmarksAndTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
             }
 
-            runBlocking(dispatcherProvider.io()) {
-                if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
-                    inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
-                }
+            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
+            if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
+                inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
             }
 
-            AutoCompleteResult(
-                query = query,
-                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
+            return@collect emit(
+                AutoCompleteResult(
+                    query = query,
+                    suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
+                ),
             )
-        }.onErrorResumeNext(Observable.empty())
+        }
     }
 
     private fun removeDuplicates(
@@ -208,7 +206,8 @@ class AutoCompleteApi @Inject constructor(
 
         val uniqueHistorySuggestions = historySuggestions.filter { !bookmarkMap.containsKey(it.suggestion.phrase.lowercase()) }
         val updatedBookmarkSuggestions = bookmarkSuggestions.map { bookmarkSuggestion ->
-            val historySuggestion = historySuggestions.find { it.suggestion.phrase.equals(bookmarkSuggestion.suggestion.phrase, ignoreCase = true) }
+            val historySuggestion =
+                historySuggestions.find { it.suggestion.phrase.equals(bookmarkSuggestion.suggestion.phrase, ignoreCase = true) }
             if (historySuggestion != null) {
                 bookmarkSuggestion.copy(
                     score = max(historySuggestion.score, bookmarkSuggestion.score),
@@ -248,64 +247,60 @@ class AutoCompleteApi @Inject constructor(
         return entry.visits.size > 3 || entry.url.isRoot()
     }
 
-    private fun getAutocompleteSwitchToTabResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
-        // TODO: ANA - Do we want to have this check here, or somewhere else? (note: this is using the RxComputationThreadPool).
-        if (autocompleteTabsFeature.self().isEnabled()) {
-            tabRepository.getTabsObservable()
-                .map { rankTabs(query, it) }
-                .flattenAsObservable { it }
-                .distinctUntilChanged()
-                .toList()
-                .onErrorReturn { emptyList() }
-                .toObservable()
-        } else {
-            Observable.just(mutableListOf())
+    private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
+        runCatching {
+            if (autocompleteTabsEnabled) {
+                tabRepository.flowTabs
+                    .map { rankTabs(query, it) }
+                    .distinctUntilChanged()
+            } else {
+                flowOf(emptyList())
+            }
+        }.getOrElse { flowOf(emptyList()) }
+
+    private val autocompleteTabsEnabled: Boolean by lazy {
+        isAutocompleteTabsFeatureEnabled ?: run {
+            val enabled = autocompleteTabsFeature.self().isEnabled()
+            isAutocompleteTabsFeatureEnabled = enabled
+            enabled
         }
+    }
 
-    private fun getAutoCompleteSearchResults(query: String) =
-        autoCompleteService.autoComplete(query)
-            .flatMapIterable { it }
-            .map {
-                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
+    private fun getAutoCompleteSearchResults(query: String) = flow {
+        val searchSuggestionsList = mutableListOf<AutoCompleteSearchSuggestion>()
+        runCatching {
+            val rawResults = autoCompleteService.autoComplete(query)
+            for (rawResult in rawResults) {
+                val searchSuggestion = AutoCompleteSearchSuggestion(
+                    phrase = rawResult.phrase.formatIfUrl(),
+                    isUrl = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
+                )
+                searchSuggestionsList.add(searchSuggestion)
             }
-            .toList()
-            .toObservable()
-            .onErrorResumeNext { throwable: Throwable ->
-                if (throwable is InterruptedIOException) {
-                    // If the query text is deleted quickly, the request may be cancelled, resulting in an InterruptedIOException.
-                    // Return an empty observable to avoid showing the default state.
-                    Observable.empty()
-                } else {
-                    Observable.just(emptyList<AutoCompleteSearchSuggestion>())
-                }
-            }
+            emit(searchSuggestionsList.toList())
+        }.getOrElse { emit(searchSuggestionsList.toList()) }
+    }
 
-    private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
-        savedSitesRepository.getBookmarksObservable()
-            .map { rankBookmarks(query, it) }
-            .flattenAsObservable { it }
-            .distinctUntilChanged()
-            .toList()
-            .onErrorReturn { emptyList() }
-            .toObservable()
+    private fun getAutoCompleteBookmarkResults(query: String): Flow<List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
+        runCatching {
+            savedSitesRepository.getBookmarks()
+                .map { rankBookmarks(query, it) }
+                .distinctUntilChanged()
+        }.getOrElse { flowOf(emptyList()) }
 
-    private fun getAutoCompleteFavoritesResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
-        savedSitesRepository.getFavoritesObservable()
-            .map { rankFavorites(query, it) }
-            .flattenAsObservable { it }
-            .distinctUntilChanged()
-            .toList()
-            .onErrorReturn { emptyList() }
-            .toObservable()
+    private fun getAutoCompleteFavoritesResults(query: String): Flow<List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
+        runCatching {
+            savedSitesRepository.getFavorites()
+                .map { rankFavorites(query, it) }
+                .distinctUntilChanged()
+        }.getOrElse { flowOf(emptyList()) }
 
-    private fun getHistoryResults(query: String): Observable<List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>>> =
-        navigationHistory.getHistorySingle()
-            .map { rankHistory(query, it) }
-            .flattenAsObservable { it }
-            .distinctUntilChanged()
-            .toList()
-            .onErrorReturn { emptyList() }
-            .toObservable()
+    private fun getHistoryResults(query: String): Flow<List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>>> =
+        runCatching {
+            navigationHistory.getHistory()
+                .map { rankHistory(query, it) }
+                .distinctUntilChanged()
+        }.getOrElse { flowOf(emptyList()) }
 
     private fun rankTabs(
         query: String,
@@ -343,7 +338,7 @@ class AutoCompleteApi @Inject constructor(
         return this.map { tabEntity ->
             RankedSuggestion(
                 AutoCompleteSwitchToTabSuggestion(
-                    phrase = tabEntity.url?.toUri()?.toStringDropScheme().orEmpty(),
+                    phrase = tabEntity.url?.formatIfUrl().orEmpty(),
                     title = tabEntity.title.orEmpty(),
                     url = tabEntity.url.orEmpty(),
                     tabId = tabEntity.tabId,
@@ -360,7 +355,7 @@ class AutoCompleteApi @Inject constructor(
         return this.map { savedSite ->
             RankedSuggestion(
                 AutoCompleteBookmarkSuggestion(
-                    phrase = savedSite.url.toUri().toStringDropScheme(),
+                    phrase = savedSite.url.formatIfUrl(),
                     title = savedSite.title,
                     url = savedSite.url,
                     isFavorite = savedSite is Favorite,
@@ -395,7 +390,7 @@ class AutoCompleteApi @Inject constructor(
                 when (entry) {
                     is VisitedPage -> {
                         AutoCompleteHistorySuggestion(
-                            phrase = entry.url.toStringDropScheme(),
+                            phrase = entry.url.toString().formatIfUrl(),
                             title = entry.title,
                             url = entry.url.toString(),
                             isAllowedInTopHits = isAllowedInTopHits(entry),
@@ -403,7 +398,7 @@ class AutoCompleteApi @Inject constructor(
                     }
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
-                            phrase = entry.query,
+                            phrase = entry.query.formatIfUrl(),
                             isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
@@ -467,4 +462,16 @@ class AutoCompleteApi @Inject constructor(
         val suggestion: T,
         val score: Int = DEFAULT_SCORE,
     )
+}
+
+@VisibleForTesting
+internal fun String.formatIfUrl(): String {
+    val trimmedUrl = this.trimEnd('/')
+
+    val prefixToRemove = listOf("http://www.", "https://www.", "www.", "http://", "https://")
+    val formattedUrl = prefixToRemove.find { trimmedUrl.startsWith(it, ignoreCase = true) }?.let {
+        trimmedUrl.substring(it.length)
+    } ?: trimmedUrl
+
+    return formattedUrl
 }
