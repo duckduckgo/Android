@@ -24,7 +24,7 @@
     <string name="duck_player_mode_always">Always</string>
     <string name="duck_player_mode_never">Never</string>
     <string name="duck_player_mode_always_ask">Ask Every Time</string>
-    <string name="duck_player_mode_dialog_title">Open Youtube videos in Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Open YouTube videos in Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Close</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Drowning in ads on YouTube? Not with Duck Player!</string>
     <string name="duck_player_info_modal_title_from_overlay">Drowning in ads on YouTube? Try Duck Player!</string>

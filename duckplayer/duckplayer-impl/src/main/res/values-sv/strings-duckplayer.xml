@@ -25,7 +25,7 @@
     <string name="duck_player_mode_always">Alltid</string>
     <string name="duck_player_mode_never">Aldrig</string>
     <string name="duck_player_mode_always_ask">Fråga varje gång</string>
-    <string name="duck_player_mode_dialog_title">Öppna Youtube-videor i Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Öppna YouTube-videor i Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Stäng</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Drunknar du i annonser på YouTube? Inte med Duck Player!</string>
     <string name="duck_player_info_modal_title_from_overlay">Drunknar du i annonser på YouTube? Prova Duck Player!</string>
