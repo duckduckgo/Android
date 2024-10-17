@@ -24,18 +24,26 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
     suspend fun handleAppLaunchOption()
+    suspend fun handleResolvedUrlStorage(
+        currentUrl: String?,
+        isRootOfTab: Boolean,
+        tabId: String
+    )
 }
 
 @ContributesBinding(AppScope::class)
 class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
+    private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
 ): ShowOnAppLaunchOptionHandler {
@@ -45,6 +53,22 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             LastOpenedTab -> Unit
             NewTabPage -> tabRepository.add()
             is SpecificPage -> handleSpecificPageOption(option)
+        }
+    }
+
+    override suspend fun handleResolvedUrlStorage(
+        currentUrl: String?,
+        isRootOfTab: Boolean,
+        tabId: String
+    ) {
+        withContext(dispatchers.io()) {
+            val shouldSaveCurrentUrlForShowOnAppLaunch = currentUrl != null &&
+                isRootOfTab &&
+                tabId == showOnAppLaunchOptionDataStore.showOnAppLaunchTabId
+
+            if (shouldSaveCurrentUrlForShowOnAppLaunch) {
+                showOnAppLaunchOptionDataStore.setResolvedPageUrl(currentUrl!!)
+            }
         }
     }
 
