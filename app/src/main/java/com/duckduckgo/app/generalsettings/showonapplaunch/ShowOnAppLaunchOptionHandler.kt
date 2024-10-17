@@ -49,19 +49,24 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
 
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
         val uri = option.url.toUri()
+        val resolvedUri = option.resolvedUrl?.toUri()
 
-        val url = if (uri.isHttpOrHttps) {
-            stripUri(uri)
-        } else {
-            option.url
+        val urls = listOfNotNull(uri, resolvedUri).map {
+            if (it.isHttpOrHttps) {
+                stripUri(it)
+            } else {
+                option.url
+            }
         }
 
-        val existingTabId = tabRepository.getTabId(url)
+        val existingTabId = urls.firstNotNullOfOrNull { url -> tabRepository.findTabIdByUrlPattern(url) }
 
         if (existingTabId != null) {
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(existingTabId)
             tabRepository.select(existingTabId)
         } else {
-            tabRepository.add(option.url)
+            val tabId = tabRepository.add(url = option.url)
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(tabId)
         }
     }
 
