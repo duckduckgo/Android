@@ -96,6 +96,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val expandedAnimated: Boolean = false,
         val updateOmnibarText: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
+        val shouldMoveCaretToStart: Boolean = false,
         val tabs: List<TabEntity> = emptyList(),
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
@@ -154,6 +155,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = showClearButton,
                     showControls = query.isBlank(),
+                    shouldMoveCaretToStart = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -167,7 +169,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     hasFocus = false,
                     expanded = false,
-                    leadingIconState = getLeadingIconState(it.url),
+                    leadingIconState = getLeadingIconState(false, it.url),
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
                     showControls = true,
@@ -177,6 +179,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
+                    shouldMoveCaretToStart = true,
                 )
             }
         }
@@ -196,8 +199,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
-    private fun getLeadingIconState(url: String): LeadingIconState {
-        val hasFocus = _viewState.value.hasFocus
+    private fun getLeadingIconState(hasFocus: Boolean, url: String): LeadingIconState {
         return when (_viewState.value.viewMode) {
             Error -> GLOBE
             NewTab -> SEARCH
@@ -473,7 +475,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 url = loadingState.url,
-                leadingIconState = getLeadingIconState(loadingState.url),
+                leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = _viewState.value.hasFocus,
                     query = _viewState.value.omnibarText,
