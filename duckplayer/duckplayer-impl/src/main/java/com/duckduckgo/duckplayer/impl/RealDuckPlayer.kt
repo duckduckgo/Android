@@ -51,6 +51,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
 import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
@@ -187,6 +189,11 @@ class RealDuckPlayer @Inject constructor(
 
     override fun setOpenInNewTab(enabled: Boolean) {
         duckPlayerFeatureRepository.setOpenInNewTab(enabled)
+        if (enabled) {
+            pixel.fire(DUCK_PLAYER_NEWTAB_SETTING_ON)
+        } else {
+            pixel.fire(DUCK_PLAYER_NEWTAB_SETTING_OFF)
+        }
     }
 
     private suspend fun createYoutubeNoCookieFromDuckPlayer(uri: Uri): String? {
@@ -312,13 +319,18 @@ class RealDuckPlayer @Inject constructor(
             }
         } else {
             val inputStream: InputStream = webView.context.assets.open(DUCK_PLAYER_ASSETS_INDEX_PATH)
+            val openInNewTab = shouldOpenDuckPlayerInNewTab() is On
             return WebResourceResponse("text/html", "UTF-8", inputStream).also {
                 when (getUserPreferences().privatePlayerMode) {
                     Enabled -> "always"
                     AlwaysAsk -> "default"
                     else -> null
                 }?.let { setting ->
-                    pixel.fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to setting))
+                    pixel.fire(
+                        DUCK_PLAYER_DAILY_UNIQUE_VIEW,
+                        type = Daily(),
+                        parameters = mapOf("setting" to setting, "newtab" to openInNewTab.toString()),
+                    )
                 }
             }
         }
