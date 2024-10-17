@@ -34,8 +34,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
-
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
