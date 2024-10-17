@@ -2917,6 +2917,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = OpenMessageInNewTab(message, tabId)
     }
 
+    override fun openLinkInNewTab(uri: Uri) {
+        command.value = OpenInNewTab(uri.toString(), tabId)
+    }
+
     override fun recoverFromRenderProcessGone() {
         webNavigationState?.let {
             navigationStateChanged(EmptyNavigationState(it))
@@ -3410,7 +3414,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
-                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl)
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl, tabId)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = it

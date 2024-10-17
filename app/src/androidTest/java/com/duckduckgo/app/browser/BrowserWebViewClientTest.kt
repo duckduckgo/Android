@@ -82,6 +82,7 @@ import java.security.interfaces.RSAPublicKey
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -142,11 +143,13 @@ class BrowserWebViewClientTest {
     private val navigationHistory: NavigationHistory = mock()
     private val loadingBarExperimentManager: LoadingBarExperimentManager = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val openInNewTabFlow: MutableSharedFlow<Boolean> = MutableSharedFlow()
 
     @UiThreadTest
     @Before
     fun setup() {
         webView = TestWebView(context)
+        whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -462,6 +465,33 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).handleNonHttpAppLink(urlType)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerThenOpenInNewTabAndReturnTrue() = runTest {
+        openInNewTabFlow.emit(true)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(true)
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).onShouldOverride()
+        verify(listener).openLinkInNewTab(EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerButNotOpenInNewTabThenReturnFalse() = runTest {
+        openInNewTabFlow.emit(false)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).onShouldOverride()
+        verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
     }
 
     @UiThreadTest
