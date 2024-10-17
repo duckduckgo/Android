@@ -18,7 +18,6 @@ package com.duckduckgo.duckplayer.impl
 
 import android.content.res.Configuration
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -445,9 +444,7 @@ class RealDuckPlayer @Inject constructor(
 
     override fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab> {
         return duckPlayerFeatureRepository.observeOpenInNewTab().map {
-            (if (!duckPlayerFeature.openInNewTab().isEnabled()) Unavailable else if (it) On else Off).also {
-                Log.d("Cris", "observeShouldOpenInNewTab: $it")
-            }
+            (if (!duckPlayerFeature.openInNewTab().isEnabled()) Unavailable else if (it) On else Off)
         }
     }
 }
