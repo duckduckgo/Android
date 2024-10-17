@@ -22,6 +22,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -48,25 +49,46 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     }
 
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
-        val uri = option.url.toUri()
+        val userUri = option.url.toUri()
+        val resolvedUri = option.resolvedUrl?.toUri()
 
-        val url = if (uri.isHttpOrHttps) {
-            stripUri(uri)
-        } else {
-            option.url
+        val urls = listOfNotNull(userUri, resolvedUri).map { uri ->
+            stripIfHttpOrHttps(uri)
         }
 
-        val existingTabId = tabRepository.getTabId(url)
+        val tabIdUrlMap = getTabIdUrlMap(tabRepository.flowTabs.first())
+
+        val existingTabId = tabIdUrlMap.entries.findLast { it.value in urls }?.key
 
         if (existingTabId != null) {
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(existingTabId)
             tabRepository.select(existingTabId)
         } else {
-            tabRepository.add(option.url)
+            val tabId = tabRepository.add(url = option.url)
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(tabId)
+        }
+    }
+
+    private fun stripIfHttpOrHttps(uri: Uri): String {
+        return if (uri.isHttpOrHttps) {
+            stripUri(uri)
+        } else {
+            uri.toString()
         }
     }
 
     private fun stripUri(uri: Uri): String {
         val host = uri.host?.removePrefix("www.") ?: ""
         return "$host${uri.path.orEmpty()}"
+    }
+
+    private fun getTabIdUrlMap(tabs: List<TabEntity>): Map<String, String> {
+        return tabs
+            .filterNot { tab -> tab.url.isNullOrBlank() }
+            .associate { tab ->
+                val tabUri = tab.url!!.toUri()
+                val strippedUrl = stripIfHttpOrHttps(tabUri)
+                tab.tabId to strippedUrl
+            }
     }
 }
