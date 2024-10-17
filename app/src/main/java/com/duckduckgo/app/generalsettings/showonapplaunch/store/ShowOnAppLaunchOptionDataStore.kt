@@ -29,16 +29,20 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore.Companion.DEFAULT_SPECIFIC_PAGE_URL
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionDataStore {
     val optionFlow: Flow<ShowOnAppLaunchOption>
     val specificPageUrlFlow: Flow<String>
+    val showOnAppLaunchTabId: String?
 
+    fun setShowOnAppLaunchTabId(tabId: String)
     suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption)
     suspend fun setSpecificPageUrl(url: String)
+    suspend fun setResolvedPageUrl(url: String)
 
     companion object {
         const val DEFAULT_SPECIFIC_PAGE_URL = "https://duckduckgo.com/"
@@ -46,9 +50,13 @@ interface ShowOnAppLaunchOptionDataStore {
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     @ShowOnAppLaunch private val store: DataStore<Preferences>,
 ) : ShowOnAppLaunchOptionDataStore {
+
+    override var showOnAppLaunchTabId: String? = null
+        private set
 
     override val optionFlow: Flow<ShowOnAppLaunchOption> = store.data.map { preferences ->
         preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)]?.let { optionId ->
@@ -58,7 +66,8 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
                 -> option
                 is SpecificPage -> {
                     val url = preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)]!!
-                    SpecificPage(url)
+                    val resolvedUrl = preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL)]
+                    SpecificPage(url, resolvedUrl)
                 }
             }
         } ?: LastOpenedTab
@@ -74,8 +83,14 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
 
             if (showOnAppLaunchOption is SpecificPage) {
                 preferences.setShowOnAppLaunch(showOnAppLaunchOption.url)
+                preferences.remove(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL))
+                showOnAppLaunchTabId = null
             }
         }
+    }
+
+    override fun setShowOnAppLaunchTabId(tabId: String) {
+        showOnAppLaunchTabId = tabId
     }
 
     override suspend fun setSpecificPageUrl(url: String) {
@@ -84,12 +99,23 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun setResolvedPageUrl(url: String) {
+        store.edit { preferences ->
+            preferences.setShowOnAppLaunchResolvedUrl(url)
+        }
+    }
+
     private fun MutablePreferences.setShowOnAppLaunch(url: String) {
         set(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL), url)
+    }
+
+    private fun MutablePreferences.setShowOnAppLaunchResolvedUrl(url: String) {
+        set(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL), url)
     }
 
     companion object {
         private const val KEY_SHOW_ON_APP_LAUNCH_OPTION = "SHOW_ON_APP_LAUNCH_OPTION"
         private const val KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL = "SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL"
+        private const val KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL = "SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL"
     }
 }
