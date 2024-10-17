@@ -73,6 +73,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
@@ -84,7 +85,6 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.forEach
 import timber.log.Timber
 
 private const val ABOUT_BLANK = "about:blank"
@@ -126,12 +126,12 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
-    private var shouldOpenDuckPlayerInNewTab: Boolean = false
+    private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
-                shouldOpenDuckPlayerInNewTab = it
+                shouldOpenDuckPlayerInNewTab = it is On
             }
         }
     }
@@ -204,11 +204,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         return true
                     } else {
-                        if (shouldOpenDuckPlayerInNewTab) {
-                            shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = true)
-                        } else {
-                            shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = false)
-                        }
+                        shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = shouldOpenDuckPlayerInNewTab)
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {

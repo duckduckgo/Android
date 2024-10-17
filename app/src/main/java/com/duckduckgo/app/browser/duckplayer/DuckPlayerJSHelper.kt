@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
@@ -207,7 +208,7 @@ class DuckPlayerJSHelper @Inject constructor(
                 return null
             }
             "openDuckPlayer" -> {
-                val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab()
+                val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
                     val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
                         it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()

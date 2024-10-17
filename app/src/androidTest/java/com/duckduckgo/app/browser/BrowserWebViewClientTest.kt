@@ -71,6 +71,10 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -143,7 +147,7 @@ class BrowserWebViewClientTest {
     private val navigationHistory: NavigationHistory = mock()
     private val loadingBarExperimentManager: LoadingBarExperimentManager = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val openInNewTabFlow: MutableSharedFlow<Boolean> = MutableSharedFlow()
+    private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
 
     @UiThreadTest
     @Before
@@ -404,7 +408,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpThenAddQueryParam() {
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpThenAddQueryParam() = runTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -417,6 +421,7 @@ class BrowserWebViewClientTest {
         doNothing().whenever(listener).willOverrideUrl(any())
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
+        openInNewTabFlow.emit(Off)
 
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
@@ -470,11 +475,11 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerThenOpenInNewTabAndReturnTrue() = runTest {
-        openInNewTabFlow.emit(true)
+        openInNewTabFlow.emit(On)
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
-        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
 
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).onShouldOverride()
@@ -484,7 +489,20 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenShouldLaunchDuckPlayerButNotOpenInNewTabThenReturnFalse() = runTest {
-        openInNewTabFlow.emit(false)
+        openInNewTabFlow.emit(Off)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).onShouldOverride()
+        verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerButOpenInNewTabUnavailableThenReturnFalse() = runTest {
+        openInNewTabFlow.emit(Unavailable)
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
