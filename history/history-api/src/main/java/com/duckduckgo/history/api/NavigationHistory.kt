@@ -16,7 +16,6 @@
 
 package com.duckduckgo.history.api
 
-import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
 interface NavigationHistory {
@@ -31,7 +30,7 @@ interface NavigationHistory {
 
     /**
      * Retrieves all [HistoryEntry].
-     * @return [Single] of all [HistoryEntry].
+     * @return [Flow] of all [HistoryEntry].
      */
     fun getHistory(): Flow<List<HistoryEntry>>
 
