@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.filterNotNull
 
 class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? = null) : ShowOnAppLaunchOptionDataStore {
 
+    override var showOnAppLaunchTabId: String? = null
+        private set
+
     private var currentOptionStateFlow = MutableStateFlow(defaultOption)
 
     private var currentSpecificPageUrl = MutableStateFlow("https://duckduckgo.com")
@@ -38,5 +41,13 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     override suspend fun setSpecificPageUrl(url: String) {
         currentSpecificPageUrl.value = url
+    }
+
+    override suspend fun setResolvedPageUrl(url: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setShowOnAppLaunchTabId(tabId: String) {
+        showOnAppLaunchTabId = tabId
     }
 }
