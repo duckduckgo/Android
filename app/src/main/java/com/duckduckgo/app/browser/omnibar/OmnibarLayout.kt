@@ -434,6 +434,10 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarTextInput.setSelection(viewState.omnibarText.length)
         }
 
+        if (viewState.shouldMoveCaretToStart) {
+            omnibarTextInput.setSelection(0)
+        }
+
         isScrollingEnabled = viewState.scrollingEnabled
 
         renderTabIcon(viewState)

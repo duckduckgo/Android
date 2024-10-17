@@ -2179,6 +2179,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
             forceExpand = true,
+            shouldMoveCaretToStart = !hasFocus,
         )
 
         val currentBrowserViewState = currentBrowserViewState()

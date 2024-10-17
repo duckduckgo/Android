@@ -556,6 +556,9 @@ class Omnibar(
                     setTextSelection(viewState.omnibarText.length)
                 }
             }
+            if (viewState.shouldMoveCaretToStart) {
+                setTextSelection(0)
+            }
         }
     }
 
