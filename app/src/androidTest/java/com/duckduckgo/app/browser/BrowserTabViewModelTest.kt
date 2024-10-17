@@ -5086,6 +5086,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageOpenDuckPlayerWithoutUrlThenDoNotNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
