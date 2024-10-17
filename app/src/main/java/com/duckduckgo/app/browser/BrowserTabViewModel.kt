@@ -118,6 +118,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -281,6 +282,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1155,6 +1157,15 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
+
+        viewModelScope.launch {
+           showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
+               currentUrl = newWebNavigationState.currentUrl,
+               isRootOfTab = !newWebNavigationState.canGoBack,
+               tabId = tabId
+           )
+        }
+
         webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
