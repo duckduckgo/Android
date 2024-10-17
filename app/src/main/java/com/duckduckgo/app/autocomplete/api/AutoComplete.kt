@@ -113,6 +113,7 @@ class AutoCompleteApi @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : AutoComplete {
 
+    // TODO ANA: Add option to "Switch to tab" in the AutoComplete suggestions
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
         if (query.isBlank()) {
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
