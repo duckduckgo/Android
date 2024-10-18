@@ -263,7 +263,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
-        viewModel.onFavoriteClicked()
+        viewModel.onFavoriteClicked(placement)
         context.startActivity(browserNav.openInCurrentTab(context, url))
     }
 
@@ -333,14 +333,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                 command.savedSite,
                 context.getString(R.string.favoriteDeleteConfirmationMessage).toSpannable(),
             ) {
-                viewModel.onDeleteFavoriteSnackbarDismissed(it)
+                viewModel.onDeleteFavoriteSnackbarDismissed(it, placement)
             }
 
             is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 command.savedSite,
                 context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
             ) {
-                viewModel.onDeleteSavedSiteSnackbarDismissed(it)
+                viewModel.onDeleteSavedSiteSnackbarDismissed(it, placement)
             }
 
             is ShowEditSavedSiteDialog -> editSavedSite(command.savedSiteChangedViewState)

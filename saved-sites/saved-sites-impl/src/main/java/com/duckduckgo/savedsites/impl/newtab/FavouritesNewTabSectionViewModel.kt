@@ -217,14 +217,20 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
+    fun onDeleteFavoriteSnackbarDismissed(
+        savedSite: SavedSite,
+        placement: Placement,
+    ) {
         delete(savedSite)
-        pixel.fire(FAVOURITE_REMOVED)
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED, placement))
     }
 
-    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+    fun onDeleteSavedSiteSnackbarDismissed(
+        savedSite: SavedSite,
+        placement: Placement,
+    ) {
         delete(savedSite, true)
-        pixel.fire(FAVOURITE_DELETED)
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED, placement))
     }
 
     private fun delete(
@@ -291,15 +297,15 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
-    fun onFavoriteClicked() {
-        pixel.fire(FAVOURITE_CLICKED)
-        pixel.fire(FAVOURITE_CLICKED_DAILY, type = Daily())
+    fun onFavoriteClicked(placement: Placement) {
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED_DAILY, placement), type = Daily())
     }
 
     private fun formatPixelWithPlacement(
         pixelName: SavedSitesPixelName,
         placement: Placement,
     ): String {
-        return pixelName.pixelName.plus(placement.name.lowercase())
+        return pixelName.pixelName + "_" + placement.name.lowercase()
     }
 }

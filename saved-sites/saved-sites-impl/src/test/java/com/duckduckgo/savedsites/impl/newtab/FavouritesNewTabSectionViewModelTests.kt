@@ -125,7 +125,7 @@ class FavouritesNewTabSectionViewModelTests {
 
     @Test
     fun onDeleteFavouriteRequestedThenRepositoryUpdated() = runTest {
-        testee.onDeleteFavoriteSnackbarDismissed(favorite1)
+        testee.onDeleteFavoriteSnackbarDismissed(favorite1, placement)
 
         verify(mockSavedSitesRepository).delete(savedSite = favorite1, deleteBookmark = false)
         verifyNoInteractions(faviconManager)
