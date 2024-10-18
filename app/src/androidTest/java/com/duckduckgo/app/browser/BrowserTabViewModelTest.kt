@@ -2344,6 +2344,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSearchSuggestionSubmittedWithTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+        val suggestions = listOf(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
+        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithoutTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
+        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
+    }
+
+    @Test
     fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = runTest {
         testee.onUserSelectedToEditQuery("foo")
 
