@@ -33,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
@@ -77,6 +78,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
         }
 
         return repository.getVpnTrackers({ dateOfLastHour() })
+            .filter { isActive() } // make sure we only emit when this plugin is active
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
                 val location = networkProtectionState.serverLocation()
