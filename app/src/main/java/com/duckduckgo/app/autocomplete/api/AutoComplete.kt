@@ -140,62 +140,88 @@ class AutoCompleteApi @Inject constructor(
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
 
-    override fun autoComplete(query: String): Flow<AutoCompleteResult> = flow {
+    override fun autoComplete(query: String): Flow<AutoCompleteResult> {
         if (query.isBlank()) {
-            return@flow emit(AutoCompleteResult(query = query, suggestions = emptyList()))
+            return flowOf(AutoCompleteResult(query = query, suggestions = emptyList()))
         }
-        val savedSites = getAutoCompleteBookmarkResults(query)
-            .combine(getAutoCompleteFavoritesResults(query)) { bookmarks, favorites ->
-                (favorites + bookmarks.filter { favorites.none { favorite -> (it.suggestion).url == favorite.suggestion.url } })
-            }.combine(getAutocompleteSwitchToTabResults(query)) { bookmarksAndFavorites, tabs ->
-                (tabs + bookmarksAndFavorites) as List<RankedSuggestion<AutoCompleteUrlSuggestion>>
-            }.combine(getHistoryResults(query)) { bookmarksAndFavoritesAndTabs, historyItems ->
-                val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
-                val navigationHistory = historyItems
-                    .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
-                (removeDuplicates(navigationHistory, bookmarksAndFavoritesAndTabs) + searchHistory)
-                    .sortedByDescending { it.score }
-                    .map { it.suggestion }
-            }.combine(getAutoCompleteSearchResults(query)) { bookmarksAndFavoritesAndTabsAndHistory, searchResults ->
-                Pair(bookmarksAndFavoritesAndTabsAndHistory, searchResults)
-            }
 
-        savedSites.collect { (bookmarksAndFavoritesAndTabsAndHistory, searchResults) ->
-            val topHits = (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
-                when (it) {
-                    is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
-                    is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
-                    is AutoCompleteUrlSuggestion -> true
-                    else -> false
-                }
-            }.take(maximumNumberOfTopHits)
+        return combine(
+            getAutoCompleteBookmarkResults(query),
+            getAutoCompleteFavoritesResults(query),
+            getAutocompleteSwitchToTabResults(query),
+            getAutoCompleteHistoryResults(query),
+            getAutoCompleteSearchResults(query),
+        ) { bookmarks, favorites, tabs, historyResults, searchResults ->
+            val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
+            val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
+            val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
+            val distinctSearchResults = getDistinctSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
-            val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
-            val filteredBookmarksAndTabsAndHistory =
-                bookmarksAndFavoritesAndTabsAndHistory
-                    .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
-                    .take(maxBottomSection)
-
-            val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
-            val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
-            val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
-            val distinctSearchResults = searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
-            val suggestions = (topHits + distinctSearchResults + filteredBookmarksAndTabsAndHistory).distinctBy {
+            (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
             }
-
+        }.map { suggestions ->
             val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
             if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
                 inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
             }
 
-            return@collect emit(
-                AutoCompleteResult(
-                    query = query,
-                    suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
-                ),
+            AutoCompleteResult(
+                query = query,
+                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
             )
         }
+    }
+
+    private fun combineBookmarksFavoritesTabsAndHistory(
+        bookmarks: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
+        favorites: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
+        tabs: List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>,
+        historyItems: List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>>,
+    ): List<AutoCompleteSuggestion> {
+        val bookmarksAndFavorites = (favorites + bookmarks.filter { favorites.none { favorite -> (it.suggestion).url == favorite.suggestion.url } })
+        val bookmarksFavoritesAndTabs = (tabs + bookmarksAndFavorites) as List<RankedSuggestion<AutoCompleteUrlSuggestion>>
+        val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
+        val navigationHistory =
+            historyItems.filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
+        return (removeDuplicates(navigationHistory, bookmarksFavoritesAndTabs) + searchHistory)
+            .sortedByDescending { it.score }
+            .map { it.suggestion }
+    }
+
+    private fun getTopHits(
+        bookmarksAndFavoritesAndTabsAndHistory: List<AutoCompleteSuggestion>,
+        searchResults: List<AutoCompleteSearchSuggestion>,
+    ): List<AutoCompleteSuggestion> {
+        return (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
+            when (it) {
+                is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
+                is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
+                is AutoCompleteUrlSuggestion -> true
+                else -> false
+            }
+        }.take(maximumNumberOfTopHits)
+    }
+
+    private fun filterBookmarksAndTabsAndHistory(
+        bookmarksAndFavoritesAndTabsAndHistory: List<AutoCompleteSuggestion>,
+        topHits: List<AutoCompleteSuggestion>,
+    ): List<AutoCompleteSuggestion> {
+        val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
+        return bookmarksAndFavoritesAndTabsAndHistory
+            .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
+            .take(maxBottomSection)
+    }
+
+    private fun getDistinctSearchResults(
+        searchResults: List<AutoCompleteSearchSuggestion>,
+        topHits: List<AutoCompleteSuggestion>,
+        filteredBookmarksAndTabsAndHistory: List<AutoCompleteSuggestion>,
+    ): List<AutoCompleteSearchSuggestion> {
+        val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
+        val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
+        val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
+        return searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
     }
 
     private fun removeDuplicates(
@@ -295,7 +321,7 @@ class AutoCompleteApi @Inject constructor(
                 .distinctUntilChanged()
         }.getOrElse { flowOf(emptyList()) }
 
-    private fun getHistoryResults(query: String): Flow<List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>>> =
+    private fun getAutoCompleteHistoryResults(query: String): Flow<List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>>> =
         runCatching {
             navigationHistory.getHistory()
                 .map { rankHistory(query, it) }
