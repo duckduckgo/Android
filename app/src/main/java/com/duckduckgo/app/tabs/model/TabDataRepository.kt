@@ -179,6 +179,8 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun getTabId(url: String): String? = tabsDao.selectTabByUrl(url)
+
     override suspend fun setIsUserNew(isUserNew: Boolean) {
         if (tabSwitcherDataStore.data.first().userState == UserState.UNKNOWN) {
             val userState = if (isUserNew) UserState.NEW else UserState.EXISTING

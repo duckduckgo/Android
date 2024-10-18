@@ -58,15 +58,21 @@ class ShowOnAppLaunchUrlConverterImplTest {
     }
 
     @Test
-    fun whenUrlHasASchemeThenShouldReturnTheSameUrl() {
+    fun whenUrlDoesNotHaveAPathThenForwardSlashIsAdded() {
         val result = urlConverter.convertUrl("https://www.example.com")
-        assertEquals("https://www.example.com", result)
+        assertEquals("https://www.example.com/", result)
+    }
+
+    @Test
+    fun whenUrlHasASchemeThenShouldReturnTheSameUrl() {
+        val result = urlConverter.convertUrl("https://www.example.com/")
+        assertEquals("https://www.example.com/", result)
     }
 
     @Test
     fun whenUrlHasDifferentSchemeThenShouldReturnTheSameUrl() {
-        val result = urlConverter.convertUrl("ftp://www.example.com")
-        assertEquals("ftp://www.example.com", result)
+        val result = urlConverter.convertUrl("ftp://www.example.com/")
+        assertEquals("ftp://www.example.com/", result)
     }
 
     @Test
@@ -77,8 +83,8 @@ class ShowOnAppLaunchUrlConverterImplTest {
 
     @Test
     fun whenUrlHasPortThenShouldReturnTheSameUrl() {
-        val result = urlConverter.convertUrl("https://www.example.com:8080")
-        assertEquals("https://www.example.com:8080", result)
+        val result = urlConverter.convertUrl("https://www.example.com:8080/")
+        assertEquals("https://www.example.com:8080/", result)
     }
 
     @Test
@@ -89,26 +95,26 @@ class ShowOnAppLaunchUrlConverterImplTest {
 
     @Test
     fun whenUrlHasUppercaseProtocolThenShouldLowercaseProtocol() {
-        val result = urlConverter.convertUrl("HTTPS://www.example.com")
-        assertEquals("https://www.example.com", result)
+        val result = urlConverter.convertUrl("HTTPS://www.example.com/")
+        assertEquals("https://www.example.com/", result)
     }
 
     @Test
     fun whenUrlHasUppercaseSubdomainThenShouldLowercaseSubdomain() {
-        val result = urlConverter.convertUrl("https://WWW.example.com")
-        assertEquals("https://www.example.com", result)
+        val result = urlConverter.convertUrl("https://WWW.example.com/")
+        assertEquals("https://www.example.com/", result)
     }
 
     @Test
     fun whenUrlHasUppercaseDomainThenShouldLowercaseDomain() {
-        val result = urlConverter.convertUrl("https://www.EXAMPLE.com")
-        assertEquals("https://www.example.com", result)
+        val result = urlConverter.convertUrl("https://www.EXAMPLE.com/")
+        assertEquals("https://www.example.com/", result)
     }
 
     @Test
     fun whenUrlHasUppercaseTopLevelDomainThenShouldLowercaseTopLevelDomain() {
-        val result = urlConverter.convertUrl("https://www.example.COM")
-        assertEquals("https://www.example.com", result)
+        val result = urlConverter.convertUrl("https://www.example.COM/")
+        assertEquals("https://www.example.com/", result)
     }
 
     @Test
@@ -121,5 +127,17 @@ class ShowOnAppLaunchUrlConverterImplTest {
     fun whenUrlIsNotAValidUrlReturnsInvalidUrlWithHttpScheme() {
         val result = urlConverter.convertUrl("example")
         assertEquals("http://example", result)
+    }
+
+    @Test
+    fun whenUrlHasADifferentSchemeThenSameUrlReturned() {
+        val result = urlConverter.convertUrl("ftp://example.com/")
+        assertEquals("ftp://example.com/", result)
+    }
+
+    @Test
+    fun whenUrlHasADifferentSchemeAndNoTrailingSlashThenTrailingSlashAdded() {
+        val result = urlConverter.convertUrl("ftp://example.com")
+        assertEquals("ftp://example.com/", result)
     }
 }

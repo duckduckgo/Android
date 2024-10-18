@@ -22,6 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -336,5 +337,96 @@ class TabsDaoTest {
         testee.undoDeletableTab(tab.copy(url = "www.other.com"))
 
         assertEquals(tab.copy(deletable = false), testee.tab(tab.tabId))
+    }
+
+    @Test
+    fun whenSelectTabByUrlAndTabExistsThenTabIdReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.selectTabByUrl("https://www.duckduckgo.com/")
+
+        assertEquals(tabId, tab.tabId)
+    }
+
+    @Test
+    fun whenSelectTabByUrlAndTabDoesNotExistThenNullReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.selectTabByUrl("https://www.quackquackno.com/")
+
+        assertNull(tabId)
+    }
+
+    @Test
+    fun whenFindTabIdByUrlPatternQueriedAndTabExistsThenTabIdIdReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.findTabIdByUrlPattern("duckduckgo.com/")
+
+        assertEquals(tab.tabId, tabId)
+    }
+
+    @Test
+    fun whenFindTabIdByUrlPatternQueriedWithFullUrlAndTabExistsThenTabIdReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.findTabIdByUrlPattern("https://www.duckduckgo.com/")
+
+        assertEquals(tab.tabId, tabId)
+    }
+
+    @Test
+    fun whenFindTabIdByUrlPatternQueriedAndMultipleTabsExistThenLastAddedTabIdIdReturned() = runTest {
+        val tab1 = TabEntity(
+            tabId = "TAB_ID_1",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+        )
+
+        val tab2 = tab1.copy(tabId = "TAB_ID_2", position = 1)
+
+        testee.insertTab(tab1)
+        testee.insertTab(tab2)
+        val tabId = testee.findTabIdByUrlPattern("duckduckgo.com/")
+
+        assertEquals(tab2.tabId, tabId)
+    }
+
+    @Test
+    fun whenFindTabIdByUrlPatternQueriedWithNoTrailingSlashAndTabExistsThenNullReturned() = runTest {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "https://www.duckduckgo.com/",
+            position = 0,
+            deletable = true,
+        )
+
+        testee.insertTab(tab)
+        val tabId = testee.findTabIdByUrlPattern("duckduckgo.com")
+
+        assertNull(tabId)
     }
 }
