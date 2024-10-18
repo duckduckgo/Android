@@ -32,6 +32,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExcl
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory.Networking
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory.Others
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.store.db.CategorizedSystemAppsDao
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -68,6 +69,7 @@ class RealSystemAppsExclusionRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val categorizedSystemAppsDao: CategorizedSystemAppsDao,
 ) : SystemAppsExclusionRepository {
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(
@@ -147,38 +149,16 @@ class RealSystemAppsExclusionRepository @Inject constructor(
         includeCategory(Others)
     }
 
-    private fun getCommunicationSystemApps(): Set<String> {
-        return setOf(
-            "com.android.calllogbackup",
-            "com.android.cellbroadcastreceiver",
-            "com.android.mms.service",
-            "com.android.phone",
-            "com.android.providers.contacts",
-            "com.android.providers.telephony",
-            "com.android.service.ims",
-            "com.google.android.apps.messaging",
-            "com.google.android.gms",
-            "com.google.android.telephony",
-            "org.codeaurora.ims",
-        )
+    private fun getCommunicationSystemApps(): List<String> {
+        return categorizedSystemAppsDao.getCommunicationSystemApps().map { it.packageName }
     }
 
-    private fun getNetworkingSystemApps(): Set<String> {
-        return setOf(
-            "com.android.bluetooth",
-            "com.android.nfc",
-            "com.google.android.networkstack",
-            "com.google.android.networkstack.tethering",
-        )
+    private fun getNetworkingSystemApps(): List<String> {
+        return categorizedSystemAppsDao.getNetworkingSystemApps().map { it.packageName }
     }
 
-    private fun getMediaSystemApps(): Set<String> {
-        return setOf(
-            "com.android.providers.media",
-            "com.google.android.providers.media.module",
-            "com.google.android.music",
-            "com.google.android.videos",
-        )
+    private fun getMediaSystemApps(): List<String> {
+        return categorizedSystemAppsDao.getMediaSystemApps().map { it.packageName }
     }
 
     private fun getOtherSystemApps(): Set<String> {

@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
     scope = AppScope::class,
     featureName = "networkProtection",
     toggleStore = VpnRemoteFeaturesStore::class,
+    settingsStore = VpnRemoteSettingsStore::class,
 )
 interface VpnRemoteFeatures {
     @Toggle.DefaultValue(true)
