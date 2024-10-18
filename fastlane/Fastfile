@@ -319,7 +319,7 @@ platform :android do
         private_lane :do_create_release_branch do |options|
             newVersion = options[:newVersion]
             releaseNotes = options[:releaseNotes]
-            sh "git checkout -b release/#{newVersion} develop"
+            sh "git checkout -b release/'#{newVersion}' develop"
 
             File.open('../app/version/version.properties', 'w') do |file|
                 file.write("VERSION=#{newVersion}")
