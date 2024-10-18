@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Zoeksuggestie verwijderen?</string>
     <string name="autocompleteRemoveItemCancel">Annuleren</string>
     <string name="autocompleteRemoveItemRemove">Verwijderen</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Overschakelen naar tabblad · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe app openen</string>

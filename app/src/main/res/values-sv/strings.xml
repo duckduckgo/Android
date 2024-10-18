@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Ta bort sökförslag?</string>
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Ta bort</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Byt till flik · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Öppna extern app</string>
