@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
@@ -51,9 +50,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var showOnAppLaunchFeature: ShowOnAppLaunchFeature
 
     private val viewModel: GeneralSettingsViewModel by bindViewModel()
     private val binding: ActivityGeneralSettingsBinding by viewBinding()
@@ -79,10 +75,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-
-        if (!showOnAppLaunchFeature.self().isEnabled()) {
-            binding.showOnAppLaunchButton.isGone = true
-        }
 
         configureUiEventHandlers()
         observeViewModel()
@@ -118,6 +110,8 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
+
+                    binding.showOnAppLaunchButton.isVisible = it.isShowOnAppLaunchOptionVisible
                     setShowOnAppLaunchOptionSecondaryText(viewState.showOnAppLaunchSelectedOption)
                 }
             }.launchIn(lifecycleScope)
