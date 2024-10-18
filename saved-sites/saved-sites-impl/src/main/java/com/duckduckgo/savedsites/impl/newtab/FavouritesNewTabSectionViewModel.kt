@@ -73,7 +73,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     enum class Placement {
         FOCUSED_STATE,
-        NEW_TAB,
+        NEW_TAB_PAGE,
         ;
 
         companion object {
@@ -81,7 +81,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 // same order as attrs-saved-sites.xml
                 return when (type) {
                     0 -> Placement.FOCUSED_STATE
-                    1 -> Placement.NEW_TAB
+                    1 -> Placement.NEW_TAB_PAGE
                     else -> Placement.FOCUSED_STATE
                 }
             }
@@ -223,6 +223,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     ) {
         delete(savedSite)
         pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED_DAILY, placement), type = Daily())
     }
 
     fun onDeleteSavedSiteSnackbarDismissed(
@@ -231,6 +232,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     ) {
         delete(savedSite, true)
         pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED_DAILY, placement), type = Daily())
     }
 
     private fun delete(

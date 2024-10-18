@@ -32,7 +32,7 @@
     <!-- Favourites New Tab -->
     <attr name="favoritesPlacement">
         <enum name="focused_state" value="0" />
-        <enum name="new_tab" value="1" />
+        <enum name="new_tab_page" value="1" />
     </attr>
     <declare-styleable name="FavouritesNewTabSectionView">
         <attr name="isExpandable" format="boolean"/>

@@ -134,7 +134,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
-            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 0))
+            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
             recycle()
         }
     }
