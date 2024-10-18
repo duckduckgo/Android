@@ -24,7 +24,6 @@ import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
@@ -71,6 +70,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Placement
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
@@ -106,6 +106,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var isExpandable = true
     private var showPlaceholders = false
+    private var placement = Placement.FOCUSED_STATE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -133,6 +134,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
+            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 0))
             recycle()
         }
     }
@@ -254,7 +256,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             {
                 submitUrl(it.url)
             },
-            { viewModel.onEditSavedSiteRequested(it) },
+            { viewModel.onEditSavedSiteRequested(it, placement) },
             { viewModel.onDeleteFavoriteRequested(it) },
             { viewModel.onDeleteSavedSiteRequested(it) },
         )

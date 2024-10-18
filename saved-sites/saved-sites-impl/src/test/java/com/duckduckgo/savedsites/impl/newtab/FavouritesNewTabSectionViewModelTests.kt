@@ -106,7 +106,7 @@ class FavouritesNewTabSectionViewModelTests {
     @Test
     fun onEditSavedSiteRequestedThenCommandSent() = runTest {
         testee.commands().test {
-            testee.onEditSavedSiteRequested(favorite1)
+            testee.onEditSavedSiteRequested(favorite1, placement)
             expectMostRecentItem().also {
                 assertTrue(it is ShowEditSavedSiteDialog)
             }
