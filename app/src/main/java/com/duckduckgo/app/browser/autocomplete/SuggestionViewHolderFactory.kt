@@ -26,6 +26,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestionBinding
@@ -33,6 +34,7 @@ import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.MessageCta.Message
 
@@ -157,6 +159,32 @@ class BookmarkSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPo
             immediateSearchClickListener,
             editableSearchClickListener,
             omnibarPosition,
+        )
+    }
+}
+
+class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteSwitchToTabSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val switchToTabSuggestionViewHolder = holder as AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder
+        switchToTabSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSwitchToTabSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener,
         )
     }
 }
@@ -315,6 +343,22 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 goToSuggestionImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
+        }
+    }
+
+    class SwitchToTabSuggestionViewHolder(val binding: ItemAutocompleteSwitchToTabSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSwitchToTabSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.title
+            url.text = item.phrase
+
+            goToTabImage.setOnClickListener {
+                // TODO: ANA to implement this. See
+            }
+            root.setOnClickListener { immediateSearchListener(item) }
         }
     }
 
