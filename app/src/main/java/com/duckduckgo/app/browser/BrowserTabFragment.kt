@@ -3026,9 +3026,11 @@ class BrowserTabFragment :
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
         val dismissHandler = Handler(Looper.getMainLooper())
         val dismissRunnable = Runnable {
-            bookmarksBottomSheetDialog?.dialog?.let { dialog ->
-                if (dialog.isShowing) {
-                    dialog.dismiss()
+            if (isAdded) {
+                bookmarksBottomSheetDialog?.dialog?.let { dialog ->
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
                 }
             }
         }
