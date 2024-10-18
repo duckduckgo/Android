@@ -232,9 +232,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     @Test
     fun whenOptionIsSpecificUrlAndIsHttpAndHttpsTabAlreadyAddedThenTabIsNotAdded() = runTest {
         val url = "http://example.com/"
+        val httpsUrl = "https://example.com/"
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        fakeTabRepository.add("https://example.com/")
+        fakeTabRepository.add(httpsUrl)
 
         testee.handleAppLaunchOption()
 
@@ -243,16 +244,17 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             awaitComplete()
 
             assertTrue(tabs.size == 1)
-            assertTrue(tabs.last().url == url)
+            assertTrue(tabs.last().url == httpsUrl)
         }
     }
 
     @Test
     fun whenOptionIsSpecificUrlAndIsHttpsAndHttpTabAlreadyAddedThenTabIsNotAdded() = runTest {
         val url = "https://example.com/"
+        val httpUrl = "http://example.com/"
 
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
-        fakeTabRepository.add("http://example.com/")
+        fakeTabRepository.add(httpUrl)
 
         testee.handleAppLaunchOption()
 
@@ -261,7 +263,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             awaitComplete()
 
             assertTrue(tabs.size == 1)
-            assertTrue(tabs.last().url == url)
+            assertTrue(tabs.last().url == httpUrl)
         }
     }
 
@@ -377,6 +379,63 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
+    fun whenOptionIsSpecificUrlWithWWWSubdomainAndDifferentPathThenTabIsAdded() = runTest {
+        val url1 = "https://www.example.com/path1"
+        val url2 = "https://www.example.com/path2"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
+        fakeTabRepository.add(url2)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 2)
+            assertTrue(tabs.last().url == url1)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithNonWWWSubdomainAndTabExistsWithWWWSubdomainThenTabIsAdded() = runTest {
+        val url1 = "https://blog.example.com/"
+        val url2 = "https://www.example.com/"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
+        fakeTabRepository.add(url2)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 2)
+            assertTrue(tabs.last().url == url1)
+        }
+    }
+
+    @Test
+    fun whenOptionIsSpecificUrlWithNoSubdomainAndTabExistsWithWWWSubdomainThenTabIsNotAdded() = runTest {
+        val url1 = "https://example.com/"
+        val url2 = "https://www.example.com/"
+
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
+        fakeTabRepository.add(url2)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == url2)
+        }
+    }
+
+    @Test
     fun whenOptionIsSpecificUrlWithQueryStringThenTabIsAdded() = runTest {
         val queryUrl = "https://example.com/?query=1"
 
@@ -434,8 +493,8 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         val url1 = "https://example.com/path?query=value#fragment1"
         val url2 = "https://example.com/path?query=value#fragment2"
 
-        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url1))
-        fakeTabRepository.add(url2)
+        fakeTabRepository.add(url1)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url2))
 
         testee.handleAppLaunchOption()
 
@@ -444,7 +503,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             awaitComplete()
 
             assertTrue(tabs.size == 2)
-            assertTrue(tabs.last().url == url1)
+            assertTrue(tabs.last().url == url2)
         }
     }
 

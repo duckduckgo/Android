@@ -101,9 +101,13 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         }
     }
 
-    private fun stripUri(uri: Uri): String {
-        val host = uri.host?.removePrefix("www.") ?: ""
-        return "$host${uri.path.orEmpty()}"
+    private fun stripUri(uri: Uri): String = uri.run {
+        val authority = uri.authority?.removePrefix("www.")
+        uri.buildUpon()
+            .scheme(null)
+            .authority(authority)
+            .toString()
+            .replaceFirst("//", "")
     }
 
     private fun getTabIdUrlMap(tabs: List<TabEntity>): Map<String, String> {
