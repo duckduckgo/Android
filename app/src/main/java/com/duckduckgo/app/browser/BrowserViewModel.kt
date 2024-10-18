@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
@@ -75,6 +76,7 @@ class BrowserViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel(),
     CoroutineScope {
@@ -293,14 +295,16 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun handleShowOnAppLaunchOption() {
-        viewModelScope.launch {
-            when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
-                LastOpenedTab -> Unit
-                NewTabPage -> onNewTabRequested()
-                is SpecificPage -> {
-                    val liveSelectedTabUrl = tabRepository.getSelectedTab()?.url
-                    if (liveSelectedTabUrl != option.url) {
-                        onOpenInNewTabRequested(option.url)
+        if(showOnAppLaunchFeature.self().isEnabled()) {
+            viewModelScope.launch {
+                when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
+                    LastOpenedTab -> Unit
+                    NewTabPage -> onNewTabRequested()
+                    is SpecificPage -> {
+                        val liveSelectedTabUrl = tabRepository.getSelectedTab()?.url
+                        if (liveSelectedTabUrl != option.url) {
+                            onOpenInNewTabRequested(option.url)
+                        }
                     }
                 }
             }
