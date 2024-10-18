@@ -28,16 +28,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
         isRootOfTab: Boolean,
-        tabId: String
+        tabId: String,
     )
 }
 
@@ -46,7 +46,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
-): ShowOnAppLaunchOptionHandler {
+) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAppLaunchOption() {
         when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
@@ -59,7 +59,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     override suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
         isRootOfTab: Boolean,
-        tabId: String
+        tabId: String,
     ) {
         withContext(dispatchers.io()) {
             val shouldSaveCurrentUrlForShowOnAppLaunch = currentUrl != null &&

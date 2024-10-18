@@ -1310,11 +1310,11 @@ class BrowserTabViewModel @Inject constructor(
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
         viewModelScope.launch {
-           showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
-               currentUrl = newWebNavigationState.currentUrl,
-               isRootOfTab = !newWebNavigationState.canGoBack,
-               tabId = tabId
-           )
+            showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
+                currentUrl = newWebNavigationState.currentUrl,
+                isRootOfTab = !newWebNavigationState.canGoBack,
+                tabId = tabId,
+            )
         }
 
         webNavigationState = newWebNavigationState
