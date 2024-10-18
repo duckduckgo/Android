@@ -25,6 +25,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -252,9 +253,21 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
-        testee.userSubmittedAutocompleteResult(AUTOCOMPLETE_RESULT)
+        testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false))
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+    }
+
+    @Test
+    fun whenUserSubmitsAutocompleteResultToOpenInTabThenBrowserLaunchedAndPixelSent() {
+        val phrase = "phrase"
+        val tabId = "tabId"
+
+        testee.userSubmittedAutocompleteResult(AutoCompleteSwitchToTabSuggestion(phrase, "title", "https://example.com", tabId))
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowserAndSwitchToTab(phrase, tabId), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 

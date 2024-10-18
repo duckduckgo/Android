@@ -228,7 +228,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         binding.autocompleteSuggestions.layoutManager = LinearLayoutManager(this)
         autocompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                viewModel.userSubmittedAutocompleteResult(it.phrase)
+                viewModel.userSubmittedAutocompleteResult(it)
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
@@ -405,7 +405,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
 
             is LaunchBrowser -> {
-                launchBrowser(command)
+                launchBrowser(command.query)
+            }
+
+            is LaunchBrowserAndSwitchToTab -> {
+                launchBrowser(command.query, command.tabId)
             }
 
             is LaunchDeviceApplication -> {
@@ -545,8 +549,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun launchBrowser(command: LaunchBrowser) {
-        startActivity(BrowserActivity.intent(this, command.query))
+    private fun launchBrowser(query: String, openExistingTabId: String? = null) {
+        startActivity(
+            BrowserActivity.intent(
+                context = this,
+                queryExtra = query,
+                openExistingTabId = openExistingTabId,
+            ),
+        )
         finish()
     }
 

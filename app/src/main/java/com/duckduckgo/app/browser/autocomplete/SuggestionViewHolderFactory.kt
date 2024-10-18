@@ -184,7 +184,6 @@ class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         switchToTabSuggestionViewHolder.bind(
             suggestion as AutoCompleteSwitchToTabSuggestion,
             immediateSearchClickListener,
-            editableSearchClickListener,
         )
     }
 }
@@ -350,14 +349,10 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteSwitchToTabSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
 
-            goToTabImage.setOnClickListener {
-                // TODO: ANA to implement this. See
-            }
             root.setOnClickListener { immediateSearchListener(item) }
         }
     }

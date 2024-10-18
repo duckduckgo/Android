@@ -884,7 +884,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteSearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = suggestion.isUrl))
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
-                    is AutoCompleteSwitchToTabSuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
+                    is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                 }
             }
@@ -3817,6 +3817,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun fireCustomTabRefreshPixel() {
         refreshPixelSender.sendCustomTabRefreshPixel()
+    }
+
+    private fun onUserSwitchedToTab(tabId: String) {
+        command.value = Command.SwitchToTab(tabId)
     }
 
     companion object {
