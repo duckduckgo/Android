@@ -541,6 +541,7 @@ class Omnibar(
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
+        Timber.d("Omnibar: renderOmnibarViewState $viewState")
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
             newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
         } else {
@@ -554,6 +555,9 @@ class Omnibar(
                 if (viewState.shouldMoveCaretToEnd) {
                     setTextSelection(viewState.omnibarText.length)
                 }
+            }
+            if (viewState.shouldMoveCaretToStart) {
+                setTextSelection(0)
             }
         }
     }
