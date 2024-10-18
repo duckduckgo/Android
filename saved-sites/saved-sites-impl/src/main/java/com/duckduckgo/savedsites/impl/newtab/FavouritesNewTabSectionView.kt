@@ -106,7 +106,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var isExpandable = true
     private var showPlaceholders = false
-    private var placement = Placement.FOCUSED_STATE
+    private var placement = Placement.NEW_TAB_PAGE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 

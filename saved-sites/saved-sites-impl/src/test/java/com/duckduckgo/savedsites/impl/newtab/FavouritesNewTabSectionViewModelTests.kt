@@ -26,6 +26,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Placement.NEW_TAB_PAGE
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import kotlinx.coroutines.flow.flowOf
@@ -106,7 +107,7 @@ class FavouritesNewTabSectionViewModelTests {
     @Test
     fun onEditSavedSiteRequestedThenCommandSent() = runTest {
         testee.commands().test {
-            testee.onEditSavedSiteRequested(favorite1, placement)
+            testee.onEditSavedSiteRequested(favorite1, NEW_TAB_PAGE)
             expectMostRecentItem().also {
                 assertTrue(it is ShowEditSavedSiteDialog)
             }
@@ -125,7 +126,7 @@ class FavouritesNewTabSectionViewModelTests {
 
     @Test
     fun onDeleteFavouriteRequestedThenRepositoryUpdated() = runTest {
-        testee.onDeleteFavoriteSnackbarDismissed(favorite1, placement)
+        testee.onDeleteFavoriteSnackbarDismissed(favorite1, NEW_TAB_PAGE)
 
         verify(mockSavedSitesRepository).delete(savedSite = favorite1, deleteBookmark = false)
         verifyNoInteractions(faviconManager)
