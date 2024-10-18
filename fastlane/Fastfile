@@ -254,7 +254,7 @@ platform :android do
         private_lane :update_app_version_and_release_notes do |options|
             newVersion = options[:newVersion]
             releaseNotes = options[:newReleaseNotes]
-            sh "git checkout -b release/#{newVersion} develop"
+            sh "git checkout -b release/'#{newVersion}' develop"
 
             File.open(appVersionFilePath, 'w') do |file|
                 file.write("VERSION=#{newVersion}")
