@@ -47,6 +47,14 @@ Update GitHub release notes
 
 Upload APK to Play Store internal testing track
 
+### android deploy_firebase
+
+```sh
+[bundle exec] fastlane android deploy_firebase
+```
+
+Upload APK to Firebase App Distribution
+
 ### android deploy_github
 
 ```sh
@@ -54,6 +62,14 @@ Upload APK to Play Store internal testing track
 ```
 
 Deploy APK to GitHub
+
+### android tag_and_release_version
+
+```sh
+[bundle exec] fastlane android tag_and_release_version
+```
+
+Tag and release a new app version
 
 ### android release
 
