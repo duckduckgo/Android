@@ -297,15 +297,11 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import com.jakewharton.rxrelay2.PublishRelay
 import dagger.Lazy
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.List
@@ -343,9 +339,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -492,7 +491,7 @@ class BrowserTabViewModel @Inject constructor(
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     @VisibleForTesting
-    val autoCompletePublishSubject = PublishRelay.create<String>()
+    internal val autoCompleteStateFlow = MutableStateFlow("")
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -501,7 +500,7 @@ class BrowserTabViewModel @Inject constructor(
         context = viewModelScope.coroutineContext,
     )
 
-    private var autoCompleteDisposable: Disposable? = null
+    private var autoCompleteJob: Job? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -745,22 +744,24 @@ class BrowserTabViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
-        autoCompleteDisposable = autoCompletePublishSubject
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .switchMap { autoComplete.autoComplete(it) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result ->
-                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                        hasUserSeenHistoryIAM = true
-                    }
-                    onAutoCompleteResultReceived(result)
-                },
-                { t: Throwable? -> Timber.w(t, "Failed to get search results") },
-            )
+        autoCompleteJob?.cancel()
+        autoCompleteJob = autoCompleteStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { autoComplete.autoComplete(it) }
+            .flowOn(dispatchers.io())
+            .onEach { result ->
+                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                    hasUserSeenHistoryIAM = true
+                }
+                onAutoCompleteResultReceived(result)
+            }
+            .flowOn(dispatchers.main())
+            .catch { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            .launchIn(viewModelScope)
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
@@ -774,8 +775,8 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     public override fun onCleared() {
         buildingSiteFactoryJob?.cancel()
-        autoCompleteDisposable?.dispose()
-        autoCompleteDisposable = null
+        autoCompleteJob?.cancel()
+        autoCompleteJob = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -931,7 +932,7 @@ class BrowserTabViewModel @Inject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                autoCompletePublishSubject.accept(omnibarText)
+                autoCompleteStateFlow.value = omnibarText
                 command.value = AutocompleteItemRemoved
             }
         }
@@ -2171,7 +2172,7 @@ class BrowserTabViewModel @Inject constructor(
             )
 
         if (hasFocus && autoCompleteSuggestionsEnabled) {
-            autoCompletePublishSubject.accept(query.trim())
+            autoCompleteStateFlow.value = query.trim()
         }
     }
 
