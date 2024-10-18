@@ -70,6 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:isExpandable="false"
-        app:showPlaceholders="false" />
+        app:showPlaceholders="false"
+        app:favoritesPlacement="new_tab_page"/>
 
 </LinearLayout>

@@ -32,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.*
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
@@ -69,6 +70,23 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         val savedSite: SavedSite,
         val bookmarkFolder: BookmarkFolder?,
     )
+
+    enum class Placement {
+        FOCUSED_STATE,
+        NEW_TAB_PAGE,
+        ;
+
+        companion object {
+            fun from(type: Int): Placement {
+                // same order as attrs-saved-sites.xml
+                return when (type) {
+                    0 -> Placement.FOCUSED_STATE
+                    1 -> Placement.NEW_TAB_PAGE
+                    else -> Placement.FOCUSED_STATE
+                }
+            }
+        }
+    }
 
     sealed class Command {
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
@@ -123,7 +141,10 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         }
     }
 
-    fun onEditSavedSiteRequested(savedSite: SavedSite) {
+    fun onEditSavedSiteRequested(
+        savedSite: SavedSite,
+        placement: Placement,
+    ) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
                 if (savedSite is SavedSite.Bookmark) {
@@ -133,8 +154,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 }
 
             withContext(dispatchers.main()) {
-                pixel.fire(EDIT_FAVOURITE_DIALOG_SHOWN)
-                pixel.fire(pixel = EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = Daily())
+                pixel.fire(formatPixelWithPlacement(EDIT_FAVOURITE_DIALOG_SHOWN, placement))
+                pixel.fire(pixelName = formatPixelWithPlacement(EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, placement), type = Daily())
                 command.send(
                     ShowEditSavedSiteDialog(
                         SavedSiteChangedViewState(
@@ -196,14 +217,22 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
+    fun onDeleteFavoriteSnackbarDismissed(
+        savedSite: SavedSite,
+        placement: Placement,
+    ) {
         delete(savedSite)
-        pixel.fire(FAVOURITE_REMOVED)
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED_DAILY, placement), type = Daily())
     }
 
-    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+    fun onDeleteSavedSiteSnackbarDismissed(
+        savedSite: SavedSite,
+        placement: Placement,
+    ) {
         delete(savedSite, true)
-        pixel.fire(FAVOURITE_DELETED)
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED_DAILY, placement), type = Daily())
     }
 
     private fun delete(
@@ -270,8 +299,15 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
-    fun onFavoriteClicked() {
-        pixel.fire(FAVOURITE_CLICKED)
-        pixel.fire(FAVOURITE_CLICKED_DAILY, type = Daily())
+    fun onFavoriteClicked(placement: Placement) {
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED, placement))
+        pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED_DAILY, placement), type = Daily())
+    }
+
+    private fun formatPixelWithPlacement(
+        pixelName: SavedSitesPixelName,
+        placement: Placement,
+    ): String {
+        return pixelName.pixelName + "_" + placement.name.lowercase()
     }
 }
