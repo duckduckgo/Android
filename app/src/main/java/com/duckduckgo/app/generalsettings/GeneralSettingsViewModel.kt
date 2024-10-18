@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.AppPixelName
@@ -56,6 +57,7 @@ class GeneralSettingsViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
 
@@ -65,6 +67,7 @@ class GeneralSettingsViewModel @Inject constructor(
         val storeHistoryEnabled: Boolean,
         val showVoiceSearch: Boolean,
         val voiceSearchEnabled: Boolean,
+        val isShowOnAppLaunchOptionVisible: Boolean,
         val showOnAppLaunchSelectedOption: ShowOnAppLaunchOption,
     )
 
@@ -90,6 +93,7 @@ class GeneralSettingsViewModel @Inject constructor(
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
             )
         }

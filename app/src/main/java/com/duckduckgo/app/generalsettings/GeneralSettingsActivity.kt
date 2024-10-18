@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings
 import android.os.Bundle
 import android.view.View.OnClickListener
 import android.widget.CompoundButton
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -109,6 +110,8 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
+
+                    binding.showOnAppLaunchButton.isVisible = it.isShowOnAppLaunchOptionVisible
                     setShowOnAppLaunchOptionSecondaryText(viewState.showOnAppLaunchSelectedOption)
                 }
             }.launchIn(lifecycleScope)
