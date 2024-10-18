@@ -243,6 +243,8 @@ platform :android do
         options_release_number = options[:app_version]
         options_release_notes = options[:release_notes]
 
+        UI.message("Release number = #{options_release_number}\nRelease Notes:\n#{options_release_notes}\n")
+
         releaseNotes = determine_release_notes(releaseNotes: options_release_notes)
 
         update_app_version_and_release_notes(newVersion: options_release_number, newReleaseNotes: releaseNotes)
