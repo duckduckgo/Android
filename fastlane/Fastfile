@@ -233,10 +233,9 @@ platform :android do
           releaseNotesLocales.each do |locale|
             sh("rm '../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt'")
           end
+    end
 
-        end
-
-    desc: "Tag and push a new app version"
+    desc "Create a new release branch and update the version"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
         branch_name = "release/#{release_number}"
