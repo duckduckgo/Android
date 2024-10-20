@@ -238,7 +238,7 @@ platform :android do
     desc "Create a new release branch and update the version"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
-        branch_name = "release/#{release_number}"
+        branch_name = "release/#{app_version}"
 
         UI.message("Release number = #{app_version}")
 
