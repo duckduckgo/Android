@@ -240,11 +240,6 @@ platform :android do
         app_version = options[:app_version]
         branch_name = "release/#{app_version}"
 
-        UI.message("Release number = #{app_version}")
-
-        # Check out the develop branch
-        sh("git checkout develop")
-
         # Create a new release branch
         sh("git checkout -b #{branch_name}")
 
