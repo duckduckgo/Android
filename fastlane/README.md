@@ -55,22 +55,6 @@ Upload APK to Play Store internal testing track
 
 Deploy APK to GitHub
 
-### android tag_and_push_release_version
-
-```sh
-[bundle exec] fastlane android tag_and_push_release_version
-```
-
-Create a new release branch and update the version
-
-### android tag_and_release_version
-
-```sh
-[bundle exec] fastlane android tag_and_release_version
-```
-
-Tag and release a new app version
-
 ### android release
 
 ```sh
