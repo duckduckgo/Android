@@ -17,7 +17,6 @@
 package com.duckduckgo.duckplayer.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
@@ -38,7 +37,7 @@ interface DuckPlayerFeatureRepository {
 
     fun setDuckPlayerRemoteConfigJson(jsonString: String)
 
-    suspend fun getUserPreferences(): UserPreferences
+    fun getUserPreferences(): UserPreferences
 
     fun observeUserPreferences(): Flow<UserPreferences>
 
@@ -46,7 +45,7 @@ interface DuckPlayerFeatureRepository {
 
     suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?)
 
-    suspend fun getDuckPlayerDisabledHelpPageLink(): String?
+    fun getDuckPlayerDisabledHelpPageLink(): String?
 
     suspend fun storeYouTubePath(youtubePath: String)
 
@@ -60,17 +59,17 @@ interface DuckPlayerFeatureRepository {
 
     suspend fun storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParam: String)
 
-    suspend fun getVideoIDQueryParam(): String
-    suspend fun getYouTubeReferrerQueryParams(): List<String>
-    suspend fun getYouTubeReferrerHeaders(): List<String>
-    suspend fun getYouTubeWatchPath(): String
-    suspend fun getYouTubeUrl(): String
-    suspend fun getYouTubeEmbedUrl(): String
-    suspend fun isOnboarded(): Boolean
+    fun getVideoIDQueryParam(): String
+    fun getYouTubeReferrerQueryParams(): List<String>
+    fun getYouTubeReferrerHeaders(): List<String>
+    fun getYouTubeWatchPath(): String
+    fun getYouTubeUrl(): String
+    fun getYouTubeEmbedUrl(): String
+    fun isOnboarded(): Boolean
     suspend fun setUserOnboarded()
     fun setOpenInNewTab(enabled: Boolean)
     fun observeOpenInNewTab(): Flow<Boolean>
-    suspend fun shouldOpenInNewTab(): Boolean
+    fun shouldOpenInNewTab(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -79,32 +78,15 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
     private val duckPlayerDataStore: DuckPlayerDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    @IsMainProcess isMainProcess: Boolean,
 ) : DuckPlayerFeatureRepository {
 
-    private var duckPlayerRC = "{}"
-
-    init {
-        if (isMainProcess) {
-            loadToMemory()
-        }
-    }
-
-    private fun loadToMemory() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            duckPlayerRC =
-                duckPlayerDataStore.getDuckPlayerRemoteConfigJson()
-        }
-    }
-
     override fun getDuckPlayerRemoteConfigJson(): String {
-        return duckPlayerRC
+        return duckPlayerDataStore.getDuckPlayerRemoteConfigJson()
     }
 
     override fun setDuckPlayerRemoteConfigJson(jsonString: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             duckPlayerDataStore.setDuckPlayerRemoteConfigJson(jsonString)
-            loadToMemory()
         }
     }
 
@@ -131,7 +113,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
             }
     }
 
-    override suspend fun getUserPreferences(): UserPreferences {
+    override fun getUserPreferences(): UserPreferences {
         return UserPreferences(
             overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
             privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {
@@ -146,7 +128,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         duckPlayerDataStore.storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink)
     }
 
-    override suspend fun getDuckPlayerDisabledHelpPageLink(): String? {
+    override fun getDuckPlayerDisabledHelpPageLink(): String? {
         return duckPlayerDataStore.getDuckPlayerDisabledHelpPageLink()
     }
 
@@ -174,31 +156,31 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         duckPlayerDataStore.storeYoutubeEmbedUrl(embedUrl)
     }
 
-    override suspend fun getVideoIDQueryParam(): String {
+    override fun getVideoIDQueryParam(): String {
         return duckPlayerDataStore.getYouTubeVideoIDQueryParam()
     }
 
-    override suspend fun getYouTubeReferrerQueryParams(): List<String> {
+    override fun getYouTubeReferrerQueryParams(): List<String> {
         return duckPlayerDataStore.getYouTubeReferrerQueryParams()
     }
 
-    override suspend fun getYouTubeReferrerHeaders(): List<String> {
+    override fun getYouTubeReferrerHeaders(): List<String> {
         return duckPlayerDataStore.getYouTubeReferrerHeaders()
     }
 
-    override suspend fun getYouTubeWatchPath(): String {
+    override fun getYouTubeWatchPath(): String {
         return duckPlayerDataStore.getYouTubeWatchPath()
     }
 
-    override suspend fun getYouTubeUrl(): String {
+    override fun getYouTubeUrl(): String {
         return duckPlayerDataStore.getYouTubeUrl()
     }
 
-    override suspend fun getYouTubeEmbedUrl(): String {
+    override fun getYouTubeEmbedUrl(): String {
         return duckPlayerDataStore.getYoutubeEmbedUrl()
     }
 
-    override suspend fun isOnboarded(): Boolean {
+    override fun isOnboarded(): Boolean {
         return duckPlayerDataStore.getUserOnboarded()
     }
 
@@ -216,7 +198,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         return duckPlayerDataStore.observeOpenInNewTab()
     }
 
-    override suspend fun shouldOpenInNewTab(): Boolean {
+    override fun shouldOpenInNewTab(): Boolean {
         return duckPlayerDataStore.getOpenInNewTab()
     }
 }
