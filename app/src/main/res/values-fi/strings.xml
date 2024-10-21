@@ -810,4 +810,10 @@
     <string name="settingsAddressBarPositionTop">Ylös</string>
     <string name="settingsAddressBarPositionBottom">Alareuna</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Näytä sovelluksen käynnistyksen yhteydessä</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Viimeksi avattu -välilehti</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
+
 </resources>

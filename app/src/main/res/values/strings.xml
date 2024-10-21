@@ -809,4 +809,10 @@
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Bottom</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Show on App Launch</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Last Opened Tab</string>
+    <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
+
 </resources>
