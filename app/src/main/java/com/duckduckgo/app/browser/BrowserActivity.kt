@@ -305,20 +305,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
-        Timber.i("launchNewSearchOrQuery: $intent")
+        Timber.i("Launch-Start: launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
             return
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
+            Timber.i("Launch-Start: launch from default browser")
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
+            Timber.i("Launch-Start: Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
@@ -329,13 +330,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
-            Timber.i("Should notify data cleared")
+            Timber.i("Launch-Start: Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
         if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
             currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
-            Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
+            Timber.v("Launch-Start: Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
 
@@ -343,7 +344,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.inContextEmailProtectionShowing = false
 
         if (launchNewSearch(intent)) {
-            Timber.w("new tab requested")
+            Timber.w("Launch-Start: new tab requested")
             lifecycleScope.launch { viewModel.onNewTabRequested() }
             return
         }
@@ -351,32 +352,37 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
-                Timber.d("Shortcut opened with url $sharedText")
+                Timber.d("Launch-Start: Shortcut opened with url $sharedText")
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
-                Timber.d("Favorite clicked from widget $sharedText")
+                Timber.d("Launch-Start: Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("open in current tab requested")
+                Timber.w("Launch-Start: open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("can't use current tab, opening in new tab instead")
+                    Timber.w("Launch-Start: can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
             } else {
-                Timber.w("opening in new tab requested for $sharedText")
+                val thirdParty = !intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
+                Timber.w("Launch-Start: opening in new tab requested for $sharedText third party = $thirdParty")
+                if (thirdParty) {
+                    viewModel.launchFromThirdParty()
+                }
+
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
-
-                viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
 
                 return
             }
+        } else {
+            Timber.i("Launch-Start: shared text empty, opening last tab")
         }
     }
 
@@ -562,6 +568,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
             isExternal: Boolean = false,
+            interstitialScreen: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -570,6 +577,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             return intent
         }
 
@@ -581,9 +589,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
-
-        private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
-
+        private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
