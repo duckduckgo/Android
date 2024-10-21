@@ -141,10 +141,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         }
     }
 
-    fun onEditSavedSiteRequested(
-        savedSite: SavedSite,
-        placement: Placement,
-    ) {
+    fun onEditSavedSiteRequested(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
                 if (savedSite is SavedSite.Bookmark) {
@@ -154,8 +151,8 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
                 }
 
             withContext(dispatchers.main()) {
-                pixel.fire(formatPixelWithPlacement(EDIT_FAVOURITE_DIALOG_SHOWN, placement))
-                pixel.fire(pixelName = formatPixelWithPlacement(EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, placement), type = Daily())
+                pixel.fire(EDIT_FAVOURITE_DIALOG_SHOWN)
+                pixel.fire(EDIT_FAVOURITE_DIALOG_SHOWN_DAILY, type = Daily())
                 command.send(
                     ShowEditSavedSiteDialog(
                         SavedSiteChangedViewState(
@@ -217,22 +214,14 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteFavoriteSnackbarDismissed(
-        savedSite: SavedSite,
-        placement: Placement,
-    ) {
+    fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite)
-        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED, placement))
-        pixel.fire(formatPixelWithPlacement(FAVOURITE_REMOVED_DAILY, placement), type = Daily())
+        pixel.fire(FAVOURITE_REMOVED)
     }
 
-    fun onDeleteSavedSiteSnackbarDismissed(
-        savedSite: SavedSite,
-        placement: Placement,
-    ) {
+    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite, true)
-        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED, placement))
-        pixel.fire(formatPixelWithPlacement(FAVOURITE_DELETED_DAILY, placement), type = Daily())
+        pixel.fire(FAVOURITE_DELETED)
     }
 
     private fun delete(
