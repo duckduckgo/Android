@@ -3710,6 +3710,7 @@ class BrowserTabFragment :
                         binding.autoCompleteSuggestionsList.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
+                        viewModel.autoCompleteSuggestionsShown()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                         hideFocusedView()
                     }

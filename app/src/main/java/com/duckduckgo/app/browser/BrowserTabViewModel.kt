@@ -581,7 +581,6 @@ class BrowserTabViewModel @Inject constructor(
 
     init {
         initializeViewStates()
-        configureAutoComplete()
         logVoiceSearchAvailability()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
@@ -3697,6 +3696,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun autoCompleteSuggestionsShown() {
+        configureAutoComplete()
+    }
+
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
             if (hasUserSeenHistoryIAM) {
@@ -3725,6 +3728,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             lastAutoCompleteState = null
+            autoCompleteJob?.cancel()
         }
     }
 
