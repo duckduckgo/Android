@@ -29,8 +29,8 @@
         android:layout_alignParentTop="true"
         layout="@layout/include_omnibar_toolbar_mockup" />
 
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/fragmentPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
