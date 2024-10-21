@@ -295,7 +295,7 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun handleShowOnAppLaunchOption() {
-        if(showOnAppLaunchFeature.self().isEnabled()) {
+        if (showOnAppLaunchFeature.self().isEnabled()) {
             viewModelScope.launch {
                 when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
                     LastOpenedTab -> Unit
