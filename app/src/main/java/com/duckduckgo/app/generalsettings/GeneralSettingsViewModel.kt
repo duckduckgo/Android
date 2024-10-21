@@ -19,6 +19,9 @@ package com.duckduckgo.app.generalsettings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
@@ -33,8 +36,15 @@ import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETT
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -46,6 +56,7 @@ class GeneralSettingsViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -54,10 +65,18 @@ class GeneralSettingsViewModel @Inject constructor(
         val storeHistoryEnabled: Boolean,
         val showVoiceSearch: Boolean,
         val voiceSearchEnabled: Boolean,
+        val showOnAppLaunchSelectedOption: ShowOnAppLaunchOption,
     )
+
+    sealed class Command {
+        data object LaunchShowOnAppLaunchScreen : Command()
+    }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow()
+
+    private val _commands = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    val commands = _commands.receiveAsFlow()
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -71,8 +90,11 @@ class GeneralSettingsViewModel @Inject constructor(
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
             )
         }
+
+        observeShowOnAppLaunchOption()
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
@@ -117,6 +139,24 @@ class GeneralSettingsViewModel @Inject constructor(
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
             }
             _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
+        }
+    }
+
+    fun onShowOnAppLaunchButtonClick() {
+        sendCommand(Command.LaunchShowOnAppLaunchScreen)
+        pixel.fire(AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
+    }
+
+    private fun observeShowOnAppLaunchOption() {
+        showOnAppLaunchOptionDataStore.optionFlow
+            .onEach { showOnAppLaunchOption ->
+                _viewState.update { it!!.copy(showOnAppLaunchSelectedOption = showOnAppLaunchOption) }
+            }.launchIn(viewModelScope)
+    }
+
+    private fun sendCommand(newCommand: Command) {
+        viewModelScope.launch {
+            _commands.send(newCommand)
         }
     }
 }
