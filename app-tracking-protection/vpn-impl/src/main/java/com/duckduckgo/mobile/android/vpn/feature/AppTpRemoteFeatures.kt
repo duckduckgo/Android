@@ -55,6 +55,10 @@ interface AppTpRemoteFeatures {
 
     @DefaultValue(true)
     fun setSearchDomains(): Toggle // kill switch
+
+    // kill-switch for promoting AppTP to all users in the NTP
+    @DefaultValue(true)
+    fun promoteAppTpInNewTabPage(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

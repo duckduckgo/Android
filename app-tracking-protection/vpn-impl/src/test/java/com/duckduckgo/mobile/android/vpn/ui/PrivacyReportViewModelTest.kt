@@ -23,6 +23,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -58,6 +60,7 @@ class PrivacyReportViewModelTest {
 
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var db: VpnDatabase
+    private val appTpRemoteFeatures = FakeFeatureToggleFactory.create(AppTpRemoteFeatures::class.java)
     private val vpnStore = mock<VpnStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
     private val vpnFeatureRemover = mock<VpnFeatureRemover>()
@@ -70,7 +73,14 @@ class PrivacyReportViewModelTest {
 
         repository = RealAppTrackerBlockingStatsRepository(db, coroutineRule.testDispatcherProvider)
 
-        testee = PrivacyReportViewModel(repository, vpnStore, vpnFeatureRemover, vpnStateMonitor, coroutineRule.testDispatcherProvider)
+        testee = PrivacyReportViewModel(
+            repository,
+            vpnStore,
+            vpnFeatureRemover,
+            vpnStateMonitor,
+            coroutineRule.testDispatcherProvider,
+            appTpRemoteFeatures,
+        )
     }
 
     private fun prepareDb() {

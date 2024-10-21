@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
@@ -41,6 +42,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider,
+    private val appTpRemoteFeatures: AppTpRemoteFeatures,
 ) : ViewModel() {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
@@ -62,8 +64,10 @@ class PrivacyReportViewModel @Inject constructor(
         }
     }
 
-    private suspend fun shouldShowCTA(): Boolean {
-        return withContext(dispatchers.io()) {
+    private suspend fun shouldShowCTA(): Boolean = withContext(dispatchers.io()) {
+        return@withContext if (appTpRemoteFeatures.promoteAppTpInNewTabPage().isEnabled()) {
+            !vpnFeatureRemover.isFeatureRemoved()
+        } else {
             if (vpnFeatureRemover.isFeatureRemoved()) {
                 false
             } else {

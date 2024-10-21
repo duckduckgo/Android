@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.ui.newtab
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -28,11 +30,16 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.FragmentDeviceShieldCtaBinding
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
@@ -41,7 +48,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import dagger.android.support.AndroidSupportInjection
@@ -51,6 +58,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @InjectWith(ViewScope::class)
 class AppTrackingProtectionStateView @JvmOverloads constructor(
@@ -68,6 +77,12 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject
+    lateinit var appTrackingProtection: AppTrackingProtection
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: PrivacyReportViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PrivacyReportViewModel::class.java]
@@ -95,8 +110,20 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
     private fun configureViewReferences() {
         binding.deviceShieldCtaLayout.setOnClickListener {
-            deviceShieldPixels.didPressNewTabSummary()
-            context.startActivity(DeviceShieldTrackerActivity.intent(context))
+            coroutineScope?.launch {
+                val activity = this@AppTrackingProtectionStateView.context as Activity
+                val options = ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
+                if (appTrackingProtection.isOnboarded()) {
+                    deviceShieldPixels.didPressNewTabSummary()
+                    globalActivityStarter.start(this@AppTrackingProtectionStateView.context, AppTrackerActivityWithEmptyParams, options)
+                } else {
+                    globalActivityStarter.start(
+                        this@AppTrackingProtectionStateView.context,
+                        AppTrackerOnboardingActivityWithEmptyParamsParams,
+                        options,
+                    )
+                }
+            }
         }
     }
 
@@ -195,6 +222,8 @@ class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val setting: NewTabAppTrackingProtectionSectionSetting,
+    private val appTpRemoteFeatures: AppTpRemoteFeatures,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
@@ -202,7 +231,15 @@ class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
         return AppTrackingProtectionStateView(context)
     }
 
-    override suspend fun isUserEnabled(): Boolean {
+    override suspend fun isUserEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext if (appTpRemoteFeatures.promoteAppTpInNewTabPage().isEnabled()) {
+            isUserEnabledPromoteFeature()
+        } else {
+            isUserEnabledInternal()
+        }
+    }
+
+    private suspend fun isUserEnabledInternal(): Boolean {
         if (vpnFeatureRemover.isFeatureRemoved()) {
             return false
         }
@@ -212,5 +249,9 @@ class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
         } else {
             false
         }
+    }
+
+    private suspend fun isUserEnabledPromoteFeature(): Boolean {
+        return !vpnFeatureRemover.isFeatureRemoved()
     }
 }
