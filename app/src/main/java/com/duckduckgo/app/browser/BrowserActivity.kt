@@ -391,6 +391,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             Timber.i("shared text empty, opening last tab")
         }
+
+        viewModel.handleShowOnAppLaunchOption()
     }
 
     private fun configureObservers() {

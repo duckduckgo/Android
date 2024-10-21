@@ -811,4 +811,10 @@
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Vis ved lansering av appen</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Sist åpnet fane</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Spesifikk side</string>
+
 </resources>
