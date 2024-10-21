@@ -93,6 +93,8 @@ interface TabRepository {
 
     suspend fun deleteAll()
 
+    suspend fun getSelectedTab(): TabEntity?
+
     suspend fun select(tabId: String)
 
     fun updateTabPreviewImage(
