@@ -71,6 +71,7 @@ interface TextInput {
         @DrawableRes endIconRes: Int,
         contentDescription: String? = null,
     )
+    fun setSelectAllOnFocus(boolean: Boolean)
 
     fun removeEndIcon()
 
@@ -255,6 +256,10 @@ class DaxTextInput @JvmOverloads constructor(
         ContextCompat.getDrawable(context, endIconRes)?.let {
             setupEndIconDrawable(it, contentDescription.orEmpty())
         }
+    }
+
+    override fun setSelectAllOnFocus(boolean: Boolean) {
+        binding.internalEditText.setSelectAllOnFocus(boolean)
     }
 
     override fun removeEndIcon() {

@@ -63,6 +63,7 @@ interface Pixel {
 
         // Loading Bar Experiment
         const val LOADING_BAR_EXPERIMENT = "loading_bar_exp"
+        const val LAUNCH_SCREEN = "launch_screen"
     }
 
     object PixelValues {

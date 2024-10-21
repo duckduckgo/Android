@@ -811,4 +811,10 @@
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Botten</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Visa vid app-start</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Senast öppnade flik</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Ny fliksida</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Specifik sida</string>
+
 </resources>
