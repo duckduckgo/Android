@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerPageInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
+import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
@@ -35,10 +36,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
+import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -160,6 +164,7 @@ class DuckPlayerJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         url: String?,
+        tabId: String,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -203,8 +208,18 @@ class DuckPlayerJSHelper @Inject constructor(
                 return null
             }
             "openDuckPlayer" -> {
+                val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
-                    Navigate(it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build().toString(), mapOf())
+                    val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()
+                    } else {
+                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
+                    }.toString()
+                    if (openInNewTab) {
+                        OpenInNewTab(newUrl, tabId)
+                    } else {
+                        Navigate(newUrl, mapOf())
+                    }
                 }
             }
             "initialSetup" -> {

@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_DISABLED_HELP_PAGE
+import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_RC
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_USER_ONBOARDED
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_YOUTUBE_PATH
@@ -85,6 +86,12 @@ interface DuckPlayerDataStore {
     suspend fun setUserOnboarded()
 
     suspend fun getUserOnboarded(): Boolean
+
+    suspend fun setOpenInNewTab(enabled: Boolean)
+
+    fun observeOpenInNewTab(): Flow<Boolean>
+
+    suspend fun getOpenInNewTab(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -104,6 +111,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS")
         val DUCK_PLAYER_YOUTUBE_EMBED_URL = stringPreferencesKey(name = "DUCK_PLAYER_YOUTUBE_EMBED_URL")
         val DUCK_PLAYER_USER_ONBOARDED = booleanPreferencesKey(name = "DUCK_PLAYER_USER_ONBOARDED")
+        val DUCK_PLAYER_OPEN_IN_NEW_TAB = booleanPreferencesKey(name = "DUCK_PLAYER_OPEN_IN_NEW_TAB")
     }
 
     private val overlayInteracted: Flow<Boolean>
@@ -180,6 +188,13 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         get() = store.data
             .map { prefs ->
                 prefs[Keys.DUCK_PLAYER_USER_ONBOARDED] ?: false
+            }
+            .distinctUntilChanged()
+
+    private val duckPlayerOpenInNewTab: Flow<Boolean>
+        get() = store.data
+            .map { prefs ->
+                prefs[Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB] ?: true
             }
             .distinctUntilChanged()
 
@@ -277,5 +292,17 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun getUserOnboarded(): Boolean {
         return duckPlayerUserOnboarded.first()
+    }
+
+    override suspend fun setOpenInNewTab(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_PLAYER_OPEN_IN_NEW_TAB] = enabled }
+    }
+
+    override fun observeOpenInNewTab(): Flow<Boolean> {
+        return duckPlayerOpenInNewTab
+    }
+
+    override suspend fun getOpenInNewTab(): Boolean {
+        return duckPlayerOpenInNewTab.first()
     }
 }

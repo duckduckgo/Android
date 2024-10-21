@@ -80,6 +80,7 @@ class SpecialUrlDetectorImplTest {
             externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
             duckPlayer = mockDuckPlayer,
             scope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)

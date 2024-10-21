@@ -101,6 +101,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -194,6 +195,9 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -484,6 +488,7 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
 
     @Before
@@ -529,6 +534,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
+        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -649,6 +655,7 @@ class BrowserTabViewModelTest {
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             loadingBarExperimentManager = loadingBarExperimentManager,
             refreshPixelSender = refreshPixelSender,
+            changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
         )
 
@@ -5058,9 +5065,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlThenNavigate() = runTest {
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOffThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Off)
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
             "openDuckPlayer",
@@ -5072,8 +5080,39 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabUnavailableThenNavigate() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Unavailable)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            { "someUrl" },
+        )
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOnThenOpenInNewTab() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            { "someUrl" },
+        )
+        assertCommandIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
     fun whenProcessJsCallbackMessageOpenDuckPlayerWithoutUrlThenDoNotNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
         testee.processJsCallbackMessage(
             DUCK_PLAYER_FEATURE_NAME,
@@ -5895,6 +5934,7 @@ class BrowserTabViewModelTest {
     fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
         setBrowserShowing(true)
         whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
+        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockDisabledToggle)
         val observer = mock<(OmnibarViewState) -> Unit>()
         testee.omnibarViewState.observeForever { observer(it) }
 

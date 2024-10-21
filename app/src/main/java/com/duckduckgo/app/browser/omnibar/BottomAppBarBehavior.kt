@@ -40,7 +40,7 @@ import kotlin.math.roundToInt
  */
 class BottomAppBarBehavior<V : View>(
     context: Context,
-    private val omnibar: LegacyOmnibarView,
+    private val omnibar: OmnibarBehaviour,
     attrs: AttributeSet? = null,
 ) : CoordinatorLayout.Behavior<V>(context, attrs) {
     @NestedScrollType
@@ -90,7 +90,7 @@ class BottomAppBarBehavior<V : View>(
         consumed: IntArray,
         type: Int,
     ) {
-        if (omnibar.isScrollingEnabled) {
+        if (omnibar.isOmnibarScrollingEnabled()) {
             super.onNestedPreScroll(coordinatorLayout, toolbar, target, dx, dy, consumed, type)
 
             // only hide the app bar in the browser layout
@@ -105,7 +105,7 @@ class BottomAppBarBehavior<V : View>(
     private fun offsetBottomByToolbar(view: View?) {
         if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
             view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                this.bottomMargin = omnibar.measuredHeight - omnibar.translationY.roundToInt()
+                this.bottomMargin = omnibar.measuredHeight() - omnibar.getTranslation().roundToInt()
             }
             view.requestLayout()
         }
@@ -137,12 +137,12 @@ class BottomAppBarBehavior<V : View>(
 
         offsetAnimator?.addUpdateListener { animation ->
             val animatedValue = animation.animatedValue as Float
-            omnibar.translationY = animatedValue
+            omnibar.setTranslation(animatedValue)
             offsetBottomByToolbar(browserLayout)
         }
 
-        val targetTranslation = if (isVisible) 0f else omnibar.height.toFloat()
-        offsetAnimator?.setFloatValues(omnibar.translationY, targetTranslation)
+        val targetTranslation = if (isVisible) 0f else omnibar.height().toFloat()
+        offsetAnimator?.setFloatValues(omnibar.getTranslation(), targetTranslation)
         offsetAnimator?.start()
     }
 

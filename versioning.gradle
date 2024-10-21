@@ -50,7 +50,7 @@ ext {
                 def newCode = Integer.parseInt(code) + 1
                 return newCode
             } else {
-                return 0
+                return 1
             }
         } else {
             return 0

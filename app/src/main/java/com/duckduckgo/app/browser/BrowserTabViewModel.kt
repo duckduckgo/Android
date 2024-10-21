@@ -177,6 +177,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
@@ -424,6 +425,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
+    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
@@ -1529,7 +1531,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
         }
     }
 
@@ -1597,12 +1599,21 @@ class BrowserTabViewModel @Inject constructor(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                Timber.d("Location Permission: domain $domain site url ${site?.url}")
                 if (!locationPermissionMessages.containsKey(domain)) {
                     setDomainHasLocationPermissionShown(domain)
-                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                    if (shouldShowLocationPermissionMessage()) {
+                        Timber.d("Show location permission for $domain")
+                        command.postValue(ShowDomainHasPermissionMessage(domain))
+                    }
                 }
             }
         }
+    }
+
+    private fun shouldShowLocationPermissionMessage(): Boolean {
+        val url = site?.url ?: return true
+        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
     }
 
     private fun setDomainHasLocationPermissionShown(domain: String) {
@@ -1701,7 +1712,7 @@ class BrowserTabViewModel @Inject constructor(
             newProgress
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -2179,6 +2190,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
             forceExpand = true,
+            shouldMoveCaretToStart = !hasFocus,
         )
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -2206,8 +2218,6 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
             showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
         )
-
-        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
     }
 
     fun onBookmarkMenuClicked() {
@@ -2924,6 +2934,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = OpenMessageInNewTab(message, tabId)
     }
 
+    override fun openLinkInNewTab(uri: Uri) {
+        command.value = OpenInNewTab(uri.toString(), tabId)
+    }
+
     override fun recoverFromRenderProcessGone() {
         webNavigationState?.let {
             navigationStateChanged(EmptyNavigationState(it))
@@ -3417,7 +3431,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
-                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl)
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl, tabId)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = it
@@ -3678,9 +3692,13 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = true,
         )
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            navigationChange = false,
-        )
+
+        // the new omnibar deals with this properly
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                navigationChange = false,
+            )
+        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {

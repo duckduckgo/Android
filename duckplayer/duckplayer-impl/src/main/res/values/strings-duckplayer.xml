@@ -15,7 +15,7 @@
   -->
     <!-- smartling.entity_escaping = false -->
     <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Save</string>
     <string name="duck_player_cancel">Cancel</string>
     <string name="duck_player_setting_title">Duck Player</string>
@@ -24,7 +24,7 @@
     <string name="duck_player_mode_always">Always</string>
     <string name="duck_player_mode_never">Never</string>
     <string name="duck_player_mode_always_ask">Ask Every Time</string>
-    <string name="duck_player_mode_dialog_title">Open Youtube videos in Duck Player?</string>
+    <string name="duck_player_mode_dialog_title">Open YouTube videos in Duck Player?</string>
     <string name="duck_player_close_modal_content_description">Close</string>
     <string name="duck_player_info_modal_title_from_duck_player_page">Drowning in ads on YouTube? Not with Duck Player!</string>
     <string name="duck_player_info_modal_title_from_overlay">Drowning in ads on YouTube? Try Duck Player!</string>
@@ -33,4 +33,8 @@
     <string name="duck_player_unavailable">Duck Player Unavailable</string>
     <string name="duck_player_unavailable_description">Duck Player\'s functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding.</string>
     <string name="duck_player_unavailable_learn_more">Learn More</string>
+    <!-- TODO: Remove this ignore when the translation is added -->
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Open YouTube Videos in Duck Player</string>
+    <!-- TODO(cbarreiro): Add missing translations asap -->
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Open Duck Player in a new tab</string>
 </resources>

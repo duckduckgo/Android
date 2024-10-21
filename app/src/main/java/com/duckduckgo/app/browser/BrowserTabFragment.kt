@@ -137,10 +137,10 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -323,7 +323,6 @@ class BrowserTabFragment :
     DuckDuckGoFragment(R.layout.fragment_browser_tab),
     FindListener,
     CoroutineScope,
-    TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
@@ -498,6 +497,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var changeOmnibarPositionFeature: ChangeOmnibarPositionFeature
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
@@ -822,7 +824,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -834,7 +836,7 @@ class BrowserTabFragment :
         initPrivacyProtectionsPopup()
         createPopupMenu()
 
-        configureLegacyOmnibar()
+        configureOmnibar()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -862,8 +864,22 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureOmnibar() {
+        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+            configureNewOmnibar()
+        } else {
+            configureLegacyOmnibar()
+        }
+    }
+
     private fun configureLegacyOmnibar() {
-        configureTextListener()
+        configureFindInPage()
+        configureOmnibarTextInput()
+        configureItemPressedListener()
+        configureCustomTab()
+    }
+
+    private fun configureNewOmnibar() {
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
@@ -878,13 +894,46 @@ class BrowserTabFragment :
         launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
     }
 
+    private fun onUserSubmittedText(text: String) {
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.sendPixelsOnEnterKeyPressed()
+        }
+        userEnteredQuery(text)
+    }
+
+    private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
+        }
+        viewModel.triggerAutocomplete(text, hasFocus, true)
+    }
+
+    private fun onOmnibarNewTabRequested() {
+        viewModel.userRequestedOpeningNewTab()
+        pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
+    }
+
+    private fun onOmnibarCustomTabClosed() {
+        requireActivity().finish()
+    }
+
+    private fun onOmnibarCustomTabPrivacyDashboardPressed() {
+        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+        val intent = globalActivityStarter.startIntent(requireContext(), params)
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        intent?.let { startActivity(it) }
+        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+    }
+
     private fun onOmnibarFireButtonPressed(isPulseAnimationPlaying: Boolean) {
         browserActivity?.launchFire()
-        pixel.fire(
-            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            mapOf(FIRE_BUTTON_STATE to isPulseAnimationPlaying.toString()),
-        )
         viewModel.onFireMenuSelected()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            pixel.fire(
+                AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                mapOf(FIRE_BUTTON_STATE to isPulseAnimationPlaying.toString()),
+            )
+        }
     }
 
     private fun onOmnibarBrowserMenuButtonPressed() {
@@ -897,7 +946,15 @@ class BrowserTabFragment :
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         browserActivity?.launchPrivacyDashboard()
-        viewModel.onPrivacyShieldSelected()
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onPrivacyShieldSelected()
+        }
+    }
+
+    private fun onOmnibarVoiceSearchPressed() {
+        webView?.onPause()
+        hideKeyboardImmediately()
+        voiceSearchLauncher.launch(requireActivity())
     }
 
     private fun onOmnibarClearTextButtonPressed() {
@@ -912,14 +969,10 @@ class BrowserTabFragment :
                 customTabToolbarColor,
                 viewModel.url?.extractDomain(),
                 onTabClosePressed = {
-                    requireActivity().finish()
+                    onOmnibarCustomTabClosed()
                 },
                 onPrivacyShieldPressed = {
-                    val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
-                    val intent = globalActivityStarter.startIntent(requireContext(), params)
-                    contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-                    intent?.let { startActivity(it) }
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+                    onOmnibarCustomTabPrivacyDashboardPressed()
                 },
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
@@ -959,8 +1012,7 @@ class BrowserTabFragment :
                 }
             }
             onMenuItemClicked(newTabMenuItem) {
-                viewModel.userRequestedOpeningNewTab()
-                pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
+                onOmnibarNewTabRequested()
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
@@ -1032,11 +1084,13 @@ class BrowserTabFragment :
     private fun launchPopupMenu() {
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
-            popupMenu.show(binding.rootView, omnibar.toolbar)
-            if (isActiveCustomTab()) {
-                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
-            } else {
-                pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            if (isAdded) {
+                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (isActiveCustomTab()) {
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+                }
             }
         }
     }
@@ -1092,7 +1146,8 @@ class BrowserTabFragment :
             requireActivity().recreate()
             return
         }
-        omnibar.legacyOmnibar.setExpanded(true)
+
+        omnibar.setExpanded(true)
 
         viewModel.onViewResumed()
 
@@ -1295,6 +1350,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        omnibar.setViewMode(Omnibar.ViewMode.Browser(viewModel.url))
     }
 
     private fun showError(
@@ -2352,52 +2408,32 @@ class BrowserTabFragment :
         }
     }
 
-    private fun configureTextListener() {
-        omnibar.addTextChangedListeners(
-            onFindInPageTextChanged = { query ->
-                viewModel.userFindingInPage(query)
-            },
-            onOmnibarTextChanged = { state ->
-                viewModel.onOmnibarInputStateChanged(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-                viewModel.triggerAutocomplete(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-            },
-            onShowSuggestions = { state ->
-                viewModel.triggerAutocomplete(
-                    state.text,
-                    state.hasFocus,
-                    true,
-                )
-            },
-        )
-    }
-
     private fun configureFindInPage() {
         omnibar.configureFindInPage(
-            object : LegacyOmnibarView.FindInPageListener {
-                override fun onFocusChanged(hasFocus: Boolean, query: String) {
+            object : Omnibar.FindInPageListener {
+                override fun onFocusChanged(
+                    hasFocus: Boolean,
+                    query: String,
+                ) {
                     if (hasFocus && query != viewModel.findInPageViewState.value?.searchTerm) {
-                        viewModel.userFindingInPage(query)
+                        onFindInPageInputChanged(query)
                     }
                 }
 
                 override fun onPreviousSearchItemPressed() {
-                    webView?.findNext(false)
+                    onFindInPagePreviousTermPressed()
                 }
 
                 override fun onNextSearchItemPressed() {
-                    webView?.findNext(true)
+                    onFindInPageNextTermPressed()
                 }
 
                 override fun onClosePressed() {
-                    viewModel.dismissFindInView()
+                    onFindInPageDismissed()
+                }
+
+                override fun onFindInPageTextChanged(query: String) {
+                    onFindInPageInputChanged(query)
                 }
             },
         )
@@ -2405,7 +2441,7 @@ class BrowserTabFragment :
 
     private fun configureItemPressedListener() {
         omnibar.configureItemPressedListeners(
-            object : ItemPressedListener {
+            object : Omnibar.ItemPressedListener {
                 override fun onTabsButtonPressed() {
                     onOmnibarTabsButtonPressed()
                 }
@@ -2429,40 +2465,95 @@ class BrowserTabFragment :
                 override fun onClearTextPressed() {
                     onOmnibarClearTextButtonPressed()
                 }
+
+                override fun onCustomTabClosePressed() {
+                    onOmnibarCustomTabClosed()
+                }
+
+                override fun onCustomTabPrivacyDashboardPressed() {
+                    onOmnibarCustomTabPrivacyDashboardPressed()
+                }
             },
         )
     }
 
     private fun configureOmnibarTextInput() {
         omnibar.addTextListener(
-            object : LegacyOmnibarView.TextListener {
-                override fun onFocusChanged(hasFocus: Boolean, query: String) {
-                    viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
-                    viewModel.triggerAutocomplete(query, hasFocus, false)
-                    if (hasFocus) {
-                        cancelPendingAutofillRequestsToChooseCredentials()
-                    } else {
-                        omnibar.omnibarTextInput.hideKeyboard()
-                        binding.focusDummy.requestFocus()
-                    }
+            object : Omnibar.TextListener {
+                override fun onFocusChanged(
+                    hasFocus: Boolean,
+                    query: String,
+                ) {
+                    onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
                 override fun onBackKeyPressed() {
-                    viewModel.sendPixelsOnBackKeyPressed()
-                    omnibar.omnibarTextInput.hideKeyboard()
-                    binding.focusDummy.requestFocus()
+                    onOmnibarBackKeyPressed()
                 }
 
                 override fun onEnterPressed() {
-                    viewModel.sendPixelsOnEnterKeyPressed()
-                    userEnteredQuery(omnibar.getText())
+                    onUserSubmittedText(omnibar.getText())
                 }
 
                 override fun onTouchEvent(event: MotionEvent) {
-                    viewModel.onUserTouchedOmnibarTextInput(event.action)
+                    if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+                        viewModel.onUserTouchedOmnibarTextInput(event.action)
+                    }
+                }
+
+                override fun onOmnibarTextChanged(state: OmnibarTextState) {
+                    onUserEnteredText(state.text, state.hasFocus)
+                }
+
+                override fun onShowSuggestions(state: OmnibarTextState) {
+                    viewModel.triggerAutocomplete(
+                        state.text,
+                        state.hasFocus,
+                        true,
+                    )
                 }
             },
         )
+    }
+
+    private fun onOmnibarTextFocusChanged(
+        hasFocus: Boolean,
+        query: String,
+    ) {
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
+        }
+        viewModel.triggerAutocomplete(query, hasFocus, false)
+        if (hasFocus) {
+            cancelPendingAutofillRequestsToChooseCredentials()
+        } else {
+            omnibar.omnibarTextInput.hideKeyboard()
+            binding.focusDummy.requestFocus()
+        }
+    }
+
+    private fun onOmnibarBackKeyPressed() {
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.sendPixelsOnBackKeyPressed()
+        }
+        omnibar.omnibarTextInput.hideKeyboard()
+        binding.focusDummy.requestFocus()
+    }
+
+    private fun onFindInPageDismissed() {
+        viewModel.dismissFindInView()
+    }
+
+    private fun onFindInPageNextTermPressed() {
+        webView?.findNext(true)
+    }
+
+    private fun onFindInPagePreviousTermPressed() {
+        webView?.findNext(false)
+    }
+
+    private fun onFindInPageInputChanged(query: String) {
+        viewModel.userFindingInPage(query)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -3483,10 +3574,6 @@ class BrowserTabFragment :
         }
     }
 
-    override fun onAnimationFinished() {
-        // NO OP
-    }
-
     private fun showEmailProtectionChooseEmailDialog(address: String) {
         context?.let {
             val url = webView?.url ?: return
@@ -3658,14 +3745,15 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenOmnibarViewState) {
                 lastSeenOmnibarViewState = viewState
 
-                if (viewState.isEditing) {
-                    omnibar.cancelTrackersAnimation()
-                }
-
                 omnibar.renderOmnibarViewState(viewState)
 
-                lastSeenBrowserViewState?.let {
-                    omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
+                if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    lastSeenBrowserViewState?.let {
+                        omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
+                    }
+                    if (viewState.isEditing) {
+                        omnibar.cancelTrackersAnimation()
+                    }
                 }
             }
         }
@@ -3685,7 +3773,7 @@ class BrowserTabFragment :
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    omnibar.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    omnibar.renderLoadingViewState(viewState) { if (!viewState.isLoading) hide() }
                 }
 
                 if (viewState.privacyOn) {
@@ -3786,11 +3874,12 @@ class BrowserTabFragment :
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
-                omnibar.renderVoiceSearch(viewState, {
-                    webView?.onPause()
-                    hideKeyboardImmediately()
-                    voiceSearchLauncher.launch(requireActivity())
-                },)
+                omnibar.renderVoiceSearch(
+                    viewState,
+                    {
+                        onOmnibarVoiceSearchPressed()
+                    },
+                )
 
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
@@ -4006,7 +4095,10 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+
+            omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
+
             viewModel.onNewTabShown()
         }
 

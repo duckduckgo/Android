@@ -1517,6 +1517,178 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test feature with multiple targets matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.FRANCE.language, Locale.US.country))
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc",
+                                        "localeCountry": "US",
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(Toggle.State.Target("mc", "US", "fr")),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple targets not matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc",
+                                        "localeCountry": "US",
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(Toggle.State.Target("mc", "US", "fr")),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.FRANCE.language, Locale.US.country))
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null),
+                Toggle.State.Target(null, "US", null),
+                Toggle.State.Target(null, null, "fr"),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature with multiple separate targets not matching`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    },
+                                    {
+                                        "localeCountry": "US"
+                                    },
+                                    {
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", null, null),
+                Toggle.State.Target(null, "US", null),
+                Toggle.State.Target(null, null, "fr"),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
     fun `test variant parsing when no remote variant provided`() {
         val feature = generatedFeatureNewInstance()
 
@@ -1875,6 +2047,180 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(
             listOf(
                 Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+            ),
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test experiment feature with ignored targets`() {
+        variantManager.variant = "mc"
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "hash": "1",
+                        "state": "enabled",
+                        "features": {
+                            "experimentDisabledByDefault": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc",
+                                        "localeCountry": "US"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null),
+            ),
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
+        )
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "hash": "2",
+                        "state": "enabled",
+                        "features": {
+                            "experimentDisabledByDefault": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc",
+                                        "localeLanguage": "US"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US"),
+            ),
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
+        )
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "hash": "3",
+                        "state": "enabled",
+                        "features": {
+                            "experimentDisabledByDefault": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+            ),
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
+        )
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "hash": "4",
+                        "state": "enabled",
+                        "features": {
+                            "experimentDisabledByDefault": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "ma"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
+        assertEquals(
+            listOf(
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+            ),
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test experiment feature with targets matching`() {
+        variantManager.variant = "mc"
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "experimentDisabledByDefault": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc",
+                                        "localeCountry": "US"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )

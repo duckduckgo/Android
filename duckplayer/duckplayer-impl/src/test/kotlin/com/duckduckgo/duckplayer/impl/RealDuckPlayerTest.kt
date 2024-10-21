@@ -37,6 +37,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
@@ -370,7 +372,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsAvailableLocally_isSimulatedYoutubeNoCookieReturnsTrue() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("js/duckplayer.js"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("js/duckplayer.js"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -380,7 +382,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndFileIsNotAvailableLocally_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf("css/duckplayer.css"))
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf("css/duckplayer.css"))
         val uri = "https://www.youtube-nocookie.com/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -390,7 +392,7 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenUrHostIsEmbedAndPathContainsEmbed_isSimulatedYoutubeNoCookieReturnsFalse() = runTest {
-        whenever(mockDuckPlayerLocalFilesPath.assetsPath).thenReturn(listOf())
+        whenever(mockDuckPlayerLocalFilesPath.assetsPath()).thenReturn(listOf())
         val uri = "https://www.youtube-nocookie.com/embed/js/duckplayer.js".toUri()
 
         val result = testee.isSimulatedYoutubeNoCookie(uri)
@@ -550,6 +552,20 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenUriIsDuckPlayerUriWithOriginAuto_interceptProcessesDuckPlayerUri() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("duck://player/12345?origin=auto")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+
+        val result = testee.intercept(request, url, webView)
+
+        verify(webView).loadUrl("https://www.youtube-nocookie.com?videoID=12345")
+        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
+        assertNotNull(result)
+    }
+
+    @Test
     fun whenUriIsDuckPlayerUriWithOpenInYouTube_interceptLoadsYouTubeUri() = runTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("duck://player/openInYouTube?v=12345")
@@ -608,7 +624,11 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(mockAssets).open("duckplayer/index.html")
-        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to "always"))
+        verify(mockPixel).fire(
+            DUCK_PLAYER_DAILY_UNIQUE_VIEW,
+            type = Daily(),
+            parameters = mapOf("setting" to "always", "newtab" to "false"),
+        )
         assertEquals("text/html", result?.mimeType)
     }
 
@@ -634,7 +654,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/12345?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 
@@ -677,7 +696,6 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/123456?origin=auto")
-        verify(mockPixel).fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
         assertNotNull(result)
     }
 
@@ -736,6 +754,22 @@ class RealDuckPlayerTest {
         val result = testee.willNavigateToDuckPlayer(uri)
 
         assertFalse(result)
+    }
+
+    // endregion
+
+    // region openInNewTab
+
+    @Test
+    fun whenSetOpenInNewTabToTrueThenFirePixel() {
+        testee.setOpenInNewTab(true)
+        verify(mockPixel).fire(DUCK_PLAYER_NEWTAB_SETTING_ON)
+    }
+
+    @Test
+    fun whenSetOpenInNewTabToFalseThenFirePixel() {
+        testee.setOpenInNewTab(false)
+        verify(mockPixel).fire(DUCK_PLAYER_NEWTAB_SETTING_OFF)
     }
 
     // endregion

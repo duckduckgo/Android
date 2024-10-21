@@ -30,7 +30,7 @@ import com.google.android.material.appbar.AppBarLayout
  */
 class TopAppBarBehavior(
     context: Context,
-    private val omnibar: LegacyOmnibarView,
+    private val omnibar: OmnibarBehaviour,
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
     override fun onNestedPreScroll(
@@ -43,7 +43,7 @@ class TopAppBarBehavior(
         type: Int,
     ) {
         if (target.id == R.id.browserWebView) {
-            if (omnibar.isScrollingEnabled) {
+            if (omnibar.isOmnibarScrollingEnabled()) {
                 super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
             }
         } else {
@@ -54,7 +54,7 @@ class TopAppBarBehavior(
     private fun offsetBottomByToolbar(view: View?) {
         if (view?.layoutParams is MarginLayoutParams) {
             view.updateLayoutParams<MarginLayoutParams> {
-                this.bottomMargin = omnibar.measuredHeight
+                this.bottomMargin = omnibar.measuredHeight()
             }
             view.requestLayout()
         }

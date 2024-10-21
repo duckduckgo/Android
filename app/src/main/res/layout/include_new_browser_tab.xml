@@ -36,6 +36,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/newTabPage"
         android:layout_width="match_parent"
+        android:foreground="@android:color/transparent"
         android:layout_height="match_parent">
 
         <FrameLayout
