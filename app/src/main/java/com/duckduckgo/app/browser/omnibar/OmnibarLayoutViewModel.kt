@@ -101,7 +101,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
-        val showControls: Boolean = true,
+        val showTabsMenu: Boolean = true,
+        val showFireIcon: Boolean = true,
+        val showBrowserMenu: Boolean = true,
         val scrollingEnabled: Boolean = true,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
@@ -141,6 +143,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         Timber.d("Omnibar: onOmnibarFocusChanged")
         val showClearButton = hasFocus && query.isNotBlank()
+        val showControls = query.isBlank()
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -154,7 +157,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     leadingIconState = SEARCH,
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = showClearButton,
-                    showControls = query.isBlank(),
+                    showTabsMenu = showControls,
+                    showFireIcon = showControls,
+                    showBrowserMenu = showControls,
                     shouldMoveCaretToStart = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
@@ -172,7 +177,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     leadingIconState = getLeadingIconState(false, it.url),
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
-                    showControls = true,
+                    showTabsMenu = true,
+                    showFireIcon = true,
+                    showBrowserMenu = true,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -255,7 +262,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                         viewMode = viewMode,
                         showClearButton = false,
                         showVoiceSearch = false,
-                        showControls = false,
+                        showBrowserMenu = true,
+                        showTabsMenu = false,
+                        showFireIcon = false,
                     )
                 }
             }
@@ -315,14 +324,17 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
             AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
         )
+        val showControls = true
 
         _viewState.update {
             it.copy(
                 omnibarText = "",
                 updateOmnibarText = true,
                 expanded = true,
-                showControls = true,
                 showClearButton = false,
+                showBrowserMenu = showControls,
+                showTabsMenu = showControls,
+                showFireIcon = showControls,
             )
         }
     }
@@ -384,7 +396,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                 omnibarText = query,
                 updateOmnibarText = false,
                 hasFocus = hasFocus,
-                showControls = showControls,
+                showBrowserMenu = showControls,
+                showTabsMenu = showControls,
+                showFireIcon = showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
