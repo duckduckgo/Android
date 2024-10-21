@@ -564,6 +564,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
             isExternal: Boolean = false,
+            isLaunchFromClearDataAction: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -572,6 +573,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             return intent
         }
 
@@ -585,6 +587,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
 
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
 
         private const val MAX_ACTIVE_TABS = 40
     }
