@@ -379,7 +379,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
-        viewModel.handleShowOnAppLaunchOption()
+        if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
+            viewModel.handleShowOnAppLaunchOption()
+        }
     }
 
     private fun configureObservers() {
