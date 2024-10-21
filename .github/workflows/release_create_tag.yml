@@ -35,4 +35,4 @@ jobs:
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |
-          bundle exec fastlane android tag_and_push_release_version app_version: "${{ github.event.inputs.app-version }}"
+          bundle exec fastlane android tag_and_push_release_version app_version:"${{ github.event.inputs.app-version }}"

@@ -17,7 +17,7 @@
     releaseNotesDefault = "Bug fixes and other improvements"
     releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
-    appVersionFilePath = "../app/version/version-properties"
+    appVersionFilePath = "../app/version/version.properties"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -238,6 +238,10 @@ platform :android do
     desc "Create a new release branch and update the version"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
+
+        UI.message("App version for fastlane is #{app_version}.")
+
+        # Define the branch name
         branch_name = "release/#{app_version}"
 
         # Create a new release branch
