@@ -340,6 +340,7 @@ platform :android do
                 skip_git_hooks: true
             )
 
+            sh "git fetch"
             sh "git checkout main"
             sh "git merge --no-ff release/#{newVersion}"
             sh "git tag -a #{newVersion} -m #{newVersion}"

@@ -1,4 +1,4 @@
-name: Tag Android Release
+name: Release - Create and Push Tag
 
 on:
   workflow_dispatch:
