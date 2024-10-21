@@ -3696,7 +3696,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun autoCompleteSuggestionsShown() {
+    fun onAutoCompleteSuggestionsChanged() {
         configureAutoComplete()
     }
 
