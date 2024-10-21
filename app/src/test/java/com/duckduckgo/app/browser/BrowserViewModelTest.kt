@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -76,6 +77,8 @@ class BrowserViewModelTest {
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
     @Mock private lateinit var showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore
+
+    private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
     private lateinit var testee: BrowserViewModel
 
@@ -289,6 +292,20 @@ class BrowserViewModelTest {
         verify(mockTabRepository, never()).addDefaultTab()
     }
 
+    @Test
+    fun whenShowOnAppLaunchFeatureToggleIsOffAndNewTabPageIsSetThenNoTabIsAdded() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = false))
+
+        whenever(showOnAppLaunchOptionDataStore.optionFlow)
+            .thenReturn(flowOf(ShowOnAppLaunchOption.NewTabPage))
+
+        testee.handleShowOnAppLaunchOption()
+
+        verify(mockTabRepository, never()).add()
+        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
+        verify(mockTabRepository, never()).addDefaultTab()
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -300,6 +317,7 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
         )
     }
