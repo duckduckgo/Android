@@ -215,6 +215,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
             Timber.i("Automatic data clearer has finished, so processing intent now")
+            Timber.i("Launch-Start: onNewIntent")
             launchNewSearchOrQuery(intent)
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
@@ -368,12 +369,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 return
             } else {
-                val thirdParty = !intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
-                Timber.w("Launch-Start: opening in new tab requested for $sharedText third party = $thirdParty")
-                if (thirdParty) {
+                val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
+                val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
+                Timber.w("Launch-Start: opening in new tab requested for $sharedText isExternal $isExternal interstitial $interstitialScreen")
+                if (!interstitialScreen) {
+                    Timber.w("Launch-Start: not launching from interstitial screen")
                     viewModel.launchFromThirdParty()
                 }
-
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
@@ -607,6 +609,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (viewState.hideWebContent) {
                     hideWebContent()
                 } else {
+                    Timber.i("Launch-Start: renderBrowserViewState $viewState")
                     showWebContent()
                 }
             }
@@ -619,6 +622,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (lastIntent != null) {
                 Timber.i("There was a deferred intent to process; handling now")
+                Timber.i("Launch-Start: lastIntent != null")
                 launchNewSearchOrQuery(lastIntent)
                 lastIntent = null
                 return
@@ -626,6 +630,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null && !intent.launchedFromRecents) {
                 Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
+                Timber.i("Launch-Start: not processedOriginalIntent")
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
