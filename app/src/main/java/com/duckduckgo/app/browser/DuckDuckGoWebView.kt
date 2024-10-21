@@ -228,6 +228,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         var returnValue = false
+        requestDisallowInterceptTouchEvent(true)
 
         val event = MotionEvent.obtain(ev)
         val action = event.actionMasked
