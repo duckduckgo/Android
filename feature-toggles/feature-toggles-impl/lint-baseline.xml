@@ -547,7 +547,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="72"
+            line="80"
             column="9"/>
     </issue>
 
@@ -558,7 +558,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="83"
+            line="91"
             column="9"/>
     </issue>
 
@@ -569,7 +569,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="100"
+            line="108"
             column="9"/>
     </issue>
 
@@ -580,7 +580,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="107"
+            line="115"
             column="9"/>
     </issue>
 
@@ -591,7 +591,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="129"
+            line="137"
             column="9"/>
     </issue>
 
@@ -602,7 +602,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="137"
+            line="145"
             column="9"/>
     </issue>
 
@@ -613,7 +613,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="217"
+            line="225"
             column="9"/>
     </issue>
 
@@ -624,7 +624,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="220"
+            line="228"
             column="9"/>
     </issue>
 
@@ -635,7 +635,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="223"
+            line="231"
             column="9"/>
     </issue>
 
@@ -646,7 +646,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="226"
+            line="234"
             column="9"/>
     </issue>
 
@@ -657,7 +657,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="229"
+            line="237"
             column="9"/>
     </issue>
 
@@ -668,7 +668,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="232"
+            line="240"
             column="9"/>
     </issue>
 
@@ -679,7 +679,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="243"
+            line="251"
             column="9"/>
     </issue>
 
@@ -690,7 +690,7 @@
         errorLine2="                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="245"
+            line="253"
             column="88"/>
     </issue>
 
@@ -701,7 +701,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="256"
+            line="264"
             column="9"/>
     </issue>
 
@@ -712,7 +712,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="270"
+            line="278"
             column="9"/>
     </issue>
 
@@ -723,7 +723,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="284"
+            line="292"
             column="9"/>
     </issue>
 
@@ -734,7 +734,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="295"
+            line="303"
             column="13"/>
     </issue>
 
@@ -745,7 +745,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="309"
+            line="317"
             column="9"/>
     </issue>
 
@@ -756,7 +756,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="325"
+            line="333"
             column="9"/>
     </issue>
 
@@ -767,7 +767,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="339"
+            line="347"
             column="9"/>
     </issue>
 
@@ -778,7 +778,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="355"
+            line="363"
             column="9"/>
     </issue>
 
@@ -789,7 +789,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="368"
+            line="376"
             column="9"/>
     </issue>
 
@@ -800,7 +800,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="381"
+            line="389"
             column="9"/>
     </issue>
 
@@ -811,7 +811,7 @@
         errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="383"
+            line="391"
             column="54"/>
     </issue>
 
@@ -822,7 +822,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="395"
+            line="403"
             column="9"/>
     </issue>
 
@@ -833,8 +833,118 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/api/FeatureTogglesTest.kt"
-            line="556"
+            line="595"
             column="12"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="                val cohortName = metric.toggle.getRawStoredState()?.assignedCohort?.name"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptor.kt"
+            line="68"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="73"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="99"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="125"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="151"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="181"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="207"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="233"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
+            line="259"
+            column="9"/>
     </issue>
 
     <issue
