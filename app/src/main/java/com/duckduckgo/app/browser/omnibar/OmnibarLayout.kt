@@ -345,6 +345,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 renderBrowserMode(viewState)
             }
         }
+
         renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
         renderButtons(viewState)
     }
@@ -415,9 +416,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderButtons(viewState: ViewState) {
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = viewState.showControls
-        fireIconMenu.isVisible = viewState.showControls
-        browserMenu.isVisible = viewState.showControls
+        tabsMenu.isVisible = viewState.showTabsMenu
+        fireIconMenu.isVisible = viewState.showFireIcon
+        browserMenu.isVisible = viewState.showBrowserMenu
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
@@ -656,6 +657,8 @@ class OmnibarLayout @JvmOverloads constructor(
             toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
 
             customTabToolbarContainer.customTabToolbar.show()
+
+            browserMenu.isVisible = true
 
             customTabToolbarContainer.customTabDomain.text = customTab.domain
             customTabToolbarContainer.customTabDomainOnly.text = customTab.domain
