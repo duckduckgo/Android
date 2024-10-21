@@ -584,8 +584,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
 
-        private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
-
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
