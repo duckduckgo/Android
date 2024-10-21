@@ -308,7 +308,7 @@ class RealDuckPlayer @Inject constructor(
         webView: WebView,
     ): WebResourceResponse {
         val path = getDuckPlayerAssetsPath(url)
-        val mimeType = mimeTypeMap.getMimeTypeFromExtension(path?.substringAfterLast("."))
+        val mimeType = getMimeTypeFromExtension(path?.substringAfterLast("."))
 
         if (path != null && mimeType != null) {
             try {
@@ -333,6 +333,16 @@ class RealDuckPlayer @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun getMimeTypeFromExtension(extension: String?): String? {
+        return mimeTypeMap.getMimeTypeFromExtension(extension) ?: when (extension) {
+            "css" -> "text/css"
+            "html" -> "text/html"
+            "js" -> "application/javascript"
+            "jpg" -> "image/jpeg"
+            else -> null
         }
     }
 
