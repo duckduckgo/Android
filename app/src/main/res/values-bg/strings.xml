@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Премахване на предложение за търсене?</string>
     <string name="autocompleteRemoveItemCancel">Отмени</string>
     <string name="autocompleteRemoveItemRemove">Премахване</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Превключване към раздел · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Отваряне на външно приложение</string>
