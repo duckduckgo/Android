@@ -1,4 +1,4 @@
-name: Release - Create and Push Tag
+name: Release - Upload Bundle to Play Store
 
 on:
   workflow_dispatch:
@@ -32,10 +32,27 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
-      - name: Use fastlane lane to create and push tagged release
-        id: create_git_tag
+      - name: Decode upload keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build_upload.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Assemble the bundle
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
+
+      - name: Upload bundle to internal
+        id: create_app_bundle
         run: |
-          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
+          bundle exec fastlane deploy_dogfood aab_path:app/build/outputs/bundle/internalRelease/duckduckgo-${{ github.event.inputs.app-version }}-internal-release.aab          
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
