@@ -109,6 +109,8 @@ interface TabRepository {
 
     suspend fun selectByUrlOrNewTab(url: String)
 
+    suspend fun getTabId(url: String): String?
+
     suspend fun setIsUserNew(isUserNew: Boolean)
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
