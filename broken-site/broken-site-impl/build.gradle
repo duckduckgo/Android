@@ -74,6 +74,8 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
 
+    implementation AndroidX.dataStore.preferences
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
