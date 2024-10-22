@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @InjectWith(FragmentScope::class)
-class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomSheetDialogFragment() {
+class NetpGeoswitchingCityChoiceDialogFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
