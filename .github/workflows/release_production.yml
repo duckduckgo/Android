@@ -44,7 +44,7 @@ jobs:
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly | head -n 1)        
           echo "::set-output name=version::$output"
 
       - name: Use the captured output
