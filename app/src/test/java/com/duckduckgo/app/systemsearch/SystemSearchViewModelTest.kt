@@ -539,15 +539,11 @@ class SystemSearchViewModelTest {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-//        val testObserver = TestObserver.create<String>()
-//        testee.resultsStateFlow.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByUrl(suggestion.url)
-//        testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()
     }
 
@@ -556,15 +552,11 @@ class SystemSearchViewModelTest {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-//        val testObserver = TestObserver.create<String>()
-//        testee.resultsStateFlow.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockHistory).removeHistoryEntryByQuery(suggestion.phrase)
-//        testObserver.assertValue(omnibarText)
         assertCommandIssued<AutocompleteItemRemoved>()
     }
 
