@@ -230,7 +230,7 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnStopVpnWithSelfStopThenResetEnabledTimeInMillisAndServerDetails() = runTest {
+    fun whenOnStopVpnWithSelfPauseThenResetEnabledTimeInMillisAndServerDetails() = runTest {
         assertEquals(
             Result.success(Unit),
             wgVpnNetworkStack.onStopVpn(SELF_STOP()),
@@ -242,7 +242,7 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnStopVpnWithRestartThenResetEnabledTimeInMillisAndServerDetails() = runTest {
+    fun whenOnPauseVpnWithRestartThenResetEnabledTimeInMillisAndServerDetails() = runTest {
         assertEquals(
             Result.success(Unit),
             wgVpnNetworkStack.onStopVpn(RESTART),

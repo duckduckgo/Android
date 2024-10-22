@@ -71,10 +71,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             ACTION_VPN_DISABLE -> {
                 logcat { "Entire VPN will disabled because the user asked it" }
                 goAsync(pendingResult) {
-                    // instead of stopping the VPN, we stop the VPN features individually
                     vpn.stop()
-                    appTrackingProtection.stop()
-                    networkProtectionState.stop()
                 }
             }
 

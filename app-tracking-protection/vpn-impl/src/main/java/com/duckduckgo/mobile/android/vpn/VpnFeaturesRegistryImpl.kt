@@ -21,8 +21,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.util.UUID
+import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -30,11 +34,20 @@ import logcat.logcat
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
 private const val IS_INITIALIZED = "IS_INITIALIZED"
 
-internal class VpnFeaturesRegistryImpl(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = VpnFeaturesRegistry::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = Vpn::class,
+)
+@SingleInstanceIn(AppScope::class)
+class VpnFeaturesRegistryImpl @Inject constructor(
     private val vpnServiceWrapper: VpnServiceWrapper,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
-) : VpnFeaturesRegistry {
+) : VpnFeaturesRegistry, Vpn {
 
     private val mutex = Mutex()
 
@@ -103,6 +116,34 @@ internal class VpnFeaturesRegistryImpl(
     private fun registeredFeatures(): Map<String, Any?> {
         return preferences.all.filter { it.key != IS_INITIALIZED }
     }
+
+    override suspend fun start() = withContext(dispatcherProvider.io()) {
+        vpnServiceWrapper.startService()
+    }
+
+    override suspend fun pause() {
+        vpnServiceWrapper.stopService()
+    }
+
+    override suspend fun stop() {
+        try {
+            mutex.lock()
+            // unregister all features
+            getRegisteredFeatures().onEach {
+                preferences.edit(commit = true) {
+                    remove(it.featureName)
+                }
+            }
+            // stop VPN
+            vpnServiceWrapper.stopService()
+        } finally {
+            mutex.unlock()
+        }
+    }
+
+    override suspend fun snooze(triggerAtMillis: Long) {
+        vpnServiceWrapper.snoozeService(triggerAtMillis)
+    }
 }
 
 /**
@@ -111,10 +152,9 @@ internal class VpnFeaturesRegistryImpl(
  *
  * The class is marked as open to be able to mock it in tests.
  */
-internal open class VpnServiceWrapper(
+open class VpnServiceWrapper @Inject constructor(
     private val context: Context,
-    private val dispatcherProvider: DispatcherProvider,
-) : Vpn {
+) {
     open fun restartVpnService(forceRestart: Boolean) {
         TrackerBlockingVpnService.restartVpnService(context, forceRestart = forceRestart)
     }
@@ -127,19 +167,11 @@ internal open class VpnServiceWrapper(
         TrackerBlockingVpnService.startService(context)
     }
 
+    open fun snoozeService(triggerAtMillis: Long) {
+        TrackerBlockingVpnService.snoozeService(context, triggerAtMillis)
+    }
+
     open fun isServiceRunning(): Boolean {
         return TrackerBlockingVpnService.isServiceRunning(context)
-    }
-
-    override suspend fun start() = withContext(dispatcherProvider.io()) {
-        startService()
-    }
-
-    override suspend fun stop() = withContext(dispatcherProvider.io()) {
-        stopService()
-    }
-
-    override suspend fun snooze(triggerAtMillis: Long) {
-        TrackerBlockingVpnService.snoozeService(context, triggerAtMillis)
     }
 }
