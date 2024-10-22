@@ -28,6 +28,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -41,6 +42,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -170,6 +172,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun onAutoCompleteSuggestionsChanged() {
+        configureAutoComplete()
+    }
+
     private fun sendLaunchPixels(intent: Intent) {
         when {
             launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
@@ -228,7 +234,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         binding.autocompleteSuggestions.layoutManager = LinearLayoutManager(this)
         autocompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                viewModel.userSubmittedAutocompleteResult(it.phrase)
+                viewModel.userSubmittedAutocompleteResult(it)
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
@@ -243,6 +249,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+        binding.autocompleteSuggestions.addItemDecoration(
+            SuggestionItemDecoration(ContextCompat.getDrawable(this, R.drawable.suggestions_divider)!!),
+        )
 
         binding.results.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
@@ -405,7 +414,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
 
             is LaunchBrowser -> {
-                launchBrowser(command)
+                launchBrowser(command.query)
+            }
+
+            is LaunchBrowserAndSwitchToTab -> {
+                launchBrowser(command.query, command.tabId)
             }
 
             is LaunchDeviceApplication -> {
@@ -478,6 +491,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun autocompleteItemRemoved() {
+        viewModel.onAutoCompleteSuggestionsChanged()
         showKeyboardAndRestorePosition()
     }
 
@@ -545,8 +559,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun launchBrowser(command: LaunchBrowser) {
-        startActivity(BrowserActivity.intent(this, command.query))
+    private fun launchBrowser(query: String, openExistingTabId: String? = null) {
+        startActivity(
+            BrowserActivity.intent(
+                context = this,
+                queryExtra = query,
+                openExistingTabId = openExistingTabId,
+            ),
+        )
         finish()
     }
 

@@ -196,6 +196,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
     AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
 
+    AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION("m_autocomplete_click_switch_to_tab"),
+
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
 
@@ -216,6 +218,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_SWITCH_TO_TAB("m_autocomplete_displayed_switch_to_tab"),
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),

@@ -88,6 +88,7 @@
     <string name="autocompleteRemoveItemTitle">Remove search suggestion?</string>
     <string name="autocompleteRemoveItemCancel">Cancel</string>
     <string name="autocompleteRemoveItemRemove">Remove</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Switch to Tab · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>

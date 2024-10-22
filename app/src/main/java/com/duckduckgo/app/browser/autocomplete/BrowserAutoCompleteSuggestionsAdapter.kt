@@ -20,12 +20,12 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
@@ -55,9 +55,9 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
         SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(omnibarPosition),
-        HISTORY_TYPE to HistorySuggestionViewHolderFactory(omnibarPosition),
-        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(omnibarPosition),
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
+        HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
+        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),

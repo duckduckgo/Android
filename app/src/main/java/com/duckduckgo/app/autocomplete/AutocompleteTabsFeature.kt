@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.app.autocomplete
+
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "autocompleteTabs",
+)
+interface AutocompleteTabsFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }
-
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-android {
-    namespace "com.duckduckgo.history.api"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
-}
-
-dependencies {
-    implementation project(':navigation-api')
-
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
-}
-
-

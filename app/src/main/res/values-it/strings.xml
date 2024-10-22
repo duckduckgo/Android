@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Rimuovere il suggerimento di ricerca?</string>
     <string name="autocompleteRemoveItemCancel">Annulla</string>
     <string name="autocompleteRemoveItemRemove">Rimuovi</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Passa alla scheda · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Apri l\'app esterna</string>
