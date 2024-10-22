@@ -109,7 +109,6 @@ class BrowserViewModel @Inject constructor(
                 }
                 ApplicationClearDataState.FINISHED -> {
                     Timber.i("App clear state finished")
-                    Timber.i("Launch-Start: clear state finished")
                     viewState.value = currentViewState.copy(hideWebContent = false)
                 }
             }

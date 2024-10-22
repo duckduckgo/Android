@@ -215,7 +215,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
             Timber.i("Automatic data clearer has finished, so processing intent now")
-            Timber.i("Launch-Start: onNewIntent")
             launchNewSearchOrQuery(intent)
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
@@ -306,21 +305,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
-        Timber.i("Launch-Start: launchNewSearchOrQuery: $intent")
+        Timber.i("launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
             return
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
-            Timber.i("Launch-Start: launch from default browser")
+            Timber.i("launch from default browser")
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            Timber.i("Launch-Start: Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
+            Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
@@ -331,13 +330,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
-            Timber.i("Launch-Start: Should notify data cleared")
+            Timber.i("Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
         if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
             currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
-            Timber.v("Launch-Start: Verification link was consumed, so don't allow it to open in a new tab")
+            Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
 
@@ -345,7 +344,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.inContextEmailProtectionShowing = false
 
         if (launchNewSearch(intent)) {
-            Timber.w("Launch-Start: new tab requested")
+            Timber.w("new tab requested")
             lifecycleScope.launch { viewModel.onNewTabRequested() }
             return
         }
@@ -353,27 +352,27 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
-                Timber.d("Launch-Start: Shortcut opened with url $sharedText")
+                Timber.d("Shortcut opened with url $sharedText")
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
-                Timber.d("Launch-Start: Favorite clicked from widget $sharedText")
+                Timber.d("Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
                 return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
-                Timber.w("Launch-Start: open in current tab requested")
+                Timber.w("open in current tab requested")
                 if (currentTab != null) {
                     currentTab?.submitQuery(sharedText)
                 } else {
-                    Timber.w("Launch-Start: can't use current tab, opening in new tab instead")
+                    Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
                 return
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
-                Timber.w("Launch-Start: opening in new tab requested for $sharedText isExternal $isExternal interstitial $interstitialScreen")
+                Timber.w("opening in new tab requested for $sharedText isExternal $isExternal interstitial $interstitialScreen")
                 if (!interstitialScreen) {
-                    Timber.w("Launch-Start: not launching from interstitial screen")
+                    Timber.w("not launching from interstitial screen")
                     viewModel.launchFromThirdParty()
                 }
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
@@ -384,7 +383,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 return
             }
         } else {
-            Timber.i("Launch-Start: shared text empty, opening last tab")
+            Timber.i("shared text empty, opening last tab")
         }
     }
 
@@ -609,7 +608,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (viewState.hideWebContent) {
                     hideWebContent()
                 } else {
-                    Timber.i("Launch-Start: renderBrowserViewState $viewState")
                     showWebContent()
                 }
             }
@@ -622,7 +620,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (lastIntent != null) {
                 Timber.i("There was a deferred intent to process; handling now")
-                Timber.i("Launch-Start: lastIntent != null")
                 launchNewSearchOrQuery(lastIntent)
                 lastIntent = null
                 return
@@ -630,7 +627,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null && !intent.launchedFromRecents) {
                 Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
-                Timber.i("Launch-Start: not processedOriginalIntent")
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }

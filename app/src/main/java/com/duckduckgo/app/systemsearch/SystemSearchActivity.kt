@@ -547,7 +547,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        startActivity(BrowserActivity.intent(this))
+        startActivity(BrowserActivity.intent(this, interstitialScreen = true))
         finish()
     }
 

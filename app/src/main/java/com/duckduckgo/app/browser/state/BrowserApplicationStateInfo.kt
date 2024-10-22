@@ -26,7 +26,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -48,7 +47,6 @@ class BrowserApplicationStateInfo @Inject constructor(
     }
 
     override fun onActivityStarted(activity: Activity) {
-        Timber.d("Launch-Start: onActivityStarted $activity started $started")
         if (started++ == 0) {
             observers.forEach { it.onOpen(isFreshLaunch) }
             isFreshLaunch = false

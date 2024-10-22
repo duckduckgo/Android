@@ -109,7 +109,6 @@ class AutomaticDataClearer @Inject constructor(
 
             if (clearWhat == ClearWhatOption.CLEAR_NONE) {
                 Timber.i("No data will be cleared as it's configured to clear nothing automatically")
-                Timber.i("Launch-Start: onAppForegroundedAsync")
                 postDataClearerState(FINISHED)
             } else {
                 if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
@@ -118,7 +117,7 @@ class AutomaticDataClearer @Inject constructor(
                         clearDataWhenAppInForeground(clearWhat)
                     }
                 } else {
-                    Timber.i("Launch-Start: Decided not to clear data at this time")
+                    Timber.i("Decided not to clear data at this time")
                     postDataClearerState(FINISHED)
                 }
             }
@@ -187,7 +186,7 @@ class AutomaticDataClearer @Inject constructor(
                 ClearWhatOption.CLEAR_TABS_ONLY -> {
                     clearDataAction.clearTabsAsync(true)
 
-                    Timber.i("Launch-Start: Notifying listener that clearing has finished")
+                    Timber.i("Notifying listener that clearing has finished")
                     postDataClearerState(FINISHED)
                 }
 
@@ -210,7 +209,7 @@ class AutomaticDataClearer @Inject constructor(
                             clearDataAction.killAndRestartProcess(notifyDataCleared = true)
                         }
                     } else {
-                        Timber.i("Launch-Start: Will not restart process")
+                        Timber.i("Will not restart process")
                         postDataClearerState(FINISHED)
                     }
                 }
