@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Удалить поисковую рекомендацию?</string>
     <string name="autocompleteRemoveItemCancel">Отменить</string>
     <string name="autocompleteRemoveItemRemove">Удалить</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Перейти на вкладку · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Открыть внешнее приложение</string>
