@@ -38,6 +38,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
+    private val mockDataStore: BrokenSitePomptDataStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
     @Before
@@ -48,6 +49,7 @@ class RealBrokenSiteReportRepositoryTest {
             database = mockDatabase,
             coroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            brokenSitePromptDataStore = mockDataStore,
         )
     }
 
@@ -108,5 +110,32 @@ class RealBrokenSiteReportRepositoryTest {
         testee.cleanupOldEntries()
 
         verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
+    }
+
+    @Test
+    fun whenSetMaxDismissStreakCalledThenSetMaxDismissStreakIsCalled() = runTest {
+        val maxDismissStreak = 3
+
+        testee.setMaxDismissStreak(maxDismissStreak)
+
+        verify(mockDataStore).setMaxDismissStreak(maxDismissStreak)
+    }
+
+    @Test
+    fun whenDismissStreakResetDaysCalledThenDismissStreakResetDaysIsCalled() = runTest {
+        val days = 30
+
+        testee.setDismissStreakResetDays(days)
+
+        verify(mockDataStore).setDismissStreakResetDays(days)
+    }
+
+    @Test
+    fun whenCoolDownDaysCalledThenCoolDownDaysIsCalled() = runTest {
+        val days = 7
+
+        testee.setCoolDownDays(days)
+
+        verify(mockDataStore).setCoolDownDays(days)
     }
 }

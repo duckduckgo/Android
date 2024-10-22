@@ -36,12 +36,24 @@ interface BrokenSiteReportRepository {
     fun setLastSentDay(hostname: String)
 
     fun cleanupOldEntries()
+
+    suspend fun setMaxDismissStreak(maxDismissStreak: Int)
+    fun getMaxDismissStreak(): Int
+
+    suspend fun setDismissStreakResetDays(days: Int)
+    fun getDismissStreakResetDays(): Int
+
+    suspend fun setCoolDownDays(days: Int)
+    fun getCoolDownDays(): Int
+
+    suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
 }
 
-class RealBrokenSiteReportRepository constructor(
+class RealBrokenSiteReportRepository(
     private val database: BrokenSiteDatabase,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val brokenSitePromptDataStore: BrokenSitePomptDataStore,
 ) : BrokenSiteReportRepository {
 
     override suspend fun getLastSentDay(hostname: String): String? {
@@ -72,6 +84,37 @@ class RealBrokenSiteReportRepository constructor(
             val expiryTime = getUTCDate30DaysAgo()
             database.brokenSiteDao().deleteAllExpiredReports(expiryTime)
         }
+    }
+
+    override suspend fun setMaxDismissStreak(maxDismissStreak: Int) {
+        brokenSitePromptDataStore.setMaxDismissStreak(maxDismissStreak)
+    }
+
+    override fun getMaxDismissStreak(): Int =
+        brokenSitePromptDataStore.getMaxDismissStreak()
+
+    override suspend fun setDismissStreakResetDays(days: Int) {
+        brokenSitePromptDataStore.setDismissStreakResetDays(days)
+    }
+
+    override fun getDismissStreakResetDays(): Int =
+        brokenSitePromptDataStore.getDismissStreakResetDays()
+
+    override suspend fun setCoolDownDays(days: Int) {
+        brokenSitePromptDataStore.setCoolDownDays(days)
+    }
+
+    override fun getCoolDownDays(): Int =
+        brokenSitePromptDataStore.getCoolDownDays()
+
+    override suspend fun setBrokenSitePromptRCSettings(
+        maxDismissStreak: Int,
+        dismissStreakResetDays: Int,
+        coolDownDays: Int,
+    ) {
+        setMaxDismissStreak(maxDismissStreak)
+        setDismissStreakResetDays(dismissStreakResetDays)
+        setCoolDownDays(coolDownDays)
     }
 
     private fun convertToShortDate(dateString: String): String {
