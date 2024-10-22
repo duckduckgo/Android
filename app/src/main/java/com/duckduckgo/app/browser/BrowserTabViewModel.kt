@@ -52,13 +52,13 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
 import com.duckduckgo.app.browser.SSLErrorType.GENERIC
@@ -297,15 +297,11 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import com.jakewharton.rxrelay2.PublishRelay
 import dagger.Lazy
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.List
@@ -343,9 +339,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -492,7 +491,7 @@ class BrowserTabViewModel @Inject constructor(
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     @VisibleForTesting
-    val autoCompletePublishSubject = PublishRelay.create<String>()
+    internal val autoCompleteStateFlow = MutableStateFlow("")
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -501,7 +500,7 @@ class BrowserTabViewModel @Inject constructor(
         context = viewModelScope.coroutineContext,
     )
 
-    private var autoCompleteDisposable: Disposable? = null
+    private var autoCompleteJob: Job? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -582,7 +581,6 @@ class BrowserTabViewModel @Inject constructor(
 
     init {
         initializeViewStates()
-        configureAutoComplete()
         logVoiceSearchAvailability()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
@@ -745,22 +743,24 @@ class BrowserTabViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
-        autoCompleteDisposable = autoCompletePublishSubject
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .switchMap { autoComplete.autoComplete(it) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result ->
-                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                        hasUserSeenHistoryIAM = true
-                    }
-                    onAutoCompleteResultReceived(result)
-                },
-                { t: Throwable? -> Timber.w(t, "Failed to get search results") },
-            )
+        autoCompleteJob?.cancel()
+        autoCompleteJob = autoCompleteStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { autoComplete.autoComplete(it) }
+            .flowOn(dispatchers.io())
+            .onEach { result ->
+                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                    hasUserSeenHistoryIAM = true
+                }
+                onAutoCompleteResultReceived(result)
+            }
+            .flowOn(dispatchers.main())
+            .catch { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            .launchIn(viewModelScope)
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
@@ -774,8 +774,8 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     public override fun onCleared() {
         buildingSiteFactoryJob?.cancel()
-        autoCompleteDisposable?.dispose()
-        autoCompleteDisposable = null
+        autoCompleteJob?.cancel()
+        autoCompleteJob = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -843,10 +843,14 @@ class BrowserTabViewModel @Inject constructor(
         val hasHistory = withContext(dispatchers.io()) {
             history.hasHistory()
         }
+        val hasTabs = withContext(dispatchers.io()) {
+            (tabRepository.liveTabs.value?.size ?: 0) > 1
+        }
         val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
         val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
         val hasHistoryResults =
             currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
+        val hasSwitchToTabResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
@@ -854,6 +858,8 @@ class BrowserTabViewModel @Inject constructor(
             PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
             PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
             PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
+            PixelParameter.SWITCH_TO_TAB_CAPABLE to hasTabs.toString(),
+            PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
         )
         val pixelName = when (suggestion) {
             is AutoCompleteBookmarkSuggestion -> {
@@ -867,6 +873,7 @@ class BrowserTabViewModel @Inject constructor(
             is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
             is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
             is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+            is AutoCompleteSwitchToTabSuggestion -> AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
             else -> return
         }
 
@@ -924,7 +931,7 @@ class BrowserTabViewModel @Inject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                autoCompletePublishSubject.accept(omnibarText)
+                autoCompleteStateFlow.value = omnibarText
                 command.value = AutocompleteItemRemoved
             }
         }
@@ -2164,7 +2171,7 @@ class BrowserTabViewModel @Inject constructor(
             )
 
         if (hasFocus && autoCompleteSuggestionsEnabled) {
-            autoCompletePublishSubject.accept(query.trim())
+            autoCompleteStateFlow.value = query.trim()
         }
     }
 
@@ -3689,6 +3696,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onAutoCompleteSuggestionsChanged() {
+        configureAutoComplete()
+    }
+
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
             if (hasUserSeenHistoryIAM) {
@@ -3712,8 +3723,12 @@ class BrowserTabViewModel @Inject constructor(
                 if (suggestions.any { it is AutoCompleteSearchSuggestion && it.isUrl }) {
                     pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE)
                 }
+                if (suggestions.any { it is AutoCompleteSwitchToTabSuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_SWITCH_TO_TAB)
+                }
             }
             lastAutoCompleteState = null
+            autoCompleteJob?.cancel()
         }
     }
 

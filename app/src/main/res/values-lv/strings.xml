@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Vai noņemt meklēšanas ieteikumu?</string>
     <string name="autocompleteRemoveItemCancel">Atcelt</string>
     <string name="autocompleteRemoveItemRemove">Noņemt</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Pārslēgties uz cilni · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atvērt ārējo lietotni</string>

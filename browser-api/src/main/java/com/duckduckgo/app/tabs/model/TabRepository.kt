@@ -20,7 +20,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -43,8 +42,6 @@ interface TabRepository {
     val liveSelectedTab: LiveData<TabEntity>
 
     val tabSwitcherData: Flow<TabSwitcherData>
-
-    fun getTabsObservable(): Single<List<TabEntity>>
 
     /**
      * @return tabId of new record
