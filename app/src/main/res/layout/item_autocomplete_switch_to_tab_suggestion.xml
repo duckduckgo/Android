@@ -14,29 +14,28 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="8dp"
     android:layout_marginTop="6dp"
+    android:layout_marginBottom="8dp"
     android:background="?attr/selectableItemBackground"
+    android:paddingStart="20dp"
     android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="20dp"
     android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
-        android:id="@+id/bookmarkIndicator"
+        android:id="@+id/switchToTabIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_bookmark_20"
+        android:src="@drawable/ic_switch_to_tab_20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/title"
@@ -44,28 +43,28 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
-        android:includeFontPadding="false"
         android:gravity="center_vertical|start"
+        android:includeFontPadding="false"
         android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
+        app:layout_constraintStart_toEndOf="@id/switchToTabIndicator"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="phrase or URL suggestion"/>
+        tools:text="phrase or URL suggestion" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:typography="body2"
-        app:textType="secondary"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:maxLines="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bookmarkIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/switchToTabIndicator"
         app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="phrase or URL suggestion"/>
+        app:textType="secondary"
+        app:typography="body2"
+        tools:text="phrase or URL suggestion" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

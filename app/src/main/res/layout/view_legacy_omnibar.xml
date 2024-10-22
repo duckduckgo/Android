@@ -86,6 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/keyline_1"
+                    android:paddingStart="@dimen/keyline_0"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -178,7 +179,7 @@
                     android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                     android:inputType="textUri|textNoSuggestions"
                     android:maxLines="1"
-                    android:paddingStart="5dp"
+                    android:paddingStart="3dp"
                     android:selectAllOnFocus="true"
                     android:textColor="?attr/daxColorPrimaryText"
                     android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
