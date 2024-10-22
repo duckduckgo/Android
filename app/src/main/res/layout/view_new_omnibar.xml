@@ -146,7 +146,8 @@
                         android:id="@+id/placeholder"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="@dimen/keyline_1"
                         android:visibility="invisible" />
 
                 </FrameLayout>
