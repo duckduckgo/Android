@@ -45,15 +45,7 @@ Update GitHub release notes
 [bundle exec] fastlane android deploy_dogfood
 ```
 
-Upload APK to Play Store internal testing track
-
-### android deploy_firebase
-
-```sh
-[bundle exec] fastlane android deploy_firebase
-```
-
-Upload APK to Firebase App Distribution
+Upload AAB to Play Store internal testing track and APK to Firebase
 
 ### android deploy_github
 
@@ -63,13 +55,13 @@ Upload APK to Firebase App Distribution
 
 Deploy APK to GitHub
 
-### android tag_and_release_version
+### android tag_and_push_release_version
 
 ```sh
-[bundle exec] fastlane android tag_and_release_version
+[bundle exec] fastlane android tag_and_push_release_version
 ```
 
-Tag and release a new app version
+Create a new release branch and update the version
 
 ### android release
 
