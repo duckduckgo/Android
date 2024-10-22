@@ -26,8 +26,10 @@ class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
 
         val uri = Uri.parse(url.trim())
 
-        val convertedUri = if (uri.scheme == null) {
-            Uri.Builder().scheme("http").authority(uri.path?.lowercase())
+        val uriWithScheme = if (uri.scheme == null) {
+            Uri.Builder()
+                .scheme("http")
+                .authority(uri.path?.lowercase())
         } else {
             uri.buildUpon()
                 .scheme(uri.scheme?.lowercase())
@@ -37,9 +39,15 @@ class ShowOnAppLaunchUrlConverterImpl : UrlConverter {
                 query(uri.query)
                 fragment(uri.fragment)
             }
-            .build()
-            .toString()
 
-        return Uri.decode(convertedUri)
+        val uriWithPath = if (uri.path.isNullOrBlank()) {
+            uriWithScheme.path("/")
+        } else {
+            uriWithScheme
+        }
+
+        val processedUrl = uriWithPath.build().toString()
+
+        return Uri.decode(processedUrl)
     }
 }
