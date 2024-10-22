@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Pašalinti paieškos pasiūlymą?</string>
     <string name="autocompleteRemoveItemCancel">Atšaukti</string>
     <string name="autocompleteRemoveItemRemove">Pašalinti</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Perjungti į skirtuką · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>

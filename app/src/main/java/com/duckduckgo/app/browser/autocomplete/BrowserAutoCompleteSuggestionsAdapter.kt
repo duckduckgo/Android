@@ -55,9 +55,9 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
         SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(omnibarPosition),
-        HISTORY_TYPE to HistorySuggestionViewHolderFactory(omnibarPosition),
-        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(omnibarPosition),
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
+        HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
+        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
