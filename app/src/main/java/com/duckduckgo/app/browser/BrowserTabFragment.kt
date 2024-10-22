@@ -1732,6 +1732,9 @@ class BrowserTabFragment :
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
             is Command.SwitchToTab -> {
+                binding.focusedView.gone()
+                viewModel.autoCompleteSuggestionsGone()
+                binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
             else -> {
@@ -1774,6 +1777,7 @@ class BrowserTabFragment :
     }
 
     private fun autocompleteItemRemoved() {
+        viewModel.onAutoCompleteSuggestionsChanged()
         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
     }
 
@@ -3707,6 +3711,7 @@ class BrowserTabFragment :
                         binding.autoCompleteSuggestionsList.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
+                        viewModel.onAutoCompleteSuggestionsChanged()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                         hideFocusedView()
                     }
