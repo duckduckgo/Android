@@ -194,8 +194,7 @@ platform :android do
       app: "1:239339218528:android:732e03dcf13d1488db8505",
       groups: "ddg-employees",
       android_artifact_type: "APK",
-      android_artifact_path: apkPath,
-      release_notes: options[:release_notes]
+      android_artifact_path: apkPath
   )
 
   end
