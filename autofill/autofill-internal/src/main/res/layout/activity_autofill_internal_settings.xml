@@ -92,6 +92,11 @@
             android:layout_height="wrap_content"
             app:primaryText="@string/autofillDevSettingsImportPasswordsTitle" />
 
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importPasswordsLaunchGooglePasswordCustomFlow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportPasswordsExportPasswordsImportFlowTitle" />
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/importPasswordsLaunchGooglePasswordWebpage"

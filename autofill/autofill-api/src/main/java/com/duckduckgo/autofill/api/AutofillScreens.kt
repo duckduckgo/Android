@@ -48,6 +48,12 @@ sealed interface AutofillScreens {
         val loginCredentials: LoginCredentials,
         val source: AutofillSettingsLaunchSource,
     ) : ActivityParams
+
+    object ImportGooglePassword {
+        data object AutofillImportViaGooglePasswordManagerScreen : ActivityParams {
+            private fun readResolve(): Any = AutofillImportViaGooglePasswordManagerScreen
+        }
+    }
 }
 
 enum class AutofillSettingsLaunchSource {

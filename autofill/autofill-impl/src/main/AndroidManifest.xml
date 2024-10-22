@@ -16,6 +16,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />
         <activity
+            android:name=".importing.gpm.webflow.ImportGooglePasswordsWebFlowActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
+            android:exported="false" />
+        <activity
             android:name=".ui.credential.management.AutofillManagementActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"
