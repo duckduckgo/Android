@@ -43,5 +43,10 @@ jobs:
       - name: Capture App Bundle Path
         id: capture_output
         run: |
-          output=$(ls app/build/outputs/bundle/internalRelease/*.aab)
+          # Find the generated .aab file
+          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
+
+      - name: Use the captured bundle path
+        run: |
+          echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
