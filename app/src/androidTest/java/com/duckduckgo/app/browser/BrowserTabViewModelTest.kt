@@ -1470,6 +1470,7 @@ class BrowserTabViewModelTest {
             whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
 
+            testee.onAutoCompleteSuggestionsChanged()
             testee.autoCompleteStateFlow.value = "title"
             delay(500)
             testee.autoCompleteSuggestionsGone()
