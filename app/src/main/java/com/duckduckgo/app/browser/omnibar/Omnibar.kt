@@ -155,6 +155,7 @@ class Omnibar(
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
                 removeAppBarBehavior(binding.browserLayout)
                 removeAppBarBehavior(binding.focusedView)
+                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
 
                 // prevent the touch event leaking to the webView below
                 binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
