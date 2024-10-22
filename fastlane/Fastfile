@@ -170,7 +170,7 @@ platform :android do
 
  end
 
- desc "Upload APK to Play Store internal testing track"
+ desc "Upload AAB to Play Store internal testing track and APK to Firebase"
  lane :deploy_dogfood do |options|
 
    UI.message("Aab path: #{options[:aab_path]}")
@@ -181,11 +181,6 @@ platform :android do
      skip_upload_images: true,
      validate_only: false
    )
-
- end
-
-  desc "Upload APK to Firebase App Distribution"
-  lane :deploy_firebase do |options|
 
   versionCode = google_play_track_version_codes(track: 'internal').max
   apkPath = "duckduckgo.apk"
