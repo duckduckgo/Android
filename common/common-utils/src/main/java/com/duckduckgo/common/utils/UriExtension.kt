@@ -56,6 +56,9 @@ val Uri.isHttps: Boolean
 val Uri.toHttps: Uri
     get() = buildUpon().scheme(UrlScheme.https).build()
 
+val Uri.isHttpOrHttps: Boolean
+    get() = isHttp || isHttps
+
 val Uri.hasIpHost: Boolean
     get() {
         return baseHost?.matches(IP_REGEX) ?: false

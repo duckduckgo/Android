@@ -814,4 +814,10 @@
     <string name="settingsAddressBarPositionTop">Nahoru</string>
     <string name="settingsAddressBarPositionBottom">Dole</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Zobrazit při spuštění aplikace</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy otevřená karta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Stránka Nová karta</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Konkrétní stránka</string>
+
 </resources>

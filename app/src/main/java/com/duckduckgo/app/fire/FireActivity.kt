@@ -80,7 +80,7 @@ class FireActivity : AppCompatActivity() {
             context: Context,
             notifyDataCleared: Boolean = false,
         ): Intent {
-            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared)
+            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared, isLaunchFromClearDataAction = true)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }

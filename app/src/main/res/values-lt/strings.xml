@@ -814,4 +814,10 @@
     <string name="settingsAddressBarPositionTop">Viršus</string>
     <string name="settingsAddressBarPositionBottom">Apačia</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Rodyti paleidus programą</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Paskutinį kartą atidarytas skirtukas</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Naujas skirtuko puslapis</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
+
 </resources>

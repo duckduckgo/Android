@@ -810,4 +810,10 @@
     <string name="settingsAddressBarPositionTop">Inizio</string>
     <string name="settingsAddressBarPositionBottom">Parte inferiore</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Mostra all\'avvio dell\'app</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Ultima scheda aperta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Pagina Nuova scheda</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Pagina specifica</string>
+
 </resources>
