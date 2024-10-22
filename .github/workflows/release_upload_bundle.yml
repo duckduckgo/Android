@@ -2,11 +2,6 @@ name: Release - Upload Bundle to Play Store
 
 on:
   workflow_dispatch:
-    inputs:
-      app-version:
-        description: 'App Version for Release'
-        required: true
-        default: 'PLACEHOLDER'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -16,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  create-tag:
-    name: Create and Push git tag for version
+  upload-nightly-bundle:
+    name: Generate and upload nightly bundle to Play Store Internal track
     runs-on: macos-latest
 
     steps:
