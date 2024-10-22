@@ -46,22 +46,12 @@ jobs:
           fileName: android
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
-
-      - name: Upload bundle to internal
-        id: create_app_bundle
+      - name: Generate nightly version name
+        id: generate_version_name
         run: |
-          bundle exec fastlane deploy_dogfood aab_path:app/build/outputs/bundle/internalRelease/duckduckgo-${{ github.event.inputs.app-version }}-internal-release.aab          
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
+          echo "::set-output name=version::$output"
 
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.1
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Upload Bundle to Play Store
-          asana-task-description: Upload Bundle to Play Store has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-          action: 'create-asana-task'
+      - name: Use the captured output
+        run: |
+          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"

@@ -49,10 +49,20 @@ jobs:
       - name: Assemble the bundle
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
 
+      - name: Generate nightly version name
+        id: generate_version_name
+        run: |
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
+          echo "::set-output name=version::$output"
+
+      - name: Use the captured output
+        run: |
+          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
+
       - name: Upload bundle to internal
         id: create_app_bundle
         run: |
-          bundle exec fastlane deploy_dogfood aab_path:app/build/outputs/bundle/internalRelease/duckduckgo-${{ github.event.inputs.app-version }}-internal-release.aab          
+          bundle exec fastlane deploy_dogfood aab_path:app/build/outputs/bundle/internalRelease/duckduckgo-${{ steps.generate_version_name.outputs.version }}-internal-release.aab          
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
@@ -62,6 +72,6 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Tag Android Release
-          asana-task-description: Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Upload Bundle to Play Store
+          asana-task-description: Upload Bundle to Play Store has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
