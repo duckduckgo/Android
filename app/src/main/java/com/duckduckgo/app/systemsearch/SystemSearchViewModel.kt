@@ -322,6 +322,10 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
+    fun onAutoCompleteSuggestionsChanged() {
+        configureResults()
+    }
+
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Command.ShowRemoveSearchSuggestionDialog(suggestion)
