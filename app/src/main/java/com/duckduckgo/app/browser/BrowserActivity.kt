@@ -392,7 +392,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("shared text empty, opening last tab")
         }
 
-        viewModel.handleShowOnAppLaunchOption()
+        if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
+            viewModel.handleShowOnAppLaunchOption()
+        }
     }
 
     private fun configureObservers() {
@@ -585,6 +587,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
+            isLaunchFromClearDataAction: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -595,6 +598,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
+            intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             return intent
         }
 
@@ -610,6 +614,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
 
         private const val MAX_ACTIVE_TABS = 40
     }
