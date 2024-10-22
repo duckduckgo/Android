@@ -41,12 +41,15 @@ jobs:
           fileName: android
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Assemble the bundle
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
+
       - name: Generate nightly version name
         id: generate_version_name
         run: |
           output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly | head -n 1)        
-          echo "::set-output name=version::$output"
+          echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured output
-        run: |
+        run: |        
           echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
