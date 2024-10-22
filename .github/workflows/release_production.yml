@@ -44,12 +44,12 @@ jobs:
       - name: Assemble the bundle
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
 
-      - name: Generate nightly version name
-        id: generate_version_name
-        run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly | head -n 1)        
-          echo "version=$output" >> $GITHUB_OUTPUT
+      - name: Capture App Bundle Path
+        id: capture_output
+        run: |          
+          output=$(ls app/build/outputs/bundle/internalRelease/*.aab)
+          echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
-      - name: Use the captured output
-        run: |        
-          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
+      - name: Use the captured bundle path
+        run: |
+          echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
