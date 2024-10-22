@@ -24,7 +24,7 @@ sealed class ShowOnAppLaunchOption(val id: Int) {
 
     data object LastOpenedTab : ShowOnAppLaunchOption(1)
     data object NewTabPage : ShowOnAppLaunchOption(2)
-    data class SpecificPage(val url: String) : ShowOnAppLaunchOption(3)
+    data class SpecificPage(val url: String, val resolvedUrl: String? = null) : ShowOnAppLaunchOption(3)
 
     companion object {
 
