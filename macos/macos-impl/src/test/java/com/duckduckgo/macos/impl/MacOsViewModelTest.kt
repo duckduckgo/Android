@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.macos.api.SharePlatformLinkManager
 import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
@@ -31,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class MacOsViewModelTest {
@@ -39,18 +41,21 @@ class MacOsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
+    private var mockSharePlatformLinkManager: SharePlatformLinkManager = mock()
+
     private lateinit var testee: MacOsViewModel
 
     @Before
     fun before() {
-        testee = MacOsViewModel(mockPixel)
+        whenever(mockSharePlatformLinkManager.originEnabled()).thenReturn(true)
+        testee = MacOsViewModel(mockPixel, mockSharePlatformLinkManager)
     }
 
     @Test
     fun whenOnShareClickedAndInviteCodeExistsThenEmitCommandShareInviteCodeWithCorrectCode() = runTest {
         testee.commands.test {
             testee.onShareClicked()
-            assertEquals(ShareLink, awaitItem())
+            assertEquals(ShareLink(true), awaitItem())
         }
     }
 

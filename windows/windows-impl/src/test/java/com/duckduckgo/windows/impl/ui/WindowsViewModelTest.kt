@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.macos.api.SharePlatformLinkManager
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
 import kotlinx.coroutines.test.runTest
@@ -29,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 internal class WindowsViewModelTest {
@@ -36,19 +38,21 @@ internal class WindowsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
+    private var mockSharePlatformLinkManager: SharePlatformLinkManager = mock()
 
     private lateinit var testee: WindowsViewModel
 
     @Before
     fun before() {
-        testee = WindowsViewModel(mockPixel)
+        whenever(mockSharePlatformLinkManager.originEnabled()).thenReturn(true)
+        testee = WindowsViewModel(mockPixel, mockSharePlatformLinkManager)
     }
 
     @Test
     fun whenOnShareClickedThenEmitShareLinkCommand() = runTest {
         testee.commands.test {
             testee.onShareClicked()
-            assertEquals(ShareLink, awaitItem())
+            assertEquals(ShareLink(true), awaitItem())
         }
     }
 
