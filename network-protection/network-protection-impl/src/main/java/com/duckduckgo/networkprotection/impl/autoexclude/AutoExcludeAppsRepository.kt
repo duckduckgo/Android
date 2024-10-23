@@ -36,33 +36,45 @@ interface AutoExcludeAppsRepository {
      * Returns a list of apps that should be shown in the auto exclude prompt.
      * An app can only be shown in the prompt once.
      * An installed app will be flagged if it is part of the auto exclude list and is not manually excluded by the user.
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     suspend fun getAppsForAutoExcludePrompt(): List<VpnIncompatibleApp>
 
     /**
      * Marks an app that has been shown in the auto exclude prompt.
      * An app can only be shown in auto-exclude prompt ONLY once.
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     fun markAppAsShown(app: VpnIncompatibleApp)
 
     /**
      * Marks a list of apps that has been shown in the auto exclude prompt.
      * An app can only be shown in auto-exclude prompt ONLY once.
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     fun markAppsAsShown(app: List<VpnIncompatibleApp>)
 
     /**
      * Returns a list of apps that is is part of the auto exclude list
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp>
 
     /**
      * Returns a list of apps that is is part of the auto exclude list and is installed in this device
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp>
 
     /**
      * Returns if the app is part of the auto exclude list
+     *
+     * This method is internally dispatched to be executed in IO.
      */
     suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean
 }
@@ -112,18 +124,24 @@ class RealAutoExcludeAppsRepository @Inject constructor(
     }
 
     override suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
-        val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
+        return withContext(dispatcherProvider.io()) {
+            val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
 
-        return autoExcludeList.await().filter {
-            installedApps.contains(it.packageName)
+            autoExcludeList.await().filter {
+                installedApps.contains(it.packageName)
+            }
         }
     }
 
     override suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp> {
-        return autoExcludeList.await()
+        return withContext(dispatcherProvider.io()) {
+            autoExcludeList.await()
+        }
     }
 
     override suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean {
-        return getAllIncompatibleApps().any { it.packageName == appPackage }
+        return withContext(dispatcherProvider.io()) {
+            getAllIncompatibleApps().any { it.packageName == appPackage }
+        }
     }
 }

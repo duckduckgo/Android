@@ -1,19 +1,23 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 class RealAutoExcludePromptTest {
+    @get:Rule var coroutineRule = CoroutineTestRule()
+
     @Mock
     private lateinit var netPExclusionListRepository: NetPExclusionListRepository
 
@@ -27,6 +31,7 @@ class RealAutoExcludePromptTest {
         autoExcludePrompt = RealAutoExcludePrompt(
             netPExclusionListRepository,
             autoExcludeAppsRepository,
+            coroutineRule.testDispatcherProvider,
         )
     }
 

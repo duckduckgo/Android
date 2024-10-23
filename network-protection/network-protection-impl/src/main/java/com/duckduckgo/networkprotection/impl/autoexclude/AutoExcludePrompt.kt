@@ -16,14 +16,21 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutoExcludePrompt {
+    /**
+     * Returns a list of apps to be shown in prompt according to the Trigger specified.
+     *
+     * This method is internally dispatched to be executed in IO.
+     */
     suspend fun getAppsForPrompt(trigger: Trigger): List<VpnIncompatibleApp>
 
     enum class Trigger {
@@ -36,22 +43,25 @@ interface AutoExcludePrompt {
 class RealAutoExcludePrompt @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutoExcludePrompt {
     override suspend fun getAppsForPrompt(trigger: Trigger): List<VpnIncompatibleApp> {
-        val manuallyExcludedApps = netPExclusionListRepository.getManualAppExclusionList().filter {
-            !it.isProtected
-        }.map {
-            it.packageId
-        }
-
-        return if (trigger == NEW_INCOMPATIBLE_APP_FOUND) {
-            getFlaggedAppsForPrompt().also {
-                autoExcludeAppsRepository.markAppsAsShown(it)
+        return withContext(dispatcherProvider.io()) {
+            val manuallyExcludedApps = netPExclusionListRepository.getManualAppExclusionList().filter {
+                !it.isProtected
+            }.map {
+                it.packageId
             }
-        } else {
-            getInstalledProtectedIncompatibleApps()
-        }.filter {
-            !manuallyExcludedApps.contains(it.packageName)
+
+            if (trigger == NEW_INCOMPATIBLE_APP_FOUND) {
+                getFlaggedAppsForPrompt().also {
+                    autoExcludeAppsRepository.markAppsAsShown(it)
+                }
+            } else {
+                getInstalledProtectedIncompatibleApps()
+            }.filter {
+                !manuallyExcludedApps.contains(it.packageName)
+            }
         }
     }
 
