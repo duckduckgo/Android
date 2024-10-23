@@ -29,7 +29,7 @@ jobs:
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly -q | tail -n 1)                  
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly | tail -n 1)                  
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured output
