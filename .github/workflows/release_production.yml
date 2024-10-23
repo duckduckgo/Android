@@ -22,7 +22,7 @@ jobs:
         id: fetch_tag
         run: |
           git fetch --tags origin
-          TAG=$(git describe --tags --abbrev=0)
+          $output=$(git describe --tags --abbrev=0)
           echo "latest_tag=$output" >> $GITHUB_OUTPUT        
 
       - name: Show the latest tag
