@@ -71,7 +71,7 @@ class VpnCallStateReceiver @Inject constructor(
                         if (state == TelephonyManager.CALL_STATE_IDLE) {
                             vpn.start()
                         } else {
-                            vpn.stop()
+                            vpn.pause()
                         }
                     }
                 }
