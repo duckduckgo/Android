@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.autoexclude
 
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_FLAGGED_APP
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,7 +27,7 @@ interface AutoExcludePrompt {
     suspend fun getAppsForPrompt(trigger: Trigger): List<VpnIncompatibleApp>
 
     enum class Trigger {
-        NEW_FLAGGED_APP,
+        NEW_INCOMPATIBLE_APP_FOUND,
         INCOMPATIBLE_APP_MANUALLY_EXCLUDED,
     }
 }
@@ -38,7 +38,7 @@ class RealAutoExcludePrompt @Inject constructor(
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
 ) : AutoExcludePrompt {
     override suspend fun getAppsForPrompt(trigger: Trigger): List<VpnIncompatibleApp> {
-        return if (trigger == NEW_FLAGGED_APP) {
+        return if (trigger == NEW_INCOMPATIBLE_APP_FOUND) {
             getFlaggedAppsForPrompt().also {
                 autoExcludeAppsRepository.markAppsAsShown(it)
             }

@@ -45,7 +45,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_FLAGGED_APP
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
@@ -194,7 +194,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         if (networkProtectionState.isRunning() &&
             !localConfig.autoExcludeBrokenApps().isEnabled()
         ) {
-            autoExcludePrompt.getAppsForPrompt(NEW_FLAGGED_APP).also {
+            autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND).also {
                 if (it.isNotEmpty()) {
                     sendCommand(ShowAutoExcludeDialog(it))
                 }

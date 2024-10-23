@@ -1,6 +1,6 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
-import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_FLAGGED_APP
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.test.runTest
@@ -44,7 +44,7 @@ class RealAutoExcludePromptTest {
                 VpnIncompatibleApp("test2"),
             ),
         )
-        val result = autoExcludePrompt.getAppsForPrompt(NEW_FLAGGED_APP)
+        val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
         assertTrue(result.contains(VpnIncompatibleApp("test1")))
         assertFalse(result.contains(VpnIncompatibleApp("test2")))
@@ -60,7 +60,7 @@ class RealAutoExcludePromptTest {
                 VpnIncompatibleApp("test2"),
             ),
         )
-        val result = autoExcludePrompt.getAppsForPrompt(NEW_FLAGGED_APP)
+        val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
         assertTrue(result.contains(VpnIncompatibleApp("test1")))
         assertTrue(result.contains(VpnIncompatibleApp("test2")))
@@ -71,7 +71,7 @@ class RealAutoExcludePromptTest {
         whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
         whenever(autoExcludeAppsRepository.getAppsForAutoExcludePrompt()).thenReturn(emptyList())
 
-        val result = autoExcludePrompt.getAppsForPrompt(NEW_FLAGGED_APP)
+        val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
         assertTrue(result.isEmpty())
     }
