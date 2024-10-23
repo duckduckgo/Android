@@ -16,7 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: main
+
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Show the latest tag
+        run: |
+          echo "The latest git tag is: ${{ steps.previoustag.outputs.tag }}"
 
       - name: Fetch Latest Git Tag
         id: fetch_tag
