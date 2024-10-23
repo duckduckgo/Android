@@ -6,12 +6,8 @@ on:
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  upload-nightly-bundle:
+  create-tag:
     name: Generate and upload nightly bundle to Play Store Internal track
     runs-on: macos-latest
 
@@ -21,11 +17,12 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up ruby env
-        uses: ruby/setup-ruby@v1
+      - name: Get Previous tag
+        id: fetch_tag
+        uses: oprypin/find-latest-tag@v1
         with:
-          ruby-version: 2.7.2
-          bundler-cache: true
+          repository: duckduckgo/android
+          prefix: '5.'
 
       - name: Decode upload keys
         uses: davidSchuppa/base64Secret-toFile-action@v2
@@ -38,36 +35,41 @@ jobs:
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
           secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
-          fileName: android
+          fileName: ddg-upload-keystore.jks
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning
-
-      - name: Capture App Bundle Path
-        id: capture_output
-        run: |
-          output=$(ls app/build/outputs/bundle/internalRelease/*.aab)
-          echo "bundle_path=$output" >> $GITHUB_OUTPUT
-
-      - name: Use the captured bundle path
-        run: |
-          echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
 
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)                  
-          echo "version=$output" >> $GITHUB_OUTPUT
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
+          echo "::set-output name=version::$output"
 
-      - name: Use the captured output
+      - name: Assemble the bundle
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
+
+      - name: Capture App Bundle Path
+        id: capture_output
         run: |
-          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
+          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
+          echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
-      - name: Upload bundle to internal
+      - name: Upload bundle to Play Store Internal track
         id: create_app_bundle
         run: |
-          bundle exec fastlane deploy_dogfood aab_path:app/build/outputs/bundle/internalRelease/duckduckgo-${{ steps.generate_version_name.outputs.version }}-internal-release.aab          
+          bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
+
+      - name: Tag Nightly release
+        id: tag_nightly_release
+        run: |
+          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git push origin ${{ steps.generate_version_name.outputs.version }}
+
+      - name: Upload app bundle as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
+          path: duckduckgo.apk
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
