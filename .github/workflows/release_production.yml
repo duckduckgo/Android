@@ -19,7 +19,9 @@ jobs:
 
       - name: Get Previous tag
         id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        uses: oprypin/find-latest-tag@v1
+        with:
+          repository: duckduckgo/android
 
       - name: Show the latest tag
         run: |
