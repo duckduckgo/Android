@@ -52,7 +52,7 @@ jobs:
           echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
 
       - name: Upload app bundle as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app-bundle
           path: ${{ steps.capture_output.outputs.bundle_path }}
