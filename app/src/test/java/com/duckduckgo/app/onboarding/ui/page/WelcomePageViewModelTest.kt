@@ -19,19 +19,25 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -40,6 +46,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -54,6 +61,10 @@ class WelcomePageViewModelTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
+    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
+        on { it.isHighlightsEnabled() } doReturn false
+    }
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -61,6 +72,8 @@ class WelcomePageViewModelTest {
             mockContext,
             mockPixel,
             mockAppInstallStore,
+            mockHighlightsOnboardingExperimentManager,
+            mockSettingsDataStore,
         )
     }
 
@@ -188,6 +201,62 @@ class WelcomePageViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             Assert.assertTrue(command is Finish)
+        }
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenDDGIsSetAsDefaultBrowserFromOnboardingThenShowAddressBarPositionDialog() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.onDefaultBrowserSet()
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowAddressBarPositionDialog)
+        }
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is Finish)
+        }
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSendPixel() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.onAddressBarPositionOptionSelected(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.onAddressBarPositionOptionSelected(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+    }
+
+    @Test
+    fun givenHighlightsExperimentWhenLoadingInitialDaxDialogThenShowDaxExperimentCta() = runTest {
+        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            val command = awaitItem()
+            Assert.assertTrue(command is ShowExperimentInitialDialog)
         }
     }
 }
