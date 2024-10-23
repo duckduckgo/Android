@@ -25,10 +25,10 @@ interface FeatureTogglesInventory {
     /**
      * @return returns the list of all sub-features for a given top level feature
      */
-    suspend fun getAllTogglesForParent(name: String): List<Toggle>
+    suspend fun getAllTogglesForParent(name: String): List<Toggle> = emptyList()
 
     /**
      * @return returns ALL toggles that have an assigned cohort AND "state": "enabled"
      */
-    suspend fun getAllActiveExperimentToggles(): List<Toggle>
+    suspend fun getAllActiveExperimentToggles(): List<Toggle> = emptyList()
 }
