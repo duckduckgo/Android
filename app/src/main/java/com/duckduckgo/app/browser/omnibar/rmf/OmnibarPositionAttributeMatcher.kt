@@ -35,11 +35,11 @@ data class OmnibarPositionFeatureEnabledMatchingAttribute(
     }
 }
 
-data class OmnibarPositionExcludedMatchingAttribute(
-    val remoteValue: OmnibarPosition?,
+data class OmnibarPositionMatchingAttribute(
+    val remoteValue: OmnibarPosition,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "omnibarPositionExcluded"
+        const val KEY = "omnibarPosition"
     }
 }
 
@@ -54,8 +54,8 @@ class OmnibarPositionAttributeMatcherPlugin @Inject constructor(
                 matchingAttribute.remoteValue == omnibarPositionFeature.self().isEnabled()
             }
 
-            is OmnibarPositionExcludedMatchingAttribute -> {
-                matchingAttribute.remoteValue != settingsDataStore.omnibarPosition
+            is OmnibarPositionMatchingAttribute -> {
+                matchingAttribute.remoteValue == settingsDataStore.omnibarPosition
             }
 
             else -> return null
@@ -75,8 +75,8 @@ class OmnibarPositionJsonMatchingAttributeMapper @Inject constructor() : JsonToM
                     jsonMatchingAttribute.value as Boolean,
                 )
             }
-            OmnibarPositionExcludedMatchingAttribute.KEY -> {
-                OmnibarPositionExcludedMatchingAttribute(
+            OmnibarPositionMatchingAttribute.KEY -> {
+                OmnibarPositionMatchingAttribute(
                     OmnibarPosition.valueOf((jsonMatchingAttribute.value as String).uppercase())
                 )
             }
