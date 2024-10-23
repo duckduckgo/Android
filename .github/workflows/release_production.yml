@@ -18,30 +18,20 @@ jobs:
           submodules: recursive
 
       - name: Get Previous tag
-        id: previoustag
+        id: fetch_tag
         uses: oprypin/find-latest-tag@v1
         with:
           repository: duckduckgo/android
+          prefix: '5.'
 
       - name: Show the latest tag
         run: |
-          echo "The latest git tag is: ${{ steps.previoustag.outputs.tag }}"
-
-      - name: Fetch Latest Git Tag
-        id: fetch_tag
-        run: |
-          git fetch --tags origin
-          $output=$(git describe --tags --abbrev=0)
-          echo "latest_tag=$output" >> $GITHUB_OUTPUT        
-
-      - name: Show the latest tag
-        run: |
-          echo "The latest git tag is: ${{ steps.fetch_tag.outputs.latest_tag }}"
+          echo "The latest git tag is: ${{ steps.fetch_tag.outputs.tag }}"
 
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag= ${{ steps.fetch_tag.outputs.latest_tag }} -q | tail -n 1)                  
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag= ${{ steps.fetch_tag.outputs.tag }} -q | tail -n 1)                  
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured output
