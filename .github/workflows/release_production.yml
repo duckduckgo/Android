@@ -17,19 +17,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup JDK 20
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 20
+      - name: Fetch Latest Git Tag
+        id: fetch_tag
+        run: |          
+          git fetch --tags
+          TAG=$(git describe --tags --abbrev=0)
+          echo "latest_tag=$TAG" >> $GITHUB_ENV        
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Show the latest tag
+        run: |
+          echo "The latest git tag is: ${{ steps.fetch_tag.outputs.latest_tag }}"
 
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly | tail -n 1)                  
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag= ${{ steps.fetch_tag.outputs.latest_tag }} -q | tail -n 1)                  
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured output

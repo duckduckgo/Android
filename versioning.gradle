@@ -36,9 +36,12 @@ ext {
     }
 
     getStoredTag = {
-        def props = new Properties()
-        file("$rootDir/app/version/version.properties").withInputStream { props.load(it) }
-        return props.getProperty("TAG")
+        if(project.hasProperty("latestTag")) {
+            return project["latestTag"]
+        } else {
+            def latestGitTagProvider = providers.of(LatestGitTagValueSource.class) {}
+            return latestGitTagProvider.get()
+        }
     }
 
     buildNumberCode = {
@@ -60,34 +63,6 @@ ext {
         } else {
             return 0
         }
-    }
-}
-
-tasks.register('incrementTag') {
-    doLast {
-        if (project.hasProperty("versionNameSuffix")) {
-            println("Incrementing tag for Nightly release")
-        } else {
-            println("Incrementing tag for Production release")
-        }
-
-        def filePath = "$rootDir/app/version/version.properties"
-        if(!new File(filePath).exists()) {
-            return
-        }
-
-        def props = new Properties()
-        props.load(new FileInputStream(filePath))
-        String currentTag = props["TAG"]
-        println("Current tag is $currentTag")
-
-        def versionName = buildVersionName()
-
-        println("Storing new tag as $versionName")
-
-        props["NEW_TAG"] = versionName.toString()
-        def os = new FileOutputStream(filePath)
-        props.store(os, null)
     }
 }
 
