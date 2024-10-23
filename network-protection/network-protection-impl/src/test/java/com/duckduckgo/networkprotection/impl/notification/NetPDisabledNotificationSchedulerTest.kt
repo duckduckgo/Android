@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.notification
 
+import android.annotation.SuppressLint
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -70,6 +71,7 @@ class NetPDisabledNotificationSchedulerTest {
         )
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenVpnManuallyStoppedThenDoNotShowSnooze() = runTest {
         netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))
@@ -81,6 +83,7 @@ class NetPDisabledNotificationSchedulerTest {
         verify(netPDisabledNotificationBuilder).buildDisabledNotification(any())
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenVpnManuallyStoppedWithSnoozeButNoTriggerTimeThenDoNotShowSnooze() = runTest {
         netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))
@@ -93,6 +96,7 @@ class NetPDisabledNotificationSchedulerTest {
         verify(netPDisabledNotificationBuilder).buildDisabledNotification(any())
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun whenVpnSnoozedThenShowSnoozeNotification() = runTest {
         netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))
