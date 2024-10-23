@@ -24,7 +24,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     scope = AppScope::class,
     featureName = "internalLinksOrigin",
 )
-interface InternalLinksOriginFeatureManager {
-    @Toggle.DefaultValue(false)
+interface InternalLinksOriginFeatureToggle {
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }

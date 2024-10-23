@@ -23,10 +23,10 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class SharePlatformLinkManagerFeature @Inject constructor(
-    private val internalLinksOriginFeatureManager: InternalLinksOriginFeatureManager,
+    private val internalLinksOriginFeatureToggle: InternalLinksOriginFeatureToggle,
 ) : SharePlatformLinkManager {
 
     override fun originEnabled(): Boolean {
-        return internalLinksOriginFeatureManager.self().isEnabled()
+        return internalLinksOriginFeatureToggle.self().isEnabled()
     }
 }
