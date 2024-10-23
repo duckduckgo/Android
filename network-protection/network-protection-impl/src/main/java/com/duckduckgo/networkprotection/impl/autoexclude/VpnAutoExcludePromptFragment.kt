@@ -39,7 +39,6 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptVie
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import java.util.ArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

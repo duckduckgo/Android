@@ -1,5 +1,7 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
@@ -7,25 +9,29 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 class RealAutoExcludePromptTest {
+    @get:Rule var coroutineRule = CoroutineTestRule()
+
     @Mock
     private lateinit var netPExclusionListRepository: NetPExclusionListRepository
 
-    @Mock
-    private lateinit var autoExcludeAppsRepository: AutoExcludeAppsRepository
     private lateinit var autoExcludePrompt: AutoExcludePrompt
+    private lateinit var autoExcludeAppsRepository: FakeAutoExcludeAppsRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
         autoExcludePrompt = RealAutoExcludePrompt(
             netPExclusionListRepository,
             autoExcludeAppsRepository,
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -38,12 +44,13 @@ class RealAutoExcludePromptTest {
             ),
         )
 
-        whenever(autoExcludeAppsRepository.getAppsForAutoExcludePrompt()).thenReturn(
+        autoExcludeAppsRepository.setAppsForAutoExcludePrompt(
             listOf(
                 VpnIncompatibleApp("test1"),
                 VpnIncompatibleApp("test2"),
             ),
         )
+
         val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
         assertTrue(result.contains(VpnIncompatibleApp("test1")))
@@ -53,13 +60,13 @@ class RealAutoExcludePromptTest {
     @Test
     fun whenManualExclusionListIsEmptyThenAppsForPromptShouldIncludeAllAppsForPrompt() = runTest {
         whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
-
-        whenever(autoExcludeAppsRepository.getAppsForAutoExcludePrompt()).thenReturn(
+        autoExcludeAppsRepository.setAppsForAutoExcludePrompt(
             listOf(
                 VpnIncompatibleApp("test1"),
                 VpnIncompatibleApp("test2"),
             ),
         )
+
         val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
         assertTrue(result.contains(VpnIncompatibleApp("test1")))
@@ -69,9 +76,80 @@ class RealAutoExcludePromptTest {
     @Test
     fun whenNoAppsForPromptThenReturnEmpty() = runTest {
         whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
-        whenever(autoExcludeAppsRepository.getAppsForAutoExcludePrompt()).thenReturn(emptyList())
 
         val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenWithIncompatibleAppsAndNoManualExclusionThenReturnAllIncompatibleApps() = runTest {
+        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+        autoExcludeAppsRepository.setIncompatibleApps(
+            listOf(
+                VpnIncompatibleApp("test1"),
+                VpnIncompatibleApp("test2"),
+            ),
+        )
+
+        val result = autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED)
+
+        assertTrue(result.contains(VpnIncompatibleApp("test1")))
+        assertTrue(result.contains(VpnIncompatibleApp("test2")))
+    }
+
+    @Test
+    fun whenWithIncompatibleAppsAndManualExclusionThenReturnAllProtectedIncompatibleApps() = runTest {
+        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+            listOf(
+                NetPManuallyExcludedApp("test1", true),
+                NetPManuallyExcludedApp("test2", false),
+            ),
+        )
+        autoExcludeAppsRepository.setIncompatibleApps(
+            listOf(
+                VpnIncompatibleApp("test1"),
+                VpnIncompatibleApp("test2"),
+            ),
+        )
+
+        val result = autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED)
+
+        assertTrue(result.contains(VpnIncompatibleApp("test1")))
+        assertFalse(result.contains(VpnIncompatibleApp("test2")))
+    }
+
+    @Test
+    fun whenWithIncompatibleAppsAllManuallyExcludedThenReturnEmpty() = runTest {
+        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+            listOf(
+                NetPManuallyExcludedApp("test1", false),
+                NetPManuallyExcludedApp("test2", false),
+            ),
+        )
+        autoExcludeAppsRepository.setIncompatibleApps(
+            listOf(
+                VpnIncompatibleApp("test1"),
+                VpnIncompatibleApp("test2"),
+            ),
+        )
+
+        val result = autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenNoIncompatibleAppsThenReturnEmpty() = runTest {
+        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+            listOf(
+                NetPManuallyExcludedApp("test1", false),
+                NetPManuallyExcludedApp("test2", false),
+            ),
+        )
+        autoExcludeAppsRepository.setIncompatibleApps(emptyList())
+
+        val result = autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED)
 
         assertTrue(result.isEmpty())
     }

@@ -22,6 +22,7 @@ data class NetpExclusionListApp(
     val packageName: String,
     val name: String,
     val isProtected: Boolean = false,
+    val isNotCompatibleWithVPN: Boolean = false,
 )
 
 data class NetpExclusionListSystemAppCategory(
