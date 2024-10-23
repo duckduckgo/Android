@@ -23,7 +23,7 @@
     <string name="macos_share_title">Jaga linki</string>
     <string name="macos_description_text">DuckDuckGo for Mac on täpselt nii kiire kui vaja, ootuspäraste brauserifunktsioonidega ja meie tippklassi privaatsuselementidest tulvil.\n\nAva oma Macis:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Kas oled valmis Macis privaatselt sirvima?\n\nAllalaadimiseks ava oma Macis järgmine URL:\nhttps://duckduckgo.com/mac</string>
+    <string name="macos_share_text">Kas oled valmis Macis privaatselt sirvima?\n\nAllalaadimiseks ava oma Macis järgmine URL:\nhttps://duckduckgo.com/mac?origin=funnel_browser_android_settings</string>
 
     <string name="macos_waitlist_windows_link">Kas otsid Windowsi versiooni?</string>
     <string name="macos_waitlist_footer">Ootenimekirjaga liitumiseks ei pea isikuandmeid jagama. Sinu järjekorrakoht on kinnitatud ainult sinu seadmes oleva ajatempliga ja me teavitame sind, kui on sinu kord.</string>
