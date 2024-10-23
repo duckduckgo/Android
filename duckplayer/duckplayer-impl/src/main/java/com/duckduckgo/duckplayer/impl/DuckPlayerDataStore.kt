@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_DISABLED_HELP_PAGE
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB
@@ -32,71 +33,77 @@ import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.OVERLAY_INTERACTED
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.PRIVATE_PLAYER_MODE
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 interface DuckPlayerDataStore {
-    suspend fun getDuckPlayerRemoteConfigJson(): String
+    fun getDuckPlayerRemoteConfigJson(): String
 
     suspend fun setDuckPlayerRemoteConfigJson(value: String)
 
-    suspend fun getOverlayInteracted(): Boolean
+    fun getOverlayInteracted(): Boolean
 
     fun observeOverlayInteracted(): Flow<Boolean>
 
     suspend fun setOverlayInteracted(value: Boolean)
 
-    suspend fun getPrivatePlayerMode(): String
+    fun getPrivatePlayerMode(): String
 
     fun observePrivatePlayerMode(): Flow<String>
 
     suspend fun setPrivatePlayerMode(value: String)
 
-    suspend fun getDuckPlayerDisabledHelpPageLink(): String?
+    fun getDuckPlayerDisabledHelpPageLink(): String?
 
     suspend fun storeDuckPlayerDisabledHelpPageLink(duckPlayerDisabledHelpPageLink: String?)
 
-    suspend fun getYouTubeWatchPath(): String
+    fun getYouTubeWatchPath(): String
 
     suspend fun storeYouTubeWatchPath(youtubePath: String)
 
-    suspend fun getYoutubeEmbedUrl(): String
+    fun getYoutubeEmbedUrl(): String
 
     suspend fun storeYoutubeEmbedUrl(embedUrl: String)
 
-    suspend fun getYouTubeUrl(): String
+    fun getYouTubeUrl(): String
 
     suspend fun storeYouTubeUrl(youtubeUrl: String)
 
-    suspend fun getYouTubeVideoIDQueryParam(): String
+    fun getYouTubeVideoIDQueryParam(): String
 
     suspend fun storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParams: String)
 
-    suspend fun getYouTubeReferrerQueryParams(): List<String>
+    fun getYouTubeReferrerQueryParams(): List<String>
 
     suspend fun storeYouTubeReferrerQueryParams(youtubeReferrerQueryParams: List<String>)
 
-    suspend fun getYouTubeReferrerHeaders(): List<String>
+    fun getYouTubeReferrerHeaders(): List<String>
 
     suspend fun storeYouTubeReferrerHeaders(youtubeReferrerHeaders: List<String>)
 
     suspend fun setUserOnboarded()
 
-    suspend fun getUserOnboarded(): Boolean
+    fun getUserOnboarded(): Boolean
 
     suspend fun setOpenInNewTab(enabled: Boolean)
 
     fun observeOpenInNewTab(): Flow<Boolean>
 
-    suspend fun getOpenInNewTab(): Boolean
+    fun getOpenInNewTab(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     @DuckPlayer private val store: DataStore<Preferences>,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckPlayerDataStore {
 
     private object Keys {
@@ -114,100 +121,100 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val DUCK_PLAYER_OPEN_IN_NEW_TAB = booleanPreferencesKey(name = "DUCK_PLAYER_OPEN_IN_NEW_TAB")
     }
 
-    private val overlayInteracted: Flow<Boolean>
-        get() = store.data
-            .map { prefs ->
-                prefs[OVERLAY_INTERACTED] ?: false
-            }
-            .distinctUntilChanged()
+    private val overlayInteracted: StateFlow<Boolean> = store.data
+        .map { prefs ->
+            prefs[OVERLAY_INTERACTED] ?: false
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
-    private val duckPlayerRC: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[DUCK_PLAYER_RC] ?: "{}"
-            }
-            .distinctUntilChanged()
+    private val duckPlayerRC: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[DUCK_PLAYER_RC] ?: "{}"
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "{}")
 
-    private val privatePlayerMode: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[PRIVATE_PLAYER_MODE] ?: "ALWAYS_ASK"
-            }
-            .distinctUntilChanged()
+    private val privatePlayerMode: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[PRIVATE_PLAYER_MODE] ?: "ALWAYS_ASK"
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "ALWAYS_ASK")
 
-    private val duckPlayerDisabledHelpPageLink: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[DUCK_PLAYER_DISABLED_HELP_PAGE] ?: ""
-            }
-            .distinctUntilChanged()
+    private val duckPlayerDisabledHelpPageLink: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[DUCK_PLAYER_DISABLED_HELP_PAGE] ?: ""
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "")
 
-    private val youtubePath: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[DUCK_PLAYER_YOUTUBE_PATH] ?: ""
-            }
-            .distinctUntilChanged()
+    private val youtubePath: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[DUCK_PLAYER_YOUTUBE_PATH] ?: ""
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "")
 
-    private val youtubeReferrerHeaders: Flow<List<String>>
-        get() = store.data
-            .map { prefs ->
-                prefs[DUCK_PLAYER_YOUTUBE_REFERRER_HEADERS]?.toList() ?: listOf()
-            }
-            .distinctUntilChanged()
+    private val youtubeReferrerHeaders: StateFlow<List<String>> = store.data
+        .map { prefs ->
+            prefs[DUCK_PLAYER_YOUTUBE_REFERRER_HEADERS]?.toList() ?: listOf()
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, listOf())
 
-    private val youtubeReferrerQueryParams: Flow<List<String>>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_YOUTUBE_REFERRER_QUERY_PARAMS]?.toList() ?: listOf()
-            }
-            .distinctUntilChanged()
+    private val youtubeReferrerQueryParams: StateFlow<List<String>> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_YOUTUBE_REFERRER_QUERY_PARAMS]?.toList() ?: listOf()
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, listOf())
 
-    private val youtubeUrl: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_YOUTUBE_URL] ?: ""
-            }
-            .distinctUntilChanged()
+    private val youtubeUrl: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_YOUTUBE_URL] ?: ""
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "")
 
-    private val youtubeVideoIDQueryParams: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS] ?: ""
-            }
-            .distinctUntilChanged()
+    private val youtubeVideoIDQueryParams: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS] ?: ""
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "")
 
-    private val youtubeEmbedUrl: Flow<String>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_YOUTUBE_EMBED_URL] ?: ""
-            }
-            .distinctUntilChanged()
+    private val youtubeEmbedUrl: StateFlow<String> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_YOUTUBE_EMBED_URL] ?: ""
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "")
 
-    private val duckPlayerUserOnboarded: Flow<Boolean>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_USER_ONBOARDED] ?: false
-            }
-            .distinctUntilChanged()
+    private val duckPlayerUserOnboarded: StateFlow<Boolean> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_USER_ONBOARDED] ?: false
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
-    private val duckPlayerOpenInNewTab: Flow<Boolean>
-        get() = store.data
-            .map { prefs ->
-                prefs[Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB] ?: true
-            }
-            .distinctUntilChanged()
+    private val duckPlayerOpenInNewTab: StateFlow<Boolean> = store.data
+        .map { prefs ->
+            prefs[Keys.DUCK_PLAYER_OPEN_IN_NEW_TAB] ?: true
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
-    override suspend fun getDuckPlayerRemoteConfigJson(): String {
-        return duckPlayerRC.first()
+    override fun getDuckPlayerRemoteConfigJson(): String {
+        return duckPlayerRC.value
     }
 
     override suspend fun setDuckPlayerRemoteConfigJson(value: String) {
         store.edit { prefs -> prefs[DUCK_PLAYER_RC] = value }
     }
 
-    override suspend fun getOverlayInteracted(): Boolean {
-        return overlayInteracted.first()
+    override fun getOverlayInteracted(): Boolean {
+        return overlayInteracted.value
     }
 
     override fun observeOverlayInteracted(): Flow<Boolean> {
@@ -218,8 +225,8 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[OVERLAY_INTERACTED] = value }
     }
 
-    override suspend fun getPrivatePlayerMode(): String {
-        return privatePlayerMode.first()
+    override fun getPrivatePlayerMode(): String {
+        return privatePlayerMode.value
     }
 
     override fun observePrivatePlayerMode(): Flow<String> {
@@ -234,8 +241,8 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_PLAYER_DISABLED_HELP_PAGE] = duckPlayerDisabledHelpPageLink ?: "" }
     }
 
-    override suspend fun getDuckPlayerDisabledHelpPageLink(): String? {
-        return duckPlayerDisabledHelpPageLink.first().let { it.ifBlank { null } }
+    override fun getDuckPlayerDisabledHelpPageLink(): String? {
+        return duckPlayerDisabledHelpPageLink.value.let { it.ifBlank { null } }
     }
 
     override suspend fun storeYouTubeWatchPath(youtubePath: String) {
@@ -246,52 +253,52 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_PLAYER_YOUTUBE_REFERRER_HEADERS] = youtubeReferrerHeaders.toSet() }
     }
 
-    override suspend fun getYouTubeReferrerHeaders(): List<String> {
-        return youtubeReferrerHeaders.first()
+    override fun getYouTubeReferrerHeaders(): List<String> {
+        return youtubeReferrerHeaders.value
     }
 
     override suspend fun storeYouTubeReferrerQueryParams(youtubeReferrerQueryParams: List<String>) {
         store.edit { prefs -> prefs[Keys.DUCK_PLAYER_YOUTUBE_REFERRER_QUERY_PARAMS] = youtubeReferrerQueryParams.toSet() }
     }
 
-    override suspend fun getYouTubeReferrerQueryParams(): List<String> {
-        return youtubeReferrerQueryParams.first()
+    override fun getYouTubeReferrerQueryParams(): List<String> {
+        return youtubeReferrerQueryParams.value
     }
 
     override suspend fun storeYouTubeUrl(youtubeUrl: String) {
         store.edit { prefs -> prefs[Keys.DUCK_PLAYER_YOUTUBE_URL] = youtubeUrl }
     }
 
-    override suspend fun getYouTubeUrl(): String {
-        return youtubeUrl.first()
+    override fun getYouTubeUrl(): String {
+        return youtubeUrl.value
     }
 
     override suspend fun storeYouTubeVideoIDQueryParam(youtubeVideoIDQueryParams: String) {
         store.edit { prefs -> prefs[Keys.DUCK_PLAYER_YOUTUBE_VIDEO_ID_QUERY_PARAMS] = youtubeVideoIDQueryParams }
     }
 
-    override suspend fun getYouTubeVideoIDQueryParam(): String {
-        return youtubeVideoIDQueryParams.first()
+    override fun getYouTubeVideoIDQueryParam(): String {
+        return youtubeVideoIDQueryParams.value
     }
 
     override suspend fun storeYoutubeEmbedUrl(embedUrl: String) {
         store.edit { prefs -> prefs[Keys.DUCK_PLAYER_YOUTUBE_EMBED_URL] = embedUrl }
     }
 
-    override suspend fun getYoutubeEmbedUrl(): String {
-        return youtubeEmbedUrl.first()
+    override fun getYoutubeEmbedUrl(): String {
+        return youtubeEmbedUrl.value
     }
 
-    override suspend fun getYouTubeWatchPath(): String {
-        return youtubePath.first()
+    override fun getYouTubeWatchPath(): String {
+        return youtubePath.value
     }
 
     override suspend fun setUserOnboarded() {
         store.edit { prefs -> prefs[DUCK_PLAYER_USER_ONBOARDED] = true }
     }
 
-    override suspend fun getUserOnboarded(): Boolean {
-        return duckPlayerUserOnboarded.first()
+    override fun getUserOnboarded(): Boolean {
+        return duckPlayerUserOnboarded.value
     }
 
     override suspend fun setOpenInNewTab(enabled: Boolean) {
@@ -302,7 +309,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         return duckPlayerOpenInNewTab
     }
 
-    override suspend fun getOpenInNewTab(): Boolean {
-        return duckPlayerOpenInNewTab.first()
+    override fun getOpenInNewTab(): Boolean {
+        return duckPlayerOpenInNewTab.value
     }
 }

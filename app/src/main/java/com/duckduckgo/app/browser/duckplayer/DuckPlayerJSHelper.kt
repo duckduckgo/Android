@@ -98,7 +98,7 @@ class DuckPlayerJSHelper @Inject constructor(
         }
     }
 
-    private suspend fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
+    private fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
         val privatePlayerMode = if (duckPlayer.getDuckPlayerState() == ENABLED) userValues.privatePlayerMode else PrivatePlayerMode.Disabled
 

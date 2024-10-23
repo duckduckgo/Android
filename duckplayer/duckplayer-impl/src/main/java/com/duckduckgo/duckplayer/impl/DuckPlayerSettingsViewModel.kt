@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @ContributesViewModel(ActivityScope::class)
 class DuckPlayerSettingsViewModel @Inject constructor(
@@ -65,7 +64,7 @@ class DuckPlayerSettingsViewModel @Inject constructor(
         }.stateIn(
             viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = runBlocking { Enabled(duckPlayer.getUserPreferences().privatePlayerMode, duckPlayer.shouldOpenDuckPlayerInNewTab()) },
+            initialValue = Enabled(duckPlayer.getUserPreferences().privatePlayerMode, duckPlayer.shouldOpenDuckPlayerInNewTab()),
         )
 
     sealed class Command {

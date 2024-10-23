@@ -50,7 +50,7 @@ interface DuckPlayer {
      *
      * @return The current state of the DuckPlayer as a DuckPlayerState enum.
      */
-    suspend fun getDuckPlayerState(): DuckPlayerState
+    fun getDuckPlayerState(): DuckPlayerState
 
     /**
      * Sends a pixel with the given name and data.
@@ -65,7 +65,7 @@ interface DuckPlayer {
      *
      * @return The user values.
      */
-    suspend fun getUserPreferences(): UserPreferences
+    fun getUserPreferences(): UserPreferences
 
     /**
      * Checks if the DuckPlayer overlay should be hidden after navigating back from Duck Player
@@ -105,7 +105,7 @@ interface DuckPlayer {
      * @param uri The YouTube no-cookie URI.
      * @return The DuckPlayer URI.
      */
-    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String?
+    fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String?
 
     /**
      * Checks if a string is a DuckPlayer URI.
@@ -120,7 +120,7 @@ interface DuckPlayer {
      * @param uri The DuckPlayer URI.
      * @return The YouTube URI.
      */
-    suspend fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
+    fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -136,7 +136,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    suspend fun isYoutubeWatchUrl(uri: Uri): Boolean
+    fun isYoutubeWatchUrl(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a YouTube URL.
@@ -184,7 +184,7 @@ interface DuckPlayer {
         destinationUrl: Uri,
     ): Boolean
 
-    suspend fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
+    fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
 
     fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab>
 
