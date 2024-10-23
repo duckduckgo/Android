@@ -197,6 +197,24 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                                         }
                                                     }
                                                 }
+                                                override suspend fun getAllTogglesForParent(name: String): List<Toggle> {
+                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
+                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
+                                                            method.invoke(feature) as Toggle
+                                                        } else {
+                                                            null
+                                                        }
+                                                    }
+                                                }
+                                                override suspend fun getAllActiveExperimentToggles(): List<Toggle> {
+                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
+                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
+                                                            method.invoke(feature) as Toggle
+                                                        } else {
+                                                            null
+                                                        }
+                                                    }
+                                                }
                                             }
                                         """.trimIndent(),
                                     ),

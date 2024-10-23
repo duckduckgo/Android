@@ -2561,12 +2561,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
 
         // we call isEnabled(cohort), then we should assign cohort
         testFeature.fooFeature().isEnabled(BLUE)
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
     }
 
@@ -2613,6 +2615,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
         assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
 
         // remove blue cohort
         assertTrue(
@@ -2647,6 +2650,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
         assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
 
         // remove all remaining cohorts
         assertTrue(
@@ -2675,6 +2679,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
         assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
         assertTrue(testFeature.fooFeature().isEnabled())
     }
 

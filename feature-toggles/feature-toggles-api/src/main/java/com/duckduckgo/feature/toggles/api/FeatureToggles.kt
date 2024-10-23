@@ -199,6 +199,11 @@ interface Toggle {
     fun getConfig(): Map<String, String>
 
     /**
+     * @return a [Cohort] if one has been assigned or `null` otherwise.
+     */
+    fun getCohort(): Cohort?
+
+    /**
      * This represents the state of a [Toggle]
      * @param remoteEnableState is the enabled/disabled state in the remote config
      * @param enable is the ultimate (computed) enabled state
@@ -506,4 +511,8 @@ internal class ToggleImpl constructor(
     }
 
     override fun getConfig(): Map<String, String> = store.get(key)?.config ?: emptyMap()
+
+    override fun getCohort(): Cohort? {
+        return store.get(key)?.assignedCohort
+    }
 }
