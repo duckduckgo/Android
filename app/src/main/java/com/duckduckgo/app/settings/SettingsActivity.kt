@@ -354,7 +354,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionScreen(url: String) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrowserActivity.intent(this, url), options)
+        startActivity(BrowserActivity.intent(this, url, interstitialScreen = true), options)
         this.finish()
     }
 
