@@ -24,20 +24,35 @@ jobs:
           repository: duckduckgo/android
           prefix: '5.'
 
-      - name: Show the latest tag
-        run: |
-          echo "The latest git tag is: ${{ steps.fetch_tag.outputs.tag }}"
+      - name: Decode upload keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build_upload.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Generate nightly version name
-        id: generate_version_name
-        run: |
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} -q | tail -n 1)                  
-          echo "version=$output" >> $GITHUB_OUTPUT
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Use the captured output
+      - name: Assemble the bundle
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
+
+      - name: Capture App Bundle Path
+        id: capture_output
         run: |
-          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
+          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
+          echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured bundle path
         run: |
           echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
+
+      - name: Upload app bundle as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-bundle
+          path: ${{ steps.capture_output.outputs.bundle_path }}
