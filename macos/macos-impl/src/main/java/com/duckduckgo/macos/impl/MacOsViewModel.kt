@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.macos.api.SharePlatformLinkManager
 import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
@@ -33,13 +34,14 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(AppScope::class)
 class MacOsViewModel @Inject constructor(
     private val pixel: Pixel,
+    private val sharePlatformLinkManager: SharePlatformLinkManager,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
-        object ShareLink : Command()
+        data class ShareLink(val originEnabled: Boolean) : Command()
         object GoToWindowsClientSettings : Command()
     }
 
@@ -47,7 +49,7 @@ class MacOsViewModel @Inject constructor(
 
     fun onShareClicked() {
         viewModelScope.launch {
-            commandChannel.send(ShareLink)
+            commandChannel.send(ShareLink(originEnabled = sharePlatformLinkManager.originEnabled()))
             pixel.fire(MACOS_WAITLIST_SHARE_PRESSED)
         }
     }

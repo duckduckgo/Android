@@ -78,15 +78,17 @@ class WindowsActivity : DuckDuckGoActivity() {
 
     private fun executeCommand(command: Command) {
         when (command) {
-            is ShareLink -> launchSharePageChooser()
+            is ShareLink -> launchSharePageChooser(command.originEnabled)
             is GoToMacClientSettings -> launchMacClientSettings()
         }
     }
 
-    private fun launchSharePageChooser() {
+    private fun launchSharePageChooser(addOrigin: Boolean) {
+        val shareText = getString(R.string.windows_share_text)
+        if (!addOrigin) { shareText.replace("?origin=funnel_browser_android_settings", "") }
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/html"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.windows_share_text))
+            putExtra(Intent.EXTRA_TEXT, shareText)
             putExtra(Intent.EXTRA_TITLE, getString(R.string.windows_share_title))
         }
 
