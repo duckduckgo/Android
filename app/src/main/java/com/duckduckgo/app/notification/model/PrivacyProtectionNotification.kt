@@ -124,7 +124,7 @@ class PrivacyProtectionNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = BrowserActivity.intent(context, newSearch = true).apply {
+        val intent = BrowserActivity.intent(context, newSearch = true, interstitialScreen = true).apply {
             putExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
         }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {

@@ -17,22 +17,22 @@ concurrency:
 
 jobs:
     create_release_task:
-      uses: ./.github/workflows/release/release_create_task.yml
+      uses: ./.github/workflows/release_create_task.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
 
     create_release_tag:
       needs: create_release_task
-      uses: ./.github/workflows/release/release_create_tag.yml
+      uses: ./.github/workflows/release_create_tag.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
 
     launch_release_tests:
       needs: create_release_tag
-      uses: ./.github/workflows/release/release_tests.yml
+      uses: ./.github/workflows/release_tests.yml
       with:
         app-version: ${{ github.event.inputs.app-version }}
 
     report_workflow_failed:
       if: ${{ failure() }}
-      uses: ./.github/workflows/release/release_report_error.yml
+      uses: ./.github/workflows/release_report_error.yml
