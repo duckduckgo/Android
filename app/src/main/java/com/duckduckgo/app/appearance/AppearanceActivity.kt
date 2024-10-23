@@ -26,7 +26,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.accessibility.AccessibilityScreens.HighlightedItem
+import com.duckduckgo.app.appearance.AppearanceScreen.Default
+import com.duckduckgo.app.appearance.AppearanceScreen.HighlightedItem
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
@@ -52,7 +53,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppearanceScreenNoParams::class, screenName = "appearance")
+@ContributeToActivityStarter(Default::class, screenName = "appearance")
 @ContributeToActivityStarter(HighlightedItem::class, screenName = "appearance")
 class AppearanceActivity : DuckDuckGoActivity() {
 
