@@ -53,6 +53,7 @@
         <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
+        <item name="checkboxStyle">@style/Widget.DuckDuckGo.CheckBox</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
         <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>

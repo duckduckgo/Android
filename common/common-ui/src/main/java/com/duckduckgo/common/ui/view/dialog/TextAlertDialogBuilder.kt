@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -51,6 +52,8 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var negativeButtonText: CharSequence = ""
     private var isCancellable: Boolean = false
     private var isDestructiveVersion: Boolean = false
+    private var isCheckboxEnabled: Boolean = false
+    private var checkBoxText: CharSequence = ""
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): TextAlertDialogBuilder {
         headerImageDrawableId = drawableId
@@ -102,9 +105,19 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    fun setCheckBoxText(@StringRes textId: Int): TextAlertDialogBuilder {
+        isCheckboxEnabled = true
+        checkBoxText = context.getText(textId)
+        return this
+    }
+
     override fun build(): DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
+
+        if (isCheckboxEnabled) {
+            binding.textAlertDialogCheckBox.show()
+        }
 
         val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)

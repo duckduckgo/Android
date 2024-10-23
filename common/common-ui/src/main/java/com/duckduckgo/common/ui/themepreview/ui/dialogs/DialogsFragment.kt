@@ -204,6 +204,29 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.findViewById<Button>(R.id.textAlertDialogCheckbox)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setCheckBoxText(R.string.text_dialog_checkbox)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 StackedAlertDialogBuilder(requireContext())
