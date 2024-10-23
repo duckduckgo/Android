@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos.api
+package com.duckduckgo.windows.impl
 
-interface SharePlatformLinkManager {
-    fun originEnabled(): Boolean
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "windowsDownloadLinkOrigin",
+)
+interface WindowsDownloadLinkOrigin {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

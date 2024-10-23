@@ -89,8 +89,8 @@ class MacOsActivity : DuckDuckGoActivity() {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun launchSharePageChooser(addOrigin: Boolean) {
-        val shareText = getString(string.macos_share_text)
-        if (!addOrigin) { shareText.replace("?origin=funnel_browser_android_settings", "") }
+        var shareText = getString(string.macos_share_text)
+        if (!addOrigin) { shareText = shareText.replace(ORIGIN_URL_PATH, "") }
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/html"
             putExtra(Intent.EXTRA_TEXT, shareText)
@@ -108,5 +108,9 @@ class MacOsActivity : DuckDuckGoActivity() {
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
+    }
+
+    companion object {
+        const val ORIGIN_URL_PATH = "?origin=funnel_browser_android_settings"
     }
 }

@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.macos.api.SharePlatformLinkManager
+import com.duckduckgo.windows.impl.WindowsDownloadLinkOrigin
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
 import javax.inject.Inject
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class WindowsViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val sharePlatformLinkManager: SharePlatformLinkManager,
+    private val windowsDownloadLinkOrigin: WindowsDownloadLinkOrigin,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -46,7 +46,7 @@ class WindowsViewModel @Inject constructor(
 
     fun onShareClicked() {
         viewModelScope.launch {
-            commandChannel.send(ShareLink(originEnabled = sharePlatformLinkManager.originEnabled()))
+            commandChannel.send(ShareLink(originEnabled = windowsDownloadLinkOrigin.self().isEnabled()))
             pixel.fire(WINDOWS_WAITLIST_SHARE_PRESSED)
         }
     }

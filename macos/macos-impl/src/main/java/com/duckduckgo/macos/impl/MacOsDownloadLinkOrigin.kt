@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos.impl.origin
+package com.duckduckgo.macos.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,9 +22,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "internalLinksOrigin",
+    featureName = "macOsDownloadLinkOrigin",
 )
-interface InternalLinksOriginFeatureToggle {
+interface MacOsDownloadLinkOrigin {
     @Toggle.DefaultValue(true)
     fun self(): Toggle
 }
