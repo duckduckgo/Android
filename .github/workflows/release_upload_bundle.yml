@@ -50,11 +50,15 @@ jobs:
           output=$(ls app/build/outputs/bundle/internalRelease/*.aab)
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
+      - name: Use the captured bundle path
+        run: |
+          echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
+
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
-          echo "::set-output name=version::$output"
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)                  
+          echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Use the captured output
         run: |

@@ -17,35 +17,18 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up ruby env
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.2
-          bundler-cache: true
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-      - name: Decode upload keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build_upload.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
-          fileName: ddg-upload-keystore.jks
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PuseUploadSigning
-
-      - name: Capture App Bundle Path
-        id: capture_output
+      - name: Generate nightly version name
+        id: generate_version_name
         run: |
-          # Find the generated .aab file
-          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
-          echo "bundle_path=$output" >> $GITHUB_OUTPUT
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)                  
+          echo "version=$output" >> $GITHUB_OUTPUT
+
+      - name: Use the captured output
+        run: |
+          echo "The captured output is: ${{ steps.generate_version_name.outputs.version }}"
 
       - name: Use the captured bundle path
         run: |
