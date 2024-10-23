@@ -19,8 +19,8 @@ jobs:
 
       - name: Fetch Latest Git Tag
         id: fetch_tag
-        run: |          
-          git fetch --tags
+        run: |
+          git fetch --tags origin
           TAG=$(git describe --tags --abbrev=0)
           echo "latest_tag=$TAG" >> $GITHUB_ENV        
 
