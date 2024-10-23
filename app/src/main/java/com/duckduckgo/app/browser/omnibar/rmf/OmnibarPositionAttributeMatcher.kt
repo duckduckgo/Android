@@ -77,7 +77,7 @@ class OmnibarPositionJsonMatchingAttributeMapper @Inject constructor() : JsonToM
             }
             OmnibarPositionMatchingAttribute.KEY -> {
                 OmnibarPositionMatchingAttribute(
-                    OmnibarPosition.valueOf((jsonMatchingAttribute.value as String).uppercase())
+                    OmnibarPosition.valueOf((jsonMatchingAttribute.value as String).uppercase()),
                 )
             }
             else -> null
