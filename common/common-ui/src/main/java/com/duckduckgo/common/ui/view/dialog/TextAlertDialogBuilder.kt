@@ -38,6 +38,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         open fun onDialogCancelled() {}
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
+        open fun onCheckedChanged(checked: Boolean) {}
     }
 
     internal class DefaultEventListener : EventListener()
@@ -116,6 +117,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
 
         if (isCheckboxEnabled) {
+            binding.textAlertDialogCheckBox.text = checkBoxText
             binding.textAlertDialogCheckBox.show()
         }
 
@@ -181,8 +183,14 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogCancelButton.gone()
         }
 
+        binding.textAlertDialogCheckBox.setOnCheckedChangeListener { compoundButton, checked ->
+            listener.onCheckedChanged(checked)
+        }
+
         if (isDestructiveVersion) {
-            setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
+            setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) {
+                listener.onPositiveButtonClicked()
+            }
             setButtonListener(binding.textAlertDialogCancelDestructiveButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
             // no need to get fancy, just change the button textColor
             binding.textAlertDialogCancelDestructiveButton.setTextColor(

@@ -58,12 +58,12 @@
         android:id="@+id/textAlertDialogCheckBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone"
-        tools:visibility="visible"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"
         tools:text="Remember me"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+        tools:visibility="visible" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/textAlertDialogPositiveButton"

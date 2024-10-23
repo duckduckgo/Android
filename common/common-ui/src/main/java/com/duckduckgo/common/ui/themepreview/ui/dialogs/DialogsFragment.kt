@@ -214,12 +214,17 @@ class DialogsFragment : Fragment() {
                     .setCheckBoxText(R.string.text_dialog_checkbox)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
+                            var isChecked: Boolean = false
                             override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                Snackbar.make(it, "Negative Button Clicked, Checked $isChecked ", Snackbar.LENGTH_SHORT).show()
                             }
 
                             override fun onNegativeButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                Snackbar.make(it, "Negative Button Clicked, Checked $isChecked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onCheckedChanged(checked: Boolean) {
+                                isChecked = checked
                             }
                         },
                     )
