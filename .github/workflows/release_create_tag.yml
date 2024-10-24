@@ -33,7 +33,7 @@ jobs:
           bundler-cache: true
 
       - name: Set Git permissions ruby env
-        run:
+        run: |
           git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
 
       - name: Use fastlane lane to create and push tagged release
