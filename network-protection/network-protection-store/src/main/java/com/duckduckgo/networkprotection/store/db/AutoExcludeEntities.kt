@@ -23,3 +23,8 @@ import androidx.room.PrimaryKey
 data class FlaggedIncompatibleApp(
     @PrimaryKey val packageName: String,
 )
+
+@Entity(tableName = "vpn_auto_excluded_apps")
+data class VpnIncompatibleApp(
+    @PrimaryKey val packageName: String,
+)
