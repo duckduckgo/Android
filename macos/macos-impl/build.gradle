@@ -75,7 +75,6 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation project(':feature-toggles-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
@@ -88,9 +87,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    lint {
-        baseline = file("lint-baseline.xml")
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true

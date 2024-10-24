@@ -92,7 +92,6 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         val scrollTo = binding.voiceSearchToggle.top
         binding.scrollView.smoothScrollTo(0, scrollTo)
     }
-
     private fun highlightVoiceSearchToggle() {
         val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
         val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)

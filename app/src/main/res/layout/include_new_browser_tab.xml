@@ -20,30 +20,22 @@
     android:id="@+id/newTabLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
     android:fillViewport="true"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:clipChildren="false"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">
 
-    <ImageView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/browserBackground"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        tools:srcCompat="@drawable/onboarding_background_bitmap_light" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/newTabPage"
-        android:layout_width="match_parent"
-        android:foreground="@android:color/transparent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingTop="?attr/actionBarSize"
+        android:foreground="@android:color/transparent">
 
         <FrameLayout
             android:id="@+id/newTabContainerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="?attr/actionBarSize"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -53,19 +45,7 @@
             layout="@layout/include_dax_dialog_intro_bubble_cta"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
-
-        <include
-            android:id="@+id/includeDaxDialogIntroBubbleCtaExperiment"
-            layout="@layout/include_dax_dialog_intro_bubble_cta_experiment"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

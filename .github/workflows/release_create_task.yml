@@ -1,4 +1,4 @@
-name: Release - Create Release Task in Asana
+name: Create Android App Release Task
 
 on:
   workflow_dispatch:

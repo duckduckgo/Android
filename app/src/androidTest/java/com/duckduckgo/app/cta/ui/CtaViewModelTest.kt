@@ -34,7 +34,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -114,8 +113,6 @@ class CtaViewModelTest {
 
     private val mockSubscriptions: Subscriptions = mock()
 
-    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
-
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -165,7 +162,6 @@ class CtaViewModelTest {
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mockSubscriptions,
             duckPlayer = mockDuckPlayer,
-            highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
         )
     }
 
@@ -767,28 +763,6 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
         assertNull(value)
-    }
-
-    @Test
-    fun givenHighlightsExperimentWhenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenExperimentIntroCtaShown() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta)
-    }
-
-    @Test
-    fun givenHighlightsExperimentWhenGettingFireDialogOnboardingDialogThenReturnExperimentFireDialogCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(false)
-
-        val value = testee.getFireDialogCta()
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxExperimentFireButtonCta)
     }
 
     private suspend fun givenDaxOnboardingActive() {

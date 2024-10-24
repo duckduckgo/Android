@@ -33,14 +33,13 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(AppScope::class)
 class MacOsViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val macOsDownloadLinkOrigin: MacOsDownloadLinkOrigin,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
-        data class ShareLink(val originEnabled: Boolean) : Command()
+        object ShareLink : Command()
         object GoToWindowsClientSettings : Command()
     }
 
@@ -48,7 +47,7 @@ class MacOsViewModel @Inject constructor(
 
     fun onShareClicked() {
         viewModelScope.launch {
-            commandChannel.send(ShareLink(originEnabled = macOsDownloadLinkOrigin.self().isEnabled()))
+            commandChannel.send(ShareLink)
             pixel.fire(MACOS_WAITLIST_SHARE_PRESSED)
         }
     }

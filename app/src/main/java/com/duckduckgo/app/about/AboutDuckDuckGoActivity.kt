@@ -196,7 +196,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchBrowserScreen() {
-        startActivity(BrowserActivity.intent(this, Url.ABOUT, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, Url.ABOUT))
         finish()
     }
 

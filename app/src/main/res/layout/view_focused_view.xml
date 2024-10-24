@@ -22,7 +22,6 @@
     android:layout_height="match_parent"
     app:isExpandable="false"
     app:showPlaceholders="false"
-    app:favoritesPlacement="focused_state"
     android:background="?attr/daxColorSurface" />
 
 

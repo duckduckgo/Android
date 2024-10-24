@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerPageInfo
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerSettings
-import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
@@ -36,7 +35,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
@@ -98,7 +96,7 @@ class DuckPlayerJSHelper @Inject constructor(
         }
     }
 
-    private fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
+    private suspend fun getInitialSetup(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
         val privatePlayerMode = if (duckPlayer.getDuckPlayerState() == ENABLED) userValues.privatePlayerMode else PrivatePlayerMode.Disabled
 
@@ -164,7 +162,6 @@ class DuckPlayerJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
         url: String?,
-        tabId: String,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -208,17 +205,14 @@ class DuckPlayerJSHelper @Inject constructor(
                 return null
             }
             "openDuckPlayer" -> {
-                val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
-                    val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()
+                    if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        Navigate(it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build().toString(), mapOf())
                     } else {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
-                    }.toString()
-                    if (openInNewTab) {
-                        OpenInNewTab(newUrl, tabId)
-                    } else {
-                        Navigate(newUrl, mapOf())
+                        Navigate(
+                            it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build().toString(),
+                            mapOf(),
+                        )
                     }
                 }
             }

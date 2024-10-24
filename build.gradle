@@ -141,10 +141,7 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                         ) {
-                            if (projectPath.endsWith(":feature-toggles-api") &&
-                                    (dependencyPath == ":experiments-api"
-                                            || dependencyPath == ":feature-toggles-internal-api")
-                            ) {
+                            if (projectPath.endsWith(":feature-toggles-api") && dependencyPath == ":experiments-api") {
                                 // noop
                             } else {
                                 throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +

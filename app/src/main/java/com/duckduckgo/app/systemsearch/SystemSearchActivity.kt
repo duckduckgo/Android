@@ -462,11 +462,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion, omnibarTextInput.text.toString())
                     }
-
                     override fun onNegativeButtonClicked() {
                         showKeyboardAndRestorePosition()
                     }
-
                     override fun onDialogCancelled() {
                         showKeyboardAndRestorePosition()
                     }
@@ -519,11 +517,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun confirmDelete(
-        savedSite: SavedSite,
-        message: Spanned,
-        onDeleteSnackbarDismissed: (SavedSite) -> Unit,
-    ) {
+    private fun confirmDelete(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
         Snackbar.make(
             binding.root,
             message,
@@ -547,12 +541,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        startActivity(BrowserActivity.intent(this, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this))
         finish()
     }
 
     private fun launchBrowser(command: LaunchBrowser) {
-        startActivity(BrowserActivity.intent(context = this, queryExtra = command.query, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, command.query))
         finish()
     }
 

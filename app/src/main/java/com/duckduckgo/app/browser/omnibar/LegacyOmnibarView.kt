@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -57,7 +58,43 @@ class LegacyOmnibarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
+) : AppBarLayout(context, attrs, defStyle) {
+
+    interface ItemPressedListener {
+        fun onTabsButtonPressed()
+        fun onTabsButtonLongPressed()
+        fun onFireButtonPressed(isPulseAnimationPlaying: Boolean)
+        fun onBrowserMenuPressed()
+        fun onPrivacyShieldPressed()
+        fun onClearTextPressed()
+    }
+
+    interface FindInPageListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onPreviousSearchItemPressed()
+        fun onNextSearchItemPressed()
+        fun onClosePressed()
+    }
+
+    interface TextListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onBackKeyPressed()
+        fun onEnterPressed()
+        fun onTouchEvent(event: MotionEvent)
+    }
+
+    data class OmnibarTextState(
+        val text: String,
+        val hasFocus: Boolean,
+    )
 
     private val omnibarPosition: OmnibarPosition
 
@@ -298,25 +335,5 @@ class LegacyOmnibarView @JvmOverloads constructor(
         safeCall {
             smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
         }
-    }
-
-    override fun measuredHeight(): Int {
-        return measuredHeight
-    }
-
-    override fun height(): Int {
-        return height
-    }
-
-    override fun getTranslation(): Float {
-        return translationY
-    }
-
-    override fun setTranslation(y: Float) {
-        translationY = y
-    }
-
-    override fun isOmnibarScrollingEnabled(): Boolean {
-        return isScrollingEnabled
     }
 }

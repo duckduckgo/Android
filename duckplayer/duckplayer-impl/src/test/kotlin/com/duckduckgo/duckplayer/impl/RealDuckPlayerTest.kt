@@ -37,8 +37,6 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_IMPRESSIONS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_OVERLAY_YOUTUBE_WATCH_HERE
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_OTHER
@@ -624,11 +622,7 @@ class RealDuckPlayerTest {
         val result = testee.intercept(request, url, webView)
 
         verify(mockAssets).open("duckplayer/index.html")
-        verify(mockPixel).fire(
-            DUCK_PLAYER_DAILY_UNIQUE_VIEW,
-            type = Daily(),
-            parameters = mapOf("setting" to "always", "newtab" to "false"),
-        )
+        verify(mockPixel).fire(DUCK_PLAYER_DAILY_UNIQUE_VIEW, type = Daily(), parameters = mapOf("setting" to "always"))
         assertEquals("text/html", result?.mimeType)
     }
 
@@ -754,22 +748,6 @@ class RealDuckPlayerTest {
         val result = testee.willNavigateToDuckPlayer(uri)
 
         assertFalse(result)
-    }
-
-    // endregion
-
-    // region openInNewTab
-
-    @Test
-    fun whenSetOpenInNewTabToTrueThenFirePixel() {
-        testee.setOpenInNewTab(true)
-        verify(mockPixel).fire(DUCK_PLAYER_NEWTAB_SETTING_ON)
-    }
-
-    @Test
-    fun whenSetOpenInNewTabToFalseThenFirePixel() {
-        testee.setOpenInNewTab(false)
-        verify(mockPixel).fire(DUCK_PLAYER_NEWTAB_SETTING_OFF)
     }
 
     // endregion

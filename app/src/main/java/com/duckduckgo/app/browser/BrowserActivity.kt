@@ -312,7 +312,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
-            Timber.i("launch from default browser")
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return
@@ -368,22 +367,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 return
             } else {
-                val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
-                val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
-                Timber.w("opening in new tab requested for $sharedText isExternal $isExternal interstitial $interstitialScreen")
-                if (!interstitialScreen) {
-                    Timber.w("not launching from interstitial screen")
-                    viewModel.launchFromThirdParty()
-                }
+                Timber.w("opening in new tab requested for $sharedText")
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
+
+                viewModel.launchFromThirdParty()
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
 
                 return
             }
-        } else {
-            Timber.i("shared text empty, opening last tab")
         }
     }
 
@@ -569,7 +562,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
             isExternal: Boolean = false,
-            interstitialScreen: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -578,7 +570,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             return intent
         }
 
@@ -590,7 +581,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
-        private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
+
+        private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
+
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40

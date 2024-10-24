@@ -30,11 +30,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 interface ExperimentFiltersManager {
-    /**
-     * This method computes the result of the filters
-     * @return returns `true` if the filters match the client state, else `false`
-     */
-    fun computeFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean
+    fun addFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,7 +39,7 @@ class ExperimentFiltersManagerImpl @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
 ) : ExperimentFiltersManager {
-    override fun computeFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean {
+    override fun addFilters(entity: VariantConfig): (AppBuildConfig) -> Boolean {
         if (entity.variantKey == "sc" || entity.variantKey == "se") {
             return { isSerpRegionToggleCountry() }
         }
@@ -55,7 +51,7 @@ class ExperimentFiltersManagerImpl @Inject constructor(
         )
 
         if (!entity.filters?.locale.isNullOrEmpty()) {
-            val userLocale = appBuildConfig.deviceLocale
+            val userLocale = Locale.getDefault()
             filters[LOCALE] = entity.filters!!.locale.contains(userLocale.toString())
         }
         if (!entity.filters?.androidVersion.isNullOrEmpty()) {

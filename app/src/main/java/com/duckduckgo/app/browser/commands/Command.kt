@@ -24,7 +24,6 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
-import androidx.annotation.DrawableRes
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
@@ -242,7 +241,4 @@ sealed class Command {
     object OpenDuckPlayerSettings : Command()
     object OpenDuckPlayerOverlayInfo : Command()
     object OpenDuckPlayerPageInfo : Command()
-    class SetBrowserBackground(@DrawableRes val backgroundRes: Int) : Command()
-    class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
-    data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
 }

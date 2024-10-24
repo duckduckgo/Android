@@ -50,7 +50,7 @@ interface DuckPlayer {
      *
      * @return The current state of the DuckPlayer as a DuckPlayerState enum.
      */
-    fun getDuckPlayerState(): DuckPlayerState
+    suspend fun getDuckPlayerState(): DuckPlayerState
 
     /**
      * Sends a pixel with the given name and data.
@@ -65,7 +65,7 @@ interface DuckPlayer {
      *
      * @return The user values.
      */
-    fun getUserPreferences(): UserPreferences
+    suspend fun getUserPreferences(): UserPreferences
 
     /**
      * Checks if the DuckPlayer overlay should be hidden after navigating back from Duck Player
@@ -105,7 +105,7 @@ interface DuckPlayer {
      * @param uri The YouTube no-cookie URI.
      * @return The DuckPlayer URI.
      */
-    fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String?
+    suspend fun createDuckPlayerUriFromYoutubeNoCookie(uri: Uri): String?
 
     /**
      * Checks if a string is a DuckPlayer URI.
@@ -120,7 +120,7 @@ interface DuckPlayer {
      * @param uri The DuckPlayer URI.
      * @return The YouTube URI.
      */
-    fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
+    suspend fun createYoutubeWatchUrlFromDuckPlayer(uri: Uri): String?
 
     /**
      * Checks if a URI is a simulated YouTube no-cookie URI.
@@ -136,7 +136,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    fun isYoutubeWatchUrl(uri: Uri): Boolean
+    suspend fun isYoutubeWatchUrl(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a YouTube URL.
@@ -180,13 +180,7 @@ interface DuckPlayer {
      * @param destinationUrl The destination URL.
      * @return True if the URL should launch Duck Player, false otherwise.
      */
-    suspend fun willNavigateToDuckPlayer(
-        destinationUrl: Uri,
-    ): Boolean
-
-    fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
-
-    fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab>
+    suspend fun willNavigateToDuckPlayer(destinationUrl: Uri): Boolean
 
     /**
      * Data class representing user preferences for Duck Player.
@@ -203,11 +197,5 @@ interface DuckPlayer {
         ENABLED,
         DISABLED,
         DISABLED_WIH_HELP_LINK,
-    }
-
-    sealed interface OpenDuckPlayerInNewTab {
-        data object On : OpenDuckPlayerInNewTab
-        data object Off : OpenDuckPlayerInNewTab
-        data object Unavailable : OpenDuckPlayerInNewTab
     }
 }

@@ -17,13 +17,9 @@
 package com.duckduckgo.feature.toggles.api
 
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.feature.toggles.api.Cohorts.CONTROL
-import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.api.Toggle.State.Target
-import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
 import java.lang.IllegalStateException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,27 +30,23 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.times
 
 class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature
     private lateinit var provider: FakeProvider
     private lateinit var toggleStore: FakeToggleStore
-    private lateinit var callback: FakeFeatureTogglesCallback
 
     @Before
     fun setup() {
         provider = FakeProvider()
         toggleStore = FakeToggleStore()
-        callback = FakeFeatureTogglesCallback()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
             .appVariantProvider { provider.variantKey }
             .appVersionProvider { provider.version }
             .flavorNameProvider { provider.flavorName }
             .forceDefaultVariantProvider { provider.variantKey = "" }
-            .callback(callback)
             .featureName("test")
             .build()
             .create(TestFeature::class.java)
@@ -525,37 +517,6 @@ class FeatureTogglesTest {
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
-
-    @Test
-    fun whenAssigningCohortOnCohortAssignedCallbackCalled() {
-        val state = Toggle.State(
-            remoteEnableState = true,
-            enable = true,
-            cohorts = listOf(
-                Toggle.State.Cohort(name = "control", weight = 0, enrollmentDateET = null),
-                Toggle.State.Cohort(name = "treatment", weight = 1, enrollmentDateET = null),
-            ),
-        )
-
-        // check callback not called yet
-        assertNull(callback.experimentName)
-        assertNull(callback.cohortName)
-        assertNull(callback.enrollmentDate)
-        assertEquals(0, callback.times)
-
-        // Use directly the store because setRawStoredState() populates the local state when the remote state is null
-        toggleStore.set("test_enabledByDefault", state)
-
-        // isEnabled triggers callback on first assignment
-        assertTrue(feature.enabledByDefault().isEnabled(TREATMENT))
-        assertEquals(1, callback.times)
-        assertEquals("enabledByDefault", callback.experimentName)
-        assertEquals("treatment", callback.cohortName)
-        assertNotNull(callback.enrollmentDate)
-
-        assertFalse(feature.enabledByDefault().isEnabled(CONTROL))
-        assertEquals(1, callback.times)
-    }
 }
 
 interface TestFeature {
@@ -603,27 +564,4 @@ private class FakeProvider {
     var version = Int.MAX_VALUE
     var flavorName = ""
     var variantKey: String? = null
-}
-
-private class FakeFeatureTogglesCallback : FeatureTogglesCallback {
-    var experimentName: String? = null
-    var cohortName: String? = null
-    var enrollmentDate: String? = null
-    var times = 0
-
-    override fun onCohortAssigned(
-        experimentName: String,
-        cohortName: String,
-        enrollmentDate: String,
-    ) {
-        this.experimentName = experimentName
-        this.cohortName = cohortName
-        this.enrollmentDate = enrollmentDate
-        times++
-    }
-}
-
-private enum class Cohorts(override val cohortName: String) : CohortName {
-    CONTROL("control"),
-    TREATMENT("treatment"),
 }

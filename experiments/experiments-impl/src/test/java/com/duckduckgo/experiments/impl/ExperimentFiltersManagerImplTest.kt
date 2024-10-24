@@ -51,59 +51,59 @@ class ExperimentFiltersManagerImplTest {
     }
 
     @Test
-    fun whenVariantComplyWithLocaleFilterThenComputeFiltersReturnsTrue() {
+    fun whenVariantComplyWithLocaleFilterThenAddFiltersReturnsTrue() {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         val testEntity = addActiveVariant(localeFilter = listOf("en_US"))
 
-        assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithLocaleFilterThenComputeFiltersReturnsFalse() {
+    fun whenVariantDoesNotComplyWithLocaleFilterThenAddFiltersReturnsFalse() {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         val testEntity = addActiveVariant(localeFilter = listOf("de_DE"))
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithAndroidVersionFilterThenComputeFiltersReturnsTrue() {
+    fun whenVariantComplyWithAndroidVersionFilterThenAddFiltersReturnsTrue() {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
         val testEntity = addActiveVariant(androidVersionFilter = listOf("33", "34"))
 
-        assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithAndroidVersionFilterThenComputeFiltersReturnsFalse() {
+    fun whenVariantDoesNotComplyWithAndroidVersionFilterThenAddFiltersReturnsFalse() {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(32)
         val testEntity = addActiveVariant(androidVersionFilter = listOf("33", "34"))
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithPrivacyProEligibleFilterThenComputeFiltersReturnsTrue() = runTest {
+    fun whenVariantComplyWithPrivacyProEligibleFilterThenAddFiltersReturnsTrue() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         val testEntity = addActiveVariant(privacyProEligible = true)
 
-        assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithPrivacyProEligibleFilterThenComputeFiltersReturnsFalse() = runTest {
+    fun whenVariantDoesNotComplyWithPrivacyProEligibleFilterThenAddFiltersReturnsFalse() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         val testEntity = addActiveVariant(privacyProEligible = true)
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithAllFiltersThenComputeFiltersReturnsTrue() = runTest {
+    fun whenVariantComplyWithAllFiltersThenAddFiltersReturnsTrue() = runTest {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         val testEntity = addActiveVariant(
@@ -112,33 +112,33 @@ class ExperimentFiltersManagerImplTest {
             privacyProEligible = false,
         )
 
-        assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertTrue(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithLocaleFiltersAndDoesNotComplyWithAndroidVersionFilterThenComputeFiltersReturnsFalse() {
+    fun whenVariantComplyWithLocaleFiltersAndDoesNotComplyWithAndroidVersionFilterThenAddFiltersReturnsFalse() {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(32)
         val testEntity = addActiveVariant(localeFilter = listOf("en_US"), androidVersionFilter = listOf("33", "34"))
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithAndroidVersionFiltersAndDoesNotComplyWithLocaleFilterThenComputeFiltersReturnsFalse() {
+    fun whenVariantComplyWithAndroidVersionFiltersAndDoesNotComplyWithLocaleFilterThenAddFiltersReturnsFalse() {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
         val testEntity = addActiveVariant(localeFilter = listOf("de_DE"), androidVersionFilter = listOf("33", "34"))
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantComplyWithLocaleAndAndroidVersionFiltersAndDoesNotComplyWithPrivacyProEligibleThenComputeFiltersReturnsFalse() = runTest {
+    fun whenVariantComplyWithLocaleAndAndroidVersionFiltersAndDoesNotComplyWithPrivacyProEligibleThenAddFiltersReturnsFalse() = runTest {
         val locale = Locale("en", "US")
-        whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
+        Locale.setDefault(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         val testEntity = addActiveVariant(
@@ -147,7 +147,7 @@ class ExperimentFiltersManagerImplTest {
             privacyProEligible = false,
         )
 
-        assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
+        assertFalse(testee.addFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     private fun addActiveVariant(

@@ -137,8 +137,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             val item = awaitItem()
@@ -153,8 +151,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentOneCompanyThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(aTrackerAndCompany())
@@ -173,8 +169,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentMultipleDifferentAppsThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -199,8 +193,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentMultipleDifferentAppsNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn(null)
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -225,8 +217,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentTrackersWithoutEntityThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
@@ -242,8 +232,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentTrackersWithoutEntityNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn(null)
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
@@ -259,8 +247,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentMultipleSameThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
@@ -279,8 +265,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentMultipleSameNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
         whenever(networkProtectionState.serverLocation()).thenReturn(null)
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))

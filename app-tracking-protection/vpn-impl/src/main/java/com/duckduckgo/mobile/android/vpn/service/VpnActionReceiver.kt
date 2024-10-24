@@ -25,10 +25,8 @@ import android.os.SystemClock
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import dagger.android.AndroidInjection
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -39,10 +37,6 @@ import logcat.logcat
 @InjectWith(ReceiverScope::class)
 class VpnActionReceiver : BroadcastReceiver() {
     @Inject lateinit var vpn: Vpn
-
-    @Inject lateinit var networkProtectionState: NetworkProtectionState
-
-    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 

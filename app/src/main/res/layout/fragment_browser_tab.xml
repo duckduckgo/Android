@@ -26,12 +26,6 @@
         android:layout_height="?attr/actionBarSize"
         app:omnibarPosition="top" />
 
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/newOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:omnibarPosition="top" />
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
@@ -91,11 +85,6 @@
                 android:id="@+id/includeOnboardingDaxDialog"
                 layout="@layout/include_onboarding_view_dax_dialog"
                 android:visibility="gone" />
-
-            <include
-                android:id="@+id/includeOnboardingDaxDialogExperiment"
-                layout="@layout/include_onboarding_view_dax_dialog_experiment"
-                android:visibility="gone" />
         </FrameLayout>
 
         <com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout
@@ -134,13 +123,6 @@
 
     <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
         android:id="@+id/legacyOmnibarBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/newOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
