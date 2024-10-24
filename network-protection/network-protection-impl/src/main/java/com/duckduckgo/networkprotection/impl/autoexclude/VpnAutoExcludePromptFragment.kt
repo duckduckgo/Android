@@ -17,7 +17,6 @@
 package com.duckduckgo.networkprotection.impl.autoexclude
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType.Secondary
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
@@ -53,6 +53,10 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private var _listener: Listener? = null
 
     private val viewModel by lazy {
@@ -77,11 +81,12 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
         }.root
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun onStart() {
         super.onStart()
         viewModel.onPromptShown(
             requireArguments().getStringArrayList(KEY_PROMPT_APP_PACKAGES)?.toList() ?: emptyList(),
-            if (Build.VERSION.SDK_INT >= 33) {
+            if (appBuildConfig.sdkInt >= 33) {
                 requireArguments().getSerializable(KEY_PROMPT_SOURCE, Source::class.java)
             } else {
                 @Suppress("DEPRECATION")
