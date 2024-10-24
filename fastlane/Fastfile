@@ -291,6 +291,7 @@ platform :android do
 
         # Merge changes into develop
         sh "git checkout develop"
+        sh "git pull origin develop"
         sh "git merge --no-ff release/#{app_version}"
         sh "git push origin develop"
 
