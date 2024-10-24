@@ -21,30 +21,6 @@ class RealAuthRepositoryTest {
     private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenIsAuthenticatedAndNoAccessTokenThenReturnFalse() = runTest {
-        authStore.authToken = "authToken"
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedAndNoAuthTokenThenReturnFalse() = runTest {
-        authStore.accessToken = "accessToken"
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedAndNoAuthTokenAndAccessTokenThenReturnFalse() = runTest {
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedThenReturnTrue() = runTest {
-        authStore.authToken = "authToken"
-        authStore.accessToken = "accessToken"
-        assertTrue(authRepository.isUserAuthenticated())
-    }
-
-    @Test
     fun whenClearAccountThenClearData() = runTest {
         authStore.email = "email@duck.com"
         authStore.externalId = "externalId"

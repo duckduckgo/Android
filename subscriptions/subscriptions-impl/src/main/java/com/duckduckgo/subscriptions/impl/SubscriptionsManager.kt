@@ -208,7 +208,9 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
-    private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
+    private suspend fun isUserAuthenticated(): Boolean {
+        return !authRepository.getAuthToken().isNullOrBlank() && !authRepository.getAccessToken().isNullOrBlank()
+    }
 
     private suspend fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {

@@ -972,6 +972,18 @@ class RealSubscriptionsManagerTest {
         assertEquals("""[]""", authDataStore.entitlements)
     }
 
+    @Test
+    fun whenNotAuthenticatedThenIsSignedInReturnsFalse() = runTest {
+        givenUserIsNotAuthenticated()
+        assertFalse(subscriptionsManager.isSignedIn.first())
+    }
+
+    @Test
+    fun whenAuthenticatedThenIsSignedInReturnsTrue() = runTest {
+        givenUserIsAuthenticated()
+        assertTrue(subscriptionsManager.isSignedIn.first())
+    }
+
     private suspend fun givenDeleteAccountSucceeds() {
         whenever(authService.delete(any())).thenReturn(DeleteAccountResponse("deleted"))
     }

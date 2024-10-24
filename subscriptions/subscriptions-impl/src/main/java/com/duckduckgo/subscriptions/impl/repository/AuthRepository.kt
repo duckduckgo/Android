@@ -39,8 +39,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
-
-    suspend fun isUserAuthenticated(): Boolean
     suspend fun setAccessToken(accessToken: String)
     suspend fun getAccessToken(): String?
     suspend fun saveAuthToken(authToken: String)
@@ -81,10 +79,6 @@ class RealAuthRepository @Inject constructor(
 
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
-    }
-
-    override suspend fun isUserAuthenticated(): Boolean = withContext(dispatcherProvider.io()) {
-        !subscriptionsDataStore.accessToken.isNullOrBlank() && !subscriptionsDataStore.authToken.isNullOrBlank()
     }
 
     override suspend fun saveAccountData(authToken: String, externalId: String) = withContext(dispatcherProvider.io()) {
