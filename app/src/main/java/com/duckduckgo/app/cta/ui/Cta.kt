@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -25,6 +26,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.animate
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -684,6 +686,54 @@ sealed class HomePanelCta(
         AppPixelName.WIDGET_LEGACY_CTA_LAUNCHED,
         AppPixelName.WIDGET_LEGACY_CTA_DISMISSED,
     )
+}
+
+class BrokenSitePromptDialogCta : Cta {
+
+    override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
+    override val shownPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
+    override val okPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+    override val cancelPixel: Pixel.PixelName? = null
+
+    override fun pixelCancelParameters(): Map<String, String> = mapOf()
+
+    override fun pixelOkParameters(): Map<String, String> = mapOf()
+
+    override fun pixelShownParameters(): Map<String, String> = mapOf()
+
+    fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+        val view = binding.includeBrokenSitePromptDialog.root
+        val fadeOutAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f).apply {
+            duration = 3000
+            addUpdateListener { animator ->
+                val alpha = animator.animatedValue as Float
+                if (alpha <= 0f) {
+                    view.visibility = View.GONE
+                    removeAllListeners()
+                }
+            }
+        }
+
+        fadeOutAnimator.start()
+    }
+
+    fun showBrokenSitePromptCta(
+        binding: FragmentBrowserTabBinding,
+        onReportBrokenSiteClicked: () -> Unit,
+        onDismissCtaClicked: () -> Unit,
+    ) {
+        val daxDialog = binding.includeBrokenSitePromptDialog
+        daxDialog.root.apply {
+            visibility = View.VISIBLE
+            alpha = 0f
+            animate()
+                .alpha(1f)
+                .setDuration(300)
+                .start()
+        }
+        binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
+        binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+    }
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {
