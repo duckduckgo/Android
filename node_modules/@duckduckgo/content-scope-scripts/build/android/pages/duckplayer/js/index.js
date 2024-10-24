@@ -1260,8 +1260,8 @@
     M.__r = 0;
   }
   function P(n2, l3, u3, t3, i3, o3, r3, f3, e3, c3, s3) {
-    var a3, p3, y3, d3, w3, _3 = t3 && t3.__k || v, g2 = l3.length;
-    for (u3.__d = e3, $(u3, l3, _3), e3 = u3.__d, a3 = 0; a3 < g2; a3++)
+    var a3, p3, y3, d3, w3, _3 = t3 && t3.__k || v, g3 = l3.length;
+    for (u3.__d = e3, $(u3, l3, _3), e3 = u3.__d, a3 = 0; a3 < g3; a3++)
       null != (y3 = u3.__k[a3]) && (p3 = -1 === y3.__i ? h : _3[y3.__i] || h, y3.__i = a3, O(n2, y3, p3, i3, o3, r3, f3, e3, c3, s3), d3 = y3.__e, y3.ref && p3.ref != y3.ref && (p3.ref && N(p3.ref, null, y3), s3.push(y3.ref, y3.__c || d3, y3)), null == w3 && null != d3 && (w3 = d3), 65536 & y3.__u || p3.__k === y3.__k ? e3 = I(y3, e3, n2) : "function" == typeof y3.type && void 0 !== y3.__d ? e3 = y3.__d : d3 && (e3 = d3.nextSibling), y3.__d = void 0, y3.__u &= -196609);
     u3.__d = e3, u3.__e = w3;
   }
@@ -1349,14 +1349,14 @@
     };
   }
   function O(n2, u3, t3, i3, o3, r3, f3, e3, c3, s3) {
-    var a3, h3, v3, p3, w3, _3, g2, m2, x3, C3, S2, M2, $2, I2, H, L2, T3 = u3.type;
+    var a3, h3, v3, p3, w3, _3, g3, m2, x3, C3, S2, M2, $2, I2, H, L2, T3 = u3.type;
     if (void 0 !== u3.constructor)
       return null;
     128 & t3.__u && (c3 = !!(32 & t3.__u), r3 = [e3 = u3.__e = t3.__e]), (a3 = l.__b) && a3(u3);
     n:
       if ("function" == typeof T3)
         try {
-          if (m2 = u3.props, x3 = "prototype" in T3 && T3.prototype.render, C3 = (a3 = T3.contextType) && i3[a3.__c], S2 = a3 ? C3 ? C3.props.value : a3.__ : i3, t3.__c ? g2 = (h3 = u3.__c = t3.__c).__ = h3.__E : (x3 ? u3.__c = h3 = new T3(m2, S2) : (u3.__c = h3 = new k(m2, S2), h3.constructor = T3, h3.render = q), C3 && C3.sub(h3), h3.props = m2, h3.state || (h3.state = {}), h3.context = S2, h3.__n = i3, v3 = h3.__d = true, h3.__h = [], h3._sb = []), x3 && null == h3.__s && (h3.__s = h3.state), x3 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = d({}, h3.__s)), d(h3.__s, T3.getDerivedStateFromProps(m2, h3.__s))), p3 = h3.props, w3 = h3.state, h3.__v = u3, v3)
+          if (m2 = u3.props, x3 = "prototype" in T3 && T3.prototype.render, C3 = (a3 = T3.contextType) && i3[a3.__c], S2 = a3 ? C3 ? C3.props.value : a3.__ : i3, t3.__c ? g3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (x3 ? u3.__c = h3 = new T3(m2, S2) : (u3.__c = h3 = new k(m2, S2), h3.constructor = T3, h3.render = q), C3 && C3.sub(h3), h3.props = m2, h3.state || (h3.state = {}), h3.context = S2, h3.__n = i3, v3 = h3.__d = true, h3.__h = [], h3._sb = []), x3 && null == h3.__s && (h3.__s = h3.state), x3 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = d({}, h3.__s)), d(h3.__s, T3.getDerivedStateFromProps(m2, h3.__s))), p3 = h3.props, w3 = h3.state, h3.__v = u3, v3)
             x3 && null == T3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), x3 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
           else {
             if (x3 && null == T3.getDerivedStateFromProps && m2 !== p3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(m2, S2), !h3.__e && (null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(m2, h3.__s, S2) || u3.__v === t3.__v)) {
@@ -1379,7 +1379,7 @@
             do {
               h3.__d = false, $2 && $2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
             } while (h3.__d && ++I2 < 25);
-          h3.state = h3.__s, null != h3.getChildContext && (i3 = d(d({}, i3), h3.getChildContext())), x3 && !v3 && null != h3.getSnapshotBeforeUpdate && (_3 = h3.getSnapshotBeforeUpdate(p3, w3)), P(n2, y(L2 = null != a3 && a3.type === b && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, o3, r3, f3, e3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && f3.push(h3), g2 && (h3.__E = h3.__ = null);
+          h3.state = h3.__s, null != h3.getChildContext && (i3 = d(d({}, i3), h3.getChildContext())), x3 && !v3 && null != h3.getSnapshotBeforeUpdate && (_3 = h3.getSnapshotBeforeUpdate(p3, w3)), P(n2, y(L2 = null != a3 && a3.type === b && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, o3, r3, f3, e3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && f3.push(h3), g3 && (h3.__E = h3.__ = null);
         } catch (n3) {
           if (u3.__v = null, c3 || null != r3) {
             for (u3.__u |= c3 ? 160 : 128; e3 && 8 === e3.nodeType && e3.nextSibling; )
@@ -1408,7 +1408,7 @@
     });
   }
   function z(u3, t3, i3, o3, r3, f3, e3, c3, s3) {
-    var a3, v3, p3, d3, _3, g2, m2, b2 = i3.props, k3 = t3.props, C3 = t3.type;
+    var a3, v3, p3, d3, _3, g3, m2, b2 = i3.props, k3 = t3.props, C3 = t3.type;
     if ("svg" === C3 ? r3 = "http://www.w3.org/2000/svg" : "math" === C3 ? r3 = "http://www.w3.org/1998/Math/MathML" : r3 || (r3 = "http://www.w3.org/1999/xhtml"), null != f3) {
       for (a3 = 0; a3 < f3.length; a3++)
         if ((_3 = f3[a3]) && "setAttribute" in _3 == !!C3 && (C3 ? _3.localName === C3 : 3 === _3.nodeType)) {
@@ -1438,13 +1438,13 @@
           A(u3, a3, null, _3, r3);
         }
       for (a3 in k3)
-        _3 = k3[a3], "children" == a3 ? d3 = _3 : "dangerouslySetInnerHTML" == a3 ? v3 = _3 : "value" == a3 ? g2 = _3 : "checked" == a3 ? m2 = _3 : c3 && "function" != typeof _3 || b2[a3] === _3 || A(u3, a3, _3, b2[a3], r3);
+        _3 = k3[a3], "children" == a3 ? d3 = _3 : "dangerouslySetInnerHTML" == a3 ? v3 = _3 : "value" == a3 ? g3 = _3 : "checked" == a3 ? m2 = _3 : c3 && "function" != typeof _3 || b2[a3] === _3 || A(u3, a3, _3, b2[a3], r3);
       if (v3)
         c3 || p3 && (v3.__html === p3.__html || v3.__html === u3.innerHTML) || (u3.innerHTML = v3.__html), t3.__k = [];
       else if (p3 && (u3.innerHTML = ""), P(u3, y(d3) ? d3 : [d3], t3, i3, o3, "foreignObject" === C3 ? "http://www.w3.org/1999/xhtml" : r3, f3, e3, f3 ? f3[0] : i3.__k && x(i3, 0), c3, s3), null != f3)
         for (a3 = f3.length; a3--; )
           w(f3[a3]);
-      c3 || (a3 = "value", "progress" === C3 && null == g2 ? u3.removeAttribute("value") : void 0 !== g2 && (g2 !== u3[a3] || "progress" === C3 && !g2 || "option" === C3 && g2 !== b2[a3]) && A(u3, a3, g2, b2[a3], r3), a3 = "checked", void 0 !== m2 && m2 !== u3[a3] && A(u3, a3, m2, b2[a3], r3));
+      c3 || (a3 = "value", "progress" === C3 && null == g3 ? u3.removeAttribute("value") : void 0 !== g3 && (g3 !== u3[a3] || "progress" === C3 && !g3 || "option" === C3 && g3 !== b2[a3]) && A(u3, a3, g3, b2[a3], r3), a3 = "checked", void 0 !== m2 && m2 !== u3[a3] && A(u3, a3, m2, b2[a3], r3));
     }
     return u3;
   }
@@ -1609,6 +1609,16 @@
   function x2(n2) {
     var u3 = r2.context[n2.__c], i3 = d2(t2++, 9);
     return i3.c = n2, u3 ? (null == i3.__ && (i3.__ = true, u3.sub(r2)), u3.props.value) : n2.__;
+  }
+  function g2() {
+    var n2 = d2(t2++, 11);
+    if (!n2.__) {
+      for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; )
+        u3 = u3.__;
+      var i3 = u3.__m || (u3.__m = [0, 0]);
+      n2.__ = "P" + i3[0] + "-" + i3[1]++;
+    }
+    return n2.__;
   }
   function j2() {
     for (var n2; n2 = f2.shift(); )
@@ -2419,6 +2429,7 @@
     switchBar: "SwitchBarMobile_switchBar",
     stateExiting: "SwitchBarMobile_stateExiting",
     stateHidden: "SwitchBarMobile_stateHidden",
+    labelRow: "SwitchBarMobile_labelRow",
     label: "SwitchBarMobile_label",
     checkbox: "SwitchBarMobile_checkbox",
     text: "SwitchBarMobile_text",
@@ -2494,13 +2505,14 @@
 
   // pages/duckplayer/app/components/Switch.jsx
   var import_classnames4 = __toESM(require_classnames(), 1);
-  function Switch({ checked, onChange, platformName = "ios" }) {
+  function Switch({ checked, onChange, id, platformName = "ios" }) {
     return /* @__PURE__ */ _(
       "button",
       {
         role: "switch",
         "aria-checked": checked,
         onClick: onChange,
+        id,
         className: (0, import_classnames4.default)(Switch_default.switch, {
           [Switch_default.ios]: platformName === "ios",
           [Switch_default.android]: platformName === "android"
@@ -2514,6 +2526,7 @@
   function SwitchBarMobile({ platformName }) {
     const { onChange, onDone, state } = x2(SwitchContext);
     const { t: t3 } = useTypedTranslation();
+    const inputId = g2();
     function blockClick(e3) {
       if (state === "exiting") {
         return e3.preventDefault();
@@ -2529,12 +2542,13 @@
       [SwitchBarMobile_default.stateExiting]: state === "exiting",
       [SwitchBarMobile_default.stateHidden]: state === "completed"
     });
-    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, onTransitionEnd }, /* @__PURE__ */ _("label", { onClick: blockClick, class: SwitchBarMobile_default.label }, /* @__PURE__ */ _("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled")), /* @__PURE__ */ _(
+    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": "true", onTransitionEnd }, /* @__PURE__ */ _("div", { class: SwitchBarMobile_default.labelRow, onClick: blockClick }, /* @__PURE__ */ _("label", { for: inputId, class: SwitchBarMobile_default.label }, /* @__PURE__ */ _("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled"))), /* @__PURE__ */ _(
       Switch,
       {
         checked: state !== "showing",
         onChange,
-        platformName
+        platformName,
+        id: inputId
       }
     )));
   }
