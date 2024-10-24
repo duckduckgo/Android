@@ -277,14 +277,15 @@ platform :android do
             file.write("VERSION=#{app_version}")
         end
 
-        sh("git add .")
+        sh("git add --all")
+        sh("git commit -am 'Updated version number for new release - #{app_version}'")
 
-        git_commit(
-            message: "Updated version number for new release - #{app_version}",
-            path: "*",
-            allow_nothing_to_commit: true,
-            skip_git_hooks: true
-        )
+#         git_commit(
+#             message: "Updated version number for new release - #{app_version}",
+#             path: "*",
+#             allow_nothing_to_commit: true,
+#             skip_git_hooks: true
+#         )
 
         sh "git checkout main"
         sh "git merge --no-ff release/#{app_version}"
