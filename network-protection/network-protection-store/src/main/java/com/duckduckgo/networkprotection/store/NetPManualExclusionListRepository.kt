@@ -33,6 +33,8 @@ interface NetPManualExclusionListRepository {
 
     fun manuallyEnableApp(packageName: String)
 
+    fun manuallyEnableApps(packageNames: List<String>)
+
     fun restoreDefaultProtectedList()
 }
 
@@ -57,6 +59,14 @@ class RealNetPManualExclusionListRepository constructor(
 
     override fun manuallyEnableApp(packageName: String) {
         exclusionListDao.insertIntoManualAppExclusionList(NetPManuallyExcludedApp(packageId = packageName, isProtected = true))
+    }
+
+    override fun manuallyEnableApps(packageNames: List<String>) {
+        packageNames.map {
+            NetPManuallyExcludedApp(packageId = it, isProtected = true)
+        }.also {
+            exclusionListDao.insertIntoManualAppExclusionList(it)
+        }
     }
 
     override fun restoreDefaultProtectedList() {

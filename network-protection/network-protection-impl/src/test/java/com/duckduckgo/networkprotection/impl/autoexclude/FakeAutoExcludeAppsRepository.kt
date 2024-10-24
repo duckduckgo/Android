@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

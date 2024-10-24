@@ -5,6 +5,7 @@ import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigg
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

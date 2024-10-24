@@ -39,7 +39,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.FakeAutoExcludePrompt
-import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.exclusion.FakeNetpExclusionListRepository
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -70,6 +69,7 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.wireguard.config.Config
 import java.io.BufferedReader
