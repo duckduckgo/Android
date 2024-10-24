@@ -27,7 +27,9 @@ class RealAuthRepositoryTest {
         authStore.authToken = "authToken"
         authStore.accessToken = "accessToken"
 
-        authRepository.clearAccount()
+        authRepository.setAuthToken(null)
+        authRepository.setAccessToken(null)
+        authRepository.setAccount(null)
 
         assertNull(authStore.accessToken)
         assertNull(authStore.authToken)
@@ -44,25 +46,25 @@ class RealAuthRepositoryTest {
         authStore.productId = "productId"
         authStore.entitlements = "[]"
 
-        authRepository.clearSubscription()
+        authRepository.setSubscription(null)
 
         assertNull(authStore.status)
         assertNull(authStore.startedAt)
         assertNull(authStore.expiresOrRenewsAt)
         assertNull(authStore.platform)
         assertNull(authStore.productId)
-        assertNull(authStore.entitlements)
+        assertEquals("[]", authStore.entitlements)
     }
 
     @Test
-    fun whenSaveAccountDataThenSetData() = runTest {
-        assertNull(authStore.authToken)
+    fun whenSetAccountThenSetData() = runTest {
+        assertNull(authStore.email)
         assertNull(authStore.externalId)
 
-        authRepository.saveAccountData(authToken = "authToken", externalId = "externalId")
+        authRepository.setAccount(Account(externalId = "externalId", email = "john@example.com"))
 
-        assertEquals("authToken", authStore.authToken)
         assertEquals("externalId", authStore.externalId)
+        assertEquals("john@example.com", authStore.email)
     }
 
     @Test

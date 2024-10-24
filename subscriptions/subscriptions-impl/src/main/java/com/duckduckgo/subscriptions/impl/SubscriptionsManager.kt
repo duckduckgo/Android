@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
@@ -291,8 +292,10 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun signOut() {
-        authRepository.clearAccount()
-        authRepository.clearSubscription()
+        authRepository.setAuthToken(null)
+        authRepository.setAccessToken(null)
+        authRepository.setAccount(null)
+        authRepository.setSubscription(null)
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
     }
@@ -339,9 +342,25 @@ class RealSubscriptionsManager @Inject constructor(
                     packageName = packageName,
                     purchaseToken = purchaseToken,
                 ),
-            ).also {
-                val subscription = authRepository.saveSubscriptionData(it.subscription, it.entitlements.toEntitlements(), it.email)
-                if (subscription?.isActive() == true) {
+            ).also { confirmationResponse ->
+                authRepository.getAccount()
+                    ?.copy(email = confirmationResponse.email)
+                    ?.let { authRepository.setAccount(it) }
+
+                val subscriptionStatus = confirmationResponse.subscription.status.toStatus()
+
+                authRepository.setSubscription(
+                    Subscription(
+                        productId = confirmationResponse.subscription.productId,
+                        startedAt = confirmationResponse.subscription.startedAt,
+                        expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
+                        status = subscriptionStatus,
+                        platform = confirmationResponse.subscription.platform,
+                        entitlements = confirmationResponse.entitlements.toEntitlements(),
+                    ),
+                )
+
+                if (subscriptionStatus.isActive()) {
                     pixelSender.reportPurchaseSuccess()
                     pixelSender.reportSubscriptionActivated()
                     emitEntitlementsValues()
@@ -396,8 +415,22 @@ class RealSubscriptionsManager @Inject constructor(
                 throw e
             }
             val accountData = validateToken(token).account
-            authRepository.saveExternalId(accountData.externalId)
-            authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
+            authRepository.setAccount(
+                Account(
+                    email = accountData.email,
+                    externalId = accountData.externalId,
+                ),
+            )
+            authRepository.setSubscription(
+                Subscription(
+                    productId = subscription.productId,
+                    startedAt = subscription.startedAt,
+                    expiresOrRenewsAt = subscription.expiresOrRenewsAt,
+                    status = subscription.status.toStatus(),
+                    platform = subscription.platform,
+                    entitlements = accountData.entitlements.toEntitlements(),
+                ),
+            )
             emitEntitlementsValues()
             _subscriptionStatus.emit(authRepository.getStatus())
             _isSignedIn.emit(isUserAuthenticated())
@@ -425,7 +458,8 @@ class RealSubscriptionsManager @Inject constructor(
                 val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
                 val response = authService.storeLogin(storeLoginBody)
                 if (externalId != null && externalId != response.externalId) return RecoverSubscriptionResult.Failure("")
-                authRepository.saveAccountData(response.authToken, response.externalId)
+                authRepository.setAccount(Account(externalId = response.externalId, email = null))
+                authRepository.setAuthToken(response.authToken)
                 exchangeAuthToken(response.authToken)
                 val subscription = fetchAndStoreAllData()
                 if (subscription != null) {
@@ -565,7 +599,8 @@ class RealSubscriptionsManager @Inject constructor(
             if (account.authToken.isEmpty()) {
                 pixelSender.reportPurchaseFailureAccountCreation()
             } else {
-                authRepository.saveAccountData(account.authToken, account.externalId)
+                authRepository.setAccount(Account(externalId = account.externalId, email = null))
+                authRepository.setAuthToken(account.authToken)
             }
         } catch (e: Exception) {
             when (e) {

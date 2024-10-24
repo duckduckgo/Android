@@ -748,8 +748,10 @@ class RealSubscriptionsManagerTest {
             pixelSender,
         )
         manager.signOut()
-        verify(mockRepo).clearSubscription()
-        verify(mockRepo).clearAccount()
+        verify(mockRepo).setSubscription(null)
+        verify(mockRepo).setAccount(null)
+        verify(mockRepo).setAuthToken(null)
+        verify(mockRepo).setAccessToken(null)
     }
 
     @Test
