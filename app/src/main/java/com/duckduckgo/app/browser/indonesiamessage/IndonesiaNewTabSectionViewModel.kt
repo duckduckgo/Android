@@ -24,8 +24,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
@@ -40,7 +38,6 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     private val indonesiaNewTabSectionDataStore: IndonesiaNewTabSectionDataStore,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
-    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val showMessage: Boolean = false)
@@ -77,12 +74,7 @@ class IndonesiaNewTabSectionViewModel @Inject constructor(
     fun onMessageDismissed() {
         viewModelScope.launch(dispatchers.io()) {
             indonesiaNewTabSectionDataStore.dismissMessage()
-            pixel.fire(AppPixelName.INDONESIA_MESSAGE_DISMISSED)
         }
-    }
-
-    fun onMessageShown() {
-        pixel.fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.Daily())
     }
 
     companion object {
