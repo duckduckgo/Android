@@ -207,7 +207,7 @@ class RealSubscriptionsManager @Inject constructor(
         return !authRepository.getAuthToken().isNullOrBlank() && !authRepository.getAccessToken().isNullOrBlank()
     }
 
-    private suspend fun emitEntitlementsValues() {
+    private fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             val entitlements = if (authRepository.getSubscription()?.status?.isActiveOrWaiting() == true) {
                 authRepository.getEntitlements().toProductList()
@@ -218,19 +218,19 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun emitIsSignedInValues() {
+    private fun emitIsSignedInValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             _isSignedIn.emit(isUserAuthenticated())
         }
     }
 
-    private suspend fun emitHasSubscriptionsValues() {
+    private fun emitHasSubscriptionsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             _subscriptionStatus.emit(subscriptionStatus())
         }
     }
 
-    private suspend fun emitCurrentPurchaseValues() {
+    private fun emitCurrentPurchaseValues() {
         purchaseStateJob?.cancel()
         purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             playBillingManager.purchaseState.collect {
