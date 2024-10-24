@@ -25,13 +25,14 @@
     android:background="?attr/selectableItemBackground"
     android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="20dp"
+    android:paddingStart="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/historyIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_0"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_history"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,13 +43,13 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
-        app:layout_constraintEnd_toStartOf="@id/goToSuggestionImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/historyIndicator"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="phrase or URL suggestion"/>
@@ -59,28 +60,15 @@
         android:layout_height="wrap_content"
         app:typography="body2"
         app:textType="secondary"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
-        app:layout_constraintEnd_toStartOf="@id/goToSuggestionImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/historyIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="phrase or URL suggestion"/>
-
-    <ImageView
-        android:id="@+id/goToSuggestionImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/editQueryBeforeSubmitting"
-        android:padding="3dp"
-        android:src="@drawable/ic_autocomplete_20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

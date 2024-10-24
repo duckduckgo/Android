@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Usunąć sugestię wyszukiwania?</string>
     <string name="autocompleteRemoveItemCancel">Anuluj</string>
     <string name="autocompleteRemoveItemRemove">Usuń</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Przełącz na kartę - %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otwórz zewnętrzną aplikację</string>

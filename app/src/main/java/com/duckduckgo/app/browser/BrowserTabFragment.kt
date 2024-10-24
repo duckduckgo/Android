@@ -109,6 +109,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -1742,6 +1743,12 @@ class BrowserTabFragment :
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
             }
+            is Command.SwitchToTab -> {
+                binding.focusedView.gone()
+                viewModel.autoCompleteSuggestionsGone()
+                binding.autoCompleteSuggestionsList.gone()
+                browserActivity?.openExistingTab(it.tabId)
+            }
             else -> {
                 // NO OP
             }
@@ -1791,6 +1798,7 @@ class BrowserTabFragment :
     }
 
     private fun autocompleteItemRemoved() {
+        viewModel.onAutoCompleteSuggestionsChanged()
         showKeyboardAndRestorePosition(autocompleteFirstVisibleItemPosition, autocompleteItemOffsetTop)
     }
 
@@ -2398,6 +2406,9 @@ class BrowserTabFragment :
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.addItemDecoration(
+            SuggestionItemDecoration(ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!),
+        )
     }
 
     private fun configureNewTab() {
@@ -3724,6 +3735,7 @@ class BrowserTabFragment :
                         binding.autoCompleteSuggestionsList.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
+                        viewModel.onAutoCompleteSuggestionsChanged()
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                         hideFocusedView()
                     }

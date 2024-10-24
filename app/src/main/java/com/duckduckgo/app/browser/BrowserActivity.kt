@@ -349,6 +349,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
+        if (existingTabId != null) {
+            openExistingTab(existingTabId)
+            return
+        }
+
         val sharedText = intent.intentText
         if (sharedText != null) {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
@@ -509,6 +515,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun openExistingTab(tabId: String) {
+        lifecycleScope.launch {
+            viewModel.onTabSelected(tabId)
+        }
+    }
+
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
@@ -570,6 +582,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             selectedText: Boolean = false,
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
+            openExistingTabId: String? = null,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -579,6 +592,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
+            intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             return intent
         }
 
@@ -591,6 +605,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
         private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
+        const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
+
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40

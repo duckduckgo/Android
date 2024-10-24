@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Želite odstraniti predlog iskanja?</string>
     <string name="autocompleteRemoveItemCancel">Prekliči</string>
     <string name="autocompleteRemoveItemRemove">Odstrani</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Preklopi na zavihek · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Odpri zunanjo aplikacijo</string>
