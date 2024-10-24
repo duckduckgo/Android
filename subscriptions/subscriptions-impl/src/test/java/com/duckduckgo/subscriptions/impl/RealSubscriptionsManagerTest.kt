@@ -790,6 +790,19 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenSignOutThenEmitEmptyEntitlements() = runTest {
+        givenSubscriptionExists()
+        givenUserIsAuthenticated()
+
+        subscriptionsManager.entitlements.test {
+            assertFalse(expectMostRecentItem().isEmpty())
+            subscriptionsManager.signOut()
+            assertTrue(expectMostRecentItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPurchaseIsSuccessfulThenPixelIsSent() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
@@ -1024,7 +1037,7 @@ class RealSubscriptionsManagerTest {
     private fun givenSubscriptionExists(status: SubscriptionStatus = AUTO_RENEWABLE) {
         authDataStore.platform = "google"
         authDataStore.productId = "productId"
-        authDataStore.entitlements = """[{"product":"product", "name":"name"}]"""
+        authDataStore.entitlements = """[{"product":"Network Protection", "name":"subscriber"}]"""
         authDataStore.status = status.statusName
         authDataStore.startedAt = 1000L
         authDataStore.expiresOrRenewsAt = 1000L

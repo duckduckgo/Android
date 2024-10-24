@@ -279,6 +279,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setSubscription(null)
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
+        _entitlements.emit(emptyList())
     }
 
     private suspend fun checkPurchase(
