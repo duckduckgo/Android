@@ -170,6 +170,7 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -1715,6 +1716,7 @@ class BrowserTabFragment :
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
+            is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -2695,6 +2697,10 @@ class BrowserTabFragment :
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
         onboardingCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
+        brokenSitePromptDialogCta.hideOnboardingCta(binding)
     }
 
     private fun hideDaxBubbleCta() {
@@ -3984,6 +3990,7 @@ class BrowserTabFragment :
                 -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
+                is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
@@ -4052,6 +4059,17 @@ class BrowserTabFragment :
                 }
             }
             viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.onCtaShown()
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun showBrokenSitePromptCta(configuration: BrokenSitePromptDialogCta) {
+            hideNewTab()
+            configuration.showBrokenSitePromptCta(
+                binding,
+                onReportBrokenSiteClicked = { viewModel.onUserClickCtaOkButton(configuration) },
+                onDismissCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
+            )
             viewModel.onCtaShown()
         }
 
