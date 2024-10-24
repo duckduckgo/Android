@@ -1,7 +1,0 @@
-require_relative 'screengrab/runner'
-require_relative 'screengrab/reports_generator'
-require_relative 'screengrab/detect_values'
-require_relative 'screengrab/dependency_checker'
-require_relative 'screengrab/options'
-require_relative 'screengrab/android_environment'
-require_relative 'screengrab/module'

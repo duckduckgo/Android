@@ -1,7 +1,0 @@
-*.gem
-.bundle
-Gemfile.lock
-pkg/*
-.rvmrc
-.ruby-version
-coverage/*
