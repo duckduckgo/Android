@@ -39,6 +39,30 @@ interface MetricsPixelStore {
      */
     @WorkerThread
     fun storePixelTag(tag: String)
+
+    /**
+     * Increases the count of searches for the [featureName] passed as parameter
+     */
+    @WorkerThread
+    fun increaseSearchForFeature(featureName: String)
+
+    /**
+     * Increases the count of app use for the [featureName] passed as parameter
+     */
+    @WorkerThread
+    fun increaseAppUseForFeature(featureName: String)
+
+    /**
+     * Returns the number [Int] of app use for the given [featureName]
+     */
+    @WorkerThread
+    fun getAppUseForFeature(featureName: String): Int
+
+    /**
+     * Returns the number [Int] of searches for the given [featureName]
+     */
+    @WorkerThread
+    fun getSearchForFeature(featureName: String): Int
 }
 
 @ContributesBinding(
@@ -73,6 +97,38 @@ class RealMetricsPixelStore @Inject constructor(
 
         val didExecuteAlready = preferences.getBoolean(tag, false)
         return didExecuteAlready
+    }
+
+    override fun increaseAppUseForFeature(featureName: String) {
+        if (appBuildConfig.isInternalBuild()) {
+            checkMainThread()
+        }
+        val count = preferences.getInt("${featureName}_appUse", 0)
+        preferences.edit { putInt("${featureName}_appUse", count + 1) }
+    }
+
+    override fun increaseSearchForFeature(featureName: String) {
+        if (appBuildConfig.isInternalBuild()) {
+            checkMainThread()
+        }
+        val count = preferences.getInt("${featureName}_search", 0)
+        preferences.edit { putInt("${featureName}_search", count + 1) }
+    }
+
+    override fun getAppUseForFeature(featureName: String): Int {
+        if (appBuildConfig.isInternalBuild()) {
+            checkMainThread()
+        }
+
+        return preferences.getInt("${featureName}_appUse", 0)
+    }
+
+    override fun getSearchForFeature(featureName: String): Int {
+        if (appBuildConfig.isInternalBuild()) {
+            checkMainThread()
+        }
+
+        return preferences.getInt("${featureName}_search", 0)
     }
 
     companion object {

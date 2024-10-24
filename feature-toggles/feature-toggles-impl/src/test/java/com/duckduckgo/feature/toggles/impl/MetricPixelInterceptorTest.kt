@@ -296,48 +296,68 @@ class MetricPixelInterceptorTest {
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s"
     }
+}
 
-    class FakeStore : MetricsPixelStore {
+class FakeStore : MetricsPixelStore {
 
-        private val list = mutableListOf<String>()
+    private val list = mutableListOf<String>()
+    private val searches = mutableMapOf<String, Int>()
+    private val appUse = mutableMapOf<String, Int>()
 
-        override fun wasPixelFired(tag: String): Boolean {
-            return list.contains(tag)
-        }
-
-        override fun storePixelTag(tag: String) {
-            list.add(tag)
-        }
+    override fun wasPixelFired(tag: String): Boolean {
+        return list.contains(tag)
     }
 
-    class FakePluginPoint(testFeature: TestTriggerFeature) : PluginPoint<MetricsPixelPlugin> {
-        private val plugin = FakeMetricsPixelPlugin(testFeature)
-        override fun getPlugins(): Collection<MetricsPixelPlugin> {
-            return listOf(plugin)
-        }
+    override fun storePixelTag(tag: String) {
+        list.add(tag)
     }
 
-    class FakeMetricsPixelPlugin(private val testFeature: TestTriggerFeature) : MetricsPixelPlugin {
+    override fun increaseSearchForFeature(featureName: String) {
+        val count = searches.getOrDefault(featureName, 0)
+        searches[featureName] = count + 1
+    }
 
-        override suspend fun getMetrics(): List<MetricsPixel> = listOf(
-            MetricsPixel(
-                metric = "refreshClicked",
-                value = "1",
-                toggle = testFeature.experimentFooFeature(),
-                conversionWindow = listOf(
-                    ConversionWindow(0, 0),
-                    ConversionWindow(0, 1),
-                    ConversionWindow(3, 4),
-                ),
+    override fun increaseAppUseForFeature(featureName: String) {
+        val count = appUse.getOrDefault(featureName, 0)
+        appUse[featureName] = count + 1
+    }
+
+    override fun getAppUseForFeature(featureName: String): Int {
+        return appUse.getOrDefault(featureName, 0)
+    }
+
+    override fun getSearchForFeature(featureName: String): Int {
+        return searches.getOrDefault(featureName, 0)
+    }
+}
+
+class FakePluginPoint(testFeature: TestTriggerFeature) : PluginPoint<MetricsPixelPlugin> {
+    private val plugin = FakeMetricsPixelPlugin(testFeature)
+    override fun getPlugins(): Collection<MetricsPixelPlugin> {
+        return listOf(plugin)
+    }
+}
+
+class FakeMetricsPixelPlugin(private val testFeature: TestTriggerFeature) : MetricsPixelPlugin {
+
+    override suspend fun getMetrics(): List<MetricsPixel> = listOf(
+        MetricsPixel(
+            metric = "refreshClicked",
+            value = "1",
+            toggle = testFeature.experimentFooFeature(),
+            conversionWindow = listOf(
+                ConversionWindow(0, 0),
+                ConversionWindow(0, 1),
+                ConversionWindow(3, 4),
             ),
-            MetricsPixel(
-                metric = "refreshClicked",
-                value = "2",
-                toggle = testFeature.experimentFooFeature(),
-                conversionWindow = listOf(
-                    ConversionWindow(1, 2),
-                ),
+        ),
+        MetricsPixel(
+            metric = "refreshClicked",
+            value = "2",
+            toggle = testFeature.experimentFooFeature(),
+            conversionWindow = listOf(
+                ConversionWindow(1, 2),
             ),
-        )
-    }
+        ),
+    )
 }
