@@ -51,7 +51,6 @@ interface AuthRepository {
     suspend fun clearSubscription()
     suspend fun clearAccount()
     suspend fun setEntitlements(entitlements: List<Entitlement>)
-    suspend fun setEmail(email: String?)
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
@@ -71,10 +70,6 @@ class RealAuthRepository @Inject constructor(
     }
     private inline fun <reified T> Moshi.parseList(jsonString: String): List<T>? {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).fromJson(jsonString)
-    }
-
-    override suspend fun setEmail(email: String?) = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.email = email
     }
 
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
