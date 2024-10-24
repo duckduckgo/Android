@@ -33,8 +33,6 @@
     <string name="duck_player_unavailable">Duck Player Unavailable</string>
     <string name="duck_player_unavailable_description">Duck Player\'s functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding.</string>
     <string name="duck_player_unavailable_learn_more">Learn More</string>
-    <!-- TODO: Remove this ignore when the translation is added -->
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Open YouTube Videos in Duck Player</string>
-    <!-- TODO(cbarreiro): Add missing translations asap -->
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Open Duck Player in a new tab</string>
 </resources>

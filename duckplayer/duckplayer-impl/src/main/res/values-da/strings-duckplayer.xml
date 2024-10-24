@@ -34,8 +34,6 @@
     <string name="duck_player_unavailable">Duck Player ikke tilgængelig</string>
     <string name="duck_player_unavailable_description">Duck Players funktionalitet er påvirket af de seneste ændringer på YouTube. Vi arbejder på at løse disse problemer og sætter pris på din forståelse.</string>
     <string name="duck_player_unavailable_learn_more">Mere info</string>
-    <!-- TODO: Remove this ignore when the translation is added -->
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Åbn YouTube-videoer i Duck Player</string>
-    <!-- TODO(cbarreiro): Add missing translations asap -->
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Åbn Duck Player i en ny fane</string>
 </resources>
