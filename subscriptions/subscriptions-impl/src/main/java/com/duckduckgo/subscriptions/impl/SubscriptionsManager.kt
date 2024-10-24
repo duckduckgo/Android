@@ -44,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.repository.isActive
+import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
@@ -208,7 +209,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            val entitlements: List<Product> = if (authRepository.getSubscription() != null) {
+            val entitlements = if (authRepository.getSubscription()?.status?.isActiveOrWaiting() == true) {
                 authRepository.getEntitlements().toProductList()
             } else {
                 emptyList()

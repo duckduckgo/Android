@@ -943,6 +943,19 @@ class RealSubscriptionsManagerTest {
         assertTrue(subscriptionsManager.isSignedIn.first())
     }
 
+    @Test
+    fun whenEntitlementsExistAndSubscriptionIsInactiveThenEntitlementsReturnsEmptyList() = runTest {
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceedsWithEntitlements(status = INACTIVE.statusName)
+
+        subscriptionsManager.fetchAndStoreAllData()
+
+        subscriptionsManager.entitlements.test {
+            val entitlements = expectMostRecentItem()
+            assertTrue(entitlements.isEmpty())
+        }
+    }
+
     private suspend fun givenUrlPortalSucceeds() {
         whenever(subscriptionsService.portal(any())).thenReturn(PortalResponse("example.com"))
     }
