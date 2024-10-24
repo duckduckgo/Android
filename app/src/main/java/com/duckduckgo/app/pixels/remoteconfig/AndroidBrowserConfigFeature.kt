@@ -67,13 +67,4 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun optimizeTrackerEvaluationV2(): Toggle
-
-    /**
-     * This feature flag guards a fix for blob downloads
-     *
-     * @return always returns `true` for internal builds
-     * @return `true` when the remote feature is enabled.
-     */
-    @Toggle.DefaultValue(true)
-    fun fixBlobDownloadWithIframes(): Toggle
 }
