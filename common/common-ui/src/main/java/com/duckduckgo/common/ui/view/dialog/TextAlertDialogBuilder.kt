@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
@@ -120,6 +121,27 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogCheckBox.text = checkBoxText
             binding.textAlertDialogCheckBox.show()
         }
+
+        val ghostButtonDestructive = DaxButtonGhost(context, null)
+        ghostButtonDestructive.setTextColor(
+            ContextCompat.getColorStateList(
+                context,
+                R.color.destructive_text_color_selector,
+            ),
+        )
+        ghostButtonDestructive.setText(checkBoxText)
+
+        val ghostButton = DaxButtonGhost(context, null)
+        ghostButton.setTextColor(
+            ContextCompat.getColorStateList(
+                context,
+                R.color.secondary_text_color_selector,
+            ),
+        )
+        ghostButton.setText(checkBoxText)
+
+        binding.textAlertDialogButtonContainer.addView(ghostButton)
+        binding.textAlertDialogButtonContainer.addView(ghostButtonDestructive)
 
         val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
