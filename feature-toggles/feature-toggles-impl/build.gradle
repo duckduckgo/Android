@@ -31,6 +31,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':feature-toggles-internal-api')
     implementation project(":statistics-api")
+    implementation project(":data-store-api")
 
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -38,6 +39,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation Square.okHttp3.okHttp
     implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
