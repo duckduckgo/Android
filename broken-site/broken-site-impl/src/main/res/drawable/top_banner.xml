@@ -14,9 +14,23 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="broken_site_prompt_title">Site not working? Let us know.</string>
-    <string name="broken_site_prompt_description">This helps us improve the browser.</string>
-    <string name="broken_site_prompt_button_dismiss">Dismiss</string>
-    <string name="broken_site_prompt_button_report">Website Is Broken</string>
-</resources>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="390dp"
+    android:height="116dp"
+    android:viewportWidth="390"
+    android:viewportHeight="116"
+    >
+    <group>
+        <clip-path
+            android:pathData="M0 0H390V116H0V0Z"
+            />
+        <path
+            android:pathData="M0 0H390V116H0V0Z"
+            android:strokeWidth="2"
+            android:strokeColor="#DDDDDD"
+            android:fillColor="?daxColorBackground"
+            />
+    </group>
+</vector>

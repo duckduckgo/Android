@@ -101,6 +101,7 @@ import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
@@ -202,6 +203,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -260,6 +262,7 @@ import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -2856,6 +2859,7 @@ class BrowserTabViewModel @Inject constructor(
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
+            is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
             else -> null
         }
         onboardingCommand?.let {
@@ -2869,6 +2873,8 @@ class BrowserTabViewModel @Inject constructor(
             if (cta is DaxBubbleCta.DaxPrivacyProCta) {
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            } else if (cta is BrokenSitePromptDialogCta) {
+                onBrokenSiteCtaDismissButtonClicked(cta)
             }
             if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
                 pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
@@ -3607,6 +3613,22 @@ class BrowserTabViewModel @Inject constructor(
                 sslError = NONE,
             )
         }
+    }
+
+    private fun onBrokenSiteCtaDismissButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        onUserDismissedCta(cta)
+        viewModelScope.launch {
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
+    }
+
+    private fun onBrokenSiteCtaOkButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        viewModelScope.launch {
+            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = PROMPT))
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {

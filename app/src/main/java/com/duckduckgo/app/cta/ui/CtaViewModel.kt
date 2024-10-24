@@ -171,7 +171,7 @@ class CtaViewModel @Inject constructor(
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getDaxDialogCta(site)
+                getBrowserCta(site)
             } else {
                 getHomeCta()
             }
@@ -287,7 +287,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun getDaxDialogCta(site: Site?): Cta? {
+    private suspend fun getBrowserCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -298,6 +298,11 @@ class CtaViewModel @Inject constructor(
         nonNullSite.let {
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
+            }
+
+            if (!daxOnboardingActive() || hideTips() || extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()) {
+                // TODO (cbarreiro) Add logic to decide whether or not to show the prompt
+                return BrokenSitePromptDialogCta()
             }
 
             if (!canShowDaxDialogCta()) return null
