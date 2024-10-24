@@ -34,7 +34,6 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
@@ -92,9 +91,7 @@ class SpecialUrlDetectorImpl(
 
         val uri = uriString.toUri()
 
-        val willNavigateToDuckPlayerDeferred = scope.async(dispatcherProvider.io()) { duckPlayer.willNavigateToDuckPlayer(uri) }
-
-        val willNavigateToDuckPlayer = runBlocking(dispatcherProvider.io()) { willNavigateToDuckPlayerDeferred.await() }
+        val willNavigateToDuckPlayer = runBlocking(dispatcherProvider.io()) { duckPlayer.willNavigateToDuckPlayer(uri) }
 
         if (willNavigateToDuckPlayer) {
             return UrlType.ShouldLaunchDuckPlayerLink(url = uri)

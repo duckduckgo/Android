@@ -122,8 +122,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/duckPlayerModeSelector"
-                app:primaryText="Open YouTube Videos in Duck Player"
+                app:primaryText="@string/duck_player_open_videos_setting"
                 />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/openDuckPlayerInNewTabToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_player_open_in_a_new_tab_setting"
+                app:showSwitch="true"/>
 
         </LinearLayout>
 

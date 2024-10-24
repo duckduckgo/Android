@@ -107,6 +107,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     )
                                     .build(),
                             )
+                            .addParameter("callback", featureTogglesCallback.asClassName(module))
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
                             .addParameter("variantManager", variantManager.asClassName(module))
                             .addCode(
@@ -118,6 +119,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
                                 .localeProvider({ appBuildConfig.deviceLocale })
+                                .callback(callback)
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
                                 .build()
@@ -1151,6 +1153,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val context = FqName("android.content.Context")
         private val privacyFeaturePlugin = FqName("com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin")
         private val appBuildConfig = FqName("com.duckduckgo.appbuildconfig.api.AppBuildConfig")
+        private val featureTogglesCallback = FqName("com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback")
         private val variantManager = FqName("com.duckduckgo.experiments.api.VariantManager")
         private val buildFlavorInternal = FqName("com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL")
         private val moshi = FqName("com.squareup.moshi.Moshi")

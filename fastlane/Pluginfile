@@ -3,3 +3,4 @@
 # Ensure this file is checked in to source control!
 
 gem 'fastlane-plugin-property_file_read'
+gem 'fastlane-plugin-firebase_app_distribution'

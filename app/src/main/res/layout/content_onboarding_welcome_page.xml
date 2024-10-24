@@ -23,15 +23,12 @@
     android:tag="onboardingDefaultBrowser"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/sceneBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/onboarding_experiment_background_small_light" />
+        tools:srcCompat="@drawable/onboarding_background_small_light" />
 
     <ImageView
         android:id="@+id/foregroundImageView"
@@ -80,6 +77,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="88dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp"
+        app:layout_constraintHeight_max="672dp"/>
+
+    <include
+        android:id="@+id/daxDialogCtaExperiment"
+        layout="@layout/pre_onboarding_dax_dialog_cta_experiment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

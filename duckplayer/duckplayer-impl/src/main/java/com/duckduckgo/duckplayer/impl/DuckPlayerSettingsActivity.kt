@@ -29,6 +29,8 @@ import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
@@ -74,6 +76,9 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
         }
         binding.duckPlayerDisabledLearnMoreButton.setOnClickListener {
             viewModel.onContingencyLearnMoreClicked()
+        }
+        binding.openDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onOpenDuckPlayerInNewTabToggled(isChecked)
         }
     }
 
@@ -151,6 +156,9 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             is ViewState.Enabled -> {
                 binding.duckPlayerModeSelector.isEnabled = true
                 binding.duckPlayerDisabledSection.isVisible = false
+                binding.openDuckPlayerInNewTabToggle.isVisible =
+                    viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
+                binding.openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
                 setDuckPlayerSectionVisibility(true)
             }
             is ViewState.DisabledWithHelpLink -> {

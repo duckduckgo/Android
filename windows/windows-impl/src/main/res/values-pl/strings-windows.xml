@@ -22,6 +22,6 @@
     <string name="windows_description">DuckDuckGo dla systemu Windows ma wszystko, czego potrzebujesz, aby przeglądać strony internetowe, zachowując większą prywatność – prywatne wyszukiwanie, blokowanie śledzących, wymuszone szyfrowanie i blokowanie wyskakujących okienek z ciasteczkami, a w planach mamy jeszcze więcej najlepszych w swojej klasie zabezpieczeń.\n\nNa komputerze z systemem Windows przejdź do:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Udostępnij link</string>
-    <string name="windows_share_text">Chcesz rozpocząć prywatne przeglądanie w systemie Windows?\n\nOdwiedź ten adres na komputerze z systemem Windows, aby pobrać:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Chcesz rozpocząć prywatne przeglądanie w systemie Windows?\n\nOdwiedź ten adres na komputerze z systemem Windows, aby pobrać:\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Szukasz wersji na komputer Mac?</string>
 </resources>

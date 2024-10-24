@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -32,6 +33,7 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
 ) :
     ViewModel() {
 
@@ -46,6 +48,7 @@ class LaunchViewModel @Inject constructor(
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
+            highlightsOnboardingExperimentManager.setExperimentVariants()
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()

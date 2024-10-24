@@ -1,0 +1,10 @@
+$ ls /bin/bash
+/bin/bash
+$ sudo su -
+[sudo] password for sio4: 
+# ls /bin/bash
+/bin/bash
+# 
+# exit
+logout
+$ 

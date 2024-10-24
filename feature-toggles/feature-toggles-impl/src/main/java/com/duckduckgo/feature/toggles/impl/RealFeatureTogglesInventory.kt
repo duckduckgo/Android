@@ -33,4 +33,12 @@ class RealFeatureTogglesInventory @Inject constructor(
     override suspend fun getAll(): List<Toggle> = withContext(dispatcherProvider.io()) {
         return@withContext toggles.flatMap { it.getAll() }.distinctBy { it.featureName() }
     }
+
+    override suspend fun getAllTogglesForParent(name: String): List<Toggle> = withContext(dispatcherProvider.io()) {
+        return@withContext getAll().filter { it.featureName().parentName == name }
+    }
+
+    override suspend fun getAllActiveExperimentToggles(): List<Toggle> = withContext(dispatcherProvider.io()) {
+        return@withContext getAll().filter { it.getCohort() != null && it.isEnabled() }
+    }
 }

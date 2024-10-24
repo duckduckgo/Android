@@ -22,6 +22,6 @@
     <string name="windows_description">Το DuckDuckGo για Windows έχει ό,τι χρειάζεστε για να περιηγηθείτε με περισσότερη ιδιωτικότητα — ιδιωτική αναζήτηση, αποκλεισμός εφαρμογών παρακολούθησης, αναγκαστική κρυπτογράφηση και αποκλεισμός αναδυόμενων παραθύρων για cookie, ενώ έρχονται σύντομα και περισσότερες κορυφαίες προστασίες στην κατηγορία τους.\n\nΣτον υπολογιστή σας με Windows, μεταβείτε στη διεύθυνση:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Κοινή χρήση συνδέσμου</string>
-    <string name="windows_share_text">Είστε έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Windows;\n\nΕπισκεφθείτε αυτήν τη διεύθυνση URL στον υπολογιστή σας με Windows για να κάνετε λήψη:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Είστε έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Windows;\n\nΕπισκεφθείτε αυτήν τη διεύθυνση URL στον υπολογιστή σας με Windows για να κάνετε λήψη:\nhttps://duckduckgo.com/windows?origin=funnel_browser_android_settings</string>
     <string name="windows_mac_link">Αναζητάτε την έκδοση των Mac;</string>
 </resources>

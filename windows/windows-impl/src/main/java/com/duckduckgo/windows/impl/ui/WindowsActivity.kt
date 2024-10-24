@@ -78,15 +78,17 @@ class WindowsActivity : DuckDuckGoActivity() {
 
     private fun executeCommand(command: Command) {
         when (command) {
-            is ShareLink -> launchSharePageChooser()
+            is ShareLink -> launchSharePageChooser(command.originEnabled)
             is GoToMacClientSettings -> launchMacClientSettings()
         }
     }
 
-    private fun launchSharePageChooser() {
+    private fun launchSharePageChooser(addOrigin: Boolean) {
+        var shareText = getString(R.string.windows_share_text)
+        if (!addOrigin) { shareText = shareText.replace(ORIGIN_URL_PATH, "") }
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/html"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.windows_share_text))
+            putExtra(Intent.EXTRA_TEXT, shareText)
             putExtra(Intent.EXTRA_TITLE, getString(R.string.windows_share_title))
         }
 
@@ -106,5 +108,9 @@ class WindowsActivity : DuckDuckGoActivity() {
     private fun launchMacClientSettings() {
         globalActivityStarter.start(this, MacOsScreenWithEmptyParams)
         finish()
+    }
+
+    companion object {
+        const val ORIGIN_URL_PATH = "?origin=funnel_browser_android_settings"
     }
 }

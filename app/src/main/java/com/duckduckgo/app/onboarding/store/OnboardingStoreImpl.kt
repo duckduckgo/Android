@@ -170,6 +170,41 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
         )
     }
 
+    override fun getExperimentSearchOptions(): List<DaxDialogIntroOption> {
+        val country = Locale.getDefault().country
+        val language = Locale.getDefault().language
+
+        return listOf(
+            DaxDialogIntroOption(
+                optionText = if (language == "en") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption1English)
+                } else {
+                    context.getString(R.string.onboardingSearchDaxDialogOption1)
+                },
+                iconRes = drawable.ic_find_search_16,
+                link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
+            ),
+            DaxDialogIntroOption(
+                optionText = if (country == "US") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                } else {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                },
+                iconRes = drawable.ic_find_search_16,
+                link = if (country == "US") {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
+                } else {
+                    context.getString(R.string.onboardingSearchDaxDialogOption2)
+                },
+            ),
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
+                iconRes = drawable.ic_wand_16,
+                link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
+            ),
+        )
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
