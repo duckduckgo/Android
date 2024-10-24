@@ -24,10 +24,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -40,13 +40,12 @@ import logcat.logcat
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class,
 )
-class AutoExcludeAppReceiver @Inject constructor(
-    private val networkProtectionState: NetworkProtectionState,
-    private val localConfig: NetPSettingsLocalConfig,
-    private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
+class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
     @AppCoroutineScope private var coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val networkProtectionState: NetworkProtectionState,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onReceive(
         context: Context?,
@@ -62,14 +61,14 @@ class AutoExcludeAppReceiver @Inject constructor(
     }
 
     private suspend fun restartVpn(packageName: String) {
-        if (localConfig.autoExcludeBrokenApps().isEnabled()) {
-            logcat { "Auto exclude enabled, checking if $packageName is in auto exclude list" }
-            if (autoExcludeAppsRepository.isAppMarkedAsIncompatible(packageName)) {
-                logcat { "Newly installed package $packageName is in auto exclude list" }
-                networkProtectionState.restart()
-            } else {
-                logcat { "Newly installed package $packageName not in auto exclude list" }
-            }
+        if (networkProtectionState.isEnabled() && networkProtectionState.isAppExcluded(packageName)) {
+            logcat { "Newly installed package $packageName is in NetP exclusion list, disabling/re-enabling vpn" }
+            networkProtectionState.restart()
+        } else if (appTrackingProtection.isEnabled() && appTrackingProtection.isAppExcluded(packageName)) {
+            logcat { "Newly installed package $packageName is in AppTP exclusion list, disabling/re-enabling vpn" }
+            appTrackingProtection.restart()
+        } else {
+            logcat { "Newly installed package $packageName not in any exclusion list" }
         }
     }
 
@@ -81,7 +80,7 @@ class AutoExcludeAppReceiver @Inject constructor(
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
         }.run {
-            applicationContext.registerExportedReceiver(this@AutoExcludeAppReceiver, this)
+            applicationContext.registerExportedReceiver(this@NewAppBroadcastReceiver, this)
         }
     }
 

@@ -47,7 +47,7 @@ class RealNetPExclusionListRepository @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             val manuallyExcludedApps = manualExclusionListRepository.getManualAppExclusionList()
             val autoExcludeApps = if (isAutoExcludeEnabled()) {
-                autoExcludeAppsRepository.getInstalledIncompatibleApps()
+                autoExcludeAppsRepository.getAllIncompatibleApps()
             } else {
                 emptyList()
             }

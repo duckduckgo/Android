@@ -172,6 +172,10 @@ class NetpAppExclusionListViewModel @Inject constructor(
         }.flowOn(dispatcherProvider.io())
     }
 
+    /**
+     * This method takes all installed apps on the device and transforms each to items to be rendered on the exclusion list taking
+     * into consideration the user's manual exclusion list and the auto-exclude feature.
+     */
     private fun getAppsForExclusionList(): Flow<List<NetpExclusionListApp>> {
         return combine(
             forceRefreshList, // allows us to manually force refresh the list
@@ -180,16 +184,24 @@ class NetpAppExclusionListViewModel @Inject constructor(
         ) { _, userExclusionList, autoExcludeList ->
             val autoExcludeFeatureEnabled = autoExcludeAppsRepository.getAllIncompatibleApps().isNotEmpty()
             val autoExcludeEnabled = localConfig.autoExcludeBrokenApps().isEnabled()
+
             installedApps.map { appInfo ->
                 val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
                 NetpExclusionListApp(
                     packageName = appInfo.packageName,
                     name = packageManager.getApplicationLabel(appInfo).toString(),
+                    /**
+                     * If app is part of user exclusion list, the value is whatever isProtected in exclusion list is.
+                     * Else, if app is part of the auto-exclude list, the value is whatever the state of the auto exclude setting is.
+                     * Else, if app is not part of the user exclusion and auto exclude, isProtected is true.
+                     */
                     isProtected = userExcludedApp?.isProtected ?: if (autoExcludeFeatureEnabled && autoExcludeList.contains(appInfo.packageName)) {
                         !autoExcludeEnabled
                     } else {
                         true
                     },
+                    // If auto exclude feature is available, we set this to true if the app is part of auto exclude list. Else, it is set to false.
+                    // This value is used to show the incompatible label
                     isNotCompatibleWithVPN = if (autoExcludeFeatureEnabled) {
                         autoExcludeList.contains(appInfo.packageName)
                     } else {
