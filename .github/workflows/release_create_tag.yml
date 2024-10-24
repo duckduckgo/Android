@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
@@ -32,9 +33,10 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
-      - name: Set Git permissions ruby env
-        run: |
-          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+      - name: Set Git permissions
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: '${{ secrets.GT_DAXMOBILE }}'
 
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
