@@ -23,8 +23,9 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButton
-import com.duckduckgo.common.ui.view.button.DaxButtonGhost
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
@@ -82,12 +83,12 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
-    fun setPositiveButton(@StringRes textId: Int): TextAlertDialogBuilder {
+    fun setPositiveButton(@StringRes textId: Int, buttonType: ButtonType = ButtonType.PRIMARY): TextAlertDialogBuilder {
         positiveButtonText = context.getText(textId)
         return this
     }
 
-    fun setNegativeButton(@StringRes textId: Int): TextAlertDialogBuilder {
+    fun setNegativeButton(@StringRes textId: Int, buttonType: ButtonType = ButtonType.GHOST): TextAlertDialogBuilder {
         negativeButtonText = context.getText(textId)
         return this
     }
@@ -122,23 +123,11 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogCheckBox.show()
         }
 
-        val ghostButtonDestructive = DaxButtonGhost(context, null)
-        ghostButtonDestructive.setTextColor(
-            ContextCompat.getColorStateList(
-                context,
-                R.color.destructive_text_color_selector,
-            ),
-        )
-        ghostButtonDestructive.setText(checkBoxText)
+        val ghostButtonDestructive = DaxButtonPrimary(context, null)
+        ghostButtonDestructive.setText("Keep")
 
-        val ghostButton = DaxButtonGhost(context, null)
-        ghostButton.setTextColor(
-            ContextCompat.getColorStateList(
-                context,
-                R.color.secondary_text_color_selector,
-            ),
-        )
-        ghostButton.setText(checkBoxText)
+        val ghostButton = DaxButtonPrimary(context, null)
+        ghostButton.setText("Keep")
 
         binding.textAlertDialogButtonContainer.addView(ghostButton)
         binding.textAlertDialogButtonContainer.addView(ghostButtonDestructive)

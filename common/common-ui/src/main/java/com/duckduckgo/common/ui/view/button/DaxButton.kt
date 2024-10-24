@@ -90,3 +90,11 @@ enum class Size {
         }
     }
 }
+
+enum class ButtonType {
+    PRIMARY,
+    GHOST,
+    SECONDARY,
+    DESTRUCTIVE,
+    GHOST_DESTRUCTIVE,
+}
