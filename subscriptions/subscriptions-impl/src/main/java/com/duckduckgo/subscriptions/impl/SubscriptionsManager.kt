@@ -210,7 +210,11 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            val entitlements: List<Product> = authRepository.getSubscription()?.entitlements?.toProductList() ?: emptyList()
+            val entitlements: List<Product> = if (authRepository.getSubscription() != null) {
+                authRepository.getEntitlements().toProductList()
+            } else {
+                emptyList()
+            }
             _entitlements.emit(entitlements)
         }
     }
@@ -337,9 +341,10 @@ class RealSubscriptionsManager @Inject constructor(
                         expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
                         status = subscriptionStatus,
                         platform = confirmationResponse.subscription.platform,
-                        entitlements = confirmationResponse.entitlements.toEntitlements(),
                     ),
                 )
+
+                authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
 
                 if (subscriptionStatus.isActive()) {
                     pixelSender.reportPurchaseSuccess()
@@ -409,9 +414,9 @@ class RealSubscriptionsManager @Inject constructor(
                     expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                     status = subscription.status.toStatus(),
                     platform = subscription.platform,
-                    entitlements = accountData.entitlements.toEntitlements(),
                 ),
             )
+            authRepository.setEntitlements(accountData.entitlements.toEntitlements())
             emitEntitlementsValues()
             _subscriptionStatus.emit(authRepository.getStatus())
             _isSignedIn.emit(isUserAuthenticated())

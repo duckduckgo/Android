@@ -12,7 +12,6 @@ import com.duckduckgo.subscriptions.impl.AuthToken
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -642,7 +641,6 @@ class SubscriptionMessagingInterfaceTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
-                entitlements = listOf(Entitlement("name", "product")),
             ),
         )
     }

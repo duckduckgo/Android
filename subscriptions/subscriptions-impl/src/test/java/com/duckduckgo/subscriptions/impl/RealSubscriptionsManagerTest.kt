@@ -107,12 +107,11 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithEntitlements()
         givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
-        val subscription = result.subscription
+        subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
 
         verify(authService).storeLogin(any())
         assertEquals("authToken", authDataStore.authToken)
-        assertTrue(subscription.entitlements.firstOrNull { it.product == NetP.value } != null)
+        assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
     }
 
     @Test
@@ -144,11 +143,10 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithEntitlements()
         givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
-        val subscription = result.subscription
+        subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
 
         assertEquals("1234", authDataStore.externalId)
-        assertTrue(subscription.entitlements.firstOrNull { it.product == NetP.value } != null)
+        assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
     }
 
     @Test
@@ -203,9 +201,9 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         givenSubscriptionSucceedsWithEntitlements()
 
-        val value = subscriptionsManager.fetchAndStoreAllData()
+        subscriptionsManager.fetchAndStoreAllData()
         assertEquals("1234", authDataStore.externalId)
-        assertTrue(value?.entitlements?.firstOrNull { it.product == NetP.value } != null)
+        assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
     }
 
     @Test

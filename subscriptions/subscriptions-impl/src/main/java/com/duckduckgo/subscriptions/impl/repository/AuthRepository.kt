@@ -47,6 +47,7 @@ interface AuthRepository {
     suspend fun setSubscription(subscription: Subscription?)
     suspend fun getSubscription(): Subscription?
     suspend fun setEntitlements(entitlements: List<Entitlement>)
+    suspend fun getEntitlements(): List<Entitlement>
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
@@ -70,6 +71,10 @@ class RealAuthRepository @Inject constructor(
 
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
+    }
+
+    override suspend fun getEntitlements(): List<Entitlement> {
+        return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
     }
 
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
@@ -98,7 +103,6 @@ class RealAuthRepository @Inject constructor(
 
     override suspend fun setSubscription(subscription: Subscription?) = withContext(dispatcherProvider.io()) {
         with(subscriptionsDataStore) {
-            entitlements = moshi.listToJson(subscription?.entitlements ?: emptyList())
             productId = subscription?.productId
             platform = subscription?.platform
             startedAt = subscription?.startedAt
@@ -108,7 +112,6 @@ class RealAuthRepository @Inject constructor(
     }
 
     override suspend fun getSubscription(): Subscription? = withContext(dispatcherProvider.io()) {
-        val entitlements = subscriptionsDataStore.entitlements ?: "[]"
         val productId = subscriptionsDataStore.productId ?: return@withContext null
         val platform = subscriptionsDataStore.platform ?: return@withContext null
         val startedAt = subscriptionsDataStore.startedAt ?: return@withContext null
@@ -120,7 +123,6 @@ class RealAuthRepository @Inject constructor(
             startedAt = startedAt,
             expiresOrRenewsAt = expiresOrRenewsAt,
             status = status,
-            entitlements = moshi.parseList<Entitlement>(entitlements).orEmpty(),
         )
     }
 
@@ -155,7 +157,6 @@ data class Subscription(
     val expiresOrRenewsAt: Long,
     val status: SubscriptionStatus,
     val platform: String,
-    val entitlements: List<Entitlement>,
 ) {
     fun isActive(): Boolean = status.isActive()
 }
