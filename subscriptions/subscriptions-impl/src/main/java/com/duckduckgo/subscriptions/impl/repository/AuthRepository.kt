@@ -41,7 +41,7 @@ import kotlinx.coroutines.withContext
 interface AuthRepository {
     suspend fun setAccessToken(accessToken: String)
     suspend fun getAccessToken(): String?
-    suspend fun saveAuthToken(authToken: String)
+    suspend fun setAuthToken(authToken: String)
     suspend fun getAuthToken(): String?
     suspend fun saveAccountData(authToken: String, externalId: String)
     suspend fun getAccount(): Account?
@@ -90,7 +90,7 @@ class RealAuthRepository @Inject constructor(
         subscriptionsDataStore.accessToken = accessToken
     }
 
-    override suspend fun saveAuthToken(authToken: String) = withContext(dispatcherProvider.io()) {
+    override suspend fun setAuthToken(authToken: String) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.authToken = authToken
     }
 

@@ -377,7 +377,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun exchangeAuthToken(authToken: String): String {
         val accessToken = authService.accessToken("Bearer $authToken").accessToken
         authRepository.setAccessToken(accessToken)
-        authRepository.saveAuthToken(authToken)
+        authRepository.setAuthToken(authToken)
         return accessToken
     }
 
