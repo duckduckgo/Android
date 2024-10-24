@@ -257,13 +257,13 @@ platform :android do
 
         # Checkout all branches are available
         sh("git fetch")
-        sh("git checkout main_test")
+        sh("git checkout main")
         sh("git branch")
         sh("git submodule update --init --recursive")
         sh("git reset --hard")
         sh("git clean -f -fxd")
 
-        sh("git checkout develop_test")
+        sh("git checkout develop")
         sh("git branch")
         sh("git submodule update --init --recursive")
         sh("git reset --hard")
@@ -283,18 +283,18 @@ platform :android do
         sh "git push origin #{branch_name}"
 
         # Merge release branch into main and tag it
-        sh "git checkout main_test"
-        sh "git pull origin main_test"
+        sh "git checkout main"
+        sh "git pull origin main"
         sh "git merge --no-ff release/#{app_version}"
         sh "git tag -a #{app_version} -m #{app_version}"
-        sh "git push origin main_test --tags"
+        sh "git push origin main --tags"
         UI.header("#{app_version} tag has been successfully created. 🎉")
 
         # Merge changes into develop
-        sh "git checkout develop_test"
-        sh "git pull origin develop_test"
+        sh "git checkout develop"
+        sh "git pull origin develop"
         sh "git merge --no-ff release/#{app_version}"
-        sh "git push origin develop_test"
+        sh "git push origin develop"
 
         # Clean up branches
         sh "git push -d origin release/#{app_version}"
