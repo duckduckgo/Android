@@ -277,6 +277,8 @@ platform :android do
             file.write("VERSION=#{app_version}")
         end
 
+        sh("git add .")
+
         git_commit(
             message: "Updated version number for new release - #{app_version}",
             path: "*",
