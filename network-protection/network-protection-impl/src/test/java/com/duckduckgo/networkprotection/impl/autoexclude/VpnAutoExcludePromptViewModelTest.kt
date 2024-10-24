@@ -138,6 +138,21 @@ class VpnAutoExcludePromptViewModelTest {
     }
 
     @Test
+    fun whenAutoExcludeCheckedWithOneAppUncheckedThenEnableAutoExcludeAndEnableOneUncheckedApp() {
+        whenever(netPManualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+        viewModel.onPromptShown(listOf("test1", "test2"), VPN_SCREEN)
+        viewModel.updateAppExcludeState("test2", false)
+
+        viewModel.onAddExclusionsSelected(true)
+
+        verify(netPManualExclusionListRepository).getManualAppExclusionList()
+        verify(netPManualExclusionListRepository).manuallyEnableApps(listOf("test2"))
+        verifyNoMoreInteractions(netPManualExclusionListRepository)
+        verify(networkProtectionState).restart()
+        assertTrue(localConfig.autoExcludeBrokenApps().isEnabled())
+    }
+
+    @Test
     fun whenAddExclusionsWithAnIncompatibleAppManuallyEnabledThenEnableAutoExcludeAndManuallyExcludeApp() {
         whenever(netPManualExclusionListRepository.getManualAppExclusionList()).thenReturn(
             listOf(
