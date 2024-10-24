@@ -1,0 +1,465 @@
+=== 4.6.0 / 2021-04-09
+
+* Fix error with SortedSet on Ruby 3.0 (#98).
+* Remove `#reset_io` as it didn't do anything.
+* Drop support for Ruby < 2.4.
+
+=== 4.5.2 / 2020-03-12
+
+* Fix bug handling global options provided in option=value form (#47). (@orien)
+* Fix ERB warnings under Ruby 2.7. (@esotericpig)
+* Fix bug handling global options placed before command name (#32). (@orien)
+
+=== 4.5.1 / 2020-03-08
+
+* Fix bug causing global options to be ignored when arguments are present (#86). (@orien)
+
+=== 4.5.0 / 2020-01-21
+
+* Drop support for Ruby < 2.3.
+* Fix bug parsing double dash (#75).
+
+=== 4.4.7 / 2018-10-22
+
+* Update HighLine dependency to 2.0.0. (@rohitpaulk)
+
+=== 4.4.6 / 2018-07-31
+
+* Fix unexpected internal behavior change introduced in 4.4.5.
+
+=== 4.4.5 / 2018-05-22
+
+* Make internal command state less mutable. (@doriantaylor)
+
+=== 4.4.4 / 2018-01-18
+
+* Fix deprecated constant warnings on Ruby 2.5. (@mattbrictson)
+
+=== 4.4.3 / 2016-12-28
+
+* Fix deprecated constant warnings on Ruby 2.4.
+
+=== 4.4.2 / 2016-12-20
+
+* Add `help_paging` program flag so that help paging may be disabled. (@gogiel)
+
+=== 4.4.1 / 2016-12-02
+
+* Fix #36 - Warning about MissingSourceFile (@fallwith)
+* Fix build on Ruby 1.9
+
+=== 4.4.0 / 2016-02-19
+
+* Add modular style template initialization. (@lebogan)
+* Allow option names that start with a global option name.
+* Fix handling of negatable global flags. (@mfurtak)
+
+=== 4.3.8 / 2016-02-09
+
+* Fix regression for deprecation warnings.
+
+=== 4.3.7 / 2016-01-26
+
+* Fix regression in help formatter introduced in 4.3.6.
+
+=== 4.3.6 / 2016-01-26 [YANKED]
+
+* Fix deprecation warnings on Ruby 2.3.0.
+* Indent option descriptions the same way as program and command descriptions. (@badeball)
+
+=== 4.3.5 / 2015-08-09
+
+* Fixed a bug with small terminal widths, changed minimum screen width for wrapping to 40 columns. (@toolmantim)
+
+=== 4.3.4 / 2015-05-03
+
+* Fixed a regression with the compact help formatter.
+
+=== 4.3.3 / 2015-04-21
+
+* Updated to highline 1.7.2 to fix a regression with terminal size (https://github.com/JEG2/highline/pull/139).
+* Help formatting updated to look better for commands with long names. (@jszwedko)
+
+=== 4.3.2 / 2015-03-31
+
+* Version bump to publish new location of Commander to Rubygems. Moved to https://github.com/commander-rb/commander
+
+=== 4.3.1 / 2015-03-27
+
+* Fix various Ruby warnings for circular requires, etc.
+* Update to use highline 1.7 (@SkyTrix)
+
+=== 4.3.0 / 2015-02-07
+
+* Drops support for Ruby 1.8. Please use 4.2.1 if you still need Ruby 1.8 compatibility.
+* Fixed a bug with `always_trace` (#91) (@KrauseFx)
+* Renamed `commands` to `defined_commands` for better compatibility with Pry
+
+=== 4.2.1 / 2014-09-28
+
+* Improve `choose` compatibility with HighLine's version (#79)
+
+=== 4.2.0 / 2014-04-29
+
+* Add ability to use commander without importing into the global namespace (#61) (@krissi)
+
+=== 4.1.6 / 2014-02-11
+
+* Respect environment setting for $LESS (@ellemenno)
+* Add ability to hide trace flags and globally enable tracing (#16, #17) (@jamesrwhite)
+
+=== 4.1.5 / 2013-08-11
+
+* Prevent deprecation warning when loaded in a Rails 4 environment (#58)
+
+=== 4.1.4 / 2013-07-21
+
+* Improve help formatting for multiline program and command descriptions
+* Add ability to set speaking rate (@kethomassen)
+* Clean up examples in docs (@parkr)
+
+=== 4.1.3 / 2012-12-15
+
+* Remove use of eval in Array.parse
+* Make generated template executable and set better defaults (@suan)
+* Fixed valid_command_names_from to match exact commands only (@fgalassi)
+
+=== 4.1.2 / 2012-02-17
+
+* Improvement to `ask_editor` to be more portable across *nix variants. (thanks to Federico Galassi)
+
+=== 4.1.1 / 2012-02-16
+
+* Update `ask_editor` to work with any *nix editor - emacs, vim, etc. (thanks to Federico Galassi)
+
+=== 4.1.0 / 2012-02-12
+
+* Update highline dependency.
+* Make optional arguments true when present (issue #2).
+
+=== 4.0.7 / 2012-01-23
+
+* Improved support for JRuby and Windows (and any other platforms that don't support Kernel.fork).
+* Fixed bug #33 - support `--help` after commands.
+* Reorganized help output to display synopsis before description (issue #12).
+
+=== 4.0.6 / 2011-09-15
+
+* Improved load time on Ruby 1.9. (thanks to Jonathon M. Abbott)
+* Updated documentation.
+
+=== 4.0.5 / 2011-08-09
+
+* Updated documentation to fix inaccuracies and unclear information.
+* Improved rake tasks for gem development.
+* Added say_ok, say_warning and say_error methods to print messages in green, yellow or red. (thanks to Simon Courtois)
+* Fixed; Allow global options to be passed in any order, even mixed with command options. (thanks to Rich Grundy)
+* Fixed; Global options can be passed before or after the command, they can even be mixed with command options. Closes #8. (thanks to Rich Grundy)
+* Fixed; Platform test should now correctly identify JRuby. (thanks to Justin Lynn)
+* Fixed; Add to_s to exceptions as option parser no longer does implicit conversion. (thanks to Justin Lynn)
+
+=== 4.0.4 / 2011-04-04
+
+* Fixed program(:key) behavior for non-Array keys like name, version, description under Ruby 1.9
+* All specs should pass under Ruby 1.9 now
+
+=== 4.0.3 / 2010-04-06
+
+* Fixed global_option which was consuming arguments when not expected. Closes #22
+
+=== 4.0.2 / 2010-01-19
+
+* Added program(:int_block) to allow a block to be run on interrupt.
+* Fixed; ProgressBar immediately shows, and doesn't die on empty lists.
+
+=== 4.0.1 / 2010-01-14
+
+* Fixed commander when using JRuby
+* Fixed template; should require "commander/import"
+
+=== 4.0.0 / 2009-10-10
+
+* Changed; Aliased #when_called as #action [#9]
+* Changed; Sort commands and aliases alphabetically.
+* Changed; Sort aliases alphabetically
+* Changed; Sort commands alphabetically.
+* Changed; require user to require 'commander/import' for dsl
+* Fixed broken regexp; Changed :int_message, only traps INT when available
+* Fixed Ruby 1.9 warning caused by removing object_id from Object
+* Removed #eval const hack
+* Moving to Gemcutter (GRRRR Github)
+
+=== 3.3.0 / 2009-05-12
+
+* Added #choose
+* Added aliasing for help formatters [#24]
+* Added UI.replace_tokens
+* Added #converse
+* Added #speak
+* Added #applescript
+* Added #reset_io
+* Added #io
+* Removed String#tokenize
+* Removed #delete_switches
+
+=== 3.2.9 / 2009-04-09
+
+* Fixed bug in removal of global options
+
+=== 3.2.8 / 2009-04-09
+
+* Added auto-loading support of visionmedia-growl convenience methods when the gem is available
+* Changed; growl related methods are now part of visionmedia-growl
+* Fixed doc typos
+
+=== 3.2.7 / 2009-04-08
+
+* Added #notify, #notify_ok, #notify_warning, #notify_info and #notify_error
+  These methods all utilize the MacOS growlnotify binary, very cool stuff check it out!
+
+=== 3.2.6 / 2009-04-08
+
+* Added Commander::UI::AskForClass
+* Added support to #remove_global_options for options with arguments
+* Removed .re directory used for visionmedia-release
+* Fixed bug preventing --trace from working
+
+=== 3.2.5 / 2009-04-02
+
+* Added #ask_editor
+
+=== 3.2.4 / 2009-04-02
+
+* Added #enable_paging [#9]
+
+=== 3.2.3 / 2009-04-01
+
+* Added new pager using less [#9]
+
+=== 3.2.2 / 2009-04-01
+
+* Github's gem builder timed out ? ...
+
+=== 3.2.1 / 2009-04-01
+
+* Added Commander::HelpFormatter::TerminalCompact
+* Fix; updated gemspec / manifest removing test/* causing issue [#26]
+
+=== 3.2.0 / 2009-03-26
+
+* Added implied small switches so they appear in help (-h, -v, etc)
+* Added #inspect back to Commander::Command::Options [#1]
+* Added inheritance of global options for commands [#7]
+* Added #require_valid_command 
+* Renamed #call_active_command to #run_active_command
+* Changed; using same option format as command options for globals [#18]
+* Changed; program :name is now optional, and is auto-defined when not specified [#21]
+* Moved #switch_to_sym from Command to Commander::Runner
+* Moved #separate_switches_from_description into Commander::Runner [#22]
+* Removed program :name from commander init template since its not required anymore
+
+=== 3.1.8 / 2009-03-25
+
+* Utilizing abort and $stderr instead of using #say [#16]
+* Fixed INT trapping issue (purely cosmetic) [#14]
+* Removed todo, use lighthouse now for commander at:
+  http://visionmedia.lighthouseapp.com/projects/27643-commander/overview
+
+=== 3.1.7 / 2009-03-24
+
+* Added global --trace option
+
+=== 3.1.6 / 2009-03-22
+
+* Changed Options struct to always use symbols
+
+=== 3.1.5 / 2009-03-22
+
+* Added Options#__hash__ to access the internal hash table
+* Refactored Options struct to function much like an OpenStruct
+* Updated commander exec init help description
+
+=== 3.1.4 / 2009-03-20
+
+* Gemspec typo
+
+=== 3.1.3 / 2009-03-20
+
+* Added #remove_global_options
+* Added core global option descriptions
+* Added display of global options
+* Removed small core switches (-v, -h) because they are implicitly set
+* Fixed issue with option switchs failing when named as common methods like --send, or --password
+* Fixed bug causing InvalidOption error when global options do not abort the process.
+  This was due to these options remaining in the arguments array, in turn being parsed
+  by the command's option parser, issuing the error. This is fixed by #remove_global_options.
+
+=== 3.1.2 / 2009-03-16
+
+* Added support for global options via #global_option
+* Added #call_active_command and #say to clean things up internally
+* Misc refactoring
+
+=== 3.1.1 / 2009-03-13
+
+* Fixed some terminal formatter spacing issues
+
+=== 3.1.0 / 2009-03-13
+
+* Added Command#inspect
+* Added displaying of aliases in global help
+* Added support for alias args
+* Added #default_command
+
+=== 3.0.3 / 2009-03-12
+
+* Added #alias_command
+
+=== 3.0.2 / 2009-03-12
+
+* Added terminal formatter specs
+* Fixed bug preventing command names passed to help from working
+
+=== 3.0.1 / 2009-03-12
+
+* Fixed bug in #command_name_from_args preventing the left-most match for a command name to be used
+* Fixed bug in Command#example preventing the formatter from outputting them correctly
+
+=== 3.0.0 / 2009-03-12
+
+* Added sub command help support when using the --help switch
+* #delete_switches is now mutative
+* Added #valid_command_names_from
+* #when_called now raises argument error when neither a block, object, or class is passed
+* Added options#default method and specs
+* Added support for multi-word list parsing in Array#parse
+* Added summary to commander template
+* Added optional block param for #new_command_runner spec helper
+* Added .re (metadata for visionmedia-release gem)
+* Moved delgation of Kernel methods to Object
+* Refactored multi-word command name specs
+* Refactored Object#method_missing; using call chain to implement
+* Refactored all specs
+* Change #color calls in formatters to $terminal#color for now
+* Using highlines $terminal.output for IO stream with the progressbar
+* Replaced #ensure_program_key_set with #require_program, taking an array of keys
+* Renamed #args_without_command to #args_without_command_name
+* Renamed #populate_options_to_when_called to #option_proc
+* Renamed #sym_from_switch to #switch_to_sym
+* Removed #get_command, use #command without supplying a block
+* Removed Command#inspect
+* Removed command description aliases of short_description, long_description. Use description / summary
+* Removed VerboseFileUtils
+* Removed String#camelcase as its not really needed (was only used in commander's executable for creating templates)
+* Removed commander/import for now
+* Removed LOG_FORMAT
+* Removed Kernel ext which only had #color
+
+=== 2.5.7 / 2009-03-11
+
+* Fixed paren warnings in import spec
+* Fixed Kernel#method_missing to preserve its original behavior (Raise errors for missing methods or variables)
+
+=== 2.5.6 / 2009-03-06
+
+* Replaced Commander::VERSION::STRING with Commander::VERSION (for release gem)
+* Refactored progress bar
+* Fixed String#tokenize
+
+=== 2.4.5 / 2009-03-03
+
+* Fixed bug which was not allowing switch arguments which are strings
+  such as --eval 'something here'
+
+=== 2.4.4 / 2009-01-15
+
+* Fixed bug which was not allowing multi-word commands to view help
+
+=== 2.4.3 / 2009-01-15
+
+* Fixed bug in command_name_from_args, preventing multi-word commands
+
+=== 2.4.2 / 2009-01-12
+
+* Github! build me!
+
+=== 2.4.1 / 2009-01-11
+
+* Added ask_for_CLASS, which may be any class name such as ask_for_date, ask_for_array, etc
+* Changed doc to *.rdoc for pretty markup on github
+
+=== 2.3.0 / 2008-12-16
+
+* Removed input, output in favour of HighLines $terminal
+* Autoloading terminal formatter since it may not always be used
+* Added wrapping of text with 10 padding, defaults to 80
+* Added friendly interruption message by default, overridable with trap or int_message
+* Fixed description now showing as summary when no summary is available
+
+=== 2.2.1 / 2008-12-09
+
+* Fixed typo in String#tokenize, preventing progress bar from working
+* Fixed some small formatting issues with help output
+
+=== 2.2.0 / 2008-12-09
+
+* Additional documentation
+* Added support for arbitrary help 'blocks' using program :help, 'Your block', 'Your blocks contents'
+* Added support for description, summary, short_description, and large_description, which are displaying conditionally within help docs
+* Allowing uncaught exceptions to reach stderr, for debugging purposes
+
+=== 2.1.1 / 2008-12-01
+
+* Changed #password, now requires that the user must enter a non-empty? value
+
+=== 2.1.0 / 2008-12-01
+
+* Added progress bar
+* Added auto-inclusion of FileUtils module
+* Added stdout logging method
+* Fixed issue with options placed before command
+
+=== 2.0.1 / 2008-11-24
+
+* Fixed new line after command options
+* Fixed padding for command list
+
+=== 2.0.0 / 2008-11-24
+
+* Rewrite of entire gem
+* Added auto-parsing and struct population of options
+* Added better documentation
+
+=== 1.2.2 / 2008-11-06
+
+* Forgot to add array.rb
+
+=== 1.2.0 / 2008-11-06
+
+* Added paging ability (similar to 'less')
+* Added coloring to default help generator
+
+=== 1.1.0 / 2008-11-06
+
+* Added dependency for Highline gem, which replaces Commander's user interaction lib
+
+=== 1.0.4 / 2008-11-04
+
+* Added support for --help and --version flags
+
+=== 1.0.3 / 2008-11-01
+
+* Typo causing the gem to fail build on github
+
+=== 1.0.2 / 2008-11-01
+
+* Added gemspec for github
+
+=== 1.0.1 / 2008-10-31
+
+* Added shebang line to commander init
+* Added require 'rubygems' 
+
+=== 1.0.0 / 2008-10-31
+
+* Initial release

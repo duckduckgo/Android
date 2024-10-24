@@ -1,0 +1,13 @@
+--hide-void-return
+--no-private
+--verbose
+--title=google-apis-firebaseappdistribution_v1alpha
+--markup-provider=redcarpet
+--markup=markdown
+--main OVERVIEW.md
+lib/google/apis/firebaseappdistribution_v1alpha/*.rb
+lib/google/apis/firebaseappdistribution_v1alpha.rb
+-
+OVERVIEW.md
+CHANGELOG.md
+LICENSE.md

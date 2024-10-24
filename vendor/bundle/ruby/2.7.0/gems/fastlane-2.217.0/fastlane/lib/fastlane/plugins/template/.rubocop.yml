@@ -1,0 +1,192 @@
+---
+require:
+- rubocop/require_tools
+- rubocop-performance
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  Include:
+  - "**/*.rb"
+  - "**/*file"
+  - "**/*.gemspec"
+  - "*/lib/assets/*Template"
+  - "*/lib/assets/*TemplateAndroid"
+  Exclude:
+  - "**/lib/assets/custom_action_template.rb"
+  - "./vendor/**/*"
+  - "**/lib/assets/DefaultFastfileTemplate"
+  - "**/lib/assets/MatchfileTemplate"
+  - "**/spec/fixtures/broken_files/broken_file.rb"
+  - "**/*.provisionprofile"
+Lint/ErbNewArguments:
+  Enabled: false
+Style/SlicingWithRange:
+  Enabled: false
+Style/MultipleComparison:
+  Enabled: false
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/ClassCheck:
+  EnforcedStyle: kind_of?
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/SafeNavigation:
+  Enabled: false
+Performance/RegexpMatch:
+  Enabled: false
+Performance/StringReplacement:
+  Enabled: false
+Style/NumericPredicate:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
+Naming/VariableNumber:
+  Enabled: false
+Style/MissingRespondToMissing:
+  Enabled: false
+Style/MultilineBlockChain:
+  Enabled: false
+Style/NumericLiteralPrefix:
+  Enabled: false
+Style/TernaryParentheses:
+  Enabled: false
+Style/EmptyMethod:
+  Enabled: false
+Lint/UselessAssignment:
+  Exclude:
+  - "**/spec/**/*"
+Require/MissingRequireStatement:
+  Exclude:
+  - "**/spec/**/*.rb"
+  - "**/spec_helper.rb"
+  - spaceship/lib/spaceship/babosa_fix.rb
+  - fastlane_core/lib/fastlane_core/ui/disable_colors.rb
+  - "**/Fastfile"
+  - "**/*.gemspec"
+  - rakelib/**/*
+  - "**/*.rake"
+  - "**/Rakefile"
+  - fastlane/**/*
+  - supply/**/*
+Layout/FirstHashElementIndentation:
+  Enabled: false
+Layout/HashAlignment:
+  Enabled: false
+Layout/DotPosition:
+  Enabled: false
+Style/DoubleNegation:
+  Enabled: false
+Style/SymbolArray:
+  Enabled: false
+Layout/HeredocIndentation:
+  Enabled: false
+Style/MixinGrouping:
+  Exclude:
+  - "**/spec/**/*"
+Lint/SuppressedException:
+  Enabled: false
+Lint/UnusedBlockArgument:
+  Enabled: false
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+Style/GlobalVars:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/SpecialGlobalVars:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Style/WordArray:
+  MinSize: 19
+Style/SignalException:
+  Enabled: false
+Style/RedundantReturn:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Style/AndOr:
+  Enabled: true
+  EnforcedStyle: conditionals
+Metrics/ClassLength:
+  Max: 320
+Layout/LineLength:
+  Max: 370
+Metrics/ParameterLists:
+  Max: 17
+Style/GuardClause:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false
+Style/QuotedSymbols:
+  Enabled: false
+Style/ConditionalAssignment:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Lint/UnusedMethodArgument:
+  Enabled: false
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+  - "**/spec/**/*"
+Naming/PredicateName:
+  Enabled: false
+Style/PerlBackrefs:
+  Enabled: false
+Layout/SpaceAroundOperators:
+  Exclude:
+  - "**/spec/actions_specs/xcodebuild_spec.rb"
+Naming/FileName:
+  Exclude:
+  - "**/Dangerfile"
+  - "**/Brewfile"
+  - "**/Gemfile"
+  - "**/Podfile"
+  - "**/Rakefile"
+  - "**/Fastfile"
+  - "**/Deliverfile"
+  - "**/Snapfile"
+  - "**/Pluginfile"
+  - "**/*.gemspec"
+Style/Documentation:
+  Enabled: false
+Style/MutableConstant:
+  Enabled: false
+Style/ZeroLengthPredicate:
+  Enabled: false
+Style/IfInsideElse:
+  Enabled: false
+Style/CollectionMethods:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  AllowedMethods:
+  - require
+  - require_relative
+  - fastlane_require
+  - gem
+  - program
+  - command
+  - raise
+  - attr_accessor
+  - attr_reader
+  - desc
+  - lane
+  - private_lane
+  - platform
+  - to
+  - not_to
+  - describe
+  - it
+  - be
+  - context
+  - before
+  - after
+Gemspec/DevelopmentDependencies:
+  Enabled: false
