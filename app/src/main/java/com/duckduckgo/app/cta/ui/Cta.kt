@@ -1095,6 +1095,36 @@ sealed class HomePanelCta(
     )
 }
 
+class BrokenSitePromptDialogCta : Cta {
+
+    override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
+    override val shownPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
+    override val okPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+    override val cancelPixel: Pixel.PixelName? = null
+
+    override fun pixelCancelParameters(): Map<String, String> = mapOf()
+
+    override fun pixelOkParameters(): Map<String, String> = mapOf()
+
+    override fun pixelShownParameters(): Map<String, String> = mapOf()
+
+    fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+        val view = binding.includeBrokenSitePromptDialog.root
+        view.gone()
+    }
+
+    fun showBrokenSitePromptCta(
+        binding: FragmentBrowserTabBinding,
+        onReportBrokenSiteClicked: () -> Unit,
+        onDismissCtaClicked: () -> Unit,
+    ) {
+        val daxDialog = binding.includeBrokenSitePromptDialog
+        daxDialog.root.show()
+        binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
+        binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+    }
+}
+
 fun DaxCta.addCtaToHistory(newCta: String): String {
     val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
     val daysInstalled = minOf(appInstallStore.daysInstalled().toInt(), MAX_DAYS_ALLOWED)
