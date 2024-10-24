@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,21 @@ interface MetricsPixelStore {
      * Stores the tag [String] passed as parameter
      */
     fun storePixelTag(tag: String)
+
+    /**
+     * Increases the count of searches for the [featureName] passed as parameter
+     */
+    fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric)
+
+    /**
+     * Returns the number [Int] of app use for the given [featureName]
+     */
+    suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int
+}
+
+enum class RetentionMetric {
+    SEARCH,
+    APP_USE,
 }
 
 @ContributesBinding(
@@ -67,6 +83,21 @@ class RealMetricsPixelStore @Inject constructor(
     override suspend fun wasPixelFired(tag: String): Boolean {
         return withContext(dispatcherProvider.io()) {
             preferences.getBoolean(tag, false)
+        }
+    }
+
+    override fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) {
+        val tag = "${definition}_$metric"
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val count = preferences.getInt(tag, 0)
+            preferences.edit { putInt(tag, count + 1) }
+        }
+    }
+
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
+        val tag = "${definition}_$metric"
+        return withContext(dispatcherProvider.io()) {
+            preferences.getInt(tag, 0)
         }
     }
 
