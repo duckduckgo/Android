@@ -2,23 +2,37 @@ name: Release - Android App Production Release
 
 on:
   workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  create-tag:
-    name: Create and Push git tag for version
-    runs-on: ubuntu-latest
+  create_release_task:
+    uses: ./.github/workflows/release_create_task.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+  create_release_tag:
+    needs: create_release_task
+    uses: ./.github/workflows/release_create_tag.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Set Git permissions
-        run: |
-          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+  launch_release_tests:
+    needs: create_release_tag
+    uses: ./.github/workflows/release_tests.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Run Git command
-        run: |
-          echo "Checking the status of the repository..."
-          git status
+  report_workflow_failed:
+    if: ${{ failure() }}
+    uses: ./.github/workflows/release_report_error.yml
