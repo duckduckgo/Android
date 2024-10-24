@@ -1,0 +1,29 @@
+  <%= program :name %>
+
+  <%= program :description %>
+
+  Commands:
+<% for name, command in @commands.sort -%>
+<% unless alias? name -%>
+    <%= "%-#{max_command_length}s %s" % [command.name, command.summary || command.description] %>
+<% end -%>
+<% end -%>
+<% unless @aliases.empty? %>
+  Aliases:
+<% for alias_name, args in @aliases.sort -%>
+    <%= "%-#{max_aliases_length}s %s %s" % [alias_name, command(alias_name).name, args.join(' ')] %>
+<% end -%>
+<% end %>
+<% unless @options.empty? -%>
+  Global Options:
+<% for option in @options -%>
+    <%= "%-20s %s" % [option[:switches].join(', '), option[:description]] -%> 
+<% end -%>
+<% end -%>
+<% if program :help -%>
+  <% for title, body in program(:help) %>
+  <%= title %>:
+    <%= body %>
+  <% end %>
+<% end -%>
+

@@ -29,7 +29,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
-import com.duckduckgo.app.appearance.AppearanceScreenNoParams
+import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
@@ -354,7 +354,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionScreen(url: String) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrowserActivity.intent(this, url), options)
+        startActivity(BrowserActivity.intent(this, url, interstitialScreen = true), options)
         this.finish()
     }
 
@@ -420,7 +420,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAppearanceScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AppearanceScreenNoParams, options)
+        globalActivityStarter.start(this, AppearanceScreen.Default, options)
     }
 
     private fun launchAboutScreen() {

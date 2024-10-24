@@ -1,0 +1,13 @@
+current directory: /Users/runner/work/Android/Android/vendor/bundle/ruby/2.7.0/gems/json-2.6.3/ext/json
+/Users/runner/hostedtoolcache/Ruby/2.7.2/arm64/bin/ruby -I /Users/runner/hostedtoolcache/Ruby/2.7.2/arm64/lib/ruby/2.7.0 -r ./siteconf20241024-2892-c6fx2h.rb extconf.rb
+creating Makefile
+
+current directory: /Users/runner/work/Android/Android/vendor/bundle/ruby/2.7.0/gems/json-2.6.3/ext/json
+make "DESTDIR=" clean
+
+current directory: /Users/runner/work/Android/Android/vendor/bundle/ruby/2.7.0/gems/json-2.6.3/ext/json
+make "DESTDIR="
+make: Nothing to be done for `all'.
+
+current directory: /Users/runner/work/Android/Android/vendor/bundle/ruby/2.7.0/gems/json-2.6.3/ext/json
+make "DESTDIR=" install

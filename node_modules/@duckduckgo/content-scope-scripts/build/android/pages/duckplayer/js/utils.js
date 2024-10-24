@@ -1,4 +1,4 @@
-import { VideoParams } from '../../../../../../src/features/duckplayer/util'
+import { VideoParams } from 'injected/src/features/duckplayer/util.js'
 
 /**
  * @param {string} href

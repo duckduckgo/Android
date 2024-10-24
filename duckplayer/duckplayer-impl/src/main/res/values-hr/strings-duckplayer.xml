@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Spremi</string>
     <string name="duck_player_cancel">Odustani</string>
     <string name="duck_player_setting_title">Duck Player</string>
@@ -34,4 +34,8 @@
     <string name="duck_player_unavailable">Duck Player je nedostupan</string>
     <string name="duck_player_unavailable_description">Na funkcionalnost Duck Playera utjecale su nedavne promjene na YouTubeu. Radimo na rješavanju ovih problema i cijenimo tvoje razumijevanje.</string>
     <string name="duck_player_unavailable_learn_more">Saznajte više</string>
+    <!-- TODO: Remove this ignore when the translation is added -->
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvaraj YouTube videozapise u Duck Playeru</string>
+    <!-- TODO(cbarreiro): Add missing translations asap -->
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvori Duck Player u novoj kartici</string>
 </resources>

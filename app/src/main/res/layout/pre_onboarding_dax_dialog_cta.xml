@@ -43,7 +43,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fadeScrollbars="false">
 
             <LinearLayout
                 android:id="@+id/cardContainer"
@@ -86,8 +87,13 @@
 
                 <include
                     android:id="@+id/comparison_chart"
-                    android:visibility="gone"
-                    layout="@layout/pre_onboarding_comparison_chart" />
+                    layout="@layout/pre_onboarding_comparison_chart"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/address_bar_position"
+                    layout="@layout/pre_onboarding_address_bar_position"
+                    android:visibility="gone" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"

@@ -73,8 +73,10 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
+import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -123,6 +125,16 @@ class BrowserWebViewClient @Inject constructor(
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
+
+    private var shouldOpenDuckPlayerInNewTab: Boolean = true
+
+    init {
+        appCoroutineScope.launch {
+            duckPlayer.observeShouldOpenInNewTab().collect {
+                shouldOpenDuckPlayerInNewTab = it is On
+            }
+        }
+    }
 
     /**
      * This is the method of url overriding available from API 24 onwards
@@ -192,7 +204,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         return true
                     } else {
-                        shouldOverrideWebRequest(url, webView, isForMainFrame)
+                        shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = shouldOpenDuckPlayerInNewTab)
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
@@ -273,10 +285,16 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.DuckScheme -> {
                     webViewClientListener?.let { listener ->
-                        loadUrl(listener, webView, url.toString())
+                        if (
+                            url.pathSegments?.firstOrNull()?.equals(DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH, ignoreCase = true) == true ||
+                            !shouldOpenDuckPlayerInNewTab
+                        ) {
+                            loadUrl(listener, webView, url.toString())
+                        } else {
+                            listener.openLinkInNewTab(url)
+                        }
                         true
-                    }
-                    false
+                    } ?: false
                 }
             }
         } catch (e: Throwable) {
@@ -291,6 +309,7 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         webView: WebView,
         isForMainFrame: Boolean,
+        openInNewTab: Boolean = false,
     ): Boolean {
         if (requestRewriter.shouldRewriteRequest(url)) {
             webViewClientListener?.let { listener ->
@@ -305,14 +324,23 @@ class BrowserWebViewClient @Inject constructor(
                 clientProvider?.let { provider ->
                     if (provider.shouldChangeBranding(url.toString())) {
                         provider.setOn(webView.settings, url.toString())
-                        loadUrl(listener, webView, url.toString())
+                        if (openInNewTab) {
+                            listener.openLinkInNewTab(url)
+                        } else {
+                            loadUrl(listener, webView, url.toString())
+                        }
                         return true
                     } else if (webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
-                        loadUrl(
-                            listener,
-                            webView,
-                            url.buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_SERP_AUTO).build().toString(),
-                        )
+                        val newUrl = url.buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_SERP_AUTO).build()
+
+                        if (openInNewTab) {
+                            listener.openLinkInNewTab(newUrl)
+                        } else {
+                            loadUrl(listener, webView, newUrl.toString())
+                        }
+                        return true
+                    } else if (openInNewTab) {
+                        webViewClientListener?.openLinkInNewTab(url)
                         return true
                     } else {
                         return false
@@ -320,6 +348,9 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 return false
             }
+        } else if (openInNewTab) {
+            webViewClientListener?.openLinkInNewTab(url)
+            return true
         }
         return false
     }

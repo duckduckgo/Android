@@ -22,4 +22,5 @@ interface OnboardingStore {
     var onboardingDialogJourney: String?
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
+    fun getExperimentSearchOptions(): List<DaxDialogIntroOption>
 }

@@ -130,15 +130,12 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentAppTpNotEnabledThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
+    fun getUpdateContentAppTpNotEnabledThenReturnsNoContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
-            val item = awaitItem()
-
-            item.assertTextEquals("")
-
-            cancelAndConsumeRemainingEvents()
+            expectNoEvents()
         }
     }
 
@@ -162,20 +159,16 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentOneCompanyAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
+    fun getUpdateContentOneCompanyAppTpNotEnabledThenReturnsNoContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(aTrackerAndCompany())
             appTrackerBlockingStatsRepository.insert(trackers)
             db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
-            skipItems(1)
-            val item = awaitItem()
-
-            item.assertTextEquals("")
-
-            cancelAndConsumeRemainingEvents()
+            expectNoEvents()
         }
     }
 
@@ -205,8 +198,9 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentMultipleDifferentAppsAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
+    fun getUpdateContentMultipleDifferentAppsAppTpNotEnabledThenReturnsNoContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -220,12 +214,7 @@ class AppTpEnabledNotificationContentPluginTest {
             appTrackerBlockingStatsRepository.insert(trackers)
             db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
-            skipItems(1)
-            val item = awaitItem()
-
-            item.assertTextEquals("")
-
-            cancelAndConsumeRemainingEvents()
+            expectNoEvents()
         }
     }
 
@@ -265,16 +254,13 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentMultipleSameAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
+    fun getUpdateContentMultipleSameAppTpNotEnabledThenReturnsNoContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
 
-            val item = expectMostRecentItem()
-
-            item.assertTextEquals("")
-
-            cancelAndConsumeRemainingEvents()
+            expectNoEvents()
         }
     }
 

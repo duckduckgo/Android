@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_player_save">Αποθήκευση</string>
     <string name="duck_player_cancel">Ακύρωση</string>
     <string name="duck_player_setting_title">Duck Player</string>
@@ -34,4 +34,8 @@
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>
     <string name="duck_player_unavailable_description">Η λειτουργία του Duck Player έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σας.</string>
     <string name="duck_player_unavailable_learn_more">Μάθετε περισσότερα</string>
+    <!-- TODO: Remove this ignore when the translation is added -->
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Ανοίξτε τα βίντεο του YouTube στο Duck Player</string>
+    <!-- TODO(cbarreiro): Add missing translations asap -->
+    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ανοίξτε το Duck Player σε νέα καρτέλα</string>
 </resources>

@@ -40,6 +40,7 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
+    testImplementation project(':feature-toggles-test')
 
     implementation AndroidX.appCompat
     implementation Google.android.material

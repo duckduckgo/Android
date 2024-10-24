@@ -47,9 +47,9 @@ class VariantManagerImpl @Inject constructor(
         experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun updateVariants(variantConfig: List<VariantConfig>) {
-        val activeVariants = variantConfig.toVariants()
-        Timber.d("Variants update $variantConfig")
+    override fun updateVariants(variants: List<VariantConfig>) {
+        val activeVariants = variants.toVariants()
+        Timber.d("Variants update $variants")
         val currentVariantKey = experimentVariantRepository.getUserVariant()
 
         updateUserVariant(activeVariants, currentVariantKey)
@@ -84,14 +84,14 @@ class VariantManagerImpl @Inject constructor(
         Timber.i("Variant $currentVariantKey is still in use, no need to update")
     }
 
-    fun List<VariantConfig>.toVariants(): List<Variant> {
+    private fun List<VariantConfig>.toVariants(): List<Variant> {
         val activeVariants: MutableList<Variant> = mutableListOf()
         this.map { entity ->
             activeVariants.add(
                 Variant(
                     key = entity.variantKey,
                     weight = entity.weight ?: 0.0,
-                    filterBy = experimentFiltersManager.addFilters(entity),
+                    filterBy = experimentFiltersManager.computeFilters(entity),
                 ),
             )
         }
