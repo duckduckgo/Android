@@ -295,6 +295,14 @@ interface NetworkProtectionPixels {
     fun reportExcludePromptExcludeAppClicked()
     fun reportExcludePromptDisableVpnClicked()
     fun reportExcludePromptDontAskAgainClicked()
+
+    fun reportAutoExcludePromptShownInVPNScreen()
+    fun reportAutoExcludePromptShownInExclusionList()
+    fun reportAutoExcludePromptExcludeApps()
+    fun reportAutoExcludePromptNoAction()
+    fun reportAutoExcludePromptEnable()
+    fun reportAutoExcludeEnableViaExclusionList()
+    fun reportAutoExcludeDisableViaExclusionList()
 }
 
 @ContributesBinding(AppScope::class)
@@ -630,6 +638,41 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportExcludePromptDontAskAgainClicked() {
         firePixel(NETP_EXCLUDE_PROMPT_DONT_ASK_AGAIN_CLICKED)
+    }
+
+    override fun reportAutoExcludePromptShownInVPNScreen() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_VPN_SCREEN)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_VPN_SCREEN_DAILY)
+    }
+
+    override fun reportAutoExcludePromptShownInExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_EXCLUSION_SCREEN)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_SHOWN_EXCLUSION_SCREEN_DAILY)
+    }
+
+    override fun reportAutoExcludePromptExcludeApps() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_EXCLUDE_APPS)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_EXCLUDE_APPS_DAILY)
+    }
+
+    override fun reportAutoExcludePromptNoAction() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_NO_ACTION)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_NO_ACTION_DAILY)
+    }
+
+    override fun reportAutoExcludePromptEnable() {
+        firePixel(NETP_AUTO_EXCLUDE_PROMPT_ENABLED)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_PROMPT_ENABLED_DAILY)
+    }
+
+    override fun reportAutoExcludeEnableViaExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_ENABLED_VIA_EXCLUSION_LIST)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_ENABLED_VIA_EXCLUSION_LIST_DAILY)
+    }
+
+    override fun reportAutoExcludeDisableViaExclusionList() {
+        firePixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST)
+        tryToFireDailyPixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST_DAILY)
     }
 
     private fun firePixel(

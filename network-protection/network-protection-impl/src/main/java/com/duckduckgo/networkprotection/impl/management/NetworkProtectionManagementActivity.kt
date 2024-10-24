@@ -51,7 +51,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
-import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -68,6 +68,7 @@ import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtecti
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
@@ -495,7 +496,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun showAutoExcludeDialog(apps: List<VpnIncompatibleApp>) {
         dismissPromotionDialog()
 
-        VpnAutoExcludePromptFragment.instance(apps)
+        VpnAutoExcludePromptFragment.instance(apps, VPN_SCREEN)
             .show(supportFragmentManager, TAG_PROMOTION_DIALOG)
     }
 

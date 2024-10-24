@@ -32,6 +32,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +50,7 @@ class NetworkProtectionStateImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val wgTunnelConfig: WgTunnelConfig,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val netPExclusionListRepository: NetPExclusionListRepository,
 ) : NetworkProtectionState {
     override suspend fun isOnboarded(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext cohortStore.cohortLocalDate != null
@@ -104,5 +106,9 @@ class NetworkProtectionStateImpl @Inject constructor(
                 else -> DISCONNECTED
             }
         }
+    }
+
+    override suspend fun isAppExcluded(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
+        netPExclusionListRepository.getExcludedAppPackages().contains(packageName)
     }
 }

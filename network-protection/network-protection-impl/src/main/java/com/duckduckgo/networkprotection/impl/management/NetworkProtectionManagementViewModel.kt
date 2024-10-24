@@ -46,10 +46,10 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
-import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
@@ -70,9 +70,9 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayabl
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import java.util.concurrent.TimeUnit
@@ -112,7 +112,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
     private var lastVpnRequestTime = -1L
-    private var excludedAppsCount: Int = 0
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -135,7 +134,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
                 locationState = locationState,
-                excludedAppsCount = excludedAppsCount,
+                excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size,
             )
         }
     }
@@ -199,13 +198,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                     sendCommand(ShowAutoExcludeDialog(it))
                 }
             }
-        }
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size
         }
     }
 
@@ -426,6 +418,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         onStopVpn()
     }
 
+    @SuppressLint("DenyListedApi")
     fun onDontShowExcludeAppPromptAgain() {
         networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
         localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))

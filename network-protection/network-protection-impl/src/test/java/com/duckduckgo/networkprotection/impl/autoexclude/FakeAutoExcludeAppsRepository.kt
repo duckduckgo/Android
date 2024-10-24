@@ -16,6 +16,10 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+
 class FakeAutoExcludeAppsRepository : AutoExcludeAppsRepository {
     private val _appsForAutoExcludePrompt = mutableListOf<VpnIncompatibleApp>()
     private val _incompatibleApps = mutableListOf<VpnIncompatibleApp>()
@@ -52,5 +56,9 @@ class FakeAutoExcludeAppsRepository : AutoExcludeAppsRepository {
 
     override suspend fun isAppMarkedAsIncompatible(appPackage: String): Boolean {
         return _incompatibleApps.any { appPackage == it.packageName }
+    }
+
+    override fun getAllIncompatibleAppPackagesFlow(): Flow<List<String>> {
+        return flowOf(_incompatibleApps.map { it.packageName })
     }
 }

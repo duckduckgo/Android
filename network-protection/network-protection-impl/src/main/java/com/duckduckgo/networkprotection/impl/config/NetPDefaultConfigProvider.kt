@@ -18,10 +18,10 @@ package com.duckduckgo.networkprotection.impl.config
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress

@@ -39,8 +39,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.autoexclude.FakeAutoExcludePrompt
-import com.duckduckgo.networkprotection.impl.autoexclude.VpnIncompatibleApp
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.exclusion.FakeNetpExclusionListRepository
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
@@ -67,9 +67,9 @@ import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.wireguard.config.Config
 import java.io.BufferedReader
@@ -120,9 +120,6 @@ class NetworkProtectionManagementViewModelTest {
     private lateinit var netpDataVolumeStore: NetpDataVolumeStore
 
     @Mock
-    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
-
-    @Mock
     private lateinit var lifecycleOwner: LifecycleOwner
 
     @Mock
@@ -154,6 +151,7 @@ class NetworkProtectionManagementViewModelTest {
     private val wgConfig: Config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
 
     private lateinit var testee: NetworkProtectionManagementViewModel
+    private val netPExclusionListRepository = FakeNetpExclusionListRepository()
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
 
     @Before
@@ -377,7 +375,7 @@ class NetworkProtectionManagementViewModelTest {
             ),
         )
         whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
-        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("app1"))
+        netPExclusionListRepository.setExcludedAppPackages(listOf("app1"))
 
         testee.onResume(lifecycleOwner)
 
