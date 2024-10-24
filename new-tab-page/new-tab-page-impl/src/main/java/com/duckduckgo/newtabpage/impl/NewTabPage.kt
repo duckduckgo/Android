@@ -30,7 +30,7 @@ import javax.inject.Inject
     priority = NewTabPagePlugin.PRIORITY_LEGACY_NTP,
     defaultActiveValue = false,
     supportExperiments = true,
-    internalAlwaysEnabled = true,
+    internalAlwaysEnabled = false,
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
