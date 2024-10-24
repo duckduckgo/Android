@@ -38,6 +38,12 @@ jobs:
           fileName: ddg-upload-keystore.jks
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Generate nightly version name
+        id: generate_version_name
+        run: |
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
+          echo "::set-output name=version::$output"
+
       - name: Assemble the bundle
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
 
@@ -47,12 +53,32 @@ jobs:
           output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
-      - name: Use the captured bundle path
+      - name: Upload bundle to Play Store Internal track
+        id: create_app_bundle
         run: |
-          echo "The generated app bundle is located at: ${{ steps.capture_output.outputs.bundle_path }}"
+          bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
+
+      - name: Tag Nightly release
+        id: tag_nightly_release
+        run: |
+          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git push origin ${{ steps.generate_version_name.outputs.version }}
 
       - name: Upload app bundle as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-bundle
-          path: ${{ steps.capture_output.outputs.bundle_path }}
+          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
+          path: duckduckgo.apk
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Upload Bundle to Play Store
+          asana-task-description: Upload Bundle to Play Store has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
