@@ -155,11 +155,6 @@ interface SubscriptionsManager {
     suspend fun signOut()
 
     /**
-     * Deletes the current account
-     */
-    suspend fun deleteAccount(): Boolean
-
-    /**
      * Returns a [String] with the URL of the portal or null otherwise
      */
     suspend fun getPortalUrl(): String?
@@ -261,20 +256,6 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
-
-    override suspend fun deleteAccount(): Boolean {
-        return try {
-            val token = getAuthToken()
-            if (token is AuthToken.Success) {
-                val state = authService.delete("Bearer ${token.authToken}")
-                (state.status == "deleted")
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
 
     override suspend fun getPortalUrl(): String? {
         return try {

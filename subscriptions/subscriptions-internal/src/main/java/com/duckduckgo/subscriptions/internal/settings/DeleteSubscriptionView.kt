@@ -27,7 +27,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -52,7 +51,7 @@ class DeleteSubscriptionView @JvmOverloads constructor(
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var subscriptionsManager: SubscriptionsManager
+    lateinit var accountDeletionHandler: AccountDeletionHandler
 
     private val binding: SubsSimpleViewBinding by viewBinding()
 
@@ -70,8 +69,7 @@ class DeleteSubscriptionView @JvmOverloads constructor(
 
     private fun deleteSubscription() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val message = if (subscriptionsManager.deleteAccount()) {
-                subscriptionsManager.signOut()
+            val message = if (accountDeletionHandler.deleteAccountAndSignOut()) {
                 "Account deleted"
             } else {
                 "We could not delete your account"
