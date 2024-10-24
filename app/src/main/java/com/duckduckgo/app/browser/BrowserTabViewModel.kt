@@ -3265,6 +3265,7 @@ class BrowserTabViewModel @Inject constructor(
                 showDaxIcon = false,
                 showSearchIcon = false,
             )
+        pixel.fire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
         command.postValue(WebViewError(errorType, url))
     }
 
