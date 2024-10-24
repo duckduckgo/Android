@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.extensions.getSerializable
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.DialogNetpAlwaysOnBinding
@@ -40,7 +41,7 @@ private enum class FragmentType {
 }
 
 @InjectWith(FragmentScope::class)
-class NetworkProtectionAlwaysOnDialogFragment private constructor() : BottomSheetDialogFragment() {
+class NetworkProtectionAlwaysOnDialogFragment : BottomSheetDialogFragment() {
 
     @Inject lateinit var appTheme: AppTheme
 
@@ -60,6 +61,7 @@ class NetworkProtectionAlwaysOnDialogFragment private constructor() : BottomShee
         savedInstanceState: Bundle?,
     ): View {
         return DialogNetpAlwaysOnBinding.inflate(inflater, container, false).apply {
+            fragmentType = requireArguments().getSerializable<FragmentType>(ARGUMENT_FRAGMENT_TYPE) ?: FragmentType.PROMOTION
             configureViews(this)
         }.root
     }
@@ -155,17 +157,22 @@ class NetworkProtectionAlwaysOnDialogFragment private constructor() : BottomShee
     }
 
     companion object {
+        private const val ARGUMENT_FRAGMENT_TYPE = "fragmentType"
         fun newPromotionDialog(listener: Listener): NetworkProtectionAlwaysOnDialogFragment {
             return NetworkProtectionAlwaysOnDialogFragment().apply {
                 this.listener = listener
-                this.fragmentType = FragmentType.PROMOTION
+                arguments = Bundle().also {
+                    it.putSerializable(ARGUMENT_FRAGMENT_TYPE, FragmentType.PROMOTION)
+                }
             }
         }
 
         fun newLockdownDialog(listener: Listener): NetworkProtectionAlwaysOnDialogFragment {
             return NetworkProtectionAlwaysOnDialogFragment().apply {
                 this.listener = listener
-                this.fragmentType = FragmentType.LOCKDOWN
+                arguments = Bundle().also {
+                    it.putSerializable(ARGUMENT_FRAGMENT_TYPE, FragmentType.LOCKDOWN)
+                }
             }
         }
     }
