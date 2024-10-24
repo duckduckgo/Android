@@ -74,12 +74,7 @@ class RealSubscriptions @Inject constructor(
     }
 
     private suspend fun checkIfActive(): Boolean {
-        return if (subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
-            true
-        } else {
-            subscriptionsManager.removeEntitlements()
-            false
-        }
+        return subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
     }
     override suspend fun isEligible(): Boolean {
         val supportsEncryption = subscriptionsManager.canSupportEncryption()

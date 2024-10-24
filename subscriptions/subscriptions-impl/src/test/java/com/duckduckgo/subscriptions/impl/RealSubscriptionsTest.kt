@@ -98,7 +98,6 @@ class RealSubscriptionsTest {
 
         subscriptions.getEntitlementStatus().test {
             assertTrue(awaitItem().isEmpty())
-            verify(mockSubscriptionsManager).removeEntitlements()
             cancelAndConsumeRemainingEvents()
         }
     }

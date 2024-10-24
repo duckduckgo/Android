@@ -932,15 +932,6 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRemoveEntitlementsThenEntitlementsDeleted() = runTest {
-        givenSubscriptionExists()
-        assertEquals("""[{"product":"product", "name":"name"}]""", authDataStore.entitlements)
-
-        subscriptionsManager.removeEntitlements()
-        assertEquals("""[]""", authDataStore.entitlements)
-    }
-
-    @Test
     fun whenNotAuthenticatedThenIsSignedInReturnsFalse() = runTest {
         givenUserIsNotAuthenticated()
         assertFalse(subscriptionsManager.isSignedIn.first())
