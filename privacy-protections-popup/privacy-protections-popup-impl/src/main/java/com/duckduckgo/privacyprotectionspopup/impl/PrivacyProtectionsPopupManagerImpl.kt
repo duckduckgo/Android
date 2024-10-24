@@ -139,6 +139,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
             val popupConditionsMet = arePopupConditionsMet(state = oldState)
 
+            // TODO (cbarreiro) set to test to trigger the old popup
             var experimentVariant = oldState.popupData.experimentVariant
 
             if (experimentVariant == null && popupConditionsMet) {
