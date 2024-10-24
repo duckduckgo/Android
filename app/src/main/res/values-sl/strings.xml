@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Zasebnost, poenostavljeno</string>
+    <string name="duckDuckGoTagline">Vaša zaščita je naša prednostna naloga.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
     <string name="open">Odpri</string>
