@@ -205,12 +205,15 @@ body[data-display=app] {
 .SwitchBarMobile_stateHidden {
   display: none;
 }
-.SwitchBarMobile_label {
+.SwitchBarMobile_labelRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   gap: 16px;
+}
+.SwitchBarMobile_label {
+  pointer-events: none;
 }
 .SwitchBarMobile_checkbox {
 }
