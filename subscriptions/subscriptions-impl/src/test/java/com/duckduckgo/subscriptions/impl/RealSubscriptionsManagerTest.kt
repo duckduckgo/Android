@@ -188,12 +188,12 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenFetchAndStoreAllDataIfUserNotAuthenticatedThenReturnNullSubscription() = runTest {
+    fun whenFetchAndStoreAllDataIfUserNotAuthenticatedThenReturnFalse() = runTest {
         givenUserIsNotAuthenticated()
 
         val value = subscriptionsManager.fetchAndStoreAllData()
 
-        assertNull(value)
+        assertFalse(value)
     }
 
     @Test
@@ -223,7 +223,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         givenSubscriptionFails()
 
-        assertNull(subscriptionsManager.fetchAndStoreAllData())
+        assertFalse(subscriptionsManager.fetchAndStoreAllData())
     }
 
     @Test
@@ -231,9 +231,9 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         givenSubscriptionFails(httpResponseCode = 401)
 
-        val subscription = subscriptionsManager.fetchAndStoreAllData()
+        val dataFetched = subscriptionsManager.fetchAndStoreAllData()
 
-        assertNull(subscription)
+        assertFalse(dataFetched)
         assertFalse(subscriptionsManager.isSignedIn.first())
         assertNull(subscriptionsManager.getSubscription())
         assertNull(subscriptionsManager.getAccount())

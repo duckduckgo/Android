@@ -97,8 +97,10 @@ interface SubscriptionsManager {
 
     /**
      * Fetches subscription and account data from the BE and stores it
+     *
+     * @return [true] if successful, [false] otherwise
      */
-    suspend fun fetchAndStoreAllData(): Subscription?
+    suspend fun fetchAndStoreAllData(): Boolean
 
     /**
      * Gets the subscription details from internal storage
@@ -383,9 +385,9 @@ class RealSubscriptionsManager @Inject constructor(
         return accessToken
     }
 
-    override suspend fun fetchAndStoreAllData(): Subscription? {
+    override suspend fun fetchAndStoreAllData(): Boolean {
         try {
-            if (!isUserAuthenticated()) return null
+            if (!isUserAuthenticated()) return false
             val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
             val subscription = try {
                 subscriptionsService.subscription("Bearer $token")
@@ -393,7 +395,7 @@ class RealSubscriptionsManager @Inject constructor(
                 if (e.code() == 401) {
                     logcat { "Token invalid, signing out" }
                     signOut()
-                    return null
+                    return false
                 }
                 throw e
             }
@@ -417,10 +419,10 @@ class RealSubscriptionsManager @Inject constructor(
             emitEntitlementsValues()
             _subscriptionStatus.emit(authRepository.getStatus())
             _isSignedIn.emit(isUserAuthenticated())
-            return authRepository.getSubscription()
+            return true
         } catch (e: Exception) {
             logcat { "Failed to fetch subscriptions data: ${e.stackTraceToString()}" }
-            return null
+            return false
         }
     }
 
@@ -444,10 +446,10 @@ class RealSubscriptionsManager @Inject constructor(
                 authRepository.setAccount(Account(externalId = response.externalId, email = null))
                 authRepository.setAuthToken(response.authToken)
                 exchangeAuthToken(response.authToken)
-                val subscription = fetchAndStoreAllData()
-                if (subscription != null) {
+                if (fetchAndStoreAllData()) {
                     logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
-                    if (subscription.isActive()) {
+                    val subscription = authRepository.getSubscription()
+                    if (subscription?.isActive() == true) {
                         RecoverSubscriptionResult.Success(subscription)
                     } else {
                         RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
