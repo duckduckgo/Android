@@ -16,14 +16,18 @@
 
 package com.duckduckgo.app.appearance
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.appearance.AppearanceScreen.Default
+import com.duckduckgo.app.appearance.AppearanceScreen.HighlightedItem
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
@@ -38,16 +42,19 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppearanceScreenNoParams::class)
+@ContributeToActivityStarter(Default::class, screenName = "appearance")
+@ContributeToActivityStarter(HighlightedItem::class, screenName = "appearance")
 class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
@@ -89,6 +96,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+        scrollToHighlightedItem()
     }
 
     private fun configureUiEventHandlers() {
@@ -208,5 +216,41 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    private fun scrollToHighlightedItem() {
+        intent.getActivityParams(HighlightedItem::class.java)?.let { params ->
+            if (params.highlightedItem == ADDRESS_BAR) {
+                binding.addressBarPositionSetting.post {
+                    scrollToAddressBarOption()
+                    highlightAddressBarOption()
+                }
+            }
+        }
+    }
+
+    private fun scrollToAddressBarOption() {
+        val scrollTo = binding.addressBarPositionSetting.top
+        binding.scrollView.smoothScrollTo(0, scrollTo)
+    }
+
+    private fun highlightAddressBarOption() {
+        val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
+        val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)
+
+        val totalAnimationDuration = FADE_DURATION * TRANSITIONS
+
+        val colorAnimator = ValueAnimator.ofArgb(transparentColor, highlightColor, transparentColor, highlightColor, transparentColor, highlightColor)
+        colorAnimator.duration = totalAnimationDuration
+        colorAnimator.addUpdateListener { animator ->
+            binding.addressBarPositionSetting.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimator.start()
+    }
+
+    companion object {
+        private const val ADDRESS_BAR = "addressBar"
+        private const val FADE_DURATION = 300L
+        private const val TRANSITIONS = 5
     }
 }
