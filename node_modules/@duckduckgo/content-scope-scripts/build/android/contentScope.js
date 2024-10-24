@@ -2262,16 +2262,11 @@
      */
 
     /**
-     * @description
-     *
      * A wrapper for messaging on Windows.
      *
      * This requires 3 methods to be available, see {@link WindowsMessagingConfig} for details
      *
-     * @example
-     *
-     * ```javascript
-     * [[include:messaging/lib/examples/windows.example.js]]```
+     * @document messaging/lib/examples/windows.example.js
      *
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -2469,8 +2464,7 @@
      * Depending on where the script is running, we may want to restrict access to those globals. On the native
      * side those handlers `window.chrome.webview` handlers might be deleted and replaces with in-scope variables, such as:
      *
-     * ```ts
-     * [[include:messaging/lib/examples/windows.example.js]]```
+     * [Example](./examples/windows.example.js)
      *
      */
     class WindowsMessagingConfig {
@@ -2585,9 +2579,6 @@
     }
 
     /**
-     * @module Messaging Schema
-     *
-     * @description
      * These are all the shared data types used throughout. Transports receive these types and
      * can choose how to deliver the message to their respective native platforms.
      *
@@ -2596,6 +2587,9 @@
      * - Subscriptions via {@link Subscription}
      *
      * Note: For backwards compatibility, some platforms may alter the data shape within the transport.
+     *
+     * @module Messaging Schema
+     *
      */
 
     /**
@@ -2725,8 +2719,6 @@
     }
 
     /**
-     *
-     * @description
      *
      * A wrapper for messaging on WebKit platforms. It supports modern WebKit messageHandlers
      * along with encryption for older versions (like macOS Catalina)
@@ -3042,10 +3034,7 @@
      *
      * Please see {@link WebkitMessagingTransport} for details on how messages are sent/received
      *
-     * @example Webkit Messaging
-     *
-     * ```javascript
-     * [[include:messaging/lib/examples/webkit.example.js]]```
+     * [Example](./examples/webkit.example.js)
      */
     class WebkitMessagingConfig {
         /**
@@ -3154,16 +3143,10 @@
     }
 
     /**
-     * @description
      *
      * A wrapper for messaging on Android.
      *
      * You must share a {@link AndroidMessagingConfig} instance between features
-     *
-     * @example
-     *
-     * ```javascript
-     * [[include:messaging/lib/examples/windows.example.js]]```
      *
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -3319,7 +3302,7 @@
      * - `$messageSecret` matches {@link AndroidMessagingConfig.messageSecret}
      * - `$message` is JSON string that represents one of {@link MessageResponse} or {@link SubscriptionEvent}
      *
-     * ```kotlin
+     * ```
      * object ReplyHandler {
      *     fun constructReply(message: String, messageCallback: String, messageSecret: String): String {
      *         return """
@@ -3498,9 +3481,6 @@
     }
 
     /**
-     * @module Messaging
-     * @category Libraries
-     * @description
      *
      * An abstraction for communications between JavaScript and host platforms.
      *
@@ -3520,6 +3500,7 @@
      * - Schema: {@link "Messaging Schema"}
      * - Implementation Guide: {@link "Messaging Implementation Guide"}
      *
+     * @module Messaging
      */
 
     /**
@@ -3626,9 +3607,6 @@
      * It's useful for debugging, and for enabling scripts to run in
      * other environments - for example, testing in a browser without the need
      * for a full integration
-     *
-     * ```js
-     * [[include:messaging/lib/examples/test.example.js]]```
      */
     class TestTransportConfig {
         /**
@@ -11701,9 +11679,6 @@
     }
 
     /**
-     * @module Duck Player Thumbnails
-     *
-     * @description
      *
      * ## Decision flow for `mouseover` (appending Dax)
      *
@@ -11754,7 +11729,7 @@
      *         - `eventTarget` matches a CSS selector in `[config] allowedEventTargets`
      *     - otherwise, do nothing
      *
-     * [[include:injected/src/features/duckplayer/thumbnails.md]]
+     * @module Duck Player Thumbnails
      */
 
 
@@ -12282,8 +12257,6 @@
     /* eslint-disable promise/prefer-await-to-then */
     /**
      * @module Duck Player Video Overlay
-     *
-     * @description
      *
      * ## Decision flow for appending the Video Overlays
      *
@@ -13004,9 +12977,6 @@
     }
 
     /**
-     * @module Duck Player Overlays
-     *
-     * @description
      *
      * Duck Player Overlays are either the small Dax icons that appear on top of video thumbnails
      * when browsing YouTube. These icons allow users to open the video in Duck Player.
@@ -13035,9 +13005,9 @@
      *
      * For example, to enable the Duck Player Overlay on YouTube, the following config is used:
      *
-     * ```json
-     * [[include:injected/integration-test/test-pages/duckplayer/config/overlays-live.json]]```
+     * [📝 JSON example](../../integration-test/test-pages/duckplayer/config/overlays-live.json)
      *
+     * @module Duck Player Overlays
      */
 
     /**
@@ -13247,7 +13217,6 @@
 
     /**
      * @module Android integration
-     * @category Content Scope Scripts Integrations
      */
 
     function initCode () {
