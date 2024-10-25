@@ -67,58 +67,15 @@
         tools:text="Remember me"
         tools:visibility="visible" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/textAlertDialogPositiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogCheckBox" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
-        android:id="@+id/textAlertDialogPositiveDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogCheckBox" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogCheckBox" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveDestructiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage" />
-
     <LinearLayout
         android:id="@+id/textAlertDialogButtonContainer"
         android:layout_width="0dp"
         android:gravity="end"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogPositiveButton" />
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogCheckBox" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

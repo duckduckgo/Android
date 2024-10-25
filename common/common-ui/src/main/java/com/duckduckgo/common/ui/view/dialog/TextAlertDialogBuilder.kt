@@ -18,14 +18,12 @@ package com.duckduckgo.common.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButton
-import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
@@ -52,7 +50,10 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var messageText: CharSequence = ""
     private var headerImageDrawableId = 0
     private var positiveButtonText: CharSequence = ""
+    private var positiveButtonType: ButtonType = ButtonType.PRIMARY
     private var negativeButtonText: CharSequence = ""
+    private var negativeButtonType: ButtonType? = null
+
     private var isCancellable: Boolean = false
     private var isDestructiveVersion: Boolean = false
     private var isCheckboxEnabled: Boolean = false
@@ -83,13 +84,21 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
-    fun setPositiveButton(@StringRes textId: Int, buttonType: ButtonType = ButtonType.PRIMARY): TextAlertDialogBuilder {
+    fun setPositiveButton(
+        @StringRes textId: Int,
+        buttonType: ButtonType = ButtonType.PRIMARY,
+    ): TextAlertDialogBuilder {
         positiveButtonText = context.getText(textId)
+        positiveButtonType = buttonType
         return this
     }
 
-    fun setNegativeButton(@StringRes textId: Int, buttonType: ButtonType = ButtonType.GHOST): TextAlertDialogBuilder {
+    fun setNegativeButton(
+        @StringRes textId: Int,
+        buttonType: ButtonType = ButtonType.GHOST,
+    ): TextAlertDialogBuilder {
         negativeButtonText = context.getText(textId)
+        negativeButtonType = buttonType
         return this
     }
 
@@ -122,15 +131,6 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogCheckBox.text = checkBoxText
             binding.textAlertDialogCheckBox.show()
         }
-
-        val ghostButtonDestructive = DaxButtonPrimary(context, null)
-        ghostButtonDestructive.setText("Keep")
-
-        val ghostButton = DaxButtonPrimary(context, null)
-        ghostButton.setText("Keep")
-
-        binding.textAlertDialogButtonContainer.addView(ghostButton)
-        binding.textAlertDialogButtonContainer.addView(ghostButtonDestructive)
 
         val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
@@ -184,35 +184,29 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding: DialogTextAlertBinding,
         dialog: AlertDialog,
     ) {
-        binding.textAlertDialogPositiveButton.isVisible = !isDestructiveVersion
-        binding.textAlertDialogPositiveDestructiveButton.isVisible = isDestructiveVersion
-        binding.textAlertDialogCancelButton.isVisible = !isDestructiveVersion
-        binding.textAlertDialogCancelDestructiveButton.isVisible = isDestructiveVersion
+        // add buttons
+        val negativeButton = negativeButtonType
+        if (negativeButton != null) {
+            val negativeButtonView = negativeButton.getView(context)
+            setButtonListener(negativeButtonView, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
 
-        if (negativeButtonText.isEmpty()) {
-            binding.textAlertDialogCancelDestructiveButton.gone()
-            binding.textAlertDialogCancelButton.gone()
+            binding.textAlertDialogButtonContainer.addView(negativeButtonView)
+            val layoutParams = negativeButtonView.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.setMargins(
+                layoutParams.leftMargin,
+                layoutParams.topMargin,
+                context.resources.getDimensionPixelSize(R.dimen.keyline_2),
+                layoutParams.bottomMargin,
+            )
+            negativeButtonView.layoutParams = layoutParams
         }
+
+        val positiveButtonView = positiveButtonType.getView(context)
+        setButtonListener(positiveButtonView, positiveButtonText, dialog) { listener.onNegativeButtonClicked() }
+        binding.textAlertDialogButtonContainer.addView(positiveButtonView)
 
         binding.textAlertDialogCheckBox.setOnCheckedChangeListener { compoundButton, checked ->
             listener.onCheckedChanged(checked)
-        }
-
-        if (isDestructiveVersion) {
-            setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) {
-                listener.onPositiveButtonClicked()
-            }
-            setButtonListener(binding.textAlertDialogCancelDestructiveButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
-            // no need to get fancy, just change the button textColor
-            binding.textAlertDialogCancelDestructiveButton.setTextColor(
-                ContextCompat.getColorStateList(
-                    context,
-                    R.color.secondary_text_color_selector,
-                ),
-            )
-        } else {
-            setButtonListener(binding.textAlertDialogPositiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
-            setButtonListener(binding.textAlertDialogCancelButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
         }
     }
 
