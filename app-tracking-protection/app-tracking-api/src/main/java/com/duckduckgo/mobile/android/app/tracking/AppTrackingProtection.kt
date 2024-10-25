@@ -47,4 +47,12 @@ interface AppTrackingProtection {
      * This method will stop the App Tracking Protection feature
      */
     fun stop()
+
+    /**
+     * This is a suspend function because the operation can take time.
+     * You DO NOT need to set any dispatcher to call this suspend function
+     *
+     * @return `true` when the app is excluded from App Tracking Protection
+     */
+    suspend fun isAppExcluded(packageName: String): Boolean
 }

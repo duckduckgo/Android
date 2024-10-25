@@ -28,27 +28,44 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType.Secondary
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.UNKNOWN
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.PromptState.NEW_INCOMPATIBLE_APP
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.databinding.DialogAutoExcludeBinding
+import com.duckduckgo.networkprotection.impl.databinding.ItemAutoexcludePromptAppBinding
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import java.util.ArrayList
 import javax.inject.Inject
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 @InjectWith(FragmentScope::class)
-class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFragment() {
+class VpnAutoExcludePromptFragment : BottomSheetDialogFragment() {
+    interface Listener {
+        fun onAutoExcludeEnabled()
+    }
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    private var _listener: Listener? = null
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[VpnAutoExcludePromptViewModel::class.java]
@@ -72,17 +89,27 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
         }.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.onPromptShown(
-            requireArguments().getStringArrayList(KEY_PROMPT_APP_PACKAGES)?.toList() ?: emptyList(),
-        )
+    fun addListener(listener: Listener) {
+        _listener = listener
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun observerViewModel(binding: DialogAutoExcludeBinding) {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .distinctUntilChanged()
             .onEach { renderViewState(binding, it) }
+            .onStart {
+                viewModel.onPromptShown(
+                    requireArguments().getStringArrayList(KEY_PROMPT_APP_PACKAGES)?.toList() ?: emptyList(),
+                    if (appBuildConfig.sdkInt >= 33) {
+                        requireArguments().getSerializable(KEY_PROMPT_SOURCE, Source::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        requireArguments().getSerializable(KEY_PROMPT_SOURCE) as? Source
+                    } ?: UNKNOWN,
+                )
+            }
             .launchIn(lifecycleScope)
     }
 
@@ -92,27 +119,64 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
     ) {
         binding.apply {
             viewState.incompatibleApps.forEach { app ->
-                val appCheckBox = CheckBox(this.root.context)
-                appCheckBox.text = app.name
-                appCheckBox.isChecked = true
-                appCheckBox.format()
-                autoExcludePromptItemsContainer.addView(appCheckBox)
+                val item = ItemAutoexcludePromptAppBinding.inflate(layoutInflater)
+                item.incompatibleAppCheckBox.isChecked = true
+                item.incompatibleAppCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.updateAppExcludeState(app.packageName, isChecked)
+                }
+
+                item.incompatibleAppName.setPrimaryText(app.name)
+
+                context?.packageManager?.safeGetApplicationIcon(app.packageName)?.apply {
+                    item.incompatibleAppName.setLeadingIconDrawable(this)
+                    item.incompatibleAppName.setPrimaryTextColorStateList(
+                        ContextCompat.getColorStateList(
+                            root.context,
+                            TextType.getTextColorStateList(Secondary),
+                        ),
+                    )
+                }
+
+                autoExcludePromptItemsContainer.addView(item.root)
             }
-            autoExcludePromptMessage.text = String.format(
-                getString(R.string.netpAutoExcludePromptMessage),
-                viewState.incompatibleApps.size,
-            )
+            if (viewState.promptState == NEW_INCOMPATIBLE_APP) {
+                autoExcludePromptTitle.text = getString(R.string.netpAutoExcludePromptTitle)
+                autoExcludePromptMessage.text = String.format(
+                    getString(R.string.netpAutoExcludePromptMessage),
+                    resources.getQuantityString(
+                        R.plurals.netpAutoExcludeAppLabel,
+                        viewState.incompatibleApps.size,
+                        viewState.incompatibleApps.size,
+                    ),
+                )
+            } else {
+                autoExcludePromptTitle.text = getString(R.string.netpAutoExcludePromptExcludeAllTitle)
+                autoExcludePromptMessage.text = String.format(
+                    getString(R.string.netpAutoExcludePromptMessage),
+                    resources.getQuantityString(
+                        R.plurals.netpAutoExcludeAllAppLabel,
+                        viewState.incompatibleApps.size,
+                        viewState.incompatibleApps.size,
+                    ),
+                )
+            }
         }
     }
 
     private fun configureViews(binding: DialogAutoExcludeBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         binding.apply {
             autoExcludeCheckBox.format()
             autoExcludePromptAddAction.setOnClickListener {
                 viewModel.onAddExclusionsSelected(autoExcludeCheckBox.isChecked)
+                if (autoExcludeCheckBox.isChecked) {
+                    _listener?.onAutoExcludeEnabled()
+                }
+                dismiss()
             }
 
             autoExcludePromptCancelAction.setOnClickListener {
+                viewModel.onCancelPrompt()
                 dismiss()
             }
         }
@@ -120,13 +184,24 @@ class VpnAutoExcludePromptFragment private constructor() : BottomSheetDialogFrag
 
     companion object {
         private const val KEY_PROMPT_APP_PACKAGES = "KEY_PROMPT_APP_PACKAGES"
+        private const val KEY_PROMPT_SOURCE = "KEY_PROMPT_SOURCE"
 
-        internal fun instance(incompatibleApps: List<VpnIncompatibleApp>): VpnAutoExcludePromptFragment {
+        internal fun instance(
+            incompatibleApps: List<VpnIncompatibleApp>,
+            source: Source,
+        ): VpnAutoExcludePromptFragment {
             return VpnAutoExcludePromptFragment().apply {
                 val args = Bundle()
                 args.putStringArrayList(KEY_PROMPT_APP_PACKAGES, ArrayList(incompatibleApps.map { it.packageName }))
+                args.putSerializable(KEY_PROMPT_SOURCE, source)
                 arguments = args
             }
+        }
+
+        enum class Source {
+            VPN_SCREEN,
+            EXCLUSION_LIST_SCREEN,
+            UNKNOWN,
         }
     }
 

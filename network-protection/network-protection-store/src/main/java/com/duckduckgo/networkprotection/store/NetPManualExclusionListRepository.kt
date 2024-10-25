@@ -22,12 +22,10 @@ import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.flow.Flow
 
 @WorkerThread
-interface NetPExclusionListRepository {
+interface NetPManualExclusionListRepository {
     fun getManualAppExclusionList(): List<NetPManuallyExcludedApp>
 
     fun getManualAppExclusionListFlow(): Flow<List<NetPManuallyExcludedApp>>
-
-    fun getExcludedAppPackages(): List<String>
 
     fun manuallyExcludeApp(packageName: String)
 
@@ -35,22 +33,17 @@ interface NetPExclusionListRepository {
 
     fun manuallyEnableApp(packageName: String)
 
+    fun manuallyEnableApps(packageNames: List<String>)
+
     fun restoreDefaultProtectedList()
 }
 
-class RealNetPExclusionListRepository constructor(
+class RealNetPManualExclusionListRepository constructor(
     private val exclusionListDao: NetPExclusionListDao,
-) : NetPExclusionListRepository {
+) : NetPManualExclusionListRepository {
     override fun getManualAppExclusionList(): List<NetPManuallyExcludedApp> = exclusionListDao.getManualAppExclusionList()
 
     override fun getManualAppExclusionListFlow(): Flow<List<NetPManuallyExcludedApp>> = exclusionListDao.getManualAppExclusionListFlow()
-
-    override fun getExcludedAppPackages(): List<String> {
-        return getManualAppExclusionList()
-            .filter { !it.isProtected }
-            .sortedBy { it.packageId }
-            .map { it.packageId }
-    }
 
     override fun manuallyExcludeApp(packageName: String) {
         exclusionListDao.insertIntoManualAppExclusionList(NetPManuallyExcludedApp(packageId = packageName, isProtected = false))
@@ -66,6 +59,14 @@ class RealNetPExclusionListRepository constructor(
 
     override fun manuallyEnableApp(packageName: String) {
         exclusionListDao.insertIntoManualAppExclusionList(NetPManuallyExcludedApp(packageId = packageName, isProtected = true))
+    }
+
+    override fun manuallyEnableApps(packageNames: List<String>) {
+        packageNames.map {
+            NetPManuallyExcludedApp(packageId = it, isProtected = true)
+        }.also {
+            exclusionListDao.insertIntoManualAppExclusionList(it)
+        }
     }
 
     override fun restoreDefaultProtectedList() {
