@@ -52,7 +52,7 @@ interface AppTrackingProtection {
      * This is a suspend function because the operation can take time.
      * You DO NOT need to set any dispatcher to call this suspend function
      *
-     * @return `true` when the app is excluded from App Tracking Protection
+     * @return a list of app packages that is excluded from App Tracking Protection
      */
-    suspend fun isAppExcluded(packageName: String): Boolean
+    suspend fun getExcludedApps(): List<String>
 }

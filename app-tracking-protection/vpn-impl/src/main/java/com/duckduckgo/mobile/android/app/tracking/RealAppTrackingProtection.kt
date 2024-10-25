@@ -63,9 +63,7 @@ class RealAppTrackingProtection @Inject constructor(
         }
     }
 
-    override suspend fun isAppExcluded(packageName: String): Boolean {
-        return withContext(dispatcherProvider.io()) {
-            trackingProtectionAppsRepository.getExclusionAppsList().contains(packageName)
-        }
+    override suspend fun getExcludedApps(): List<String> = withContext(dispatcherProvider.io()) {
+        trackingProtectionAppsRepository.getExclusionAppsList()
     }
 }

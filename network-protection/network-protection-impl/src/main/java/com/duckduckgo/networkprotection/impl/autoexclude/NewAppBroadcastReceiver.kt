@@ -61,10 +61,10 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     private suspend fun restartVpn(packageName: String) {
-        if (networkProtectionState.isEnabled() && networkProtectionState.isAppExcluded(packageName)) {
+        if (networkProtectionState.isEnabled() && networkProtectionState.getExcludedApps().contains(packageName)) {
             logcat { "Newly installed package $packageName is in NetP exclusion list, disabling/re-enabling vpn" }
             networkProtectionState.restart()
-        } else if (appTrackingProtection.isEnabled() && appTrackingProtection.isAppExcluded(packageName)) {
+        } else if (appTrackingProtection.isEnabled() && appTrackingProtection.getExcludedApps().contains(packageName)) {
             logcat { "Newly installed package $packageName is in AppTP exclusion list, disabling/re-enabling vpn" }
             appTrackingProtection.restart()
         } else {

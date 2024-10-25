@@ -108,7 +108,7 @@ class NetworkProtectionStateImpl @Inject constructor(
         }
     }
 
-    override suspend fun isAppExcluded(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
-        netPExclusionListRepository.getExcludedAppPackages().contains(packageName)
+    override suspend fun getExcludedApps(): List<String> = withContext(dispatcherProvider.io()) {
+        netPExclusionListRepository.getExcludedAppPackages()
     }
 }
