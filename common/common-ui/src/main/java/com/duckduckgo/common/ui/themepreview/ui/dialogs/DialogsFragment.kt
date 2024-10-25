@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
@@ -145,6 +146,27 @@ class DialogsFragment : Fragment() {
                     .setMessage(R.string.text_dialog_message)
                     .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
                     .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNegativeButtonClicked() {
+                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.findViewById<Button>(R.id.textAlertSingleDialogButton)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive, GHOST)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
