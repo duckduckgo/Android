@@ -76,7 +76,7 @@ dependencies {
     ksp AndroidX.room.compiler
     implementation AndroidX.room.ktx
 
-    implementation "net.zetetic:android-database-sqlcipher:_"
+    implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"
 
     // Testing dependencies
