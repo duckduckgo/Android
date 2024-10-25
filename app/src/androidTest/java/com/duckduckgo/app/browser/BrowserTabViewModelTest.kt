@@ -202,8 +202,10 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -464,8 +466,6 @@ class BrowserTabViewModelTest {
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
-    private val androidBrowserConfig: AndroidBrowserConfigFeature = mock()
-
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -490,6 +490,7 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
+    private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun before() = runTest {
@@ -526,7 +527,6 @@ class BrowserTabViewModelTest {
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
-        whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -639,7 +639,7 @@ class BrowserTabViewModelTest {
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
             cameraHardwareChecker = cameraHardwareChecker,
-            androidBrowserConfig = androidBrowserConfig,
+            androidBrowserConfig = fakeAndroidConfigBrowserFeature,
             privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
@@ -4946,7 +4946,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageScreenLockEnabledSendCommand() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        fakeAndroidConfigBrowserFeature.screenLock().setRawStoredState(State(enable = true))
         testee.processJsCallbackMessage(
             "myFeature",
             "screenLock",
@@ -4977,7 +4977,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockEnabledSendCommand() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        fakeAndroidConfigBrowserFeature.screenLock().setRawStoredState(State(enable = true))
         testee.processJsCallbackMessage(
             "myFeature",
             "screenUnlock",
@@ -5998,6 +5998,33 @@ class BrowserTabViewModelTest {
         testee.onUserClickCtaSecondaryButton(cta)
 
         verify(mockPixel).fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
+    }
+
+    @Test
+    fun whenPageIsChangedWithWebViewErrorResponseThenPixelIsFired() = runTest {
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+    }
+
+    @Test
+    fun givenErrorPageFeatureDisabledWhenPageIsChangedWithWebViewErrorResponseThenPixelIsNotFired() = runTest {
+        fakeAndroidConfigBrowserFeature.errorPagePixel().setRawStoredState(State(enable = false))
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
     }
 
     private fun aCredential(): LoginCredentials {

@@ -67,4 +67,12 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun optimizeTrackerEvaluationV2(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(true)
+    fun errorPagePixel(): Toggle
 }
