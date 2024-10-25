@@ -23,8 +23,8 @@ import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Inject
-import net.sqlcipher.database.SupportFactory
 
 interface SecureStorageDatabaseFactory {
     fun getDatabase(): SecureStorageDatabase?
@@ -52,7 +52,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
                 context,
                 SecureStorageDatabase::class.java,
                 "secure_storage_database_encrypted.db",
-            ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
+            ).openHelperFactory(SupportOpenHelperFactory(keyProvider.getl1Key()))
                 .addMigrations(*ALL_MIGRATIONS)
                 .build()
             _database
