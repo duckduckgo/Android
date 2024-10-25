@@ -46,7 +46,7 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorSurface"
         android:clipToPadding="false"
-        android:elevation="4dp"
+        android:elevation="2dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
