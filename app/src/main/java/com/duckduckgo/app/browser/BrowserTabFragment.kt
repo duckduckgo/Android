@@ -2506,7 +2506,6 @@ class BrowserTabFragment :
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
                 setSupportMultipleWindows(true)
-                disableWebSql(this)
                 setSupportZoom(true)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
@@ -2889,13 +2888,6 @@ class BrowserTabFragment :
 
         // avoids progressView from showing under toolbar
         binding.swipeRefreshContainer.progressViewStartOffset -= 15
-    }
-
-    /**
-     * Explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
-     */
-    private fun disableWebSql(settings: WebSettings) {
-        settings.databaseEnabled = false
     }
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
