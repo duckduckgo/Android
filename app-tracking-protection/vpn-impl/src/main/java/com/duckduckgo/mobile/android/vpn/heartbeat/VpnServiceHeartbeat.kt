@@ -42,7 +42,6 @@ import logcat.logcat
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceHeartbeat @Inject constructor(
-    private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
