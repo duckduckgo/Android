@@ -39,10 +39,15 @@ import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.time.Instant
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
     suspend fun getExternalID(): String?
+    suspend fun setAccessTokenV2(accessToken: AccessToken?)
+    suspend fun getAccessTokenV2(): AccessToken?
+    suspend fun setRefreshTokenV2(refreshToken: RefreshToken?)
+    suspend fun getRefreshTokenV2(): RefreshToken?
     suspend fun setAccessToken(accessToken: String?)
     suspend fun getAccessToken(): String?
     suspend fun setAuthToken(authToken: String?)
@@ -85,6 +90,28 @@ internal class RealAuthRepository constructor(
     }
     private inline fun <reified T> Moshi.parseList(jsonString: String): List<T>? {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).fromJson(jsonString)
+    }
+
+    override suspend fun setAccessTokenV2(accessToken: AccessToken?) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.accessTokenV2 = accessToken?.jwt
+        subscriptionsDataStore.accessTokenV2ExpiresAt = accessToken?.expiresAt
+    }
+
+    override suspend fun getAccessTokenV2(): AccessToken? {
+        val jwt = subscriptionsDataStore.accessTokenV2 ?: return null
+        val expiresAt = subscriptionsDataStore.accessTokenV2ExpiresAt ?: return null
+        return AccessToken(jwt, expiresAt)
+    }
+
+    override suspend fun setRefreshTokenV2(refreshToken: RefreshToken?) {
+        subscriptionsDataStore.refreshTokenV2 = refreshToken?.jwt
+        subscriptionsDataStore.refreshTokenV2ExpiresAt = refreshToken?.expiresAt
+    }
+
+    override suspend fun getRefreshTokenV2(): RefreshToken? {
+        val jwt = subscriptionsDataStore.refreshTokenV2 ?: return null
+        val expiresAt = subscriptionsDataStore.refreshTokenV2ExpiresAt ?: return null
+        return RefreshToken(jwt, expiresAt)
     }
 
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
@@ -168,6 +195,16 @@ internal class RealAuthRepository constructor(
         subscriptionsDataStore.canUseEncryption()
     }
 }
+
+data class AccessToken(
+    val jwt: String,
+    val expiresAt: Instant,
+)
+
+data class RefreshToken(
+    val jwt: String,
+    val expiresAt: Instant,
+)
 
 data class Account(
     val email: String?,
