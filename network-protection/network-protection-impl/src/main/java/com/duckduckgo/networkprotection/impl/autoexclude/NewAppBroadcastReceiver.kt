@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,68 +14,66 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.apps
+package com.duckduckgo.networkprotection.impl.autoexclude
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.annotation.MainThread
-import androidx.annotation.WorkerThread
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import logcat.logcat
 
-@SingleInstanceIn(AppScope::class)
+@SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class,
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
-    private val appTrackerRepository: AppTrackerRepository,
+    @AppCoroutineScope private var coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
-
-    @MainThread
     override fun onReceive(
-        context: Context,
-        intent: Intent,
+        context: Context?,
+        intent: Intent?,
     ) {
-        when (intent.action) {
-            Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
-        }
-    }
-
-    private fun restartVpn(packageName: String) {
-        logcat { "Newly installed package $packageName" }
-
-        val pendingResult = goAsync()
-        goAsync(pendingResult) {
-            if (isInExclusionList(packageName)) {
-                logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
-            } else {
-                logcat { "Newly installed package $packageName not in exclusion list" }
+        when (intent?.action) {
+            Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let {
+                coroutineScope.launch(dispatcherProvider.io()) {
+                    restartVpn(it)
+                }
             }
         }
     }
 
-    private fun register() {
+    private suspend fun restartVpn(packageName: String) {
+        if (networkProtectionState.isEnabled() && networkProtectionState.getExcludedApps().contains(packageName)) {
+            logcat { "Newly installed package $packageName is in NetP exclusion list, disabling/re-enabling vpn" }
+            networkProtectionState.restart()
+        } else if (appTrackingProtection.isEnabled() && appTrackingProtection.getExcludedApps().contains(packageName)) {
+            logcat { "Newly installed package $packageName is in AppTP exclusion list, disabling/re-enabling vpn" }
+            appTrackingProtection.restart()
+        } else {
+            logcat { "Newly installed package $packageName not in any exclusion list" }
+        }
+    }
+
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        logcat { "Auto exclude receiver started" }
         kotlin.runCatching { applicationContext.unregisterReceiver(this) }
 
         IntentFilter().apply {
@@ -86,25 +84,11 @@ class NewAppBroadcastReceiver @Inject constructor(
         }
     }
 
-    private fun unregister() {
-        kotlin.runCatching { applicationContext.unregisterReceiver(this) }
-    }
-
-    @WorkerThread
-    private suspend fun isInExclusionList(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext appTrackerRepository.getAppExclusionList().any { it.packageId == packageName }
-    }
-
-    override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        logcat { "New app receiver started" }
-        register()
-    }
-
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        logcat { "New app receiver stopped" }
-        unregister()
+        logcat { "Auto exclude receiver stopped" }
+        kotlin.runCatching { applicationContext.unregisterReceiver(this) }
     }
 }

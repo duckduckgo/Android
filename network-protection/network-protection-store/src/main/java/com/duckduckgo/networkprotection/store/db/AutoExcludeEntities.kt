@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.exclusion.ui
+package com.duckduckgo.networkprotection.store.db
 
-import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-data class NetpExclusionListApp(
-    val packageName: String,
-    val name: String,
-    val isProtected: Boolean = false,
-    val isNotCompatibleWithVPN: Boolean = false,
+@Entity(tableName = "vpn_flagged_auto_excluded_apps")
+data class FlaggedIncompatibleApp(
+    @PrimaryKey val packageName: String,
 )
 
-data class NetpExclusionListSystemAppCategory(
-    val category: SystemAppCategory,
-    val text: String,
-    val isEnabled: Boolean = false,
+@Entity(tableName = "vpn_auto_excluded_apps")
+data class VpnIncompatibleApp(
+    @PrimaryKey val packageName: String,
 )

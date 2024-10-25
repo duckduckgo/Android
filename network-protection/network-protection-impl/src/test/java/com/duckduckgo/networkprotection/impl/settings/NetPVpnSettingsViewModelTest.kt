@@ -1,5 +1,6 @@
 package com.duckduckgo.networkprotection.impl.settings
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -87,6 +88,7 @@ class NetPVpnSettingsViewModelTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun onStartEmitCorrectState() = runTest {
         whenever(vpnDisableOnCall.isEnabled()).thenReturn(true)
