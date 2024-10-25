@@ -3265,6 +3265,9 @@ class BrowserTabViewModel @Inject constructor(
                 showDaxIcon = false,
                 showSearchIcon = false,
             )
+        if (androidBrowserConfig.errorPagePixel().isEnabled()) {
+            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+        }
         command.postValue(WebViewError(errorType, url))
     }
 
