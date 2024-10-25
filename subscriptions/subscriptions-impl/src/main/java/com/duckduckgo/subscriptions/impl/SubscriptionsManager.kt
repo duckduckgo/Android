@@ -120,12 +120,12 @@ interface SubscriptionsManager {
     /**
      * Returns the auth token and if expired, tries to refresh irt
      */
-    suspend fun getAuthToken(): AuthToken
+    suspend fun getAuthToken(): AuthTokenResult
 
     /**
      * Returns the access token from store
      */
-    suspend fun getAccessToken(): AccessToken
+    suspend fun getAccessToken(): AccessTokenResult
 
     /**
      * Returns [true] if the user has an active subscription and [false] otherwise
@@ -539,14 +539,14 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun getAuthToken(): AuthToken {
+    override suspend fun getAuthToken(): AuthTokenResult {
         try {
             return if (isUserAuthenticated()) {
                 logcat { "Subs auth token is ${authRepository.getAuthToken()}" }
                 validateToken(authRepository.getAuthToken()!!)
-                AuthToken.Success(authRepository.getAuthToken()!!)
+                AuthTokenResult.Success(authRepository.getAuthToken()!!)
             } else {
-                AuthToken.Failure.UnknownError
+                AuthTokenResult.Failure.UnknownError
             }
         } catch (e: Exception) {
             return when (extractError(e)) {
@@ -554,23 +554,23 @@ class RealSubscriptionsManager @Inject constructor(
                     logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
                     val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
                     if (result is RecoverSubscriptionResult.Success) {
-                        AuthToken.Success(authRepository.getAuthToken()!!)
+                        AuthTokenResult.Success(authRepository.getAuthToken()!!)
                     } else {
-                        AuthToken.Failure.TokenExpired(authRepository.getAuthToken()!!)
+                        AuthTokenResult.Failure.TokenExpired(authRepository.getAuthToken()!!)
                     }
                 }
                 else -> {
-                    AuthToken.Failure.UnknownError
+                    AuthTokenResult.Failure.UnknownError
                 }
             }
         }
     }
 
-    override suspend fun getAccessToken(): AccessToken {
+    override suspend fun getAccessToken(): AccessTokenResult {
         return if (isUserAuthenticated()) {
-            AccessToken.Success(authRepository.getAccessToken()!!)
+            AccessTokenResult.Success(authRepository.getAccessToken()!!)
         } else {
-            AccessToken.Failure("Token not found")
+            AccessTokenResult.Failure("Token not found")
         }
     }
 
@@ -611,14 +611,14 @@ class RealSubscriptionsManager @Inject constructor(
     }
 }
 
-sealed class AccessToken {
-    data class Success(val accessToken: String) : AccessToken()
-    data class Failure(val message: String) : AccessToken()
+sealed class AccessTokenResult {
+    data class Success(val accessToken: String) : AccessTokenResult()
+    data class Failure(val message: String) : AccessTokenResult()
 }
 
-sealed class AuthToken {
-    data class Success(val authToken: String) : AuthToken()
-    sealed class Failure : AuthToken() {
+sealed class AuthTokenResult {
+    data class Success(val authToken: String) : AuthTokenResult()
+    sealed class Failure : AuthTokenResult() {
         data class TokenExpired(val authToken: String) : Failure()
         data object UnknownError : Failure()
     }

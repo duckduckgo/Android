@@ -61,8 +61,8 @@ class RealSubscriptions @Inject constructor(
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
-            is AccessToken.Success -> result.accessToken
-            is AccessToken.Failure -> null
+            is AccessTokenResult.Success -> result.accessToken
+            is AccessTokenResult.Failure -> null
         }
     }
 

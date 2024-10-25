@@ -17,7 +17,7 @@
 package com.duckduckgo.subscriptions.internal.settings
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.AuthToken
+import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,7 +44,7 @@ class AccountDeletionHandlerImpl @Inject constructor(
     private suspend fun deleteAccount(): Boolean {
         return try {
             val token = subscriptionsManager.getAuthToken()
-            if (token is AuthToken.Success) {
+            if (token is AuthTokenResult.Success) {
                 val state = authService.delete("Bearer ${token.authToken}")
                 (state.status == "deleted")
             } else {

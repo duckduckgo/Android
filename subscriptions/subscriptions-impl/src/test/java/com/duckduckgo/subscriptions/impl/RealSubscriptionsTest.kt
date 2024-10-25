@@ -68,14 +68,14 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenGetAccessTokenSucceedsThenReturnAccessToken() = runTest {
-        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
         val result = subscriptions.getAccessToken()
         assertEquals("accessToken", result)
     }
 
     @Test
     fun whenGetAccessTokenFailsThenReturnNull() = runTest {
-        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure("error"))
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("error"))
         assertNull(subscriptions.getAccessToken())
     }
 

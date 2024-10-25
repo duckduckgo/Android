@@ -1,6 +1,6 @@
 package com.duckduckgo.subscriptions.internal.settings
 
-import com.duckduckgo.subscriptions.impl.AuthToken
+import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.DeleteAccountResponse
@@ -65,7 +65,7 @@ class AccountDeletionHandlerImplTest {
     }
 
     private suspend fun givenUserIsAuthenticated() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Success("token"))
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthTokenResult.Success("token"))
     }
 
     private suspend fun givenUserIsNotAuthenticated() {
