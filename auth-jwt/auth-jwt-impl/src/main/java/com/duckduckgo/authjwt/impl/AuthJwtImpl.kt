@@ -20,16 +20,20 @@ import com.duckduckgo.authjwt.api.AccessTokenClaims
 import com.duckduckgo.authjwt.api.AuthJwt
 import com.duckduckgo.authjwt.api.Entitlement
 import com.duckduckgo.authjwt.api.RefreshTokenClaims
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwsHeader
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Jwks
+import java.util.Date
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class AuthJwtImpl @Inject constructor() : AuthJwt {
+class AuthJwtImpl @Inject constructor(
+    private val timeProvider: CurrentTimeProvider,
+) : AuthJwt {
 
     override fun validateAccessToken(
         jwt: String,
@@ -77,6 +81,7 @@ class AuthJwtImpl @Inject constructor() : AuthJwt {
                 val keyId = (header as JwsHeader).keyId
                 jwks.first { it.id == keyId }.toKey()
             }
+            .clock { Date(timeProvider.currentTimeMillis()) }
             .build()
             .parseSignedClaims(jwt)
             .payload
