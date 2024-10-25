@@ -162,7 +162,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
-import com.duckduckgo.app.browser.errors.ErrorPagePixelFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -428,7 +427,6 @@ class BrowserTabViewModel @Inject constructor(
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
-    private val errorPagePixelFeature: ErrorPagePixelFeature,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3267,7 +3265,7 @@ class BrowserTabViewModel @Inject constructor(
                 showDaxIcon = false,
                 showSearchIcon = false,
             )
-        if (errorPagePixelFeature.self().isEnabled()) {
+        if (androidBrowserConfig.errorPagePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         command.postValue(WebViewError(errorType, url))
