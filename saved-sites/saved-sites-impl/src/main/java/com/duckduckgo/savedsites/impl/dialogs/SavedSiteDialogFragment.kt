@@ -28,6 +28,8 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput
@@ -223,9 +225,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         TextAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(message)
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete)
-            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel)
+            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete, DESTRUCTIVE)
+            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

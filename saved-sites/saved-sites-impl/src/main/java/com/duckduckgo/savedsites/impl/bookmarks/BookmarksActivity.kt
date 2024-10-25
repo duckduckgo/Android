@@ -40,6 +40,8 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -518,9 +520,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         TextAlertDialogBuilder(this)
             .setTitle(getString(R.string.deleteFolder, bookmarkFolder.name))
             .setMessage(getMessageString(bookmarkFolder))
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete)
-            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel)
+            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete, DESTRUCTIVE)
+            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

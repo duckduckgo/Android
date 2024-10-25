@@ -40,6 +40,8 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.DaxDialogListener
 import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -356,9 +358,8 @@ class DeviceShieldTrackerActivity :
         TextAlertDialogBuilder(this)
             .setTitle(R.string.atp_RemoveFeatureDialogTitle)
             .setMessage(R.string.atp_RemoveFeatureDialogMessage)
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.atp_RemoveFeatureDialogRemove)
-            .setNegativeButton(R.string.atp_RemoveFeatureDialogCancel)
+            .setPositiveButton(R.string.atp_RemoveFeatureDialogRemove, DESTRUCTIVE)
+            .setNegativeButton(R.string.atp_RemoveFeatureDialogCancel, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

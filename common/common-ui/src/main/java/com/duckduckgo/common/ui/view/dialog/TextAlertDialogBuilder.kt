@@ -55,7 +55,6 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var negativeButtonType: ButtonType? = null
 
     private var isCancellable: Boolean = false
-    private var isDestructiveVersion: Boolean = false
     private var isCheckboxEnabled: Boolean = false
     private var checkBoxText: CharSequence = ""
 
@@ -104,11 +103,6 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setCancellable(cancellable: Boolean): TextAlertDialogBuilder {
         isCancellable = cancellable
-        return this
-    }
-
-    fun setDestructiveButtons(isDestructive: Boolean): TextAlertDialogBuilder {
-        isDestructiveVersion = isDestructive
         return this
     }
 

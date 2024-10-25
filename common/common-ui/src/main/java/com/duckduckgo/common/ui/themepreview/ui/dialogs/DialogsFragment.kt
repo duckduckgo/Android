@@ -26,6 +26,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -141,9 +143,8 @@ class DialogsFragment : Fragment() {
                 TextAlertDialogBuilder(requireContext())
                     .setTitle(R.string.text_dialog_title)
                     .setMessage(R.string.text_dialog_message)
-                    .setDestructiveButtons(true)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
