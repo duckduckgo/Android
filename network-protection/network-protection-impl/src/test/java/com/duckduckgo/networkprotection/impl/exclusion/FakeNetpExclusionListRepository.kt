@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.exclusion.ui
+package com.duckduckgo.networkprotection.impl.exclusion
 
-import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory
+class FakeNetpExclusionListRepository : NetPExclusionListRepository {
+    private val _excludedPackages = mutableListOf<String>()
+    fun setExcludedAppPackages(packages: List<String>) {
+        _excludedPackages.clear()
+        _excludedPackages.addAll(packages)
+    }
 
-data class NetpExclusionListApp(
-    val packageName: String,
-    val name: String,
-    val isProtected: Boolean = false,
-    val isNotCompatibleWithVPN: Boolean = false,
-)
-
-data class NetpExclusionListSystemAppCategory(
-    val category: SystemAppCategory,
-    val text: String,
-    val isEnabled: Boolean = false,
-)
+    override suspend fun getExcludedAppPackages(): List<String> {
+        return _excludedPackages.toList()
+    }
+}

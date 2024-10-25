@@ -44,15 +44,19 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAutoExcludeDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowUnifiedFeedback
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
@@ -66,9 +70,9 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayabl
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import java.util.concurrent.TimeUnit
@@ -98,6 +102,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
+    private val autoExcludePrompt: AutoExcludePrompt,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -107,7 +112,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
     private var lastVpnRequestTime = -1L
-    private var excludedAppsCount: Int = 0
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -130,7 +134,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
                 locationState = locationState,
-                excludedAppsCount = excludedAppsCount,
+                excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size,
             )
         }
     }
@@ -181,13 +185,19 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             getRunningState().firstOrNull()?.alwaysOnState?.let {
                 handleAlwaysOnInitialState(it)
             }
+            tryShowAutoExcludePrompt()
         }
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size
+    private suspend fun tryShowAutoExcludePrompt() {
+        if (networkProtectionState.isRunning() &&
+            !localConfig.autoExcludeBrokenApps().isEnabled()
+        ) {
+            autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND).also {
+                if (it.isNotEmpty()) {
+                    sendCommand(ShowAutoExcludeDialog(it))
+                }
+            }
         }
     }
 
@@ -408,6 +418,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         onStopVpn()
     }
 
+    @SuppressLint("DenyListedApi")
     fun onDontShowExcludeAppPromptAgain() {
         networkProtectionPixels.reportExcludePromptDontAskAgainClicked()
         localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))
@@ -429,6 +440,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
         data object ShowUnifiedFeedback : Command()
         data object ShowExcludeAppPrompt : Command()
+        data class ShowAutoExcludeDialog(val apps: List<VpnIncompatibleApp>) : Command()
     }
 
     data class ViewState(

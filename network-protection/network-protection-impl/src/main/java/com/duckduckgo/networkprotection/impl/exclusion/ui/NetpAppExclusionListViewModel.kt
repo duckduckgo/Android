@@ -26,10 +26,14 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt
+import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
@@ -39,27 +43,31 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Fil
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowAutoExcludePrompt
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproAppFeedback
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowUnifiedPproFeedback
-import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.Default
+import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.WithToggle
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -70,15 +78,19 @@ import kotlinx.coroutines.launch
 class NetpAppExclusionListViewModel @Inject constructor(
     private val packageManager: PackageManager,
     private val dispatcherProvider: DispatcherProvider,
-    private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val netPManualExclusionListRepository: NetPManualExclusionListRepository,
     @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val localConfig: NetPSettingsLocalConfig,
+    private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
+    private val autoExcludePrompt: AutoExcludePrompt,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
+    private val forceRefreshList = MutableStateFlow(System.currentTimeMillis())
     private val refreshSnapshot = MutableStateFlow(System.currentTimeMillis())
     private val currentExclusionList = mutableListOf<NetPManuallyExcludedApp>()
     private val exclusionListSnapshot = mutableListOf<NetPManuallyExcludedApp>()
@@ -101,7 +113,12 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 )
             }
 
-            val panelType = HeaderType(headerContent = DEFAULT)
+            val panelType = if (autoExcludeAppsRepository.getAllIncompatibleApps().isNotEmpty()) {
+                HeaderType(headerContent = WithToggle(localConfig.autoExcludeBrokenApps().isEnabled()))
+            } else {
+                HeaderType(headerContent = Default)
+            }
+
             val appList = when (filter) {
                 AppsFilter.PROTECTED_ONLY -> {
                     val protectedApps = list.filter { it.isProtected }.map { AppType(it) }
@@ -149,25 +166,53 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 }
             }
 
-            return@combine ViewState(appList)
-        }
+            return@combine ViewState(
+                apps = appList,
+            )
+        }.flowOn(dispatcherProvider.io())
     }
 
+    /**
+     * This method takes all installed apps on the device and transforms each to items to be rendered on the exclusion list taking
+     * into consideration the user's manual exclusion list and the auto-exclude feature.
+     */
     private fun getAppsForExclusionList(): Flow<List<NetpExclusionListApp>> {
-        return netPExclusionListRepository.getManualAppExclusionListFlow()
-            .map { userExclusionList ->
-                installedApps
-                    .map { appInfo ->
-                        NetpExclusionListApp(
-                            packageName = appInfo.packageName,
-                            name = packageManager.getApplicationLabel(appInfo).toString(),
-                            isProtected = isProtected(appInfo, userExclusionList),
-                        )
-                    }.sortedBy { it.name.lowercase() }
-                    .toList()
-            }.onStart {
-                refreshInstalledApps()
-            }.flowOn(dispatcherProvider.io())
+        return combine(
+            forceRefreshList, // allows us to manually force refresh the list
+            netPManualExclusionListRepository.getManualAppExclusionListFlow(), // provides user's manual exclusion list
+            autoExcludeAppsRepository.getAllIncompatibleAppPackagesFlow(), // provides all apps in the auto exclude list
+        ) { _, userExclusionList, autoExcludeList ->
+            val autoExcludeFeatureEnabled = autoExcludeAppsRepository.getAllIncompatibleApps().isNotEmpty()
+            val autoExcludeEnabled = localConfig.autoExcludeBrokenApps().isEnabled()
+
+            installedApps.map { appInfo ->
+                val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
+                NetpExclusionListApp(
+                    packageName = appInfo.packageName,
+                    name = packageManager.getApplicationLabel(appInfo).toString(),
+                    /**
+                     * If app is part of user exclusion list, the value is whatever isProtected in exclusion list is.
+                     * Else, if app is part of the auto-exclude list, the value is whatever the state of the auto exclude setting is.
+                     * Else, if app is not part of the user exclusion and auto exclude, isProtected is true.
+                     */
+                    isProtected = userExcludedApp?.isProtected ?: if (autoExcludeFeatureEnabled && autoExcludeList.contains(appInfo.packageName)) {
+                        !autoExcludeEnabled
+                    } else {
+                        true
+                    },
+                    // If auto exclude feature is available, we set this to true if the app is part of auto exclude list. Else, it is set to false.
+                    // This value is used to show the incompatible label
+                    isNotCompatibleWithVPN = if (autoExcludeFeatureEnabled) {
+                        autoExcludeList.contains(appInfo.packageName)
+                    } else {
+                        false
+                    },
+                )
+            }.sortedBy { it.name.lowercase() }
+                .toList()
+        }.onStart {
+            refreshInstalledApps()
+        }.flowOn(dispatcherProvider.io())
     }
 
     private fun refreshInstalledApps() {
@@ -176,19 +221,9 @@ class NetpAppExclusionListViewModel @Inject constructor(
             .filterNot { !systemAppOverridesProvider.getSystemAppOverridesList().contains(it.packageName) && it.isSystemApp() }
     }
 
-    private fun isProtected(
-        appInfo: ApplicationInfo,
-        userExclusionList: List<NetPManuallyExcludedApp>,
-    ): Boolean {
-        return userExclusionList.find {
-            it.packageId == appInfo.packageName
-        }?.run {
-            isProtected
-        } ?: true
-    }
-
     private fun MutableStateFlow<Long>.refresh() {
         viewModelScope.launch {
+            delay(100)
             emit(System.currentTimeMillis())
         }
     }
@@ -226,7 +261,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     fun initialize() {
         networkProtectionPixels.reportExclusionListShown()
-        netPExclusionListRepository.getManualAppExclusionListFlow()
+        netPManualExclusionListRepository.getManualAppExclusionListFlow()
             .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp ->
                 ManualProtectionSnapshot(timestamp, excludedApps)
             }
@@ -278,7 +313,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportAppAddedToExclusionList()
-            netPExclusionListRepository.manuallyExcludeApp(packageName)
+            netPManualExclusionListRepository.manuallyExcludeApp(packageName)
             if (report) {
                 networkProtectionPixels.reportExclusionListLaunchBreakageReport()
                 if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_EXCLUDED_APPS)) {
@@ -303,13 +338,23 @@ class NetpAppExclusionListViewModel @Inject constructor(
             } else {
                 networkProtectionPixels.reportSkippedReportAfterExcludingApp()
             }
+
+            if (!localConfig.autoExcludeBrokenApps().isEnabled()) {
+                if (autoExcludeAppsRepository.isAppMarkedAsIncompatible(packageName)) {
+                    autoExcludePrompt.getAppsForPrompt(INCOMPATIBLE_APP_MANUALLY_EXCLUDED).also {
+                        if (it.isNotEmpty()) {
+                            command.send(ShowAutoExcludePrompt(it))
+                        }
+                    }
+                }
+            }
         }
     }
 
     private fun onAppProtectionEnabled(packageName: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportAppRemovedFromExclusionList()
-            netPExclusionListRepository.manuallyEnableApp(packageName)
+            netPManualExclusionListRepository.manuallyEnableApp(packageName)
         }
     }
 
@@ -337,13 +382,16 @@ class NetpAppExclusionListViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
     fun restoreProtectedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListRestoreDefaults()
-            netPExclusionListRepository.restoreDefaultProtectedList()
+            netPManualExclusionListRepository.restoreDefaultProtectedList()
             systemAppsExclusionRepository.restoreDefaults()
+            localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = false))
             forceRestart = true
             refreshSnapshot.refresh()
+            forceRefreshList.refresh()
             command.send(Command.RestartVpn)
         }
     }
@@ -368,6 +416,24 @@ class NetpAppExclusionListViewModel @Inject constructor(
             }
         }
     }
+
+    @SuppressLint("DenyListedApi")
+    fun onAutoExcludeToggled(enabled: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = enabled))
+            forceRefreshList.refresh()
+            if (enabled) {
+                networkProtectionPixels.reportAutoExcludeEnableViaExclusionList()
+            } else {
+                networkProtectionPixels.reportAutoExcludeDisableViaExclusionList()
+            }
+            command.send(Command.RestartVpn)
+        }
+    }
+
+    fun forceRefresh() {
+        forceRefreshList.refresh()
+    }
 }
 
 private data class ManualProtectionSnapshot(
@@ -391,6 +457,7 @@ internal sealed class Command {
 
     data class ShowDisableProtectionDialog(val forApp: NetpExclusionListApp) : Command()
     data class ShowSystemAppsExclusionWarning(val category: NetpExclusionListSystemAppCategory) : Command()
+    data class ShowAutoExcludePrompt(val apps: List<VpnIncompatibleApp>) : Command()
 }
 
 sealed class AppsProtectionType {
@@ -407,7 +474,10 @@ sealed class AppsProtectionType {
     data object DividerType : AppsProtectionType()
 }
 
-enum class HeaderContent {
-    DEFAULT,
-    NETP_DISABLED,
+sealed class HeaderContent {
+    data object Default : HeaderContent()
+    data object NetpDisabled : HeaderContent()
+    data class WithToggle(
+        val enabled: Boolean,
+    ) : HeaderContent()
 }
