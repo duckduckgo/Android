@@ -86,6 +86,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.errors.ErrorPagePixelFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
@@ -202,8 +203,10 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -490,6 +493,7 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
+    private var fakeErrorPagePixelFeature = FakeFeatureToggleFactory.create(ErrorPagePixelFeature::class.java)
 
     @Before
     fun before() = runTest {
@@ -657,6 +661,7 @@ class BrowserTabViewModelTest {
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            errorPagePixelFeature = fakeErrorPagePixelFeature,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5998,6 +6003,33 @@ class BrowserTabViewModelTest {
         testee.onUserClickCtaSecondaryButton(cta)
 
         verify(mockPixel).fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
+    }
+
+    @Test
+    fun whenPageIsChangedWithWebViewErrorResponseThenPixelIsFired() = runTest {
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
+    }
+
+    @Test
+    fun givenErrorPageFeatureDisabledWhenPageIsChangedWithWebViewErrorResponseThenPixelIsNotFired() = runTest {
+        fakeErrorPagePixelFeature.self().setRawStoredState(State(enable = false))
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
     }
 
     private fun aCredential(): LoginCredentials {
