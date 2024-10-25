@@ -369,5 +369,5 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     URI_LOADED("m_uri_loaded"),
 
-    ERROR_PAGE_SHOWN_DAILY_PIXEL("m_errorpageshown"),
+    ERROR_PAGE_SHOWN("m_errorpageshown"),
 }

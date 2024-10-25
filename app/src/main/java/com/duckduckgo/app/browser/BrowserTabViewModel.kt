@@ -3268,7 +3268,7 @@ class BrowserTabViewModel @Inject constructor(
                 showSearchIcon = false,
             )
         if (errorPagePixelFeature.self().isEnabled()) {
-            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
+            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         command.postValue(WebViewError(errorType, url))
     }

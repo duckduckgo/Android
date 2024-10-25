@@ -6015,7 +6015,7 @@ class BrowserTabViewModelTest {
             isBrowserShowing = true,
         )
 
-        verify(mockPixel).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
+        verify(mockPixel).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
     }
 
     @Test
@@ -6029,7 +6029,7 @@ class BrowserTabViewModelTest {
             isBrowserShowing = true,
         )
 
-        verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN_DAILY_PIXEL)
+        verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
     }
 
     private fun aCredential(): LoginCredentials {
