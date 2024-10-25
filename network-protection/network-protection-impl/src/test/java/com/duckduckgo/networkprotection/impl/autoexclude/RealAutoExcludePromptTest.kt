@@ -3,8 +3,9 @@ package com.duckduckgo.networkprotection.impl.autoexclude
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.INCOMPATIBLE_APP_MANUALLY_EXCLUDED
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -19,7 +20,7 @@ class RealAutoExcludePromptTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+    private lateinit var manualExclusionListRepository: NetPManualExclusionListRepository
 
     private lateinit var autoExcludePrompt: AutoExcludePrompt
     private lateinit var autoExcludeAppsRepository: FakeAutoExcludeAppsRepository
@@ -29,7 +30,7 @@ class RealAutoExcludePromptTest {
         MockitoAnnotations.openMocks(this)
         autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
         autoExcludePrompt = RealAutoExcludePrompt(
-            netPExclusionListRepository,
+            manualExclusionListRepository,
             autoExcludeAppsRepository,
             coroutineRule.testDispatcherProvider,
         )
@@ -37,7 +38,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenManualExclusionListContainAppsForAutoExcludeThenAppsForPromptShouldOnlyIncludeProtectedApps() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(
             listOf(
                 NetPManuallyExcludedApp("test1", true),
                 NetPManuallyExcludedApp("test2", false),
@@ -59,7 +60,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenManualExclusionListIsEmptyThenAppsForPromptShouldIncludeAllAppsForPrompt() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
         autoExcludeAppsRepository.setAppsForAutoExcludePrompt(
             listOf(
                 VpnIncompatibleApp("test1"),
@@ -75,7 +76,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenNoAppsForPromptThenReturnEmpty() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
 
         val result = autoExcludePrompt.getAppsForPrompt(NEW_INCOMPATIBLE_APP_FOUND)
 
@@ -84,7 +85,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenWithIncompatibleAppsAndNoManualExclusionThenReturnAllIncompatibleApps() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
         autoExcludeAppsRepository.setIncompatibleApps(
             listOf(
                 VpnIncompatibleApp("test1"),
@@ -100,7 +101,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenWithIncompatibleAppsAndManualExclusionThenReturnAllProtectedIncompatibleApps() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(
             listOf(
                 NetPManuallyExcludedApp("test1", true),
                 NetPManuallyExcludedApp("test2", false),
@@ -121,7 +122,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenWithIncompatibleAppsAllManuallyExcludedThenReturnEmpty() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(
             listOf(
                 NetPManuallyExcludedApp("test1", false),
                 NetPManuallyExcludedApp("test2", false),
@@ -141,7 +142,7 @@ class RealAutoExcludePromptTest {
 
     @Test
     fun whenNoIncompatibleAppsThenReturnEmpty() = runTest {
-        whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(
             listOf(
                 NetPManuallyExcludedApp("test1", false),
                 NetPManuallyExcludedApp("test2", false),

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.store.db
+package com.duckduckgo.networkprotection.impl.exclusion
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+class FakeNetpExclusionListRepository : NetPExclusionListRepository {
+    private val _excludedPackages = mutableListOf<String>()
+    fun setExcludedAppPackages(packages: List<String>) {
+        _excludedPackages.clear()
+        _excludedPackages.addAll(packages)
+    }
 
-@Entity(tableName = "vpn_flagged_auto_excluded_apps")
-data class FlaggedIncompatibleApp(
-    @PrimaryKey val packageName: String,
-)
-
-@Entity(tableName = "vpn_auto_excluded_apps")
-data class VpnIncompatibleApp(
-    @PrimaryKey val packageName: String,
-)
+    override suspend fun getExcludedAppPackages(): List<String> {
+        return _excludedPackages.toList()
+    }
+}
