@@ -384,6 +384,9 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
+    implementation project(":auth-jwt-api")
+    implementation project(":auth-jwt-impl")
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
