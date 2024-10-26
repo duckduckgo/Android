@@ -142,6 +142,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun serpPromoCookie(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun authApiV2(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
