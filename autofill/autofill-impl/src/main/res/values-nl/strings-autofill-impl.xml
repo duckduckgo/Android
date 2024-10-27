@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisch invullen voor wachtwoorden is niet beschikbaar omdat je versie van Android WebView te oud is.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisch invullen voor wachtwoorden is niet beschikbaar omdat je versie van Android WebView verouderd of niet compatibel is.</string>
 
     <string name="autofillManagementSearchClearDescription">Zoekinvoer wissen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Geen resultaten voor \'%1$s\'</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Synchronisatie onderbroken</b>\nSommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nooit vragen voor deze site</string>
+    <string name="saveOnboardingLoginDialogNotNow">Niet nu</string>
     <string name="credentialManagementInstructionNeverForThisSite">Als je uitgesloten sites opnieuw instelt, zie je de volgende keer dat je bij een van deze sites inlogt een melding om je wachtwoord op te slaan.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Uitgesloten sites opnieuw instellen</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Uitgesloten sites opnieuw instellen?</string>

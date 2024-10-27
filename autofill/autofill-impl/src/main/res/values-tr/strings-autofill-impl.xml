@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Android WebView sürümünüz çok eski olduğundan parolalar için otomatik doldurma kullanılamıyor.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Android WebView sürümünüz güncel değil veya uyumsuz olduğundan parolalar için otomatik doldurma kullanılamıyor.</string>
 
     <string name="autofillManagementSearchClearDescription">Arama girişini temizle</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">\'%1$s\' için sonuç yok</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Şifre Senkronizasyonu Durduruldu</b>\nBazı şifreler yanlış biçimlendirilmiş veya çok uzun olduğu için senkronize edilmedi.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Bu Site için Hiçbir Zaman Sorma</string>
+    <string name="saveOnboardingLoginDialogNotNow">Şimdi Değil</string>
     <string name="credentialManagementInstructionNeverForThisSite">Hariç tutulan siteleri sıfırlarsanız, bu sitelerden herhangi birinde bir sonraki oturum açtığınızda şifrenizi kaydetmeniz istenecektir.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Hariç Tutulan Siteleri Sıfırla</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Hariç Tutulan Siteler Sıfırlansın mı?</string>

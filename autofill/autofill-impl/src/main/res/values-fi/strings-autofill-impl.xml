@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Salasanojen automaattinen täyttäminen ei ole käytettävissä, koska Android WebView -versiosi on liian vanha.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Salasanojen automaattinen täyttäminen ei ole käytettävissä, koska Android WebView -versiosi on vanhentunut tai yhteensopimaton.</string>
 
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Salasanojen synkronointi keskeytetty</b>\nSalasanojen synkronointi on keskeytetty.\n\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Älä kysy enää tällä sivustolla</string>
+    <string name="saveOnboardingLoginDialogNotNow">Ei nyt</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Nollaa poissuljetut sivustot</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Nollataanko poissuljetut sivustot?</string>

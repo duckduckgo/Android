@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Paroļu automātiskā aizpildīšana nav pieejama, jo tava Android WebView versija ir pārāk veca.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Paroļu automātiskā aizpildīšana nav pieejama, jo tava Android WebView versija ir novecojusi vai nesaderīga.</string>
 
     <string name="autofillManagementSearchClearDescription">Notīrīt meklēšanas ievadi</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Vaicājumam “%1$s” nav rezultātu</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nekad nejautāt par šo vietni</string>
+    <string name="saveOnboardingLoginDialogNotNow">Ne tagad</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ja atiestatīsi izslēgtās vietnes, tev tiks piedāvāts saglabāt savus pieteikšanās datus, kad nākamreiz tajās pierakstīsies.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Atiestatīt izslēgtās vietnes</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Atiestatīt izslēgtās vietnes?</string>

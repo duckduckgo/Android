@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">A jelszavak automatikus kitöltése nem érhető el, mert az Android WebView verziója túl régi.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">A jelszavak automatikus kitöltése nem érhető el, mert az Android WebView verziója elavult vagy nem kompatibilis.</string>
 
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Jelszó-szinkronizálás szüneteltetve</b>\nEgyes jelszavak helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Soha ne kérdezzen rá ennél a webhelynél</string>
+    <string name="saveOnboardingLoginDialogNotNow">Most nem</string>
     <string name="credentialManagementInstructionNeverForThisSite">A kizárt webhelyek visszaállítása esetén a rendszer a jelszavad mentését kéri, amikor legközelebb bejelentkezel ezen webhelyek bármelyikére.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Kizárt webhelyek visszaállítása</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Kizárt webhelyek visszaállítása?</string>

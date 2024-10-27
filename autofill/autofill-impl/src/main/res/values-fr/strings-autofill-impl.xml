@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">La saisie automatique des mots de passe n\'est pas disponible car votre version d\'Android WebView est trop ancienne.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">La saisie automatique des mots de passe n\'est pas disponible car votre version d\'Android WebView est obsolète ou incompatible.</string>
 
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Ne jamais demander pour ce site</string>
+    <string name="saveOnboardingLoginDialogNotNow">Pas maintenant</string>
     <string name="credentialManagementInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Réinitialiser les sites exclus</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Réinitialiser les sites exclus ?</string>

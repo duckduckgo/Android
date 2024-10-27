@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Predloženo</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatsko popunjavanje lozinki nije dostupno jer je vaša verzija Android WebViewa prestara.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatsko popunjavanje lozinki nije dostupno jer je tvoja verzija Android WebViewa zastarjela ili nekompatibilna.</string>
 
     <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nNeke su lozinke formatirane pogrešno, ili su preduge i nisu sinkronizirane.\n\n</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikada ne traži za ovu web lokaciju</string>
+    <string name="saveOnboardingLoginDialogNotNow">Ne sad</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ako resetiraš isključene web lokacije, od tebe će se zatražiti da spremiš svoju lozinku sljedeći put kad se prijaviš na bilo koju od ovih lokacija.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Resetiraj isključene web lokacije</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Resetiraj isključene web lokacije?</string>

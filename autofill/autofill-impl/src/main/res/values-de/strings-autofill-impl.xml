@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Die automatische Vervollständigung von Passwörtern ist nicht verfügbar, da Ihre Version von Android WebView zu alt ist.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Die automatische Vervollständigung von Passwörtern ist nicht verfügbar, da deine Version von Android WebView nicht aktuell oder inkompatibel ist.</string>
 
     <string name="autofillManagementSearchClearDescription">Sucheingabe löschen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Keine Ergebnisse für „%1$s“</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Die Passwort-Synchronisierung wurde angehalten</b>\nEinige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n</string>
 
     <string name="saveLoginDialogNeverForThisSite">Für diese Website niemals fragen</string>
+    <string name="saveOnboardingLoginDialogNotNow">Jetzt nicht</string>
     <string name="credentialManagementInstructionNeverForThisSite">Wenn du die ausgeschlossenen Websites zurücksetzt, wirst du aufgefordert, dein Passwort zu speichern, wenn du dich das nächste Mal auf einer dieser Websites anmeldest.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Ausgeschlossene Websites zurücksetzen</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Ausgeschlossene Websites zurücksetzen?</string>

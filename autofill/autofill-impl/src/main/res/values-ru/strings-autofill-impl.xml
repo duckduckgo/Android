@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автозаполнение паролей недоступно, так как ваша версия Android WebView устарела.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автозаполнение паролей недоступно: ваша версия Android WebView устарела или утратила совместимость.</string>
 
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Синхронизация паролей на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Больше не спрашивать на этом сайте</string>
+    <string name="saveOnboardingLoginDialogNotNow">Не сейчас</string>
     <string name="credentialManagementInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Сбросить список исключений</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Сбросить список исключений?</string>
