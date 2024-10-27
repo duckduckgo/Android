@@ -46,7 +46,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val shouldShowExpandedView = autofillDeclineCounter.declineCount() < 2 && autofillDeclineCounter.isDeclineCounterActive()
             _viewState.value = ViewState(shouldShowExpandedView)
-            Timber.d("Autofill: AutofillSavingCredentialsViewModel initialized")
+            Timber.d("Autofill: AutofillSavingCredentialsViewModel initialized with expanded view state: $shouldShowExpandedView")
         }
     }
 
