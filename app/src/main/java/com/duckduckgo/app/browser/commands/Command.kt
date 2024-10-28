@@ -27,7 +27,6 @@ import android.webkit.ValueCallback
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
-import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SslErrorResponse
@@ -160,13 +159,6 @@ sealed class Command {
         val url: String?,
         val showDuckPlayerIcon: Boolean = false,
     ) : Command()
-    class CheckSystemLocationPermission(
-        val domain: String,
-        val deniedForever: Boolean,
-    ) : Command()
-
-    class AskDomainPermission(val locationPermission: LocationPermission) : Command()
-    object RequestSystemLocationPermission : Command()
     class RefreshUserAgent(
         val url: String?,
         val isDesktop: Boolean,

@@ -17,6 +17,7 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,8 +44,14 @@ class SitePermissionsManagerTest {
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockPackageManager = mock<PackageManager>()
+    private val mockLocationManager = mock<LocationManager>()
 
-    private val testee = SitePermissionsManagerImpl(mockPackageManager, mockSitePermissionsRepository, coroutineRule.testDispatcherProvider)
+    private val testee = SitePermissionsManagerImpl(
+        mockPackageManager,
+        mockLocationManager,
+        mockSitePermissionsRepository,
+        coroutineRule.testDispatcherProvider,
+    )
 
     private val url = "https://domain.com/whatever"
     private val tabId = "tabId"
