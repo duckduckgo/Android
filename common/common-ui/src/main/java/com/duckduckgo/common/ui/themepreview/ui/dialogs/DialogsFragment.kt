@@ -102,9 +102,8 @@ class DialogsFragment : Fragment() {
                 RadioListAlertDialogBuilder(requireContext())
                     .setTitle(R.string.text_dialog_title)
                     .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
-                    .setDestructiveButtons(true)
+                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
                     .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
                     .addEventListener(
                         object : RadioListAlertDialogBuilder.EventListener() {
