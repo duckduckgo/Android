@@ -16,6 +16,7 @@
 
 package com.duckduckgo.site.permissions.api
 
+import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 
 /** Public interface for managing site permissions data */
@@ -61,4 +62,13 @@ interface SitePermissionsManager {
         object Prompt : SitePermissionQueryResponse()
         object Denied : SitePermissionQueryResponse()
     }
+
+    /**
+     * Class that represents a location permission asked
+     * callback is used to interact with the site that requested the permission
+     */
+    data class LocationPermission(
+        val origin: String,
+        val callback: GeolocationPermissions.Callback,
+    )
 }

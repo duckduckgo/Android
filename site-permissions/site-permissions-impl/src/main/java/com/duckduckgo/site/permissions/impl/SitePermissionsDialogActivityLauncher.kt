@@ -23,12 +23,14 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
 import android.view.ViewGroup
+import android.webkit.GeolocationPermissions.Callback
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -37,6 +39,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
@@ -109,6 +112,18 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 showSiteDrmPermissionsDialog(activity, url)
             }
         }
+    }
+
+    override fun askForLocationPermission(
+        activity: Activity,
+        locationPermission: LocationPermission,
+        tabId: String,
+    ) {
+        Timber.d("Permissions: permission askForLocationPermission ${locationPermission.origin}")
+        this.tabId = tabId
+        this.activity = activity
+
+        showLocationPermissionDialog(locationPermission)
     }
 
     private fun showSitePermissionsRationaleDialog(
@@ -217,6 +232,42 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         appCoroutineScope.launch(dispatcher.io()) {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)
         }
+    }
+
+    private fun showLocationPermissionDialog(
+        locationPermission: LocationPermission,
+    ) {
+        val domain = locationPermission.origin.websiteFromGeoLocationsApiOrigin()
+
+        val subtitle = if (domain == "duckduckgo.com") {
+            R.string.preciseLocationDDGDialogSubtitle
+        } else {
+            R.string.preciseLocationSiteDialogSubtitle
+        }
+
+        TextAlertDialogBuilder(activity)
+            .setTitle(
+                String.format(
+                    activity.getString(R.string.sitePermissionsLocationDialogTitle),
+                    locationPermission.origin.websiteFromGeoLocationsApiOrigin(),
+                ),
+            )
+            .setMessage(subtitle)
+            .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
+            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onLocationPermissionAllowed(locationPermission)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        denyLocationPermission(locationPermission)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun askForMicAndCameraPermissions() {
@@ -369,6 +420,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             // IllegalStateException is thrown when grant() or deny() have been called already.
             Timber.w("IllegalStateException when calling grant() or deny() site permissions")
         }
+    }
+
+    private fun denyLocationPermission(locationPermission: LocationPermission) {
+        locationPermission.callback.invoke(locationPermission.origin, false, false)
+    }
+
+    private fun onLocationPermissionAllowed(locationPermission: LocationPermission) {
+        locationPermission.callback.invoke(locationPermission.origin, true, false)
     }
 
     private fun showSystemPermissionsDeniedDialog() {

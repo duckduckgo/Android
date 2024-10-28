@@ -77,7 +77,7 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
-import com.duckduckgo.app.browser.commands.Command.AskDomainPermission
+import com.duckduckgo.app.browser.commands.Command.AskDomainLocationPermission
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
@@ -301,6 +301,7 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -445,11 +446,6 @@ class BrowserTabViewModel @Inject constructor(
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
-
-    data class LocationPermission(
-        val origin: String,
-        val callback: GeolocationPermissions.Callback,
-    )
 
     data class FileChooserRequestedParams(
         val filePickingMode: Int,
@@ -1868,7 +1864,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.ALLOW_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission))
+                    command.postValue(AskDomainLocationPermission(locationPermission))
                 }
 
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1876,7 +1872,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.DENY_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission))
+                    command.postValue(AskDomainLocationPermission(locationPermission))
                 }
             }
         }
@@ -1917,7 +1913,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
-                    command.postValue(AskDomainPermission(locationPermission))
+                    command.postValue(AskDomainLocationPermission(locationPermission))
                 } else {
                     reactToSitePermission(permissionEntity.permission)
                 }
