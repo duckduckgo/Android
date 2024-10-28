@@ -66,7 +66,7 @@ class DialogsFragment : Fragment() {
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
                             }
 
                             override fun onNegativeButtonClicked() {
@@ -238,7 +238,7 @@ class DialogsFragment : Fragment() {
                         object : TextAlertDialogBuilder.EventListener() {
                             var isChecked: Boolean = false
                             override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked, Checked $isChecked ", Snackbar.LENGTH_SHORT).show()
+                                Snackbar.make(it, "Positive Button Clicked, Checked $isChecked ", Snackbar.LENGTH_SHORT).show()
                             }
 
                             override fun onNegativeButtonClicked() {
