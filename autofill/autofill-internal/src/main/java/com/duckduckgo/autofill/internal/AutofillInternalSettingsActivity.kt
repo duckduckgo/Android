@@ -41,6 +41,8 @@ import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSett
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -324,9 +326,8 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this@AutofillInternalSettingsActivity)
             .setTitle(R.string.autofillDevSettingsClearLogins)
             .setMessage(getString(R.string.autofillDevSettingsClearLoginsConfirmationMessage, count))
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.autofillDevSettingsClearLoginsDeleteButton)
-            .setNegativeButton(R.string.autofillDevSettingsClearLoginsCancelButton)
+            .setPositiveButton(R.string.autofillDevSettingsClearLoginsDeleteButton, DESTRUCTIVE)
+            .setNegativeButton(R.string.autofillDevSettingsClearLoginsCancelButton, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

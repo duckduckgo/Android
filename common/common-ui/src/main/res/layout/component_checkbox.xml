@@ -57,4 +57,14 @@
       app:layout_constraintStart_toEndOf="@+id/checkbox_one"
       app:layout_constraintTop_toBottomOf="@+id/label" />
 
+    <CheckBox
+        android:id="@+id/checkbox_three"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:text="@string/text_dialog_checkbox"
+        app:layout_constraintTop_toBottomOf="@+id/checkbox_one"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

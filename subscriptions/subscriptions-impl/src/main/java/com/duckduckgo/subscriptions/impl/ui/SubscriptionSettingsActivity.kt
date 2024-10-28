@@ -28,6 +28,8 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -98,9 +100,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             TextAlertDialogBuilder(this)
                 .setTitle(string.removeFromDevice)
                 .setMessage(string.removeFromDeviceDescription)
-                .setDestructiveButtons(true)
-                .setPositiveButton(string.removeSubscription)
-                .setNegativeButton(string.cancel)
+                .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
+                .setNegativeButton(string.cancel, GHOST_ALT)
                 .addEventListener(
                     object : TextAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked() {

@@ -60,6 +60,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -188,9 +190,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                     TextAlertDialogBuilder(it)
                         .setTitle(dialogTitle)
                         .setMessage(dialogMessage)
-                        .setDestructiveButtons(true)
-                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete, DESTRUCTIVE)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel, GHOST_ALT)
                         .addEventListener(
                             object : TextAlertDialogBuilder.EventListener() {
                                 override fun onPositiveButtonClicked() {
