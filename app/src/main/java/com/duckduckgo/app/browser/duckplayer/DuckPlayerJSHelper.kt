@@ -239,6 +239,27 @@ class DuckPlayerJSHelper @Inject constructor(
             "reportPageException", "reportInitException" -> {
                 Timber.tag(method).d(data.toString())
             }
+            "telemetryEvent" -> {
+                /**
+                 * incoming data looks like this, where `name` is used to discriminate,
+                 * and 'value' is linked to it (but is optional)
+                 *
+                 * {
+                 *   "attributes": {
+                 *     "name": "impression",
+                 *     "value": "landscape-layout"
+                 *   }
+                 * }
+                 *
+                 * Another event might look like this in the future: (note: no 'value' field)
+                 * {
+                 *   "attributes": {
+                 *     "name": "page-view"
+                 *   }
+                 * }
+                 */
+                Timber.tag(method).d(data.toString())
+            }
             "openSettings" -> {
                 return OpenDuckPlayerSettings
             }
