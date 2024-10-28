@@ -113,7 +113,7 @@ class MetricPixelInterceptor @Inject constructor(
         logcat { "Pixel URL request dropped: ${chain.request()}" }
 
         return Response.Builder()
-            .code(200)
+            .code(500)
             .protocol(Protocol.HTTP_2)
             .body("Experiment metrics pixel dropped".toResponseBody())
             .message("Dropped experiment metrics pixel")

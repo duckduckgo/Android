@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.refreshpixels
 
+import android.annotation.SuppressLint
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -9,9 +10,26 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
+import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
+import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
+import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -26,6 +44,7 @@ import org.mockito.Mockito.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class RefreshPixelSenderTest {
 
     @get:Rule
@@ -36,11 +55,33 @@ class RefreshPixelSenderTest {
     private val mockPixel: Pixel = mock()
     private val mockLoadingBarExperimentManager: LoadingBarExperimentManager = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private lateinit var testBlockListFeature: TestBlockListFeature
+    private lateinit var inventory: FeatureTogglesInventory
+    private lateinit var blockListPixelsPlugin: BlockListPixelsPlugin
 
     private lateinit var testee: DuckDuckGoRefreshPixelSender
 
     @Before
     fun setUp() {
+        testBlockListFeature = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "blockList",
+        ).build().create(TestBlockListFeature::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        testBlockListFeature.tdsNextExperimentTest(),
+                        testBlockListFeature.tdsNextExperimentAnotherTest(),
+                    ),
+                ),
+            ),
+            coroutineTestRule.testDispatcherProvider,
+        )
+
+        blockListPixelsPlugin = BlockListPixelsPlugin(inventory)
+
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -56,6 +97,7 @@ class RefreshPixelSenderTest {
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            blockListPixelsPlugin = BlockListPixelsPlugin(inventory),
         )
     }
 
@@ -183,6 +225,7 @@ class RefreshPixelSenderTest {
             loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
+            blockListPixelsPlugin = blockListPixelsPlugin,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
 
@@ -201,6 +244,7 @@ class RefreshPixelSenderTest {
             loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
+            blockListPixelsPlugin = blockListPixelsPlugin,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
 
@@ -219,6 +263,7 @@ class RefreshPixelSenderTest {
             loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
+            blockListPixelsPlugin = blockListPixelsPlugin,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
 
@@ -243,7 +288,19 @@ class RefreshPixelSenderTest {
 
         verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
         verify(mockPixel, never()).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        assertNull(blockListPixelsPlugin.get2XRefresh())
         assertTrue(refreshDao.all().size == 2)
+    }
+
+    @Test
+    fun whenRefreshedTwiceAndAssignedToExperimentThen2XRefreshPixelsFired() = runTest {
+        assignToExperiment()
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+
+        blockListPixelsPlugin.get2XRefresh()!!.getPixelDefinitions().forEach {
+            verify(mockPixel).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -254,7 +311,20 @@ class RefreshPixelSenderTest {
 
         verify(mockPixel, times(2)).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
         verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+        assertNull(blockListPixelsPlugin.get3XRefresh())
         assertTrue(refreshDao.all().size == 3)
+    }
+
+    @Test
+    fun whenRefreshedThreeTimesAndAssignedToExperimentThen3XRefreshPixelsFired() = runTest {
+        assignToExperiment()
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+        testee.sendMenuRefreshPixels()
+
+        blockListPixelsPlugin.get3XRefresh()!!.getPixelDefinitions().forEach {
+            verify(mockPixel).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -309,6 +379,21 @@ class RefreshPixelSenderTest {
         verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
         verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
         assertTrue(refreshDao.all().size == 3)
+    }
+
+    private fun assignToExperiment() {
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                config = mapOf(
+                    TREATMENT_URL to "treatmentUrl",
+                    CONTROL_URL to "controlUrl",
+                ),
+                assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
+            ),
+        )
     }
 
     companion object {

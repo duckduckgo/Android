@@ -23,6 +23,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.blocklist.activeTdsFlag
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
@@ -40,6 +41,8 @@ import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -75,6 +78,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val ampLinks: AmpLinks,
+    private val inventory: FeatureTogglesInventory,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -96,6 +100,8 @@ class BrokenSiteSubmitter @Inject constructor(
 
             val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
             val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
+
+            val blockListToggle: Toggle? = inventory.activeTdsFlag()
 
             val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
@@ -129,6 +135,12 @@ class BrokenSiteSubmitter @Inject constructor(
 
             brokenSite.reportFlow?.let { reportFlow ->
                 params[REPORT_FLOW] = reportFlow.toStringValue()
+            }
+
+            blockListToggle?.let { toggle ->
+                toggle.getCohort()?.let { cohort ->
+                    params[BLOCKLIST_EXPERIMENT] = "${toggle.featureName().name}_${cohort.name}"
+                }
             }
 
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
@@ -201,6 +213,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val USER_REFRESH_COUNT = "userRefreshCount"
         private const val OPENER_CONTEXT = "openerContext"
         private const val JS_PERFORMANCE = "jsPerformance"
+        private const val BLOCKLIST_EXPERIMENT = "blockListExperiment"
     }
 }
 

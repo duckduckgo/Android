@@ -1,5 +1,6 @@
 package com.duckduckgo.app.brokensite.api
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
@@ -9,6 +10,11 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
+import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
@@ -21,7 +27,12 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.NAVIGATION
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -32,6 +43,9 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -49,6 +63,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class BrokenSiteSubmitterTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -87,6 +102,9 @@ class BrokenSiteSubmitterTest {
 
     private val ampLinks: AmpLinks = mock()
 
+    private lateinit var testBlockListFeature: TestBlockListFeature
+    private lateinit var inventory: FeatureTogglesInventory
+
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
@@ -102,6 +120,23 @@ class BrokenSiteSubmitterTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+
+        testBlockListFeature = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "blockList",
+        ).build().create(TestBlockListFeature::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        testBlockListFeature.tdsNextExperimentTest(),
+                        testBlockListFeature.tdsNextExperimentAnotherTest(),
+                    ),
+                ),
+            ),
+            coroutineRule.testDispatcherProvider,
+        )
 
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
@@ -122,6 +157,7 @@ class BrokenSiteSubmitterTest {
             networkProtectionState,
             webViewVersionProvider,
             ampLinks,
+            inventory,
         )
     }
 
@@ -549,6 +585,33 @@ class BrokenSiteSubmitterTest {
 
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals(TRACKING_URL, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
+    }
+
+    @Test
+    fun whenSubmitReportAndBlockListExperimentActiveThenAddParameter() {
+        assignToExperiment()
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+        assertEquals("tdsNextExperimentTest_treatment", paramsCaptor.lastValue["blockListExperiment"])
+    }
+
+    private fun assignToExperiment() {
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                config = mapOf(
+                    TREATMENT_URL to "treatmentUrl",
+                    CONTROL_URL to "controlUrl",
+                ),
+                assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
+            ),
+        )
     }
 
     private fun getBrokenSite(): BrokenSite {
