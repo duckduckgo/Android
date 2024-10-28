@@ -128,7 +128,7 @@ interface SubscriptionsManager {
     suspend fun getAccessToken(): AccessTokenResult
 
     /**
-     * Returns [true] if the user has an active subscription and [false] otherwise
+     * Returns current subscription status
      */
     suspend fun subscriptionStatus(): SubscriptionStatus
 
@@ -138,7 +138,7 @@ interface SubscriptionsManager {
     val isSignedIn: Flow<Boolean>
 
     /**
-     * Flow to know if a user has a subscription or not
+     * Flow to know current subscription status
      */
     val subscriptionStatus: Flow<SubscriptionStatus>
 
