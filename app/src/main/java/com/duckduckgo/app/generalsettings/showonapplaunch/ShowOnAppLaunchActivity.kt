@@ -92,7 +92,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 when (viewState.selectedOption) {
                     LastOpenedTab -> {
