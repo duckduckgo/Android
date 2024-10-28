@@ -210,7 +210,9 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val positiveButtonView = positiveButtonType.getView(context)
         positiveButtonView.isEnabled = selectedOption != null
         binding.radioListAlertDialogButtonContainer.addView(positiveButtonView)
-        setButtonListener(positiveButtonView, positiveButtonText, dialog) { listener.onNegativeButtonClicked() }
+        setButtonListener(positiveButtonView, positiveButtonText, dialog) {
+            listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
+        }
     }
 
     private fun setButtonListener(

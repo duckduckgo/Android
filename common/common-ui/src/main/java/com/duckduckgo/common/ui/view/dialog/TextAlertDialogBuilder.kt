@@ -196,7 +196,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         }
 
         val positiveButtonView = positiveButtonType.getView(context)
-        setButtonListener(positiveButtonView, positiveButtonText, dialog) { listener.onNegativeButtonClicked() }
+        setButtonListener(positiveButtonView, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
         binding.textAlertDialogButtonContainer.addView(positiveButtonView)
 
         binding.textAlertDialogCheckBox.setOnCheckedChangeListener { compoundButton, checked ->
