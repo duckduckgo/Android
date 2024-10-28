@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    testImplementation project(':feature-toggles-test')
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':broken-site-api')

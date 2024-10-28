@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.sha256
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -47,6 +48,13 @@ interface BrokenSiteReportRepository {
     suspend fun getCoolDownDays(): Int
 
     suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
+
+    suspend fun setNextShownDate(nextShownDate: LocalDate?)
+    fun getNextShownDate(): LocalDate?
+
+    suspend fun incrementDismissStreak()
+    fun getDismissStreak(): Int
+    suspend fun resetDismissStreak()
 }
 
 class RealBrokenSiteReportRepository(
@@ -115,6 +123,27 @@ class RealBrokenSiteReportRepository(
         setMaxDismissStreak(maxDismissStreak)
         setDismissStreakResetDays(dismissStreakResetDays)
         setCoolDownDays(coolDownDays)
+    }
+
+    override suspend fun resetDismissStreak() {
+        brokenSitePromptDataStore.setDismissStreak(0)
+    }
+
+    override suspend fun setNextShownDate(nextShownDate: LocalDate?) {
+        brokenSitePromptDataStore.setNextShownDate(nextShownDate)
+    }
+
+    override fun getDismissStreak(): Int {
+        return brokenSitePromptDataStore.getDismissStreak()
+    }
+
+    override fun getNextShownDate(): LocalDate? {
+        return brokenSitePromptDataStore.getNextShownDate()
+    }
+
+    override suspend fun incrementDismissStreak() {
+        val dismissCount = getDismissStreak()
+        brokenSitePromptDataStore.setDismissStreak(dismissCount + 1)
     }
 
     private fun convertToShortDate(dateString: String): String {
