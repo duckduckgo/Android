@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
-import android.content.Context
 import android.os.Process
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider

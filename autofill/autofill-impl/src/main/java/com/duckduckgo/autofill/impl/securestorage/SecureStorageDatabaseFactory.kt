@@ -23,8 +23,8 @@ import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Inject
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 interface SecureStorageDatabaseFactory {
     fun getDatabase(): SecureStorageDatabase?
