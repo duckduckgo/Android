@@ -3154,7 +3154,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionGranted()
 
-        assertCommandIssued<Command.AskDomainPermission>()
+        assertCommandIssued<Command.AskDomainLocationPermission>()
     }
 
     @Test
@@ -3168,7 +3168,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionGranted()
 
-        assertCommandIssued<Command.AskDomainPermission>()
+        assertCommandIssued<Command.AskDomainLocationPermission>()
     }
 
     @Test
@@ -3181,7 +3181,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionGranted()
 
-        assertCommandIssued<Command.AskDomainPermission>()
+        assertCommandIssued<Command.AskDomainLocationPermission>()
     }
 
     @Test

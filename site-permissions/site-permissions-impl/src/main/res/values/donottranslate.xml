@@ -23,4 +23,9 @@
     <string name="drmSiteDialogDenyAlways">Deny Always</string>
     <string name="drmSiteDialogDenyOnce">Deny for This Session</string>
 
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access your location</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Remember my choice</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
 </resources>

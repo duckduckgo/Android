@@ -3,6 +3,7 @@ package com.duckduckgo.site.permissions.api
 import android.app.Activity
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 /** Public interface for requesting microphone and/or camera permissions when website requests it */
@@ -34,5 +35,18 @@ interface SitePermissionsDialogLauncher {
         permissionsRequested: SitePermissions,
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
+    )
+
+    /**
+     * This method should be called if website requests site permissions (audio or video). It will launch dialogs flow for asking the user.
+     *
+     * @param activity where this method is called from
+     * @param locationPermission information about the origin of the location permission
+     * @param tabId id from the tab where this method is called from
+     */
+    fun askForLocationPermission(
+        activity: Activity,
+        locationPermission: LocationPermission,
+        tabId: String,
     )
 }

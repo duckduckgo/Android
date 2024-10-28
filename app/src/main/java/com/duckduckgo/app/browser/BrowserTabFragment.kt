@@ -100,7 +100,6 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
-import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -118,7 +117,6 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
@@ -186,7 +184,6 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -290,6 +287,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -298,7 +296,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -1667,7 +1664,7 @@ class BrowserTabFragment :
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainPermission -> askSiteLocationPermission(it.locationPermission)
+            is Command.AskDomainLocationPermission -> askSiteLocationPermission(it.locationPermission)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1981,46 +1978,50 @@ class BrowserTabFragment :
             return
         }
 
-        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
-
         val domain = locationPermission.origin
-        val title = domain.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
-        binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
-            getString(R.string.preciseLocationDDGDialogSubtitle)
-        } else {
-            getString(R.string.preciseLocationSiteDialogSubtitle)
+
+        activity?.let {
+            sitePermissionsDialogLauncher.askForLocationPermission(it, locationPermission, tabId)
         }
 
-        val dialog = MaterialAlertDialogBuilder(requireActivity())
-            .setView(binding.root)
-            .setOnCancelListener {
-                // Called when user clicks outside the dialog - deny to be safe
-                locationPermission.callback.invoke(locationPermission.origin, false, false)
-            }
-            .create()
-
-        binding.siteAllowAlwaysLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-            dialog.dismiss()
-        }
-
-        binding.siteAllowOnceLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-            dialog.dismiss()
-        }
-
-        binding.siteDenyOnceLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
-            dialog.dismiss()
-        }
-
-        binding.siteDenyAlwaysLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        // val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
+        //
+        // binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
+        // binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
+        //     getString(R.string.preciseLocationDDGDialogSubtitle)
+        // } else {
+        //     getString(R.string.preciseLocationSiteDialogSubtitle)
+        // }
+        //
+        // val dialog = MaterialAlertDialogBuilder(requireActivity())
+        //     .setView(binding.root)
+        //     .setOnCancelListener {
+        //         // Called when user clicks outside the dialog - deny to be safe
+        //         locationPermission.callback.invoke(locationPermission.origin, false, false)
+        //     }
+        //     .create()
+        //
+        // binding.siteAllowAlwaysLocationPermission.setOnClickListener {
+        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+        //     dialog.dismiss()
+        // }
+        //
+        // binding.siteAllowOnceLocationPermission.setOnClickListener {
+        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+        //     dialog.dismiss()
+        // }
+        //
+        // binding.siteDenyOnceLocationPermission.setOnClickListener {
+        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+        //     dialog.dismiss()
+        // }
+        //
+        // binding.siteDenyAlwaysLocationPermission.setOnClickListener {
+        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+        //     dialog.dismiss()
+        // }
+        //
+        // dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -3636,7 +3637,6 @@ class BrowserTabFragment :
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
-        private const val DDG_DOMAIN = "duckduckgo.com"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
