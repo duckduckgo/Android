@@ -50,6 +50,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -115,6 +116,8 @@ class CtaViewModelTest {
 
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
 
+    private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -148,6 +151,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
+        whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -165,6 +169,7 @@ class CtaViewModelTest {
             subscriptions = mockSubscriptions,
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            brokenSitePrompt = mockBrokenSitePrompt,
         )
     }
 
