@@ -39,6 +39,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -71,6 +72,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
+    private val brokenSitePrompt: BrokenSitePrompt,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -300,7 +302,7 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (!daxOnboardingActive() || hideTips() || extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()) {
+            if ((!daxOnboardingActive() || hideTips() || extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()) && brokenSitePrompt.isFeatureEnabled()) {
                 // TODO (cbarreiro) Add logic to decide whether or not to show the prompt
                 return BrokenSitePromptDialogCta()
             }
