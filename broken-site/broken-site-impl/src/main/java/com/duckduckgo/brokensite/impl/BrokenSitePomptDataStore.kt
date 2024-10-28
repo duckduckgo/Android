@@ -20,20 +20,28 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.COOL_DOWN_DAYS
+import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.DISMISS_STREAK
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.DISMISS_STREAK_RESET_DAYS
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.MAX_DISMISS_STREAK
+import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.NEXT_SHOWN_DATE
 import com.duckduckgo.brokensite.impl.di.BrokenSitePrompt
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
@@ -44,6 +52,10 @@ interface BrokenSitePomptDataStore {
 
     suspend fun setCoolDownDays(days: Int)
     suspend fun getCoolDownDays(): Int
+    suspend fun setDismissStreak(streak: Int)
+    fun getDismissStreak(): Int
+    suspend fun setNextShownDate(nextShownDate: LocalDate?)
+    fun getNextShownDate(): LocalDate?
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,7 +69,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val MAX_DISMISS_STREAK = intPreferencesKey(name = "MAX_DISMISS_STREAK")
         val DISMISS_STREAK_RESET_DAYS = intPreferencesKey(name = "DISMISS_STREAK_RESET_DAYS")
         val COOL_DOWN_DAYS = intPreferencesKey(name = "COOL_DOWN_DAYS")
+        val DISMISS_STREAK = intPreferencesKey(name = "DISMISS_STREAK")
+        val NEXT_SHOWN_DATE = stringPreferencesKey(name = "NEXT_SHOWN_DATE")
     }
+
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     private val maxDismissStreak: Flow<Int> = store.data
         .map { prefs ->
@@ -77,6 +93,20 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         }
         .distinctUntilChanged()
 
+    private val dismissStreak: StateFlow<Int> = store.data
+        .map { prefs ->
+            prefs[DISMISS_STREAK] ?: 7
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 0)
+
+    private val nextShownDate: StateFlow<String?> = store.data
+        .map { prefs ->
+            prefs[NEXT_SHOWN_DATE]
+        }
+        .distinctUntilChanged()
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
+
     override suspend fun setMaxDismissStreak(maxDismissStreak: Int) {
         store.edit { prefs -> prefs[MAX_DISMISS_STREAK] = maxDismissStreak }
     }
@@ -94,4 +124,27 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     }
 
     override suspend fun getCoolDownDays(): Int = coolDownDays.first()
+
+    override suspend fun setDismissStreak(streak: Int) {
+        store.edit { prefs -> prefs[DISMISS_STREAK] = streak }
+    }
+
+    override suspend fun setNextShownDate(nextShownDate: LocalDate?) {
+        store.edit { prefs ->
+
+            nextShownDate?.let {
+                prefs[NEXT_SHOWN_DATE] = formatter.format(nextShownDate)
+            } ?: run {
+                prefs.remove(NEXT_SHOWN_DATE)
+            }
+        }
+    }
+
+    override fun getDismissStreak(): Int {
+        return dismissStreak.value
+    }
+
+    override fun getNextShownDate(): LocalDate? {
+        return nextShownDate.value?.let { LocalDate.parse(it, formatter) }
+    }
 }

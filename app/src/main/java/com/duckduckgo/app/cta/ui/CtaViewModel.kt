@@ -272,7 +272,7 @@ class CtaViewModel @Inject constructor(
         !hideTips() &&
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
-    private suspend fun canShowDaxDialogCta(): Boolean {
+    private suspend fun canShowOnboardingDaxDialogCta(): Boolean {
         return when {
             !daxOnboardingActive() || hideTips() -> false
             extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
@@ -302,12 +302,14 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if ((!daxOnboardingActive() || hideTips() || extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()) && brokenSitePrompt.isFeatureEnabled()) {
-                // TODO (cbarreiro) Add logic to decide whether or not to show the prompt
-                return BrokenSitePromptDialogCta()
+            if (!canShowOnboardingDaxDialogCta()) {
+                return if (brokenSitePrompt.isFeatureEnabled()) {
+                    // TODO (cbarreiro) Add logic to decide whether or not to show the prompt
+                    BrokenSitePromptDialogCta()
+                } else {
+                    null
+                }
             }
-
-            if (!canShowDaxDialogCta()) return null
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {

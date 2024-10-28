@@ -20,6 +20,7 @@ import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.test.CoroutineTestRule
+import java.time.LocalDate
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -137,5 +138,41 @@ class RealBrokenSiteReportRepositoryTest {
         testee.setCoolDownDays(days)
 
         verify(mockDataStore).setCoolDownDays(days)
+    }
+
+    @Test
+    fun whenResetDismissStreakCalledThenDismissStreakIsSetToZero() = runTest {
+        testee.resetDismissStreak()
+
+        verify(mockDataStore).setDismissStreak(0)
+    }
+
+    @Test
+    fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
+        val nextShownDate = LocalDate.now()
+
+        testee.setNextShownDate(nextShownDate)
+
+        verify(mockDataStore).setNextShownDate(nextShownDate)
+    }
+
+    @Test
+    fun whenGetDismissStreakCalledThenReturnDismissStreak() {
+        val dismissStreak = 5
+        whenever(mockDataStore.getDismissStreak()).thenReturn(dismissStreak)
+
+        val result = testee.getDismissStreak()
+
+        assertEquals(dismissStreak, result)
+    }
+
+    @Test
+    fun whenGetNextShownDateCalledThenReturnNextShownDate() {
+        val nextShownDate = LocalDate.now()
+        whenever(mockDataStore.getNextShownDate()).thenReturn(nextShownDate)
+
+        val result = testee.getNextShownDate()
+
+        assertEquals(nextShownDate, result)
     }
 }
