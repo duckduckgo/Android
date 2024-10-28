@@ -16,13 +16,13 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.DuckDuckGo.Dialog.Content"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    style="@style/Widget.DuckDuckGo.Dialog.Content">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/textAlertDialogImage"
@@ -32,7 +32,8 @@
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogTitle"
@@ -41,7 +42,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"
-        app:textType="primary" app:typography="h2"/>
+        app:textType="primary"
+        app:typography="h2" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogMessage"
@@ -52,50 +54,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"
         app:textType="secondary"
-        app:typography="body1"/>
+        app:typography="body1" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/textAlertDialogPositiveButton"
+    <CheckBox
+        android:id="@+id/textAlertDialogCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
-        android:id="@+id/textAlertDialogPositiveDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="Positive"
+        android:layout_marginTop="@dimen/keyline_2"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"
+        tools:text="Remember me"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/textAlertDialogButtonContainer"
+        android:layout_width="0dp"
+        android:gravity="end"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelDestructiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveDestructiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogCheckBox" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
