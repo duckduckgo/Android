@@ -144,10 +144,12 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
+        Timber.d("Permissions: permission requested $request")
         webViewClientListener?.getCurrentTabId()?.let { tabId ->
             appCoroutineScope.launch(coroutineDispatcher.io()) {
                 val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
                 if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
+                    Timber.d("Permissions: permission requested not user handled")
                     webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
                 }
             }

@@ -84,6 +84,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
+        Timber.d("Permissions: permission askForSitePermission")
         sitePermissionRequest = request
         siteURL = url
         this.tabId = tabId

@@ -26,6 +26,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 // Cannot be a Singleton
 @ContributesBinding(AppScope::class)
@@ -74,7 +75,9 @@ class SitePermissionsManagerImpl @Inject constructor(
             }
         }
 
-        return SitePermissions(autoAccept = autoAccept, userHandled = userList)
+        val sitePermissions = SitePermissions(autoAccept = autoAccept, userHandled = userList)
+        Timber.d("Permissions: site permissions $sitePermissions")
+        return sitePermissions
     }
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
