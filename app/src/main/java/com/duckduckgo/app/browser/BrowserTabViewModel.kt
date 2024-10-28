@@ -1746,7 +1746,9 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         locationPermission = LocationPermission(origin, callback)
 
+        Timber.d("Permissions: onSiteLocationPermissionRequested $origin")
         if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            Timber.d("Permissions: isDeviceLocationEnabled false")
             viewModelScope.launch(dispatchers.io()) {
                 onDeviceLocationDisabled()
             }
@@ -1755,11 +1757,13 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!sameEffectiveTldPlusOne(site, origin)) {
+            Timber.d("Permissions: sameEffectiveTldPlusOne false")
             onSiteLocationPermissionAlwaysDenied()
             return
         }
 
         if (!appSettingsPreferencesStore.appLocationPermission) {
+            Timber.d("Permissions: user disabled location permission")
             onSiteLocationPermissionAlwaysDenied()
             return
         }
@@ -1768,12 +1772,14 @@ class BrowserTabViewModel @Inject constructor(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
+                Timber.d("Permissions: location permission for $origin not stored")
                 if (locationPermissionSession.containsKey(origin)) {
                     reactToSiteSessionPermission(locationPermissionSession[origin]!!)
                 } else {
                     command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                 }
             } else {
+                Timber.d("Permissions: location permission for $origin stored as ${permissionEntity.permission}")
                 if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                     onSiteLocationPermissionAlwaysDenied()
                 } else {
