@@ -282,6 +282,16 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndBrokenSitePromptEnabledThenReturnBrokenSitePrompt() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(true)
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueAndWidgetCompatibleThenReturnWidgetCta() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
