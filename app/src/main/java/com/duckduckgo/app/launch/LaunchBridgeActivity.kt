@@ -26,7 +26,6 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
@@ -39,8 +38,6 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         splashScreen.setKeepOnScreenCondition { true }
 
         setContentView(R.layout.activity_launch)
-
-        Timber.d("pixel request: launch")
 
         configureObservers()
 
