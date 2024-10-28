@@ -970,22 +970,22 @@ class RealSubscriptionsManagerTest {
     }
 
     private suspend fun givenUrlPortalSucceeds() {
-        whenever(subscriptionsService.portal(any())).thenReturn(PortalResponse("example.com"))
+        whenever(subscriptionsService.portal()).thenReturn(PortalResponse("example.com"))
     }
 
     private suspend fun givenUrlPortalFails() {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(subscriptionsService.portal(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+        whenever(subscriptionsService.portal()).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenSubscriptionFails(httpResponseCode: Int = 400) {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(subscriptionsService.subscription(any())).thenThrow(HttpException(Response.error<String>(httpResponseCode, exception)))
+        whenever(subscriptionsService.subscription()).thenThrow(HttpException(Response.error<String>(httpResponseCode, exception)))
     }
 
     private suspend fun givenSubscriptionSucceedsWithoutEntitlements(status: String = "Auto-Renewable") {
         givenValidateTokenSucceedsNoEntitlements()
-        whenever(subscriptionsService.subscription(any())).thenReturn(
+        whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN,
                 startedAt = 1234,
@@ -998,7 +998,7 @@ class RealSubscriptionsManagerTest {
 
     private suspend fun givenSubscriptionSucceedsWithEntitlements(status: String = "Auto-Renewable") {
         givenValidateTokenSucceedsWithEntitlements()
-        whenever(subscriptionsService.subscription(any())).thenReturn(
+        whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN,
                 startedAt = 1234,
@@ -1144,11 +1144,11 @@ class RealSubscriptionsManagerTest {
 
     private suspend fun givenConfirmPurchaseFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(subscriptionsService.confirm(any(), any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+        whenever(subscriptionsService.confirm(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenConfirmPurchaseSucceeds() {
-        whenever(subscriptionsService.confirm(any(), any())).thenReturn(
+        whenever(subscriptionsService.confirm(any())).thenReturn(
             ConfirmationResponse(
                 email = "test@duck.com",
                 entitlements = listOf(

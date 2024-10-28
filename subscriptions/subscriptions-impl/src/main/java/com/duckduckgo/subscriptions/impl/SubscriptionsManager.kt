@@ -261,10 +261,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getPortalUrl(): String? {
         return try {
-            if (isUserAuthenticated()) {
-                return subscriptionsService.portal("Bearer ${authRepository.getAccessToken()}").customerPortalUrl
-            }
-            null
+            return subscriptionsService.portal().customerPortalUrl
         } catch (e: Exception) {
             null
         }
@@ -321,7 +318,6 @@ class RealSubscriptionsManager @Inject constructor(
     ): Boolean {
         return try {
             subscriptionsService.confirm(
-                "Bearer ${authRepository.getAccessToken()}",
                 ConfirmationBody(
                     packageName = packageName,
                     purchaseToken = purchaseToken,
@@ -388,9 +384,8 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun fetchAndStoreAllData(): Boolean {
         try {
             if (!isUserAuthenticated()) return false
-            val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
             val subscription = try {
-                subscriptionsService.subscription("Bearer $token")
+                subscriptionsService.subscription()
             } catch (e: HttpException) {
                 if (e.code() == 401) {
                     logcat { "Token invalid, signing out" }
@@ -399,6 +394,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
                 throw e
             }
+            val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
             val accountData = validateToken(token).account
             authRepository.setAccount(
                 Account(
