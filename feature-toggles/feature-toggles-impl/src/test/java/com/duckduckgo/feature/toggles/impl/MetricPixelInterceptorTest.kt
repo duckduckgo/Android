@@ -301,7 +301,7 @@ class MetricPixelInterceptorTest {
 
         private val list = mutableListOf<String>()
 
-        override fun wasPixelFired(tag: String): Boolean {
+        override suspend fun wasPixelFired(tag: String): Boolean {
             return list.contains(tag)
         }
 

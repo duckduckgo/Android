@@ -17,27 +17,26 @@
 package com.duckduckgo.feature.toggles.impl
 
 import android.content.SharedPreferences
-import androidx.annotation.WorkerThread
 import androidx.core.content.edit
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface MetricsPixelStore {
     /**
      * @return true if the pixel with the given tag can be fired or false otherwise
      */
-    @WorkerThread
-    fun wasPixelFired(tag: String): Boolean
+    suspend fun wasPixelFired(tag: String): Boolean
 
     /**
      * Stores the tag [String] passed as parameter
      */
-    @WorkerThread
     fun storePixelTag(tag: String)
 }
 
@@ -47,7 +46,8 @@ interface MetricsPixelStore {
 )
 class RealMetricsPixelStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
-    private val appBuildConfig: AppBuildConfig,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MetricsPixelStore {
 
     private val preferences: SharedPreferences by lazy {
@@ -59,20 +59,15 @@ class RealMetricsPixelStore @Inject constructor(
     }
 
     override fun storePixelTag(tag: String) {
-        if (appBuildConfig.isInternalBuild()) {
-            checkMainThread()
+        coroutineScope.launch(dispatcherProvider.io()) {
+            preferences.edit { putBoolean(tag, true) }
         }
-
-        preferences.edit { putBoolean(tag, true) }
     }
 
-    override fun wasPixelFired(tag: String): Boolean {
-        if (appBuildConfig.isInternalBuild()) {
-            checkMainThread()
+    override suspend fun wasPixelFired(tag: String): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            preferences.getBoolean(tag, false)
         }
-
-        val didExecuteAlready = preferences.getBoolean(tag, false)
-        return didExecuteAlready
     }
 
     companion object {

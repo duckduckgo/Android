@@ -90,7 +90,8 @@ class MetricPixelInterceptor @Inject constructor(
         // If pixel already fired, drop
         val tag = "$pixel{metric=${metricName}value=${value}conversionWindow=${conversionWindowDays}enrollmentDate=$enrollmentDate}".encode()
             .md5().hex()
-        if (pixelStore.wasPixelFired(tag)) return dummyResponse(chain)
+        val wasPixelFired = runBlocking { pixelStore.wasPixelFired(tag) }
+        if (wasPixelFired) return dummyResponse(chain)
 
         // If inside conversion window, proceed, if not drop
         val diffDays = daysBetweenTodayAnd(enrollmentDate)
