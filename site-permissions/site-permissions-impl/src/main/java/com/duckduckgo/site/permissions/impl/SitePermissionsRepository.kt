@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
@@ -39,6 +40,7 @@ interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
     var askMicEnabled: Boolean
     var askDrmEnabled: Boolean
+    var askLocationEnabled: Boolean
     suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
@@ -83,6 +85,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askDrmEnabled = value
         }
 
+    override var askLocationEnabled: Boolean
+        get() = sitePermissionsPreferences.askLocationEnabled
+        set(value) {
+            sitePermissionsPreferences.askLocationEnabled = value
+        }
+
     private val drmSessions = mutableMapOf<String, Boolean>()
 
     override suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
@@ -107,6 +115,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                     askDrmEnabled || sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
                 isAskDrmDisabled && !isAskDrmSettingDenied
             }
+            LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
+                val isLocationSettingDenied = sitePermissionsForDomain?.askLocationSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                val isLocationDisabled =
+                    askLocationEnabled || sitePermissionsForDomain?.askLocationSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                isLocationDisabled && !isLocationSettingDenied
+            }
             else -> false
         }
     }
@@ -128,6 +142,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
                 sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+            }
+            LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
+                val isLocationAlwaysAllowed = sitePermissionForDomain?.askLocationSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                permissionGrantedWithin24h || isLocationAlwaysAllowed
             }
             else -> false
         }

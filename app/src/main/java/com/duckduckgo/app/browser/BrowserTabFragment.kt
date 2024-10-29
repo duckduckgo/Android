@@ -287,7 +287,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -1664,7 +1664,7 @@ class BrowserTabFragment :
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainLocationPermission -> askSiteLocationPermission(it.locationPermission)
+            is Command.AskDomainLocationPermission -> askSiteLocationPermission(it.locationPermissionRequest)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1972,16 +1972,14 @@ class BrowserTabFragment :
         )
     }
 
-    private fun askSiteLocationPermission(locationPermission: LocationPermission) {
+    private fun askSiteLocationPermission(locationPermissionRequest: LocationPermissionRequest) {
         if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
 
-        val domain = locationPermission.origin
-
         activity?.let {
-            sitePermissionsDialogLauncher.askForLocationPermission(it, locationPermission, tabId)
+            sitePermissionsDialogLauncher.showSiteLocationPermissionDialog(it, locationPermissionRequest, tabId)
         }
 
         // val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)

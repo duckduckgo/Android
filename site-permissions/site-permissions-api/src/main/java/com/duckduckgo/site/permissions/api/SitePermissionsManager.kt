@@ -16,8 +16,10 @@
 
 package com.duckduckgo.site.permissions.api
 
+import android.net.Uri
 import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
+import androidx.core.net.toUri
 
 /** Public interface for managing site permissions data */
 interface SitePermissionsManager {
@@ -67,8 +69,29 @@ interface SitePermissionsManager {
      * Class that represents a location permission asked
      * callback is used to interact with the site that requested the permission
      */
-    data class LocationPermission(
+    data class LocationPermissionRequest(
         val origin: String,
         val callback: GeolocationPermissions.Callback,
-    )
+    ) : PermissionRequest() {
+
+        override fun getOrigin(): Uri {
+            return origin.toUri()
+        }
+
+        override fun getResources(): Array<String> {
+            return listOf(RESOURCE_LOCATION_PERMISSION).toTypedArray()
+        }
+
+        override fun grant(p0: Array<out String>?) {
+            callback.invoke(origin, true, false)
+        }
+
+        override fun deny() {
+            callback.invoke(origin, false, false)
+        }
+
+        companion object {
+            const val RESOURCE_LOCATION_PERMISSION: String = "com.duckduckgo.permissions.resource.LOCATION_PERMISSION"
+        }
+    }
 }

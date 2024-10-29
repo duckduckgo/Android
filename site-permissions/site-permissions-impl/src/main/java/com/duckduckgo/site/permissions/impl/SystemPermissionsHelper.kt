@@ -33,6 +33,7 @@ import javax.inject.Inject
 interface SystemPermissionsHelper {
     fun hasMicPermissionsGranted(): Boolean
     fun hasCameraPermissionsGranted(): Boolean
+    fun hasLocationPermissionsGranted(): Boolean
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
         onResultPermissionRequest: (Boolean) -> Unit,
@@ -58,6 +59,11 @@ class SystemPermissionsHelperImpl @Inject constructor(
 
     override fun hasCameraPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+    override fun hasLocationPermissionsGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
 
     override fun registerPermissionLaunchers(
         caller: ActivityResultCaller,

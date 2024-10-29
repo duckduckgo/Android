@@ -302,7 +302,7 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -494,7 +494,7 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
-    private var locationPermission: LocationPermission? = null
+    private var locationPermissionRequest: LocationPermissionRequest? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
@@ -1751,7 +1751,7 @@ class BrowserTabViewModel @Inject constructor(
         origin: String,
         callback: GeolocationPermissions.Callback,
     ) {
-        locationPermission = LocationPermission(origin, callback)
+        locationPermissionRequest = LocationPermissionRequest(origin, callback)
 
         Timber.d("Permissions: onSiteLocationPermissionRequested $origin")
         if (!geoLocationPermissions.isDeviceLocationEnabled()) {
@@ -1813,7 +1813,7 @@ class BrowserTabViewModel @Inject constructor(
         domain: String,
         permission: LocationPermissionType,
     ) {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
@@ -1850,14 +1850,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onSiteLocationPermissionAlwaysAllowed() {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             geoLocationPermissions.allow(locationPermission.origin)
             locationPermission.callback.invoke(locationPermission.origin, true, false)
         }
     }
 
     fun onSiteLocationPermissionAlwaysDenied() {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             geoLocationPermissions.clear(locationPermission.origin)
             locationPermission.callback.invoke(locationPermission.origin, false, false)
         }
@@ -1868,7 +1868,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun reactToSitePermission(permission: LocationPermissionType) {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
@@ -1890,7 +1890,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             if (permission == LocationPermissionType.ALLOW_ONCE) {
                 locationPermission.callback.invoke(locationPermission.origin, true, false)
             } else {
@@ -1910,14 +1910,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onSystemLocationPermissionNeverAllowed() {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
             pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         }
     }
 
     fun onSystemLocationPermissionGranted() {
-        locationPermission?.let { locationPermission ->
+        locationPermissionRequest?.let { locationPermission ->
             appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
             appSettingsPreferencesStore.appLocationPermission = true
             pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
