@@ -312,10 +312,11 @@ class FakeStore : MetricsPixelStore {
         list.add(tag)
     }
 
-    override fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) {
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
         val tag = "${definition}_$metric"
         val count = metrics.getOrDefault(tag, 0)
         metrics[tag] = count + 1
+        return metrics[tag]!!
     }
 
     override suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
