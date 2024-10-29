@@ -113,8 +113,8 @@ class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
     private val experimentAA: ExperimentTestAA,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
-        experimentAA.experimentTestAA().isEnabled(CONTROL)
         coroutineScope.launch {
+            experimentAA.experimentTestAA().isEnabled(CONTROL)
             inventory.activeTdsFlag()?.let {
                 trackerDataDownloader.downloadTds()
             }
