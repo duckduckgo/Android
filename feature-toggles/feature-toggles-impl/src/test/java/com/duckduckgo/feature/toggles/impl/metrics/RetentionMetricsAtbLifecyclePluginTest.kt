@@ -32,8 +32,10 @@ import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.feature.toggles.impl.RetentionMetric
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -87,42 +89,37 @@ class RetentionMetricsAtbLifecyclePluginTest {
     }
 
     @Test
-    fun `when search atb refreshed and matches metric, pixel sent to all active experiments`() = runTest {
-        setCohorts()
+    fun `when search atb refreshed and matches metric and conversion window, pixel sent to all active experiments`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+
+        setCohorts(today)
 
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
-        searchMetricPixelsPlugin.getMetrics().forEach { metric ->
-            metric.getPixelDefinitions().forEach { definition ->
-                if (metric.value == "1") {
-                    assertTrue(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                } else {
-                    assertFalse(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                }
-            }
-        }
+        val pixel1 = "experiment_metrics_experimentFooFeature_control{metric=search, value=1, enrollmentDate=$parsedDate, conversionWindowDays=0}"
+        val pixel2 = "experiment_metrics_fooFeature_control{metric=search, value=1, enrollmentDate=$parsedDate, conversionWindowDays=0}"
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertTrue(pixel.firedPixels.contains(pixel1))
+        assertTrue(pixel.firedPixels.contains(pixel2))
     }
 
     @Test
-    fun `when app use atb refreshed and matches metric, pixel sent to all active experiments`() = runTest {
-        setCohorts()
+    fun `when app use atb refreshed and no metric match conversion window, do not send pixels`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        setCohorts(today)
 
         atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
-
-        appUseMetricPixelsPlugin.getMetrics().forEach { metric ->
-            metric.getPixelDefinitions().forEach { definition ->
-                if (metric.value == "1") {
-                    assertTrue(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                } else {
-                    assertFalse(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                }
-            }
-        }
+        assertTrue(pixel.firedPixels.isEmpty())
     }
 
     @Test
-    fun `when search atb refreshed, fire all pixels which metric matches the number of searches done`() = runTest {
-        setCohorts()
+    fun `when search atb refreshed, fire all pixels which metric matches the number of searches done and conversion window`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).truncatedTo(ChronoUnit.DAYS).toString()
+        val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+
+        setCohorts(today)
 
         searchMetricPixelsPlugin.getMetrics().forEach { metric ->
             metric.getPixelDefinitions().forEach { definition ->
@@ -133,20 +130,20 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
-        searchMetricPixelsPlugin.getMetrics().forEach { metric ->
-            metric.getPixelDefinitions().forEach { definition ->
-                if (metric.value == "4") {
-                    assertTrue(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                } else {
-                    assertFalse(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                }
-            }
-        }
+        val pixel1 = "experiment_metrics_experimentFooFeature_control{metric=search, value=4, enrollmentDate=$parsedDate, conversionWindowDays=5-7}"
+        val pixel2 = "experiment_metrics_fooFeature_control{metric=search, value=4, enrollmentDate=$parsedDate, conversionWindowDays=5-7}"
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertTrue(pixel.firedPixels.contains(pixel1))
+        assertTrue(pixel.firedPixels.contains(pixel2))
     }
 
     @Test
-    fun `when app use atb refreshed, fire all pixels which metric matches the number of app use`() = runTest {
-        setCohorts()
+    fun `when app use atb refreshed, fire all pixels which metric matches the number of app use and conversion window`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).truncatedTo(ChronoUnit.DAYS).toString()
+        val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
+
+        setCohorts(today)
 
         appUseMetricPixelsPlugin.getMetrics().forEach { metric ->
             metric.getPixelDefinitions().forEach { definition ->
@@ -157,15 +154,12 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
 
-        appUseMetricPixelsPlugin.getMetrics().forEach { metric ->
-            metric.getPixelDefinitions().forEach { definition ->
-                if (metric.value == "4") {
-                    assertTrue(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                } else {
-                    assertFalse(pixel.firedPixels.contains("${definition.pixelName}${definition.params}"))
-                }
-            }
-        }
+        val pixel1 = "experiment_metrics_experimentFooFeature_control{metric=app_use, value=4, enrollmentDate=$parsedDate, conversionWindowDays=5-7}"
+        val pixel2 = "experiment_metrics_fooFeature_control{metric=app_use, value=4, enrollmentDate=$parsedDate, conversionWindowDays=5-7}"
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertTrue(pixel.firedPixels.contains(pixel1))
+        assertTrue(pixel.firedPixels.contains(pixel2))
     }
 
     @Test
@@ -189,6 +183,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
         assertTrue(pixel.firedPixels.none { it.contains("experimentFooFeature") })
+        assertFalse(pixel.firedPixels.none { it.contains("fooFeature") })
     }
 
     @Test
@@ -212,10 +207,60 @@ class RetentionMetricsAtbLifecyclePluginTest {
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
         assertTrue(pixel.firedPixels.none { it.contains("experimentFooFeature") })
+        assertFalse(pixel.firedPixels.none { it.contains("fooFeature") })
     }
 
-    private fun setCohorts() {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+    @Test
+    fun `when app use refreshed, only fire pixels with active experiments`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).truncatedTo(ChronoUnit.DAYS).toString()
+
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+            ),
+        )
+        testFeature.fooFeature().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+            ),
+        )
+
+        atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
+
+        assertTrue(pixel.firedPixels.none { it.contains("experimentFooFeature") })
+        assertFalse(pixel.firedPixels.none { it.contains("fooFeature") })
+    }
+
+    @Test
+    fun `when app use refreshed, only fire pixels from experiments with cohorts assigned`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).truncatedTo(ChronoUnit.DAYS).toString()
+
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = null,
+            ),
+        )
+        testFeature.fooFeature().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+            ),
+        )
+
+        atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
+
+        assertTrue(pixel.firedPixels.none { it.contains("experimentFooFeature") })
+        assertFalse(pixel.firedPixels.none { it.contains("fooFeature") })
+    }
+
+    private fun setCohorts(today: String) {
         testFeature.experimentFooFeature().setRawStoredState(
             State(
                 remoteEnableState = true,

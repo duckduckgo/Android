@@ -17,7 +17,10 @@
 package com.duckduckgo.app.trackerdetection.blocklist
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.EXPERIMENT_PREFIX
+import com.duckduckgo.app.trackerdetection.blocklist.ExperimentTestAA.Cohorts.CONTROL
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -25,8 +28,11 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -99,6 +105,23 @@ class BlockListPixelsPlugin @Inject constructor(private val inventory: FeatureTo
     }
 }
 
+@ContributesMultibinding(AppScope::class)
+class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
+    private val inventory: FeatureTogglesInventory,
+    private val trackerDataDownloader: TrackerDataDownloader,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val experimentAA: ExperimentTestAA,
+) : PrivacyConfigCallbackPlugin {
+    override fun onPrivacyConfigDownloaded() {
+        experimentAA.experimentTestAA().isEnabled(CONTROL)
+        coroutineScope.launch {
+            inventory.activeTdsFlag()?.let {
+                trackerDataDownloader.downloadTds()
+            }
+        }
+    }
+}
+
 internal suspend fun BlockListPixelsPlugin.get2XRefresh(): MetricsPixel? {
     return this.getMetrics().firstOrNull { it.metric == "2xRefresh" }
 }
@@ -114,5 +137,22 @@ suspend fun BlockListPixelsPlugin.getPrivacyToggleUsed(): MetricsPixel? {
 suspend fun FeatureTogglesInventory.activeTdsFlag(): Toggle? {
     return this.getAllTogglesForParent("blockList").firstOrNull {
         it.featureName().name.startsWith(EXPERIMENT_PREFIX) && it.isEnabled()
+    }
+}
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "experimentTest",
+)
+interface ExperimentTestAA {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun experimentTestAA(): Toggle
+
+    enum class Cohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
     }
 }
