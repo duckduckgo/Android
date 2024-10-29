@@ -20,7 +20,7 @@ import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import org.junit.Assert
 import org.junit.Test
 
-class LocationPermissionEntityTest {
+class LocationPermissionRequestEntityTest {
 
     @Test
     fun whenDomainStartsWithHttpsThenDropPrefix() {

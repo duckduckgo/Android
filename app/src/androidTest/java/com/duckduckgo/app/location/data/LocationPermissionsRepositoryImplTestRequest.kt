@@ -35,7 +35,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class LocationPermissionsRepositoryImplTest {
+class LocationPermissionsRepositoryImplTestRequest {
 
     @get:Rule
     @Suppress("unused")

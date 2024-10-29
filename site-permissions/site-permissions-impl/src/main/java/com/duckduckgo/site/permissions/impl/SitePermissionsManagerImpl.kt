@@ -21,6 +21,7 @@ import android.webkit.PermissionRequest
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,10 +52,13 @@ class SitePermissionsManagerImpl @Inject constructor(
     ): SitePermissions {
         val autoAccept = mutableListOf<String>()
         val url = request.origin.toString()
+
         val sitePermissionsAllowedToAsk = request.resources
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
+
+        Timber.d("Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}")
 
         val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         if (sitePermissionsGranted.isNotEmpty()) {
@@ -62,14 +66,19 @@ class SitePermissionsManagerImpl @Inject constructor(
                 autoAccept.addAll(sitePermissionsGranted)
             }
         }
+
+        Timber.d("Permissions: sitePermissionsGranted for $url are ${sitePermissionsGranted.asList()}")
+
         val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
         if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
             withContext(dispatcherProvider.main()) {
+                Timber.d("Permissions: site permission not granted, deny")
                 request.deny()
             }
         }
         if (userList.isEmpty() && autoAccept.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
+                Timber.d("Permissions: site permission granted, auto accept")
                 request.grant(autoAccept.toTypedArray())
                 autoAccept.clear()
             }
@@ -107,7 +116,7 @@ class SitePermissionsManagerImpl @Inject constructor(
 
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE ||
-            permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+            permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID || permission == LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION
 
     private fun isHardwareSupported(permission: String): Boolean = when (permission) {
         PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {

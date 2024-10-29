@@ -42,7 +42,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 sealed class Command {
@@ -165,7 +165,7 @@ sealed class Command {
         val deniedForever: Boolean,
     ) : Command()
 
-    class AskDomainLocationPermission(val locationPermission: LocationPermission) : Command()
+    class AskDomainLocationPermission(val locationPermissionRequest: LocationPermissionRequest) : Command()
     object RequestSystemLocationPermission : Command()
     class RefreshUserAgent(
         val url: String?,

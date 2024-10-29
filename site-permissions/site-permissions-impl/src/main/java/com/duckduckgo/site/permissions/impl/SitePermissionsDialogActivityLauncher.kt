@@ -23,7 +23,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
 import android.view.ViewGroup
-import android.webkit.GeolocationPermissions.Callback
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
@@ -39,7 +38,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermission
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
@@ -87,7 +86,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
-        Timber.d("Permissions: permission askForSitePermission")
+        Timber.d("Permissions: permission askForSitePermission $permissionsRequested")
         sitePermissionRequest = request
         siteURL = url
         this.tabId = tabId
@@ -111,19 +110,57 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) -> {
                 showSiteDrmPermissionsDialog(activity, url)
             }
+            permissionsHandledByUser.contains(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION) -> {
+                showSiteLocationPermissionDialog(activity, request as LocationPermissionRequest, tabId)
+            }
         }
     }
 
-    override fun askForLocationPermission(
+    override fun showSiteLocationPermissionDialog(
         activity: Activity,
-        locationPermission: LocationPermission,
+        locationPermissionRequest: LocationPermissionRequest,
         tabId: String,
     ) {
-        Timber.d("Permissions: permission askForLocationPermission ${locationPermission.origin}")
         this.tabId = tabId
         this.activity = activity
 
-        showLocationPermissionDialog(locationPermission)
+        val domain = locationPermissionRequest.origin.websiteFromGeoLocationsApiOrigin()
+
+        val subtitle = if (domain == "duckduckgo.com") {
+            R.string.preciseLocationDDGDialogSubtitle
+        } else {
+            R.string.preciseLocationSiteDialogSubtitle
+        }
+
+        TextAlertDialogBuilder(activity)
+            .setTitle(
+                String.format(
+                    activity.getString(R.string.sitePermissionsLocationDialogTitle),
+                    locationPermissionRequest.origin.websiteFromGeoLocationsApiOrigin(),
+                ),
+            )
+            .setMessage(subtitle)
+            .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
+            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    var isChecked: Boolean = false
+
+                    override fun onPositiveButtonClicked() {
+                        askForLocationPermissions()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        denyPermissions()
+                    }
+
+                    override fun onCheckedChanged(checked: Boolean) {
+                        isChecked = checked
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showSitePermissionsRationaleDialog(
@@ -133,8 +170,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     ) {
         TextAlertDialogBuilder(activity)
             .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
-            .setPositiveButton(R.string.sitePermissionsDialogAllowButton)
-            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
+            .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton, GHOST)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -234,42 +271,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    private fun showLocationPermissionDialog(
-        locationPermission: LocationPermission,
-    ) {
-        val domain = locationPermission.origin.websiteFromGeoLocationsApiOrigin()
-
-        val subtitle = if (domain == "duckduckgo.com") {
-            R.string.preciseLocationDDGDialogSubtitle
-        } else {
-            R.string.preciseLocationSiteDialogSubtitle
-        }
-
-        TextAlertDialogBuilder(activity)
-            .setTitle(
-                String.format(
-                    activity.getString(R.string.sitePermissionsLocationDialogTitle),
-                    locationPermission.origin.websiteFromGeoLocationsApiOrigin(),
-                ),
-            )
-            .setMessage(subtitle)
-            .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
-            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
-            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        onLocationPermissionAllowed(locationPermission)
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        denyLocationPermission(locationPermission)
-                    }
-                },
-            )
-            .show()
-    }
-
     private fun askForMicAndCameraPermissions() {
         permissionRequested = SitePermissionsRequestedType.CAMERA_AND_AUDIO
         when {
@@ -317,6 +318,17 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
+    private fun askForLocationPermissions() {
+        permissionRequested = SitePermissionsRequestedType.LOCATION
+        if (systemPermissionsHelper.hasLocationPermissionsGranted()) {
+            systemPermissionGranted()
+        } else {
+            systemPermissionsHelper.requestMultiplePermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+            )
+        }
+    }
+
     private fun onResultSystemPermissionRequest(granted: Boolean) {
         when (granted) {
             true -> systemPermissionGranted()
@@ -345,6 +357,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun systemPermissionGranted() {
         grantPermissions()
         permissionsHandledByUser.forEach {
+            Timber.w("Permissions: sitePermission $it granted for $siteURL")
             sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
         }
         checkIfActionNeeded()
@@ -381,6 +394,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
                     onPermissionAllowed = this::askForMicAndCameraPermissions
                     R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
+                }
+                SitePermissionsRequestedType.LOCATION -> {
+                    onPermissionAllowed = this::askForLocationPermissions
+                    R.string.sitePermissionsLocationDeniedSnackBarMessage
                 }
             }
 
@@ -422,25 +439,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    private fun denyLocationPermission(locationPermission: LocationPermission) {
-        locationPermission.callback.invoke(locationPermission.origin, false, false)
-    }
-
-    private fun onLocationPermissionAllowed(locationPermission: LocationPermission) {
-        locationPermission.callback.invoke(locationPermission.origin, true, false)
-    }
-
     private fun showSystemPermissionsDeniedDialog() {
         denyPermissions()
         val titleRes = when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
+            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedTitle
         }
         val contentRes = when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
+            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
         }
         TextAlertDialogBuilder(activity)
             .setTitle(titleRes)
@@ -482,4 +493,5 @@ enum class SitePermissionsRequestedType {
     CAMERA,
     AUDIO,
     CAMERA_AND_AUDIO,
+    LOCATION,
 }
