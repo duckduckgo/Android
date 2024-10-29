@@ -8,6 +8,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
@@ -296,48 +297,60 @@ class MetricPixelInterceptorTest {
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s"
     }
+}
 
-    class FakeStore : MetricsPixelStore {
+class FakeStore : MetricsPixelStore {
 
-        private val list = mutableListOf<String>()
+    private val list = mutableListOf<String>()
+    val metrics = mutableMapOf<String, Int>()
 
-        override suspend fun wasPixelFired(tag: String): Boolean {
-            return list.contains(tag)
-        }
-
-        override fun storePixelTag(tag: String) {
-            list.add(tag)
-        }
+    override suspend fun wasPixelFired(tag: String): Boolean {
+        return list.contains(tag)
     }
 
-    class FakePluginPoint(testFeature: TestTriggerFeature) : PluginPoint<MetricsPixelPlugin> {
-        private val plugin = FakeMetricsPixelPlugin(testFeature)
-        override fun getPlugins(): Collection<MetricsPixelPlugin> {
-            return listOf(plugin)
-        }
+    override fun storePixelTag(tag: String) {
+        list.add(tag)
     }
 
-    class FakeMetricsPixelPlugin(private val testFeature: TestTriggerFeature) : MetricsPixelPlugin {
+    override fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) {
+        val tag = "${definition}_$metric"
+        val count = metrics.getOrDefault(tag, 0)
+        metrics[tag] = count + 1
+    }
 
-        override suspend fun getMetrics(): List<MetricsPixel> = listOf(
-            MetricsPixel(
-                metric = "refreshClicked",
-                value = "1",
-                toggle = testFeature.experimentFooFeature(),
-                conversionWindow = listOf(
-                    ConversionWindow(0, 0),
-                    ConversionWindow(0, 1),
-                    ConversionWindow(3, 4),
-                ),
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
+        val tag = "${definition}_$metric"
+        return metrics.getOrDefault(tag, 0)
+    }
+}
+
+class FakePluginPoint(testFeature: TestTriggerFeature) : PluginPoint<MetricsPixelPlugin> {
+    private val plugin = FakeMetricsPixelPlugin(testFeature)
+    override fun getPlugins(): Collection<MetricsPixelPlugin> {
+        return listOf(plugin)
+    }
+}
+
+class FakeMetricsPixelPlugin(private val testFeature: TestTriggerFeature) : MetricsPixelPlugin {
+
+    override suspend fun getMetrics(): List<MetricsPixel> = listOf(
+        MetricsPixel(
+            metric = "refreshClicked",
+            value = "1",
+            toggle = testFeature.experimentFooFeature(),
+            conversionWindow = listOf(
+                ConversionWindow(0, 0),
+                ConversionWindow(0, 1),
+                ConversionWindow(3, 4),
             ),
-            MetricsPixel(
-                metric = "refreshClicked",
-                value = "2",
-                toggle = testFeature.experimentFooFeature(),
-                conversionWindow = listOf(
-                    ConversionWindow(1, 2),
-                ),
+        ),
+        MetricsPixel(
+            metric = "refreshClicked",
+            value = "2",
+            toggle = testFeature.experimentFooFeature(),
+            conversionWindow = listOf(
+                ConversionWindow(1, 2),
             ),
-        )
-    }
+        ),
+    )
 }
