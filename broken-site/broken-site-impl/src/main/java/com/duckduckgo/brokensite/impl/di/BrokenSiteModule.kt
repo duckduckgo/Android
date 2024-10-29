@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.impl.BrokenSitePomptDataStore
+import com.duckduckgo.brokensite.impl.BrokenSitePromptInMemoryStore
 import com.duckduckgo.brokensite.impl.BrokenSiteReportRepository
 import com.duckduckgo.brokensite.impl.RealBrokenSiteReportRepository
 import com.duckduckgo.brokensite.store.ALL_MIGRATIONS
@@ -42,9 +43,10 @@ class BrokenSiteModule {
         database: BrokenSiteDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        brokenSitePomptDataStore: BrokenSitePomptDataStore,
+        brokenSitePromptDataStore: BrokenSitePomptDataStore,
+        brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
     ): BrokenSiteReportRepository {
-        return RealBrokenSiteReportRepository(database, coroutineScope, dispatcherProvider, brokenSitePomptDataStore)
+        return RealBrokenSiteReportRepository(database, coroutineScope, dispatcherProvider, brokenSitePromptDataStore, brokenSitePromptInMemoryStore)
     }
 
     @Provides

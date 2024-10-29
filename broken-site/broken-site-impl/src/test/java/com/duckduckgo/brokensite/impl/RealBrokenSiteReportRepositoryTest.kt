@@ -21,6 +21,7 @@ import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -40,6 +41,7 @@ class RealBrokenSiteReportRepositoryTest {
     private val mockDatabase: BrokenSiteDatabase = mock()
     private val mockBrokenSiteDao: BrokenSiteDao = mock()
     private val mockDataStore: BrokenSitePomptDataStore = mock()
+    private val mockInMemoryStore: BrokenSitePromptInMemoryStore = mock()
     lateinit var testee: RealBrokenSiteReportRepository
 
     @Before
@@ -51,6 +53,7 @@ class RealBrokenSiteReportRepositoryTest {
             coroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             brokenSitePromptDataStore = mockDataStore,
+            brokenSitePromptInMemoryStore = mockInMemoryStore,
         )
     }
 
@@ -174,5 +177,33 @@ class RealBrokenSiteReportRepositoryTest {
         val result = testee.getNextShownDate()
 
         assertEquals(nextShownDate, result)
+    }
+
+    @Test
+    fun whenResetRefreshCountCalledThenResetRefreshCountIsCalled() = runTest {
+        testee.resetRefreshCount()
+
+        verify(mockInMemoryStore).resetRefreshCount()
+    }
+
+    @Test
+    fun whenAddRefreshCalledThenAddRefreshIsCalled() = runTest {
+        val localDateTime = LocalDateTime.now()
+
+        testee.addRefresh(localDateTime)
+
+        verify(mockInMemoryStore).addRefresh(localDateTime)
+    }
+
+    @Test
+    fun whenGetAndUpdateUserRefreshesBetweenCalledThenReturnRefreshCount() = runTest {
+        val t1 = LocalDateTime.now().minusDays(1)
+        val t2 = LocalDateTime.now()
+        val refreshCount = 5
+        whenever(mockInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)).thenReturn(refreshCount)
+
+        val result = testee.getAndUpdateUserRefreshesBetween(t1, t2)
+
+        assertEquals(refreshCount, result)
     }
 }

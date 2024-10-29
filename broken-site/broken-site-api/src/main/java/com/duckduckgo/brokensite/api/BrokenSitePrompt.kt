@@ -23,4 +23,12 @@ interface BrokenSitePrompt {
     suspend fun userAcceptedPrompt()
 
     suspend fun isFeatureEnabled(): Boolean
+
+    fun incrementRefreshCount()
+
+    fun resetRefreshCount()
+
+    fun getUserRefreshesCount(): Int
+
+    suspend fun shouldShowBrokenSitePrompt(): Boolean
 }

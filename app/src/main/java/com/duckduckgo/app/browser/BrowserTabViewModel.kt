@@ -253,6 +253,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -428,6 +429,7 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
+    private val brokenSitePrompt: BrokenSitePrompt,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -820,6 +822,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
+        brokenSitePrompt.resetRefreshCount()
     }
 
     fun onViewHidden() {
@@ -955,6 +958,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
+        brokenSitePrompt.resetRefreshCount()
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -1162,7 +1166,10 @@ class BrowserTabViewModel @Inject constructor(
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
-        viewModelScope.launch { removeCurrentTabFromRepository() }
+        viewModelScope.launch {
+            removeCurrentTabFromRepository()
+            brokenSitePrompt.resetRefreshCount()
+        }
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -1172,7 +1179,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun closeAndSelectSourceTab() {
-        viewModelScope.launch { removeAndSelectTabFromRepository() }
+        viewModelScope.launch {
+            removeAndSelectTabFromRepository()
+            brokenSitePrompt.resetRefreshCount()
+        }
     }
 
     private suspend fun removeAndSelectTabFromRepository() {
@@ -1203,6 +1213,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
+            brokenSitePrompt.incrementRefreshCount()
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }
     }
@@ -1356,6 +1367,14 @@ class BrowserTabViewModel @Inject constructor(
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
+                    ctaViewState.value?.cta?.let { cta ->
+                        if (cta is BrokenSitePromptDialogCta) {
+                            withContext(dispatchers.main()) {
+                                command.value = HideBrokenSitePromptCta(cta)
+                            }
+                        }
+                    }
+                    brokenSitePrompt.resetRefreshCount()
                 }
             }
 
