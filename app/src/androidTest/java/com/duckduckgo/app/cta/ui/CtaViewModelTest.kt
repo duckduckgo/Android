@@ -152,7 +152,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
-        whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt()).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -282,9 +282,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndBrokenSitePromptEnabledThenReturnBrokenSitePrompt() = runTest {
+    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(true)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt()).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)

@@ -16,16 +16,25 @@
 
 package com.duckduckgo.brokensite.impl
 
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.LocalDate
 import javax.inject.Inject
 
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal const val REFRESH_COUNT_WINDOW = 20L
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal const val REFRESH_COUNT_LIMIT = 3
+
 @ContributesBinding(AppScope::class)
 class RealBrokenSitePrompt @Inject constructor(
     private val brokenSiteReportRepository: BrokenSiteReportRepository,
     private val brokenSitePromptRCFeature: BrokenSitePromptRCFeature,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : BrokenSitePrompt {
 
     private val _featureEnabled by lazy { brokenSitePromptRCFeature.self().isEnabled() }
@@ -54,5 +63,24 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun isFeatureEnabled(): Boolean {
         return _featureEnabled
+    }
+
+    override fun incrementRefreshCount() {
+        brokenSiteReportRepository.addRefresh(currentTimeProvider.localDateTimeNow())
+    }
+
+    override fun resetRefreshCount() {
+        brokenSiteReportRepository.resetRefreshCount()
+    }
+
+    override fun getUserRefreshesCount(): Int {
+        return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
+            currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
+            currentTimeProvider.localDateTimeNow(),
+        )
+    }
+
+    override suspend fun shouldShowBrokenSitePrompt(): Boolean {
+        return isFeatureEnabled() && getUserRefreshesCount() >= REFRESH_COUNT_LIMIT
     }
 }
