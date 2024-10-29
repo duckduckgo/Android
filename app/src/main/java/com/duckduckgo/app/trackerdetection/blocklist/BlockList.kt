@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.EXPERIMENT_PREFIX
 import com.duckduckgo.app.trackerdetection.blocklist.ExperimentTestAA.Cohorts.CONTROL
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -111,9 +112,10 @@ class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
     private val trackerDataDownloader: TrackerDataDownloader,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val experimentAA: ExperimentTestAA,
+    private val dispatcherProvider: DispatcherProvider,
 ) : PrivacyConfigCallbackPlugin {
     override fun onPrivacyConfigDownloaded() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             experimentAA.experimentTestAA().isEnabled(CONTROL)
             inventory.activeTdsFlag()?.let {
                 trackerDataDownloader.downloadTds()
