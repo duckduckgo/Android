@@ -57,10 +57,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DevSettingsViewModel by bindViewModel()
 
-    private val nextTdsToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onNextTdsToggled(isChecked)
-    }
-
     private val startupTraceToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onStartupTraceToggled(isChecked)
     }
@@ -109,7 +105,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState ->
                 viewState.let {
-                    binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
                     binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
