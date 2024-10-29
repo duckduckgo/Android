@@ -72,7 +72,7 @@ class BlockListPrivacyTogglePluginTest {
     }
 
     @Test
-    fun `when toggle is off and assigned to experiment and origin is not dashboard then do not pixels`() = runTest {
+    fun `when toggle is off and assigned to experiment and origin is not dashboard then do not send pixels`() = runTest {
         assignToExperiment()
 
         blockListPrivacyTogglePlugin.onToggleOff(MENU)

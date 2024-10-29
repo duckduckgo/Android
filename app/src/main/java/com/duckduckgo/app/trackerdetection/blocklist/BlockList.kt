@@ -81,40 +81,19 @@ class BlockListPixelsPlugin @Inject constructor(private val inventory: FeatureTo
                 metric = "2xRefresh",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = listOf(
-                    ConversionWindow(lowerWindow = 0, upperWindow = 0),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 1),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 2),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 3),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 4),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 5),
-                ),
+                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "3xRefresh",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = listOf(
-                    ConversionWindow(lowerWindow = 0, upperWindow = 0),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 1),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 2),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 3),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 4),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 5),
-                ),
+                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = "privacyToggleUsed",
                 value = "1",
                 toggle = activeToggle,
-                conversionWindow = listOf(
-                    ConversionWindow(lowerWindow = 0, upperWindow = 0),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 1),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 2),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 3),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 4),
-                    ConversionWindow(lowerWindow = 0, upperWindow = 5),
-                ),
+                conversionWindow = (0..5).map { ConversionWindow(lowerWindow = 0, upperWindow = it) },
             ),
         )
     }
