@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -107,6 +108,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -125,6 +127,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -540,7 +543,6 @@ class BrowserTabViewModelTest {
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
-        whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -659,6 +661,7 @@ class BrowserTabViewModelTest {
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
+            brokenSitePrompt = mockBrokenSitePrompt,
         )
 
         testee.loadData("abc", null, false, false)
@@ -732,6 +735,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenViewBecomesVisibleThenc() {
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        verify(mockBrokenSitePrompt).resetRefreshCount()
+    }
+
+    @Test
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         runTest {
             setBrowserShowing(false)
@@ -766,6 +776,16 @@ class BrowserTabViewModelTest {
         setBrowserShowing(true)
         testee.onViewResumed()
         assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
+    @Test
+    fun whenSubmittedQueryThenResetRefreshCount() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("https://example.com"))
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), eq(null), eq(FromUser))).thenReturn("https://example.com")
+
+        testee.onUserSubmittedQuery("https://example.com")
+
+        verify(mockBrokenSitePrompt).resetRefreshCount()
     }
 
     @Test
@@ -2423,9 +2443,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCloseCurrentTabThenResetRefreshCount() = runTest {
+        givenOneActiveTabSelected()
+        testee.closeCurrentTab()
+        verify(mockBrokenSitePrompt).resetRefreshCount()
+    }
+
+    @Test
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runTest {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+    }
+
+    @Test
+    fun whenCloseAndSelectSourceTabSelectedThenTabDeletedFromRepository() = runTest {
+        givenOneActiveTabSelected()
+        testee.closeAndSelectSourceTab()
         verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
@@ -5004,6 +5038,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockBrokenSitePrompt, never()).incrementRefreshCount()
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockBrokenSitePrompt).incrementRefreshCount()
+    }
+
+    @Test
     fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
         verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
@@ -5628,6 +5670,24 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenNewPageAndBrokenSitePromptVisibleThenHideCta() = runTest {
+        setCta(BrokenSitePromptDialogCta())
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        assertCommandIssued<HideBrokenSitePromptCta>()
+    }
+
+    @Test
+    fun whenNewPageThenResetRefreshCount() = runTest {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        verify(mockBrokenSitePrompt).resetRefreshCount()
     }
 
     @Test

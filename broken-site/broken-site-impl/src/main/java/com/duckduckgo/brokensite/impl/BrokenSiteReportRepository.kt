@@ -55,6 +55,9 @@ interface BrokenSiteReportRepository {
     suspend fun incrementDismissStreak()
     suspend fun getDismissStreak(): Int
     suspend fun resetDismissStreak()
+    fun resetRefreshCount()
+    fun addRefresh(localDateTime: LocalDateTime)
+    fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 }
 
 class RealBrokenSiteReportRepository(
@@ -62,6 +65,7 @@ class RealBrokenSiteReportRepository(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val brokenSitePromptDataStore: BrokenSitePomptDataStore,
+    private val brokenSitePromptInMemoryStore: BrokenSitePromptInMemoryStore,
 ) : BrokenSiteReportRepository {
 
     override suspend fun getLastSentDay(hostname: String): String? {
@@ -144,6 +148,18 @@ class RealBrokenSiteReportRepository(
     override suspend fun incrementDismissStreak() {
         val dismissCount = getDismissStreak()
         brokenSitePromptDataStore.setDismissStreak(dismissCount + 1)
+    }
+
+    override fun resetRefreshCount() {
+        brokenSitePromptInMemoryStore.resetRefreshCount()
+    }
+
+    override fun addRefresh(localDateTime: LocalDateTime) {
+        brokenSitePromptInMemoryStore.addRefresh(localDateTime)
+    }
+
+    override fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
+        return brokenSitePromptInMemoryStore.getAndUpdateUserRefreshesBetween(t1, t2)
     }
 
     private fun convertToShortDate(dateString: String): String {
