@@ -1098,8 +1098,8 @@ sealed class HomePanelCta(
 class BrokenSitePromptDialogCta : Cta {
 
     override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
-    override val shownPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
-    override val okPixel: Pixel.PixelName? = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+    override val shownPixel: Pixel.PixelName? = null
+    override val okPixel: Pixel.PixelName? = null
     override val cancelPixel: Pixel.PixelName? = null
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf()
