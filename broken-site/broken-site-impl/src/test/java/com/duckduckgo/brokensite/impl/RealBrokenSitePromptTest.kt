@@ -1,10 +1,14 @@
 package com.duckduckgo.brokensite.impl
 
 import android.annotation.SuppressLint
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -18,10 +22,12 @@ class RealBrokenSitePromptTest {
 
     private val mockBrokenSiteReportRepository: BrokenSiteReportRepository = mock()
     private val fakeBrokenSitePromptRCFeature: BrokenSitePromptRCFeature = FakeFeatureToggleFactory.create(BrokenSitePromptRCFeature::class.java)
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     private val testee = RealBrokenSitePrompt(
         brokenSiteReportRepository = mockBrokenSiteReportRepository,
         brokenSitePromptRCFeature = fakeBrokenSitePromptRCFeature,
+        currentTimeProvider = mockCurrentTimeProvider,
     )
 
     @Before
@@ -103,5 +109,61 @@ class RealBrokenSitePromptTest {
 
         verify(mockBrokenSiteReportRepository, never()).resetDismissStreak()
         verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
+    }
+
+    @Test
+    fun whenIncrementRefreshCountThenAddRefreshCalled() {
+        val now = LocalDateTime.now()
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
+        testee.incrementRefreshCount()
+
+        verify(mockBrokenSiteReportRepository).addRefresh(any())
+    }
+
+    @Test
+    fun whenResetRefreshCountThenResetRefreshCountCalled() {
+        testee.resetRefreshCount()
+
+        verify(mockBrokenSiteReportRepository).resetRefreshCount()
+    }
+
+    @Test
+    fun whenGetUserRefreshesCountThenGetAndUpdateUserRefreshesBetweenCalled() {
+        val now = LocalDateTime.now()
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
+
+        testee.getUserRefreshesCount()
+
+        verify(mockBrokenSiteReportRepository).getAndUpdateUserRefreshesBetween(now.minusSeconds(REFRESH_COUNT_WINDOW), now)
+    }
+
+    @Test
+    fun whenFeatureEnabledAndUserRefreshesCountIsThreeOrMoreThenShouldShowBrokenSitePromptReturnsTrue() = runTest {
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
+        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
+
+        val result = testee.shouldShowBrokenSitePrompt()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenFeatureEnabledAndUserRefreshesCountIsLessThanThreeThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
+        whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(2)
+
+        val result = testee.shouldShowBrokenSitePrompt()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenFeatureDisabledThenShouldShowBrokenSitePromptReturnsFalse() = runTest {
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
+
+        val result = testee.shouldShowBrokenSitePrompt()
+
+        assertFalse(result)
     }
 }

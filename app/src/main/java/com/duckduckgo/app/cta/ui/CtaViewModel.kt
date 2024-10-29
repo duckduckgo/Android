@@ -303,8 +303,7 @@ class CtaViewModel @Inject constructor(
             }
 
             if (!canShowOnboardingDaxDialogCta()) {
-                return if (withContext(dispatchers.io()) { brokenSitePrompt.isFeatureEnabled() }) {
-                    // TODO (cbarreiro) Add logic to decide whether or not to show the prompt
+                return if (withContext(dispatchers.io()) { brokenSitePrompt.shouldShowBrokenSitePrompt() }) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null
