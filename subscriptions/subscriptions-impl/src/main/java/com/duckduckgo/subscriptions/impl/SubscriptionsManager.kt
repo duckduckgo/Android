@@ -205,7 +205,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
-    private suspend fun isUserAuthenticated(): Boolean {
+    private suspend fun isSignedIn(): Boolean {
         return !authRepository.getAuthToken().isNullOrBlank() && !authRepository.getAccessToken().isNullOrBlank()
     }
 
@@ -222,7 +222,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun emitIsSignedInValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            _isSignedIn.emit(isUserAuthenticated())
+            _isSignedIn.emit(isSignedIn())
         }
     }
 
@@ -367,7 +367,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun subscriptionStatus(): SubscriptionStatus {
-        return if (isUserAuthenticated()) {
+        return if (isSignedIn()) {
             authRepository.getStatus()
         } else {
             UNKNOWN
@@ -383,7 +383,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun fetchAndStoreAllData(): Boolean {
         try {
-            if (!isUserAuthenticated()) return false
+            if (!isSignedIn()) return false
             val subscription = try {
                 subscriptionsService.subscription()
             } catch (e: HttpException) {
@@ -414,7 +414,7 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.setEntitlements(accountData.entitlements.toEntitlements())
             emitEntitlementsValues()
             _subscriptionStatus.emit(authRepository.getStatus())
-            _isSignedIn.emit(isUserAuthenticated())
+            _isSignedIn.emit(isSignedIn())
             return true
         } catch (e: Exception) {
             logcat { "Failed to fetch subscriptions data: ${e.stackTraceToString()}" }
@@ -492,7 +492,7 @@ class RealSubscriptionsManager @Inject constructor(
             // refresh any existing account / subscription data
             fetchAndStoreAllData()
 
-            if (!isUserAuthenticated()) {
+            if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
             } else {
                 authRepository.getSubscription()?.run {
@@ -515,7 +515,7 @@ class RealSubscriptionsManager @Inject constructor(
                 return
             }
 
-            if (subscription == null && !isUserAuthenticated()) {
+            if (subscription == null && !isSignedIn()) {
                 createAccount()
                 exchangeAuthToken(authRepository.getAuthToken()!!)
             }
@@ -537,7 +537,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getAuthToken(): AuthTokenResult {
         try {
-            return if (isUserAuthenticated()) {
+            return if (isSignedIn()) {
                 logcat { "Subs auth token is ${authRepository.getAuthToken()}" }
                 validateToken(authRepository.getAuthToken()!!)
                 AuthTokenResult.Success(authRepository.getAuthToken()!!)
@@ -563,7 +563,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getAccessToken(): AccessTokenResult {
-        return if (isUserAuthenticated()) {
+        return if (isSignedIn()) {
             AccessTokenResult.Success(authRepository.getAccessToken()!!)
         } else {
             AccessTokenResult.Failure("Token not found")
