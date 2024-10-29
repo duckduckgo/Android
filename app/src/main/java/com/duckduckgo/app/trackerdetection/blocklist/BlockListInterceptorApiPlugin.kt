@@ -14,66 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection
+package com.duckduckgo.app.trackerdetection.blocklist
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.app.trackerdetection.BlockList.Cohorts.CONTROL
-import com.duckduckgo.app.trackerdetection.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.EXPERIMENT_PREFIX
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.NEXT_URL
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.NEXT_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "blockList",
-)
-interface BlockList {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentBaseline(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentNov24(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentDec24(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentJan25(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentFeb25(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun tdsNextExperimentMar25(): Toggle
-
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        TREATMENT("treatment"),
-    }
-
-    companion object {
-        const val EXPERIMENT_PREFIX = "tds"
-        const val TREATMENT_URL = "treatmentUrl"
-        const val CONTROL_URL = "controlUrl"
-        const val NEXT_URL = "nextUrl"
-    }
-}
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -90,9 +47,7 @@ class BlockListInterceptorApiPlugin @Inject constructor(
             return chain.proceed(request.build())
         }
         val activeExperiment = runBlocking {
-            inventory.getAllTogglesForParent("blockList").firstOrNull {
-                it.featureName().name.startsWith(EXPERIMENT_PREFIX) && it.isEnabled()
-            }
+            inventory.activeTdsFlag()
         }
 
         return activeExperiment?.let {

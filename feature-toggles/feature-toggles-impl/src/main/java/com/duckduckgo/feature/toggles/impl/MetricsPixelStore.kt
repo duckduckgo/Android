@@ -43,7 +43,7 @@ interface MetricsPixelStore {
     /**
      * Increases the count of searches for the [featureName] passed as parameter
      */
-    fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric)
+    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int
 
     /**
      * Returns the number [Int] of app use for the given [featureName]
@@ -86,13 +86,16 @@ class RealMetricsPixelStore @Inject constructor(
         }
     }
 
-    override fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) {
-        val tag = "${definition}_$metric"
-        coroutineScope.launch(dispatcherProvider.io()) {
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) =
+        withContext(dispatcherProvider.io()) {
+            val tag = "${definition}_$metric"
             val count = preferences.getInt(tag, 0)
-            preferences.edit { putInt(tag, count + 1) }
+            preferences.edit {
+                putInt(tag, count + 1)
+                apply()
+            }
+            preferences.getInt(tag, 0)
         }
-    }
 
     override suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
         val tag = "${definition}_$metric"

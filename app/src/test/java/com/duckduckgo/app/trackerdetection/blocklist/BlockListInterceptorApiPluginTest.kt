@@ -1,14 +1,30 @@
-package com.duckduckgo.app.trackerdetection
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.trackerdetection.blocklist
 
 import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.app.trackerdetection.BlockList.Cohorts.CONTROL
-import com.duckduckgo.app.trackerdetection.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.NEXT_URL
-import com.duckduckgo.app.trackerdetection.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_PATH
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.NEXT_URL
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -30,23 +46,23 @@ class BlockListInterceptorApiPluginTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var testFeature: TestFeature
+    private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var interceptor: BlockListInterceptorApiPlugin
 
     @Before
     fun setup() {
-        testFeature = FeatureToggles.Builder(
+        testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "blockList",
-        ).build().create(TestFeature::class.java)
+        ).build().create(TestBlockListFeature::class.java)
 
         inventory = RealFeatureTogglesInventory(
             setOf(
                 FakeFeatureTogglesInventory(
                     features = listOf(
-                        testFeature.tdsNextExperimentTest(),
-                        testFeature.tdsNextExperimentAnotherTest(),
+                        testBlockListFeature.tdsNextExperimentTest(),
+                        testBlockListFeature.tdsNextExperimentAnotherTest(),
                     ),
                 ),
             ),
@@ -58,7 +74,7 @@ class BlockListInterceptorApiPluginTest {
 
     @Test
     fun `when multiple experiments enabled, use the first one`() {
-        testFeature.tdsNextExperimentTest().setRawStoredState(
+        testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -72,7 +88,7 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
-        testFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -94,7 +110,7 @@ class BlockListInterceptorApiPluginTest {
 
     @Test
     fun `when cohort is treatment use treatment URL`() {
-        testFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -116,7 +132,7 @@ class BlockListInterceptorApiPluginTest {
 
     @Test
     fun `when cohort is control use control URL`() {
-        testFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -138,7 +154,7 @@ class BlockListInterceptorApiPluginTest {
 
     @Test
     fun `when feature is for next URL rollout then use next url`() {
-        testFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -162,7 +178,7 @@ class BlockListInterceptorApiPluginTest {
 
     @Test
     fun `when feature name doesn't match prefix, it is ignored`() {
-        testFeature.nonMatchingFeatureName().setRawStoredState(
+        testBlockListFeature.nonMatchingFeatureName().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -197,7 +213,7 @@ abstract class TriggerTestScope private constructor()
     scope = TriggerTestScope::class,
     featureName = "blockList",
 )
-interface TestFeature {
+interface TestBlockListFeature {
     @DefaultValue(false)
     fun self(): Toggle
 

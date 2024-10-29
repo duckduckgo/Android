@@ -25,6 +25,8 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
@@ -34,7 +36,11 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext.SERP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -92,6 +98,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     }
 
     private val webViewVersionProvider: WebViewVersionProvider = mock()
+    private lateinit var testBlockListFeature: TestBlockListFeature
+    private lateinit var inventory: FeatureTogglesInventory
 
     private lateinit var testee: BrokenSiteSubmitter
 
@@ -119,6 +127,23 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
 
+        testBlockListFeature = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "blockList",
+        ).build().create(TestBlockListFeature::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        testBlockListFeature.tdsNextExperimentTest(),
+                        testBlockListFeature.tdsNextExperimentAnotherTest(),
+                    ),
+                ),
+            ),
+            coroutineRule.testDispatcherProvider,
+        )
+
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -138,6 +163,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             networkProtectionState,
             webViewVersionProvider,
             ampLinks = mock(),
+            inventory,
         )
     }
 

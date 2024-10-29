@@ -191,6 +191,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -222,6 +223,8 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
+import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -490,6 +493,8 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
+    private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
+    private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
 
@@ -662,6 +667,7 @@ class BrowserTabViewModelTest {
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            privacyProtectionTogglePlugin = protectionTogglePluginPoint,
         )
 
         testee.loadData("abc", null, false, false)
@@ -1999,6 +2005,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListRepository).addDomainToUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
     }
 
     @Test
@@ -2018,6 +2025,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     @Test
@@ -5349,6 +5357,8 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = Count)
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = Count)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
     }
@@ -6352,5 +6362,23 @@ class BrowserTabViewModelTest {
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
+    }
+
+    class FakePluginPoint(val plugin: FakePrivacyProtectionTogglePlugin) : PluginPoint<PrivacyProtectionTogglePlugin> {
+        override fun getPlugins(): Collection<PrivacyProtectionTogglePlugin> {
+            return listOf(plugin)
+        }
+    }
+
+    class FakePrivacyProtectionTogglePlugin : PrivacyProtectionTogglePlugin {
+        var toggleOff = 0
+        var toggleOn = 0
+
+        override suspend fun onToggleOff(origin: PrivacyToggleOrigin) {
+            toggleOff++
+        }
+        override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
+            toggleOn++
+        }
     }
 }
