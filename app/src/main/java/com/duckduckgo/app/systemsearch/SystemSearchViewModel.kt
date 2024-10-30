@@ -38,6 +38,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -124,7 +125,7 @@ class SystemSearchViewModel @Inject constructor(
     @VisibleForTesting
     internal val resultsStateFlow = MutableStateFlow("")
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
-    private var resultsJob: Job? = null
+    private var resultsJob = ConflatedJob()
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
     private var hasUserSeenHistory = false
 
@@ -181,8 +182,7 @@ class SystemSearchViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun configureResults() {
-        resultsJob?.cancel()
-        resultsJob = resultsStateFlow
+        resultsJob += resultsStateFlow
             .debounce(DEBOUNCE_TIME_MS)
             .distinctUntilChanged()
             .flatMapLatest { buildResultsFlow(query = it) }
@@ -322,10 +322,6 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun onAutoCompleteSuggestionsChanged() {
-        configureResults()
-    }
-
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Command.ShowRemoveSearchSuggestionDialog(suggestion)
@@ -371,8 +367,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        resultsJob?.cancel()
-        resultsJob = null
+        resultsJob.cancel()
         super.onCleared()
     }
 

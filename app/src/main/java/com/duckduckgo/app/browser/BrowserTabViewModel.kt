@@ -260,6 +260,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
@@ -509,7 +510,7 @@ class BrowserTabViewModel @Inject constructor(
         context = viewModelScope.coroutineContext,
     )
 
-    private var autoCompleteJob: Job? = null
+    private var autoCompleteJob = ConflatedJob()
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -755,8 +756,7 @@ class BrowserTabViewModel @Inject constructor(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
-        autoCompleteJob?.cancel()
-        autoCompleteJob = autoCompleteStateFlow
+        autoCompleteJob += autoCompleteStateFlow
             .debounce(300)
             .distinctUntilChanged()
             .flatMapLatest { autoComplete.autoComplete(it) }
@@ -783,8 +783,7 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     public override fun onCleared() {
         buildingSiteFactoryJob?.cancel()
-        autoCompleteJob?.cancel()
-        autoCompleteJob = null
+        autoCompleteJob.cancel()
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -924,6 +923,8 @@ class BrowserTabViewModel @Inject constructor(
         suggestion: AutoCompleteSuggestion,
         omnibarText: String,
     ) {
+        configureAutoComplete()
+
         appCoroutineScope.launch(dispatchers.io()) {
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED)
             pixel.fire(AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
@@ -2157,6 +2158,8 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
     ) {
+        configureAutoComplete()
+
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -3718,10 +3721,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onAutoCompleteSuggestionsChanged() {
-        configureAutoComplete()
-    }
-
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
             if (hasUserSeenHistoryIAM) {
@@ -3750,7 +3749,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             lastAutoCompleteState = null
-            autoCompleteJob?.cancel()
+            autoCompleteJob.cancel()
         }
     }
 
