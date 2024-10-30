@@ -44,6 +44,7 @@ interface SitePermissionsRepository {
     suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
+    fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
@@ -227,6 +228,38 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity) {
         withContext(dispatcherProvider.io()) {
             sitePermissionsDao.insert(sitePermissionsEntity)
+        }
+    }
+
+    override fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val domain = url.extractDomain() ?: url
+            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(domain)
+            if (existingPermission == null) {
+                sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
+            } else {
+                val updatedPermission = when (permission) {
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
+                        existingPermission.copy(askCameraSetting = settingType.name)
+                    }
+                    PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
+                        existingPermission.copy(askMicSetting = settingType.name)
+                    }
+                    PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                        existingPermission.copy(askDrmSetting = settingType.name)
+                    }
+
+                    LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
+                        existingPermission.copy(askLocationSetting = settingType.name)
+                    }
+                    else -> {
+                        null
+                    }
+                }
+                if (updatedPermission != null) {
+                    sitePermissionsDao.insert(updatedPermission)
+                }
+            }
         }
     }
 }

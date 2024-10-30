@@ -43,6 +43,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.DENY_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
@@ -69,6 +71,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var permissionsGrantedListener: SitePermissionsGrantedListener
     private lateinit var permissionsHandledByUser: List<String>
     private lateinit var permissionsHandledAutomatically: List<String>
+    private var rememberPermissionChoice: Boolean = false
     private var siteURL: String = ""
     private var tabId: String = ""
 
@@ -103,15 +106,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             ) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions)
             }
+
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicDialogTitle, url, this::askForMicPermissions)
             }
+
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, this::askForCameraPermissions)
             }
+
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) -> {
                 showSiteDrmPermissionsDialog(activity, url)
             }
+
             permissionsHandledByUser.contains(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION) -> {
                 showSiteLocationPermissionDialog(activity, request as LocationPermissionRequest, tabId)
             }
@@ -144,12 +151,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             .setMessage(subtitle)
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
             .setNegativeButton(R.string.sitePermissionsDialogDenyButton, GHOST)
+            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
-                    var isChecked: Boolean = false
-
                     override fun onPositiveButtonClicked() {
-                        if (isChecked) {
+                        if (rememberPermissionChoice) {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                         } else {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
@@ -159,8 +165,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     }
 
                     override fun onNegativeButtonClicked() {
-                        if (isChecked) {
+                        if (rememberPermissionChoice) {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                            sitePermissionsRepository.sitePermissionPermanentlySaved(
+                                siteURL,
+                                LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION,
+                                DENY_ALWAYS,
+                            )
                         } else {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                         }
@@ -168,7 +179,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     }
 
                     override fun onCheckedChanged(checked: Boolean) {
-                        isChecked = checked
+                        rememberPermissionChoice = checked
                     }
                 },
             )
@@ -289,9 +300,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             systemPermissionsHelper.hasMicPermissionsGranted() && systemPermissionsHelper.hasCameraPermissionsGranted() -> {
                 systemPermissionGranted()
             }
+
             systemPermissionsHelper.hasMicPermissionsGranted() -> {
                 systemPermissionsHelper.requestPermission(Manifest.permission.CAMERA)
             }
+
             systemPermissionsHelper.hasCameraPermissionsGranted() -> {
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
@@ -300,6 +313,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     ),
                 )
             }
+
             else -> {
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
@@ -369,8 +383,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun systemPermissionGranted() {
         grantPermissions()
         permissionsHandledByUser.forEach {
-            Timber.w("Permissions: sitePermission $it granted for $siteURL")
-            sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+            Timber.w("Permissions: sitePermission $it granted for $siteURL rememberChoice $rememberPermissionChoice")
+            if (rememberPermissionChoice) {
+                sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
+            } else {
+                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+            }
         }
         checkIfActionNeeded()
     }
@@ -399,14 +417,17 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     onPermissionAllowed = this::askForCameraPermissions
                     R.string.sitePermissionsCameraDeniedSnackBarMessage
                 }
+
                 SitePermissionsRequestedType.AUDIO -> {
                     onPermissionAllowed = this::askForMicPermissions
                     R.string.sitePermissionsMicDeniedSnackBarMessage
                 }
+
                 SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
                     onPermissionAllowed = this::askForMicAndCameraPermissions
                     R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
                 }
+
                 SitePermissionsRequestedType.LOCATION -> {
                     onPermissionAllowed = this::askForLocationPermissions
                     R.string.sitePermissionsLocationDeniedSnackBarMessage
@@ -438,7 +459,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    private fun denyPermissions() {
+    private fun denyPermissions(rememberChoice: Boolean = false) {
+        Timber.w("Permissions: sitePermission ${sitePermissionRequest.resources.asList()} denied for $siteURL rememberChoice $rememberChoice")
         try {
             if (permissionsHandledAutomatically.isNotEmpty()) {
                 sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
