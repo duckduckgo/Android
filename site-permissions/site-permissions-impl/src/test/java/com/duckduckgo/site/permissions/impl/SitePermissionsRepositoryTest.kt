@@ -19,9 +19,11 @@ package com.duckduckgo.site.permissions.impl
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
@@ -255,6 +257,16 @@ class SitePermissionsRepositoryTest {
     fun whenSavePermissionCalledThenInsertEntityInDb() = runTest {
         val testEntity = SitePermissionsEntity(domain)
         repository.savePermission(testEntity)
+
+        verify(mockSitePermissionsDao).insert(testEntity)
+    }
+
+    @Test
+    fun whenLocationPermissionAllowRememberThenEntityInsertedInDb() = runTest {
+        val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
+        val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
+
+        repository.sitePermissionPermanentlySaved(testEntity.domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, ALLOW_ALWAYS)
 
         verify(mockSitePermissionsDao).insert(testEntity)
     }
