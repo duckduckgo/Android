@@ -262,10 +262,20 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
+    fun whenNewLocationPermissionAllowRememberThenEntityInsertedInDb() = runTest {
+        val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
+        val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
+        whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(null)
+        repository.sitePermissionPermanentlySaved(testEntity.domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, ALLOW_ALWAYS)
+
+        verify(mockSitePermissionsDao).insert(testEntity)
+    }
+
+    @Test
     fun whenLocationPermissionAllowRememberThenEntityInsertedInDb() = runTest {
         val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
         val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
-
+        whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(testEntity)
         repository.sitePermissionPermanentlySaved(testEntity.domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, ALLOW_ALWAYS)
 
         verify(mockSitePermissionsDao).insert(testEntity)
@@ -275,11 +285,13 @@ class SitePermissionsRepositoryTest {
         cameraEnabled: Boolean = true,
         micEnabled: Boolean = true,
         drmEnabled: Boolean = true,
+        locationEnabled: Boolean = true,
         sitePermissionEntity: SitePermissionsEntity? = null,
     ) = runTest {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsPreferences.askDrmEnabled).thenReturn(drmEnabled)
+        whenever(mockSitePermissionsPreferences.askLocationEnabled).thenReturn(locationEnabled)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(sitePermissionEntity)
     }
 
