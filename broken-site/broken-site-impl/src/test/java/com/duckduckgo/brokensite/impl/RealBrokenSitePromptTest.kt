@@ -1,5 +1,6 @@
 package com.duckduckgo.brokensite.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.time.LocalDate
@@ -12,6 +13,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RealBrokenSitePromptTest {
 
     private val mockBrokenSiteReportRepository: BrokenSiteReportRepository = mock()
@@ -26,12 +28,12 @@ class RealBrokenSitePromptTest {
     fun setup() {
         whenever(mockBrokenSiteReportRepository.getCoolDownDays()).thenReturn(7)
         whenever(mockBrokenSiteReportRepository.getMaxDismissStreak()).thenReturn(3)
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
     }
 
     @Test
     fun whenUserDismissedPromptAndNoNextShownDateThenIncrementDismissStreakAndDoNotUpdateNextShownDate() = runTest {
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(null)
-        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
         testee.userDismissedPrompt()
 
@@ -44,7 +46,6 @@ class RealBrokenSitePromptTest {
         runTest {
             whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
-            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
             testee.userDismissedPrompt()
 
@@ -57,7 +58,6 @@ class RealBrokenSitePromptTest {
         runTest {
             whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(11))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
-            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
             testee.userDismissedPrompt()
 
@@ -70,7 +70,6 @@ class RealBrokenSitePromptTest {
         runTest {
             whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(0)
-            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
             testee.userDismissedPrompt()
 
@@ -91,7 +90,6 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenUserAcceptedPromptThenResetDismissStreakAndSetNextShownDateToNull() = runTest {
         testee.userAcceptedPrompt()
-        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
         verify(mockBrokenSiteReportRepository).resetDismissStreak()
         verify(mockBrokenSiteReportRepository).setNextShownDate(null)
