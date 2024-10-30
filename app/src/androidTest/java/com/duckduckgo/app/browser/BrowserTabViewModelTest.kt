@@ -140,7 +140,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -544,6 +543,7 @@ class BrowserTabViewModelTest {
         whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(any, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -619,12 +619,6 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
             savedSitesRepository = mockSavedSitesRepository,
-            locationPermissionsRepository = LocationPermissionsRepositoryImpl(
-                locationPermissionsDao,
-                lazyFaviconManager,
-                coroutineRule.testDispatcherProvider,
-            ),
-            geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,

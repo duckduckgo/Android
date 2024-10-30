@@ -215,9 +215,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -375,8 +373,6 @@ class BrowserTabViewModel @Inject constructor(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -1592,15 +1588,6 @@ class BrowserTabViewModel @Inject constructor(
             Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
             command.postValue(ShowDomainHasPermissionMessage(domain))
         }
-    }
-
-    private fun shouldShowLocationPermissionMessage(): Boolean {
-        val url = site?.url ?: return true
-        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
-    }
-
-    private fun setDomainHasLocationPermissionShown(domain: String) {
-        locationPermissionMessages[domain] = true
     }
 
     private fun urlUpdated(url: String) {
