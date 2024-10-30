@@ -70,7 +70,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -117,7 +116,6 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -1906,43 +1904,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun showSystemLocationPermissionDialog(domain: String) {
-        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
-
-        val originUrl = domain.websiteFromGeoLocationsApiOrigin()
-        val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
-        binding.systemPermissionDialogSubtitle.text = subtitle
-
-        val dialog = CustomAlertDialogBuilder(requireActivity())
-            .setView(binding)
-            .build()
-
-        binding.allowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionAllowed()
-            dialog.dismiss()
-        }
-
-        binding.denyLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNotAllowed()
-            dialog.dismiss()
-        }
-
-        binding.neverAllowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNeverAllowed()
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         val context = context ?: return
 
@@ -3446,18 +3407,6 @@ class BrowserTabFragment :
                     omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
-
-            PERMISSION_REQUEST_GEO_LOCATION -> {
-                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    viewModel.onSystemLocationPermissionGranted()
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        viewModel.onSystemLocationPermissionDeniedOneTime()
-                    } else {
-                        viewModel.onSystemLocationPermissionDeniedTwice()
-                    }
-                }
-            }
         }
     }
 
@@ -3565,7 +3514,6 @@ class BrowserTabFragment :
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
-        private const val PERMISSION_REQUEST_GEO_LOCATION = 300
 
         private const val URL_BUNDLE_KEY = "url"
 

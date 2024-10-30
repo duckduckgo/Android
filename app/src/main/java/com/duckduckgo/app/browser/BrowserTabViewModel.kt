@@ -1588,7 +1588,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (sitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
+        if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
             Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
             command.postValue(ShowDomainHasPermissionMessage(domain))
         }

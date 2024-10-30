@@ -117,6 +117,13 @@ class SitePermissionsManagerImpl @Inject constructor(
         return SitePermissionQueryResponse.Denied
     }
 
+    override suspend fun hasSitePermanentPermission(
+        url: String,
+        request: String,
+    ): Boolean {
+        return sitePermissionsRepository.isDomainGranted(url, "", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+    }
+
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE ||
             permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID || permission == LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION

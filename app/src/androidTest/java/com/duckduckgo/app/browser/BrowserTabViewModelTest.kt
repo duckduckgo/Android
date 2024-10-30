@@ -2987,7 +2987,9 @@ class BrowserTabViewModelTest {
     fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = runTest {
         val domain = "https://www.example.com/"
 
-        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(true)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            true,
+        )
 
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
@@ -3002,7 +3004,9 @@ class BrowserTabViewModelTest {
     fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com/"
 
-        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(false)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            false,
+        )
 
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
@@ -3040,7 +3044,9 @@ class BrowserTabViewModelTest {
     fun whenUserRefreshesASiteLocationMessageIsNotShownAgain() = runTest {
         val domain = "https://www.example.com/"
 
-        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(true)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            true,
+        )
 
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
