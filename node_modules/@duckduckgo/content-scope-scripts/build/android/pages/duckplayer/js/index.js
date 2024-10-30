@@ -2182,6 +2182,11 @@
     {}
   );
   var useMessaging = () => x2(MessagingContext2);
+  var TelemetryContext = G(
+    /** @type {import("../src/js/index.js").Telemetry} */
+    {}
+  );
+  var useTelemetry = () => x2(TelemetryContext);
 
   // pages/duckplayer/app/providers/SettingsProvider.jsx
   var SettingsContext = G(
@@ -3351,8 +3356,10 @@
   // pages/duckplayer/app/providers/OrientationProvider.jsx
   function OrientationProvider({ onChange }) {
     y2(() => {
-      if (!screen.orientation?.type)
+      if (!screen.orientation?.type) {
+        onChange(getOrientationFromWidth());
         return;
+      }
       onChange(getOrientationFromScreen());
       const handleOrientationChange = () => {
         onChange(getOrientationFromScreen());
@@ -3382,13 +3389,16 @@
   var DISABLED_HEIGHT = 450;
   function MobileApp({ embed }) {
     const settings = useSettings();
+    const telemetry2 = useTelemetry();
     const features = createAppFeaturesFrom(settings);
     return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _(Background, null), features.focusMode(), /* @__PURE__ */ _(OrientationProvider, { onChange: (orientation) => {
       if (orientation === "portrait") {
         return FocusMode.enable();
       }
       if (window.innerHeight < DISABLED_HEIGHT) {
-        return FocusMode.disable();
+        FocusMode.disable();
+        telemetry2.landscapeImpression();
+        return;
       }
       return FocusMode.enable();
     } }), /* @__PURE__ */ _(MobileLayout, { embed }));
@@ -3423,7 +3433,7 @@
   }
 
   // pages/duckplayer/app/index.js
-  async function init(messaging2, baseEnvironment2) {
+  async function init(messaging2, telemetry2, baseEnvironment2) {
     const result = await callWithRetry(() => messaging2.initialSetup());
     if ("error" in result) {
       throw new Error(result.error);
@@ -3455,7 +3465,7 @@
             injectName: environment.injectName,
             willThrow: environment.willThrow
           },
-          /* @__PURE__ */ _(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ _(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ _(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ _(TranslationProvider, { translationObject: duckplayer_default, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(DesktopApp, { embed })), settings.layout === "mobile" && /* @__PURE__ */ _(TranslationProvider, { translationObject: strings, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(MobileApp, { embed })), /* @__PURE__ */ _(WillThrow, null)))))
+          /* @__PURE__ */ _(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ _(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ _(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ _(TelemetryContext.Provider, { value: telemetry2 }, /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ _(TranslationProvider, { translationObject: duckplayer_default, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(DesktopApp, { embed })), settings.layout === "mobile" && /* @__PURE__ */ _(TranslationProvider, { translationObject: strings, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(MobileApp, { embed })), /* @__PURE__ */ _(WillThrow, null))))))
         ),
         root
       );
@@ -3621,17 +3631,59 @@
       this.messaging.notify("reportInitException", params);
     }
   };
+  var Telemetry = class {
+    /**
+     * @internal
+     */
+    oneTimeEvents = /* @__PURE__ */ new Set();
+    /**
+     * @param {import("@duckduckgo/messaging").Messaging} messaging
+     * @internal
+     */
+    constructor(messaging2) {
+      this.messaging = messaging2;
+    }
+    /**
+     * @param {import('../../../../types/duckplayer').TelemetryEvent} event
+     * @internal
+     */
+    _event(event) {
+      this.messaging.notify("telemetryEvent", event);
+    }
+    /**
+     * A landscape impression should only be sent once
+     *
+     * - Sends {@link "Duckplayer Messages".TelemetryEvent}
+     * - With attributes: {@link "Duckplayer Messages".Impression}
+     *
+     * ```json
+     * {
+     *   "attributes": {
+     *     "name": "impression",
+     *     "value": "landscape-layout"
+     *   }
+     * }
+     * ```
+     */
+    landscapeImpression() {
+      if (this.oneTimeEvents.has("landscapeImpression"))
+        return;
+      this.oneTimeEvents.add("landscapeImpression");
+      this._event({ attributes: { name: "impression", value: "landscape-layout" } });
+    }
+  };
   var baseEnvironment = new Environment().withInjectName(document.documentElement.dataset.platform).withEnv("production");
   var messaging = createSpecialPageMessaging({
     injectName: baseEnvironment.injectName,
     env: baseEnvironment.env,
     pageName: "duckPlayerPage"
   });
-  var example = new DuckplayerPage(messaging, "android");
-  init(example, baseEnvironment).catch((e3) => {
+  var duckplayerPage = new DuckplayerPage(messaging, "android");
+  var telemetry = new Telemetry(messaging);
+  init(duckplayerPage, telemetry, baseEnvironment).catch((e3) => {
     console.error(e3);
     const msg = typeof e3?.message === "string" ? e3.message : "unknown init error";
-    example.reportInitException({ message: msg });
+    duckplayerPage.reportInitException({ message: msg });
   });
   initStorage();
 })();
