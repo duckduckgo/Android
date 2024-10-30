@@ -306,6 +306,17 @@ internal class ToggleImpl constructor(
     private val callback: FeatureTogglesCallback?,
 ) : Toggle {
 
+    override fun equals(other: Any?): Boolean {
+        if (other !is Toggle) {
+            return false
+        }
+        return this.featureName() == other.featureName()
+    }
+
+    override fun hashCode(): Int {
+        return this.featureName().hashCode()
+    }
+
     private fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
         val variant = appVariantProvider.invoke()
         // no targets then consider always treated
