@@ -43,6 +43,8 @@ import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED
@@ -330,7 +332,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
 
-            if(!enabled) {
+            if(!event.isProtected) {
                 //TODO: Add logic to only fire when limiter conditions met
                 command.send(LaunchToggleReport(opener = "dashboard"))
             }

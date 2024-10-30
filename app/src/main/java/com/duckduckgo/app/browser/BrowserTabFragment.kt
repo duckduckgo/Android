@@ -948,7 +948,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        browserActivity?.launchPrivacyDashboard()
+        browserActivity?.launchPrivacyDashboard(toggle = false, opener = "")
         if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
             viewModel.onPrivacyShieldSelected()
         }
