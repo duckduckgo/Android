@@ -40,18 +40,21 @@
                 android:id="@+id/lastOpenedTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/oneLineItemHeight"
                 app:primaryText="Last Opened Tab" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/newTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/oneLineItemHeight"
                 app:primaryText="New Tab Page" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/specificPageCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/oneLineItemHeight"
                 app:primaryText="Specific Page" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
