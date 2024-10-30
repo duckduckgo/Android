@@ -48,6 +48,7 @@ class RealBrokenSitePrompt @Inject constructor(
     override suspend fun userAcceptedPrompt() {
         if (!_featureEnabled) return
         brokenSiteReportRepository.resetDismissStreak()
+        // TODO (cbarreiro) Set next shown date based on limiting logic: https://app.asana.com/0/0/1208572901396846/f
         brokenSiteReportRepository.setNextShownDate(null)
     }
 
