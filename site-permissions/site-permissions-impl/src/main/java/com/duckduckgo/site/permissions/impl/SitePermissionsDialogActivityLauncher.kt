@@ -141,8 +141,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             )
             .setMessage(subtitle)
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
-            .setNegativeButton(R.string.sitePermissionsDialogDenyButton)
-            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton, GHOST)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     var isChecked: Boolean = false
