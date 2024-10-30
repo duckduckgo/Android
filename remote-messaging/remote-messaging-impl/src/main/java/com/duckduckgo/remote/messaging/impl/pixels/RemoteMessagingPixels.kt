@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -38,7 +39,11 @@ class RealRemoteMessagingPixels @Inject constructor(
     private val pixel: Pixel,
 ) : RemoteMessagingPixels {
     override fun fireRemoteMessageShownPixel(remoteMessage: RemoteMessage) {
-        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, parameters = remoteMessage.asPixelParams(), type = Unique())
+        pixel.fire(
+            pixel = REMOTE_MESSAGE_SHOWN_UNIQUE,
+            parameters = remoteMessage.asPixelParams(),
+            type = Unique("${REMOTE_MESSAGE_SHOWN_UNIQUE.pixelName}_${remoteMessage.id}"),
+        )
         pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN, parameters = remoteMessage.asPixelParams())
     }
 
