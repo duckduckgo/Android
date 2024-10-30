@@ -2470,6 +2470,7 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 addToAllowList(domain, clickedFromCustomTab)
             }
+
             privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
