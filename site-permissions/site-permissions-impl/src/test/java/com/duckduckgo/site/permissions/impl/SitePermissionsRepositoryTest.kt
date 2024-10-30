@@ -262,7 +262,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenNewLocationPermissionAllowRememberThenEntityInsertedInDb() = runTest {
+    fun whenPermissionAllowedPermanentlyForTheFirstTimeThenEntityInsertedInDb() = runTest {
         val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
         val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(null)
@@ -272,7 +272,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenLocationPermissionAllowRememberThenEntityInsertedInDb() = runTest {
+    fun whenPermissionAllowedPermanentlyThenEntityInsertedInDb() = runTest {
         val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
         val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(testEntity)
