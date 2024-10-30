@@ -15,23 +15,23 @@ import org.mockito.kotlin.whenever
 class RealBrokenSitePromptTest {
 
     private val mockBrokenSiteReportRepository: BrokenSiteReportRepository = mock()
-    private val mockBrokenSitePromptRCFeature: BrokenSitePromptRCFeature = FakeFeatureToggleFactory.create(BrokenSitePromptRCFeature::class.java)
+    private val fakeBrokenSitePromptRCFeature: BrokenSitePromptRCFeature = FakeFeatureToggleFactory.create(BrokenSitePromptRCFeature::class.java)
 
     private val testee = RealBrokenSitePrompt(
         brokenSiteReportRepository = mockBrokenSiteReportRepository,
-        brokenSitePromptRCFeature = mockBrokenSitePromptRCFeature,
+        brokenSitePromptRCFeature = fakeBrokenSitePromptRCFeature,
     )
 
     @Before
     fun setup() {
         whenever(mockBrokenSiteReportRepository.getCoolDownDays()).thenReturn(7)
         whenever(mockBrokenSiteReportRepository.getMaxDismissStreak()).thenReturn(3)
-        mockBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
     }
 
     @Test
     fun whenUserDismissedPromptAndNoNextShownDateThenIncrementDismissStreakAndDoNotUpdateNextShownDate() = runTest {
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(null)
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
         testee.userDismissedPrompt()
 
@@ -40,41 +40,47 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndUpdateNextShownDate() = runTest {
-        whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
-        whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndUpdateNextShownDate() =
+        runTest {
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
+            whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
-        testee.userDismissedPrompt()
+            testee.userDismissedPrompt()
 
-        verify(mockBrokenSiteReportRepository).setNextShownDate(LocalDate.now().plusDays(7))
-        verify(mockBrokenSiteReportRepository).incrementDismissStreak()
-    }
-
-    @Test
-    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDatLaterThanCooldownDaysThenIncrementDismissStreakAndDoNotUpdateNextShownDate() = runTest {
-        whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(11))
-        whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
-
-        testee.userDismissedPrompt()
-
-        verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
-        verify(mockBrokenSiteReportRepository).incrementDismissStreak()
-    }
+            verify(mockBrokenSiteReportRepository).setNextShownDate(LocalDate.now().plusDays(7))
+            verify(mockBrokenSiteReportRepository).incrementDismissStreak()
+        }
 
     @Test
-    fun whenUserDismissedPromptLessThanMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndDoNotUpdateNextShownDate() = runTest {
-        whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
-        whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(0)
+    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDatLaterThanCooldownDaysThenIncrementDismissStreakAndDoNotUpdateNextShownDate() =
+        runTest {
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(11))
+            whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
-        testee.userDismissedPrompt()
+            testee.userDismissedPrompt()
 
-        verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
-        verify(mockBrokenSiteReportRepository).incrementDismissStreak()
-    }
+            verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
+            verify(mockBrokenSiteReportRepository).incrementDismissStreak()
+        }
+
+    @Test
+    fun whenUserDismissPromptLessThanMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndNotSetNextShownDate() =
+        runTest {
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
+            whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(0)
+            fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
+
+            testee.userDismissedPrompt()
+
+            verify(mockBrokenSiteReportRepository, never()).setNextShownDate(any())
+            verify(mockBrokenSiteReportRepository).incrementDismissStreak()
+        }
 
     @Test
     fun whenUserDismissedPromptAndFeatureDisabledThenDoNothing() = runTest {
-        mockBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 
         testee.userDismissedPrompt()
 
@@ -85,6 +91,7 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenUserAcceptedPromptThenResetDismissStreakAndSetNextShownDateToNull() = runTest {
         testee.userAcceptedPrompt()
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
 
         verify(mockBrokenSiteReportRepository).resetDismissStreak()
         verify(mockBrokenSiteReportRepository).setNextShownDate(null)
@@ -92,7 +99,7 @@ class RealBrokenSitePromptTest {
 
     @Test
     fun whenUserAcceptedPromptAndFeatureDisabledThenDoNothing() = runTest {
-        mockBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
+        fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 
         testee.userAcceptedPrompt()
 
