@@ -59,6 +59,7 @@ class SitePermissionsManagerTest {
     @Before
     fun before() {
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+        whenever(mockLocationManager.isLocationEnabled).thenReturn(true)
     }
 
     @Test
