@@ -35,7 +35,7 @@
     <string name="duck_player_unavailable_description">Duck Playeri funktsionaalsust on mõjutanud hiljutised YouTube\'i muudatused. Töötame nende probleemide lahendamise nimel ja täname sind mõistva suhtumise eest.</string>
     <string name="duck_player_unavailable_learn_more">Loe edasi</string>
     <!-- TODO: Remove this ignore when the translation is added -->
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Kas avada YouTube\'i videod Duck Playeris?</string>
+    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Kas avada Youtube\'i videod Duck Playeris?</string>
     <!-- TODO(cbarreiro): Add missing translations asap -->
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ava Duck Player uues vahekaardis</string>
 </resources>
