@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToDuckPlayer
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_SERP
@@ -240,6 +241,13 @@ class DuckPlayerJSHelper @Inject constructor(
                 Timber.tag(method).d(data.toString())
             }
             "telemetryEvent" -> {
+                val attributes = data?.getJSONObject("attributes")
+
+                if (attributes?.getString("name") == "impression" && attributes.getString("value") == "landscape-layout") {
+                    pixel.fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
+                }
+
+                // TODO (cbarreiro) Abstract this to provide better support for telemetry events
                 /**
                  * incoming data looks like this, where `name` is used to discriminate,
                  * and 'value' is linked to it (but is optional)
@@ -258,7 +266,6 @@ class DuckPlayerJSHelper @Inject constructor(
                  *   }
                  * }
                  */
-                Timber.tag(method).d(data.toString())
             }
             "openSettings" -> {
                 return OpenDuckPlayerSettings
