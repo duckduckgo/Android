@@ -277,6 +277,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
@@ -920,7 +921,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
-        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId, opener = "")
         val intent = globalActivityStarter.startIntent(requireContext(), params)
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { startActivity(it) }
@@ -1598,6 +1599,10 @@ class BrowserTabFragment :
                 launchBrokenSiteFeedback(it.data)
             }
 
+            is Command.ToggleReportFeedback -> {
+                launchToggleReportFeedback()
+            }
+
             is Command.ShowFullScreen -> {
                 binding.webViewFullScreenContainer.addView(
                     it.view,
@@ -2027,12 +2032,19 @@ class BrowserTabFragment :
         val context = context ?: return
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId))
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId, opener = ""))
                 ?.let { startActivity(it) }
         } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
             startActivity(BrokenSiteActivity.intent(context, data), options)
         }
+    }
+
+    private fun launchToggleReportFeedback(opener: String = "") {
+        // val context = context ?: return
+        // TODO: Add logic to only fire toggle report if limiter conditions are met
+        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
+                ?.let { startActivity(it) }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {

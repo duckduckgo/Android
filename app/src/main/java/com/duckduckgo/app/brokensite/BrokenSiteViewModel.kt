@@ -211,7 +211,7 @@ class BrokenSiteViewModel @Inject constructor(
 
             val brokenSite = getBrokenSite(url, description, loginSiteFinal)
 
-            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
         }
         command.value = Command.ConfirmAndFinish
     }

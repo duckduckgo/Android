@@ -49,9 +49,11 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -76,12 +78,13 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -463,9 +466,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
     }
 
-    fun launchPrivacyDashboard() {
-        currentTab?.tabId?.let {
-            val params = PrivacyDashboardPrimaryScreen(it)
+    fun launchPrivacyDashboard(toggle: Boolean, opener: String) {
+        currentTab?.tabId?.let { tabId ->
+            val params = if (toggle) PrivacyDashboardToggleReportScreen(tabId, opener) else PrivacyDashboardPrimaryScreen(tabId, opener)
             val intent = globalActivityStarter.startIntent(this, params)
             intent?.let { startActivity(it) }
         }

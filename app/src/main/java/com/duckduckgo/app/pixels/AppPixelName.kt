@@ -35,6 +35,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_REPORT("epbf"),
     BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
+    PROTECTION_TOGGLE_BROKEN_SITE_REPORT("m_protection-toggled-off-breakage-report"),
 
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),

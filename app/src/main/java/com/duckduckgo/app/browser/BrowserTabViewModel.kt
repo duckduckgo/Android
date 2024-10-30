@@ -156,6 +156,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpda
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -2469,7 +2470,6 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 addToAllowList(domain, clickedFromCustomTab)
             }
-
             privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
@@ -2490,6 +2490,7 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
+            command.value = ToggleReportFeedback(opener = "menu")
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }

@@ -38,6 +38,10 @@ sealed class RendererViewHolder {
         val onOpenSettings: (String) -> Unit,
         val onClose: () -> Unit,
         val onSubmitBrokenSiteReport: (String) -> Unit,
+        val onGetToggleReportOptions: () -> Unit,
+        val onSendToggleReport: () -> Unit,
+        val onRejectToggleReport: () -> Unit,
+        val onSeeWhatIsSent: () -> Unit,
     ) : RendererViewHolder()
 }
 
@@ -58,6 +62,10 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.onOpenSettings,
                 renderer.onClose,
                 renderer.onSubmitBrokenSiteReport,
+                renderer.onGetToggleReportOptions,
+                renderer.onSendToggleReport,
+                renderer.onRejectToggleReport,
+                renderer.onSeeWhatIsSent,
             )
         }
     }

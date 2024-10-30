@@ -37,11 +37,15 @@ class PrivacyDashboardRenderer(
     private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
     private val onSubmitBrokenSiteReport: (String) -> Unit,
+    private val onGetToggleReportOptions: () -> Unit,
+    private val onSendToggleReport: () -> Unit,
+    private val onRejectToggleReport: () -> Unit,
+    private val onSeeWhatIsSent: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
 
-    fun loadDashboard(webView: WebView, initialScreen: InitialScreen) {
+    fun loadDashboard(webView: WebView, initialScreen: InitialScreen, toggleOpener: String) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
                 onBrokenSiteClicked = { onBrokenSiteClicked() },
@@ -56,10 +60,14 @@ class PrivacyDashboardRenderer(
                 },
                 onClose = { onClose() },
                 onSubmitBrokenSiteReport = onSubmitBrokenSiteReport,
+                onGetToggleReportOptions = onGetToggleReportOptions,
+                onSendToggleReport = onSendToggleReport,
+                onRejectToggleReport = onRejectToggleReport,
+                onSeeWhatIsSent = onSeeWhatIsSent,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}")
+        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}&opener=${toggleOpener}")
     }
 
     fun render(viewState: ViewState) {
@@ -108,5 +116,6 @@ class PrivacyDashboardRenderer(
     enum class InitialScreen(val value: String) {
         PRIMARY("primaryScreen"),
         BREAKAGE_FORM("breakageForm"),
+        TOGGLE_REPORT("toggleReport"),
     }
 }

@@ -17,7 +17,7 @@
 package com.duckduckgo.brokensite.api
 
 interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
+    fun submitBrokenSiteFeedback(brokenSite: BrokenSite, toggle: Boolean)
 }
 
 data class BrokenSite(
