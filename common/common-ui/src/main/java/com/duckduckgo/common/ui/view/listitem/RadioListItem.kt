@@ -55,6 +55,13 @@ class RadioListItem @JvmOverloads constructor(
             0,
             R.style.Widget_DuckDuckGo_TwoLineListItem,
         ).apply {
+            if (hasValue(R.styleable.RadioListItem_android_minHeight)) {
+                binding.itemContainer.minHeight =
+                    getDimensionPixelSize(R.styleable.RadioListItem_android_minHeight, resources.getDimensionPixelSize(R.dimen.oneLineItemHeight))
+            } else {
+                binding.itemContainer.minHeight = resources.getDimensionPixelSize(R.dimen.oneLineItemHeight)
+            }
+
             binding.radioButton.isChecked = getBoolean(R.styleable.RadioListItem_android_checked, false)
 
             binding.primaryText.text = getString(R.styleable.RadioListItem_primaryText)

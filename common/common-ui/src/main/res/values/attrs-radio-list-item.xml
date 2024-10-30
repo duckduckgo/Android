@@ -27,5 +27,6 @@
         <attr name="leadingIconBackground" />
         <attr name="leadingEmojiIcon" format="string" />
         <attr name="showTrailingIcon" format="boolean" />
+        <attr name="android:minHeight"/>
     </declare-styleable>
 </resources>
