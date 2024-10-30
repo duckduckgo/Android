@@ -172,10 +172,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onAutoCompleteSuggestionsChanged() {
-        configureAutoComplete()
-    }
-
     private fun sendLaunchPixels(intent: Intent) {
         when {
             launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
@@ -493,7 +489,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun autocompleteItemRemoved() {
-        viewModel.onAutoCompleteSuggestionsChanged()
         showKeyboardAndRestorePosition()
     }
 
