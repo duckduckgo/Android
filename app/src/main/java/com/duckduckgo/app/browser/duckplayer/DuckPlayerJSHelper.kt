@@ -165,6 +165,7 @@ class DuckPlayerJSHelper @Inject constructor(
         data: JSONObject?,
         url: String?,
         tabId: String,
+        isActiveCustomTab: Boolean,
     ): Command? {
         when (method) {
             "getUserValues" -> if (id != null) {
@@ -215,7 +216,7 @@ class DuckPlayerJSHelper @Inject constructor(
                     } else {
                         it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
                     }.toString()
-                    if (openInNewTab) {
+                    if (openInNewTab && !isActiveCustomTab) {
                         OpenInNewTab(newUrl, tabId)
                     } else {
                         Navigate(newUrl, mapOf())

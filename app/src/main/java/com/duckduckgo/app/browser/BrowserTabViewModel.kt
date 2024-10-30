@@ -3411,6 +3411,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
+        isActiveCustomTab: Boolean = false,
         getWebViewUrl: () -> String?,
     ) {
         when (method) {
@@ -3441,7 +3442,7 @@ class BrowserTabViewModel @Inject constructor(
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
-                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl, tabId)
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(featureName, method, id, data, webViewUrl, tabId, isActiveCustomTab)
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = it

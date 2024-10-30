@@ -4950,6 +4950,7 @@ class BrowserTabViewModelTest {
             "webShare",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.WebShareRequest> {
@@ -4970,8 +4971,8 @@ class BrowserTabViewModelTest {
             "permissionsQuery",
             "myId",
             JSONObject("""{ "name":"somePermission"}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToJs> {
             assertEquals("granted", this.data.params.getString("state"))
             assertEquals("myFeature", this.data.featureName)
@@ -4988,8 +4989,8 @@ class BrowserTabViewModelTest {
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandNotIssued<Command.ScreenLock>()
     }
 
@@ -5001,6 +5002,7 @@ class BrowserTabViewModelTest {
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.ScreenLock> {
@@ -5019,6 +5021,7 @@ class BrowserTabViewModelTest {
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandNotIssued<Command.ScreenUnlock>()
@@ -5032,6 +5035,7 @@ class BrowserTabViewModelTest {
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.ScreenUnlock>()
@@ -5046,6 +5050,7 @@ class BrowserTabViewModelTest {
             "getUserValues",
             "id",
             data = null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5060,8 +5065,8 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
         verify(mockPixel).fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
@@ -5076,6 +5081,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5092,8 +5098,8 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
         verify(mockDuckPlayer).setUserPreferences(true, "enabled")
         verify(mockPixel).fire(DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER)
@@ -5108,8 +5114,8 @@ class BrowserTabViewModelTest {
             "sendDuckPlayerPixel",
             "id",
             JSONObject("""{ pixelName: "pixel", params: {}}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
     }
 
@@ -5123,6 +5129,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Navigate>()
@@ -5138,6 +5145,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Navigate>()
@@ -5153,9 +5161,25 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOnWithCustomTabThenNavigate() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            true,
+        ) { "someUrl" }
+        assertCommandIssued<Navigate>()
     }
 
     @Test
@@ -5168,8 +5192,8 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             null,
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandNotIssued<Navigate>()
     }
 
@@ -5182,6 +5206,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5196,6 +5221,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
@@ -5209,6 +5235,7 @@ class BrowserTabViewModelTest {
             "openSettings",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerSettings>()
@@ -5224,6 +5251,7 @@ class BrowserTabViewModelTest {
             "openInfo",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
