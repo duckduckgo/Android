@@ -69,16 +69,13 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
             ) {
                 listener.onFaqsOpened()
             }
-            binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackSubmitVpnDescriptionHeader).uppercase()
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
             if (reportType == GENERAL_FEEDBACK) {
-                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionGeneralFeedback).uppercase()
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
             } else {
-                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionFeatureRequest).uppercase()
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitFeatureRequestDescriptionHint)
             }
         }
