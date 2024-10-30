@@ -50,6 +50,14 @@ interface SitePermissionsManager {
      */
     suspend fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
 
+    /**
+     * Checks if a site has been granted a specific set of permissions permanently
+     *
+     * @param request original permission request type
+     * @return Returns true if site has that type of permission enabled
+     */
+    suspend fun hasSitePermanentPermission(request: String): Boolean
+
     data class SitePermissions(
         val autoAccept: List<String>,
         val userHandled: List<String>,

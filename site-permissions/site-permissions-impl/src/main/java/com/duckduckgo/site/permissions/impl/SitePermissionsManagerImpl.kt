@@ -17,7 +17,9 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.webkit.PermissionRequest
+import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -33,6 +35,7 @@ import timber.log.Timber
 @ContributesBinding(AppScope::class)
 class SitePermissionsManagerImpl @Inject constructor(
     private val packageManager: PackageManager,
+    private val locationManager: LocationManager,
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : SitePermissionsManager {
@@ -121,6 +124,9 @@ class SitePermissionsManagerImpl @Inject constructor(
     private fun isHardwareSupported(permission: String): Boolean = when (permission) {
         PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
             kotlin.runCatching { packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) }.getOrDefault(false)
+        }
+        LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
+            kotlin.runCatching { LocationManagerCompat.isLocationEnabled(locationManager) }.getOrDefault(false)
         }
         else -> {
             true

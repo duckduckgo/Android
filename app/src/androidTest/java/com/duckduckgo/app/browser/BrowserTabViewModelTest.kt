@@ -27,7 +27,6 @@ import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -140,8 +139,6 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -239,6 +236,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -2986,260 +2984,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDeviceLocationSharingIsDisabledThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(false)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = runTest {
-        givenDeviceLocationSharingIsEnabled(true)
-        givenCurrentSite("https://wwww.example.com/")
-        givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
-
-        verify(geoLocationPermissions).clear("https://wwww.anotherexample.com/")
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssued<Command.CheckSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssued<Command.CheckSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionThenPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssuedTimes<Command.CheckSystemLocationPermission>(times = 1)
-    }
-
-    @Test
-    fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(false)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedOneTime()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShouldBeEnabled() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockSettingsStore).appLocationPermission = true
-    }
-
-    @Test
-    fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
-    }
-
-    @Test
-    fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(geoLocationPermissions, atLeastOnce()).allow(domain)
-    }
-
-    @Test
-    fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(geoLocationPermissions, atLeastOnce()).clear(domain)
-    }
-
-    @Test
-    fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainLocationPermission>()
-    }
-
-    @Test
-    fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainLocationPermission>()
-    }
-
-    @Test
-    fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainLocationPermission>()
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionNotAllowed()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionNeverAllowed()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-        verify(geoLocationPermissions).clear(domain)
-        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionAllowed()
-
-        assertCommandIssued<Command.RequestSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSiteLocationPermissionAlwaysDenied()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
     fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(true)
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3253,7 +3002,8 @@ class BrowserTabViewModelTest {
     fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(false)
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3290,7 +3040,8 @@ class BrowserTabViewModelTest {
     fun whenUserRefreshesASiteLocationMessageIsNotShownAgain() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(true)
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3298,73 +3049,6 @@ class BrowserTabViewModelTest {
         loadUrl("https://www.example.com", isBrowserShowing = true)
         loadUrl("https://www.example.com", isBrowserShowing = true)
         assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
-    }
-
-    @Test
-    fun whenUserSelectsPermissionAndRefreshesPageThenLocationMessageIsNotShown() = runTest {
-        val domain = "http://example.com"
-
-        givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-
-        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-
-        loadUrl(domain, isBrowserShowing = true)
-
-        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedOneTime()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedForeverThenSiteLocationPermissionIsAlwaysDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedForever()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedForeverThenSettingsFlagIsUpdated() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedForever()
-
-        verify(mockSettingsStore).appLocationPermissionDeniedForever = true
-    }
-
-    @Test
-    fun whenSystemLocationIsGrantedThenSettingsFlagIsUpdated() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockSettingsStore).appLocationPermissionDeniedForever = false
     }
 
     @Test
@@ -3481,38 +3165,6 @@ class BrowserTabViewModelTest {
         testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
         verify(mockFaviconManager, never()).storeFavicon(any(), any())
-    }
-
-    @Test
-    fun whenOnSiteLocationPermissionSelectedAndPermissionIsAllowAlwaysThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        val permission = LocationPermissionType.ALLOW_ALWAYS
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSiteLocationPermissionSelected(url, permission)
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
-    }
-
-    @Test
-    fun whenOnSiteLocationPermissionSelectedAndPermissionIsDenyAlwaysThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        val permission = LocationPermissionType.DENY_ALWAYS
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSiteLocationPermissionSelected(url, permission)
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
-    }
-
-    @Test
-    fun whenOnSystemLocationPermissionNeverAllowedThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSystemLocationPermissionNeverAllowed()
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
 
     @Test
@@ -6178,33 +5830,12 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
     }
 
-    private fun givenNewPermissionRequestFromDomain(domain: String) {
-        testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
-    }
-
     private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
         whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
     }
 
     private fun givenLocationPermissionIsEnabled(state: Boolean) {
         whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
-    }
-
-    private fun givenUserAlreadySelectedPermissionForDomain(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
-    }
-
-    class StubPermissionCallback : GeolocationPermissions.Callback {
-        override fun invoke(
-            p0: String?,
-            p1: Boolean,
-            p2: Boolean,
-        ) {
-            // nothing to see
-        }
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

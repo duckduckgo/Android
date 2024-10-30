@@ -28,7 +28,6 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -77,14 +76,12 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
-import com.duckduckgo.app.browser.commands.Command.AskDomainLocationPermission
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
-import com.duckduckgo.app.browser.commands.Command.CheckSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
 import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
@@ -120,7 +117,6 @@ import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
-import com.duckduckgo.app.browser.commands.Command.RequestSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
 import com.duckduckgo.app.browser.commands.Command.ResetHistory
 import com.duckduckgo.app.browser.commands.Command.SaveCredentials
@@ -1592,29 +1588,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
-            viewModelScope.launch(dispatchers.io()) {
-                onDeviceLocationDisabled()
-            }
-            return
-        }
-
-        if (!appSettingsPreferencesStore.appLocationPermission) {
-            return
-        }
-
-        val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
-        permissionEntity?.let {
-            if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                Timber.d("Location Permission: domain $domain site url ${site?.url}")
-                if (!locationPermissionMessages.containsKey(domain)) {
-                    setDomainHasLocationPermissionShown(domain)
-                    if (shouldShowLocationPermissionMessage()) {
-                        Timber.d("Show location permission for $domain")
-                        command.postValue(ShowDomainHasPermissionMessage(domain))
-                    }
-                }
-            }
+        if (sitePermissionsManager.hasSitePermanentPermission(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
+            Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+            command.postValue(ShowDomainHasPermissionMessage(domain))
         }
     }
 
@@ -1731,57 +1707,16 @@ class BrowserTabViewModel @Inject constructor(
         request: PermissionRequest,
         sitePermissionsAllowedToAsk: SitePermissions,
     ) {
+        if (request is LocationPermissionRequest) {
+            if (!sameEffectiveTldPlusOne(site, request.origin)) {
+                Timber.d("Permissions: sameEffectiveTldPlusOne false")
+                request.deny()
+                return
+            }
+        }
+
         viewModelScope.launch(dispatchers.io()) {
             command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))
-        }
-    }
-
-    override fun onSiteLocationPermissionRequested(
-        origin: String,
-        callback: GeolocationPermissions.Callback,
-    ) {
-        locationPermissionRequest = LocationPermissionRequest(origin, callback)
-
-        Timber.d("Permissions: onSiteLocationPermissionRequested $origin")
-        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
-            Timber.d("Permissions: isDeviceLocationEnabled false")
-            viewModelScope.launch(dispatchers.io()) {
-                onDeviceLocationDisabled()
-            }
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        if (!sameEffectiveTldPlusOne(site, origin)) {
-            Timber.d("Permissions: sameEffectiveTldPlusOne false")
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        if (!appSettingsPreferencesStore.appLocationPermission) {
-            Timber.d("Permissions: user disabled location permission")
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        viewModelScope.launch {
-            val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
-            val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
-            if (permissionEntity == null) {
-                Timber.d("Permissions: location permission for $origin not stored")
-                if (locationPermissionSession.containsKey(origin)) {
-                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
-                } else {
-                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
-                }
-            } else {
-                Timber.d("Permissions: location permission for $origin stored as ${permissionEntity.permission}")
-                if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
-                    onSiteLocationPermissionAlwaysDenied()
-                } else {
-                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
-                }
-            }
         }
     }
 
@@ -1796,144 +1731,6 @@ class BrowserTabViewModel @Inject constructor(
         val originETldPlusOne = originDomain.topPrivateDomain()
 
         return siteETldPlusOne == originETldPlusOne
-    }
-
-    fun onSiteLocationPermissionSelected(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        locationPermissionRequest?.let { locationPermission ->
-            when (permission) {
-                LocationPermissionType.ALLOW_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysAllowed()
-                    setDomainHasLocationPermissionShown(domain)
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
-                    viewModelScope.launch {
-                        locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistCachedFavicon(tabId, domain)
-                    }
-                }
-
-                LocationPermissionType.ALLOW_ONCE -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
-                    locationPermissionSession[domain] = permission
-                    locationPermission.callback.invoke(locationPermission.origin, true, false)
-                }
-
-                LocationPermissionType.DENY_ALWAYS -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
-                    onSiteLocationPermissionAlwaysDenied()
-                    viewModelScope.launch {
-                        locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistCachedFavicon(tabId, domain)
-                    }
-                }
-
-                LocationPermissionType.DENY_ONCE -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
-                    locationPermissionSession[domain] = permission
-                    locationPermission.callback.invoke(locationPermission.origin, false, false)
-                }
-            }
-        }
-    }
-
-    private fun onSiteLocationPermissionAlwaysAllowed() {
-        locationPermissionRequest?.let { locationPermission ->
-            geoLocationPermissions.allow(locationPermission.origin)
-            locationPermission.callback.invoke(locationPermission.origin, true, false)
-        }
-    }
-
-    fun onSiteLocationPermissionAlwaysDenied() {
-        locationPermissionRequest?.let { locationPermission ->
-            geoLocationPermissions.clear(locationPermission.origin)
-            locationPermission.callback.invoke(locationPermission.origin, false, false)
-        }
-    }
-
-    private suspend fun onDeviceLocationDisabled() {
-        geoLocationPermissions.clearAll()
-    }
-
-    private fun reactToSitePermission(permission: LocationPermissionType) {
-        locationPermissionRequest?.let { locationPermission ->
-            when (permission) {
-                LocationPermissionType.ALLOW_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysAllowed()
-                }
-
-                LocationPermissionType.ALLOW_ONCE -> {
-                    command.postValue(AskDomainLocationPermission(locationPermission))
-                }
-
-                LocationPermissionType.DENY_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysDenied()
-                }
-
-                LocationPermissionType.DENY_ONCE -> {
-                    command.postValue(AskDomainLocationPermission(locationPermission))
-                }
-            }
-        }
-    }
-
-    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
-        locationPermissionRequest?.let { locationPermission ->
-            if (permission == LocationPermissionType.ALLOW_ONCE) {
-                locationPermission.callback.invoke(locationPermission.origin, true, false)
-            } else {
-                locationPermission.callback.invoke(locationPermission.origin, false, false)
-            }
-        }
-    }
-
-    fun onSystemLocationPermissionAllowed() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
-        command.postValue(RequestSystemLocationPermission)
-    }
-
-    fun onSystemLocationPermissionNotAllowed() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
-        onSiteLocationPermissionAlwaysDenied()
-    }
-
-    fun onSystemLocationPermissionNeverAllowed() {
-        locationPermissionRequest?.let { locationPermission ->
-            onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
-            pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-        }
-    }
-
-    fun onSystemLocationPermissionGranted() {
-        locationPermissionRequest?.let { locationPermission ->
-            appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
-            appSettingsPreferencesStore.appLocationPermission = true
-            pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
-            viewModelScope.launch {
-                val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
-                if (permissionEntity == null) {
-                    command.postValue(AskDomainLocationPermission(locationPermission))
-                } else {
-                    reactToSitePermission(permissionEntity.permission)
-                }
-            }
-        }
-    }
-
-    fun onSystemLocationPermissionDeniedOneTime() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        onSiteLocationPermissionAlwaysDenied()
-    }
-
-    fun onSystemLocationPermissionDeniedTwice() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        onSystemLocationPermissionDeniedForever()
-    }
-
-    fun onSystemLocationPermissionDeniedForever() {
-        appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
-        onSiteLocationPermissionAlwaysDenied()
     }
 
     private fun registerSiteVisit() {

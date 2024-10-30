@@ -287,7 +287,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -1662,9 +1661,6 @@ class BrowserTabFragment :
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
-            is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainLocationPermission -> askSiteLocationPermission(it.locationPermissionRequest)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1918,21 +1914,6 @@ class BrowserTabFragment :
             ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
-    private fun checkSystemLocationPermission(
-        domain: String,
-        deniedForever: Boolean,
-    ) {
-        if (locationPermissionsHaveNotBeenGranted()) {
-            if (deniedForever) {
-                viewModel.onSystemLocationPermissionDeniedForever()
-            } else {
-                showSystemLocationPermissionDialog(domain)
-            }
-        } else {
-            viewModel.onSystemLocationPermissionGranted()
-        }
-    }
-
     private fun showSystemLocationPermissionDialog(domain: String) {
         val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
 
@@ -1960,66 +1941,6 @@ class BrowserTabFragment :
         }
 
         dialog.show()
-    }
-
-    private fun requestLocationPermissions() {
-        requestPermissions(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ),
-            PERMISSION_REQUEST_GEO_LOCATION,
-        )
-    }
-
-    private fun askSiteLocationPermission(locationPermissionRequest: LocationPermissionRequest) {
-        if (!isActiveCustomTab() && !isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
-            return
-        }
-
-        activity?.let {
-            sitePermissionsDialogLauncher.showSiteLocationPermissionDialog(it, locationPermissionRequest, tabId)
-        }
-
-        // val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
-        //
-        // binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
-        // binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
-        //     getString(R.string.preciseLocationDDGDialogSubtitle)
-        // } else {
-        //     getString(R.string.preciseLocationSiteDialogSubtitle)
-        // }
-        //
-        // val dialog = MaterialAlertDialogBuilder(requireActivity())
-        //     .setView(binding.root)
-        //     .setOnCancelListener {
-        //         // Called when user clicks outside the dialog - deny to be safe
-        //         locationPermission.callback.invoke(locationPermission.origin, false, false)
-        //     }
-        //     .create()
-        //
-        // binding.siteAllowAlwaysLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteAllowOnceLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteDenyOnceLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteDenyAlwaysLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
-        //     dialog.dismiss()
-        // }
-        //
-        // dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
