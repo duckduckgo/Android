@@ -47,6 +47,11 @@ body[data-display=app] {
   overflow: hidden;
   padding: 16px;
 }
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  body[data-display=app] {
+    padding: 8px;
+  }
+}
 
 /* shared/components/Fallback/Fallback.module.css */
 .Fallback_fallback {
@@ -96,13 +101,13 @@ body[data-display=app] {
   display: flex;
   height: 44px;
   line-height: 44px;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: bold;
   padding: 0 20px;
   flex-shrink: 0;
   box-shadow: none;
   background: rgba(255, 255, 255, 0.12);
   border-radius: var(--inner-radius);
-  font-weight: bold;
   color: rgba(255, 255, 255, 1);
   text-decoration: none;
 }
@@ -179,21 +184,11 @@ body[data-display=app] {
 /* pages/duckplayer/app/components/SwitchBarMobile.module.css */
 .SwitchBarMobile_switchBar {
   display: grid;
-  border-radius: 16px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
   padding-inline: 16px;
   height: 100%;
   line-height: 1.1;
-}
-@media screen and (min-width: 900px) {
-  .SwitchBarMobile_switchBar {
-    border-radius: 8px;
-  }
-}
-@media screen and (min-width: 667px) and (max-height: 450px) {
-  .SwitchBarMobile_switchBar {
-    border-radius: 8px;
-  }
 }
 .SwitchBarMobile_stateExiting {
   transition: all .3s ease-in-out;
@@ -510,17 +505,15 @@ body[data-display=app] {
   grid-column-gap: 8px;
   grid-template-columns: max-content max-content;
 }
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 767px) {
   .Wordmark_mobile_logo {
     height: 100px;
   }
 }
-.Wordmark_mobile_logoSvg {
-  img {
-    display: block;
-    width: 32px;
-    height: 32px;
-  }
+.Wordmark_mobile_logoSvg img {
+  display: block;
+  width: 32px;
+  height: 32px;
 }
 .Wordmark_mobile_text {
   font-size: 17px;
@@ -585,6 +578,7 @@ body[data-display=app] {
 .Player_root.Player_mobile {
   aspect-ratio: 16/9;
   border-radius: var(--inner-radius);
+  overflow: hidden;
   height: auto;
 }
 .Player_root.Player_desktop {
@@ -616,8 +610,28 @@ body[data-display=app] {
   justify-items: center;
   background: #2f2f2f;
 }
+@media screen and (min-width: 600px) and (max-height: 450px) {
+  .Player_root.Player_mobile {
+    max-height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+  }
+  .Player_iframe.Player_mobile {
+    overflow: hidden;
+    border-radius: 0;
+  }
+  .Player_error {
+    overflow: hidden;
+    border-radius: 0;
+  }
+}
 
 /* pages/duckplayer/app/components/MobileApp.module.css */
+body[data-display=app] {
+  padding: 8px;
+}
 html[data-focus-mode=on]:root .MobileApp_main {
   --bg-color: transparent;
 }
@@ -646,14 +660,11 @@ html[data-focus-mode=on] .MobileApp_hideInFocus {
 .MobileApp_main {
   --bg-color: rgba(0, 0, 0, 0.3);
   --logo-spacing: 185px;
-  --ui-control-height: calc(44px + 12px + 12px);
-  --additional-ui: calc(44px * 3);
   --gutter-width: 8px;
-  --gutter-combined: calc(var(--gutter-width) * 2);
   --outer-radius: 16px;
-  --inner-radius: 8px;
+  --inner-radius: 12px;
   --logo-width: 157px;
-  --inner-padding: 12px;
+  --inner-padding: 8px;
   position: relative;
   max-width: 100vh;
   margin: 0 auto;
@@ -664,7 +675,7 @@ html[data-focus-mode=on] .MobileApp_hideInFocus {
   --row-2: auto;
   --row-3: max-content;
   --row-4: max-content;
-  --row-5: 12px;
+  --row-5: 16px;
   --row-6: max-content;
   --row-7: auto;
   grid-template-rows: var(--row-1) var(--row-2) var(--row-3) var(--row-4) var(--row-5) var(--row-6) var(--row-7);
@@ -685,7 +696,7 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
 .MobileApp_embed {
   background: var(--bg-color);
   grid-area: embed;
-  padding: var(--inner-padding);
+  padding: calc(var(--inner-padding) / 2);
   padding-bottom: 0;
   border-top-left-radius: var(--outer-radius);
   border-top-right-radius: var(--outer-radius);
@@ -703,9 +714,7 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
 }
 .MobileApp_switch {
   grid-area: switch;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
+  height: 44px;
 }
 @media screen and (min-width: 425px) and (max-height: 600px) {
   .MobileApp_main {
@@ -719,7 +728,7 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
     border-bottom-left-radius: var(--outer-radius);
     display: grid;
     align-items: center;
-    padding-left: var(--inner-padding);
+    padding-left: 12px;
   }
   .MobileApp_buttons {
     border-bottom-left-radius: unset;
@@ -744,8 +753,8 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
     background: var(--bg-color);
     border-radius: unset;
     display: grid;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     height: 100%;
   }
   .MobileApp_buttons {
@@ -763,72 +772,41 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
   }
 }
 @media screen and (min-width: 600px) and (max-height: 450px) {
+  :root {
+    --body-padding: 4px;
+    --max-width: calc(100vw - var(--body-padding) * 2);
+  }
+  body[data-display=app] {
+    padding: 0;
+  }
   .MobileApp_main {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: calc(44px + 24px) 44px auto calc(44px + 24px);
-    grid-template-areas: "embed logo" "embed buttons" "embed filler" "embed switch";
-    align-content: center;
-    max-width: 100%;
-    max-height: 90vh;
-  }
-  body:has([data-state=completed] [aria-checked=true]) .MobileApp_main {
-    grid-template-rows: max-content max-content 0 0;
-  }
-  body:has([data-state=completed] [aria-checked=true]) .MobileApp_logo {
-    padding-top: 0;
-    align-items: end;
-  }
-  body:has([data-state=completed] [aria-checked=true]) .MobileApp_buttons {
-    border-bottom-right-radius: var(--outer-radius);
-    padding-bottom: 12px;
-  }
-  body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
-    display: none;
-  }
-  .MobileApp_filler {
-    display: block;
-    height: 100%;
-    grid-area: filler;
-    background: var(--bg-color);
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    grid-template-areas: "embed";
+    max-width: none;
   }
   .MobileApp_embed {
-    padding: var(--inner-padding);
-    border-bottom-left-radius: var(--outer-radius);
-    border-top-right-radius: 0;
+    padding: 0;
+    border-radius: 0;
+    width: 100%;
+    background-color: transparent;
+  }
+  .MobileApp_filler {
+    display: none;
   }
   .MobileApp_logo {
-    display: grid;
-    width: 100%;
-    background: var(--bg-color);
-    justify-content: center;
-    border-top-right-radius: var(--outer-radius);
-    padding: var(--inner-padding);
-    padding-left: 0;
+    display: none;
   }
   .MobileApp_buttons {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 0;
-    padding-right: var(--inner-padding);
+    display: none;
   }
   .MobileApp_switch {
-    background: var(--bg-color);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: var(--outer-radius);
-    align-self: end;
-    padding: var(--inner-padding);
-    padding-left: 0;
-    height: 100%;
+    display: none;
   }
 }
 @media screen and (min-width: 1100px) {
   .MobileApp_switch {
     justify-content: end;
-  }
-  .MobileApp_switch > * {
-    min-width: 400px;
   }
 }
 
