@@ -25,10 +25,10 @@
     <string name="duck_player_mode_always">Alati</string>
     <string name="duck_player_mode_never">Mitte kunagi</string>
     <string name="duck_player_mode_always_ask">Küsi iga kord</string>
-    <string name="duck_player_mode_dialog_title">Kas avada Youtube\'i videod Duck Playeris?</string>
+    <string name="duck_player_mode_dialog_title">Kas avada YouTube\'i videod Duck Playeris?</string>
     <string name="duck_player_close_modal_content_description">Sulge</string>
-    <string name="duck_player_info_modal_title_from_duck_player_page">Kas näed Youtube\'i kasutades massiliselt reklaame? Mitte Duck Playeriga!</string>
-    <string name="duck_player_info_modal_title_from_overlay">Kas näed Youtube\'i kasutades massiliselt reklaame? Proovi Duck Playerit!</string>
+    <string name="duck_player_info_modal_title_from_duck_player_page">Kas näed YouTube\'i kasutades massiliselt reklaame? Mitte Duck Playeriga!</string>
+    <string name="duck_player_info_modal_title_from_overlay">Kas näed YouTube\'i kasutades massiliselt reklaame? Proovi Duck Playerit!</string>
     <string name="duck_player_info_modal_text">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
     <string name="duck_player_info_modal_button">Sain aru!</string>
     <string name="duck_player_unavailable">Duck Player ei ole saadaval</string>
