@@ -322,38 +322,38 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): Boolean {
         return try {
-            subscriptionsService.confirm(
+            val confirmationResponse = subscriptionsService.confirm(
                 ConfirmationBody(
                     packageName = packageName,
                     purchaseToken = purchaseToken,
                 ),
-            ).also { confirmationResponse ->
-                authRepository.getAccount()
-                    ?.copy(email = confirmationResponse.email)
-                    ?.let { authRepository.setAccount(it) }
+            )
 
-                val subscriptionStatus = confirmationResponse.subscription.status.toStatus()
+            authRepository.getAccount()
+                ?.copy(email = confirmationResponse.email)
+                ?.let { authRepository.setAccount(it) }
 
-                authRepository.setSubscription(
-                    Subscription(
-                        productId = confirmationResponse.subscription.productId,
-                        startedAt = confirmationResponse.subscription.startedAt,
-                        expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
-                        status = subscriptionStatus,
-                        platform = confirmationResponse.subscription.platform,
-                    ),
-                )
+            val subscriptionStatus = confirmationResponse.subscription.status.toStatus()
 
-                authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
+            authRepository.setSubscription(
+                Subscription(
+                    productId = confirmationResponse.subscription.productId,
+                    startedAt = confirmationResponse.subscription.startedAt,
+                    expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
+                    status = subscriptionStatus,
+                    platform = confirmationResponse.subscription.platform,
+                ),
+            )
 
-                if (subscriptionStatus.isActive()) {
-                    pixelSender.reportPurchaseSuccess()
-                    pixelSender.reportSubscriptionActivated()
-                    emitEntitlementsValues()
-                    _currentPurchaseState.emit(CurrentPurchase.Success)
-                } else {
-                    handlePurchaseFailed()
-                }
+            authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
+
+            if (subscriptionStatus.isActive()) {
+                pixelSender.reportPurchaseSuccess()
+                pixelSender.reportSubscriptionActivated()
+                emitEntitlementsValues()
+                _currentPurchaseState.emit(CurrentPurchase.Success)
+            } else {
+                handlePurchaseFailed()
             }
 
             _subscriptionStatus.emit(authRepository.getStatus())
