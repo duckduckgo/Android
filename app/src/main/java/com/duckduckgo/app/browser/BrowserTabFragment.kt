@@ -2650,7 +2650,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
                             it.url
                         }
                     }
@@ -2665,7 +2665,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
                             it.url
                         }
                     }
