@@ -173,13 +173,13 @@ platform :android do
  lane :deploy_dogfood do |options|
 
    UI.message("Aab path: #{options[:aab_path]}")
-   upload_to_play_store(
-     aab: options[:aab_path],
-     track: 'internal',
-     skip_upload_screenshots: true,
-     skip_upload_images: true,
-     validate_only: false
-   )
+#    upload_to_play_store(
+#      aab: options[:aab_path],
+#      track: 'internal',
+#      skip_upload_screenshots: true,
+#      skip_upload_images: true,
+#      validate_only: false
+#    )
 
   versionCode = google_play_track_version_codes(track: 'internal').max
   apkPath = "duckduckgo.apk"
