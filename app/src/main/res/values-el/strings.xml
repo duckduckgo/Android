@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
+    <string name="duckDuckGoTagline">Προτεραιότητά μας η προστασία σας.</string>
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
     <string name="open">Άνοιγμα</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Αλλαγή στην Καρτέλα · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Άνοιγμα εξωτερικής εφαρμογής</string>

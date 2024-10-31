@@ -24,6 +24,9 @@ import com.duckduckgo.app.pixels.AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
+import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
+import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -48,6 +51,7 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
     private val dao: RefreshDao,
     private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val blockListPixelsPlugin: BlockListPixelsPlugin,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : RefreshPixelSender {
@@ -108,9 +112,16 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
 
             if (refreshes.count { it.timestamp >= twelveSecondsAgo } >= 2) {
                 pixel.fire(RELOAD_TWICE_WITHIN_12_SECONDS)
+                blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
+                    pixel.fire(it.pixelName, it.params)
+                }
             }
             if (refreshes.size >= 3) {
                 pixel.fire(RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
+
+                blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
+                    pixel.fire(it.pixelName, it.params)
+                }
             }
         }
     }

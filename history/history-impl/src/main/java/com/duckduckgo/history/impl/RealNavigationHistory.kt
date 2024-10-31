@@ -24,8 +24,9 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import io.reactivex.Single
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 
 interface InternalNavigationHistory : NavigationHistory {
@@ -54,9 +55,9 @@ class RealNavigationHistory @Inject constructor(
         historyRepository.saveToHistory(url, title, query, query != null)
     }
 
-    override fun getHistorySingle(): Single<List<HistoryEntry>> {
+    override fun getHistory(): Flow<List<HistoryEntry>> {
         val isHistoryUserEnabled = runBlocking(dispatcherProvider.io()) { isHistoryUserEnabled() }
-        return if (isHistoryFeatureAvailable() && isHistoryUserEnabled) historyRepository.getHistoryObservable() else Single.just(emptyList())
+        return if (isHistoryFeatureAvailable() && isHistoryUserEnabled) historyRepository.getHistory() else flowOf(emptyList())
     }
 
     override suspend fun clearHistory() {

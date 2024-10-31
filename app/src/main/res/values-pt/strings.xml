@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Privacidade, simplificada</string>
+    <string name="duckDuckGoTagline">A tua proteção, a nossa prioridade.</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
     <string name="open">Abrir</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Remover sugestão de pesquisa?</string>
     <string name="autocompleteRemoveItemCancel">Cancelar</string>
     <string name="autocompleteRemoveItemRemove">Remover</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Mudar para separador · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicação externa</string>

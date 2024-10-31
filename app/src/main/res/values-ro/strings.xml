@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt</string>
+    <string name="duckDuckGoTagline">Protecția ta, prioritatea noastră.</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
     <string name="open">Deschide</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Dorești să elimini sugestia de căutare?</string>
     <string name="autocompleteRemoveItemCancel">Anulare</string>
     <string name="autocompleteRemoveItemRemove">Elimină</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Comută la fila %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Deschide aplicația externă</string>

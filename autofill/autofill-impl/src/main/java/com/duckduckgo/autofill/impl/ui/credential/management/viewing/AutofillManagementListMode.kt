@@ -72,6 +72,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
@@ -510,9 +512,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     TextAlertDialogBuilder(it)
                         .setTitle(dialogTitle)
                         .setMessage(dialogMessage)
-                        .setDestructiveButtons(true)
-                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete, DESTRUCTIVE)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel, GHOST_ALT)
                         .addEventListener(
                             object : TextAlertDialogBuilder.EventListener() {
                                 override fun onPositiveButtonClicked() {
@@ -536,9 +537,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     TextAlertDialogBuilder(it)
                         .setTitle(dialogTitle)
                         .setMessage(dialogMessage)
-                        .setDestructiveButtons(true)
-                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete, DESTRUCTIVE)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel, GHOST_ALT)
                         .setCancellable(true)
                         .addEventListener(
                             object : TextAlertDialogBuilder.EventListener() {
@@ -567,9 +567,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             TextAlertDialogBuilder(it)
                 .setTitle(R.string.credentialManagementClearNeverForThisSiteDialogTitle)
                 .setMessage(R.string.credentialManagementInstructionNeverForThisSite)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.credentialManagementClearNeverForThisSiteDialogPositiveButton)
-                .setNegativeButton(R.string.credentialManagementClearNeverForThisSiteDialogNegativeButton)
+                .setPositiveButton(R.string.credentialManagementClearNeverForThisSiteDialogPositiveButton, DESTRUCTIVE)
+                .setNegativeButton(R.string.credentialManagementClearNeverForThisSiteDialogNegativeButton, GHOST_ALT)
                 .setCancellable(true)
                 .addEventListener(
                     object : TextAlertDialogBuilder.EventListener() {

@@ -93,7 +93,6 @@ class CtaViewModel @Inject constructor(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                CtaId.DAX_DIALOG_NETWORK,
                 CtaId.DAX_FIRE_BUTTON,
                 CtaId.DAX_END,
                 CtaId.DAX_INTRO_PRIVACY_PRO,
@@ -103,7 +102,6 @@ class CtaViewModel @Inject constructor(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                CtaId.DAX_DIALOG_NETWORK,
                 CtaId.DAX_FIRE_BUTTON,
                 CtaId.DAX_END,
             )

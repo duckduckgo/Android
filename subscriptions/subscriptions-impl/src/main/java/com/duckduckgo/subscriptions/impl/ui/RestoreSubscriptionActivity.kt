@@ -141,7 +141,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle(string.subscriptionNotFound)
             .setMessage(string.subscriptionNotFoundDescription)
-            .setDestructiveButtons(false)
             .setPositiveButton(string.viewPlans)
             .setNegativeButton(string.cancel)
             .addEventListener(
@@ -158,7 +157,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle(string.somethingWentWrong)
             .setMessage(string.somethingWentWrongDescription)
-            .setDestructiveButtons(false)
             .setPositiveButton(string.ok)
             .show()
     }

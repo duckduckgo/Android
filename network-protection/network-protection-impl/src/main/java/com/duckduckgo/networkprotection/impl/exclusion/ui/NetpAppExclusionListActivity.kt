@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,8 +40,12 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN
+import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Listener
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
+import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
@@ -149,6 +154,7 @@ class NetpAppExclusionListActivity :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
         }
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
@@ -176,6 +182,10 @@ class NetpAppExclusionListActivity :
                     position: Int,
                 ) {
                     viewModel.onSystemAppCategoryStateChanged(category, enabled)
+                }
+
+                override fun onHeaderToggleClicked(enabled: Boolean) {
+                    viewModel.onAutoExcludeToggled(enabled)
                 }
             },
         )
@@ -206,7 +216,9 @@ class NetpAppExclusionListActivity :
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.RestartVpn -> restartVpn()
+            is Command.RestartVpn -> {
+                restartVpn()
+            }
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.forApp,
             )
@@ -226,9 +238,30 @@ class NetpAppExclusionListActivity :
             )
 
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
+
+            is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
             else -> { /* noop */
             }
         }
+    }
+
+    private fun showAutoExcludePrompt(apps: List<VpnIncompatibleApp>) {
+        dismissPromotionDialog()
+
+        VpnAutoExcludePromptFragment.instance(apps, EXCLUSION_LIST_SCREEN).also {
+            it.addListener(
+                object : Listener {
+                    override fun onAutoExcludeEnabled() {
+                        viewModel.forceRefresh()
+                    }
+                },
+            )
+            it.show(supportFragmentManager, TAG_PROMOTION_DIALOG)
+        }
+    }
+
+    private fun dismissPromotionDialog() {
+        (supportFragmentManager.findFragmentByTag(TAG_PROMOTION_DIALOG) as? DialogFragment)?.dismiss()
     }
 
     private fun showSystemAppsWarning(category: NetpExclusionListSystemAppCategory) {
@@ -269,5 +302,7 @@ class NetpAppExclusionListActivity :
             PROTECTED_ONLY,
             UNPROTECTED_ONLY,
         }
+
+        private const val TAG_PROMOTION_DIALOG = "TAG_PROMO_DIALOG"
     }
 }

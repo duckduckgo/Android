@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
-    <string name="duckDuckGoPrivacySimplified">Adatvédelem, leegyszerűsítve</string>
+    <string name="duckDuckGoTagline">A prioritásunk, hogy megvédjünk téged.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
     <string name="open">Megnyitás</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Eltávolítod a keresési javaslatot?</string>
     <string name="autocompleteRemoveItemCancel">Mégsem</string>
     <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Váltás lapra · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>

@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="duckDuckGoPrivacySimplified">Fortrolighed, helt enkelt</string>
+    <string name="duckDuckGoTagline">Din beskyttelse, vores prioritet.</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
     <string name="open">Åben</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Fjern søgeforslag?</string>
     <string name="autocompleteRemoveItemCancel">Annuller</string>
     <string name="autocompleteRemoveItemRemove">Fjern</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Skift til fane · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Åbn ekstern app</string>

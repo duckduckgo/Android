@@ -24,6 +24,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -343,9 +345,8 @@ class SyncActivity : DuckDuckGoActivity() {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_delete_server_data_dialog_title)
             .setMessage(getString(R.string.sync_delete_server_data_dialog_content))
-            .setPositiveButton(R.string.sync_delete_server_data_dialog_primary_button)
-            .setNegativeButton(R.string.sync_delete_server_data_dialog_secondary_button)
-            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.sync_delete_server_data_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_delete_server_data_dialog_secondary_button, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

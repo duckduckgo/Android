@@ -49,6 +49,7 @@
     <string name="text_dialog_positive" translatable="false">Keep using</string>
     <string name="text_dialog_negative" translatable="false">Negative</string>
     <string name="text_dialog_option" translatable="false">Option</string>
+    <string name="text_dialog_checkbox" translatable="false">Remember my choice</string>
 
     <!-- Defaults Searchbar -->
     <string name="searchbar_cleartextaction_content_description_default" translatable="false">Collapse</string>

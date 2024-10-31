@@ -33,10 +33,13 @@ import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
+import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
@@ -95,6 +98,8 @@ class PrivacyDashboardHybridViewModelTest {
     private val webBrokenSiteFormFeature = FakeFeatureToggleFactory.create(WebBrokenSiteFormFeature::class.java)
 
     private val brokenSiteSender: BrokenSiteSender = mock()
+    private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
+    private val pluginPoint = FakePluginPoint(protectionTogglePlugin)
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -111,6 +116,7 @@ class PrivacyDashboardHybridViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             webBrokenSiteFormFeature = webBrokenSiteFormFeature,
             brokenSiteSender = brokenSiteSender,
+            privacyProtectionTogglePlugin = pluginPoint,
             moshi = Moshi.Builder().build(),
         )
     }
@@ -211,9 +217,11 @@ class PrivacyDashboardHybridViewModelTest {
         verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = Count)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = Count)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     @Test
@@ -332,6 +340,7 @@ class PrivacyDashboardHybridViewModelTest {
         advanceUntilIdle()
         verify(pixel).fire(BROKEN_SITE_ALLOWLIST_ADD)
         verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
     }
 
     @Test
@@ -341,6 +350,7 @@ class PrivacyDashboardHybridViewModelTest {
         advanceUntilIdle()
         verify(pixel).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
         verify(pixel, never()).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     @Test
@@ -350,6 +360,7 @@ class PrivacyDashboardHybridViewModelTest {
         advanceUntilIdle()
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
         verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_ADD)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
     }
 
     @Test
@@ -359,6 +370,7 @@ class PrivacyDashboardHybridViewModelTest {
         advanceUntilIdle()
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
         verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_REMOVE)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     private fun site(
@@ -396,4 +408,22 @@ private class FakeUserAllowListRepository : UserAllowListRepository {
     override suspend fun addDomainToUserAllowList(domain: String) = domains.update { it + domain }
 
     override suspend fun removeDomainFromUserAllowList(domain: String) = domains.update { it - domain }
+}
+
+class FakePluginPoint(val plugin: FakePrivacyProtectionTogglePlugin) : PluginPoint<PrivacyProtectionTogglePlugin> {
+    override fun getPlugins(): Collection<PrivacyProtectionTogglePlugin> {
+        return listOf(plugin)
+    }
+}
+
+class FakePrivacyProtectionTogglePlugin : PrivacyProtectionTogglePlugin {
+    var toggleOff = 0
+    var toggleOn = 0
+
+    override suspend fun onToggleOff(origin: PrivacyToggleOrigin) {
+        toggleOff++
+    }
+    override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
+        toggleOn++
+    }
 }

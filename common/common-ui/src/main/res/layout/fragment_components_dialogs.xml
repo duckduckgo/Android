@@ -57,6 +57,14 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/textAlertSingleDialogButton"
+            app:buttonSize="large"
+            android:text="Text Alert Single Button Dialog"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogCancellable"
             app:buttonSize="large"
             android:text="Text Alert Dialog Cancellable"
@@ -65,12 +73,20 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/textAlertDialogOneButton"
-                app:buttonSize="large"
-                android:text="Text Alert Dialog With One Button"
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            android:id="@+id/textAlertDialogOneButton"
+            app:buttonSize="large"
+            android:text="Text Alert Dialog With One Button"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/textAlertDialogCheckbox"
+            app:buttonSize="large"
+            android:text="Text Alert Dialog With CheckBox"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:buttonSize="large"

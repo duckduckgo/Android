@@ -53,6 +53,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -483,9 +485,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         TextAlertDialogBuilder(this)
             .setTitle(R.string.closeAppTabsConfirmationDialogTitle)
             .setMessage(R.string.closeAppTabsConfirmationDialogDescription)
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.closeAppTabsConfirmationDialogClose)
-            .setNegativeButton(R.string.closeAppTabsConfirmationDialogCancel)
+            .setPositiveButton(R.string.closeAppTabsConfirmationDialogClose, DESTRUCTIVE)
+            .setNegativeButton(R.string.closeAppTabsConfirmationDialogCancel, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
