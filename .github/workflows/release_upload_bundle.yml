@@ -16,6 +16,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+
+      - name: Set Git permissions
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: '${{ secrets.GT_DAXMOBILE }}'
 
       - name: Get Previous tag
         id: fetch_tag
@@ -62,7 +68,6 @@ jobs:
         id: tag_nightly_release
         run: |
           git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
-          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
           git push origin ${{ steps.generate_version_name.outputs.version }}
 
       - name: Upload app bundle as artifact
