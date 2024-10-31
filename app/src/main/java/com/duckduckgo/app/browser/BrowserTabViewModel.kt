@@ -2661,7 +2661,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        ctaViewModel.onUserClickCtaOkButton(cta)
+        viewModelScope.launch {
+            ctaViewModel.onUserClickCtaOkButton(cta)
+        }
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
@@ -3423,7 +3425,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onBrokenSiteCtaDismissButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
-        onUserDismissedCta(cta)
         viewModelScope.launch {
             command.value = HideBrokenSitePromptCta(cta)
         }

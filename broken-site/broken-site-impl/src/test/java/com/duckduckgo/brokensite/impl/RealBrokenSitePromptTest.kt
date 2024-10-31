@@ -145,7 +145,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
 
-        val result = testee.shouldShowBrokenSitePrompt()
+        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
 
         assertTrue(result)
     }
@@ -155,7 +155,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(2)
 
-        val result = testee.shouldShowBrokenSitePrompt()
+        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
 
         assertFalse(result)
     }
@@ -165,7 +165,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 
-        val result = testee.shouldShowBrokenSitePrompt()
+        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
 
         assertFalse(result)
     }

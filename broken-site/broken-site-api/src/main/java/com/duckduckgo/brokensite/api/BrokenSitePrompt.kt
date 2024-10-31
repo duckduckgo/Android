@@ -32,5 +32,7 @@ interface BrokenSitePrompt {
 
     fun getUserRefreshesCount(): Int
 
-    suspend fun shouldShowBrokenSitePrompt(): Boolean
+    suspend fun shouldShowBrokenSitePrompt(url: String): Boolean
+
+    suspend fun ctaShown()
 }

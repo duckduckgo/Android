@@ -17,12 +17,13 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import android.util.Log
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDate
 import javax.inject.Inject
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -36,20 +37,22 @@ class RealBrokenSitePrompt @Inject constructor(
     private val brokenSiteReportRepository: BrokenSiteReportRepository,
     private val brokenSitePromptRCFeature: BrokenSitePromptRCFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val duckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrokenSitePrompt {
 
     private val _featureEnabled by lazy { brokenSitePromptRCFeature.self().isEnabled() }
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
-        brokenSiteReportRepository.getNextShownDate()?.let {
-            if (brokenSiteReportRepository.getDismissStreak() == brokenSiteReportRepository.getMaxDismissStreak() - 1) {
-                val nextShownDate = brokenSiteReportRepository.getNextShownDate()
-                val newNextShownDate = LocalDate.now().plusDays(brokenSiteReportRepository.getCoolDownDays().toLong())
+        Log.d("BrokenSitePrompt", "User dismissed prompt, dismiss streak: ${brokenSiteReportRepository.getDismissStreak()}")
+        if (brokenSiteReportRepository.getDismissStreak() >= brokenSiteReportRepository.getMaxDismissStreak() - 1) {
+            val nextShownDate = brokenSiteReportRepository.getNextShownDate()
+            val newNextShownDate = currentTimeProvider.localDateNow().plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
 
-                if (newNextShownDate.isAfter(nextShownDate)) {
-                    brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-                }
+            Log.d("BrokenSitePrompt", "User dismissed. Next shown date: $nextShownDate, new next show date: $newNextShownDate")
+
+            if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
+                brokenSiteReportRepository.setNextShownDate(newNextShownDate)
             }
         }
         brokenSiteReportRepository.incrementDismissStreak()
@@ -57,9 +60,9 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun userAcceptedPrompt() {
         if (!_featureEnabled) return
+        Log.d("BrokenSitePrompt", "User accepted")
+
         brokenSiteReportRepository.resetDismissStreak()
-        // TODO (cbarreiro) Set next shown date based on limiting logic: https://app.asana.com/0/0/1208572901396846/f
-        brokenSiteReportRepository.setNextShownDate(null)
     }
 
     override suspend fun isFeatureEnabled(): Boolean {
@@ -83,7 +86,19 @@ class RealBrokenSitePrompt @Inject constructor(
         )
     }
 
-    override suspend fun shouldShowBrokenSitePrompt(): Boolean {
-        return isFeatureEnabled() && getUserRefreshesCount() >= REFRESH_COUNT_LIMIT
+    override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
+        return isFeatureEnabled() &&
+            getUserRefreshesCount() >= REFRESH_COUNT_LIMIT &&
+            // && brokenSiteReportRepository.getNextShownDate()?.isBefore(currentTimeProvider.localDateNow()) ?: true
+            !duckGoUrlDetector.isDuckDuckGoUrl(url)
+    }
+
+    override suspend fun ctaShown() {
+        Log.d("BrokenSitePrompt", "CTA shown")
+        val nextShownDate = brokenSiteReportRepository.getNextShownDate()?.atStartOfDay()
+        val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
+        if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
+            brokenSiteReportRepository.setNextShownDate(newNextShownDate.toLocalDate())
+        }
     }
 }

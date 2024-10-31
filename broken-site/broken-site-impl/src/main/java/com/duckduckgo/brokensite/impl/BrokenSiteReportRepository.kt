@@ -45,8 +45,8 @@ interface BrokenSiteReportRepository {
     suspend fun setDismissStreakResetDays(days: Int)
     suspend fun getDismissStreakResetDays(): Int
 
-    suspend fun setCoolDownDays(days: Int)
-    suspend fun getCoolDownDays(): Int
+    suspend fun setCoolDownDays(days: Long)
+    suspend fun getCoolDownDays(): Long
 
     suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
 
@@ -56,6 +56,7 @@ interface BrokenSiteReportRepository {
     suspend fun incrementDismissStreak()
     suspend fun getDismissStreak(): Int
     suspend fun resetDismissStreak()
+
     fun resetRefreshCount()
     fun addRefresh(url: Uri, localDateTime: LocalDateTime)
     fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
@@ -113,11 +114,11 @@ class RealBrokenSiteReportRepository(
     override suspend fun getDismissStreakResetDays(): Int =
         brokenSitePromptDataStore.getDismissStreakResetDays()
 
-    override suspend fun setCoolDownDays(days: Int) {
+    override suspend fun setCoolDownDays(days: Long) {
         brokenSitePromptDataStore.setCoolDownDays(days)
     }
 
-    override suspend fun getCoolDownDays(): Int =
+    override suspend fun getCoolDownDays(): Long =
         brokenSitePromptDataStore.getCoolDownDays()
 
     override suspend fun setBrokenSitePromptRCSettings(
@@ -127,7 +128,7 @@ class RealBrokenSiteReportRepository(
     ) {
         setMaxDismissStreak(maxDismissStreak)
         setDismissStreakResetDays(dismissStreakResetDays)
-        setCoolDownDays(coolDownDays)
+        setCoolDownDays(coolDownDays.toLong())
     }
 
     override suspend fun resetDismissStreak() {
@@ -136,6 +137,7 @@ class RealBrokenSiteReportRepository(
 
     override suspend fun setNextShownDate(nextShownDate: LocalDate?) {
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
+        // Log.d("BrokenSitePrompt", "Next shown date set to $nextShownDate")
     }
 
     override suspend fun getDismissStreak(): Int {
