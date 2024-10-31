@@ -18,6 +18,7 @@
     releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
     appVersionFilePath = "../app/version/version-properties"
+    firebaseFilePath = "#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -195,7 +196,7 @@ platform :android do
       groups: "ddg-employees",
       android_artifact_type: "APK",
       android_artifact_path: apkPath,
-      service_credentials_file: options[:firebase_path]
+      service_credentials_file: firebaseFilePath
   )
 
   end
