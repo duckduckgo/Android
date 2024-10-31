@@ -24,12 +24,6 @@ jobs:
         with:
           token: '${{ secrets.GT_DAXMOBILE }}'
 
-      - name: Set up ruby env
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.2
-          bundler-cache: true
-
       - name: Get Previous tag
         id: fetch_tag
         uses: oprypin/find-latest-tag@v1
@@ -37,53 +31,11 @@ jobs:
           repository: duckduckgo/android
           prefix: '5.'
 
-      - name: Decode upload keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build_upload.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
-          fileName: ddg-upload-keystore.jks
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Play Store credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
-          fileName: api.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Firebase credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
-          fileName: ddg-upload-firebase.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
-
       - name: Generate nightly version name
         id: generate_version_name
         run: |
           output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet)        
           echo "::set-output name=version::$output"
-
-      - name: Capture App Bundle Path
-        id: capture_output
-        run: |
-          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
-          echo "bundle_path=$output" >> $GITHUB_OUTPUT
-
-      - name: Upload bundle to Play Store Internal track
-        id: create_app_bundle
-        run: |
-          bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
 
       - name: Tag Nightly release
         id: tag_nightly_release
