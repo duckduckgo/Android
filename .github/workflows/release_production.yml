@@ -31,40 +31,10 @@ jobs:
           repository: duckduckgo/android
           prefix: '5.'
 
-      - name: Decode upload keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build_upload.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
-          fileName: ddg-upload-keystore.jks
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Play Store credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
-          fileName: api.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Firebase credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
-          fileName: ddg-upload-firebase.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
-
       - name: Generate nightly version name
         id: generate_version_name
-        run: |        
+        run: |   
+          ./gradleW clean
           output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} | head -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
