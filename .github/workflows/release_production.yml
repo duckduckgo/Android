@@ -1,85 +1,38 @@
-name: Release - Upload Bundle to Play Store
+name: Release - Android App Production Release
 
 on:
   workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
-  GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  create-tag:
-    name: Generate and upload nightly bundle to Play Store Internal track
-    runs-on: macos-latest
+  create_release_task:
+    uses: ./.github/workflows/release_create_task.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
+  create_release_tag:
+    needs: create_release_task
+    uses: ./.github/workflows/release_create_tag.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Set Git permissions
-        uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: '${{ secrets.GT_DAXMOBILE }}'
+  launch_release_tests:
+    needs: create_release_tag
+    uses: ./.github/workflows/release_tests.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
 
-      - name: Get Previous tag
-        id: fetch_tag
-        uses: oprypin/find-latest-tag@v1
-        with:
-          repository: duckduckgo/android
-          prefix: '5.'
-
-      - name: Decode upload keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build_upload.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
-          fileName: ddg-upload-keystore.jks
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Play Store credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
-          fileName: api.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode Firebase credentials file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
-          fileName: ddg-upload-firebase.json
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Clean project
-        run: |
-          ./gradleW clean        
-
-      - name: Assemble the bundle
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
-
-      - name: Generate nightly version name
-        id: generate_version_name
-        run: |             
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet | tail -n 1)
-          echo "version=$output" >> $GITHUB_OUTPUT
-
-      - name: Tag Nightly release
-        id: tag_nightly_release
-        run: |
-          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
-          git push origin ${{ steps.generate_version_name.outputs.version }}
-
-      - name: Upload app bundle as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
-          path: duckduckgo.apk
+  report_workflow_failed:
+    if: ${{ failure() }}
+    uses: ./.github/workflows/release_report_error.yml
