@@ -34,7 +34,7 @@ jobs:
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }})
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet)
           echo "version=$output" >> $GITHUB_OUTPUT          
 
       - name: Tag Nightly release
