@@ -95,17 +95,6 @@ class Omnibar(
                     binding.rootView.removeView(binding.newOmnibarBottom)
                     binding.rootView.removeView(binding.newOmnibar)
                     binding.rootView.removeView(binding.legacyOmnibarBottom)
-
-                    // remove the default top abb bar behavior
-                    removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                    removeAppBarBehavior(binding.browserLayout)
-                    removeAppBarBehavior(binding.focusedView)
-                    removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
-
-                    // prevent the touch event leaking to the webView below
-                    binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
-
-                    binding.newOmnibarBottom
                 }
             }
 
