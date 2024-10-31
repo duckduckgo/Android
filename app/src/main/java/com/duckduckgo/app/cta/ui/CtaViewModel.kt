@@ -90,7 +90,8 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
-        return if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) { // TODO NOELIA add subscriptions.isEligible()
+        val shouldShowPrivacyProCta = extendedOnboardingFeatureToggles.privacyProCta().isEnabled() && subscriptions.isEligible()
+        return if (shouldShowPrivacyProCta) {
             arrayOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
@@ -252,7 +253,7 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> { // TODO NOELIA add subscriptions.isEligible()
+            canShowPrivacyProCta() -> {
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                     DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore)
                 } else {
@@ -301,7 +302,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun canShowPrivacyProCta(): Boolean {
-        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown()
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && subscriptions.isEligible() &&
+            extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
     }
 
     @WorkerThread
