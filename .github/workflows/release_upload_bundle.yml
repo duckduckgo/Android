@@ -44,12 +44,6 @@ jobs:
           fileName: ddg-upload-keystore.jks
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Generate nightly version name
-        id: generate_version_name
-        run: |
-          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly --quiet)        
-          echo "::set-output name=version::$output"
-
       - name: Assemble the bundle
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
 
