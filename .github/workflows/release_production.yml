@@ -31,11 +31,14 @@ jobs:
           repository: duckduckgo/android
           prefix: '5.'
 
+      - name: Clean project
+        run: |
+          ./gradleW clean          
+
       - name: Generate nightly version name
         id: generate_version_name
-        run: |   
-          ./gradleW clean
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} | head -n 1)
+        run: |             
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Tag Nightly release
