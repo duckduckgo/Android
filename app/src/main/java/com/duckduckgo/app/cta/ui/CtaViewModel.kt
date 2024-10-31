@@ -117,7 +117,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun onCtaShown(cta: Cta) {
+    suspend fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
             val canSendPixel = when (cta) {
                 is DaxCta -> cta.canSendShownPixel()
@@ -129,6 +129,10 @@ class CtaViewModel @Inject constructor(
         }
         if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
             dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+        }
+
+        if (cta is BrokenSitePromptDialogCta) {
+            brokenSitePrompt.ctaShown()
         }
     }
 
@@ -150,6 +154,10 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onUserDismissedCta(cta: Cta) {
         withContext(dispatchers.io()) {
+            if (cta is BrokenSitePromptDialogCta) {
+                brokenSitePrompt.userDismissedPrompt()
+            }
+
             cta.cancelPixel?.let {
                 pixel.fire(it, cta.pixelCancelParameters())
             }
@@ -160,9 +168,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun onUserClickCtaOkButton(cta: Cta) {
+    suspend fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
+        }
+
+        if (cta is BrokenSitePromptDialogCta) {
+            brokenSitePrompt.userAcceptedPrompt()
         }
     }
 
@@ -303,7 +315,7 @@ class CtaViewModel @Inject constructor(
             }
 
             if (!canShowOnboardingDaxDialogCta()) {
-                return if (withContext(dispatchers.io()) { brokenSitePrompt.shouldShowBrokenSitePrompt() }) {
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null
