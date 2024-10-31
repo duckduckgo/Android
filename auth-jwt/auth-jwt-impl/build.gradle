@@ -24,7 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-	implementation project(":auth-jwt-api")
+    implementation project(":auth-jwt-api")
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
