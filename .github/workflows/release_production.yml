@@ -5,6 +5,7 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GOOGLE_APPLICATION_CREDENTIALS: $HOME/jenkins_static/com.duckduckgo.mobile.android/api.json
 
 jobs:
   create-tag:
@@ -48,6 +49,13 @@ jobs:
         with:
           secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
           fileName: ddg-upload-keystore.jks
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode credential file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
+          fileName: api.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Assemble the bundle
