@@ -5,6 +5,7 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
 
 jobs:
   create-tag:
@@ -66,6 +67,12 @@ jobs:
 
       - name: Assemble the bundle
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
+
+      - name: Generate nightly version name
+        id: generate_version_name
+        run: |
+          output=$(./gradlew -q getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet)        
+          echo "::set-output name=version::$output"
 
       - name: Capture App Bundle Path
         id: capture_output

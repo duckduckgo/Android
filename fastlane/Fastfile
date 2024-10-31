@@ -18,7 +18,6 @@
     releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
     appVersionFilePath = "../app/version/version-properties"
-    firebaseFilePath = "#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -175,13 +174,13 @@ platform :android do
 
    UI.message("Aab path: #{options[:aab_path]}")
 
-   upload_to_play_store(
-     aab: options[:aab_path],
-     track: 'internal',
-     skip_upload_screenshots: true,
-     skip_upload_images: true,
-     validate_only: false
-   )
+#    upload_to_play_store(
+#      aab: options[:aab_path],
+#      track: 'internal',
+#      skip_upload_screenshots: true,
+#      skip_upload_images: true,
+#      validate_only: false
+#    )
 
   versionCode = google_play_track_version_codes(track: 'internal').max
   apkPath = "duckduckgo.apk"
@@ -196,7 +195,7 @@ platform :android do
       groups: "ddg-employees",
       android_artifact_type: "APK",
       android_artifact_path: apkPath,
-      service_credentials_file: firebaseFilePath,
+      service_credentials_file: options[:firebase_path]
   )
 
   end
@@ -565,8 +564,5 @@ platform :android do
         patch = patch.to_i
         (major * 10_000_000) + (minor * 10_000) + (patch * 1_000)
     end
-
-
-
 
 end
