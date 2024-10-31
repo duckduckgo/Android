@@ -33,7 +33,10 @@ jobs:
 
       - name: Clean project
         run: |
-          ./gradleW clean          
+          ./gradleW clean        
+
+      - name: Assemble the bundle
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
 
       - name: Generate nightly version name
         id: generate_version_name
