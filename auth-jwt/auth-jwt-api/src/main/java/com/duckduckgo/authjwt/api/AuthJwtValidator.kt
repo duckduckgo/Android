@@ -21,7 +21,7 @@ import java.time.Instant
 /**
  * This class provides methods for checking the validity of JWTs obtained from Auth API V2 and parsing claims included in those tokens.
  */
-interface AuthJwt {
+interface AuthJwtValidator {
     /**
      * Validates access token against the given JSON Web Key (JWK) set and parses claims included in the token.
      *

@@ -11,14 +11,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AuthJwtImplTest {
+class AuthJwtValidatorImplTest {
 
     private val timeProvider = FakeTimeProvider()
-    private val authJwt = AuthJwtImpl(timeProvider)
+    private val authJwtValidator = AuthJwtValidatorImpl(timeProvider)
 
     @Test
     fun `when valid access token then returns claims`() {
-        val claims = authJwt.validateAccessToken(ACCESS_TOKEN, JWK_SET)
+        val claims = authJwtValidator.validateAccessToken(ACCESS_TOKEN, JWK_SET)
 
         val expectedEntitlements = listOf(
             Entitlement(name = "subscriber", product = "Network Protection"),
@@ -34,7 +34,7 @@ class AuthJwtImplTest {
 
     @Test
     fun `when valid refresh token then returns claims`() {
-        val claims = authJwt.validateRefreshToken(REFRESH_TOKEN, JWK_SET)
+        val claims = authJwtValidator.validateRefreshToken(REFRESH_TOKEN, JWK_SET)
 
         assertEquals(Instant.parse("2024-11-30T16:10:32Z"), claims.expiresAt)
         assertEquals("ff300a25-693a-47f5-8398-064fc00ce3de", claims.accountExternalId)
@@ -43,13 +43,13 @@ class AuthJwtImplTest {
     @Test(expected = IllegalArgumentException::class)
     fun `when access token is expired then throws IllegalArgumentException`() {
         timeProvider.currentTime = Instant.parse("2024-11-16T00:00:00.00Z")
-        authJwt.validateAccessToken(ACCESS_TOKEN, JWK_SET)
+        authJwtValidator.validateAccessToken(ACCESS_TOKEN, JWK_SET)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `when refresh token is expired then throws IllegalArgumentException`() {
         timeProvider.currentTime = Instant.parse("2024-12-01T00:00:00.00Z")
-        authJwt.validateRefreshToken(REFRESH_TOKEN, JWK_SET)
+        authJwtValidator.validateRefreshToken(REFRESH_TOKEN, JWK_SET)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -70,7 +70,7 @@ class AuthJwtImplTest {
             }
             """
 
-        authJwt.validateAccessToken(ACCESS_TOKEN, jwkSet)
+        authJwtValidator.validateAccessToken(ACCESS_TOKEN, jwkSet)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -91,7 +91,7 @@ class AuthJwtImplTest {
             }
             """
 
-        authJwt.validateRefreshToken(REFRESH_TOKEN, jwkSet)
+        authJwtValidator.validateRefreshToken(REFRESH_TOKEN, jwkSet)
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {

@@ -17,7 +17,7 @@
 package com.duckduckgo.authjwt.impl
 
 import com.duckduckgo.authjwt.api.AccessTokenClaims
-import com.duckduckgo.authjwt.api.AuthJwt
+import com.duckduckgo.authjwt.api.AuthJwtValidator
 import com.duckduckgo.authjwt.api.Entitlement
 import com.duckduckgo.authjwt.api.RefreshTokenClaims
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -31,9 +31,9 @@ import java.util.Date
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class AuthJwtImpl @Inject constructor(
+class AuthJwtValidatorImpl @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
-) : AuthJwt {
+) : AuthJwtValidator {
 
     override fun validateAccessToken(
         jwt: String,
