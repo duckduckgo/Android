@@ -11,7 +11,6 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscri
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
@@ -198,7 +197,6 @@ class RestoreSubscriptionViewModelTest {
             expiresOrRenewsAt = 10000L,
             status = AUTO_RENEWABLE,
             platform = "google",
-            entitlements = listOf(Entitlement("name", "product")),
         )
     }
 

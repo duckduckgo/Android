@@ -21,37 +21,15 @@ class RealAuthRepositoryTest {
     private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenIsAuthenticatedAndNoAccessTokenThenReturnFalse() = runTest {
-        authStore.authToken = "authToken"
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedAndNoAuthTokenThenReturnFalse() = runTest {
-        authStore.accessToken = "accessToken"
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedAndNoAuthTokenAndAccessTokenThenReturnFalse() = runTest {
-        assertFalse(authRepository.isUserAuthenticated())
-    }
-
-    @Test
-    fun whenIsAuthenticatedThenReturnTrue() = runTest {
-        authStore.authToken = "authToken"
-        authStore.accessToken = "accessToken"
-        assertTrue(authRepository.isUserAuthenticated())
-    }
-
-    @Test
     fun whenClearAccountThenClearData() = runTest {
         authStore.email = "email@duck.com"
         authStore.externalId = "externalId"
         authStore.authToken = "authToken"
         authStore.accessToken = "accessToken"
 
-        authRepository.clearAccount()
+        authRepository.setAuthToken(null)
+        authRepository.setAccessToken(null)
+        authRepository.setAccount(null)
 
         assertNull(authStore.accessToken)
         assertNull(authStore.authToken)
@@ -68,25 +46,25 @@ class RealAuthRepositoryTest {
         authStore.productId = "productId"
         authStore.entitlements = "[]"
 
-        authRepository.clearSubscription()
+        authRepository.setSubscription(null)
 
         assertNull(authStore.status)
         assertNull(authStore.startedAt)
         assertNull(authStore.expiresOrRenewsAt)
         assertNull(authStore.platform)
         assertNull(authStore.productId)
-        assertNull(authStore.entitlements)
+        assertEquals("[]", authStore.entitlements)
     }
 
     @Test
-    fun whenSaveAccountDataThenSetData() = runTest {
-        assertNull(authStore.authToken)
+    fun whenSetAccountThenSetData() = runTest {
+        assertNull(authStore.email)
         assertNull(authStore.externalId)
 
-        authRepository.saveAccountData(authToken = "authToken", externalId = "externalId")
+        authRepository.setAccount(Account(externalId = "externalId", email = "john@example.com"))
 
-        assertEquals("authToken", authStore.authToken)
         assertEquals("externalId", authStore.externalId)
+        assertEquals("john@example.com", authStore.email)
     }
 
     @Test

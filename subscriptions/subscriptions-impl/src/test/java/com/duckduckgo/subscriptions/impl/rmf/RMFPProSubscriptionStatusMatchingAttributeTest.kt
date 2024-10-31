@@ -10,7 +10,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -31,7 +30,6 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,
         platform = "Google",
-        entitlements = listOf(Entitlement("name", "product")),
     )
 
     @Before

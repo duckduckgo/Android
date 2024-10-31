@@ -32,8 +32,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.subscriptions.impl.AccessToken
-import com.duckduckgo.subscriptions.impl.AuthToken
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -160,8 +160,8 @@ class SubscriptionMessagingInterface @Inject constructor(
             val authToken: String? = runBlocking(dispatcherProvider.io()) {
                 val pat = subscriptionsManager.getAuthToken()
                 when (pat) {
-                    is AuthToken.Success -> pat.authToken
-                    is AuthToken.Failure.TokenExpired -> pat.authToken
+                    is AuthTokenResult.Success -> pat.authToken
+                    is AuthTokenResult.Failure.TokenExpired -> pat.authToken
                     else -> null
                 }
             }
@@ -267,13 +267,13 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            val pat: AccessToken = runBlocking {
+            val pat: AccessTokenResult = runBlocking {
                 subscriptionsManager.getAccessToken()
             }
 
             val resultJson = when (pat) {
-                is AccessToken.Success -> """{"token":"${pat.accessToken}"}"""
-                is AccessToken.Failure -> """{ }"""
+                is AccessTokenResult.Success -> """{"token":"${pat.accessToken}"}"""
+                is AccessTokenResult.Failure -> """{ }"""
             }
 
             val response = JsRequestResponse.Success(

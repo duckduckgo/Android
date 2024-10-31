@@ -102,7 +102,8 @@ class SubscriptionsCheckWorker(
     override suspend fun doWork(): Result {
         return try {
             if (subscriptionsManager.subscriptionStatus() != UNKNOWN) {
-                val subscription = subscriptionsManager.fetchAndStoreAllData()
+                subscriptionsManager.fetchAndStoreAllData()
+                val subscription = subscriptionsManager.getSubscription()
                 if (subscription?.status == null || subscription.status == UNKNOWN) {
                     workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
                 }
