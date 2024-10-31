@@ -125,7 +125,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    override fun showSiteLocationPermissionDialog(
+    private fun showSiteLocationPermissionDialog(
         activity: Activity,
         locationPermissionRequest: LocationPermissionRequest,
         tabId: String,
