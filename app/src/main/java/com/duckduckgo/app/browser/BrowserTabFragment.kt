@@ -3853,7 +3853,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta, is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
-                is DaxBubbleCta.DaxExperimentEndCta,
+                is DaxBubbleCta.DaxExperimentEndCta, is DaxBubbleCta.DaxExperimentPrivacyProCta,
                 -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)

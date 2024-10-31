@@ -1032,6 +1032,24 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
+    data class DaxExperimentPrivacyProCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
+        title = R.string.onboardingPrivacyProDaxDialogTitle,
+        description = R.string.onboardingPrivacyProDaxDialogDescription,
+        placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
+        primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
+        secondaryCta = R.string.onboardingPrivacyProDaxDialogCancelButton,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    )
+
     data class DaxDialogIntroOption(
         val optionText: String,
         @DrawableRes val iconRes: Int,
