@@ -40,7 +40,13 @@ class AuthJwtValidatorImpl @Inject constructor(
         jwkSet: String,
     ): AccessTokenClaims {
         try {
-            val claims = parseSignedClaims(jwt, jwkSet)
+            val claims = parseSignedClaims(
+                jwt = jwt,
+                jwkSet = jwkSet,
+                requiredAudience = "PrivacyPro",
+                requiredScope = "privacypro",
+            )
+
             return AccessTokenClaims(
                 expiresAt = claims.expiration.toInstant(),
                 accountExternalId = claims.accountExternalId,
@@ -57,7 +63,13 @@ class AuthJwtValidatorImpl @Inject constructor(
         jwkSet: String,
     ): RefreshTokenClaims {
         try {
-            val claims = parseSignedClaims(jwt, jwkSet)
+            val claims = parseSignedClaims(
+                jwt = jwt,
+                jwkSet = jwkSet,
+                requiredAudience = "Auth",
+                requiredScope = "refresh",
+            )
+
             return RefreshTokenClaims(
                 expiresAt = claims.expiration.toInstant(),
                 accountExternalId = claims.accountExternalId,
@@ -70,6 +82,8 @@ class AuthJwtValidatorImpl @Inject constructor(
     private fun parseSignedClaims(
         jwt: String,
         jwkSet: String,
+        requiredAudience: String,
+        requiredScope: String,
     ): Claims {
         val jwks = Jwks.setParser()
             .build()
@@ -82,6 +96,9 @@ class AuthJwtValidatorImpl @Inject constructor(
                 jwks.first { it.id == keyId }.toKey()
             }
             .clock { Date(timeProvider.currentTimeMillis()) }
+            .requireIssuer("https://quack.duckduckgo.com")
+            .requireAudience(requiredAudience)
+            .require("scope", requiredScope)
             .build()
             .parseSignedClaims(jwt)
             .payload

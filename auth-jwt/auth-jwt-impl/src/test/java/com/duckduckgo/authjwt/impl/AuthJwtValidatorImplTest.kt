@@ -94,6 +94,54 @@ class AuthJwtValidatorImplTest {
         authJwtValidator.validateRefreshToken(REFRESH_TOKEN, jwkSet)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `when access token has incorrect issuer then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateAccessToken(
+            jwt = FakeCredentialsWithIncorrectIssuer.ACCESS_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectIssuer.JWK_SET,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `when refresh token has incorrect issuer then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateRefreshToken(
+            jwt = FakeCredentialsWithIncorrectIssuer.REFRESH_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectIssuer.JWK_SET,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `when access token has incorrect audience then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateAccessToken(
+            jwt = FakeCredentialsWithIncorrectAudience.ACCESS_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectAudience.JWK_SET,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `when refresh token has incorrect audience then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateRefreshToken(
+            jwt = FakeCredentialsWithIncorrectAudience.REFRESH_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectAudience.JWK_SET,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `when access token has incorrect scope then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateAccessToken(
+            jwt = FakeCredentialsWithIncorrectScope.ACCESS_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectScope.JWK_SET,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `when refresh token has incorrect scope then validating throws IllegalArgumentException`() {
+        authJwtValidator.validateRefreshToken(
+            jwt = FakeCredentialsWithIncorrectScope.REFRESH_TOKEN,
+            jwkSet = FakeCredentialsWithIncorrectScope.JWK_SET,
+        )
+    }
+
     private class FakeTimeProvider : CurrentTimeProvider {
         var currentTime: Instant = Instant.parse("2024-10-16T00:00:00.00Z")
 
@@ -129,5 +177,26 @@ class AuthJwtValidatorImplTest {
                 ]
             }
         """
+    }
+
+    private object FakeCredentialsWithIncorrectIssuer {
+        const val ACCESS_TOKEN = "eyJraWQiOiJkMzI3ODU3NC02NDkyLTQ2ZmYtOGQ2NS1kYTk1YmIyOTFjYzQiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJlbnRpdGxlbWVudHMiOlt7Im5hbWUiOiJzdWJzY3JpYmVyIiwiaWQiOjQsInByb2R1Y3QiOiJOZXR3b3JrIFByb3RlY3Rpb24ifSx7InByb2R1Y3QiOiJEYXRhIEJyb2tlciBQcm90ZWN0aW9uIiwibmFtZSI6InN1YnNjcmliZXIiLCJpZCI6NX0seyJwcm9kdWN0IjoiSWRlbnRpdHkgVGhlZnQgUmVzdG9yYXRpb24iLCJuYW1lIjoic3Vic2NyaWJlciIsImlkIjo2fV0sImF1ZCI6IlByaXZhY3lQcm8iLCJzdWIiOiJmZjMwMGEyNS02OTNhLTQ3ZjUtODM5OC0wNjRmYzAwY2UzZGUiLCJzY29wZSI6InByaXZhY3lwcm8iLCJpc3MiOiJodHRwczovL3F1YWNrLmR1Y2tkdWNrZ28uY29tL3Rlc3QiLCJhcGkiOiJ2MiIsImV4cCI6MTczMDQyNzI1MiwiaWF0IjoxNzMwNDEyODUyLCJqdGkiOiJSNEY4Rzd0eE5NazVTR1JsdkNrenJrRTh6Z2tvYmhyeE5qTXJXbXBJYVpkcWtORHlMNDdNRE9RSkg1aFdIQUo0dzRVMERKcVh5dUR4ZXgwNXJyN3F1VTpjM2E1YzExMy04NzdmLTQ2ZDQtYWM2My1mMjdkYmVlY2NkYTQiLCJlbWFpbCI6bnVsbH0.q4-VSoafMcZMo4oKQ7nn2iSge3UO4Z5ALQi6E4qcJa8EAiM0P06CLAytL8Ev_TYfAtys_G9LwU1FYDObwCw8hA"
+        const val REFRESH_TOKEN = "eyJraWQiOiJkMzI3ODU3NC02NDkyLTQ2ZmYtOGQ2NS1kYTk1YmIyOTFjYzQiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJBdXRoIiwic3ViIjoiZmYzMDBhMjUtNjkzYS00N2Y1LTgzOTgtMDY0ZmMwMGNlM2RlIiwic2NvcGUiOiJyZWZyZXNoIiwiaXNzIjoiaHR0cHM6Ly9xdWFjay5kdWNrZHVja2dvLmNvbS90ZXN0IiwiYXBpIjoidjIiLCJleHAiOjE3MzI5ODMwMzIsImlhdCI6MTczMDM5MTAzMiwianRpIjoiUjRGOEc3dHhOTWs1U0dSbHZDa3pya0U4emdrb2JocnhOak1yV21wSWFaZHFrTkR5TDQ3TURPUUpINWhXSEFKNHc0VTBESnFYeXVEeGV4MDVycjdxdVU6ODMyM2RhNzItY2ZjZS00MjhlLTlkMDUtYWYxNDg3NTM2YzgxIn0.3rA2bAC-Rh-vwe9bSQTEj-jgHM1Dtx9PE7Cv8GellHw1wqIrLpRifRDJVYiDZ1XuHzdPfxpedCh9AOAN-mcL3w"
+
+        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=d3278574-6492-46ff-8d65-da95bb291cc4, x=AM2J0W8piRoFBj17tvHcVtusFs6QQze9N_hGzBnpWZiv, y=AJTXf8ndxPVg7vocTIPI3i23LeRCpvr5UhYOD86FOD86}]}"""
+    }
+
+    private object FakeCredentialsWithIncorrectAudience {
+        const val ACCESS_TOKEN = "eyJraWQiOiIzNDJhMWI5OS1iNTUxLTRlYzAtOTc1Yy05ODRjNDBhZDMwNzMiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJlbnRpdGxlbWVudHMiOlt7Im5hbWUiOiJzdWJzY3JpYmVyIiwiaWQiOjQsInByb2R1Y3QiOiJOZXR3b3JrIFByb3RlY3Rpb24ifSx7InByb2R1Y3QiOiJEYXRhIEJyb2tlciBQcm90ZWN0aW9uIiwibmFtZSI6InN1YnNjcmliZXIiLCJpZCI6NX0seyJwcm9kdWN0IjoiSWRlbnRpdHkgVGhlZnQgUmVzdG9yYXRpb24iLCJuYW1lIjoic3Vic2NyaWJlciIsImlkIjo2fV0sImF1ZCI6IlByaXZhY3lQcm9zIiwic3ViIjoiZmYzMDBhMjUtNjkzYS00N2Y1LTgzOTgtMDY0ZmMwMGNlM2RlIiwic2NvcGUiOiJwcml2YWN5cHJvIiwiaXNzIjoiaHR0cHM6Ly9xdWFjay5kdWNrZHVja2dvLmNvbSIsImFwaSI6InYyIiwiZXhwIjoxNzMwNDI3OTU1LCJpYXQiOjE3MzA0MTM1NTUsImp0aSI6IlI0RjhHN3R4Tk1rNVNHUmx2Q2t6cmtFOHpna29iaHJ4TmpNcldtcElhWmRxa05EeUw0N01ET1FKSDVoV0hBSjR3NFUwREpxWHl1RHhleDA1cnI3cXVVOmMzYTVjMTEzLTg3N2YtNDZkNC1hYzYzLWYyN2RiZWVjY2RhNCIsImVtYWlsIjpudWxsfQ.JqaJdZf9N_mhlqR04C0RO6R5O5yDLkjNAPHIcmn6KUuVm2j1izjCNwv4GX8D6WrFU9uXQywARaNC2o1wJQaBnw"
+        const val REFRESH_TOKEN = "eyJraWQiOiIzNDJhMWI5OS1iNTUxLTRlYzAtOTc1Yy05ODRjNDBhZDMwNzMiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJBdXRoZW50aWNhdGlvbiIsInN1YiI6ImZmMzAwYTI1LTY5M2EtNDdmNS04Mzk4LTA2NGZjMDBjZTNkZSIsInNjb3BlIjoicmVmcmVzaCIsImlzcyI6Imh0dHBzOi8vcXVhY2suZHVja2R1Y2tnby5jb20iLCJhcGkiOiJ2MiIsImV4cCI6MTczMzAwNTU1NSwiaWF0IjoxNzMwMzkxMDMyLCJqdGkiOiJSNEY4Rzd0eE5NazVTR1JsdkNrenJrRTh6Z2tvYmhyeE5qTXJXbXBJYVpkcWtORHlMNDdNRE9RSkg1aFdIQUo0dzRVMERKcVh5dUR4ZXgwNXJyN3F1VTo4MzIzZGE3Mi1jZmNlLTQyOGUtOWQwNS1hZjE0ODc1MzZjODEifQ.A1EP6hwV8Xusdfd8hWKTADcurX3Y5SON5J98t4x9FyGDzu_fawoZLq9jmqXy0EDDP27iXtLt919QpPzFwCRo0w"
+
+        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=342a1b99-b551-4ec0-975c-984c40ad3073, x=a0csfZFP45WHyCRW8IhNkmbtvgT4I5afXFuuAtnV75M, y=AOMBpLXT0WIPmq1zME1NFONefBtwtXNJzM4mQaZDNXrO}]}"""
+    }
+
+    private object FakeCredentialsWithIncorrectScope {
+        const val ACCESS_TOKEN = "eyJraWQiOiIzNzE2NzI5Yy0zMTM1LTRjOTItODhjNC1mYjEzYjlhMDkyOWMiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJlbnRpdGxlbWVudHMiOlt7Im5hbWUiOiJzdWJzY3JpYmVyIiwiaWQiOjQsInByb2R1Y3QiOiJOZXR3b3JrIFByb3RlY3Rpb24ifSx7InByb2R1Y3QiOiJEYXRhIEJyb2tlciBQcm90ZWN0aW9uIiwibmFtZSI6InN1YnNjcmliZXIiLCJpZCI6NX0seyJwcm9kdWN0IjoiSWRlbnRpdHkgVGhlZnQgUmVzdG9yYXRpb24iLCJuYW1lIjoic3Vic2NyaWJlciIsImlkIjo2fV0sImF1ZCI6IlByaXZhY3lQcm8iLCJzdWIiOiJmZjMwMGEyNS02OTNhLTQ3ZjUtODM5OC0wNjRmYzAwY2UzZGUiLCJzY29wZSI6InBwcm8iLCJpc3MiOiJodHRwczovL3F1YWNrLmR1Y2tkdWNrZ28uY29tIiwiYXBpIjoidjIiLCJleHAiOjE3MzA0Mjc3NTEsImlhdCI6MTczMDQxMzM1MSwianRpIjoiUjRGOEc3dHhOTWs1U0dSbHZDa3pya0U4emdrb2JocnhOak1yV21wSWFaZHFrTkR5TDQ3TURPUUpINWhXSEFKNHc0VTBESnFYeXVEeGV4MDVycjdxdVU6YzNhNWMxMTMtODc3Zi00NmQ0LWFjNjMtZjI3ZGJlZWNjZGE0IiwiZW1haWwiOm51bGx9.xJ1ZefISvIRW1ef7_dymx1eXwjML6ZW9BeieWEkAvRn6vQjgsu1glTaxrb0QHDsgHIZNoNW89Mk8QvHiyeHRuw"
+        const val REFRESH_TOKEN = "eyJraWQiOiIzNzE2NzI5Yy0zMTM1LTRjOTItODhjNC1mYjEzYjlhMDkyOWMiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJBdXRoIiwic3ViIjoiZmYzMDBhMjUtNjkzYS00N2Y1LTgzOTgtMDY0ZmMwMGNlM2RlIiwic2NvcGUiOiJyZWZyZXNoaW5nIiwiaXNzIjoiaHR0cHM6Ly9xdWFjay5kdWNrZHVja2dvLmNvbSIsImFwaSI6InYyIiwiZXhwIjoxNzMzMDA1MzUxLCJpYXQiOjE3MzAzOTEwMzIsImp0aSI6IlI0RjhHN3R4Tk1rNVNHUmx2Q2t6cmtFOHpna29iaHJ4TmpNcldtcElhWmRxa05EeUw0N01ET1FKSDVoV0hBSjR3NFUwREpxWHl1RHhleDA1cnI3cXVVOjgzMjNkYTcyLWNmY2UtNDI4ZS05ZDA1LWFmMTQ4NzUzNmM4MSJ9.OEKrHqpgc6PVujwIHoj9OoDFH-kRT79e0NE5eTmDwvnoHglweJigsKuWFxN6FoTfAKvC7tMPjy3EM3peYIRHXg"
+
+        const val JWK_SET = """{keys=[{kty=EC, crv=P-256, kid=3716729c-3135-4c92-88c4-fb13b9a0929c, x=HFzQVBbfBdeOYsMdRSx_3MxbZowmDG1OwyiFBYRubgE, y=eLlCqUJEVGgc0K7mjUo3Wk52C9mgRllnOfG_S6KSEck}]}"""
     }
 }
