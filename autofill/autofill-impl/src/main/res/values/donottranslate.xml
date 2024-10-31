@@ -18,5 +18,5 @@
     <!-- New Tab -->
     <string name="newTabPageShortcutPasswords">Passwords</string>
 
-    <string name="saveOnboardingLoginDialogNotNow">Not Now</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">No Thanks</string>
 </resources>

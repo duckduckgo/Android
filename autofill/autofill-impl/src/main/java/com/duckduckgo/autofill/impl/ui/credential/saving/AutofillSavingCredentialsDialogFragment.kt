@@ -258,7 +258,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureSecondaryButtons(isOnboarding: Boolean) {
         if (isOnboarding) {
-            secondaryButton.text = getString(R.string.saveOnboardingLoginDialogNotNow)
+            secondaryButton.text = getString(R.string.saveOnboardingLoginDialogSecondaryButton)
             secondaryButton.setOnClickListener {
                 onUserChoseNotNow()
                 animateClosed()
