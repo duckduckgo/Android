@@ -82,6 +82,61 @@ class Omnibar(
     private val binding: FragmentBrowserTabBinding,
 ) {
 
+    init {
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    Timber.d("Omnibar: using NewOmnibar anchored TOP")
+                    binding.rootView.removeView(binding.legacyOmnibarBottom)
+                    binding.rootView.removeView(binding.legacyOmnibar)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                } else {
+                    Timber.d("Omnibar: using LegacyOmnibar anchored TOP")
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.legacyOmnibarBottom)
+
+                    // remove the default top abb bar behavior
+                    removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                    removeAppBarBehavior(binding.browserLayout)
+                    removeAppBarBehavior(binding.focusedView)
+                    removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+
+                    // prevent the touch event leaking to the webView below
+                    binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
+
+                    binding.newOmnibarBottom
+                }
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+                    Timber.d("Omnibar: using NewOmnibar anchored BOTTOM")
+                    binding.rootView.removeView(binding.legacyOmnibarBottom)
+                    binding.rootView.removeView(binding.legacyOmnibar)
+                    binding.rootView.removeView(binding.newOmnibar)
+
+                    // prevent the touch event leaking to the webView below
+                    binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
+                } else {
+                    Timber.d("Omnibar: using LegacyOmnibar anchored BOTTOM")
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.legacyOmnibar)
+
+                    // prevent the touch event leaking to the webView below
+                    binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
+                }
+
+                // remove the default top abb bar behavior
+                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+                removeAppBarBehavior(binding.browserLayout)
+                removeAppBarBehavior(binding.focusedView)
+                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+            }
+        }
+    }
+
     interface ItemPressedListener {
         fun onTabsButtonPressed()
         fun onTabsButtonLongPressed()
@@ -135,61 +190,25 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    val newOmnibar: OmnibarLayout by lazy {
+    private val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                Timber.d("Omnibar: using NewOmnibar anchored TOP")
-                binding.rootView.removeView(binding.legacyOmnibarBottom)
-                binding.rootView.removeView(binding.legacyOmnibar)
-                binding.rootView.removeView(binding.newOmnibarBottom)
                 binding.newOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
-                Timber.d("Omnibar: using NewOmnibar anchored BOTTOM")
-                binding.rootView.removeView(binding.legacyOmnibarBottom)
-                binding.rootView.removeView(binding.legacyOmnibar)
-                binding.rootView.removeView(binding.newOmnibar)
-
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
-
-                // prevent the touch event leaking to the webView below
-                binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
-
                 binding.newOmnibarBottom
             }
         }
     }
 
-    val legacyOmnibar: LegacyOmnibarView by lazy {
+    private val legacyOmnibar: LegacyOmnibarView by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                Timber.d("Omnibar: using LegacyOmnibar anchored TOP")
-                binding.rootView.removeView(binding.newOmnibarBottom)
-                binding.rootView.removeView(binding.newOmnibar)
-                binding.rootView.removeView(binding.legacyOmnibarBottom)
                 binding.legacyOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
-                Timber.d("Omnibar: using LegacyOmnibar anchored BOTTOM")
-                binding.rootView.removeView(binding.newOmnibarBottom)
-                binding.rootView.removeView(binding.newOmnibar)
-                binding.rootView.removeView(binding.legacyOmnibar)
-
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
-
-                // prevent the touch event leaking to the webView below
-                binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
-
                 binding.legacyOmnibarBottom
             }
         }
