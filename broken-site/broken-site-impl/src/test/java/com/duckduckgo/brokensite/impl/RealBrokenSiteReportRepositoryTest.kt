@@ -137,7 +137,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     @Test
     fun whenCoolDownDaysCalledThenCoolDownDaysIsCalled() = runTest {
-        val days = 7
+        val days = 7L
 
         testee.setCoolDownDays(days)
 
