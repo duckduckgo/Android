@@ -23,6 +23,12 @@ jobs:
         with:
           token: '${{ secrets.GT_DAXMOBILE }}'
 
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
       - name: Get Previous tag
         id: fetch_tag
         uses: oprypin/find-latest-tag@v1
