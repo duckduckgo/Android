@@ -34,8 +34,6 @@
     <string name="duck_player_unavailable">Duck Player nie je dostupný</string>
     <string name="duck_player_unavailable_description">Funkčnosť prehrávača Duck Player bola ovplyvnená nedávnymi zmenami v službe YouTube. Na odstránení týchto problémov pracujeme. Ďakujeme za pochopenie.</string>
     <string name="duck_player_unavailable_learn_more">Zistite viac</string>
-    <!-- TODO: Remove this ignore when the translation is added -->
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvárať YouTube videá s Duck Player?</string>
-    <!-- TODO(cbarreiro): Add missing translations asap -->
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvoriť Duck Player na novej karte</string>
 </resources>
