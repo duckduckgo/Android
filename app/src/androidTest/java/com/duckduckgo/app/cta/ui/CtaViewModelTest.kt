@@ -152,7 +152,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
-        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt()).thenReturn(false)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any())).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -180,26 +180,26 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
+    fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() = runTest {
         testee.onCtaShown(DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
-    fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
+    fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() = runTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
-    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
+    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
         testee.onCtaShown(HomePanelCta.AddWidgetAuto)
         verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
-    fun whenCtaLaunchedPixelIsFired() {
+    fun whenCtaLaunchedPixelIsFired() = runTest {
         testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAuto)
         verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
     }
@@ -284,7 +284,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt()).thenReturn(true)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any())).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -685,14 +685,14 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() {
+    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() = runTest {
         testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
     }
 
     @Test
-    fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() {
+    fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() = runTest {
         testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore, mockSettingsDataStore))
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))

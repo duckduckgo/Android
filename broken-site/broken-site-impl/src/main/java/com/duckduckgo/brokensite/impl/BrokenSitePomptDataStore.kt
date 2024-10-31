@@ -20,6 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.COOL_DOWN_DAYS
@@ -47,8 +48,8 @@ interface BrokenSitePomptDataStore {
     suspend fun setDismissStreakResetDays(days: Int)
     suspend fun getDismissStreakResetDays(): Int
 
-    suspend fun setCoolDownDays(days: Int)
-    suspend fun getCoolDownDays(): Int
+    suspend fun setCoolDownDays(days: Long)
+    suspend fun getCoolDownDays(): Long
     suspend fun setDismissStreak(streak: Int)
     suspend fun getDismissStreak(): Int
     suspend fun setNextShownDate(nextShownDate: LocalDate?)
@@ -65,7 +66,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     private object Keys {
         val MAX_DISMISS_STREAK = intPreferencesKey(name = "MAX_DISMISS_STREAK")
         val DISMISS_STREAK_RESET_DAYS = intPreferencesKey(name = "DISMISS_STREAK_RESET_DAYS")
-        val COOL_DOWN_DAYS = intPreferencesKey(name = "COOL_DOWN_DAYS")
+        val COOL_DOWN_DAYS = longPreferencesKey(name = "COOL_DOWN_DAYS")
         val DISMISS_STREAK = intPreferencesKey(name = "DISMISS_STREAK")
         val NEXT_SHOWN_DATE = stringPreferencesKey(name = "NEXT_SHOWN_DATE")
     }
@@ -84,11 +85,10 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         }
         .distinctUntilChanged()
 
-    private val coolDownDays: Flow<Int> = store.data
+    private val coolDownDays: Flow<Long> = store.data
         .map { prefs ->
             prefs[COOL_DOWN_DAYS] ?: 7
         }
-        .distinctUntilChanged()
 
     private val dismissStreak: Flow<Int> = store.data
         .map { prefs ->
@@ -114,11 +114,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     override suspend fun getDismissStreakResetDays(): Int = dismissStreakResetDays.first()
 
-    override suspend fun setCoolDownDays(days: Int) {
+    override suspend fun setCoolDownDays(days: Long) {
         store.edit { prefs -> prefs[COOL_DOWN_DAYS] = days }
     }
 
-    override suspend fun getCoolDownDays(): Int = coolDownDays.first()
+    override suspend fun getCoolDownDays(): Long = coolDownDays.first()
 
     override suspend fun setDismissStreak(streak: Int) {
         store.edit { prefs -> prefs[DISMISS_STREAK] = streak }
