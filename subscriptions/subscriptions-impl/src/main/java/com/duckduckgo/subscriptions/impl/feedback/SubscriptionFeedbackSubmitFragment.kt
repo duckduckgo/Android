@@ -38,19 +38,14 @@ import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackSubmitBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
-import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout.content_feedback_submit) {
-
     private val binding: ContentFeedbackSubmitBinding by viewBinding()
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var pixelSender: PrivacyProUnifiedFeedbackPixelSender
 
     override fun onViewCreated(
         view: View,
@@ -70,9 +65,11 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
                 listener.onFaqsOpened()
             }
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
+            binding.showEmail()
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
+            binding.hideEmail()
             if (reportType == GENERAL_FEEDBACK) {
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
             } else {
@@ -81,10 +78,20 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         }
 
         binding.feedbackSubmitButton.setOnClickListener {
-            listener.onUserSubmit(binding.feedbackSubmitDescription.text)
+            listener.onUserSubmit(binding.feedbackSubmitDescription.text, binding.feedbackSubmitEmail.text)
         }
 
         binding.feedbackSubmitDescription.showKeyboard()
+    }
+
+    private fun ContentFeedbackSubmitBinding.showEmail() {
+        feedbackSubmitEmailByLine.show()
+        feedbackSubmitEmail.show()
+    }
+
+    private fun ContentFeedbackSubmitBinding.hideEmail() {
+        feedbackSubmitEmailByLine.gone()
+        feedbackSubmitEmail.gone()
     }
 
     private fun DaxTextView.setClickableLink(
@@ -130,7 +137,11 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
     }
 
     interface Listener {
-        fun onUserSubmit(description: String)
+        fun onUserSubmit(
+            description: String,
+            email: String? = null,
+        )
+
         fun onFaqsOpened()
     }
 

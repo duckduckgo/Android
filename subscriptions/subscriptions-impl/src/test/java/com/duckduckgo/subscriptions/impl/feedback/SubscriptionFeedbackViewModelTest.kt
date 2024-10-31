@@ -15,6 +15,8 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REQUEST_FEATURE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
@@ -24,9 +26,11 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE
 import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
+import com.duckduckgo.subscriptions.impl.services.FeedbackBody
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -34,6 +38,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -46,20 +51,22 @@ class SubscriptionFeedbackViewModelTest {
     private lateinit var pixelSender: PrivacyProUnifiedFeedbackPixelSender
 
     @Mock
-    private lateinit var customMetadataProvider: FeedbackCustomMetadataProvider
-
-    @Mock
     private lateinit var feedbackHelpUrlProvider: FeedbackHelpUrlProvider
 
+    private lateinit var supportInbox: FakeSubscriptionSupportInbox
+    private lateinit var customMetadataProvider: FakeCustomMetadataProvider
     private lateinit var viewModel: SubscriptionFeedbackViewModel
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        customMetadataProvider = FakeCustomMetadataProvider()
+        supportInbox = FakeSubscriptionSupportInbox()
         viewModel = SubscriptionFeedbackViewModel(
             pixelSender,
             customMetadataProvider,
             feedbackHelpUrlProvider,
+            supportInbox,
         )
     }
 
@@ -855,7 +862,6 @@ class SubscriptionFeedbackViewModelTest {
 
     @Test
     fun whenSubsIssueSubmittedTheSendReportIssuePixel() = runTest {
-        whenever(customMetadataProvider.getCustomMetadata(SUBS_AND_PAYMENTS)).thenReturn("testMetadata")
         viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
@@ -867,7 +873,7 @@ class SubscriptionFeedbackViewModelTest {
                 "category" to "subscription",
                 "subcategory" to "somethingElse",
                 "description" to "Test",
-                "customMetadata" to "testMetadata",
+                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
                 "appName" to "",
                 "appPackage" to "",
             ),
@@ -876,7 +882,6 @@ class SubscriptionFeedbackViewModelTest {
 
     @Test
     fun whenVpnIssueSubmittedTheSendReportIssuePixel() = runTest {
-        whenever(customMetadataProvider.getCustomMetadata(VPN)).thenReturn("testMetadata")
         viewModel.allowUserToChooseReportType(VPN_MANAGEMENT)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
         viewModel.onSubcategorySelected(SubscriptionFeedbackVpnSubCategory.CANNOT_CONNECT_TO_LOCAL_DEVICE)
@@ -888,7 +893,7 @@ class SubscriptionFeedbackViewModelTest {
                 "category" to "vpn",
                 "subcategory" to "cantConnectToLocalDevice",
                 "description" to "Test",
-                "customMetadata" to "testMetadata",
+                "customMetadata" to "VPN encoded metadata",
                 "appName" to "",
                 "appPackage" to "",
             ),
@@ -897,7 +902,6 @@ class SubscriptionFeedbackViewModelTest {
 
     @Test
     fun whenAppSpecificVpnIssueSubmittedTheSendReportIssuePixel() = runTest {
-        whenever(customMetadataProvider.getCustomMetadata(VPN)).thenReturn("testMetadata")
         viewModel.allowUserToReportAppIssue("test", "com.test")
         viewModel.onSubmitFeedback("Test")
 
@@ -907,7 +911,7 @@ class SubscriptionFeedbackViewModelTest {
                 "category" to "vpn",
                 "subcategory" to "issueWithAppOrWebsite",
                 "description" to "Test",
-                "customMetadata" to "testMetadata",
+                "customMetadata" to "VPN encoded metadata",
                 "appName" to "test",
                 "appPackage" to "com.test",
             ),
@@ -916,7 +920,6 @@ class SubscriptionFeedbackViewModelTest {
 
     @Test
     fun whenPIRIssueSubmittedTheSendReportIssuePixel() = runTest {
-        whenever(customMetadataProvider.getCustomMetadata(PIR)).thenReturn("")
         viewModel.allowUserToChooseReportType(DDG_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
         viewModel.onCategorySelected(PIR)
@@ -929,7 +932,7 @@ class SubscriptionFeedbackViewModelTest {
                 "category" to "pir",
                 "subcategory" to "removalStuck",
                 "description" to "Test",
-                "customMetadata" to "",
+                "customMetadata" to "PIR encoded metadata",
                 "appName" to "",
                 "appPackage" to "",
             ),
@@ -938,7 +941,6 @@ class SubscriptionFeedbackViewModelTest {
 
     @Test
     fun whenITRIssueSubmittedTheSendReportIssuePixel() = runTest {
-        whenever(customMetadataProvider.getCustomMetadata(ITR)).thenReturn("")
         viewModel.allowUserToChooseReportType(DDG_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
         viewModel.onCategorySelected(ITR)
@@ -951,11 +953,75 @@ class SubscriptionFeedbackViewModelTest {
                 "category" to "itr",
                 "subcategory" to "advisorUnhelpful",
                 "description" to "Test",
-                "customMetadata" to "",
+                "customMetadata" to "ITR encoded metadata",
                 "appName" to "",
                 "appPackage" to "",
             ),
         )
+    }
+
+    @Test
+    fun whenSubscriptionFeedbackWithEmailSucceedsThenSendBothToSupportInboxAndPixel() = runTest {
+        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
+        viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
+        viewModel.onSubmitFeedback("Test", "test@mail.com")
+
+        verify(pixelSender).sendPproReportIssue(
+            mapOf(
+                "source" to "ppro",
+                "category" to "subscription",
+                "subcategory" to "somethingElse",
+                "description" to "Test",
+                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
+                "appName" to "",
+                "appPackage" to "",
+            ),
+        )
+
+        assertNotNull(supportInbox.getLastSentFeedback())
+        assertEquals(
+            FeedbackBody(
+                userEmail = "test@mail.com",
+                platform = "android",
+                feedbackSource = "ppro",
+                problemCategory = "subscription",
+                customMetadata = "SUBS_AND_PAYMENTS raw metadata",
+                feedbackText = "Test",
+                appName = null,
+                appPackage = null,
+                problemSubCategory = "somethingElse",
+            ),
+            supportInbox.getLastSentFeedback(),
+        )
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionFeedbackWithEmailFailsThenSendNothingAndShowFailed() = runTest {
+        supportInbox.setSendFeedbackResult(false)
+        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
+        viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
+        viewModel.onSubmitFeedback("Test", "test@mail.com")
+
+        verify(pixelSender, never()).sendPproReportIssue(
+            mapOf(
+                "source" to "ppro",
+                "category" to "subscription",
+                "subcategory" to "somethingElse",
+                "description" to "Test",
+                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
+                "appName" to "",
+                "appPackage" to "",
+            ),
+        )
+
+        viewModel.commands().test {
+            assertEquals(FeedbackFailed, expectMostRecentItem())
+        }
     }
 
     private fun SubscriptionFeedbackViewModel.ViewState.assertViewStateMoveForward(

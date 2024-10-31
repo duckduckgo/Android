@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
 import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -39,6 +40,12 @@ interface SubscriptionsService {
     suspend fun confirm(
         @Body confirmationBody: ConfirmationBody,
     ): ConfirmationResponse
+
+    @AuthRequired
+    @POST("https://subscriptions.duckduckgo.com/api/feedback")
+    suspend fun feedback(
+        @Body feedbackBody: FeedbackBody,
+    ): Response<FeedbackResponse>
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -70,3 +77,19 @@ data class ConfirmationEntitlement(
 fun List<ConfirmationEntitlement>.toEntitlements(): List<Entitlement> {
     return this.map { Entitlement(it.name, it.product) }
 }
+
+data class FeedbackBody(
+    val userEmail: String,
+    val platform: String = "android",
+    val feedbackSource: String,
+    val problemCategory: String,
+    val customMetadata: String?,
+    val feedbackText: String?,
+    val appName: String?,
+    val appPackage: String?,
+    val problemSubCategory: String?,
+)
+
+data class FeedbackResponse(
+    val message: String,
+)
