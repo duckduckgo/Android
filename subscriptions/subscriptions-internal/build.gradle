@@ -59,4 +59,8 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"
+
+    testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
 }

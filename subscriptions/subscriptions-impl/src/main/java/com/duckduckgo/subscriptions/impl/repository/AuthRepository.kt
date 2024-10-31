@@ -27,7 +27,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
-import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,21 +38,16 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
-
-    suspend fun isUserAuthenticated(): Boolean
-    suspend fun setAccessToken(accessToken: String)
+    suspend fun setAccessToken(accessToken: String?)
     suspend fun getAccessToken(): String?
-    suspend fun saveAuthToken(authToken: String)
+    suspend fun setAuthToken(authToken: String?)
     suspend fun getAuthToken(): String?
-    suspend fun saveAccountData(authToken: String, externalId: String)
+    suspend fun setAccount(account: Account?)
     suspend fun getAccount(): Account?
-    suspend fun saveSubscriptionData(subscriptionResponse: SubscriptionResponse, entitlements: List<Entitlement>, email: String?): Subscription?
-    suspend fun saveExternalId(externalId: String)
+    suspend fun setSubscription(subscription: Subscription?)
     suspend fun getSubscription(): Subscription?
-    suspend fun clearSubscription()
-    suspend fun clearAccount()
     suspend fun setEntitlements(entitlements: List<Entitlement>)
-    suspend fun setEmail(email: String?)
+    suspend fun getEntitlements(): List<Entitlement>
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
@@ -75,36 +69,20 @@ class RealAuthRepository @Inject constructor(
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).fromJson(jsonString)
     }
 
-    override suspend fun setEmail(email: String?) = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.email = email
-    }
-
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
     }
 
-    override suspend fun isUserAuthenticated(): Boolean = withContext(dispatcherProvider.io()) {
-        !subscriptionsDataStore.accessToken.isNullOrBlank() && !subscriptionsDataStore.authToken.isNullOrBlank()
+    override suspend fun getEntitlements(): List<Entitlement> {
+        return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
     }
 
-    override suspend fun saveAccountData(authToken: String, externalId: String) = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.authToken = authToken
-        subscriptionsDataStore.externalId = externalId
-    }
-
-    override suspend fun setAccessToken(accessToken: String) = withContext(dispatcherProvider.io()) {
+    override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessToken = accessToken
     }
 
-    override suspend fun saveAuthToken(authToken: String) = withContext(dispatcherProvider.io()) {
+    override suspend fun setAuthToken(authToken: String?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.authToken = authToken
-    }
-
-    override suspend fun clearAccount() = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.email = null
-        subscriptionsDataStore.externalId = null
-        subscriptionsDataStore.authToken = null
-        subscriptionsDataStore.accessToken = null
     }
 
     override suspend fun purchaseToWaitingStatus() = withContext(dispatcherProvider.io()) {
@@ -115,15 +93,6 @@ class RealAuthRepository @Inject constructor(
         subscriptionsDataStore.status?.toStatus() ?: UNKNOWN
     }
 
-    override suspend fun clearSubscription() = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.status = null
-        subscriptionsDataStore.startedAt = null
-        subscriptionsDataStore.expiresOrRenewsAt = null
-        subscriptionsDataStore.platform = null
-        subscriptionsDataStore.productId = null
-        subscriptionsDataStore.entitlements = null
-    }
-
     override suspend fun getAccessToken(): String? = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessToken
     }
@@ -132,8 +101,17 @@ class RealAuthRepository @Inject constructor(
         subscriptionsDataStore.authToken
     }
 
+    override suspend fun setSubscription(subscription: Subscription?) = withContext(dispatcherProvider.io()) {
+        with(subscriptionsDataStore) {
+            productId = subscription?.productId
+            platform = subscription?.platform
+            startedAt = subscription?.startedAt
+            expiresOrRenewsAt = subscription?.expiresOrRenewsAt
+            status = subscription?.status?.statusName
+        }
+    }
+
     override suspend fun getSubscription(): Subscription? = withContext(dispatcherProvider.io()) {
-        val entitlements = subscriptionsDataStore.entitlements ?: "[]"
         val productId = subscriptionsDataStore.productId ?: return@withContext null
         val platform = subscriptionsDataStore.platform ?: return@withContext null
         val startedAt = subscriptionsDataStore.startedAt ?: return@withContext null
@@ -145,8 +123,12 @@ class RealAuthRepository @Inject constructor(
             startedAt = startedAt,
             expiresOrRenewsAt = expiresOrRenewsAt,
             status = status,
-            entitlements = moshi.parseList<Entitlement>(entitlements).orEmpty(),
         )
+    }
+
+    override suspend fun setAccount(account: Account?) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.externalId = account?.externalId
+        subscriptionsDataStore.email = account?.email
     }
 
     override suspend fun getAccount(): Account? = withContext(dispatcherProvider.io()) {
@@ -157,25 +139,6 @@ class RealAuthRepository @Inject constructor(
             email = email,
             externalId = externalId,
         )
-    }
-
-    override suspend fun saveSubscriptionData(
-        subscriptionResponse: SubscriptionResponse,
-        entitlements: List<Entitlement>,
-        email: String?,
-    ): Subscription? = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.status = subscriptionResponse.status.toStatus().statusName
-        subscriptionsDataStore.startedAt = subscriptionResponse.startedAt
-        subscriptionsDataStore.expiresOrRenewsAt = subscriptionResponse.expiresOrRenewsAt
-        subscriptionsDataStore.platform = subscriptionResponse.platform
-        subscriptionsDataStore.productId = subscriptionResponse.productId
-        subscriptionsDataStore.email = email
-        subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
-        getSubscription()
-    }
-
-    override suspend fun saveExternalId(externalId: String) = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.externalId = externalId
     }
 
     override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
@@ -194,7 +157,6 @@ data class Subscription(
     val expiresOrRenewsAt: Long,
     val status: SubscriptionStatus,
     val platform: String,
-    val entitlements: List<Entitlement>,
 ) {
     fun isActive(): Boolean = status.isActive()
 }

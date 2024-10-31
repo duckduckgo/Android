@@ -50,7 +50,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -62,25 +61,15 @@ class RealSubscriptions @Inject constructor(
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
-            is AccessToken.Success -> result.accessToken
-            is AccessToken.Failure -> null
+            is AccessTokenResult.Success -> result.accessToken
+            is AccessTokenResult.Failure -> null
         }
     }
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
-        return subscriptionsManager.entitlements.map {
-            if (!checkIfActive()) emptyList() else it
-        }
+        return subscriptionsManager.entitlements
     }
 
-    private suspend fun checkIfActive(): Boolean {
-        return if (subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
-            true
-        } else {
-            subscriptionsManager.removeEntitlements()
-            false
-        }
-    }
     override suspend fun isEligible(): Boolean {
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()

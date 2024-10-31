@@ -6,7 +6,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
-import com.duckduckgo.subscriptions.impl.AccessToken
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -203,11 +203,11 @@ class ItrMessagingInterfaceTest {
     }
 
     private suspend fun givenAccessTokenIsSuccess() {
-        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success(accessToken = "accessToken"))
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success(accessToken = "accessToken"))
     }
 
     private suspend fun givenAccessTokenIsFailure() {
-        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure(message = "something happened"))
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure(message = "something happened"))
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

@@ -30,7 +30,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.subscriptions.impl.AccessToken
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
@@ -110,12 +110,12 @@ class ItrMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
-            val pat: AccessToken = runBlocking(dispatcherProvider.io()) {
+            val pat: AccessTokenResult = runBlocking(dispatcherProvider.io()) {
                 subscriptionsManager.getAccessToken()
             }
 
             val data = when (pat) {
-                is AccessToken.Success -> {
+                is AccessTokenResult.Success -> {
                     JsRequestResponse.Success(
                         context = jsMessage.context,
                         featureName = featureName,
@@ -125,7 +125,7 @@ class ItrMessagingInterface @Inject constructor(
                     )
                 }
 
-                is AccessToken.Failure -> {
+                is AccessTokenResult.Failure -> {
                     JsRequestResponse.Success(
                         context = jsMessage.context,
                         featureName = featureName,
