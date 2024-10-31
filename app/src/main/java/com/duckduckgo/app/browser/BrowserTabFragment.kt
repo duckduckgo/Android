@@ -4073,8 +4073,8 @@ class BrowserTabFragment :
                 binding,
                 onReportBrokenSiteClicked = { viewModel.onUserClickCtaOkButton(configuration) },
                 onDismissCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                onCtaShown = { viewModel.onCtaShown() },
             )
-            viewModel.onCtaShown()
         }
 
         private fun showHomeCta(
