@@ -5,7 +5,6 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
-  GOOGLE_APPLICATION_CREDENTIALS: $HOME/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json
 
 jobs:
   create-tag:

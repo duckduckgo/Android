@@ -18,6 +18,7 @@
     releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
     appVersionFilePath = "../app/version/version-properties"
+    firebaseFilePath = "#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -173,6 +174,7 @@ platform :android do
  lane :deploy_dogfood do |options|
 
    UI.message("Aab path: #{options[:aab_path]}")
+
    upload_to_play_store(
      aab: options[:aab_path],
      track: 'internal',
@@ -193,7 +195,8 @@ platform :android do
       app: "1:239339218528:android:732e03dcf13d1488db8505",
       groups: "ddg-employees",
       android_artifact_type: "APK",
-      android_artifact_path: apkPath
+      android_artifact_path: apkPath,
+      service_credentials_file: firebaseFilePath,
   )
 
   end
