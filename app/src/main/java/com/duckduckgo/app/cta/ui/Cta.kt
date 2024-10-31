@@ -1095,7 +1095,7 @@ sealed class HomePanelCta(
     )
 }
 
-class BrokenSitePromptDialogCta : Cta {
+class BrokenSitePromptDialogCta() : Cta {
 
     override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
     override val shownPixel: Pixel.PixelName? = null
@@ -1117,11 +1117,13 @@ class BrokenSitePromptDialogCta : Cta {
         binding: FragmentBrowserTabBinding,
         onReportBrokenSiteClicked: () -> Unit,
         onDismissCtaClicked: () -> Unit,
+        onCtaShown: () -> Unit,
     ) {
         val daxDialog = binding.includeBrokenSitePromptDialog
         daxDialog.root.show()
         binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
         binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+        onCtaShown()
     }
 }
 
