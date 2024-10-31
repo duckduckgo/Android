@@ -826,6 +826,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewHidden() {
+        ctaViewState.value?.cta.let {
+            if (it is BrokenSitePromptDialogCta) {
+                command.value = HideBrokenSitePromptCta(it)
+            }
+        }
         skipHome = false
         viewModelScope.launch {
             downloadCallback
@@ -990,6 +995,11 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
+                }
+            }
+            is BrokenSitePromptDialogCta -> {
+                viewModelScope.launch(dispatchers.main()) {
+                    command.value = HideBrokenSitePromptCta(currentCtaViewState().cta as BrokenSitePromptDialogCta)
                 }
             }
         }
