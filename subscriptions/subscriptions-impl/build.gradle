@@ -58,6 +58,7 @@ dependencies {
     implementation project(':remote-messaging-api') // remote feature flag
     implementation project(':survey-api')
     implementation project(':vpn-api')
+    implementation project(':auth-jwt-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
