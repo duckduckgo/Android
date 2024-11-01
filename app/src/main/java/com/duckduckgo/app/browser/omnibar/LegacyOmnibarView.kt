@@ -144,7 +144,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         safeCall {
             when (omnibarPosition) {
                 OmnibarPosition.TOP -> super.setExpanded(expanded)
-                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
             }
         }
     }
@@ -156,7 +156,7 @@ class LegacyOmnibarView @JvmOverloads constructor(
         safeCall {
             when (omnibarPosition) {
                 OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(expanded)
+                OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded, animate)
             }
         }
     }

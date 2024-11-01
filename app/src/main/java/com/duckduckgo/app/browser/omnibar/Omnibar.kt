@@ -819,9 +819,9 @@ class Omnibar(
 
     fun hide() {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            newOmnibar.hide()
+            newOmnibar.gone()
         } else {
-            legacyOmnibar.hide()
+            legacyOmnibar.gone()
         }
     }
 }
