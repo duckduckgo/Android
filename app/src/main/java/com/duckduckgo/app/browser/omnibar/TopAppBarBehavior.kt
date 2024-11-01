@@ -54,8 +54,6 @@ class TopAppBarBehavior(
             if (omnibar.isOmnibarScrollingEnabled()) {
                 super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
             }
-        } else {
-            offsetBottomByToolbar(target)
         }
     }
 
