@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.view.expand.daxExpandableMenuItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -219,6 +220,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLongTextTruncated).apply {
+                setPrimaryText(context.getString(R.string.dax_one_line_list_item_html_primary_text).html(context))
+            }
         }
     }
 
@@ -298,6 +302,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithSwitchDisabledChecked).apply {
                 quietlySetIsChecked(true, null)
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithHTMLTags).apply {
+                setPrimaryText(context.getString(R.string.dax_list_item_html_primary_text).html(context))
+                setSecondaryText(context.getString(R.string.dax_list_item_html_secondary_text).html(context))
             }
         }
     }
