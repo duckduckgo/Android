@@ -1701,11 +1701,19 @@
       /** @type {import('../environment').Environment['injectName']} */
       "windows"
     ),
-    willThrow: false
+    willThrow: false,
+    /** @type {import('../environment').Environment['env']} */
+    env: "production"
   });
   var THEME_QUERY = "(prefers-color-scheme: dark)";
   var REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-  function EnvironmentProvider({ children, debugState, willThrow = false, injectName = "windows" }) {
+  function EnvironmentProvider({
+    children,
+    debugState,
+    env = "production",
+    willThrow = false,
+    injectName = "windows"
+  }) {
     const [theme, setTheme] = h2(window.matchMedia(THEME_QUERY).matches ? "dark" : "light");
     const [isReducedMotion, setReducedMotion] = h2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
     y2(() => {
@@ -1733,7 +1741,8 @@
       debugState,
       isDarkMode: theme === "dark",
       injectName,
-      willThrow
+      willThrow,
+      env
     } }, children);
   }
   function UpdateEnvironment({ search }) {
