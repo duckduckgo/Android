@@ -664,6 +664,10 @@ class Omnibar(
         } else {
             legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
         }
+
+        if (viewState.showDuckPlayerIcon) {
+            isScrollingEnabled = false
+        }
     }
 
     fun animateTabsCount() {
