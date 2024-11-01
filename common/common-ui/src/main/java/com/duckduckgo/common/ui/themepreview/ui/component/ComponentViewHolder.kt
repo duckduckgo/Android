@@ -220,6 +220,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLongTextTruncated).apply {
+                setPrimaryText(context.getString(R.string.dax_one_line_list_item_html_primary_text).html(context))
+            }
         }
     }
 
