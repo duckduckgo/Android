@@ -57,7 +57,7 @@ class BottomAppBarBehavior<V : View>(
 
         if (dependency.id == R.id.browserLayout) {
             browserLayout = dependency as RelativeLayout
-        } else if (dependency.id != R.id.includeNewBrowserTab && dependency.id != R.id.webViewFullScreenContainer) {
+        } else if (dependency.id != R.id.webViewFullScreenContainer) {
             offsetBottomByToolbar(dependency)
         }
 
