@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.recursiveEnable
 import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.mobile.android.R
 
 abstract class DaxListItem(
@@ -61,7 +62,7 @@ abstract class DaxListItem(
 
     /** Sets the primary text title */
     fun setPrimaryText(title: String?) {
-        primaryText.text = title
+        primaryText.text = title?.html(context)
     }
 
     /** Sets primary text color */
@@ -86,7 +87,7 @@ abstract class DaxListItem(
 
     /** Sets the secondary text title */
     fun setSecondaryText(title: String?) {
-        secondaryText?.text = title
+        secondaryText?.text = title?.html(context)
     }
 
     /** Sets secondary text color */
