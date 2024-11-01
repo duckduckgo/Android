@@ -151,11 +151,8 @@ class Omnibar(
                 binding.rootView.removeView(binding.legacyOmnibar)
                 binding.rootView.removeView(binding.newOmnibar)
 
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+                // remove the default top abb bar behavior when using the bottom omnibar
+                removeTopAppBarBehavior()
 
                 // prevent the touch event leaking to the webView below
                 binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
@@ -181,11 +178,8 @@ class Omnibar(
                 binding.rootView.removeView(binding.newOmnibar)
                 binding.rootView.removeView(binding.legacyOmnibar)
 
-                // remove the default top abb bar behavior
-                removeAppBarBehavior(binding.autoCompleteSuggestionsList)
-                removeAppBarBehavior(binding.browserLayout)
-                removeAppBarBehavior(binding.focusedView)
-                removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
+                // remove the default top abb bar behavior when using the bottom omnibar
+                removeTopAppBarBehavior()
 
                 // prevent the touch event leaking to the webView below
                 binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
@@ -193,6 +187,13 @@ class Omnibar(
                 binding.legacyOmnibarBottom
             }
         }
+    }
+
+    private fun removeTopAppBarBehavior() {
+        removeAppBarBehavior(binding.autoCompleteSuggestionsList)
+        removeAppBarBehavior(binding.browserLayout)
+        removeAppBarBehavior(binding.focusedView)
+        removeAppBarBehavior(binding.includeNewBrowserTab.newTabLayout)
     }
 
     private fun removeAppBarBehavior(view: View) {
