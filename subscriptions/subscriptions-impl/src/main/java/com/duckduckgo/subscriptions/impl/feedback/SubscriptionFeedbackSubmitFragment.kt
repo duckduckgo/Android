@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackSubmitBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
@@ -46,6 +47,9 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var privacyProFeature: PrivacyProFeature
 
     override fun onViewCreated(
         view: View,
@@ -65,7 +69,12 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
                 listener.onFaqsOpened()
             }
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
-            binding.showEmail()
+
+            if (privacyProFeature.allowEmailFeedback().isEnabled()) {
+                binding.showEmail()
+            } else {
+                binding.hideEmail()
+            }
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
