@@ -327,7 +327,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithSecondaryTextColorOverlay"
-        app:primaryText="@string/dax_list_item_html_primary_text"
-        app:secondaryText="@string/dax_list_item_html_secondary_text" />
+         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
