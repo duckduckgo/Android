@@ -809,17 +809,6 @@ class Omnibar(
         }
     }
 
-    fun onFullScreenModeChanged(isFullScreen: Boolean) {
-        if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            val expanded = !isFullScreen
-            if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-                newOmnibar.setExpanded(expanded, false)
-            } else {
-                legacyOmnibar.setExpanded(expanded, false)
-            }
-        }
-    }
-
     fun show() {
         if (changeOmnibarPositionFeature.refactor().isEnabled()) {
             newOmnibar.show()

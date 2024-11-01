@@ -46,7 +46,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -77,9 +76,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.OnApplyWindowInsetsListener
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -868,8 +864,6 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
-
-        // requireActivity().setFullScreenModeDetector(omnibar::onFullScreenModeChanged)
     }
 
     private fun configureOmnibar() {
