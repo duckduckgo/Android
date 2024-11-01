@@ -204,7 +204,13 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         return true
                     } else {
-                        shouldOverrideWebRequest(url, webView, isForMainFrame, openInNewTab = shouldOpenDuckPlayerInNewTab)
+                        shouldOverrideWebRequest(
+                            url,
+                            webView,
+                            isForMainFrame,
+                            openInNewTab = shouldOpenDuckPlayerInNewTab,
+                            willOpenDuckPlayer = true,
+                        )
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
@@ -310,6 +316,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         isForMainFrame: Boolean,
         openInNewTab: Boolean = false,
+        willOpenDuckPlayer: Boolean = false,
     ): Boolean {
         if (requestRewriter.shouldRewriteRequest(url)) {
             webViewClientListener?.let { listener ->
@@ -330,9 +337,8 @@ class BrowserWebViewClient @Inject constructor(
                             loadUrl(listener, webView, url.toString())
                         }
                         return true
-                    } else if (webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
+                    } else if (willOpenDuckPlayer && webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
                         val newUrl = url.buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_SERP_AUTO).build()
-
                         if (openInNewTab) {
                             listener.openLinkInNewTab(newUrl)
                         } else {
