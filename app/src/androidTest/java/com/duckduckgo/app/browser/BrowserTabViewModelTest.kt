@@ -543,9 +543,7 @@ class BrowserTabViewModelTest {
         whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
-        whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
-            false,
-        )
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
