@@ -142,7 +142,7 @@
 
     <string name="feedbackSubmitVpnHeader">Found an issue not covered in our <annotation type="faqs_link">help center</annotation> ? We definitely want to know about it.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Tell us what’s going on…</string>
-    <string name="feedbackSubmitVpnDisclaimer">In addition to details entered above, we send some anonymized info with your feedback:\n\n• Whether some browser features are active\n• Aggregate app diagnostics (e.g., error codes)\n\n By clicking "Submit" you agree that DuckDuckGo may use information submitted to improve the app.</string>
+    <string name="feedbackSubmitVpnDisclaimer">In addition to details entered above, we send some anonymized info with your feedback:\n\n• Whether some browser features are active\n• Aggregate app diagnostics (e.g., error codes)\n\nBy clicking "Submit" you agree that DuckDuckGo may use information submitted to improve the app.</string>
     <string name="feedbackSubmitVpnSubmit">Submit</string>
     <string name="feedbackSubmitCompletedMessage">Thank You! Feedback submitted.</string>
     <string name="feedbackSubmitFailedMessage">Something went wrong</string>

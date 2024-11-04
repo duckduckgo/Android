@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -1021,6 +1022,31 @@ class SubscriptionFeedbackViewModelTest {
 
         viewModel.commands().test {
             assertEquals(FeedbackFailed, expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionFeedbackWithBlankEmailThenSendPixelOnly() = runTest {
+        viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
+        viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
+        viewModel.onSubmitFeedback("Test", "     ")
+
+        verify(pixelSender).sendPproReportIssue(
+            mapOf(
+                "source" to "ppro",
+                "category" to "subscription",
+                "subcategory" to "somethingElse",
+                "description" to "Test",
+                "customMetadata" to "SUBS_AND_PAYMENTS encoded metadata",
+                "appName" to "",
+                "appPackage" to "",
+            ),
+        )
+
+        assertNull(supportInbox.getLastSentFeedback())
+        viewModel.commands().test {
+            assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
     }
 

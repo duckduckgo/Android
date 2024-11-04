@@ -20,7 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
 import com.duckduckgo.subscriptions.impl.repository.Entitlement
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -45,7 +44,7 @@ interface SubscriptionsService {
     @POST("https://subscriptions.duckduckgo.com/api/feedback")
     suspend fun feedback(
         @Body feedbackBody: FeedbackBody,
-    ): Response<FeedbackResponse>
+    ): FeedbackResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)

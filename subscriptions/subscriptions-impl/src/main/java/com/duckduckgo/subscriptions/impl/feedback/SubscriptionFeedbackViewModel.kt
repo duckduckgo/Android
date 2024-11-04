@@ -202,7 +202,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 }
 
                 REPORT_PROBLEM -> {
-                    if (!email.isNullOrEmpty()) {
+                    if (!email.isNullOrBlank()) {
                         sendFeedbackToInbox(email, metadata)
                     } else {
                         true

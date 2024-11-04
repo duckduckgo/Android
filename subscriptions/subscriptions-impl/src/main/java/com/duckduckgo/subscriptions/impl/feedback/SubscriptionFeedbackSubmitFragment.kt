@@ -18,8 +18,10 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
 import android.text.Annotation
+import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -51,6 +53,32 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
     @Inject
     lateinit var privacyProFeature: PrivacyProFeature
 
+    private val submitTextWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(
+            s: CharSequence,
+            start: Int,
+            count: Int,
+            after: Int,
+        ) {
+        }
+
+        override fun onTextChanged(
+            s: CharSequence,
+            start: Int,
+            before: Int,
+            count: Int,
+        ) {
+            // get the content of both the edit text
+            val description = binding.feedbackSubmitDescription.text.trim()
+
+            // check whether both the fields are empty or not
+            binding.feedbackSubmitButton.isEnabled = description.isNotEmpty()
+        }
+
+        override fun afterTextChanged(s: Editable) {
+        }
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -58,6 +86,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         super.onViewCreated(view, savedInstanceState)
         val listener = activity as Listener
         val reportType = requireArguments().getSerializable(EXTRA_REPORT_TYPE) as SubscriptionFeedbackReportType
+        binding.feedbackSubmitDescription.addTextChangedListener(submitTextWatcher)
 
         if (reportType == REPORT_PROBLEM) {
             binding.feedbackSubmitHeader.show()
@@ -87,7 +116,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         }
 
         binding.feedbackSubmitButton.setOnClickListener {
-            listener.onUserSubmit(binding.feedbackSubmitDescription.text, binding.feedbackSubmitEmail.text)
+            listener.onUserSubmit(binding.feedbackSubmitDescription.text.trim(), binding.feedbackSubmitEmail.text.trim())
         }
 
         binding.feedbackSubmitDescription.showKeyboard()
