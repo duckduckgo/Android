@@ -84,6 +84,9 @@ interface TextInput {
     }
 }
 
+private const val ENABLED_OPACITY = 1f
+private const val DISABLED_OPACITY = 0.4f
+
 class DaxTextInput @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -197,6 +200,7 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.isEnabled
         set(value) {
             binding.internalEditText.isEnabled = value
+            binding.root.alpha = if (value) ENABLED_OPACITY else DISABLED_OPACITY
             handleIsEditableChangeForEndIcon(value)
         }
 
