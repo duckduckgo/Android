@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import java.io.File
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
@@ -173,6 +174,7 @@ class DuckDuckGoFaviconManager constructor(
 
     override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
         val bitmap = loadFromDisk(tabId, url)
+        Timber.d("Permissions: load favicon for $url exists ${bitmap != null}")
         view.loadFavicon(bitmap, url, placeholder)
     }
 
@@ -186,6 +188,7 @@ class DuckDuckGoFaviconManager constructor(
             if (cachedFavicon != null) {
                 faviconPersister.copyToDirectory(cachedFavicon, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
             }
+            Timber.d("Permissions: stored favicon for $domain")
         }
     }
 
