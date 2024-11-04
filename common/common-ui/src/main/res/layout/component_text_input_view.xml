@@ -177,8 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
             android:hint="Error"
-            android:text="This is an error"
-            app:editable="false" />
+            android:text="This is an error" />
 
     </LinearLayout>
 
