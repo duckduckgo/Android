@@ -732,7 +732,7 @@ class Omnibar(
         onPrivacyShieldPressed: () -> Unit,
     ) {
         if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
+            newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
         } else {
             configureLegacyCustomTab(context, customTabToolbarColor, customTabDomainText, onTabClosePressed, onPrivacyShieldPressed)
         }
@@ -822,7 +822,7 @@ class Omnibar(
     }
 
     fun show() {
-        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+        if (refactorFlagEnabled) {
             newOmnibar.show()
         } else {
             legacyOmnibar.show()
@@ -830,7 +830,7 @@ class Omnibar(
     }
 
     fun hide() {
-        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
+        if (refactorFlagEnabled) {
             newOmnibar.gone()
         } else {
             legacyOmnibar.gone()
