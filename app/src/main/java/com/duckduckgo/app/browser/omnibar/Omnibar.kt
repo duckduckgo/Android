@@ -672,6 +672,10 @@ class Omnibar(
         } else {
             legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
         }
+
+        if (viewState.showDuckPlayerIcon) {
+            isScrollingEnabled = false
+        }
     }
 
     fun animateTabsCount() {
@@ -728,7 +732,7 @@ class Omnibar(
         onPrivacyShieldPressed: () -> Unit,
     ) {
         if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
+            newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
         } else {
             configureLegacyCustomTab(context, customTabToolbarColor, customTabDomainText, onTabClosePressed, onPrivacyShieldPressed)
         }
@@ -814,6 +818,22 @@ class Omnibar(
             customTabToolbarContainer.customTabDomain.show()
             customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
             customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
+        }
+    }
+
+    fun show() {
+        if (refactorFlagEnabled) {
+            newOmnibar.show()
+        } else {
+            legacyOmnibar.show()
+        }
+    }
+
+    fun hide() {
+        if (refactorFlagEnabled) {
+            newOmnibar.gone()
+        } else {
+            legacyOmnibar.gone()
         }
     }
 }

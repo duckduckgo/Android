@@ -34,7 +34,7 @@ class TopAppBarBehavior(
     attrs: AttributeSet? = null,
 ) : AppBarLayout.Behavior(context, attrs) {
     override fun layoutDependsOn(parent: CoordinatorLayout, child: AppBarLayout, dependency: View): Boolean {
-        if (dependency.id != R.id.browserLayout) {
+        if (dependency.id != R.id.browserLayout && dependency.id != R.id.webViewFullScreenContainer) {
             offsetBottomByToolbar(dependency)
         }
 

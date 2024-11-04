@@ -57,7 +57,7 @@ class BottomAppBarBehavior<V : View>(
 
         if (dependency.id == R.id.browserLayout) {
             browserLayout = dependency as RelativeLayout
-        } else {
+        } else if (dependency.id != R.id.webViewFullScreenContainer) {
             offsetBottomByToolbar(dependency)
         }
 
@@ -125,7 +125,17 @@ class BottomAppBarBehavior<V : View>(
         }
     }
 
-    fun animateToolbarVisibility(isVisible: Boolean) {
+    fun setExpanded(expanded: Boolean, animate: Boolean = true) {
+        if (animate) {
+            animateToolbarVisibility(expanded)
+        } else {
+            val targetTranslation = if (expanded) 0f else omnibar.height().toFloat()
+            omnibar.setTranslation(targetTranslation)
+            offsetBottomByToolbar(browserLayout)
+        }
+    }
+
+    private fun animateToolbarVisibility(isVisible: Boolean) {
         if (offsetAnimator == null) {
             offsetAnimator = ValueAnimator().apply {
                 interpolator = DecelerateInterpolator()
