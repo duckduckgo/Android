@@ -115,7 +115,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                if (binding.specificPageUrlInput.text != viewState.specificPageUrl) {
+                if (binding.specificPageUrlInput.text.isBlank()) {
                     binding.specificPageUrlInput.text = viewState.specificPageUrl
                 }
             }
