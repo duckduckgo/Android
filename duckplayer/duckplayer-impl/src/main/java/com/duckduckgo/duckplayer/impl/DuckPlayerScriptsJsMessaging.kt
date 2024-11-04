@@ -131,6 +131,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             "setUserValues",
             "reportPageException",
             "reportInitException",
+            "telemetryEvent",
         )
     }
 }
