@@ -29,7 +29,6 @@ import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
@@ -41,12 +40,10 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
-import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.DENY_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
@@ -233,51 +230,54 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
 
         // No session-based setting and no config --> proceed to show dialog
-        val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
-        val dialog = MaterialAlertDialogBuilder(activity)
-            .setView(binding.root)
-            .setOnCancelListener {
-                // Called when user clicks outside the dialog - deny to be safe
-                denyPermissions()
-            }
-            .create()
-
         val title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
-        binding.sitePermissionDialogSubtitle.addClickableLink(
-            DRM_LEARN_MORE_ANNOTATION,
-            activity.getText(R.string.drmSiteDialogSubtitle),
-        ) {
-            denyPermissions()
-            dialog.dismiss()
-            activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
-        }
+        TextAlertDialogBuilder(activity)
+            .setTitle(
+                String.format(
+                    activity.getString(R.string.drmSiteDialogTitle),
+                    title,
+                ),
+            )
+            .setClickableMessage(
+                activity.getText(R.string.drmSiteDialogSubtitle),
+                DRM_LEARN_MORE_ANNOTATION,
+            ) {
+                denyPermissions()
+                activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
+            }
+            .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
+            .setNegativeButton(R.string.sitePermissionsDialogDenyButton, GHOST)
+            .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        if (rememberPermissionChoice) {
+                            grantPermissions()
+                            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
+                        } else {
+                            sitePermissionsRepository.saveDrmForSession(domain, true)
+                            grantPermissions()
+                        }
+                    }
 
-        binding.siteAllowAlwaysDrmPermission.setOnClickListener {
-            grantPermissions()
-            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
-            dialog.dismiss()
-        }
+                    override fun onNegativeButtonClicked() {
+                        if (rememberPermissionChoice) {
+                            denyPermissions()
+                            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
+                        } else {
+                            sitePermissionsRepository.saveDrmForSession(domain, false)
+                            denyPermissions()
+                        }
 
-        binding.siteAllowOnceDrmPermission.setOnClickListener {
-            sitePermissionsRepository.saveDrmForSession(domain, true)
-            grantPermissions()
-            dialog.dismiss()
-        }
+                        denyPermissions()
+                    }
 
-        binding.siteDenyOnceDrmPermission.setOnClickListener {
-            sitePermissionsRepository.saveDrmForSession(domain, false)
-            denyPermissions()
-            dialog.dismiss()
-        }
-
-        binding.siteDenyAlwaysDrmPermission.setOnClickListener {
-            denyPermissions()
-            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
-            dialog.dismiss()
-        }
-
-        dialog.show()
+                    override fun onCheckedChanged(checked: Boolean) {
+                        rememberPermissionChoice = checked
+                    }
+                },
+            )
+            .show()
     }
 
     private fun onSiteDrmPermissionSave(
