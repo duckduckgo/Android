@@ -5206,6 +5206,7 @@ class BrowserTabViewModelTest {
             "telemetryEvent",
             "id",
             JSONObject("""{"attributes": {"name": "impression", "value": "landscape-layout"}}"""),
+            false,
             { "someUrl" },
         )
         verify(mockPixel).fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
