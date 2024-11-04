@@ -549,9 +549,7 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun setExpanded(expanded: Boolean) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(
-                expanded,
-            )
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
@@ -561,9 +559,7 @@ class OmnibarLayout @JvmOverloads constructor(
     ) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(
-                expanded,
-            )
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
