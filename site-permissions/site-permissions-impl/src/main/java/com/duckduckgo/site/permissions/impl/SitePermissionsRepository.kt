@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
@@ -130,22 +131,30 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
+
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
+        Timber.d("Permissions: permissionGrantedWithin24h $permissionGrantedWithin24h")
 
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
                 val isCameraAlwaysAllowed = sitePermissionForDomain?.askCameraSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isCameraAlwaysAllowed $isCameraAlwaysAllowed")
                 permissionGrantedWithin24h || isCameraAlwaysAllowed
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isMicAlwaysAllowed = sitePermissionForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isMicAlwaysAllowed $isMicAlwaysAllowed")
+
                 permissionGrantedWithin24h || isMicAlwaysAllowed
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
-                sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                val isDRMAlwaysAllowed = SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isCameraAlwaysAllowed $isDRMAlwaysAllowed")
+                sitePermissionForDomain?.askDrmSetting == isDRMAlwaysAllowed
             }
             LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
                 val isLocationAlwaysAllowed = sitePermissionForDomain?.askLocationSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isLocationAlwaysAllowed $isLocationAlwaysAllowed")
                 permissionGrantedWithin24h || isLocationAlwaysAllowed
             }
             else -> false
