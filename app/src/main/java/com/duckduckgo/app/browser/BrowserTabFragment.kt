@@ -826,7 +826,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
