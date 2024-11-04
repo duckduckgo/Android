@@ -108,7 +108,10 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     is SpecificPage -> {
                         uncheckLastOpenedTabCheckListItem()
                         uncheckNewTabCheckListItem()
-                        binding.specificPageCheckListItem.setChecked(true)
+                        with(binding) {
+                            specificPageCheckListItem.setChecked(true)
+                            specificPageUrlInput.isEditable = true
+                        }
                     }
                 }
 
@@ -130,6 +133,5 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     private fun uncheckSpecificPageCheckListItem() {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEditable = false
-        binding.specificPageUrlInput.isEditable = true
     }
 }
