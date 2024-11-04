@@ -274,15 +274,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     }
 
                     override fun onNegativeButtonClicked() {
+                        denyPermissions(rememberChoice)
                         if (rememberChoice) {
-                            denyPermissions()
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
                         } else {
                             sitePermissionsRepository.saveDrmForSession(domain, false)
-                            denyPermissions()
                         }
-
-                        denyPermissions()
                     }
 
                     override fun onCheckedChanged(checked: Boolean) {
@@ -509,7 +506,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun showSystemPermissionsDeniedDialog() {
-        denyPermissions()
+        denyPermissions(permissionPermanent)
         val titleRes = when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
