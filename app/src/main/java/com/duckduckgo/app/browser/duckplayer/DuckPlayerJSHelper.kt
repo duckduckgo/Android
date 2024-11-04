@@ -247,7 +247,8 @@ class DuckPlayerJSHelper @Inject constructor(
                     pixel.fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
                 }
 
-                // TODO (cbarreiro) Abstract this to provide better support for telemetry events
+                /* TODO (cbarreiro) Abstract this to provide better support for telemetry events
+                  * https://app.asana.com/0/1202552961248957/1208690124356904/f */
                 /**
                  * incoming data looks like this, where `name` is used to discriminate,
                  * and 'value' is linked to it (but is optional)
