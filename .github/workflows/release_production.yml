@@ -10,7 +10,7 @@ env:
 jobs:
   create-tag:
     name: Generate and upload nightly bundle to Play Store Internal track
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
