@@ -35,11 +35,19 @@ ext {
         }
     }
 
+    getStoredTag = {
+        if(project.hasProperty("latestTag")) {
+            return project["latestTag"]
+        } else {
+            def latestGitTagProvider = providers.of(LatestGitTagValueSource.class) {}
+            return latestGitTagProvider.get()
+        }
+    }
+
     buildNumberCode = {
         def suffix = getVersionNameSuffix()
         if (suffix?.trim()) {
-            def latestGitTagProvider = providers.of(LatestGitTagValueSource.class) {}
-            def tag = latestGitTagProvider.get()
+            def tag = getStoredTag()
             if (tag.contains('nightly')) {
                 def (major, minor, patch, nightly) = tag.toLowerCase().tokenize('.')
                 (major, minor, patch, nightly) = [major, minor, patch, nightly].collect { it.toString() }

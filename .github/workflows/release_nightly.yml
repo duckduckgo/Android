@@ -1,0 +1,122 @@
+name: Release - Nightly Release to Internal and Firebase
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 3 AM UTC
+  workflow_dispatch:
+
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
+
+jobs:
+  create-tag:
+    name: Generate and upload nightly bundle to Play Store Internal track
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+
+      - name: Set Git permissions
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: '${{ secrets.GT_DAXMOBILE }}'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          git fetch --tags        
+          output=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "Latest tag: $output"
+          echo "latest_tag=$output" >> $GITHUB_OUTPUT
+
+      - name: Decode upload keys
+        uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build_upload.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
+        with:
+          secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
+          fileName: ddg-upload-keystore.jks
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode Play Store credentials file
+        uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
+        with:
+          secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
+          fileName: api.json
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode Firebase credentials file
+        uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
+        with:
+          secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
+          fileName: ddg-upload-firebase.json
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Clean project
+        run: |
+          gradle clean          
+
+      - name: Assemble the bundle
+        run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }}
+
+      - name: Generate nightly version name
+        id: generate_version_name
+        run: |
+          output=$(gradle getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          echo "version=$output" >> $GITHUB_OUTPUT
+
+      - name: Capture App Bundle Path
+        id: capture_output
+        run: |
+          output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
+          echo "bundle_path=$output" >> $GITHUB_OUTPUT
+
+      - name: Upload bundle to Play Store Internal track
+        id: create_app_bundle
+        run: |
+          bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
+
+      - name: Tag Nightly release
+        id: tag_nightly_release
+        run: |
+          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
+          git push origin ${{ steps.generate_version_name.outputs.version }}
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
+          path: duckduckgo.apk
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Nightly Release
+          asana-task-description: The Nightly Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
