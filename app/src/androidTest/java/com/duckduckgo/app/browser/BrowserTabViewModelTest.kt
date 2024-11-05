@@ -5381,10 +5381,10 @@ class BrowserTabViewModelTest {
         givenCurrentSite(url)
 
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockBrokenSitePrompt, never()).pageLoaded(any())
+        verify(mockBrokenSitePrompt, never()).pageRefreshed(any())
 
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockBrokenSitePrompt).pageLoaded(url.toUri())
+        verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
     }
 
     @Test
