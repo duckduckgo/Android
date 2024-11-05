@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK
@@ -39,7 +38,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -70,7 +68,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         sitePermissionsEntity: SitePermissionsEntity?,
     ): List<WebsitePermissionSetting> {
         var locationSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askLocationSetting)
-        if (locationSetting == ASK && !settingsDataStore.appLocationPermission) {
+        if (locationSetting == ASK && !sitePermissionsRepository.askLocationEnabled) {
             locationSetting = ASK_DISABLED
         }
 
@@ -135,7 +133,10 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         }
     }
 
-    fun onPermissionSettingSelected(editedPermissionSetting: WebsitePermissionSetting, url: String) {
+    fun onPermissionSettingSelected(
+        editedPermissionSetting: WebsitePermissionSetting,
+        url: String,
+    ) {
         var askLocationSetting = viewState.value.websitePermissions[0].setting
         var askCameraSetting = viewState.value.websitePermissions[1].setting
         var askMicSetting = viewState.value.websitePermissions[2].setting
@@ -143,23 +144,26 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
         when (editedPermissionSetting.title) {
             R.string.sitePermissionsSettingsLocation -> {
-                askLocationSetting = when (editedPermissionSetting.setting == ASK && !settingsDataStore.appLocationPermission) {
+                askLocationSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askLocationEnabled) {
                     true -> ASK_DISABLED
                     false -> editedPermissionSetting.setting
                 }
             }
+
             R.string.sitePermissionsSettingsCamera -> {
                 askCameraSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askCameraEnabled) {
                     true -> ASK_DISABLED
                     false -> editedPermissionSetting.setting
                 }
             }
+
             R.string.sitePermissionsSettingsMicrophone -> {
                 askMicSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askMicEnabled) {
                     true -> ASK_DISABLED
                     false -> editedPermissionSetting.setting
                 }
             }
+
             R.string.sitePermissionsSettingsDRM -> {
                 askDrmSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askDrmEnabled) {
                     true -> ASK_DISABLED

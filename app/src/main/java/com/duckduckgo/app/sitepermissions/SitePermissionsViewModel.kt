@@ -20,9 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -41,8 +38,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SitePermissionsViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val geolocationPermissions: GeoLocationPermissions,
-    private val settingsDataStore: SettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -89,21 +84,14 @@ class SitePermissionsViewModel @Inject constructor(
         }
     }
 
-    fun combineAllPermissions(
-        locationPermissions: List<LocationPermissionEntity>,
-        sitePermissions: List<SitePermissionsEntity>,
-    ): List<String> =
-        locationPermissions.map { it.domain }.union(sitePermissions.map { it.domain }).toList()
-
     fun permissionToggleSelected(
         isChecked: Boolean,
         textRes: Int,
     ) {
         when (textRes) {
             R.string.sitePermissionsSettingsLocation -> {
-                settingsDataStore.appLocationPermission = isChecked
+                sitePermissionsRepository.askLocationEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askLocationEnabled = isChecked)
-                removeLocationSites()
             }
 
             R.string.sitePermissionsSettingsCamera -> {
@@ -123,12 +111,6 @@ class SitePermissionsViewModel @Inject constructor(
         }
     }
 
-    private fun removeLocationSites() {
-        viewModelScope.launch {
-            geolocationPermissions.clearAll()
-        }
-    }
-
     fun allowedSiteSelected(domain: String) {
         viewModelScope.launch {
             _commands.send(LaunchWebsiteAllowed(domain))
@@ -139,7 +121,6 @@ class SitePermissionsViewModel @Inject constructor(
         val sitePermissions = _viewState.value.sitesPermissionsAllowed.toMutableList()
         viewModelScope.launch(dispatcherProvider.io()) {
             sitePermissionsRepository.sitePermissionsAllowedFlow().collect { sitePermissionsAllowed ->
-                geolocationPermissions.clearAll()
                 sitePermissionsRepository.deleteAll()
                 _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions))
                 cachedAllowedSites = sitePermissionsAllowed
