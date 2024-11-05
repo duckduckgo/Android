@@ -17,7 +17,6 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
@@ -25,6 +24,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 internal const val REFRESH_COUNT_WINDOW = 20L
@@ -50,9 +50,9 @@ class RealBrokenSitePrompt @Inject constructor(
 
             if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
                 brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-                Log.d("BrokenSitePrompt", "New next shown date: $newNextShownDate")
+                Timber.d("New next shown date: $newNextShownDate")
             } else {
-                Log.d("BrokenSitePrompt", "Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
+                Timber.d("Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
             }
         }
         brokenSiteReportRepository.incrementDismissStreak()
@@ -101,9 +101,9 @@ class RealBrokenSitePrompt @Inject constructor(
         val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
             brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-            Log.d("BrokenSitePrompt", "New next shown date: $newNextShownDate")
+            Timber.d("New next shown date: $newNextShownDate")
         } else {
-            Log.d("BrokenSitePrompt", "Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
+            Timber.d("Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
         }
     }
 }
