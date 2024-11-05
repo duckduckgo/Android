@@ -29,7 +29,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -54,7 +54,7 @@ class CopySubscriptionDataView @JvmOverloads constructor(
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var subscriptionsDataStore: SubscriptionsDataStore
+    lateinit var authRepository: AuthRepository
 
     private val binding: SubsSimpleViewBinding by viewBinding()
 
@@ -74,21 +74,21 @@ class CopySubscriptionDataView @JvmOverloads constructor(
         val clipboardManager = context.getSystemService(ClipboardManager::class.java)
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val auth = subscriptionsDataStore.authToken
+            val auth = authRepository.getAuthToken()
             val authToken = if (auth.isNullOrBlank()) {
                 "No auth token found"
             } else {
                 auth
             }
 
-            val access = subscriptionsDataStore.accessToken
+            val access = authRepository.getAccessToken()
             val accessToken = if (access.isNullOrBlank()) {
                 "No access token found"
             } else {
                 access
             }
 
-            val external = subscriptionsDataStore.externalId
+            val external = authRepository.getExternalID()
             val externalId = if (external.isNullOrBlank()) {
                 "No external id found"
             } else {

@@ -136,6 +136,9 @@ interface PrivacyProFeature {
     // Kill switch
     @Toggle.DefaultValue(true)
     fun allowEmailFeedback(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun serpPromoCookie(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
