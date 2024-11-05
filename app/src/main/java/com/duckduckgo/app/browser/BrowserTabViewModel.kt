@@ -1220,7 +1220,7 @@ class BrowserTabViewModel @Inject constructor(
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
             site?.uri?.let {
-                brokenSitePrompt.pageLoaded(it)
+                brokenSitePrompt.pageRefreshed(it)
             }
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }

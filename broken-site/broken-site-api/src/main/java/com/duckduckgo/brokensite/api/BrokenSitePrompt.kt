@@ -26,7 +26,7 @@ interface BrokenSitePrompt {
 
     suspend fun isFeatureEnabled(): Boolean
 
-    fun pageLoaded(url: Uri)
+    fun pageRefreshed(url: Uri)
 
     fun resetRefreshCount()
 

@@ -118,7 +118,7 @@ class RealBrokenSitePromptTest {
         val url: Uri = org.mockito.kotlin.mock()
 
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
-        testee.pageLoaded(url)
+        testee.pageRefreshed(url)
 
         verify(mockBrokenSiteReportRepository).addRefresh(url, now)
     }
