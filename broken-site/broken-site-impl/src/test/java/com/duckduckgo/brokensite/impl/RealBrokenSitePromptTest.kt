@@ -1,6 +1,7 @@
 package com.duckduckgo.brokensite.impl
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -114,10 +115,12 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenIncrementRefreshCountThenAddRefreshCalled() {
         val now = LocalDateTime.now()
-        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
-        testee.incrementRefreshCount()
+        val url: Uri = org.mockito.kotlin.mock()
 
-        verify(mockBrokenSiteReportRepository).addRefresh(any())
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
+        testee.pageLoaded(url)
+
+        verify(mockBrokenSiteReportRepository).addRefresh(url, now)
     }
 
     @Test
