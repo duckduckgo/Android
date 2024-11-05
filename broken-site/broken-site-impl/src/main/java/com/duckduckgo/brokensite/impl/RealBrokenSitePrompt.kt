@@ -47,7 +47,9 @@ class RealBrokenSitePrompt @Inject constructor(
         Log.d("BrokenSitePrompt", "User dismissed prompt, dismiss streak: ${brokenSiteReportRepository.getDismissStreak()}")
         if (brokenSiteReportRepository.getDismissStreak() >= brokenSiteReportRepository.getMaxDismissStreak() - 1) {
             val nextShownDate = brokenSiteReportRepository.getNextShownDate()
-            val newNextShownDate = currentTimeProvider.localDateNow().plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
+            // TODO (cbarreiro): Add days, not seconds
+            // val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
+            val newNextShownDate = currentTimeProvider.localDateTimeNow().plusSeconds(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
 
             Log.d("BrokenSitePrompt", "User dismissed. Next shown date: $nextShownDate, new next show date: $newNextShownDate")
 
@@ -83,22 +85,28 @@ class RealBrokenSitePrompt @Inject constructor(
         return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
             currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
             currentTimeProvider.localDateTimeNow(),
-        )
+        ).also {
+            if (it >= REFRESH_COUNT_LIMIT) {
+                brokenSiteReportRepository.resetRefreshCount()
+            }
+        }
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
         return isFeatureEnabled() &&
             getUserRefreshesCount() >= REFRESH_COUNT_LIMIT &&
-            // && brokenSiteReportRepository.getNextShownDate()?.isBefore(currentTimeProvider.localDateNow()) ?: true
+            brokenSiteReportRepository.getNextShownDate()?.isBefore(currentTimeProvider.localDateTimeNow()) ?: true &&
             !duckGoUrlDetector.isDuckDuckGoUrl(url)
     }
 
     override suspend fun ctaShown() {
         Log.d("BrokenSitePrompt", "CTA shown")
-        val nextShownDate = brokenSiteReportRepository.getNextShownDate()?.atStartOfDay()
-        val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
+        val nextShownDate = brokenSiteReportRepository.getNextShownDate()
+        // TODO (cbarreiro): Add days, not seconds
+        // val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
+        val newNextShownDate = currentTimeProvider.localDateTimeNow().plusSeconds(brokenSiteReportRepository.getCoolDownDays())
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
-            brokenSiteReportRepository.setNextShownDate(newNextShownDate.toLocalDate())
+            brokenSiteReportRepository.setNextShownDate(newNextShownDate)
         }
     }
 }

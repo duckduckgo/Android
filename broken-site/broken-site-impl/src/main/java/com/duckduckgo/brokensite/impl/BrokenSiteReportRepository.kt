@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.sha256
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -50,8 +49,8 @@ interface BrokenSiteReportRepository {
 
     suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
 
-    suspend fun setNextShownDate(nextShownDate: LocalDate?)
-    suspend fun getNextShownDate(): LocalDate?
+    suspend fun setNextShownDate(nextShownDate: LocalDateTime?)
+    suspend fun getNextShownDate(): LocalDateTime?
 
     suspend fun incrementDismissStreak()
     suspend fun getDismissStreak(): Int
@@ -135,7 +134,7 @@ class RealBrokenSiteReportRepository(
         brokenSitePromptDataStore.setDismissStreak(0)
     }
 
-    override suspend fun setNextShownDate(nextShownDate: LocalDate?) {
+    override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
         // Log.d("BrokenSitePrompt", "Next shown date set to $nextShownDate")
     }
@@ -144,7 +143,7 @@ class RealBrokenSiteReportRepository(
         return brokenSitePromptDataStore.getDismissStreak()
     }
 
-    override suspend fun getNextShownDate(): LocalDate? {
+    override suspend fun getNextShownDate(): LocalDateTime? {
         return brokenSitePromptDataStore.getNextShownDate()
     }
 
