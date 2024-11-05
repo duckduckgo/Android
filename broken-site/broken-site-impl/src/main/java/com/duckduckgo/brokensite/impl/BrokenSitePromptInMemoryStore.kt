@@ -16,6 +16,7 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -24,7 +25,7 @@ import javax.inject.Inject
 
 interface BrokenSitePromptInMemoryStore {
     fun resetRefreshCount()
-    fun addRefresh(localDateTime: LocalDateTime)
+    fun addRefresh(url: Uri, localDateTime: LocalDateTime)
     fun getAndUpdateUserRefreshesBetween(
         t1: LocalDateTime,
         t2: LocalDateTime,
@@ -34,21 +35,37 @@ interface BrokenSitePromptInMemoryStore {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealBrokenSitePromptInMemoryStore @Inject constructor() : BrokenSitePromptInMemoryStore {
-    private var refreshes = mutableListOf<LocalDateTime>()
+    private var refreshes: LastRefreshedUrl? = null
 
     override fun resetRefreshCount() {
-        this.refreshes = mutableListOf()
+        this.refreshes = null
     }
 
-    override fun addRefresh(localDateTime: LocalDateTime) {
-        refreshes.add(localDateTime)
+    override fun addRefresh(
+        url: Uri,
+        localDateTime: LocalDateTime,
+    ) {
+        refreshes.let {
+            refreshes = if (it == null || it.url != url) {
+                LastRefreshedUrl(url, mutableListOf(localDateTime))
+            } else {
+                it.copy(time = it.time.plus(localDateTime))
+            }
+        }
     }
 
     override fun getAndUpdateUserRefreshesBetween(
         t1: LocalDateTime,
         t2: LocalDateTime,
     ): Int {
-        refreshes = refreshes.filter { it.isAfter(t1) && it.isBefore(t2) }.toMutableList()
-        return refreshes.size
+        return refreshes?.let {
+            refreshes = it.copy(time = it.time.filter { time -> time.isAfter(t1) && time.isBefore(t2) })
+            it.time.size
+        } ?: 0
     }
 }
+
+data class LastRefreshedUrl(
+    val url: Uri,
+    val time: List<LocalDateTime>,
+)

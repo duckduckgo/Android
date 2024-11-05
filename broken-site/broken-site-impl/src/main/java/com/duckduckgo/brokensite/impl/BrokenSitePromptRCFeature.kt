@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -39,6 +40,7 @@ import kotlinx.coroutines.launch
 )
 interface BrokenSitePromptRCFeature {
     // TODO (cbarreiro) Implement broken site prompt
+    @InternalAlwaysEnabled
     @DefaultValue(false)
     fun self(): Toggle
 }

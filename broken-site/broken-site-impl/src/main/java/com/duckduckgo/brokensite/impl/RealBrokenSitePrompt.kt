@@ -16,6 +16,7 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -65,8 +66,10 @@ class RealBrokenSitePrompt @Inject constructor(
         return _featureEnabled
     }
 
-    override fun incrementRefreshCount() {
-        brokenSiteReportRepository.addRefresh(currentTimeProvider.localDateTimeNow())
+    override fun pageLoaded(
+        url: Uri,
+    ) {
+        brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
     }
 
     override fun resetRefreshCount() {
