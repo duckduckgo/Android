@@ -24,6 +24,12 @@ jobs:
         with:
           token: '${{ secrets.GT_DAXMOBILE }}'
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
@@ -33,16 +39,10 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          # Fetch all tags
-          git fetch --tags
-          # Get the latest tag
+          git fetch --tags        
           output=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
-
-      - name: Output latest tag
-        run: |
-          echo "The latest tag is: ${{ steps.get_latest_tag.outputs.latest_tag }}"
 
       - name: Decode upload keys
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
