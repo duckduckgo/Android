@@ -17,10 +17,12 @@
 package com.duckduckgo.subscriptions.impl.auth2
 
 import android.net.Uri
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import retrofit2.HttpException
+import retrofit2.Response
 
 interface AuthClient {
     /**
@@ -67,6 +69,20 @@ interface AuthClient {
      * @return [String] containing JWK set in JSON format (RFC 7517 section 5)
      */
     suspend fun getJwks(): String
+
+    /**
+     * Attempts to sign in using Play Store purchase history data.
+     *
+     * @param sessionId authorization session id
+     * @param signature cryptographically signed string that can be verified by the Auth API with public keys published by the Play Store
+     * @param googleSignedData signed data that produced the cryptographic signature in the signature param
+     * @return authorization code required to fetch access token
+     */
+    suspend fun storeLogin(
+        sessionId: String,
+        signature: String,
+        googleSignedData: String,
+    ): String
 }
 
 data class TokenPair(
@@ -77,6 +93,7 @@ data class TokenPair(
 @ContributesBinding(AppScope::class)
 class AuthClientImpl @Inject constructor(
     private val authService: AuthService,
+    private val appBuildConfig: AppBuildConfig,
 ) : AuthClient {
 
     override suspend fun authorize(codeChallenge: String): String {
@@ -108,22 +125,7 @@ class AuthClientImpl @Inject constructor(
 
     override suspend fun createAccount(sessionId: String): String {
         val response = authService.createAccount("ddg_auth_session_id=$sessionId")
-
-        if (response.code() == 302) {
-            val authorizationCode = response.headers()
-                .values("Location")
-                .firstOrNull()
-                ?.let { Uri.parse(it) }
-                ?.getQueryParameter("code")
-
-            if (authorizationCode == null) {
-                throw RuntimeException("Failed to extract authorization code")
-            }
-
-            return authorizationCode
-        } else {
-            throw HttpException(response)
-        }
+        return response.getAuthorizationCode()
     }
 
     override suspend fun getTokens(
@@ -162,6 +164,43 @@ class AuthClientImpl @Inject constructor(
 
     override suspend fun getJwks(): String =
         authService.jwks().string()
+
+    override suspend fun storeLogin(
+        sessionId: String,
+        signature: String,
+        googleSignedData: String,
+    ): String {
+        val response = authService.login(
+            cookie = "ddg_auth_session_id=$sessionId",
+            body = StoreLoginBody(
+                method = "signature",
+                signature = signature,
+                source = "google_play_store",
+                googleSignedData = googleSignedData,
+                googlePackageName = appBuildConfig.applicationId,
+            ),
+        )
+
+        return response.getAuthorizationCode()
+    }
+
+    private fun Response<Unit>.getAuthorizationCode(): String {
+        if (code() == 302) {
+            val authorizationCode = headers()
+                .values("Location")
+                .firstOrNull()
+                ?.let { Uri.parse(it) }
+                ?.getQueryParameter("code")
+
+            if (authorizationCode == null) {
+                throw RuntimeException("Failed to extract authorization code")
+            }
+
+            return authorizationCode
+        } else {
+            throw HttpException(this)
+        }
+    }
 
     private companion object {
         const val AUTH_V2_CLIENT_ID = "f4311287-0121-40e6-8bbd-85c36daf1837"

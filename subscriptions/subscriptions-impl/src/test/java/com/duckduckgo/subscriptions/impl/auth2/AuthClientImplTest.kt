@@ -1,6 +1,7 @@
 package com.duckduckgo.subscriptions.impl.auth2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.test.runTest
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,7 +23,10 @@ import retrofit2.Response
 class AuthClientImplTest {
 
     private val authService: AuthService = mock()
-    private val authClient = AuthClientImpl(authService)
+    private val appBuildConfig: AppBuildConfig = mock { config ->
+        whenever(config.applicationId).thenReturn("com.duckduckgo.android")
+    }
+    private val authClient = AuthClientImpl(authService, appBuildConfig)
 
     @Test
     fun `when authorize success then returns sessionId parsed from Set-Cookie header`() = runTest {
@@ -158,5 +162,53 @@ class AuthClientImplTest {
         whenever(authService.jwks()).thenReturn(jwksResponse)
 
         assertEquals(jwks, authClient.getJwks())
+    }
+
+    @Test
+    fun `when login success then returns authorization code`() = runTest {
+        val sessionId = "fake auth session id"
+        val authorizationCode = "fake_authorization_code"
+        val signature = "fake signature"
+        val googleSignedData = "fake signed data"
+
+        val mockResponse: Response<Unit> = mock {
+            on { code() } doReturn 302
+            on { headers() } doReturn Headers.headersOf("Location", "https://example.com?code=$authorizationCode")
+            on { isSuccessful } doReturn false // Retrofit treats non-2xx responses as unsuccessful
+        }
+
+        whenever(authService.login(any(), any())).thenReturn(mockResponse)
+
+        val storeLoginResponse = authClient.storeLogin(sessionId, signature, googleSignedData)
+
+        assertEquals(authorizationCode, storeLoginResponse)
+
+        verify(authService).login(
+            cookie = "ddg_auth_session_id=$sessionId",
+            body = StoreLoginBody(
+                method = "signature",
+                signature = signature,
+                source = "google_play_store",
+                googleSignedData = googleSignedData,
+                googlePackageName = appBuildConfig.applicationId,
+            ),
+        )
+    }
+
+    @Test
+    fun `when login HTTP error then throws HttpException`() = runTest {
+        val errorResponse = Response.error<Unit>(
+            400,
+            "{}".toResponseBody("application/json".toMediaTypeOrNull()),
+        )
+
+        whenever(authService.login(any(), any())).thenReturn(errorResponse)
+
+        try {
+            authClient.storeLogin("fake auth session id", "fake signature", "fake signed data")
+            fail("Expected HttpException to be thrown")
+        } catch (e: HttpException) {
+            assertEquals(400, e.code())
+        }
     }
 }

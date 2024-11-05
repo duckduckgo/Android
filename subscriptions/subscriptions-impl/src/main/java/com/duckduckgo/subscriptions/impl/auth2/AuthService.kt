@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.auth2
 import com.squareup.moshi.Json
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -52,9 +53,23 @@ interface AuthService {
 
     @GET("https://quack.duckduckgo.com/api/auth/v2/.well-known/jwks.json")
     suspend fun jwks(): ResponseBody
+
+    @POST("https://quack.duckduckgo.com/api/auth/v2/login")
+    suspend fun login(
+        @Header("Cookie") cookie: String,
+        @Body body: StoreLoginBody,
+    ): Response<Unit>
 }
 
 data class TokensResponse(
     @field:Json(name = "access_token") val accessToken: String,
     @field:Json(name = "refresh_token") val refreshToken: String,
+)
+
+data class StoreLoginBody(
+    @field:Json(name = "method") val method: String,
+    @field:Json(name = "signature") val signature: String,
+    @field:Json(name = "source") val source: String,
+    @field:Json(name = "google_signed_data") val googleSignedData: String,
+    @field:Json(name = "google_package_name") val googlePackageName: String,
 )
