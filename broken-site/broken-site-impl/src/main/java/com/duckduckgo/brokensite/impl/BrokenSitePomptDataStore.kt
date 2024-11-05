@@ -32,7 +32,7 @@ import com.duckduckgo.brokensite.impl.di.BrokenSitePrompt
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -52,8 +52,8 @@ interface BrokenSitePomptDataStore {
     suspend fun getCoolDownDays(): Long
     suspend fun setDismissStreak(streak: Int)
     suspend fun getDismissStreak(): Int
-    suspend fun setNextShownDate(nextShownDate: LocalDate?)
-    suspend fun getNextShownDate(): LocalDate?
+    suspend fun setNextShownDate(nextShownDate: LocalDateTime?)
+    suspend fun getNextShownDate(): LocalDateTime?
 }
 
 @ContributesBinding(AppScope::class)
@@ -71,8 +71,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val NEXT_SHOWN_DATE = stringPreferencesKey(name = "NEXT_SHOWN_DATE")
     }
 
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private val maxDismissStreak: Flow<Int> = store.data
         .map { prefs ->
             prefs[MAX_DISMISS_STREAK] ?: 3
@@ -124,7 +123,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[DISMISS_STREAK] = streak }
     }
 
-    override suspend fun setNextShownDate(nextShownDate: LocalDate?) {
+    override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         store.edit { prefs ->
 
             nextShownDate?.let {
@@ -139,7 +138,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         return dismissStreak.first()
     }
 
-    override suspend fun getNextShownDate(): LocalDate? {
-        return nextShownDate.first()?.let { LocalDate.parse(it, formatter) }
+    override suspend fun getNextShownDate(): LocalDateTime? {
+        return nextShownDate.first()?.let { LocalDateTime.parse(it, formatter) }
     }
 }
