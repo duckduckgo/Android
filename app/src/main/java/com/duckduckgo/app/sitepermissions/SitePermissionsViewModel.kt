@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
@@ -36,14 +35,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SitePermissionsViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geolocationPermissions: GeoLocationPermissions,
     private val settingsDataStore: SettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,
@@ -63,20 +60,17 @@ class SitePermissionsViewModel @Inject constructor(
         val askMicEnabled: Boolean = true,
         val askDrmEnabled: Boolean = true,
         val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
-        val locationPermissionsAllowed: List<LocationPermissionEntity> = listOf(),
     )
 
     sealed class Command {
-        class ShowRemovedAllConfirmationSnackbar(
-            val removedSitePermissions: List<SitePermissionsEntity>,
-            val removedLocationPermissions: List<LocationPermissionEntity>,
-        ) : Command()
+        class ShowRemovedAllConfirmationSnackbar(val removedSitePermissions: List<SitePermissionsEntity>) : Command()
         class LaunchWebsiteAllowed(val domain: String) : Command()
     }
 
     init {
         _viewState.value = ViewState(
-            askLocationEnabled = settingsDataStore.appLocationPermission,
+            // askLocationEnabled = settingsDataStore.appLocationPermission,
+            askLocationEnabled = sitePermissionsRepository.askLocationEnabled,
             askCameraEnabled = sitePermissionsRepository.askCameraEnabled,
             askMicEnabled = sitePermissionsRepository.askMicEnabled,
             askDrmEnabled = sitePermissionsRepository.askDrmEnabled,
@@ -85,23 +79,20 @@ class SitePermissionsViewModel @Inject constructor(
 
     fun allowedSites() {
         viewModelScope.launch {
-            val locationsPermissionsFlow = locationPermissionsRepository.getLocationPermissionsFlow()
-            val sitePermissionsFlow = sitePermissionsRepository.sitePermissionsWebsitesFlow()
-
-            sitePermissionsFlow.combine(locationsPermissionsFlow) { sitePermissionsList, locationPermissionsList ->
-                Pair(sitePermissionsList, locationPermissionsList)
-            }.collect {
+            sitePermissionsRepository.sitePermissionsWebsitesFlow().collect {
                 _viewState.emit(
                     _viewState.value.copy(
-                        sitesPermissionsAllowed = it.first,
-                        locationPermissionsAllowed = it.second,
+                        sitesPermissionsAllowed = it,
                     ),
                 )
             }
         }
     }
 
-    fun combineAllPermissions(locationPermissions: List<LocationPermissionEntity>, sitePermissions: List<SitePermissionsEntity>): List<String> =
+    fun combineAllPermissions(
+        locationPermissions: List<LocationPermissionEntity>,
+        sitePermissions: List<SitePermissionsEntity>,
+    ): List<String> =
         locationPermissions.map { it.domain }.union(sitePermissions.map { it.domain }).toList()
 
     fun permissionToggleSelected(
@@ -114,14 +105,17 @@ class SitePermissionsViewModel @Inject constructor(
                 _viewState.value = _viewState.value.copy(askLocationEnabled = isChecked)
                 removeLocationSites()
             }
+
             R.string.sitePermissionsSettingsCamera -> {
                 sitePermissionsRepository.askCameraEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askCameraEnabled = isChecked)
             }
+
             R.string.sitePermissionsSettingsMicrophone -> {
                 sitePermissionsRepository.askMicEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askMicEnabled = isChecked)
             }
+
             R.string.sitePermissionsSettingsDRM -> {
                 sitePermissionsRepository.askDrmEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askDrmEnabled = isChecked)
@@ -143,24 +137,19 @@ class SitePermissionsViewModel @Inject constructor(
 
     fun removeAllSitesSelected() {
         val sitePermissions = _viewState.value.sitesPermissionsAllowed.toMutableList()
-        val locationPermissions = _viewState.value.locationPermissionsAllowed.toMutableList()
         viewModelScope.launch(dispatcherProvider.io()) {
             sitePermissionsRepository.sitePermissionsAllowedFlow().collect { sitePermissionsAllowed ->
                 geolocationPermissions.clearAll()
                 sitePermissionsRepository.deleteAll()
-                _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions, locationPermissions))
+                _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions))
                 cachedAllowedSites = sitePermissionsAllowed
             }
         }
     }
 
-    fun onSnackBarUndoRemoveAllWebsites(
-        removedSitePermissions: List<SitePermissionsEntity>,
-        removedLocationPermissions: List<LocationPermissionEntity>,
-    ) {
+    fun onSnackBarUndoRemoveAllWebsites(removedSitePermissions: List<SitePermissionsEntity>) {
         viewModelScope.launch(dispatcherProvider.io()) {
             sitePermissionsRepository.undoDeleteAll(removedSitePermissions, cachedAllowedSites)
-            geolocationPermissions.undoClearAll(removedLocationPermissions)
         }
     }
 }
