@@ -186,6 +186,18 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenBrokenSitePromptDialogCtaIsShownThenPixelIsFired() = runTest {
+        testee.onCtaShown(BrokenSitePromptDialogCta())
+        verify(mockPixel).fire(eq(SITE_NOT_WORKING_SHOWN), any(), any(), eq(Count))
+    }
+
+    @Test
+    fun whenUserClicksReportBrokenSiteThenPixelIsFired() = runTest {
+        testee.onUserClickCtaOkButton(BrokenSitePromptDialogCta())
+        verify(mockPixel).fire(eq(SITE_NOT_WORKING_WEBSITE_BROKEN), any(), any(), eq(Count))
+    }
+
+    @Test
     fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() = runTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
