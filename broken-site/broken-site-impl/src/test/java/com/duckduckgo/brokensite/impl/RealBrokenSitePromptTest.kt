@@ -2,18 +2,20 @@ package com.duckduckgo.brokensite.impl
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -24,11 +26,13 @@ class RealBrokenSitePromptTest {
     private val mockBrokenSiteReportRepository: BrokenSiteReportRepository = mock()
     private val fakeBrokenSitePromptRCFeature: BrokenSitePromptRCFeature = FakeFeatureToggleFactory.create(BrokenSitePromptRCFeature::class.java)
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private val testee = RealBrokenSitePrompt(
         brokenSiteReportRepository = mockBrokenSiteReportRepository,
         brokenSitePromptRCFeature = fakeBrokenSitePromptRCFeature,
         currentTimeProvider = mockCurrentTimeProvider,
+        duckGoUrlDetector = mockDuckGoUrlDetector,
     )
 
     @Before
@@ -49,22 +53,27 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndUpdateNextShownDate() =
+    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateEarlierThanDismissStreakDaysThenIncrementDismissStreakAndUpdateNextShownDate() =
         runTest {
-            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(5))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+            whenever(mockBrokenSiteReportRepository.getDismissStreakResetDays()).thenReturn(30)
+            whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
 
             testee.userDismissedPrompt()
 
-            verify(mockBrokenSiteReportRepository).setNextShownDate(LocalDate.now().plusDays(7))
+            val argumentCaptor = argumentCaptor<LocalDateTime>()
+            verify(mockBrokenSiteReportRepository).setNextShownDate(argumentCaptor.capture())
+            assertEquals(LocalDateTime.now().plusDays(30).toLocalDate(), argumentCaptor.firstValue.toLocalDate())
             verify(mockBrokenSiteReportRepository).incrementDismissStreak()
         }
 
     @Test
-    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDatLaterThanCooldownDaysThenIncrementDismissStreakAndDoNotUpdateNextShownDate() =
+    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateLaterThanCooldownDaysThenIncrementDismissStreakAndDoNotUpdateNextShownDate() =
         runTest {
-            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(11))
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(11))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+            whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
 
             testee.userDismissedPrompt()
 
@@ -75,7 +84,7 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenUserDismissPromptLessThanMaxDismissStreakTimesAndNextShownDateEarlierThanCooldownDaysThenIncrementDismissStreakAndNotSetNextShownDate() =
         runTest {
-            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDate.now().plusDays(5))
+            whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(5))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(0)
 
             testee.userDismissedPrompt()
@@ -99,7 +108,6 @@ class RealBrokenSitePromptTest {
         testee.userAcceptedPrompt()
 
         verify(mockBrokenSiteReportRepository).resetDismissStreak()
-        verify(mockBrokenSiteReportRepository).setNextShownDate(null)
     }
 
     @Test
@@ -145,7 +153,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(REFRESH_COUNT_LIMIT)
 
-        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
+        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
 
         assertTrue(result)
     }
@@ -155,7 +163,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         whenever(mockBrokenSiteReportRepository.getAndUpdateUserRefreshesBetween(any(), any())).thenReturn(2)
 
-        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
+        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
 
         assertFalse(result)
     }
@@ -165,7 +173,7 @@ class RealBrokenSitePromptTest {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
         fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(false))
 
-        val result = testee.shouldShowBrokenSitePrompt(nonNullSite.url)
+        val result = testee.shouldShowBrokenSitePrompt("https://example.com")
 
         assertFalse(result)
     }
