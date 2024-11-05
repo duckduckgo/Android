@@ -59,7 +59,8 @@ class RealBrokenSitePromptInMemoryStore @Inject constructor() : BrokenSitePrompt
         t2: LocalDateTime,
     ): Int {
         return refreshes?.let {
-            refreshes = it.copy(time = it.time.filter { time -> time.isAfter(t1) && time.isBefore(t2) })
+            val time = it.time.filter { time -> time.isAfter(t1) && time.isBefore(t2) }
+            refreshes = it.copy(time = time)
             it.time.size
         } ?: 0
     }
