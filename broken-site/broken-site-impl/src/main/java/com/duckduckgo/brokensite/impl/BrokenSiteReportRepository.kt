@@ -16,6 +16,7 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
@@ -56,7 +57,7 @@ interface BrokenSiteReportRepository {
     suspend fun getDismissStreak(): Int
     suspend fun resetDismissStreak()
     fun resetRefreshCount()
-    fun addRefresh(localDateTime: LocalDateTime)
+    fun addRefresh(url: Uri, localDateTime: LocalDateTime)
     fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 }
 
@@ -154,8 +155,8 @@ class RealBrokenSiteReportRepository(
         brokenSitePromptInMemoryStore.resetRefreshCount()
     }
 
-    override fun addRefresh(localDateTime: LocalDateTime) {
-        brokenSitePromptInMemoryStore.addRefresh(localDateTime)
+    override fun addRefresh(url: Uri, localDateTime: LocalDateTime) {
+        brokenSitePromptInMemoryStore.addRefresh(url, localDateTime)
     }
 
     override fun getAndUpdateUserRefreshesBetween(t1: LocalDateTime, t2: LocalDateTime): Int {
