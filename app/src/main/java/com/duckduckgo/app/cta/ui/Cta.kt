@@ -38,6 +38,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
@@ -1098,8 +1100,8 @@ sealed class HomePanelCta(
 class BrokenSitePromptDialogCta() : Cta {
 
     override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
-    override val shownPixel: Pixel.PixelName? = null
-    override val okPixel: Pixel.PixelName? = null
+    override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN
+    override val okPixel: Pixel.PixelName = SITE_NOT_WORKING_WEBSITE_BROKEN
     override val cancelPixel: Pixel.PixelName? = null
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf()
