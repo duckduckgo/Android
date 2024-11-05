@@ -36,20 +36,13 @@ jobs:
           # Fetch all tags
           git fetch --tags
           # Get the latest tag
-          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "Latest tag: $LATEST_TAG"
+          output=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
 
       - name: Output latest tag
         run: |
           echo "The latest tag is: ${{ steps.get_latest_tag.outputs.latest_tag }}"
-
-      - name: Get Previous tag
-        id: fetch_tag
-        uses: oprypin/find-latest-tag@v1.1.2
-        with:
-          repository: duckduckgo/android"
-          prefix: '5.'
 
       - name: Decode upload keys
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
@@ -84,12 +77,12 @@ jobs:
           gradle clean          
 
       - name: Assemble the bundle
-        run: gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.fetch_tag.outputs.tag }}
+        run: gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }}
 
       - name: Generate nightly version name
         id: generate_version_name
         run: |
-          output=$(gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.fetch_tag.outputs.tag }} --quiet | tail -n 1)
+          output=$(gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path
