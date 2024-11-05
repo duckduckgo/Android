@@ -834,7 +834,6 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
-        brokenSitePrompt.resetRefreshCount()
     }
 
     fun onViewHidden() {
@@ -975,7 +974,6 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
-        brokenSitePrompt.resetRefreshCount()
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -1193,7 +1191,6 @@ class BrowserTabViewModel @Inject constructor(
     override fun closeCurrentTab() {
         viewModelScope.launch {
             removeCurrentTabFromRepository()
-            brokenSitePrompt.resetRefreshCount()
         }
     }
 
@@ -1206,7 +1203,6 @@ class BrowserTabViewModel @Inject constructor(
     override fun closeAndSelectSourceTab() {
         viewModelScope.launch {
             removeAndSelectTabFromRepository()
-            brokenSitePrompt.resetRefreshCount()
         }
     }
 
@@ -1238,7 +1234,9 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            brokenSitePrompt.incrementRefreshCount()
+            site?.uri?.let {
+                brokenSitePrompt.pageLoaded(it)
+            }
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }
     }
@@ -1399,7 +1397,6 @@ class BrowserTabViewModel @Inject constructor(
                             }
                         }
                     }
-                    brokenSitePrompt.resetRefreshCount()
                 }
             }
 
