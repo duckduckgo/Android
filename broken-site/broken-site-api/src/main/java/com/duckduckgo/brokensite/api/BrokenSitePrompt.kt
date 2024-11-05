@@ -16,6 +16,8 @@
 
 package com.duckduckgo.brokensite.api
 
+import android.net.Uri
+
 interface BrokenSitePrompt {
 
     suspend fun userDismissedPrompt()
@@ -24,7 +26,7 @@ interface BrokenSitePrompt {
 
     suspend fun isFeatureEnabled(): Boolean
 
-    fun incrementRefreshCount()
+    fun pageLoaded(url: Uri)
 
     fun resetRefreshCount()
 
