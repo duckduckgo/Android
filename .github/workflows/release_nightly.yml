@@ -1,6 +1,8 @@
-name: Release - Upload Bundle to Play Store
+name: Release - Nightly Release to Internal and Firebase
 
 on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
   workflow_dispatch:
 
 env:
@@ -10,7 +12,7 @@ env:
 jobs:
   create-tag:
     name: Generate and upload nightly bundle to Play Store Internal track
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -100,3 +102,14 @@ jobs:
         with:
           name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
           path: duckduckgo.apk
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Nightly Release
+          asana-task-description: The Nightly Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
