@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.duckplayer
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
@@ -39,9 +38,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -212,15 +208,15 @@ class DuckPlayerJSHelper @Inject constructor(
             "openDuckPlayer" -> {
                 val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
-                    val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()
+                    if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        duckPlayer.willNavigateToDuckPlayerAutomatically()
                     } else {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
+                        duckPlayer.willNavigateToDuckPlayerFromOverlay()
                     }.toString()
                     if (openInNewTab && !isActiveCustomTab) {
-                        OpenInNewTab(newUrl, tabId)
+                        OpenInNewTab(it, tabId)
                     } else {
-                        Navigate(newUrl, mapOf())
+                        Navigate(it, mapOf())
                     }
                 }
             }
