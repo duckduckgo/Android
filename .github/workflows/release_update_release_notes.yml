@@ -7,7 +7,6 @@ on:
         description: 'App Version for Release'
         required: true
         default: 'PLACEHOLDER'
-
       release-notes:
       description: 'Release notes for the version'
       required: true
