@@ -66,7 +66,7 @@ class RealBrokenSitePrompt @Inject constructor(
         return _featureEnabled
     }
 
-    override fun pageLoaded(
+    override fun pageRefreshed(
         url: Uri,
     ) {
         brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
