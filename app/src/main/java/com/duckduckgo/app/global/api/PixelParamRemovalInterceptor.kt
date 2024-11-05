@@ -19,6 +19,8 @@ package com.duckduckgo.app.global.api
 import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -87,6 +89,9 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY.pixelName to PixelParameter.removeAtb(),
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FEATURES_ENABLED_AT_SEARCH_TIME.pixelName to PixelParameter.removeAll(),
+            SITE_NOT_WORKING_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SITE_NOT_WORKING_WEBSITE_BROKEN.pixelName to PixelParameter.removeAtb(),
+
         )
     }
 }
