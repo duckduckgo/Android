@@ -16,6 +16,7 @@
 
 package com.duckduckgo.brokensite.impl
 
+import android.net.Uri
 import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
@@ -189,10 +190,11 @@ class RealBrokenSiteReportRepositoryTest {
     @Test
     fun whenAddRefreshCalledThenAddRefreshIsCalled() = runTest {
         val localDateTime = LocalDateTime.now()
+        val url: Uri = mock()
 
-        testee.addRefresh(localDateTime)
+        testee.addRefresh(url, localDateTime)
 
-        verify(mockInMemoryStore).addRefresh(localDateTime)
+        verify(mockInMemoryStore).addRefresh(url, localDateTime)
     }
 
     @Test
