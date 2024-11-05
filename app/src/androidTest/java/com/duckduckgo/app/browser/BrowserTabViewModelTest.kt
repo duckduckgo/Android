@@ -106,7 +106,6 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -753,13 +752,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleThenc() {
-        setBrowserShowing(true)
-        testee.onViewVisible()
-        verify(mockBrokenSitePrompt).resetRefreshCount()
-    }
-
-    @Test
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         runTest {
             setBrowserShowing(false)
@@ -794,16 +786,6 @@ class BrowserTabViewModelTest {
         setBrowserShowing(true)
         testee.onViewResumed()
         assertCommandIssued<Command.ShowErrorWithAction>()
-    }
-
-    @Test
-    fun whenSubmittedQueryThenResetRefreshCount() {
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("https://example.com"))
-        whenever(mockOmnibarConverter.convertQueryToUrl(any(), eq(null), eq(FromUser))).thenReturn("https://example.com")
-
-        testee.onUserSubmittedQuery("https://example.com")
-
-        verify(mockBrokenSitePrompt).resetRefreshCount()
     }
 
     @Test
@@ -2458,13 +2440,6 @@ class BrowserTabViewModelTest {
         testee.userRequestedOpeningNewTab(longPress = true)
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
-    }
-
-    @Test
-    fun whenCloseCurrentTabThenResetRefreshCount() = runTest {
-        givenOneActiveTabSelected()
-        testee.closeCurrentTab()
-        verify(mockBrokenSitePrompt).resetRefreshCount()
     }
 
     @Test
@@ -5402,10 +5377,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
         testee.onRefreshRequested(triggeredByUser = false)
-        verify(mockBrokenSitePrompt, never()).incrementRefreshCount()
+        verify(mockBrokenSitePrompt, never()).pageLoaded(any())
+
         testee.onRefreshRequested(triggeredByUser = true)
-        verify(mockBrokenSitePrompt).incrementRefreshCount()
+        verify(mockBrokenSitePrompt).pageLoaded(url.toUri())
     }
 
     @Test
@@ -6043,14 +6022,6 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://example.com"))
 
         assertCommandIssued<HideBrokenSitePromptCta>()
-    }
-
-    @Test
-    fun whenNewPageThenResetRefreshCount() = runTest {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
-
-        verify(mockBrokenSitePrompt).resetRefreshCount()
     }
 
     @Test
