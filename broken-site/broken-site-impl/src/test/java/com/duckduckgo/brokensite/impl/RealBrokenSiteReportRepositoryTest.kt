@@ -21,7 +21,6 @@ import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -153,7 +152,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     @Test
     fun whenSetNextShownDateCalledThenNextShownDateIsSet() = runTest {
-        val nextShownDate = LocalDate.now()
+        val nextShownDate = LocalDateTime.now()
 
         testee.setNextShownDate(nextShownDate)
 
@@ -172,7 +171,7 @@ class RealBrokenSiteReportRepositoryTest {
 
     @Test
     fun whenGetNextShownDateCalledThenReturnNextShownDate() = runTest {
-        val nextShownDate = LocalDate.now()
+        val nextShownDate = LocalDateTime.now()
         whenever(mockDataStore.getNextShownDate()).thenReturn(nextShownDate)
 
         val result = testee.getNextShownDate()
