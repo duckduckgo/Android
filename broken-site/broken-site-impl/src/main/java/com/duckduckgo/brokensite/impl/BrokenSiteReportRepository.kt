@@ -136,7 +136,6 @@ class RealBrokenSiteReportRepository(
 
     override suspend fun setNextShownDate(nextShownDate: LocalDateTime?) {
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
-        // Log.d("BrokenSitePrompt", "Next shown date set to $nextShownDate")
     }
 
     override suspend fun getDismissStreak(): Int {
