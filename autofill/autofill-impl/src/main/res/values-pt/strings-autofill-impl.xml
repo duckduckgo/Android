@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">O preenchimento automático de palavras-passe não está disponível porque a tua versão do Android WebView é demasiado antiga.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">O preenchimento automático de palavras-passe não está disponível porque a tua versão do Android WebView está desatualizada ou é incompatível.</string>
 
     <string name="autofillManagementSearchClearDescription">Limpar introdução da pesquisa</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nAlgumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nunca pedir para este site</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Não, obrigado</string>
     <string name="credentialManagementInstructionNeverForThisSite">Se repuseres os sites excluídos, ser-te-á pedido que guardes a tua palavra-passe da próxima vez que iniciares sessão num destes sites.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Repor sites excluídos</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Repor sites excluídos?</string>

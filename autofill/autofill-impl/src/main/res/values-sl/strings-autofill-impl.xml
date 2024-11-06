@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Samodejno izpolnjevanje gesel ni na voljo, ker je vaša različica programa Android WebView prestara.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Samodejno izpolnjevanje gesel ni na voljo, ker je vaša različica programa Android WebView zastarela ali nezdružljiva.</string>
 
     <string name="autofillManagementSearchClearDescription">Počisti vhod iskanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ni rezultatov za »%1$s«</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nNekatera gesla so napačno oblikovana ali predolga in niso bila sinhronizirana.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikoli ne vprašaj za to spletno mesto</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Ne, hvala</string>
     <string name="credentialManagementInstructionNeverForThisSite">Če ponastavite izključena spletna mesta, boste ob naslednji prijavi na katero koli od teh spletnih mest pozvani, da shranite svojo prijavo.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Ponastavi izključena spletna mesta</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Želite ponastaviti izključena spletna mesta?</string>

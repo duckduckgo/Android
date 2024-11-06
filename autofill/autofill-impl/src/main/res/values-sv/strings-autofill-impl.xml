@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk ifyllning för lösenord är inte tillgängligt eftersom din version av Android WebView är för gammal.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk ifyllning för lösenord är inte tillgängligt eftersom din version av Android WebView är för gammal eller inkompatibel.</string>
 
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Fråga aldrig för den här webbplatsen</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Nej tack</string>
     <string name="credentialManagementInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Återställ exkluderade webbplatser</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Återställ exkluderade webbplatser?</string>
