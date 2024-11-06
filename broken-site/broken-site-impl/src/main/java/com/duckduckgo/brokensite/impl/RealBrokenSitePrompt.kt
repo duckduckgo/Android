@@ -52,7 +52,7 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.setNextShownDate(null)
     }
 
-    override fun isFeatureEnabled(): Boolean {
+    override suspend fun isFeatureEnabled(): Boolean {
         return _featureEnabled
     }
 }
