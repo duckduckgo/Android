@@ -329,7 +329,7 @@ platform :android do
 
         sh("git add #{appVersionFilePath}")
         sh("git commit -am 'Updated version number for new release - #{app_version}'")
-        # sh "git push origin #{branch_name}"
+        sh "git push origin #{branch_name}"
 
         # Merge release branch into main and tag it
         sh "git checkout main"

@@ -34,8 +34,13 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
-        run: |
-          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/        
+        run: |                  
           bundle exec fastlane android test_tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
