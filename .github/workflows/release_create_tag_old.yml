@@ -1,0 +1,53 @@
+name: Release - Create and Push Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-tag:
+    name: Create and Push git tag for version
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Use fastlane lane to create and push tagged release
+        id: create_git_tag
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Tag Android Release
+          asana-task-description: Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
