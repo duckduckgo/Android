@@ -270,26 +270,26 @@ internal class GeneralSettingsViewModelTest {
     }
 
     @Test
-    fun whenLaunchedThenShowOnAppLaunchIsVisibleByDefault() = runTest {
+    fun whenLaunchedThenShowOnAppLaunchIsNotVisibleByDefault() = runTest {
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(!state!!.isShowOnAppLaunchOptionVisible)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchFeatureIsDisabledThenIsShowOnAppLaunchOptionIsVisible() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(Toggle.State(enable = true))
+
         initTestee()
 
         testee.viewState.test {
             val state = awaitItem()
 
             assertTrue(state!!.isShowOnAppLaunchOptionVisible)
-        }
-    }
-
-    @Test
-    fun whenShowOnAppLaunchFeatureIsDisabledThenIsShowOnAppLaunchOptionIsHidden() = runTest {
-        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(Toggle.State(enable = false))
-
-        initTestee()
-
-        testee.viewState.test {
-            val state = awaitItem()
-
-            assertFalse(state!!.isShowOnAppLaunchOptionVisible)
         }
     }
 
