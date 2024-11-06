@@ -19,9 +19,11 @@ package com.duckduckgo.site.permissions.impl
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
@@ -259,15 +261,37 @@ class SitePermissionsRepositoryTest {
         verify(mockSitePermissionsDao).insert(testEntity)
     }
 
+    @Test
+    fun whenPermissionAllowedPermanentlyForTheFirstTimeThenEntityInsertedInDb() = runTest {
+        val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
+        val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
+        whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(null)
+        repository.sitePermissionPermanentlySaved(testEntity.domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, ALLOW_ALWAYS)
+
+        verify(mockSitePermissionsDao).insert(testEntity)
+    }
+
+    @Test
+    fun whenPermissionAllowedPermanentlyThenEntityInsertedInDb() = runTest {
+        val settingType = SitePermissionAskSettingType.ALLOW_ALWAYS
+        val testEntity = SitePermissionsEntity(domain, askLocationSetting = settingType.name)
+        whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(testEntity)
+        repository.sitePermissionPermanentlySaved(testEntity.domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, ALLOW_ALWAYS)
+
+        verify(mockSitePermissionsDao).insert(testEntity)
+    }
+
     private fun setInitialSettings(
         cameraEnabled: Boolean = true,
         micEnabled: Boolean = true,
         drmEnabled: Boolean = true,
+        locationEnabled: Boolean = true,
         sitePermissionEntity: SitePermissionsEntity? = null,
     ) = runTest {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsPreferences.askDrmEnabled).thenReturn(drmEnabled)
+        whenever(mockSitePermissionsPreferences.askLocationEnabled).thenReturn(locationEnabled)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(sitePermissionEntity)
     }
 

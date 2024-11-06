@@ -70,7 +70,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -117,7 +116,6 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -287,7 +285,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
-import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -1662,9 +1659,6 @@ class BrowserTabFragment :
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
-            is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainLocationPermission -> askSiteLocationPermission(it.locationPermissionRequest)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1908,118 +1902,6 @@ class BrowserTabFragment :
                 thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
             }
         }
-    }
-
-    private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkSystemLocationPermission(
-        domain: String,
-        deniedForever: Boolean,
-    ) {
-        if (locationPermissionsHaveNotBeenGranted()) {
-            if (deniedForever) {
-                viewModel.onSystemLocationPermissionDeniedForever()
-            } else {
-                showSystemLocationPermissionDialog(domain)
-            }
-        } else {
-            viewModel.onSystemLocationPermissionGranted()
-        }
-    }
-
-    private fun showSystemLocationPermissionDialog(domain: String) {
-        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
-
-        val originUrl = domain.websiteFromGeoLocationsApiOrigin()
-        val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
-        binding.systemPermissionDialogSubtitle.text = subtitle
-
-        val dialog = CustomAlertDialogBuilder(requireActivity())
-            .setView(binding)
-            .build()
-
-        binding.allowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionAllowed()
-            dialog.dismiss()
-        }
-
-        binding.denyLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNotAllowed()
-            dialog.dismiss()
-        }
-
-        binding.neverAllowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNeverAllowed()
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun requestLocationPermissions() {
-        requestPermissions(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ),
-            PERMISSION_REQUEST_GEO_LOCATION,
-        )
-    }
-
-    private fun askSiteLocationPermission(locationPermissionRequest: LocationPermissionRequest) {
-        if (!isActiveCustomTab() && !isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
-            return
-        }
-
-        activity?.let {
-            sitePermissionsDialogLauncher.showSiteLocationPermissionDialog(it, locationPermissionRequest, tabId)
-        }
-
-        // val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
-        //
-        // binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
-        // binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
-        //     getString(R.string.preciseLocationDDGDialogSubtitle)
-        // } else {
-        //     getString(R.string.preciseLocationSiteDialogSubtitle)
-        // }
-        //
-        // val dialog = MaterialAlertDialogBuilder(requireActivity())
-        //     .setView(binding.root)
-        //     .setOnCancelListener {
-        //         // Called when user clicks outside the dialog - deny to be safe
-        //         locationPermission.callback.invoke(locationPermission.origin, false, false)
-        //     }
-        //     .create()
-        //
-        // binding.siteAllowAlwaysLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteAllowOnceLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteDenyOnceLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
-        //     dialog.dismiss()
-        // }
-        //
-        // binding.siteDenyAlwaysLocationPermission.setOnClickListener {
-        //     viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
-        //     dialog.dismiss()
-        // }
-        //
-        // dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -3525,18 +3407,6 @@ class BrowserTabFragment :
                     omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
-
-            PERMISSION_REQUEST_GEO_LOCATION -> {
-                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    viewModel.onSystemLocationPermissionGranted()
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        viewModel.onSystemLocationPermissionDeniedOneTime()
-                    } else {
-                        viewModel.onSystemLocationPermissionDeniedTwice()
-                    }
-                }
-            }
         }
     }
 
@@ -3644,7 +3514,6 @@ class BrowserTabFragment :
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
-        private const val PERMISSION_REQUEST_GEO_LOCATION = 300
 
         private const val URL_BUNDLE_KEY = "url"
 

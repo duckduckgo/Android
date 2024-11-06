@@ -163,8 +163,6 @@ class BrowserChromeClient @Inject constructor(
     ) {
         Timber.d("Permissions: location permission requested $origin")
         onPermissionRequest(LocationPermissionRequest(origin, callback))
-
-        // webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
 
     override fun onCloseWindow(window: WebView?) {

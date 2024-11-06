@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
@@ -44,6 +45,7 @@ interface SitePermissionsRepository {
     suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
+    fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
@@ -129,22 +131,30 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
+
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
+        Timber.d("Permissions: permissionGrantedWithin24h $permissionGrantedWithin24h")
 
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
                 val isCameraAlwaysAllowed = sitePermissionForDomain?.askCameraSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isCameraAlwaysAllowed $isCameraAlwaysAllowed")
                 permissionGrantedWithin24h || isCameraAlwaysAllowed
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isMicAlwaysAllowed = sitePermissionForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isMicAlwaysAllowed $isMicAlwaysAllowed")
+
                 permissionGrantedWithin24h || isMicAlwaysAllowed
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
-                sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                val isDRMAlwaysAllowed = SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isDRMAlwaysAllowed $isDRMAlwaysAllowed")
+                sitePermissionForDomain?.askDrmSetting == isDRMAlwaysAllowed
             }
             LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
                 val isLocationAlwaysAllowed = sitePermissionForDomain?.askLocationSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                Timber.d("Permissions: isLocationAlwaysAllowed $isLocationAlwaysAllowed")
                 permissionGrantedWithin24h || isLocationAlwaysAllowed
             }
             else -> false
@@ -227,6 +237,34 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity) {
         withContext(dispatcherProvider.io()) {
             sitePermissionsDao.insert(sitePermissionsEntity)
+        }
+    }
+
+    override fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val domain = url.extractDomain() ?: url
+
+            val permissionToUpdate = sitePermissionsDao.getSitePermissionsByDomain(domain) ?: SitePermissionsEntity(domain = domain)
+
+            val permanentPermission = when (permission) {
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
+                    permissionToUpdate.copy(askCameraSetting = settingType.name)
+                }
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
+                    permissionToUpdate.copy(askMicSetting = settingType.name)
+                }
+                PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                    permissionToUpdate.copy(askDrmSetting = settingType.name)
+                }
+                LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
+                    permissionToUpdate.copy(askLocationSetting = settingType.name)
+                }
+                else -> {
+                    permissionToUpdate
+                }
+            }
+
+            sitePermissionsDao.insert(permanentPermission)
         }
     }
 }
