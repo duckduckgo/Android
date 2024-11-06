@@ -17,10 +17,12 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
     fun getExperimentSearchOptions(): List<DaxDialogIntroOption>
+    fun getPrivacyProContent(content: ContentType): Int
 }

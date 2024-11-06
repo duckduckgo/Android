@@ -302,8 +302,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun canShowPrivacyProCta(): Boolean {
-        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && subscriptions.isEligible() &&
-            extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
+            extendedOnboardingFeatureToggles.privacyProOnboardingCopyNov24().isEnabled()
     }
 
     @WorkerThread

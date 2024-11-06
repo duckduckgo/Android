@@ -21,11 +21,19 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.DESCRIPTION
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.PRIMARY_BUTTON
+import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.TITLE
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.mobile.android.R.drawable
 import java.util.Locale
 import javax.inject.Inject
 
-class OnboardingStoreImpl @Inject constructor(private val context: Context) : OnboardingStore {
+class OnboardingStoreImpl @Inject constructor(
+    private val context: Context,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+) : OnboardingStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
@@ -203,6 +211,42 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
                 link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
             ),
         )
+    }
+
+    override fun getPrivacyProContent(content: ContentType): Int {
+        val cohort = extendedOnboardingFeatureToggles.privacyProOnboardingCopyNov24().getCohort()?.name
+        return when (content) {
+            TITLE -> {
+                when (cohort) {
+                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogTitle
+                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogTitle
+                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogTitle
+                    else -> R.string.onboardingPrivacyProDaxDialogTitle
+                }
+            }
+            DESCRIPTION -> {
+                when (cohort) {
+                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogDescription
+                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogDescription
+                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogDescription
+                    else -> R.string.onboardingPrivacyProDaxDialogDescription
+                }
+            }
+            PRIMARY_BUTTON -> {
+                when (cohort) {
+                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogOkButton
+                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogOkButton
+                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogOkButton
+                    else -> R.string.onboardingPrivacyProDaxDialogOkButton
+                }
+            }
+        }
+    }
+
+    enum class ContentType {
+        TITLE,
+        DESCRIPTION,
+        PRIMARY_BUTTON,
     }
 
     companion object {

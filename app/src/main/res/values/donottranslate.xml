@@ -63,4 +63,18 @@
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
+    <!-- Privacy Pro onboarding copy test -->
+    <string name="onboardingPrivacyProProtectionDaxDialogTitle">Protection…</string>
+    <string name="onboardingPrivacyProProtectionDaxDialogDescription"><![CDATA[DuckDuckGo Protection also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProProtectionDaxDialogOkButton">Get More</string>
+    <string name="onboardingPrivacyProProtectionDaxDialogCancelButton">Skip</string>
+    <string name="onboardingPrivacyProPirDaxDialogTitle">PIR…</string>
+    <string name="onboardingPrivacyProPirDaxDialogDescription"><![CDATA[DuckDuckGo PIR also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProPirDaxDialogOkButton">PIR More</string>
+    <string name="onboardingPrivacyProPirDaxDialogCancelButton">Skip</string>
+    <string name="onboardingPrivacyProVpnDaxDialogTitle">VPN…</string>
+    <string name="onboardingPrivacyProVpnDaxDialogDescription"><![CDATA[DuckDuckGo VPN also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProVpnDaxDialogOkButton">VPN More</string>
+    <string name="onboardingPrivacyProVpnDaxDialogCancelButton">Skip</string>
+
 </resources>

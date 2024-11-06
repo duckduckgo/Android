@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -39,4 +40,14 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(false)
     @Experiment
     fun highlights(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun privacyProOnboardingCopyNov24(): Toggle
+
+    enum class Cohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        PROTECTION("protection"),
+        PIR("pir"),
+        VPN("vpn"),
+    }
 }
