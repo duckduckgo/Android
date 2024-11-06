@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsEmptyListBinding
+import com.duckduckgo.app.browser.databinding.ViewSitePermissionsSiteBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -49,7 +50,6 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(
@@ -96,24 +96,29 @@ class SitePermissionsAdapter(
                 val binding = ViewSitePermissionsDescriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SitePermissionsSimpleViewHolder(binding)
             }
+
             HEADER -> {
                 val binding = ViewSitePermissionsTitleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SitePermissionsHeaderViewHolder(binding, LayoutInflater.from(parent.context), viewModel)
             }
+
             TOGGLE -> {
                 val binding = ViewSitePermissionsToggleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SitePermissionToggleViewHolder(binding)
             }
+
             DIVIDER -> {
                 val view = HorizontalDivider(parent.context)
                 SitePermissionsDividerViewHolder(view)
             }
+
             SITES_EMPTY -> {
                 val binding = ViewSitePermissionsEmptyListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SitePermissionsSimpleViewHolder(binding)
             }
+
             SITE_ALLOWED_ITEM -> {
-                val binding = RowOneLineListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val binding = ViewSitePermissionsSiteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SiteViewHolder(binding, viewModel, lifecycleOwner, faviconManager)
             }
         }
@@ -127,6 +132,7 @@ class SitePermissionsAdapter(
             is SitePermissionToggle -> (holder as SitePermissionToggleViewHolder).bind(item) { _, isChecked ->
                 viewModel.permissionToggleSelected(isChecked, item.text)
             }
+
             is SiteAllowedItem -> (holder as SiteViewHolder).bind(item)
             else -> {}
         }
@@ -159,6 +165,7 @@ class SitePermissionsAdapter(
                         setOnClickListener { showOverflowMenu(isListEmpty) }
                     }
                 }
+
                 else -> binding.sitePermissionsSectionHeader.showOverflowMenuIcon(false)
             }
             binding.sitePermissionsSectionHeader.setText(title)
@@ -194,6 +201,7 @@ class SitePermissionsAdapter(
                         R.drawable.ic_location_blocked_24
                     }
                 }
+
                 R.string.sitePermissionsSettingsCamera -> {
                     if (item.enable) {
                         R.drawable.ic_video_24
@@ -201,6 +209,7 @@ class SitePermissionsAdapter(
                         R.drawable.ic_video_blocked_24
                     }
                 }
+
                 R.string.sitePermissionsSettingsMicrophone -> {
                     if (item.enable) {
                         R.drawable.ic_microphone_24
@@ -208,6 +217,7 @@ class SitePermissionsAdapter(
                         R.drawable.ic_microphone_blocked_24
                     }
                 }
+
                 R.string.sitePermissionsSettingsDRM -> {
                     if (item.enable) {
                         R.drawable.ic_video_player_24
@@ -215,6 +225,7 @@ class SitePermissionsAdapter(
                         R.drawable.ic_video_player_blocked_24
                     }
                 }
+
                 else -> null
             }
             iconRes?.let {
@@ -226,7 +237,7 @@ class SitePermissionsAdapter(
     }
 
     class SiteViewHolder(
-        private val binding: RowOneLineListItemBinding,
+        private val binding: ViewSitePermissionsSiteBinding,
         private val viewModel: SitePermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,

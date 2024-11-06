@@ -27,6 +27,7 @@ import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
@@ -57,6 +58,7 @@ import timber.log.Timber
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
+    private val faviconManager: FaviconManager,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -161,6 +163,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     override fun onPositiveButtonClicked() {
                         if (rememberChoice) {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                            storeFavicon(locationPermissionRequest.origin)
                         } else {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
                         }
@@ -171,6 +174,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     override fun onNegativeButtonClicked() {
                         if (rememberChoice) {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                            storeFavicon(locationPermissionRequest.origin)
                         } else {
                             pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                         }
@@ -201,10 +205,16 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     var rememberChoice = false
                     override fun onPositiveButtonClicked() {
                         onPermissionAllowed(rememberChoice)
+                        if (rememberChoice) {
+                            storeFavicon(url)
+                        }
                     }
 
                     override fun onNegativeButtonClicked() {
                         denyPermissions(rememberChoice)
+                        if (rememberChoice) {
+                            storeFavicon(url)
+                        }
                     }
 
                     override fun onCheckedChanged(checked: Boolean) {
@@ -267,6 +277,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         if (rememberChoice) {
                             grantPermissions()
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
+                            storeFavicon(url)
                         } else {
                             sitePermissionsRepository.saveDrmForSession(domain, true)
                             grantPermissions()
@@ -277,6 +288,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         denyPermissions(rememberChoice)
                         if (rememberChoice) {
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
+                            storeFavicon(url)
                         } else {
                             sitePermissionsRepository.saveDrmForSession(domain, false)
                         }
@@ -536,6 +548,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 },
             )
             .show()
+    }
+
+    private fun storeFavicon(url: String) {
+        appCoroutineScope.launch {
+            faviconManager.persistCachedFavicon(tabId, url)
+        }
     }
 
     companion object {

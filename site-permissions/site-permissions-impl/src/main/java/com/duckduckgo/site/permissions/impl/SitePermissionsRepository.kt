@@ -149,7 +149,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
                 val isDRMAlwaysAllowed = SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                Timber.d("Permissions: isCameraAlwaysAllowed $isDRMAlwaysAllowed")
+                Timber.d("Permissions: isDRMAlwaysAllowed $isDRMAlwaysAllowed")
                 sitePermissionForDomain?.askDrmSetting == isDRMAlwaysAllowed
             }
             LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> {
