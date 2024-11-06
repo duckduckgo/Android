@@ -22,5 +22,5 @@ interface BrokenSitePrompt {
 
     suspend fun userAcceptedPrompt()
 
-    fun isFeatureEnabled(): Boolean
+    suspend fun isFeatureEnabled(): Boolean
 }
