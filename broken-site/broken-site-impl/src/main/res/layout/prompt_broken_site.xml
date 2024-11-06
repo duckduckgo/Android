@@ -27,6 +27,7 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_4"
     android:alpha="0"
+    android:elevation="4dp"
     tools:alpha="1">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
