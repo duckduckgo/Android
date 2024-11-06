@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Completarea automată a parolelor nu este disponibilă, deoarece versiunea ta de Android WebView este prea veche.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Completarea automată a parolelor nu este disponibilă, deoarece versiunea ta de Android WebView este învechită sau incompatibilă.</string>
 
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nUnele parole sunt formatate incorect sau sunt prea lungi și nu au fost sincronizate.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nu solicita niciodată pentru acest site</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Nu, mulțumesc</string>
     <string name="credentialManagementInstructionNeverForThisSite">Dacă resetezi site-urile excluse, ți se va solicita să îți salvezi parola data viitoare când te conectezi la oricare dintre aceste site-uri.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Resetează site-urile excluse</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Resetezi site-urile excluse?</string>

@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автоматичното попълване за пароли не е достъпно, защото Вашата версия на Android WebView е твърде стара.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автоматичното попълване на пароли не е достъпно, тъй като Вашата версия на Android WebView е остаряла или несъвместима.</string>
 
     <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b></b>\nСинхронизирането на пароли е на пауза\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Никога не питай за този сайт</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Не, благодаря</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Нулиране на изключените сайтове</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Нулиране на изключените сайтове?</string>

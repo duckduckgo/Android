@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatinis slaptažodžių įrašymas nepasiekiamas, nes jūsų „Android WebView“ versija yra per sena.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatinis slaptažodžių įrašymas nepasiekiamas, nes jūsų „Android WebView“ versija yra pasenusi arba nesuderinama.</string>
 
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nKai kurie slaptažodžiai suformatuoti neteisingai arba yra per ilgi ir nebuvo sinchronizuoti.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Niekada neklauskite šioje svetainėje</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Ne, dėkoju</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jei iš naujo nustatysite neįtrauktas svetaines, kitą kartą, kai prisijungsite prie bet kurios iš šių svetainių, būsite paraginti išsaugoti savo slaptažodį.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Iš naujo nustatyti neįtrauktas svetaines</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Iš naujo nustatyti neįtrauktas svetaines?</string>

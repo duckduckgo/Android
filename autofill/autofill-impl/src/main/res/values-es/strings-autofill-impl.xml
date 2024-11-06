@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">La función de autocompletar para las contraseñas no está disponible porque tu versión de Android WebView es demasiado antigua.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">La función de autocompletar para las contraseñas no está disponible porque tu versión de Android WebView está desfasada o es incompatible.</string>
 
     <string name="autofillManagementSearchClearDescription">Borrar búsqueda</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Sin resultados para «%1$s»</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>La sincronización de contraseña está en pausa</b>\nAlgunas contraseñas tienen un formato incorrecto o son demasiado largas y no se han sincronizado.</string>
 
     <string name="saveLoginDialogNeverForThisSite">No preguntar nunca para esta página</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">No, gracias</string>
     <string name="credentialManagementInstructionNeverForThisSite">Si restableces los sitios excluidos, se te pedirá que guardes tu contraseña la próxima vez que accedas a cualquiera de estos sitios.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Restablecer sitios excluidos</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">¿Restablecer sitios excluidos?</string>
