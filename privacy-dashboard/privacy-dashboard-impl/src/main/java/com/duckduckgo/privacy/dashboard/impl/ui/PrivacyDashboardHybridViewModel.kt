@@ -35,7 +35,10 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
+import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
@@ -92,6 +95,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
+    private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -331,7 +335,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_REMOVE
                             else -> null
                         }
-                        pixelName?.let { pixel.fire(it, pixelParams, type = Count) }
+                        pixelName?.let {
+                            pixel.fire(it, pixelParams, type = Count)
+                            val origin = if (it == PRIVACY_DASHBOARD_ALLOWLIST_REMOVE) {
+                                PrivacyToggleOrigin.DASHBOARD
+                            } else {
+                                PrivacyToggleOrigin.BREAKAGE_FORM
+                            }
+                            privacyProtectionTogglePlugin.getPlugins().forEach { plugin ->
+                                plugin.onToggleOn(origin)
+                            }
+                        }
                     }
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
@@ -345,7 +359,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_ADD
                             else -> null
                         }
-                        pixelName?.let { pixel.fire(it, pixelParams, type = Count) }
+                        pixelName?.let { it ->
+                            pixel.fire(it, pixelParams, type = Count)
+                            val origin = if (it == PRIVACY_DASHBOARD_ALLOWLIST_ADD) {
+                                PrivacyToggleOrigin.DASHBOARD
+                            } else {
+                                PrivacyToggleOrigin.BREAKAGE_FORM
+                            }
+                            privacyProtectionTogglePlugin.getPlugins().forEach { plugin ->
+                                plugin.onToggleOff(origin)
+                            }
+                        }
                     }
                 }
                 privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(event.isProtected)

@@ -90,3 +90,24 @@ enum class Size {
         }
     }
 }
+
+enum class ButtonType {
+    PRIMARY,
+    GHOST,
+    SECONDARY,
+    DESTRUCTIVE,
+    GHOST_DESTRUCTIVE,
+    GHOST_ALT,
+    ;
+
+    fun getView(context: Context): DaxButton {
+        return when (this) {
+            PRIMARY -> DaxButtonPrimary(context, null)
+            GHOST -> DaxButtonGhost(context, null)
+            SECONDARY -> DaxButtonSecondary(context, null)
+            DESTRUCTIVE -> DaxButtonDestructive(context, null)
+            GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
+            GHOST_ALT -> DaxButtonGhostAlt(context, null)
+        }
+    }
+}

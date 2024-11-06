@@ -198,6 +198,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
     AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
 
+    AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION("m_autocomplete_click_switch_to_tab"),
+
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
 
@@ -218,6 +220,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_SWITCH_TO_TAB("m_autocomplete_displayed_switch_to_tab"),
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
@@ -358,17 +361,17 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
+    DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS("duckplayer_landscape_layout_impressions"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
     REFERRAL_INSTALL_UTM_CAMPAIGN("m_android_install"),
-
-    INDONESIA_MESSAGE_SHOWN("m_indonesia_message_shown_d"),
-    INDONESIA_MESSAGE_DISMISSED("m_indonesia_message_dismissed"),
 
     REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
     RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
     RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
 
     URI_LOADED("m_uri_loaded"),
+
+    ERROR_PAGE_SHOWN("m_errorpageshown"),
 }

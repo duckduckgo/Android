@@ -9,8 +9,6 @@ import com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionViewMod
 import com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionViewModel.Companion.MCC_INDONESIA
 import com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionViewModel.Companion.MCC_UNDEFINED
 import com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionViewModel.ViewState
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -34,7 +32,6 @@ class IndonesiaNewTabSectionViewModelTest {
 
     private val mockIndonesiaNewTabSectionDataStore: IndonesiaNewTabSectionDataStore = mock()
     private val mockApplicationContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val mockPixel: Pixel = mock()
 
     private lateinit var testee: IndonesiaNewTabSectionViewModel
 
@@ -44,7 +41,6 @@ class IndonesiaNewTabSectionViewModelTest {
             mockIndonesiaNewTabSectionDataStore,
             coroutinesTestRule.testDispatcherProvider,
             mockApplicationContext,
-            mockPixel,
         )
     }
 
@@ -77,17 +73,9 @@ class IndonesiaNewTabSectionViewModelTest {
     }
 
     @Test
-    fun whenOnMessageDismissedThenDismissMessageCalledOnDataStoreAndPixelFired() = runTest {
+    fun whenOnMessageDismissedThenDismissMessageCalledOnDataStore() = runTest {
         testee.onMessageDismissed()
 
         verify(mockIndonesiaNewTabSectionDataStore).dismissMessage()
-        verify(mockPixel).fire(AppPixelName.INDONESIA_MESSAGE_DISMISSED)
-    }
-
-    @Test
-    fun whenOnMessageShownThenDailyPixelFired() = runTest {
-        testee.onMessageShown()
-
-        verify(mockPixel).fire(AppPixelName.INDONESIA_MESSAGE_SHOWN, type = Pixel.PixelType.Daily())
     }
 }

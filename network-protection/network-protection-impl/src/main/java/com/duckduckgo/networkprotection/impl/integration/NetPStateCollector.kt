@@ -25,12 +25,12 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
+import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isActive
-import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.Inet4Address

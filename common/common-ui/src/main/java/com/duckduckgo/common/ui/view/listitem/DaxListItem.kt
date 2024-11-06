@@ -60,7 +60,7 @@ abstract class DaxListItem(
     }
 
     /** Sets the primary text title */
-    fun setPrimaryText(title: String?) {
+    fun setPrimaryText(title: CharSequence?) {
         primaryText.text = title
     }
 
@@ -85,7 +85,7 @@ abstract class DaxListItem(
     }
 
     /** Sets the secondary text title */
-    fun setSecondaryText(title: String?) {
+    fun setSecondaryText(title: CharSequence?) {
         secondaryText?.text = title
     }
 

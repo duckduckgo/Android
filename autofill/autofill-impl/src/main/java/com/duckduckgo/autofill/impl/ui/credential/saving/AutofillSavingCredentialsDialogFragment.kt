@@ -64,6 +64,7 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -115,6 +116,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private lateinit var keyFeaturesContainer: ViewGroup
 
+    private lateinit var secondaryButton: DaxButton
+
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
     }
@@ -157,12 +160,14 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun renderViewState(viewState: ViewState) {
         keyFeaturesContainer.isVisible = viewState.expandedDialog
+        configureSecondaryButtons(viewState.expandedDialog)
         (dialog as? BottomSheetDialog)?.behavior?.isDraggable = viewState.expandedDialog
         pixelNameDialogEvent(Shown, viewState.expandedDialog)?.let { pixel.fire(it) }
     }
 
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
         keyFeaturesContainer = binding.keyFeaturesContainer
+        secondaryButton = binding.secondaryButton
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureCloseButtons(binding)
         configureSaveButton(binding)
@@ -222,6 +227,16 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
+    private fun onUserChoseNotNow() {
+        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let { pixel.fire(it) }
+
+        // this is another way to refuse saving credentials, so ensure that normal logic still runs
+        onUserRejectedToSaveCredentials()
+
+        // avoid the standard cancellation logic from running
+        ignoreCancellationEvents = true
+    }
+
     private fun onUserChoseNeverSaveThisSite() {
         pixelNameDialogEvent(Exclude, isOnboardingMode())?.let { pixel.fire(it) }
         viewModel.addSiteToNeverSaveList(getOriginalUrl())
@@ -239,9 +254,21 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
      */
     private fun configureCloseButtons(binding: ContentAutofillSaveNewCredentialsBinding) {
         binding.closeButton.setOnClickListener { animateClosed() }
-        binding.neverSaveForThisSiteButton.setOnClickListener {
-            onUserChoseNeverSaveThisSite()
-            animateClosed()
+    }
+
+    private fun configureSecondaryButtons(isOnboarding: Boolean) {
+        if (isOnboarding) {
+            secondaryButton.text = getString(R.string.saveOnboardingLoginDialogSecondaryButton)
+            secondaryButton.setOnClickListener {
+                onUserChoseNotNow()
+                animateClosed()
+            }
+        } else {
+            secondaryButton.text = getString(R.string.saveLoginDialogNeverForThisSite)
+            secondaryButton.setOnClickListener {
+                onUserChoseNeverSaveThisSite()
+                animateClosed()
+            }
         }
     }
 

@@ -69,11 +69,10 @@ interface AndroidBrowserConfigFeature {
     fun optimizeTrackerEvaluationV2(): Toggle
 
     /**
-     * This feature flag guards a fix for blob downloads
-     *
-     * @return always returns `true` for internal builds
-     * @return `true` when the remote feature is enabled.
+     * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(true)
-    fun fixBlobDownloadWithIframes(): Toggle
+    fun errorPagePixel(): Toggle
 }

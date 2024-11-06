@@ -6,7 +6,6 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import java.util.concurrent.TimeUnit.DAYS
 import kotlinx.coroutines.test.runTest
@@ -36,7 +35,6 @@ class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
         expiresOrRenewsAt = DAYS.toMillis(10),
         status = AUTO_RENEWABLE,
         platform = "google",
-        entitlements = listOf(Entitlement("name", "product")),
     )
 
     @Before

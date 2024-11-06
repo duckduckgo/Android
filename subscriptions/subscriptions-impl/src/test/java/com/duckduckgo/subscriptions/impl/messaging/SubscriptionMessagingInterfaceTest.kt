@@ -7,12 +7,11 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.AccessToken
-import com.duckduckgo.subscriptions.impl.AuthToken
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -642,29 +641,28 @@ class SubscriptionMessagingInterfaceTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
-                entitlements = listOf(Entitlement("name", "product")),
             ),
         )
     }
 
     private suspend fun givenAuthTokenIsSuccess() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Success(authToken = "authToken"))
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthTokenResult.Success(authToken = "authToken"))
     }
 
     private suspend fun givenAuthTokenIsFailure() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.UnknownError)
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthTokenResult.Failure.UnknownError)
     }
 
     private suspend fun givenAuthTokenIsExpired() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.TokenExpired(authToken = "authToken"))
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthTokenResult.Failure.TokenExpired(authToken = "authToken"))
     }
 
     private suspend fun givenAccessTokenIsSuccess() {
-        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success(accessToken = "accessToken"))
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success(accessToken = "accessToken"))
     }
 
     private suspend fun givenAccessTokenIsFailure() {
-        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure(message = "something happened"))
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure(message = "something happened"))
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

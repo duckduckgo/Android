@@ -48,7 +48,6 @@ class DevSettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
         val userAgent: String = "",
@@ -70,7 +69,6 @@ class DevSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
                     userAgent = userAgentProvider.userAgent("", false),
@@ -86,15 +84,6 @@ class DevSettingsViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
-    }
-
-    fun onNextTdsToggled(nextTds: Boolean) {
-        Timber.i("User toggled next tds, is now enabled: $nextTds")
-        devSettingsDataStore.nextTdsEnabled = nextTds
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(nextTdsEnabled = nextTds))
-            command.send(Command.SendTdsIntent)
-        }
     }
 
     fun onStartupTraceToggled(value: Boolean) {

@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatické vyplňování hesel není dostupné, protože tvoje verze Android WebView je moc stará.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatické vyplňování hesel není dostupné, protože tvoje verze Android WebView je zastaralá nebo nekompatibilní.</string>
 
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nNěkterá hesla jsou nesprávně naformátovaná nebo moc dlouhá, takže jsme je nemohli synchronizovat.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Na téhle stránce už se neptat</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Ne, děkuji</string>
     <string name="credentialManagementInstructionNeverForThisSite">Pokud vyloučené weby resetuješ, při příštím přihlašování na některý z nich se ti zobrazí výzva k uložení hesla.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Obnovit vyloučené stránky</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Obnovit vyloučené stránky?</string>

@@ -28,7 +28,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -69,14 +68,14 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenGetAccessTokenSucceedsThenReturnAccessToken() = runTest {
-        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
         val result = subscriptions.getAccessToken()
         assertEquals("accessToken", result)
     }
 
     @Test
     fun whenGetAccessTokenFailsThenReturnNull() = runTest {
-        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure("error"))
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("error"))
         assertNull(subscriptions.getAccessToken())
     }
 
@@ -87,18 +86,6 @@ class RealSubscriptionsTest {
 
         subscriptions.getEntitlementStatus().test {
             assertTrue(awaitItem().isNotEmpty())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenGetEntitlementStatusHasEntitlementAndEnabledAndInactiveThenReturnEmptyList() = runTest {
-        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(INACTIVE)
-        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
-
-        subscriptions.getEntitlementStatus().test {
-            assertTrue(awaitItem().isEmpty())
-            verify(mockSubscriptionsManager).removeEntitlements()
             cancelAndConsumeRemainingEvents()
         }
     }

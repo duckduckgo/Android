@@ -79,6 +79,14 @@ interface NetworkProtectionState {
      */
     fun getConnectionStateFlow(): Flow<ConnectionState>
 
+    /**
+     * This is a suspend function because the operation can take time.
+     * You DO NOT need to set any dispatcher to call this suspend function
+     *
+     * @return a list of app packages that is excluded from Network Protection
+     */
+    suspend fun getExcludedApps(): List<String>
+
     enum class ConnectionState {
         CONNECTED,
         CONNECTING,

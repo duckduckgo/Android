@@ -4,7 +4,6 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -25,7 +24,6 @@ class RMFPProBillingPeriodMatchingAttributeTest {
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,
         platform = "Google",
-        entitlements = listOf(Entitlement("name", "product")),
     )
 
     @Before

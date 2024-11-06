@@ -76,6 +76,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -109,6 +110,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -824,7 +826,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1366,9 +1368,9 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
         if (appTheme.isLightModeEnabled()) {
-            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
-            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
     }
@@ -1741,6 +1743,14 @@ class BrowserTabFragment :
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
+            }
+            is Command.SwitchToTab -> {
+                binding.focusedView.gone()
+                if (binding.autoCompleteSuggestionsList.isVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+                binding.autoCompleteSuggestionsList.gone()
+                browserActivity?.openExistingTab(it.tabId)
             }
             else -> {
                 // NO OP
@@ -2398,6 +2408,9 @@ class BrowserTabFragment :
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.addItemDecoration(
+            SuggestionItemDecoration(ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!),
+        )
     }
 
     private fun configureNewTab() {
@@ -2637,7 +2650,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
                             it.url
                         }
                     }
@@ -2652,7 +2665,7 @@ class BrowserTabFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
                             it.url
                         }
                     }
@@ -3720,7 +3733,9 @@ class BrowserTabFragment :
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
                         showFocusedView()
-                        viewModel.autoCompleteSuggestionsGone()
+                        if (binding.autoCompleteSuggestionsList.isVisible) {
+                            viewModel.autoCompleteSuggestionsGone()
+                        }
                         binding.autoCompleteSuggestionsList.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
@@ -3728,7 +3743,9 @@ class BrowserTabFragment :
                         hideFocusedView()
                     }
                 } else {
-                    viewModel.autoCompleteSuggestionsGone()
+                    if (binding.autoCompleteSuggestionsList.isVisible) {
+                        viewModel.autoCompleteSuggestionsGone()
+                    }
                     binding.autoCompleteSuggestionsList.gone()
                     hideFocusedView()
                 }
@@ -4129,12 +4146,14 @@ class BrowserTabFragment :
         }
 
         private fun goFullScreen() {
+            omnibar.hide()
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {
+            omnibar.show()
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()

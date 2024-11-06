@@ -117,25 +117,43 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     private suspend fun getFeatureViews(): List<View> = withContext(dispatcherProvider.io()) {
         val toggles = this@FeatureToggleInventoryActivity.toggles.await()
         val match = featureNameFilter.get().lowercase()
-        val parentFeature = toggles
+        val parentFeatures = toggles
             .filter { it.featureName().parentName == null }
             .sortedBy { it.featureName().name.lowercase() }
         val subFeatures = toggles
             .filter { it.featureName().parentName != null }
             .sortedBy { it.featureName().name.lowercase() }
+
         val features = mutableListOf<Toggle>().apply {
-            for (parent in parentFeature) {
-                add(parent)
-                addAll(subFeatures.filter { it.featureName().parentName == parent.featureName().name })
+            // add parent features that match and all their sub-features
+            parentFeatures.forEach { parentFeature ->
+                if (match.isNotBlank()) {
+                    if (parentFeature.featureName().name.lowercase().contains(match)) {
+                        add(parentFeature)
+                        // add also all sub-features
+                        addAll(
+                            subFeatures.filter { it.featureName().parentName == parentFeature.featureName().name },
+                        )
+                    }
+                } else {
+                    for (parent in parentFeatures) {
+                        add(parent)
+                        addAll(subFeatures.filter { it.featureName().parentName == parent.featureName().name })
+                    }
+                }
             }
-        }.filter {
-            if (match.isNotBlank()) {
-                // Apply search box filter if needed
-                it.featureName().name.lowercase().contains(match)
-            } else {
-                true
+
+            // add sub-features that match and their parent feature
+            subFeatures.forEach { feature ->
+                if (match.isNotBlank() && feature.featureName().name.lowercase().contains(match)) {
+                    // add its parent too
+                    addAll(
+                        parentFeatures.filter { it.featureName().name == feature.featureName().parentName },
+                    )
+                    add(feature)
+                }
             }
-        }
+        }.distinct() // de-dup
 
         val views = features.map { feature ->
             OneLineListItem(this@FeatureToggleInventoryActivity).apply {

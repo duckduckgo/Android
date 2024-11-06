@@ -3,7 +3,6 @@ package com.duckduckgo.subscriptions.impl.rmf
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -73,7 +72,6 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "Google",
-                entitlements = listOf(Entitlement("name", "product")),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("google", "ios")))
@@ -93,7 +91,6 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "iOS",
-                entitlements = listOf(Entitlement("name", "product")),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
@@ -124,7 +121,6 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "",
-                entitlements = listOf(Entitlement("name", "product")),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))

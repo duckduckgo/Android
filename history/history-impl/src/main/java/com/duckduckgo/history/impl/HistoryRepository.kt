@@ -20,14 +20,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
-import io.reactivex.Single
 import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 interface HistoryRepository {
-    fun getHistoryObservable(): Single<List<HistoryEntry>>
+    fun getHistory(): Flow<List<HistoryEntry>>
 
     suspend fun saveToHistory(
         url: String,
@@ -60,21 +62,11 @@ class RealHistoryRepository(
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null
 
-    override fun getHistoryObservable(): Single<List<HistoryEntry>> {
-        return if (cachedHistoryEntries != null) {
-            Single.just(cachedHistoryEntries)
-        } else {
-            Single.create { emitter ->
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    try {
-                        emitter.onSuccess(fetchAndCacheHistoryEntries())
-                    } catch (e: Exception) {
-                        emitter.onError(e)
-                    }
-                }
-            }
-        }
-    }
+    override fun getHistory(): Flow<List<HistoryEntry>> = runCatching {
+        flow {
+            emit(cachedHistoryEntries ?: fetchAndCacheHistoryEntries())
+        }.flowOn(dispatcherProvider.io())
+    }.getOrElse { flowOf(emptyList()) }
 
     override suspend fun saveToHistory(
         url: String,

@@ -105,7 +105,6 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
                 viewModel.onMessageDismissed()
             }
             show()
-            viewModel.onMessageShown()
         }
     }
 }

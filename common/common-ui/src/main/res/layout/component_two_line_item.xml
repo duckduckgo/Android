@@ -320,4 +320,13 @@
         app:secondaryText="With custom Secondary Text color"
         app:secondaryTextColorOverlay="@color/destructive_text_color_selector" />
 
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithHTMLTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithSecondaryTextColorOverlay"
+         />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

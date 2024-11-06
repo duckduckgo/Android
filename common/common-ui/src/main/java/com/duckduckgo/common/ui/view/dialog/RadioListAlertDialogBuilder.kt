@@ -18,12 +18,12 @@ package com.duckduckgo.common.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RadioGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.button.RadioButton
 import com.duckduckgo.common.ui.view.gone
@@ -50,10 +50,11 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var titleText: CharSequence = ""
     private var messageText: CharSequence = ""
     private var positiveButtonText: CharSequence = ""
+    private var positiveButtonType: ButtonType = ButtonType.PRIMARY
     private var negativeButtonText: CharSequence = ""
+    private var negativeButtonType: ButtonType? = null
     private var optionList: MutableList<CharSequence> = mutableListOf()
     private var selectedOption: Int? = null
-    private var isDestructiveVersion: Boolean = false
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
         titleText = context.getText(textId)
@@ -99,18 +100,21 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
-    fun setPositiveButton(@StringRes textId: Int): RadioListAlertDialogBuilder {
+    fun setPositiveButton(
+        @StringRes textId: Int,
+        buttonType: ButtonType = ButtonType.PRIMARY,
+    ): RadioListAlertDialogBuilder {
         positiveButtonText = context.getText(textId)
+        positiveButtonType = buttonType
         return this
     }
 
-    fun setNegativeButton(@StringRes textId: Int): RadioListAlertDialogBuilder {
+    fun setNegativeButton(
+        @StringRes textId: Int,
+        buttonType: ButtonType = ButtonType.GHOST,
+    ): RadioListAlertDialogBuilder {
         negativeButtonText = context.getText(textId)
-        return this
-    }
-
-    fun setDestructiveButtons(isDestructive: Boolean): RadioListAlertDialogBuilder {
-        isDestructiveVersion = isDestructive
+        negativeButtonType = buttonType
         return this
     }
 
@@ -175,8 +179,8 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             selectedOption?.let { check(it) }
             setOnCheckedChangeListener { _, checkedId ->
                 listener.onRadioItemSelected(checkedId)
-                binding.radioListDialogPositiveButton.isEnabled = true
-                binding.radioListDialogDestructivePositiveButton.isEnabled = true
+                // enable positive button added to the container
+                binding.radioListAlertDialogButtonContainer.getChildAt(1).isEnabled = true
             }
         }
 
@@ -187,34 +191,27 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,
     ) {
-        binding.radioListDialogPositiveButton.isVisible = !isDestructiveVersion
-        binding.radioListDialogPositiveButton.isEnabled = selectedOption != null
-        binding.radioListDialogDestructivePositiveButton.isVisible = isDestructiveVersion
-        binding.radioListDialogDestructivePositiveButton.isEnabled = selectedOption != null
-        binding.radioListDialogNegativeButton.isVisible = !isDestructiveVersion
-        binding.radioListDestructiveDialogNegativeButton.isVisible = isDestructiveVersion
+        val negativeButton = negativeButtonType
+        if (negativeButton != null) {
+            val negativeButtonView = negativeButton.getView(context)
+            setButtonListener(negativeButtonView, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
 
-        if (isDestructiveVersion) {
-            setButtonListener(
-                binding.radioListDialogDestructivePositiveButton,
-                positiveButtonText,
-                dialog,
-            ) { listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId) }
-            setButtonListener(binding.radioListDestructiveDialogNegativeButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
-            // no need to get fancy, just change the button textColor
-            binding.radioListDestructiveDialogNegativeButton.setTextColor(
-                ContextCompat.getColorStateList(
-                    context,
-                    R.color.secondary_text_color_selector,
-                ),
+            binding.radioListAlertDialogButtonContainer.addView(negativeButtonView)
+            val layoutParams = negativeButtonView.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.setMargins(
+                layoutParams.leftMargin,
+                layoutParams.topMargin,
+                context.resources.getDimensionPixelSize(R.dimen.keyline_2),
+                layoutParams.bottomMargin,
             )
-        } else {
-            setButtonListener(
-                binding.radioListDialogPositiveButton,
-                positiveButtonText,
-                dialog,
-            ) { listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId) }
-            setButtonListener(binding.radioListDialogNegativeButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
+            negativeButtonView.layoutParams = layoutParams
+        }
+
+        val positiveButtonView = positiveButtonType.getView(context)
+        positiveButtonView.isEnabled = selectedOption != null
+        binding.radioListAlertDialogButtonContainer.addView(positiveButtonView)
+        setButtonListener(positiveButtonView, positiveButtonText, dialog) {
+            listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
         }
     }
 

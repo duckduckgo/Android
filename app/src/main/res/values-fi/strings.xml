@@ -20,7 +20,7 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="duckDuckGoPrivacySimplified">Itsestään selvää tietosuojaa</string>
+    <string name="duckDuckGoTagline">Tietosuoja on ehdoton prioriteettimme.</string>
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>
     <string name="open">Avaa</string>
@@ -89,6 +89,7 @@
     <string name="autocompleteRemoveItemTitle">Poistetaanko hakuehdotus?</string>
     <string name="autocompleteRemoveItemCancel">Peruuta</string>
     <string name="autocompleteRemoveItemRemove">Poista</string>
+    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Vaihda välilehdelle · %1$s</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Avaa ulkoinen sovellus</string>

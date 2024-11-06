@@ -45,13 +45,15 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
+import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -150,6 +152,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
@@ -189,6 +192,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -202,8 +206,10 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -218,6 +224,8 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
+import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -238,9 +246,6 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -251,6 +256,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -464,8 +470,6 @@ class BrowserTabViewModelTest {
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
-    private val androidBrowserConfig: AndroidBrowserConfigFeature = mock()
-
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -490,6 +494,10 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
+    private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
+    private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
+    private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
 
     @Before
     fun before() = runTest {
@@ -506,8 +514,10 @@ class BrowserTabViewModelTest {
             mockNavigationHistory,
             mockAutoCompleteScorer,
             mockAutoCompleteRepository,
+            mockTabRepository,
             mockUserStageStore,
             coroutineRule.testDispatcherProvider,
+            mockAutocompleteTabsFeature,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
@@ -526,7 +536,6 @@ class BrowserTabViewModelTest {
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
-        whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -535,6 +544,8 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
+        whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -639,7 +650,7 @@ class BrowserTabViewModelTest {
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
             cameraHardwareChecker = cameraHardwareChecker,
-            androidBrowserConfig = androidBrowserConfig,
+            androidBrowserConfig = fakeAndroidConfigBrowserFeature,
             privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
@@ -657,6 +668,7 @@ class BrowserTabViewModelTest {
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            privacyProtectionTogglePlugin = protectionTogglePluginPoint,
         )
 
         testee.loadData("abc", null, false, false)
@@ -1393,8 +1405,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
+    fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
@@ -1453,15 +1465,18 @@ class BrowserTabViewModelTest {
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasBeenShownThenNotifyUserSeenIAM() {
         runTest {
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-                Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+            whenever(mockNavigationHistory.getHistory()).thenReturn(
+                flowOf(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+            )
+            whenever(mockTabRepository.flowTabs).thenReturn(
+                flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
             )
             doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
 
@@ -1470,7 +1485,8 @@ class BrowserTabViewModelTest {
             whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
 
-            testee.autoCompletePublishSubject.accept("title")
+            testee.triggerAutocomplete("title", hasFocus = true, hasQueryChanged = true)
+            delay(500)
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
             verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
@@ -1480,16 +1496,16 @@ class BrowserTabViewModelTest {
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasNotBeenShownThenDoNotNotifyUserSeenIAM() {
         runTest {
-            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(Observable.just(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
             )
-            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
-            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+            whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
             doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-            testee.autoCompletePublishSubject.accept("query")
+            testee.autoCompleteStateFlow.value = "query"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
             verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
@@ -1989,6 +2005,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListRepository).addDomainToUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
     }
 
     @Test
@@ -2008,6 +2025,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
     }
 
     @Test
@@ -2344,6 +2362,37 @@ class BrowserTabViewModelTest {
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+        val suggestions = listOf(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
+        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithoutTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
+        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
     }
 
     @Test
@@ -4901,6 +4950,7 @@ class BrowserTabViewModelTest {
             "webShare",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.WebShareRequest> {
@@ -4921,8 +4971,8 @@ class BrowserTabViewModelTest {
             "permissionsQuery",
             "myId",
             JSONObject("""{ "name":"somePermission"}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToJs> {
             assertEquals("granted", this.data.params.getString("state"))
             assertEquals("myFeature", this.data.featureName)
@@ -4939,19 +4989,20 @@ class BrowserTabViewModelTest {
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandNotIssued<Command.ScreenLock>()
     }
 
     @Test
     fun whenProcessJsCallbackMessageScreenLockEnabledSendCommand() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        fakeAndroidConfigBrowserFeature.screenLock().setRawStoredState(State(enable = true))
         testee.processJsCallbackMessage(
             "myFeature",
             "screenLock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.ScreenLock> {
@@ -4970,6 +5021,7 @@ class BrowserTabViewModelTest {
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandNotIssued<Command.ScreenUnlock>()
@@ -4977,12 +5029,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockEnabledSendCommand() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        fakeAndroidConfigBrowserFeature.screenLock().setRawStoredState(State(enable = true))
         testee.processJsCallbackMessage(
             "myFeature",
             "screenUnlock",
             "myId",
             JSONObject("""{ "my":"object"}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.ScreenUnlock>()
@@ -4997,6 +5050,7 @@ class BrowserTabViewModelTest {
             "getUserValues",
             "id",
             data = null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5011,8 +5065,8 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {disabled: {} }}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToJs>()
         verify(mockDuckPlayer).setUserPreferences(any(), any())
         verify(mockPixel).fire(DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE)
@@ -5027,6 +5081,7 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5043,8 +5098,8 @@ class BrowserTabViewModelTest {
             "setUserValues",
             "id",
             JSONObject("""{ overlayInteracted: "true", privatePlayerMode: {enabled: {} }}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
         verify(mockDuckPlayer).setUserPreferences(true, "enabled")
         verify(mockPixel).fire(DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER)
@@ -5059,8 +5114,8 @@ class BrowserTabViewModelTest {
             "sendDuckPlayerPixel",
             "id",
             JSONObject("""{ pixelName: "pixel", params: {}}"""),
-            { "someUrl" },
-        )
+            false,
+        ) { "someUrl" }
         verify(mockDuckPlayer).sendDuckPlayerPixel("pixel", mapOf())
     }
 
@@ -5074,6 +5129,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Navigate>()
@@ -5089,6 +5145,7 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Navigate>()
@@ -5104,9 +5161,25 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabOnWithCustomTabThenNavigate() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            true,
+        ) { "someUrl" }
+        assertCommandIssued<Navigate>()
     }
 
     @Test
@@ -5119,9 +5192,24 @@ class BrowserTabViewModelTest {
             "openDuckPlayer",
             "id",
             null,
+            false,
+        ) { "someUrl" }
+        assertCommandNotIssued<Navigate>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageTelemetryEventThenFirePixel() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_PAGE_FEATURE_NAME,
+            "telemetryEvent",
+            "id",
+            JSONObject("""{"attributes": {"name": "impression", "value": "landscape-layout"}}"""),
+            false,
             { "someUrl" },
         )
-        assertCommandNotIssued<Navigate>()
+        verify(mockPixel).fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
     }
 
     @Test
@@ -5133,6 +5221,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToJs>()
@@ -5147,6 +5236,7 @@ class BrowserTabViewModelTest {
             "initialSetup",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.SendResponseToDuckPlayer>()
@@ -5160,6 +5250,7 @@ class BrowserTabViewModelTest {
             "openSettings",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerSettings>()
@@ -5175,6 +5266,7 @@ class BrowserTabViewModelTest {
             "openInfo",
             "id",
             null,
+            false,
             { "someUrl" },
         )
         assertCommandIssued<Command.OpenDuckPlayerPageInfo>()
@@ -5308,6 +5400,8 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = Count)
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = Count)
+        assertEquals(1, protectionTogglePlugin.toggleOff)
+        assertEquals(1, protectionTogglePlugin.toggleOn)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
     }
@@ -5837,15 +5931,11 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-        val testObserver = TestObserver.create<String>()
-        testee.autoCompletePublishSubject.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
-        testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
@@ -5854,15 +5944,11 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
         val omnibarText = "foo"
 
-        val testObserver = TestObserver.create<String>()
-        testee.autoCompletePublishSubject.subscribe(testObserver)
-
         testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText)
 
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED)
         verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
         verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
-        testObserver.assertValue(omnibarText)
         assertCommandIssued<Command.AutocompleteItemRemoved>()
     }
 
@@ -5998,6 +6084,47 @@ class BrowserTabViewModelTest {
         testee.onUserClickCtaSecondaryButton(cta)
 
         verify(mockPixel).fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
+    }
+
+    @Test
+    fun whenPageIsChangedWithWebViewErrorResponseThenPixelIsFired() = runTest {
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+    }
+
+    @Test
+    fun givenErrorPageFeatureDisabledWhenPageIsChangedWithWebViewErrorResponseThenPixelIsNotFired() = runTest {
+        fakeAndroidConfigBrowserFeature.errorPagePixel().setRawStoredState(State(enable = false))
+        testee.onReceivedError(BAD_URL, "example2.com")
+
+        updateUrl(
+            originalUrl = "example.com",
+            currentUrl = "example2.com",
+            isBrowserShowing = true,
+        )
+
+        verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+    }
+
+    @Test
+    fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() = runTest {
+        val tabId = "tabId"
+        val suggestion = AutoCompleteSwitchToTabSuggestion(phrase = "phrase", title = "title", url = "https://www.example.com", tabId = tabId)
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+
+        testee.userSelectedAutocomplete(suggestion)
+
+        assertCommandIssued<Command.SwitchToTab> {
+            assertEquals(tabId, this.tabId)
+        }
     }
 
     private fun aCredential(): LoginCredentials {
@@ -6278,5 +6405,23 @@ class BrowserTabViewModelTest {
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
+    }
+
+    class FakePluginPoint(val plugin: FakePrivacyProtectionTogglePlugin) : PluginPoint<PrivacyProtectionTogglePlugin> {
+        override fun getPlugins(): Collection<PrivacyProtectionTogglePlugin> {
+            return listOf(plugin)
+        }
+    }
+
+    class FakePrivacyProtectionTogglePlugin : PrivacyProtectionTogglePlugin {
+        var toggleOff = 0
+        var toggleOn = 0
+
+        override suspend fun onToggleOff(origin: PrivacyToggleOrigin) {
+            toggleOff++
+        }
+        override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
+            toggleOn++
+        }
     }
 }

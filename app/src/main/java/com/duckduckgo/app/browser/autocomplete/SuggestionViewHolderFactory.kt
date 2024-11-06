@@ -21,18 +21,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
+import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySearchSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.MessageCta.Message
 
@@ -78,7 +83,7 @@ class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosi
     }
 }
 
-class HistorySuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+class HistorySuggestionViewHolderFactory() : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -99,18 +104,16 @@ class HistorySuggestionViewHolderFactory(private val omnibarPosition: OmnibarPos
         searchSuggestionViewHolder.bind(
             suggestion as AutoCompleteHistorySuggestion,
             immediateSearchClickListener,
-            editableSearchClickListener,
             longPressClickListener,
-            omnibarPosition,
         )
     }
 }
 
-class HistorySearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+class HistorySearchSuggestionViewHolderFactory() : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemAutocompleteSearchSuggestionBinding.inflate(inflater, parent, false)
+        val binding = ItemAutocompleteHistorySearchSuggestionBinding.inflate(inflater, parent, false)
         return AutoCompleteViewHolder.HistorySearchSuggestionViewHolder(binding)
     }
 
@@ -127,14 +130,12 @@ class HistorySearchSuggestionViewHolderFactory(private val omnibarPosition: Omni
         historySearchSuggestionViewHolder.bind(
             suggestion as AutoCompleteHistorySearchSuggestion,
             immediateSearchClickListener,
-            editableSearchClickListener,
             longPressClickListener,
-            omnibarPosition,
         )
     }
 }
 
-class BookmarkSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -155,8 +156,31 @@ class BookmarkSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPo
         bookmarkSuggestionViewHolder.bind(
             suggestion as AutoCompleteBookmarkSuggestion,
             immediateSearchClickListener,
-            editableSearchClickListener,
-            omnibarPosition,
+        )
+    }
+}
+
+class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteSwitchToTabSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val switchToTabSuggestionViewHolder = holder as AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder
+        switchToTabSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSwitchToTabSuggestion,
+            immediateSearchClickListener,
         )
     }
 }
@@ -246,31 +270,26 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
+
+            root.tag = SEARCH_ITEM
         }
     }
 
-    class HistorySearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class HistorySearchSuggestionViewHolder(val binding: ItemAutocompleteHistorySearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteHistorySearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             phrase.text = item.phrase
 
-            phraseOrUrlIndicator.setImageResource(R.drawable.ic_history)
-
-            editQueryImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
             root.setOnLongClickListener {
                 longPressClickListener(item)
                 true
             }
 
-            if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
-            }
+            root.tag = OTHER_ITEM
         }
     }
 
@@ -278,19 +297,14 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteBookmarkSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
 
             bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_20 else R.drawable.ic_bookmark_20)
-            goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
 
-            if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                goToBookmarkImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
-            }
+            root.tag = OTHER_ITEM
         }
     }
 
@@ -298,23 +312,32 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteHistorySuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             longPressClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
 
-            goToSuggestionImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
             root.setOnLongClickListener {
                 longPressClickListener(item)
                 true
             }
 
-            if (omnibarPosition == OmnibarPosition.BOTTOM) {
-                goToSuggestionImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
-            }
+            root.tag = OTHER_ITEM
+        }
+    }
+
+    class SwitchToTabSuggestionViewHolder(val binding: ItemAutocompleteSwitchToTabSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSwitchToTabSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.title
+            url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
+
+            root.setOnClickListener { immediateSearchListener(item) }
+
+            root.tag = OTHER_ITEM
         }
     }
 
@@ -332,6 +355,8 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 binding.editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
+
+            binding.root.tag = OTHER_ITEM
         }
     }
 
@@ -350,6 +375,8 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             )
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
+
+            binding.root.tag = OTHER_ITEM
         }
     }
 }

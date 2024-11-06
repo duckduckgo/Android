@@ -226,7 +226,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemCustomTextColor"
-        app:primaryText="Item with custom text color asdasda sd asda sdasda s"/>
+        app:primaryText="Item with long primary text that expands to more lines as primaryTextTruncated is disabled by default"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongTextTruncated"
@@ -236,7 +236,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongText"
-        app:primaryText="Item with custom text color asdasda sd asda sdasda s"
         app:primaryTextTruncated="true"/>
 
 

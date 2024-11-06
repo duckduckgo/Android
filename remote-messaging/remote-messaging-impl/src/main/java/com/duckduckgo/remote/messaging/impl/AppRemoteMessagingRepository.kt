@@ -39,10 +39,10 @@ class AppRemoteMessagingRepository(
 
     override fun activeMessage(message: RemoteMessage?) {
         if (message == null) {
-            remoteMessagesDao.deleteActiveMessages()
+            remoteMessagesDao.updateActiveMessageStateAndDeleteNeverShownMessages()
         } else {
             val stringMessage = messageMapper.toString(message)
-            remoteMessagesDao.newMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
+            remoteMessagesDao.addOrUpdateActiveMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
         }
     }
 

@@ -197,9 +197,17 @@ class OmnibarLayout @JvmOverloads constructor(
     )
 
     var isScrollingEnabled: Boolean
-        get() = viewModel.viewState.value.scrollingEnabled
+        get() {
+            return if (isAttachedToWindow) {
+                viewModel.viewState.value.scrollingEnabled
+            } else {
+                true
+            }
+        }
         set(value) {
-            viewModel.onOmnibarScrollingEnabledChanged(value)
+            if (isAttachedToWindow) {
+                viewModel.onOmnibarScrollingEnabledChanged(value)
+            }
         }
 
     private var coroutineScope: CoroutineScope? = null
@@ -250,31 +258,39 @@ class OmnibarLayout @JvmOverloads constructor(
 
         omnibarTextInput.onFocusChangeListener =
             View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                omnibarTextListener?.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
+                if (isAttachedToWindow) {
+                    viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
+                    omnibarTextListener?.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
+                }
             }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
-                viewModel.onBackKeyPressed()
-                omnibarTextListener?.onBackKeyPressed()
+                if (isAttachedToWindow) {
+                    viewModel.onBackKeyPressed()
+                    omnibarTextListener?.onBackKeyPressed()
+                }
                 return false
             }
         }
 
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    viewModel.onEnterKeyPressed()
-                    omnibarTextListener?.onEnterPressed()
-                    return@OnEditorActionListener true
+                if (isAttachedToWindow) {
+                    if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                        viewModel.onEnterKeyPressed()
+                        omnibarTextListener?.onEnterPressed()
+                        return@OnEditorActionListener true
+                    }
                 }
                 false
             },
         )
 
         omnibarTextInput.setOnTouchListener { _, event ->
-            viewModel.onUserTouchedOmnibarTextInput(event.action)
+            if (isAttachedToWindow) {
+                viewModel.onUserTouchedOmnibarTextInput(event.action)
+            }
             false
         }
 
@@ -319,18 +335,24 @@ class OmnibarLayout @JvmOverloads constructor(
             return@setOnLongClickListener true
         }
         fireIconMenu.setOnClickListener {
-            viewModel.onFireIconPressed(isPulseAnimationPlaying())
+            if (isAttachedToWindow) {
+                viewModel.onFireIconPressed(isPulseAnimationPlaying())
+            }
             omnibarItemPressedListener?.onFireButtonPressed(isPulseAnimationPlaying())
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
         shieldIcon.setOnClickListener {
-            viewModel.onPrivacyShieldButtonPressed()
+            if (isAttachedToWindow) {
+                viewModel.onPrivacyShieldButtonPressed()
+            }
             omnibarItemPressedListener?.onPrivacyShieldPressed()
         }
         clearTextButton.setOnClickListener {
-            viewModel.onClearTextButtonPressed()
+            if (isAttachedToWindow) {
+                viewModel.onClearTextButtonPressed()
+            }
             omnibarItemPressedListener?.onClearTextPressed()
         }
     }
@@ -527,9 +549,7 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun setExpanded(expanded: Boolean) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(
-                expanded,
-            )
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
@@ -539,9 +559,7 @@ class OmnibarLayout @JvmOverloads constructor(
     ) {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).animateToolbarVisibility(
-                expanded,
-            )
+            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 

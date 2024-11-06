@@ -63,7 +63,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -91,7 +90,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -119,7 +117,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -147,7 +144,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -200,7 +196,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -229,7 +224,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 
@@ -258,7 +252,6 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
-                entitlements = emptyList(),
             ),
         )
 

@@ -212,6 +212,41 @@
             android:enabled="false"
             android:text="Ghost Destructive Disabled" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Alt Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_arrow_left_24"
+            android:text="Ghost Alt Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Alt Large"
+            app:buttonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_bell"
+            android:text="Ghost Alt Large"
+            app:buttonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Ghost Alt Disabled" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/label"
             android:layout_width="match_parent"
