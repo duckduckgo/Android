@@ -29,7 +29,6 @@
         <path
             android:pathData="M0 0H390V116H0V0Z"
             android:strokeWidth="2"
-            android:strokeColor="#DDDDDD"
             android:fillColor="?daxColorBackground"
             />
     </group>
