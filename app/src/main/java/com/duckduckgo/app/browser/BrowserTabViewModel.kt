@@ -277,7 +277,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -428,7 +427,6 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
@@ -1344,7 +1342,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
-        if (loadingBarExperimentManager.isExperimentEnabled() || settingsDataStore.omnibarPosition == BOTTOM) {
+        if (settingsDataStore.omnibarPosition == BOTTOM) {
             showOmniBar()
         }
 

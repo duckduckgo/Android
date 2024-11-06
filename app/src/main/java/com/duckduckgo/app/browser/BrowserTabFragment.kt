@@ -267,7 +267,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -523,9 +522,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
-
-    @Inject
-    lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker

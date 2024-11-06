@@ -8,7 +8,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
@@ -20,7 +19,6 @@ import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
 import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -53,7 +51,6 @@ class RefreshPixelSenderTest {
     private lateinit var db: AppDatabase
     private lateinit var refreshDao: RefreshDao
     private val mockPixel: Pixel = mock()
-    private val mockLoadingBarExperimentManager: LoadingBarExperimentManager = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
@@ -93,7 +90,6 @@ class RefreshPixelSenderTest {
         testee = DuckDuckGoRefreshPixelSender(
             pixel = mockPixel,
             dao = refreshDao,
-            loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -107,45 +103,7 @@ class RefreshPixelSenderTest {
     }
 
     @Test
-    fun whenSendMenuRefreshPixelsAndExperimentEnabledAndIsTestVariantThenTestVariantPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(mockLoadingBarExperimentManager.variant).thenReturn(true)
-
-        testee.sendMenuRefreshPixels()
-
-        verify(mockPixel).fire(
-            pixel = AppPixelName.MENU_ACTION_REFRESH_PRESSED,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
-        )
-        verify(mockPixel).fire(
-            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
-            type = Daily(),
-        )
-    }
-
-    @Test
-    fun whenSendMenuRefreshPixelsAndExperimentEnabledAndIsControlVariantThenControlVariantPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(mockLoadingBarExperimentManager.variant).thenReturn(false)
-
-        testee.sendMenuRefreshPixels()
-
-        verify(mockPixel).fire(
-            pixel = AppPixelName.MENU_ACTION_REFRESH_PRESSED,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
-        )
-        verify(mockPixel).fire(
-            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
-            type = Daily(),
-        )
-    }
-
-    @Test
-    fun whenSendMenuRefreshPixelsAndExperimentDisabledThenDefaultPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-
+    fun whenSendMenuRefreshPixelsThenPixelsFired() {
         testee.sendMenuRefreshPixels()
 
         verify(mockPixel).fire(
@@ -158,45 +116,7 @@ class RefreshPixelSenderTest {
     }
 
     @Test
-    fun whenSendPullToRefreshPixelsAndExperimentEnabledAndIsTestVariantThenTestVariantPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(mockLoadingBarExperimentManager.variant).thenReturn(true)
-
-        testee.sendPullToRefreshPixels()
-
-        verify(mockPixel).fire(
-            pixel = AppPixelName.BROWSER_PULL_TO_REFRESH,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
-        )
-        verify(mockPixel).fire(
-            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "1"),
-            type = Daily(),
-        )
-    }
-
-    @Test
-    fun whenSendPullToRefreshPixelsAndExperimentEnabledAndIsControlVariantThenControlVariantPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(mockLoadingBarExperimentManager.variant).thenReturn(false)
-
-        testee.sendPullToRefreshPixels()
-
-        verify(mockPixel).fire(
-            pixel = AppPixelName.BROWSER_PULL_TO_REFRESH,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
-        )
-        verify(mockPixel).fire(
-            pixel = AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-            parameters = mapOf(LOADING_BAR_EXPERIMENT to "0"),
-            type = Daily(),
-        )
-    }
-
-    @Test
-    fun whenSendPullToRefreshPixelsAndExperimentDisabledThenDefaultPixelsFired() {
-        whenever(mockLoadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-
+    fun whenSendPullToRefreshPixelsThenPixelsFired() {
         testee.sendPullToRefreshPixels()
 
         verify(mockPixel).fire(
@@ -222,7 +142,6 @@ class RefreshPixelSenderTest {
         testee = DuckDuckGoRefreshPixelSender(
             pixel = mockPixel,
             dao = mockDao,
-            loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             blockListPixelsPlugin = blockListPixelsPlugin,
@@ -241,7 +160,6 @@ class RefreshPixelSenderTest {
         testee = DuckDuckGoRefreshPixelSender(
             pixel = mockPixel,
             dao = mockDao,
-            loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             blockListPixelsPlugin = blockListPixelsPlugin,
@@ -260,7 +178,6 @@ class RefreshPixelSenderTest {
         testee = DuckDuckGoRefreshPixelSender(
             pixel = mockPixel,
             dao = mockDao,
-            loadingBarExperimentManager = mockLoadingBarExperimentManager,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             blockListPixelsPlugin = blockListPixelsPlugin,

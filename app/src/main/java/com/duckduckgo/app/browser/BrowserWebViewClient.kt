@@ -58,17 +58,15 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.uriloaded.DuckDuckGoUriLoadedManager
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -77,7 +75,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -117,8 +114,8 @@ class BrowserWebViewClient @Inject constructor(
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val uriLoadedManager: DuckDuckGoUriLoadedManager,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -472,16 +469,7 @@ class BrowserWebViewClient @Inject constructor(
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
                             }
                         }
-                        if (loadingBarExperimentManager.shouldSendUriLoadedPixel) {
-                            if (loadingBarExperimentManager.isExperimentEnabled()) {
-                                pixel.fire(
-                                    AppPixelName.URI_LOADED.pixelName,
-                                    mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                                )
-                            } else {
-                                pixel.fire(AppPixelName.URI_LOADED)
-                            }
-                        }
+                        uriLoadedManager.sendUriLoadedPixel()
                         start = null
                     }
                 }

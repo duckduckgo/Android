@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.experiments.impl.loadingbarexperiment
+package com.duckduckgo.app.browser.uriloaded
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,12 +22,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "loadingBarExp",
+    featureName = "sendUriLoadedPixel",
 )
-interface LoadingBarExperimentFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+interface UriLoadedPixelFeature {
 
-    @Toggle.DefaultValue(false)
-    fun allocateVariants(): Toggle
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
