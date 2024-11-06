@@ -1,0 +1,64 @@
+name: Release - Update Release Notes in Play Store and Github
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+      release-notes:
+        description: 'Release notes for the version'
+        required: true
+        default: 'Bug fixes and other improvements'
+
+env:
+  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+
+jobs:
+  update-release-notes:
+    name: Update release notes in Play Store and Github
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Decode Play Store credentials file
+        uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
+        with:
+          secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
+          fileName: api.json
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Update release notes in Play Store
+        id: update_play_store_release_notes
+        run: |
+          bundle exec fastlane update_release_notes_playstore release_number:${{ github.event.inputs.app-version }} release_notes:"${{ github.event.inputs.release-notes }}"          
+
+      - name: Update release notes in Github
+        id: update_gh_release_notes
+        run: |
+          bundle exec fastlane update_release_notes_github release_number:${{ github.event.inputs.app-version }} release_notes:"${{ github.event.inputs.release-notes }}"          
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Update Release Notes
+          asana-task-description: Update Release Notes in Play Store and Github has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
