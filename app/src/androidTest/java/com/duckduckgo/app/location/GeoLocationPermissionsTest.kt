@@ -39,7 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class GeoLocationPermissionsTestRequest {
+class GeoLocationPermissionsTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
