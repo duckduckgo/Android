@@ -57,7 +57,7 @@ jobs:
       - name: Update release notes in Github
         id: update_gh_release_notes
         run: |
-          bundle exec fastlane update_release_notes_github release_number:${{ github.event.inputs.app-version }} release_notes:${{ github.event.inputs.release-notes }}          
+          bundle exec fastlane update_release_notes_github release_number:${{ github.event.inputs.app-version }} release_notes:"${{ github.event.inputs.release-notes }}"          
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
