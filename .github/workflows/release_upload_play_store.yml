@@ -5,12 +5,13 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
   GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
 
 jobs:
-  create-tag:
-    name: Generate and upload nightly bundle to Play Store Internal track
+  release-production:
     runs-on: ubuntu-latest
+    name: Publish Bundle to Play Store Internal track
 
     steps:
       - name: Checkout repository
@@ -19,10 +20,8 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
 
-      - name: Set Git permissions
-        uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: '${{ secrets.GT_DAXMOBILE }}'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -57,12 +56,8 @@ jobs:
           fileName: api.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Clean project
-        run: |
-          gradle clean          
-
       - name: Assemble the bundle
-        run: gradle bundleRelease -PuseUploadSigning
+        run: ./gradleW bundleRelease -PuseUploadSigning
 
       - name: Capture App Bundle Path
         id: capture_output
