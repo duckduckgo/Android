@@ -269,21 +269,21 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenHandleShowOnAppLaunchCalledThenShowOnAppLaunchHandled() = runTest {
-        testee.handleShowOnAppLaunchOption()
-
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
-    }
-
-    @Test
-    fun whenShowOnAppLaunchFeatureToggleIsOffAndNewTabPageIsSetThenNoTabIsAdded() = runTest {
-        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = false))
-
+    fun whenHandleShowOnAppLaunchCalledThenNoTabIsAddedByDefault() = runTest {
         testee.handleShowOnAppLaunchOption()
 
         verify(mockTabRepository, never()).add()
         verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
         verify(mockTabRepository, never()).addDefaultTab()
+    }
+
+    @Test
+    fun whenShowOnAppLaunchFeatureToggleIsOnThenShowOnAppLaunchHandled() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = true))
+
+        testee.handleShowOnAppLaunchOption()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
     private fun initTestee() {
