@@ -556,9 +556,10 @@ class RealDuckPlayerTest {
     @Test
     fun whenUriIsDuckPlayerUriWithOriginAuto_interceptProcessesDuckPlayerUri() = runTest {
         val request: WebResourceRequest = mock()
-        val url: Uri = Uri.parse("duck://player/12345?origin=auto")
+        val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        testee.willNavigateToDuckPlayerAutomatically()
 
         val result = testee.intercept(request, url, webView)
 
@@ -655,7 +656,7 @@ class RealDuckPlayerTest {
 
         val result = testee.intercept(request, url, webView)
 
-        verify(webView).loadUrl("duck://player/12345?origin=auto")
+        verify(webView).loadUrl("duck://player/12345")
         assertNotNull(result)
     }
 
@@ -697,7 +698,7 @@ class RealDuckPlayerTest {
 
         val result = testee.intercept(request, url, webView)
 
-        verify(webView).loadUrl("duck://player/123456?origin=auto")
+        verify(webView).loadUrl("duck://player/123456")
         assertNotNull(result)
     }
 
