@@ -28,6 +28,12 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
 
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |
