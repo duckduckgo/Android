@@ -390,10 +390,6 @@ class CtaViewModel @Inject constructor(
                         duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
                     )
 
-        if (isDuckPlayerUrl) {
-            pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
-        }
-
         return isDuckPlayerUrl
     }
 
