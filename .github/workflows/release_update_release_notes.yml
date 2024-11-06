@@ -28,11 +28,6 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
 
-      - name: Set Git permissions
-        uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: '${{ secrets.GT_DAXMOBILE }}'
-
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
