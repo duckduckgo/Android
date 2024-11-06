@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
@@ -31,10 +33,14 @@ import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -52,11 +58,17 @@ internal class EnterCodeViewModelTest {
 
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
+        this.seamlessAccountSwitching().setRawStoredState(State(true))
+    }
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = EnterCodeViewModel(
         syncAccountRepository,
         clipboard,
         coroutineTestRule.testDispatcherProvider,
+        syncFeature = syncFeature,
+        syncPixels = syncPixels,
     )
 
     @Test
@@ -86,7 +98,7 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LoginSucess)
+            assertTrue(command is LoginSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -100,7 +112,7 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue(command is LoginSucess)
+            assertTrue(command is LoginSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -121,6 +133,7 @@ internal class EnterCodeViewModelTest {
 
     @Test
     fun whenProcessCodeButUserSignedInThenShowError() = runTest {
+        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
 
@@ -129,6 +142,33 @@ internal class EnterCodeViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessCodeButUserSignedInThenOfferToSwitchAccount() = runTest {
+        whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(code = ALREADY_SIGNED_IN.code))
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is AskToSwitchAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserAcceptsToSwitchAccountThenPerformAction() = runTest {
+        whenever(syncAccountRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+
+        testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is SwitchAccountSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }

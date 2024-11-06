@@ -59,6 +59,7 @@ interface SyncAccountRepository {
     fun getConnectQR(): Result<String>
     fun pollConnectionKeys(): Result<Boolean>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
+    fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -108,7 +109,7 @@ class AppSyncAccountRepository @Inject constructor(
 
     private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
         if (isSignedIn()) {
-            return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in")
+            return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in", payload = recoveryCode)
                 .alsoFireAlreadySignedInErrorPixel()
         }
 
@@ -321,6 +322,13 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun isSignedIn() = syncStore.isSignedIn()
+
+    override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
+        logout(syncStore.deviceId.orEmpty()).takeIf { it is Error }?.let {
+            return it
+        }
+        return processCode(stringCode)
+    }
 
     private fun performCreateAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
@@ -554,6 +562,7 @@ sealed class Result<out R> {
     data class Error(
         val code: Int = GENERIC_ERROR.code,
         val reason: String = "",
+        val payload: Any? = null,
     ) : Result<Nothing>()
 
     override fun toString(): String {

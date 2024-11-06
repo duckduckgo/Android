@@ -30,4 +30,7 @@
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
 
+    <string name="sync_dialog_switch_account_primary_button">Switch Account</string>
+    <string name="sync_dialog_switch_account_secondary_button">Cancel</string>
+    <string name="sync_dialog_switch_account_description">"You\'re already signed in to another account. Would you like to sign out and switch accounts?"</string>
 </resources>

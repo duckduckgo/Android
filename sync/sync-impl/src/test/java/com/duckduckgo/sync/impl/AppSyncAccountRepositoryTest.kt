@@ -77,6 +77,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -220,6 +221,29 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertEquals(Result.Success(true), result)
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = token,
+        )
+    }
+
+    @Test
+    fun whenLogoutAndJoinNewAccountSucceedsThenReturnSuccess() {
+        givenAuthenticatedDevice()
+        doAnswer {
+            givenUnauthenticatedDevice() // simulate logout locally
+            logoutSuccess
+        }.`when`(syncApi).logout(token, deviceId)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)
+
+        assertTrue(result is Result.Success)
+        verify(syncStore).clearAll()
         verify(syncStore).storeCredentials(
             userId = userId,
             deviceId = deviceId,
@@ -520,6 +544,10 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.secretKey).thenReturn(secretKey)
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.isSignedIn()).thenReturn(true)
+    }
+
+    private fun givenUnauthenticatedDevice() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
     }
 
     private fun prepareToProvideDeviceIds() {

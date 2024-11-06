@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
@@ -26,10 +28,13 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -53,6 +58,9 @@ class SyncWithAnotherDeviceViewModelTest {
     private val clipboard: Clipboard = mock()
     private val qrEncoder: QREncoder = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
+        this.seamlessAccountSwitching().setRawStoredState(State(true))
+    }
 
     private val testee = SyncWithAnotherActivityViewModel(
         syncRepository,
@@ -60,6 +68,7 @@ class SyncWithAnotherDeviceViewModelTest {
         clipboard,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        syncFeature,
     )
 
     @Test
@@ -123,12 +132,38 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
+        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
             verifyNoInteractions(syncPixels)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserScansRecoveryCodeButSignedInThenCommandIsAskToSwithAccount() = runTest {
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        testee.commands().test {
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
+            val command = awaitItem()
+            assertTrue(command is Command.AskToSwitchAccount)
+            verifyNoInteractions(syncPixels)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserAcceptsToSwitchAccountThenPerformAction() = runTest {
+        whenever(syncRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+
+        testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is SwitchAccountSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }
