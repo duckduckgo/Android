@@ -56,7 +56,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk udfyldning af adgangskoder er ikke tilgængelig, fordi din version af Android WebView er for gammel.</string>
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk udfyldning af adgangskoder er ikke tilgængelig, fordi din version af Android WebView er forældet eller inkompatibel.</string>
 
     <string name="autofillManagementSearchClearDescription">Ryd søgeinput</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for \"%1$s\"</string>
@@ -145,6 +145,7 @@
     <string name="credentials_invalid_request_warning_notif"><b>Synkronisering af adgangskoder er sat på pause</b>\nNogle adgangskoder er formateret forkert eller er for lange og blev ikke synkroniseret.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Spørg aldrig på dette websted</string>
+    <string name="saveOnboardingLoginDialogSecondaryButton">Nej tak</string>
     <string name="credentialManagementInstructionNeverForThisSite">Hvis du nulstiller ekskluderede websteder, vil du blive bedt om at gemme din adgangskode, næste gang du logger ind på en af disse sider.</string>
     <string name="credentialManagementClearNeverForThisSiteList">Nulstil ekskluderede websteder</string>
     <string name="credentialManagementClearNeverForThisSiteDialogTitle">Nulstil ekskluderede websteder?</string>
