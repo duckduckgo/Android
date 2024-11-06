@@ -91,7 +91,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
 
     private val dismissStreak: Flow<Int> = store.data
         .map { prefs ->
-            prefs[DISMISS_STREAK] ?: 7
+            prefs[DISMISS_STREAK] ?: 0
         }
         .distinctUntilChanged()
 

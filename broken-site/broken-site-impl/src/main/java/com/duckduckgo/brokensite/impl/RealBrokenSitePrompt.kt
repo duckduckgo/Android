@@ -44,18 +44,21 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
+        Timber.d("Cris. Dismiss streak: ${brokenSiteReportRepository.getDismissStreak()}")
         if (brokenSiteReportRepository.getDismissStreak() >= brokenSiteReportRepository.getMaxDismissStreak() - 1) {
+            brokenSiteReportRepository.resetDismissStreak()
             val nextShownDate = brokenSiteReportRepository.getNextShownDate()
             val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getDismissStreakResetDays().toLong())
 
             if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
                 brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-                Timber.d("New next shown date: $newNextShownDate")
+                Timber.d("Cris. Dismiss. New next shown date: $newNextShownDate")
             } else {
-                Timber.d("Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
+                Timber.d("Cris. Dismiss. Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
             }
+        } else {
+            brokenSiteReportRepository.incrementDismissStreak()
         }
-        brokenSiteReportRepository.incrementDismissStreak()
     }
 
     override suspend fun userAcceptedPrompt() {
@@ -101,9 +104,9 @@ class RealBrokenSitePrompt @Inject constructor(
         val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
             brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-            Timber.d("New next shown date: $newNextShownDate")
+            Timber.d("Cris. Shown. New next shown date: $newNextShownDate")
         } else {
-            Timber.d("Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
+            Timber.d("Cris. Shown. Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
         }
     }
 }
