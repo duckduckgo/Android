@@ -66,6 +66,7 @@ class SitePermissionsManagerImpl @Inject constructor(
         val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
+                Timber.d("Permissions: site permission granted")
                 autoAccept.addAll(sitePermissionsGranted)
             }
         }
