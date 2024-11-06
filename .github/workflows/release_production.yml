@@ -8,9 +8,9 @@ on:
         required: true
         default: 'PLACEHOLDER'
       release-notes:
-      description: 'Release notes for the version'
-      required: true
-      default: 'Bug fixes and other improvements'
+       description: 'Release notes for the version'
+       required: true
+       default: 'Bug fixes and other improvements'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
