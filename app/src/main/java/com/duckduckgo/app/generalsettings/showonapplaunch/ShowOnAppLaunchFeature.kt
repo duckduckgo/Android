@@ -26,6 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface ShowOnAppLaunchFeature {
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 }
