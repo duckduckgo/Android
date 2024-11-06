@@ -10,6 +10,7 @@ on:
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,11 +33,6 @@ jobs:
         with:
           ruby-version: 2.7.2
           bundler-cache: true
-
-      - name: Set Git permissions
-        uses: oleksiyrudenko/gha-git-credentials@v2-latest
-        with:
-          token: '${{ secrets.GT_DAXMOBILE }}'
 
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
