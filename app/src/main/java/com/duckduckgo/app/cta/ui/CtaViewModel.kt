@@ -328,10 +328,20 @@ class CtaViewModel @Inject constructor(
                         entity.displayName.contains(mainNetwork)
                     }
                     ) {
-                        return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                            OnboardingDaxDialogCta.DaxExperimentMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
-                        } else {
-                            OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
+                            (
+                                (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(it.url.toUri())) ||
+                                    duckPlayer.isDuckPlayerUri(it.url) || duckPlayer.isSimulatedYoutubeNoCookie(it.url)
+                                )
+                        return when {
+                            isDuckPlayerUrl -> { // Temporary pixel
+                                pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
+                                null
+                            }
+                            highlightsOnboardingExperimentManager.isHighlightsEnabled() -> {
+                                OnboardingDaxDialogCta.DaxExperimentMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                            }
+                            else -> OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                         }
                     }
                 }
@@ -368,8 +378,8 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isSiteNotAllowedForOnboarding(url: String?): Boolean {
-        val uri = url?.toUri() ?: return true
+    private suspend fun isSiteNotAllowedForOnboarding(url: String): Boolean {
+        val uri = url.toUri()
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
 
