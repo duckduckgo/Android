@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
+import com.duckduckgo.app.bookmarks.migration.AppDatabaseLocationPermissionMigrationCallbackProvider
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.global.db.AppDatabase
@@ -55,12 +56,14 @@ object DatabaseModule {
         context: Context,
         migrationsProvider: MigrationsProvider,
         databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
+        locationPermissionMigrationCallbackProvider: AppDatabaseLocationPermissionMigrationCallbackProvider,
     ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
             .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
             .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
+            .addCallback(locationPermissionMigrationCallbackProvider.provideCallbacks())
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .build()
     }
