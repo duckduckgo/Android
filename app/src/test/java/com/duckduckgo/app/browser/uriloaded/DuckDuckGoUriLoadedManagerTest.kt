@@ -62,6 +62,25 @@ class DuckDuckGoUriLoadedManagerTest {
         verify(mockPixel, never()).fire(AppPixelName.URI_LOADED)
     }
 
+    @Test
+    fun whenPrivacyConfigDownloadedThenUpdateState() {
+        initialize()
+
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        testee.sendUriLoadedPixel()
+
+        verify(mockPixel).fire(AppPixelName.URI_LOADED)
+
+        reset(mockPixel)
+
+        whenever(mockUriLoadedKillSwitch.isEnabled()).thenReturn(false)
+        testee.onPrivacyConfigDownloaded()
+        testee.sendUriLoadedPixel()
+
+        verify(mockPixel, never()).fire(AppPixelName.URI_LOADED)
+    }
+
     private fun initialize() {
         testee = DuckDuckGoUriLoadedManager(
             mockPixel,
