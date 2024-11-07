@@ -50,10 +50,10 @@ interface BrokenSiteReportRepository {
     suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
 
     suspend fun setNextShownDate(nextShownDate: LocalDate?)
-    fun getNextShownDate(): LocalDate?
+    suspend fun getNextShownDate(): LocalDate?
 
     suspend fun incrementDismissStreak()
-    fun getDismissStreak(): Int
+    suspend fun getDismissStreak(): Int
     suspend fun resetDismissStreak()
 }
 
@@ -133,11 +133,11 @@ class RealBrokenSiteReportRepository(
         brokenSitePromptDataStore.setNextShownDate(nextShownDate)
     }
 
-    override fun getDismissStreak(): Int {
+    override suspend fun getDismissStreak(): Int {
         return brokenSitePromptDataStore.getDismissStreak()
     }
 
-    override fun getNextShownDate(): LocalDate? {
+    override suspend fun getNextShownDate(): LocalDate? {
         return brokenSitePromptDataStore.getNextShownDate()
     }
 

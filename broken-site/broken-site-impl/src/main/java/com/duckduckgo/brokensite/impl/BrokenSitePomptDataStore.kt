@@ -36,12 +36,9 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
@@ -53,9 +50,9 @@ interface BrokenSitePomptDataStore {
     suspend fun setCoolDownDays(days: Int)
     suspend fun getCoolDownDays(): Int
     suspend fun setDismissStreak(streak: Int)
-    fun getDismissStreak(): Int
+    suspend fun getDismissStreak(): Int
     suspend fun setNextShownDate(nextShownDate: LocalDate?)
-    fun getNextShownDate(): LocalDate?
+    suspend fun getNextShownDate(): LocalDate?
 }
 
 @ContributesBinding(AppScope::class)
@@ -93,19 +90,17 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         }
         .distinctUntilChanged()
 
-    private val dismissStreak: StateFlow<Int> = store.data
+    private val dismissStreak: Flow<Int> = store.data
         .map { prefs ->
             prefs[DISMISS_STREAK] ?: 7
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 0)
 
-    private val nextShownDate: StateFlow<String?> = store.data
+    private val nextShownDate: Flow<String?> = store.data
         .map { prefs ->
             prefs[NEXT_SHOWN_DATE]
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
 
     override suspend fun setMaxDismissStreak(maxDismissStreak: Int) {
         store.edit { prefs -> prefs[MAX_DISMISS_STREAK] = maxDismissStreak }
@@ -140,11 +135,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         }
     }
 
-    override fun getDismissStreak(): Int {
-        return dismissStreak.value
+    override suspend fun getDismissStreak(): Int {
+        return dismissStreak.first()
     }
 
-    override fun getNextShownDate(): LocalDate? {
-        return nextShownDate.value?.let { LocalDate.parse(it, formatter) }
+    override suspend fun getNextShownDate(): LocalDate? {
+        return nextShownDate.first()?.let { LocalDate.parse(it, formatter) }
     }
 }

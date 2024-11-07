@@ -157,7 +157,7 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenGetDismissStreakCalledThenReturnDismissStreak() {
+    fun whenGetDismissStreakCalledThenReturnDismissStreak() = runTest {
         val dismissStreak = 5
         whenever(mockDataStore.getDismissStreak()).thenReturn(dismissStreak)
 
@@ -167,7 +167,7 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenGetNextShownDateCalledThenReturnNextShownDate() {
+    fun whenGetNextShownDateCalledThenReturnNextShownDate() = runTest {
         val nextShownDate = LocalDate.now()
         whenever(mockDataStore.getNextShownDate()).thenReturn(nextShownDate)
 
