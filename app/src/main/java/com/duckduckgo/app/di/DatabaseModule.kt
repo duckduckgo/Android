@@ -20,18 +20,21 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
-import com.duckduckgo.app.bookmarks.migration.AppDatabaseLocationPermissionMigrationCallbackProvider
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.*
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module(includes = [DaoModule::class])
 object DatabaseModule {
@@ -50,20 +53,19 @@ object DatabaseModule {
         return AppDatabaseBookmarksMigrationCallbackProvider(appDatabase, appBuildConfig)
     }
 
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAppDatabase(
         context: Context,
         migrationsProvider: MigrationsProvider,
         databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
-        locationPermissionMigrationCallbackProvider: AppDatabaseLocationPermissionMigrationCallbackProvider,
     ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
             .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
             .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
-            .addCallback(locationPermissionMigrationCallbackProvider.provideCallbacks())
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .build()
     }
