@@ -30,15 +30,17 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
-    fun getMaxDismissStreak(): Int
+    suspend fun getMaxDismissStreak(): Int
 
     suspend fun setDismissStreakResetDays(days: Int)
     fun getDismissStreakResetDays(): Int
@@ -60,12 +62,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         val COOL_DOWN_DAYS = intPreferencesKey(name = "COOL_DOWN_DAYS")
     }
 
-    private val maxDismissStreak: StateFlow<Int> = store.data
+    private val maxDismissStreak: Flow<Int> = store.data
         .map { prefs ->
             prefs[MAX_DISMISS_STREAK] ?: 3
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 3)
 
     private val dismissStreakResetDays: StateFlow<Int> = store.data
         .map { prefs ->
@@ -85,7 +86,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[MAX_DISMISS_STREAK] = maxDismissStreak }
     }
 
-    override fun getMaxDismissStreak(): Int = maxDismissStreak.value
+    override suspend fun getMaxDismissStreak(): Int = maxDismissStreak.first()
 
     override suspend fun setDismissStreakResetDays(days: Int) {
         store.edit { prefs -> prefs[DISMISS_STREAK_RESET_DAYS] = days }
