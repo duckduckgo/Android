@@ -28,7 +28,7 @@ import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object DuckPlayerDataStoreModule {
+object BrokenSitePrompDataStoreModule {
 
     private val Context.brokenSitePromptDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "broken_site_prompt",
