@@ -18,7 +18,6 @@ package com.duckduckgo.brokensite.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -50,13 +49,12 @@ interface BrokenSitePromptRCFeature {
 class BrokenSitePromptRCFeatureStore @Inject constructor(
     private val repository: BrokenSiteReportRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
 
     private val jsonAdapter by lazy { buildJsonAdapter() }
 
     override fun store(jsonString: String) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             jsonAdapter.fromJson(jsonString)?.let {
                 repository.setBrokenSitePromptRCSettings(it.maxDismissStreak, it.dismissStreakResetDays, it.coolDownDays)
             }
