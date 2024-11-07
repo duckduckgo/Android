@@ -24,16 +24,15 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.migrations.MigrationPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -72,7 +71,6 @@ class LocationPermissionMigrationPlugin @Inject constructor(
                 settingsDataStore.appLocationPermissionMigrated = true
                 Timber.d("Location permissions migrated: ALLOW ALWAYS ${alwaysAllowedPermissions.size} DENY ALWAYS ${alwaysDeniedPermissions.size}.")
             }
-
         }
     }
 }

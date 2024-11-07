@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.migrations
 
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType.ALLOW_ALWAYS
-import com.duckduckgo.app.location.data.LocationPermissionType.ALLOW_ONCE
 import com.duckduckgo.app.location.data.LocationPermissionType.DENY_ALWAYS
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -45,6 +44,7 @@ class LocationPermissionsMigrationPluginTest {
     private var sitePermissionsRepository: SitePermissionsRepository = mock()
 
     private lateinit var testee: LocationPermissionMigrationPlugin
+
     @Before
     fun before() {
         testee = LocationPermissionMigrationPlugin(
@@ -88,26 +88,31 @@ class LocationPermissionsMigrationPluginTest {
     fun whenAllowedPermissionsPresentThenCanBeMigrated() {
         whenever(settingsDataStore.appLocationPermissionMigrated).thenReturn(false)
         whenever(locationPermissionsRepository.getLocationPermissionsSync()).thenReturn(
-            listOf(LocationPermissionEntity("domain.com", ALLOW_ALWAYS))
+            listOf(LocationPermissionEntity("domain.com", ALLOW_ALWAYS)),
         )
 
         testee.run()
 
-        verify(sitePermissionsRepository).sitePermissionPermanentlySaved("domain.com", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, SitePermissionAskSettingType.ALLOW_ALWAYS)
-
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "domain.com",
+            LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION,
+            SitePermissionAskSettingType.ALLOW_ALWAYS,
+        )
     }
 
     @Test
     fun whenDeniedPermissionsPresentThenCanBeMigrated() {
         whenever(settingsDataStore.appLocationPermissionMigrated).thenReturn(false)
         whenever(locationPermissionsRepository.getLocationPermissionsSync()).thenReturn(
-            listOf(LocationPermissionEntity("domain.com", DENY_ALWAYS))
+            listOf(LocationPermissionEntity("domain.com", DENY_ALWAYS)),
         )
 
         testee.run()
 
-        verify(sitePermissionsRepository).sitePermissionPermanentlySaved("domain.com", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION, SitePermissionAskSettingType.DENY_ALWAYS)
-
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "domain.com",
+            LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION,
+            SitePermissionAskSettingType.DENY_ALWAYS,
+        )
     }
-
 }
