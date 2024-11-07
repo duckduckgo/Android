@@ -32,36 +32,45 @@
       (function() {
         "use strict";
         var hasOwn = {}.hasOwnProperty;
-        var nativeCodeString = "[native code]";
         function classNames() {
-          var classes = [];
+          var classes = "";
           for (var i3 = 0; i3 < arguments.length; i3++) {
             var arg = arguments[i3];
-            if (!arg)
-              continue;
-            var argType = typeof arg;
-            if (argType === "string" || argType === "number") {
-              classes.push(arg);
-            } else if (Array.isArray(arg)) {
-              if (arg.length) {
-                var inner = classNames.apply(null, arg);
-                if (inner) {
-                  classes.push(inner);
-                }
-              }
-            } else if (argType === "object") {
-              if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes("[native code]")) {
-                classes.push(arg.toString());
-                continue;
-              }
-              for (var key in arg) {
-                if (hasOwn.call(arg, key) && arg[key]) {
-                  classes.push(key);
-                }
-              }
+            if (arg) {
+              classes = appendClass(classes, parseValue(arg));
             }
           }
-          return classes.join(" ");
+          return classes;
+        }
+        function parseValue(arg) {
+          if (typeof arg === "string" || typeof arg === "number") {
+            return arg;
+          }
+          if (typeof arg !== "object") {
+            return "";
+          }
+          if (Array.isArray(arg)) {
+            return classNames.apply(null, arg);
+          }
+          if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes("[native code]")) {
+            return arg.toString();
+          }
+          var classes = "";
+          for (var key in arg) {
+            if (hasOwn.call(arg, key) && arg[key]) {
+              classes = appendClass(classes, key);
+            }
+          }
+          return classes;
+        }
+        function appendClass(value, newClass) {
+          if (!newClass) {
+            return value;
+          }
+          if (value) {
+            return value + " " + newClass;
+          }
+          return value + newClass;
         }
         if (typeof module !== "undefined" && module.exports) {
           classNames.default = classNames;
@@ -122,10 +131,8 @@
         return eventData.featureName === msg.featureName && eventData.context === msg.context && eventData.id === msg.id;
       };
       function isMessageResponse(data2) {
-        if ("result" in data2)
-          return true;
-        if ("error" in data2)
-          return true;
+        if ("result" in data2) return true;
+        if ("error" in data2) return true;
         return false;
       }
       return new this.globals.Promise((resolve, reject) => {
@@ -186,8 +193,7 @@
           return;
         }
         if (comparator(event.data)) {
-          if (!teardown)
-            throw new Error("unreachable");
+          if (!teardown) throw new Error("unreachable");
           callback(event.data, teardown);
         }
       };
@@ -537,8 +543,7 @@
      */
     captureWebkitHandlers(handlerNames) {
       const handlers = window.webkit.messageHandlers;
-      if (!handlers)
-        throw new MissingHandler("window.webkit.messageHandlers was absent", "all");
+      if (!handlers) throw new MissingHandler("window.webkit.messageHandlers was absent", "all");
       for (const webkitMessageHandlerName of handlerNames) {
         if (typeof handlers[webkitMessageHandlerName]?.postMessage === "function") {
           const original = handlers[webkitMessageHandlerName];
@@ -763,8 +768,7 @@
      * @internal
      */
     _dispatch(payload) {
-      if (!payload)
-        return this._log("no response");
+      if (!payload) return this._log("no response");
       if ("id" in payload) {
         if (this.listeners.has(payload.id)) {
           this._tryCatch(() => this.listeners.get(payload.id)?.(payload));
@@ -1020,10 +1024,8 @@
      * @returns {Environment}
      */
     withInjectName(injectName) {
-      if (!injectName)
-        return this;
-      if (!isInjectName(injectName))
-        return this;
+      if (!injectName) return this;
+      if (!isInjectName(injectName)) return this;
       return new _Environment({
         ...this,
         injectName
@@ -1034,10 +1036,8 @@
      * @returns {Environment}
      */
     withEnv(env) {
-      if (!env)
-        return this;
-      if (env !== "production" && env !== "development")
-        return this;
+      if (!env) return this;
+      if (env !== "production" && env !== "development") return this;
       return new _Environment({
         ...this,
         env
@@ -1048,10 +1048,8 @@
      * @returns {Environment}
      */
     withDisplay(display) {
-      if (!display)
-        return this;
-      if (display !== "app" && display !== "components")
-        return this;
+      if (!display) return this;
+      if (display !== "app" && display !== "components") return this;
       return new _Environment({
         ...this,
         display
@@ -1062,12 +1060,9 @@
      * @returns {Environment}
      */
     withLocale(locale) {
-      if (!locale)
-        return this;
-      if (typeof locale !== "string")
-        return this;
-      if (locale.length !== 2)
-        return this;
+      if (!locale) return this;
+      if (typeof locale !== "string") return this;
+      if (locale.length !== 2) return this;
       return new _Environment({
         ...this,
         locale
@@ -1078,8 +1073,7 @@
      * @returns {Environment}
      */
     withTextLength(length) {
-      if (!length)
-        return this;
+      if (!length) return this;
       const num = Number(length);
       if (num >= 1 && num <= 2) {
         return new _Environment({
@@ -1145,7 +1139,6 @@
       /**
        * @param {import('@duckduckgo/messaging').RequestMessage} msg
        */
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       request: (msg) => {
         console.log(msg);
         if (msg.method === "initialSetup") {
@@ -1205,8 +1198,7 @@
   var p = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
   var y = Array.isArray;
   function d(n2, l3) {
-    for (var u3 in l3)
-      n2[u3] = l3[u3];
+    for (var u3 in l3) n2[u3] = l3[u3];
     return n2;
   }
   function w(n2) {
@@ -1214,11 +1206,8 @@
   }
   function _(l3, u3, t3) {
     var i3, o3, r3, f3 = {};
-    for (r3 in u3)
-      "key" == r3 ? i3 = u3[r3] : "ref" == r3 ? o3 = u3[r3] : f3[r3] = u3[r3];
-    if (arguments.length > 2 && (f3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l3 && null != l3.defaultProps)
-      for (r3 in l3.defaultProps)
-        void 0 === f3[r3] && (f3[r3] = l3.defaultProps[r3]);
+    for (r3 in u3) "key" == r3 ? i3 = u3[r3] : "ref" == r3 ? o3 = u3[r3] : f3[r3] = u3[r3];
+    if (arguments.length > 2 && (f3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l3 && null != l3.defaultProps) for (r3 in l3.defaultProps) void 0 === f3[r3] && (f3[r3] = l3.defaultProps[r3]);
     return g(l3, f3, i3, o3, null);
   }
   function g(n2, t3, i3, o3, r3) {
@@ -1232,21 +1221,17 @@
     this.props = n2, this.context = l3;
   }
   function x(n2, l3) {
-    if (null == l3)
-      return n2.__ ? x(n2.__, n2.__i + 1) : null;
-    for (var u3; l3 < n2.__k.length; l3++)
-      if (null != (u3 = n2.__k[l3]) && null != u3.__e)
-        return u3.__e;
+    if (null == l3) return n2.__ ? x(n2.__, n2.__i + 1) : null;
+    for (var u3; l3 < n2.__k.length; l3++) if (null != (u3 = n2.__k[l3]) && null != u3.__e) return u3.__e;
     return "function" == typeof n2.type ? x(n2) : null;
   }
   function C(n2) {
     var l3, u3;
     if (null != (n2 = n2.__) && null != n2.__c) {
-      for (n2.__e = n2.__c.base = null, l3 = 0; l3 < n2.__k.length; l3++)
-        if (null != (u3 = n2.__k[l3]) && null != u3.__e) {
-          n2.__e = n2.__c.base = u3.__e;
-          break;
-        }
+      for (n2.__e = n2.__c.base = null, l3 = 0; l3 < n2.__k.length; l3++) if (null != (u3 = n2.__k[l3]) && null != u3.__e) {
+        n2.__e = n2.__c.base = u3.__e;
+        break;
+      }
       return C(n2);
     }
   }
@@ -1255,29 +1240,23 @@
   }
   function M() {
     var n2, u3, t3, o3, r3, e3, c3, s3;
-    for (i.sort(f); n2 = i.shift(); )
-      n2.__d && (u3 = i.length, o3 = void 0, e3 = (r3 = (t3 = n2).__v).__e, c3 = [], s3 = [], t3.__P && ((o3 = d({}, r3)).__v = r3.__v + 1, l.vnode && l.vnode(o3), O(t3.__P, o3, r3, t3.__n, t3.__P.namespaceURI, 32 & r3.__u ? [e3] : null, c3, null == e3 ? x(r3) : e3, !!(32 & r3.__u), s3), o3.__v = r3.__v, o3.__.__k[o3.__i] = o3, j(c3, o3, s3), o3.__e != e3 && C(o3)), i.length > u3 && i.sort(f));
+    for (i.sort(f); n2 = i.shift(); ) n2.__d && (u3 = i.length, o3 = void 0, e3 = (r3 = (t3 = n2).__v).__e, c3 = [], s3 = [], t3.__P && ((o3 = d({}, r3)).__v = r3.__v + 1, l.vnode && l.vnode(o3), O(t3.__P, o3, r3, t3.__n, t3.__P.namespaceURI, 32 & r3.__u ? [e3] : null, c3, null == e3 ? x(r3) : e3, !!(32 & r3.__u), s3), o3.__v = r3.__v, o3.__.__k[o3.__i] = o3, j(c3, o3, s3), o3.__e != e3 && C(o3)), i.length > u3 && i.sort(f));
     M.__r = 0;
   }
   function P(n2, l3, u3, t3, i3, o3, r3, f3, e3, c3, s3) {
     var a3, p3, y3, d3, w3, _3 = t3 && t3.__k || v, g3 = l3.length;
-    for (u3.__d = e3, $(u3, l3, _3), e3 = u3.__d, a3 = 0; a3 < g3; a3++)
-      null != (y3 = u3.__k[a3]) && (p3 = -1 === y3.__i ? h : _3[y3.__i] || h, y3.__i = a3, O(n2, y3, p3, i3, o3, r3, f3, e3, c3, s3), d3 = y3.__e, y3.ref && p3.ref != y3.ref && (p3.ref && N(p3.ref, null, y3), s3.push(y3.ref, y3.__c || d3, y3)), null == w3 && null != d3 && (w3 = d3), 65536 & y3.__u || p3.__k === y3.__k ? e3 = I(y3, e3, n2) : "function" == typeof y3.type && void 0 !== y3.__d ? e3 = y3.__d : d3 && (e3 = d3.nextSibling), y3.__d = void 0, y3.__u &= -196609);
+    for (u3.__d = e3, $(u3, l3, _3), e3 = u3.__d, a3 = 0; a3 < g3; a3++) null != (y3 = u3.__k[a3]) && (p3 = -1 === y3.__i ? h : _3[y3.__i] || h, y3.__i = a3, O(n2, y3, p3, i3, o3, r3, f3, e3, c3, s3), d3 = y3.__e, y3.ref && p3.ref != y3.ref && (p3.ref && N(p3.ref, null, y3), s3.push(y3.ref, y3.__c || d3, y3)), null == w3 && null != d3 && (w3 = d3), 65536 & y3.__u || p3.__k === y3.__k ? e3 = I(y3, e3, n2) : "function" == typeof y3.type && void 0 !== y3.__d ? e3 = y3.__d : d3 && (e3 = d3.nextSibling), y3.__d = void 0, y3.__u &= -196609);
     u3.__d = e3, u3.__e = w3;
   }
   function $(n2, l3, u3) {
     var t3, i3, o3, r3, f3, e3 = l3.length, c3 = u3.length, s3 = c3, a3 = 0;
-    for (n2.__k = [], t3 = 0; t3 < e3; t3++)
-      null != (i3 = l3[t3]) && "boolean" != typeof i3 && "function" != typeof i3 ? (r3 = t3 + a3, (i3 = n2.__k[t3] = "string" == typeof i3 || "number" == typeof i3 || "bigint" == typeof i3 || i3.constructor == String ? g(null, i3, null, null, null) : y(i3) ? g(b, { children: i3 }, null, null, null) : void 0 === i3.constructor && i3.__b > 0 ? g(i3.type, i3.props, i3.key, i3.ref ? i3.ref : null, i3.__v) : i3).__ = n2, i3.__b = n2.__b + 1, o3 = null, -1 !== (f3 = i3.__i = L(i3, u3, r3, s3)) && (s3--, (o3 = u3[f3]) && (o3.__u |= 131072)), null == o3 || null === o3.__v ? (-1 == f3 && a3--, "function" != typeof i3.type && (i3.__u |= 65536)) : f3 !== r3 && (f3 == r3 - 1 ? a3-- : f3 == r3 + 1 ? a3++ : (f3 > r3 ? a3-- : a3++, i3.__u |= 65536))) : i3 = n2.__k[t3] = null;
-    if (s3)
-      for (t3 = 0; t3 < c3; t3++)
-        null != (o3 = u3[t3]) && 0 == (131072 & o3.__u) && (o3.__e == n2.__d && (n2.__d = x(o3)), V(o3, o3));
+    for (n2.__k = [], t3 = 0; t3 < e3; t3++) null != (i3 = l3[t3]) && "boolean" != typeof i3 && "function" != typeof i3 ? (r3 = t3 + a3, (i3 = n2.__k[t3] = "string" == typeof i3 || "number" == typeof i3 || "bigint" == typeof i3 || i3.constructor == String ? g(null, i3, null, null, null) : y(i3) ? g(b, { children: i3 }, null, null, null) : void 0 === i3.constructor && i3.__b > 0 ? g(i3.type, i3.props, i3.key, i3.ref ? i3.ref : null, i3.__v) : i3).__ = n2, i3.__b = n2.__b + 1, o3 = null, -1 !== (f3 = i3.__i = L(i3, u3, r3, s3)) && (s3--, (o3 = u3[f3]) && (o3.__u |= 131072)), null == o3 || null === o3.__v ? (-1 == f3 && a3--, "function" != typeof i3.type && (i3.__u |= 65536)) : f3 !== r3 && (f3 == r3 - 1 ? a3-- : f3 == r3 + 1 ? a3++ : (f3 > r3 ? a3-- : a3++, i3.__u |= 65536))) : i3 = n2.__k[t3] = null;
+    if (s3) for (t3 = 0; t3 < c3; t3++) null != (o3 = u3[t3]) && 0 == (131072 & o3.__u) && (o3.__e == n2.__d && (n2.__d = x(o3)), V(o3, o3));
   }
   function I(n2, l3, u3) {
     var t3, i3;
     if ("function" == typeof n2.type) {
-      for (t3 = n2.__k, i3 = 0; t3 && i3 < t3.length; i3++)
-        t3[i3] && (t3[i3].__ = n2, l3 = I(t3[i3], l3, u3));
+      for (t3 = n2.__k, i3 = 0; t3 && i3 < t3.length; i3++) t3[i3] && (t3[i3].__ = n2, l3 = I(t3[i3], l3, u3));
       return l3;
     }
     n2.__e != l3 && (l3 && n2.type && !u3.contains(l3) && (l3 = x(n2)), u3.insertBefore(n2.__e, l3 || null), l3 = n2.__e);
@@ -1288,21 +1267,17 @@
   }
   function L(n2, l3, u3, t3) {
     var i3 = n2.key, o3 = n2.type, r3 = u3 - 1, f3 = u3 + 1, e3 = l3[u3];
-    if (null === e3 || e3 && i3 == e3.key && o3 === e3.type && 0 == (131072 & e3.__u))
-      return u3;
-    if (t3 > (null != e3 && 0 == (131072 & e3.__u) ? 1 : 0))
-      for (; r3 >= 0 || f3 < l3.length; ) {
-        if (r3 >= 0) {
-          if ((e3 = l3[r3]) && 0 == (131072 & e3.__u) && i3 == e3.key && o3 === e3.type)
-            return r3;
-          r3--;
-        }
-        if (f3 < l3.length) {
-          if ((e3 = l3[f3]) && 0 == (131072 & e3.__u) && i3 == e3.key && o3 === e3.type)
-            return f3;
-          f3++;
-        }
+    if (null === e3 || e3 && i3 == e3.key && o3 === e3.type && 0 == (131072 & e3.__u)) return u3;
+    if (t3 > (null != e3 && 0 == (131072 & e3.__u) ? 1 : 0)) for (; r3 >= 0 || f3 < l3.length; ) {
+      if (r3 >= 0) {
+        if ((e3 = l3[r3]) && 0 == (131072 & e3.__u) && i3 == e3.key && o3 === e3.type) return r3;
+        r3--;
       }
+      if (f3 < l3.length) {
+        if ((e3 = l3[f3]) && 0 == (131072 & e3.__u) && i3 == e3.key && o3 === e3.type) return f3;
+        f3++;
+      }
+    }
     return -1;
   }
   function T(n2, l3, u3) {
@@ -1310,93 +1285,70 @@
   }
   function A(n2, l3, u3, t3, i3) {
     var o3;
-    n:
-      if ("style" === l3)
-        if ("string" == typeof u3)
-          n2.style.cssText = u3;
-        else {
-          if ("string" == typeof t3 && (n2.style.cssText = t3 = ""), t3)
-            for (l3 in t3)
-              u3 && l3 in u3 || T(n2.style, l3, "");
-          if (u3)
-            for (l3 in u3)
-              t3 && u3[l3] === t3[l3] || T(n2.style, l3, u3[l3]);
-        }
-      else if ("o" === l3[0] && "n" === l3[1])
-        o3 = l3 !== (l3 = l3.replace(/(PointerCapture)$|Capture$/i, "$1")), l3 = l3.toLowerCase() in n2 || "onFocusOut" === l3 || "onFocusIn" === l3 ? l3.toLowerCase().slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + o3] = u3, u3 ? t3 ? u3.u = t3.u : (u3.u = e, n2.addEventListener(l3, o3 ? s : c, o3)) : n2.removeEventListener(l3, o3 ? s : c, o3);
-      else {
-        if ("http://www.w3.org/2000/svg" == i3)
-          l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
-        else if ("width" != l3 && "height" != l3 && "href" != l3 && "list" != l3 && "form" != l3 && "tabIndex" != l3 && "download" != l3 && "rowSpan" != l3 && "colSpan" != l3 && "role" != l3 && "popover" != l3 && l3 in n2)
-          try {
-            n2[l3] = null == u3 ? "" : u3;
-            break n;
-          } catch (n3) {
-          }
-        "function" == typeof u3 || (null == u3 || false === u3 && "-" !== l3[4] ? n2.removeAttribute(l3) : n2.setAttribute(l3, "popover" == l3 && 1 == u3 ? "" : u3));
+    n: if ("style" === l3) if ("string" == typeof u3) n2.style.cssText = u3;
+    else {
+      if ("string" == typeof t3 && (n2.style.cssText = t3 = ""), t3) for (l3 in t3) u3 && l3 in u3 || T(n2.style, l3, "");
+      if (u3) for (l3 in u3) t3 && u3[l3] === t3[l3] || T(n2.style, l3, u3[l3]);
+    }
+    else if ("o" === l3[0] && "n" === l3[1]) o3 = l3 !== (l3 = l3.replace(/(PointerCapture)$|Capture$/i, "$1")), l3 = l3.toLowerCase() in n2 || "onFocusOut" === l3 || "onFocusIn" === l3 ? l3.toLowerCase().slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + o3] = u3, u3 ? t3 ? u3.u = t3.u : (u3.u = e, n2.addEventListener(l3, o3 ? s : c, o3)) : n2.removeEventListener(l3, o3 ? s : c, o3);
+    else {
+      if ("http://www.w3.org/2000/svg" == i3) l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
+      else if ("width" != l3 && "height" != l3 && "href" != l3 && "list" != l3 && "form" != l3 && "tabIndex" != l3 && "download" != l3 && "rowSpan" != l3 && "colSpan" != l3 && "role" != l3 && "popover" != l3 && l3 in n2) try {
+        n2[l3] = null == u3 ? "" : u3;
+        break n;
+      } catch (n3) {
       }
+      "function" == typeof u3 || (null == u3 || false === u3 && "-" !== l3[4] ? n2.removeAttribute(l3) : n2.setAttribute(l3, "popover" == l3 && 1 == u3 ? "" : u3));
+    }
   }
   function F(n2) {
     return function(u3) {
       if (this.l) {
         var t3 = this.l[u3.type + n2];
-        if (null == u3.t)
-          u3.t = e++;
-        else if (u3.t < t3.u)
-          return;
+        if (null == u3.t) u3.t = e++;
+        else if (u3.t < t3.u) return;
         return t3(l.event ? l.event(u3) : u3);
       }
     };
   }
   function O(n2, u3, t3, i3, o3, r3, f3, e3, c3, s3) {
     var a3, h3, v3, p3, w3, _3, g3, m2, x3, C3, S2, M2, $2, I2, H, L2, T3 = u3.type;
-    if (void 0 !== u3.constructor)
-      return null;
+    if (void 0 !== u3.constructor) return null;
     128 & t3.__u && (c3 = !!(32 & t3.__u), r3 = [e3 = u3.__e = t3.__e]), (a3 = l.__b) && a3(u3);
-    n:
-      if ("function" == typeof T3)
-        try {
-          if (m2 = u3.props, x3 = "prototype" in T3 && T3.prototype.render, C3 = (a3 = T3.contextType) && i3[a3.__c], S2 = a3 ? C3 ? C3.props.value : a3.__ : i3, t3.__c ? g3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (x3 ? u3.__c = h3 = new T3(m2, S2) : (u3.__c = h3 = new k(m2, S2), h3.constructor = T3, h3.render = q), C3 && C3.sub(h3), h3.props = m2, h3.state || (h3.state = {}), h3.context = S2, h3.__n = i3, v3 = h3.__d = true, h3.__h = [], h3._sb = []), x3 && null == h3.__s && (h3.__s = h3.state), x3 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = d({}, h3.__s)), d(h3.__s, T3.getDerivedStateFromProps(m2, h3.__s))), p3 = h3.props, w3 = h3.state, h3.__v = u3, v3)
-            x3 && null == T3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), x3 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
-          else {
-            if (x3 && null == T3.getDerivedStateFromProps && m2 !== p3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(m2, S2), !h3.__e && (null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(m2, h3.__s, S2) || u3.__v === t3.__v)) {
-              for (u3.__v !== t3.__v && (h3.props = m2, h3.state = h3.__s, h3.__d = false), u3.__e = t3.__e, u3.__k = t3.__k, u3.__k.some(function(n3) {
-                n3 && (n3.__ = u3);
-              }), M2 = 0; M2 < h3._sb.length; M2++)
-                h3.__h.push(h3._sb[M2]);
-              h3._sb = [], h3.__h.length && f3.push(h3);
-              break n;
-            }
-            null != h3.componentWillUpdate && h3.componentWillUpdate(m2, h3.__s, S2), x3 && null != h3.componentDidUpdate && h3.__h.push(function() {
-              h3.componentDidUpdate(p3, w3, _3);
-            });
-          }
-          if (h3.context = S2, h3.props = m2, h3.__P = n2, h3.__e = false, $2 = l.__r, I2 = 0, x3) {
-            for (h3.state = h3.__s, h3.__d = false, $2 && $2(u3), a3 = h3.render(h3.props, h3.state, h3.context), H = 0; H < h3._sb.length; H++)
-              h3.__h.push(h3._sb[H]);
-            h3._sb = [];
-          } else
-            do {
-              h3.__d = false, $2 && $2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
-            } while (h3.__d && ++I2 < 25);
-          h3.state = h3.__s, null != h3.getChildContext && (i3 = d(d({}, i3), h3.getChildContext())), x3 && !v3 && null != h3.getSnapshotBeforeUpdate && (_3 = h3.getSnapshotBeforeUpdate(p3, w3)), P(n2, y(L2 = null != a3 && a3.type === b && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, o3, r3, f3, e3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && f3.push(h3), g3 && (h3.__E = h3.__ = null);
-        } catch (n3) {
-          if (u3.__v = null, c3 || null != r3) {
-            for (u3.__u |= c3 ? 160 : 128; e3 && 8 === e3.nodeType && e3.nextSibling; )
-              e3 = e3.nextSibling;
-            r3[r3.indexOf(e3)] = null, u3.__e = e3;
-          } else
-            u3.__e = t3.__e, u3.__k = t3.__k;
-          l.__e(n3, u3, t3);
+    n: if ("function" == typeof T3) try {
+      if (m2 = u3.props, x3 = "prototype" in T3 && T3.prototype.render, C3 = (a3 = T3.contextType) && i3[a3.__c], S2 = a3 ? C3 ? C3.props.value : a3.__ : i3, t3.__c ? g3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (x3 ? u3.__c = h3 = new T3(m2, S2) : (u3.__c = h3 = new k(m2, S2), h3.constructor = T3, h3.render = q), C3 && C3.sub(h3), h3.props = m2, h3.state || (h3.state = {}), h3.context = S2, h3.__n = i3, v3 = h3.__d = true, h3.__h = [], h3._sb = []), x3 && null == h3.__s && (h3.__s = h3.state), x3 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = d({}, h3.__s)), d(h3.__s, T3.getDerivedStateFromProps(m2, h3.__s))), p3 = h3.props, w3 = h3.state, h3.__v = u3, v3) x3 && null == T3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), x3 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
+      else {
+        if (x3 && null == T3.getDerivedStateFromProps && m2 !== p3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(m2, S2), !h3.__e && (null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(m2, h3.__s, S2) || u3.__v === t3.__v)) {
+          for (u3.__v !== t3.__v && (h3.props = m2, h3.state = h3.__s, h3.__d = false), u3.__e = t3.__e, u3.__k = t3.__k, u3.__k.some(function(n3) {
+            n3 && (n3.__ = u3);
+          }), M2 = 0; M2 < h3._sb.length; M2++) h3.__h.push(h3._sb[M2]);
+          h3._sb = [], h3.__h.length && f3.push(h3);
+          break n;
         }
-      else
-        null == r3 && u3.__v === t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : u3.__e = z(t3.__e, u3, t3, i3, o3, r3, f3, c3, s3);
+        null != h3.componentWillUpdate && h3.componentWillUpdate(m2, h3.__s, S2), x3 && null != h3.componentDidUpdate && h3.__h.push(function() {
+          h3.componentDidUpdate(p3, w3, _3);
+        });
+      }
+      if (h3.context = S2, h3.props = m2, h3.__P = n2, h3.__e = false, $2 = l.__r, I2 = 0, x3) {
+        for (h3.state = h3.__s, h3.__d = false, $2 && $2(u3), a3 = h3.render(h3.props, h3.state, h3.context), H = 0; H < h3._sb.length; H++) h3.__h.push(h3._sb[H]);
+        h3._sb = [];
+      } else do {
+        h3.__d = false, $2 && $2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
+      } while (h3.__d && ++I2 < 25);
+      h3.state = h3.__s, null != h3.getChildContext && (i3 = d(d({}, i3), h3.getChildContext())), x3 && !v3 && null != h3.getSnapshotBeforeUpdate && (_3 = h3.getSnapshotBeforeUpdate(p3, w3)), P(n2, y(L2 = null != a3 && a3.type === b && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, o3, r3, f3, e3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && f3.push(h3), g3 && (h3.__E = h3.__ = null);
+    } catch (n3) {
+      if (u3.__v = null, c3 || null != r3) {
+        for (u3.__u |= c3 ? 160 : 128; e3 && 8 === e3.nodeType && e3.nextSibling; ) e3 = e3.nextSibling;
+        r3[r3.indexOf(e3)] = null, u3.__e = e3;
+      } else u3.__e = t3.__e, u3.__k = t3.__k;
+      l.__e(n3, u3, t3);
+    }
+    else null == r3 && u3.__v === t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : u3.__e = z(t3.__e, u3, t3, i3, o3, r3, f3, c3, s3);
     (a3 = l.diffed) && a3(u3);
   }
   function j(n2, u3, t3) {
     u3.__d = void 0;
-    for (var i3 = 0; i3 < t3.length; i3++)
-      N(t3[i3], t3[++i3], t3[++i3]);
+    for (var i3 = 0; i3 < t3.length; i3++) N(t3[i3], t3[++i3], t3[++i3]);
     l.__c && l.__c(u3, n2), n2.some(function(u4) {
       try {
         n2 = u4.__h, u4.__h = [], n2.some(function(n3) {
@@ -1410,40 +1362,27 @@
   function z(u3, t3, i3, o3, r3, f3, e3, c3, s3) {
     var a3, v3, p3, d3, _3, g3, m2, b2 = i3.props, k3 = t3.props, C3 = t3.type;
     if ("svg" === C3 ? r3 = "http://www.w3.org/2000/svg" : "math" === C3 ? r3 = "http://www.w3.org/1998/Math/MathML" : r3 || (r3 = "http://www.w3.org/1999/xhtml"), null != f3) {
-      for (a3 = 0; a3 < f3.length; a3++)
-        if ((_3 = f3[a3]) && "setAttribute" in _3 == !!C3 && (C3 ? _3.localName === C3 : 3 === _3.nodeType)) {
-          u3 = _3, f3[a3] = null;
-          break;
-        }
+      for (a3 = 0; a3 < f3.length; a3++) if ((_3 = f3[a3]) && "setAttribute" in _3 == !!C3 && (C3 ? _3.localName === C3 : 3 === _3.nodeType)) {
+        u3 = _3, f3[a3] = null;
+        break;
+      }
     }
     if (null == u3) {
-      if (null === C3)
-        return document.createTextNode(k3);
+      if (null === C3) return document.createTextNode(k3);
       u3 = document.createElementNS(r3, C3, k3.is && k3), c3 && (l.__m && l.__m(t3, f3), c3 = false), f3 = null;
     }
-    if (null === C3)
-      b2 === k3 || c3 && u3.data === k3 || (u3.data = k3);
+    if (null === C3) b2 === k3 || c3 && u3.data === k3 || (u3.data = k3);
     else {
-      if (f3 = f3 && n.call(u3.childNodes), b2 = i3.props || h, !c3 && null != f3)
-        for (b2 = {}, a3 = 0; a3 < u3.attributes.length; a3++)
-          b2[(_3 = u3.attributes[a3]).name] = _3.value;
-      for (a3 in b2)
-        if (_3 = b2[a3], "children" == a3)
-          ;
-        else if ("dangerouslySetInnerHTML" == a3)
-          p3 = _3;
-        else if (!(a3 in k3)) {
-          if ("value" == a3 && "defaultValue" in k3 || "checked" == a3 && "defaultChecked" in k3)
-            continue;
-          A(u3, a3, null, _3, r3);
-        }
-      for (a3 in k3)
-        _3 = k3[a3], "children" == a3 ? d3 = _3 : "dangerouslySetInnerHTML" == a3 ? v3 = _3 : "value" == a3 ? g3 = _3 : "checked" == a3 ? m2 = _3 : c3 && "function" != typeof _3 || b2[a3] === _3 || A(u3, a3, _3, b2[a3], r3);
-      if (v3)
-        c3 || p3 && (v3.__html === p3.__html || v3.__html === u3.innerHTML) || (u3.innerHTML = v3.__html), t3.__k = [];
-      else if (p3 && (u3.innerHTML = ""), P(u3, y(d3) ? d3 : [d3], t3, i3, o3, "foreignObject" === C3 ? "http://www.w3.org/1999/xhtml" : r3, f3, e3, f3 ? f3[0] : i3.__k && x(i3, 0), c3, s3), null != f3)
-        for (a3 = f3.length; a3--; )
-          w(f3[a3]);
+      if (f3 = f3 && n.call(u3.childNodes), b2 = i3.props || h, !c3 && null != f3) for (b2 = {}, a3 = 0; a3 < u3.attributes.length; a3++) b2[(_3 = u3.attributes[a3]).name] = _3.value;
+      for (a3 in b2) if (_3 = b2[a3], "children" == a3) ;
+      else if ("dangerouslySetInnerHTML" == a3) p3 = _3;
+      else if (!(a3 in k3)) {
+        if ("value" == a3 && "defaultValue" in k3 || "checked" == a3 && "defaultChecked" in k3) continue;
+        A(u3, a3, null, _3, r3);
+      }
+      for (a3 in k3) _3 = k3[a3], "children" == a3 ? d3 = _3 : "dangerouslySetInnerHTML" == a3 ? v3 = _3 : "value" == a3 ? g3 = _3 : "checked" == a3 ? m2 = _3 : c3 && "function" != typeof _3 || b2[a3] === _3 || A(u3, a3, _3, b2[a3], r3);
+      if (v3) c3 || p3 && (v3.__html === p3.__html || v3.__html === u3.innerHTML) || (u3.innerHTML = v3.__html), t3.__k = [];
+      else if (p3 && (u3.innerHTML = ""), P(u3, y(d3) ? d3 : [d3], t3, i3, o3, "foreignObject" === C3 ? "http://www.w3.org/1999/xhtml" : r3, f3, e3, f3 ? f3[0] : i3.__k && x(i3, 0), c3, s3), null != f3) for (a3 = f3.length; a3--; ) w(f3[a3]);
       c3 || (a3 = "value", "progress" === C3 && null == g3 ? u3.removeAttribute("value") : void 0 !== g3 && (g3 !== u3[a3] || "progress" === C3 && !g3 || "option" === C3 && g3 !== b2[a3]) && A(u3, a3, g3, b2[a3], r3), a3 = "checked", void 0 !== m2 && m2 !== u3[a3] && A(u3, a3, m2, b2[a3], r3));
     }
     return u3;
@@ -1453,8 +1392,7 @@
       if ("function" == typeof n2) {
         var i3 = "function" == typeof n2.__u;
         i3 && n2.__u(), i3 && null == u3 || (n2.__u = n2(u3));
-      } else
-        n2.current = u3;
+      } else n2.current = u3;
     } catch (n3) {
       l.__e(n3, t3);
     }
@@ -1462,17 +1400,14 @@
   function V(n2, u3, t3) {
     var i3, o3;
     if (l.unmount && l.unmount(n2), (i3 = n2.ref) && (i3.current && i3.current !== n2.__e || N(i3, null, u3)), null != (i3 = n2.__c)) {
-      if (i3.componentWillUnmount)
-        try {
-          i3.componentWillUnmount();
-        } catch (n3) {
-          l.__e(n3, u3);
-        }
+      if (i3.componentWillUnmount) try {
+        i3.componentWillUnmount();
+      } catch (n3) {
+        l.__e(n3, u3);
+      }
       i3.base = i3.__P = null;
     }
-    if (i3 = n2.__k)
-      for (o3 = 0; o3 < i3.length; o3++)
-        i3[o3] && V(i3[o3], u3, t3 || "function" != typeof n2.type);
+    if (i3 = n2.__k) for (o3 = 0; o3 < i3.length; o3++) i3[o3] && V(i3[o3], u3, t3 || "function" != typeof n2.type);
     t3 || w(n2.__e), n2.__c = n2.__ = n2.__e = n2.__d = void 0;
   }
   function q(n2, l3, u3) {
@@ -1506,14 +1441,11 @@
     return u3.Provider.__ = u3.Consumer.contextType = u3;
   }
   n = v.slice, l = { __e: function(n2, l3, u3, t3) {
-    for (var i3, o3, r3; l3 = l3.__; )
-      if ((i3 = l3.__c) && !i3.__)
-        try {
-          if ((o3 = i3.constructor) && null != o3.getDerivedStateFromError && (i3.setState(o3.getDerivedStateFromError(n2)), r3 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t3 || {}), r3 = i3.__d), r3)
-            return i3.__E = i3;
-        } catch (l4) {
-          n2 = l4;
-        }
+    for (var i3, o3, r3; l3 = l3.__; ) if ((i3 = l3.__c) && !i3.__) try {
+      if ((o3 = i3.constructor) && null != o3.getDerivedStateFromError && (i3.setState(o3.getDerivedStateFromError(n2)), r3 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t3 || {}), r3 = i3.__d), r3) return i3.__E = i3;
+    } catch (l4) {
+      n2 = l4;
+    }
     throw n2;
   } }, u = 0, t = function(n2) {
     return null != n2 && null == n2.constructor;
@@ -1555,15 +1487,13 @@
       t3 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
     }], o3.__c = r2, !r2.u)) {
       var f3 = function(n3, t3, r3) {
-        if (!o3.__c.__H)
-          return true;
+        if (!o3.__c.__H) return true;
         var u4 = o3.__c.__H.__.filter(function(n4) {
           return !!n4.__c;
         });
         if (u4.every(function(n4) {
           return !n4.__N;
-        }))
-          return !c3 || c3.call(this, n3, t3, r3);
+        })) return !c3 || c3.call(this, n3, t3, r3);
         var i4 = false;
         return u4.forEach(function(n4) {
           if (n4.__N) {
@@ -1613,21 +1543,18 @@
   function g2() {
     var n2 = d2(t2++, 11);
     if (!n2.__) {
-      for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; )
-        u3 = u3.__;
+      for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; ) u3 = u3.__;
       var i3 = u3.__m || (u3.__m = [0, 0]);
       n2.__ = "P" + i3[0] + "-" + i3[1]++;
     }
     return n2.__;
   }
   function j2() {
-    for (var n2; n2 = f2.shift(); )
-      if (n2.__P && n2.__H)
-        try {
-          n2.__H.__h.forEach(z2), n2.__H.__h.forEach(B2), n2.__H.__h = [];
-        } catch (t3) {
-          n2.__H.__h = [], c2.__e(t3, n2.__v);
-        }
+    for (var n2; n2 = f2.shift(); ) if (n2.__P && n2.__H) try {
+      n2.__H.__h.forEach(z2), n2.__H.__h.forEach(B2), n2.__H.__h = [];
+    } catch (t3) {
+      n2.__H.__h = [], c2.__e(t3, n2.__v);
+    }
   }
   c2.__b = function(n2) {
     r2 = null, e2 && e2(n2);
@@ -1769,13 +1696,11 @@
 
   // shared/translations.js
   function apply(subject, replacements, textLength = 1) {
-    if (typeof subject !== "string" || subject.length === 0)
-      return "";
+    if (typeof subject !== "string" || subject.length === 0) return "";
     let out = subject;
     if (replacements) {
       for (let [name, value] of Object.entries(replacements)) {
-        if (typeof value !== "string")
-          value = "";
+        if (typeof value !== "string") value = "";
         out = out.replaceAll(`{${name}}`, value);
       }
     }
@@ -1853,8 +1778,7 @@
      * @return {EmbedSettings}
      */
     withAutoplay(autoplay) {
-      if (typeof autoplay !== "boolean")
-        return this;
+      if (typeof autoplay !== "boolean") return this;
       return new _EmbedSettings({
         ...this,
         autoplay
@@ -1865,8 +1789,7 @@
      * @return {EmbedSettings}
      */
     withMuted(muted) {
-      if (typeof muted !== "boolean")
-        return this;
+      if (typeof muted !== "boolean") return this;
       return new _EmbedSettings({
         ...this,
         muted
@@ -1925,11 +1848,9 @@
      * @throws {Error}
      */
     constructor(input) {
-      if (typeof input !== "string")
-        throw new Error("string required, got: " + input);
+      if (typeof input !== "string") throw new Error("string required, got: " + input);
       const sanitized = sanitizeYoutubeId(input);
-      if (sanitized === null)
-        throw new Error("invalid ID from: " + input);
+      if (sanitized === null) throw new Error("invalid ID from: " + input);
       this.id = sanitized;
     }
     /**
@@ -1945,11 +1866,9 @@
      * @throws {Error}
      */
     constructor(input) {
-      if (typeof input !== "string")
-        throw new Error("string required for timestamp");
+      if (typeof input !== "string") throw new Error("string required for timestamp");
       const seconds = timestampInSeconds(input);
-      if (seconds === null)
-        throw new Error("invalid input for timestamp: " + input);
+      if (seconds === null) throw new Error("invalid input for timestamp: " + input);
       this.seconds = seconds;
     }
     /**
@@ -1957,8 +1876,7 @@
      * @return {Timestamp|null}
      */
     static fromHref(href) {
-      if (typeof href !== "string")
-        return null;
+      if (typeof href !== "string") return null;
       const param = timestampFromHref(href);
       if (param) {
         try {
@@ -1971,8 +1889,7 @@
     }
   };
   function idFromHref(href) {
-    if (typeof href !== "string")
-      return null;
+    if (typeof href !== "string") return null;
     let url;
     try {
       url = new URL(href);
@@ -1980,8 +1897,7 @@
       return null;
     }
     const fromParam = url.searchParams.get("videoID");
-    if (fromParam)
-      return fromParam;
+    if (fromParam) return fromParam;
     if (url.protocol === "duck:") {
       return url.pathname.slice(1);
     }
@@ -1991,8 +1907,7 @@
     return null;
   }
   function timestampFromHref(href) {
-    if (typeof href !== "string")
-      return null;
+    if (typeof href !== "string") return null;
     let url;
     try {
       url = new URL(href);
@@ -2014,8 +1929,7 @@
     };
     const parts = timestamp.split(/(\d+[hms]?)/);
     const totalSeconds = parts.reduce((total, part) => {
-      if (!part)
-        return total;
+      if (!part) return total;
       for (const unit in units) {
         if (part.includes(unit)) {
           return total + parseInt(part) * units[unit];
@@ -2103,8 +2017,7 @@
      * @return {Settings}
      */
     withFeatureState(named, settings) {
-      if (!settings)
-        return this;
+      if (!settings) return this;
       const valid = ["pip", "autoplay", "focusMode"];
       if (!valid.includes(named)) {
         console.warn(`Excluding invalid feature key ${named}`);
@@ -2249,8 +2162,7 @@
   function useOpenOnYoutubeHandler() {
     const settings = x2(SettingsContext).settings;
     return (embed) => {
-      if (!embed)
-        return console.warn("unreachable, settings.embed must be present");
+      if (!embed) return console.warn("unreachable, settings.embed must be present");
       try {
         const base = new URL(settings.youtubeBase);
         window.location.href = embed.intoYoutubeUrl(base);
@@ -2707,8 +2619,7 @@
         off();
       });
       window.addEventListener(EVENT_ON, () => {
-        if (enabled === true)
-          return;
+        if (enabled === true) return;
         enabled = true;
         on();
       });
@@ -2752,8 +2663,7 @@
       setFocusMode("enabled");
     }
     _2(() => {
-      if (!tooltipRef.current)
-        return;
+      if (!tooltipRef.current) return;
       const icon = tooltipRef.current;
       const rect = icon.getBoundingClientRect();
       const iconTop = rect.top + window.scrollY;
@@ -2811,8 +2721,7 @@
         formfactor: "desktop",
         buttonProps: {
           onClick: () => {
-            if (embed)
-              openOnYoutube(embed);
+            if (embed) openOnYoutube(embed);
           }
         }
       },
@@ -2904,10 +2813,8 @@
       let attempt = 0;
       let id;
       function check() {
-        if (!iframe.contentDocument)
-          return;
-        if (attempt > maxAttempts)
-          return;
+        if (!iframe.contentDocument) return;
+        if (attempt > maxAttempts) return;
         attempt += 1;
         const selector = "#player video";
         const video = (
@@ -3019,11 +2926,9 @@
   // pages/duckplayer/src/js/utils.js
   function createYoutubeURLForError(href, urlBase) {
     const valid = VideoParams.forWatchPage(href);
-    if (!valid)
-      return null;
+    if (!valid) return null;
     const original = new URL(href);
-    if (original.searchParams.get("feature") !== "emb_err_woyt")
-      return null;
+    if (original.searchParams.get("feature") !== "emb_err_woyt") return null;
     const url = new URL(urlBase);
     url.searchParams.set("v", valid.id);
     if (typeof valid.time === "string") {
@@ -3032,10 +2937,8 @@
     return url.toString();
   }
   function getValidVideoTitle(iframeTitle) {
-    if (typeof iframeTitle !== "string")
-      return null;
-    if (iframeTitle === "YouTube")
-      return null;
+    if (typeof iframeTitle !== "string") return null;
+    if (iframeTitle === "YouTube") return null;
     return iframeTitle.replace(/ - YouTube$/g, "");
   }
 
@@ -3053,17 +2956,14 @@
      */
     iframeDidLoad(iframe) {
       const handler = (e3) => {
-        if (!e3.target)
-          return;
+        if (!e3.target) return;
         const target = (
           /** @type {Element} */
           e3.target
         );
-        if (!("href" in target) || typeof target.href !== "string")
-          return;
+        if (!("href" in target) || typeof target.href !== "string") return;
         const next = createYoutubeURLForError(target.href, this.baseUrl);
-        if (!next)
-          return;
+        if (!next) return;
         e3.preventDefault();
         e3.stopImmediatePropagation();
         window.location.href = next;
@@ -3135,7 +3035,6 @@
      * @param {HTMLIFrameElement} iframe
      * @returns {(() => void) | null}
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     iframeDidLoad(iframe) {
       return () => {
         console.log("teardown");
@@ -3240,8 +3139,7 @@
     );
     const settings = useSettings();
     y2(() => {
-      if (!ref.current)
-        return;
+      if (!ref.current) return;
       const iframe = ref.current;
       const features = createIframeFeatures(settings);
       const iframeFeatures = [
@@ -3283,8 +3181,7 @@
     });
     let embed = EmbedSettings.fromHref("https://localhost?videoID=123");
     let url = embed?.toEmbedUrl();
-    if (!url)
-      throw new Error("unreachable");
+    if (!url) throw new Error("unreachable");
     return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _("div", { "data-layout": "mobile" }, /* @__PURE__ */ _(Background, null)), /* @__PURE__ */ _("main", { class: Components_default.main }, /* @__PURE__ */ _("div", { class: Components_default.tube }, /* @__PURE__ */ _(Wordmark, null), /* @__PURE__ */ _("h2", null, "Floating Bar"), /* @__PURE__ */ _("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ _(InfoIcon, { debugStyles: true })), /* @__PURE__ */ _("h2", null, "Info Tooltip"), /* @__PURE__ */ _(FloatingBar, null, /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: info_data_default })), /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: cog_data_default })), /* @__PURE__ */ _(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ _("h2", null, "Info Bar"), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(InfoBar, { embed }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ _("h2", null, "Desktop Switch bar"), /* @__PURE__ */ _("h3", null, "idle"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarDesktop, null))), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=false (desktop)")), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(Player, { src: url, layout: "desktop" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=true (mobile)")), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null)));
   }
 
@@ -3353,8 +3250,7 @@
         fill: true,
         buttonProps: {
           onClick: () => {
-            if (embed)
-              openOnYoutube(embed);
+            if (embed) openOnYoutube(embed);
           }
         }
       },
@@ -3463,8 +3359,7 @@
     };
     document.body.dataset.layout = settings.layout;
     const root = document.querySelector("body");
-    if (!root)
-      throw new Error("could not render, root element missing");
+    if (!root) throw new Error("could not render, root element missing");
     if (environment.display === "app") {
       B(
         /* @__PURE__ */ _(
@@ -3487,8 +3382,7 @@
   }
   function createEmbedSettings(href, settings) {
     const embed = EmbedSettings.fromHref(href);
-    if (!embed)
-      return null;
+    if (!embed) return null;
     return embed.withAutoplay(settings.autoplay.state === "enabled").withMuted(settings.platform.name === "ios");
   }
   async function getTranslationsFromStringOrLoadDynamically(stringInput, locale) {
@@ -3675,8 +3569,7 @@
      * ```
      */
     landscapeImpression() {
-      if (this.oneTimeEvents.has("landscapeImpression"))
-        return;
+      if (this.oneTimeEvents.has("landscapeImpression")) return;
       this.oneTimeEvents.add("landscapeImpression");
       this._event({ attributes: { name: "impression", value: "landscape-layout" } });
     }
