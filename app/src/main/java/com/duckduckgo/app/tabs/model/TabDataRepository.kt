@@ -179,6 +179,8 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun getTabId(url: String): String? = tabsDao.selectTabByUrl(url)
+
     override suspend fun setIsUserNew(isUserNew: Boolean) {
         if (tabSwitcherDataStore.data.first().userState == UserState.UNKNOWN) {
             val userState = if (isUserNew) UserState.NEW else UserState.EXISTING
@@ -297,6 +299,9 @@ class TabDataRepository @Inject constructor(
         faviconManager.deleteAllTemp()
         siteData.clear()
     }
+
+    override suspend fun getSelectedTab(): TabEntity? =
+        withContext(dispatchers.io()) { tabsDao.selectedTab() }
 
     override suspend fun select(tabId: String) {
         databaseExecutor().scheduleDirect {

@@ -93,6 +93,8 @@ interface TabRepository {
 
     suspend fun deleteAll()
 
+    suspend fun getSelectedTab(): TabEntity?
+
     suspend fun select(tabId: String)
 
     fun updateTabPreviewImage(
@@ -106,6 +108,8 @@ interface TabRepository {
     )
 
     suspend fun selectByUrlOrNewTab(url: String)
+
+    suspend fun getTabId(url: String): String?
 
     suspend fun setIsUserNew(isUserNew: Boolean)
 

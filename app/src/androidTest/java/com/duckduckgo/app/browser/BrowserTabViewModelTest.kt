@@ -133,6 +133,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -412,6 +413,8 @@ class BrowserTabViewModelTest {
 
     private var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
 
+    private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -669,6 +672,7 @@ class BrowserTabViewModelTest {
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
+            showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
         )
 
         testee.loadData("abc", null, false, false)
@@ -6125,6 +6129,13 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.SwitchToTab> {
             assertEquals(tabId, this.tabId)
         }
+    }
+
+    @Test
+    fun whenNavigationStateChangedCalledThenHandleResolvedUrlIsChecked() = runTest {
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        verify(mockShowOnAppLaunchHandler).handleResolvedUrlStorage(eq("https://example.com"), any(), any())
     }
 
     private fun aCredential(): LoginCredentials {

@@ -23,6 +23,8 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -44,7 +46,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class BrowserViewModelTest {
 
@@ -52,34 +59,29 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    @Mock private lateinit var mockCommandObserver: Observer<Command>
 
     private val commandCaptor = argumentCaptor<Command>()
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    @Mock private lateinit var mockTabRepository: TabRepository
 
-    @Mock
-    private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
+    @Mock private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
 
-    @Mock
-    private lateinit var mockAutomaticDataClearer: DataClearer
+    @Mock private lateinit var mockAutomaticDataClearer: DataClearer
 
-    @Mock
-    private lateinit var mockAppEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+    @Mock private lateinit var mockAppEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
 
-    @Mock
-    private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
+    @Mock private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    @Mock private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+    @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
+    @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
+
+    private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
     private lateinit var testee: BrowserViewModel
 
@@ -93,17 +95,7 @@ class BrowserViewModelTest {
 
         configureSkipUrlConversionInNewTabState(enabled = true)
 
-        testee = BrowserViewModel(
-            tabRepository = mockTabRepository,
-            queryUrlConverter = mockOmnibarEntryConverter,
-            dataClearer = mockAutomaticDataClearer,
-            appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
-            defaultBrowserDetector = mockDefaultBrowserDetector,
-            dispatchers = coroutinesTestRule.testDispatcherProvider,
-            pixel = mockPixel,
-            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-        )
+        initTestee()
 
         testee.command.observeForever(mockCommandObserver)
 
@@ -274,6 +266,40 @@ class BrowserViewModelTest {
         testee.onTabSelected(tabId)
 
         verify(mockTabRepository).select(tabId)
+    }
+
+    @Test
+    fun whenHandleShowOnAppLaunchCalledThenNoTabIsAddedByDefault() = runTest {
+        testee.handleShowOnAppLaunchOption()
+
+        verify(mockTabRepository, never()).add()
+        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
+        verify(mockTabRepository, never()).addDefaultTab()
+    }
+
+    @Test
+    fun whenShowOnAppLaunchFeatureToggleIsOnThenShowOnAppLaunchHandled() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = true))
+
+        testee.handleShowOnAppLaunchOption()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    private fun initTestee() {
+        testee = BrowserViewModel(
+            tabRepository = mockTabRepository,
+            queryUrlConverter = mockOmnibarEntryConverter,
+            dataClearer = mockAutomaticDataClearer,
+            appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
+            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+        )
     }
 
     private fun configureSkipUrlConversionInNewTabState(enabled: Boolean) {
