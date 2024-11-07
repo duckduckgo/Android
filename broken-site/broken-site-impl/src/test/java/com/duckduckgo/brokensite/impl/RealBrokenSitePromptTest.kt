@@ -45,6 +45,8 @@ class RealBrokenSitePromptTest {
     @Test
     fun whenUserDismissedPromptAndNoNextShownDateThenIncrementDismissStreakAndDoNotUpdateNextShownDate() = runTest {
         whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(null)
+        whenever(mockBrokenSiteReportRepository.getMaxDismissStreak()).thenReturn(3)
+        whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(0)
 
         testee.userDismissedPrompt()
 
@@ -69,10 +71,12 @@ class RealBrokenSitePromptTest {
         }
 
     @Test
-    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateLaterThanCooldownDaysThenResetDismissStreakAndDoNotUpdateNextShownDate() =
+    fun whenUserDismissedPromptMaxDismissStreakTimesAndNextShownDateLaterThanDismissStreakDaysThenResetDismissStreakAndDoNotUpdateNextShownDate() =
         runTest {
             whenever(mockBrokenSiteReportRepository.getNextShownDate()).thenReturn(LocalDateTime.now().plusDays(11))
             whenever(mockBrokenSiteReportRepository.getDismissStreak()).thenReturn(2)
+            whenever(mockBrokenSiteReportRepository.getMaxDismissStreak()).thenReturn(3)
+            whenever(mockBrokenSiteReportRepository.getDismissStreakResetDays()).thenReturn(2)
             whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.now())
 
             testee.userDismissedPrompt()
