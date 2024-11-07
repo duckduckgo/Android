@@ -31,22 +31,19 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 interface BrokenSitePomptDataStore {
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
     suspend fun getMaxDismissStreak(): Int
 
     suspend fun setDismissStreakResetDays(days: Int)
-    fun getDismissStreakResetDays(): Int
+    suspend fun getDismissStreakResetDays(): Int
 
     suspend fun setCoolDownDays(days: Int)
-    fun getCoolDownDays(): Int
+    suspend fun getCoolDownDays(): Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -68,19 +65,17 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         }
         .distinctUntilChanged()
 
-    private val dismissStreakResetDays: StateFlow<Int> = store.data
+    private val dismissStreakResetDays: Flow<Int> = store.data
         .map { prefs ->
             prefs[DISMISS_STREAK_RESET_DAYS] ?: 30
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 30)
 
-    private val coolDownDays: StateFlow<Int> = store.data
+    private val coolDownDays: Flow<Int> = store.data
         .map { prefs ->
             prefs[COOL_DOWN_DAYS] ?: 7
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 7)
 
     override suspend fun setMaxDismissStreak(maxDismissStreak: Int) {
         store.edit { prefs -> prefs[MAX_DISMISS_STREAK] = maxDismissStreak }
@@ -92,11 +87,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[DISMISS_STREAK_RESET_DAYS] = days }
     }
 
-    override fun getDismissStreakResetDays(): Int = dismissStreakResetDays.value
+    override suspend fun getDismissStreakResetDays(): Int = dismissStreakResetDays.first()
 
     override suspend fun setCoolDownDays(days: Int) {
         store.edit { prefs -> prefs[COOL_DOWN_DAYS] = days }
     }
 
-    override fun getCoolDownDays(): Int = coolDownDays.value
+    override suspend fun getCoolDownDays(): Int = coolDownDays.first()
 }
