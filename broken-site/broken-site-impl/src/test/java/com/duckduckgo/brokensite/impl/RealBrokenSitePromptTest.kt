@@ -25,7 +25,7 @@ class RealBrokenSitePromptTest {
     )
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(mockBrokenSiteReportRepository.getCoolDownDays()).thenReturn(7)
         whenever(mockBrokenSiteReportRepository.getMaxDismissStreak()).thenReturn(3)
         fakeBrokenSitePromptRCFeature.self().setRawStoredState(State(true))
