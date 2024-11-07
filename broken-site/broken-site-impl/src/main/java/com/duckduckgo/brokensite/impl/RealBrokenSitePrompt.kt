@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 internal const val REFRESH_COUNT_WINDOW = 20L
@@ -44,7 +43,6 @@ class RealBrokenSitePrompt @Inject constructor(
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
-        Timber.d("Cris. Dismiss streak: ${brokenSiteReportRepository.getDismissStreak()}")
         if (brokenSiteReportRepository.getDismissStreak() >= brokenSiteReportRepository.getMaxDismissStreak() - 1) {
             brokenSiteReportRepository.resetDismissStreak()
             val nextShownDate = brokenSiteReportRepository.getNextShownDate()
@@ -52,9 +50,6 @@ class RealBrokenSitePrompt @Inject constructor(
 
             if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
                 brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-                Timber.d("Cris. Dismiss. New next shown date: $newNextShownDate")
-            } else {
-                Timber.d("Cris. Dismiss. Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
             }
         } else {
             brokenSiteReportRepository.incrementDismissStreak()
@@ -104,9 +99,6 @@ class RealBrokenSitePrompt @Inject constructor(
         val newNextShownDate = currentTimeProvider.localDateTimeNow().plusDays(brokenSiteReportRepository.getCoolDownDays())
         if (nextShownDate == null || newNextShownDate.isAfter(nextShownDate)) {
             brokenSiteReportRepository.setNextShownDate(newNextShownDate)
-            Timber.d("Cris. Shown. New next shown date: $newNextShownDate")
-        } else {
-            Timber.d("Cris. Shown. Next shown date not updated to $newNextShownDate, keeping existing value: $nextShownDate")
         }
     }
 }

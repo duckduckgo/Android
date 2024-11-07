@@ -22,7 +22,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
 import javax.inject.Inject
-import timber.log.Timber
 
 interface BrokenSitePromptInMemoryStore {
     fun resetRefreshCount()
@@ -62,7 +61,6 @@ class RealBrokenSitePromptInMemoryStore @Inject constructor() : BrokenSitePrompt
         return refreshes?.let {
             val time = it.time.filter { time -> time.isAfter(t1) && time.isBefore(t2) }
             refreshes = it.copy(time = time)
-            Timber.d("Cris. $refreshes")
             time.size
         } ?: 0
     }
