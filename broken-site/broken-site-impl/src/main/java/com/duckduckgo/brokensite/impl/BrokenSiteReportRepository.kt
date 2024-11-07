@@ -41,10 +41,10 @@ interface BrokenSiteReportRepository {
     suspend fun getMaxDismissStreak(): Int
 
     suspend fun setDismissStreakResetDays(days: Int)
-    fun getDismissStreakResetDays(): Int
+    suspend fun getDismissStreakResetDays(): Int
 
     suspend fun setCoolDownDays(days: Int)
-    fun getCoolDownDays(): Int
+    suspend fun getCoolDownDays(): Int
 
     suspend fun setBrokenSitePromptRCSettings(maxDismissStreak: Int, dismissStreakResetDays: Int, coolDownDays: Int)
 }
@@ -97,14 +97,14 @@ class RealBrokenSiteReportRepository(
         brokenSitePromptDataStore.setDismissStreakResetDays(days)
     }
 
-    override fun getDismissStreakResetDays(): Int =
+    override suspend fun getDismissStreakResetDays(): Int =
         brokenSitePromptDataStore.getDismissStreakResetDays()
 
     override suspend fun setCoolDownDays(days: Int) {
         brokenSitePromptDataStore.setCoolDownDays(days)
     }
 
-    override fun getCoolDownDays(): Int =
+    override suspend fun getCoolDownDays(): Int =
         brokenSitePromptDataStore.getCoolDownDays()
 
     override suspend fun setBrokenSitePromptRCSettings(
