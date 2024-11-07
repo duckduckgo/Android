@@ -49,8 +49,8 @@ class LocationPermissionMigrationPlugin @Inject constructor(
     override fun run() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (!settingsDataStore.appLocationPermissionMigrated) {
-                Timber.d("Location permissions migration running")
                 sitePermissionsRepository.askLocationEnabled = settingsDataStore.appLocationPermission
+                Timber.d("Location permissions migrated: location permission set to ${sitePermissionsRepository.askLocationEnabled}")
                 val locationPermissions = locationPermissionsRepository.getLocationPermissionsSync()
                 val alwaysAllowedPermissions = locationPermissions.filter { it.permission == ALLOW_ALWAYS }
                 val alwaysDeniedPermissions = locationPermissions.filter { it.permission == DENY_ALWAYS }
