@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCat
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackSubsSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
@@ -64,6 +65,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     private val pixelSender: PrivacyProUnifiedFeedbackPixelSender,
     private val feedbackCustomMetadataProvider: FeedbackCustomMetadataProvider,
     private val feedbackHelpUrlProvider: FeedbackHelpUrlProvider,
+    private val supportInbox: SubscriptionSupportInbox,
 ) : ViewModel() {
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -179,20 +181,43 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitFeedback(description: String) {
+    fun onSubmitFeedback(
+        description: String,
+        email: String? = null,
+    ) {
         viewModelScope.launch {
             val metadata = viewState.value.feedbackMetadata.copy(
                 description = description,
             )
 
             when (metadata.reportType) {
-                GENERAL_FEEDBACK -> sendGeneralFeedbackPixel(metadata)
-                REQUEST_FEATURE -> sendFeatureRequestPixel(metadata)
-                REPORT_PROBLEM -> sendReportIssuePixel(metadata)
+                GENERAL_FEEDBACK -> {
+                    sendGeneralFeedbackPixel(metadata)
+                    command.send(FeedbackCompleted)
+                }
+
+                REQUEST_FEATURE -> {
+                    sendFeatureRequestPixel(metadata)
+                    command.send(FeedbackCompleted)
+                }
+
+                REPORT_PROBLEM -> {
+                    if (!email.isNullOrBlank()) {
+                        sendFeedbackToInbox(email, metadata)
+                    } else {
+                        true
+                    }.also { completeFeedback ->
+                        if (completeFeedback) {
+                            sendReportIssuePixel(metadata)
+                            command.send(FeedbackCompleted)
+                        } else {
+                            command.send(FeedbackFailed)
+                        }
+                    }
+                }
+
                 null -> {} // Do nothing
             }
-
-            command.send(FeedbackCompleted)
         }
     }
 
@@ -205,11 +230,31 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 PARAMS_KEY_DESC to (metadata.description ?: ""),
                 PARAMS_KEY_APP_NAME to (metadata.appName ?: ""),
                 PARAMS_KEY_APP_PACKAGE to (metadata.appPackageName ?: ""),
-                PARAMS_KEY_CUSTOM_METADATA to feedbackCustomMetadataProvider.getCustomMetadata(
+                PARAMS_KEY_CUSTOM_METADATA to feedbackCustomMetadataProvider.getCustomMetadataEncoded(
                     metadata.category,
                 ),
             ),
         )
+    }
+
+    private suspend fun sendFeedbackToInbox(
+        email: String,
+        metadata: FeedbackMetadata,
+    ): Boolean {
+        return with(metadata) {
+            supportInbox.sendFeedback(
+                email = email,
+                source = source!!,
+                category = category!!,
+                subCategory = subCategory,
+                description = description,
+                appName = appName,
+                appPackage = appPackageName,
+                customMetadata = feedbackCustomMetadataProvider.getCustomMetadata(
+                    category!!,
+                ),
+            )
+        }
     }
 
     private fun sendFeatureRequestPixel(metadata: FeedbackMetadata) {
@@ -475,6 +520,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
     }
 
     sealed class Command {
+        data object FeedbackFailed : Command()
         data object FeedbackCompleted : Command()
         data object FeedbackCancelled : Command()
         data class ShowHelpPages(val url: String) : Command()

@@ -132,6 +132,10 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun useUnifiedFeedback(): Toggle
+
+    // Kill switch
+    @Toggle.DefaultValue(true)
+    fun allowEmailFeedback(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
