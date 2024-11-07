@@ -336,10 +336,10 @@ class BrowserWebViewClient @Inject constructor(
                         duckPlayer.willNavigateToDuckPlayerFromSerp()
                         if (openInNewTab) {
                             listener.openLinkInNewTab(url)
+                            return true
                         } else {
-                            loadUrl(listener, webView, url.toString())
+                            return false
                         }
-                        return true
                     } else if (openInNewTab) {
                         webViewClientListener?.openLinkInNewTab(url)
                         return true
