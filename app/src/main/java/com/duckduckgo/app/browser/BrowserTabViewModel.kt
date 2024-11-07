@@ -1401,6 +1401,11 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+                ctaViewState.value?.cta?.let { cta ->
+                    if (cta is BrokenSitePromptDialogCta) {
+                        command.value = HideBrokenSitePromptCta(cta)
+                    }
+                }
             }
 
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
