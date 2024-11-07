@@ -38,7 +38,7 @@ interface BrokenSiteReportRepository {
     fun cleanupOldEntries()
 
     suspend fun setMaxDismissStreak(maxDismissStreak: Int)
-    fun getMaxDismissStreak(): Int
+    suspend fun getMaxDismissStreak(): Int
 
     suspend fun setDismissStreakResetDays(days: Int)
     fun getDismissStreakResetDays(): Int
@@ -90,7 +90,7 @@ class RealBrokenSiteReportRepository(
         brokenSitePromptDataStore.setMaxDismissStreak(maxDismissStreak)
     }
 
-    override fun getMaxDismissStreak(): Int =
+    override suspend fun getMaxDismissStreak(): Int =
         brokenSitePromptDataStore.getMaxDismissStreak()
 
     override suspend fun setDismissStreakResetDays(days: Int) {
