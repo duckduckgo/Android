@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
@@ -102,20 +103,23 @@ private annotation class InternalApi
 object CookieManagerWrapperModule {
     @Provides
     @InternalApi
-    fun providesCookieManagerWrapper(): CookieManagerWrapper {
-        return CookieManagerWrapperImpl()
+    fun providesCookieManagerWrapper(cookieManagerProvider: CookieManagerProvider): CookieManagerWrapper {
+        return CookieManagerWrapperImpl(cookieManagerProvider)
     }
 }
-private class CookieManagerWrapperImpl constructor() : CookieManagerWrapper {
+private class CookieManagerWrapperImpl constructor(
+    private val cookieManagerProvider: CookieManagerProvider,
+) : CookieManagerWrapper {
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.get() }
+
     override fun getCookie(url: String): String? {
-        return cookieManager.getCookie(url)
+        return cookieManager?.getCookie(url)
     }
 
     override fun setCookie(domain: String, cookie: String) {
         logcat { "Setting cookie $cookie for domain $domain" }
-        cookieManager.setCookie(domain, cookie)
-        cookieManager.flush()
+        cookieManager?.setCookie(domain, cookie)
+        cookieManager?.flush()
     }
 }
