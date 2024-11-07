@@ -57,8 +57,8 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -146,6 +146,7 @@ class BrowserWebViewClientTest {
     private val navigationHistory: NavigationHistory = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
+    private val mockUriLoadedManager: UriLoadedManager = mock()
 
     @UiThreadTest
     @Before
@@ -181,6 +182,7 @@ class BrowserWebViewClientTest {
             subscriptions,
             mockDuckPlayer,
             mockDuckDuckGoUrlDetector,
+            mockUriLoadedManager,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -1056,7 +1058,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        verify(pixel).fire(AppPixelName.URI_LOADED)
+        mockUriLoadedManager.sendUriLoadedPixel()
     }
 
     private class TestWebView(context: Context) : WebView(context) {

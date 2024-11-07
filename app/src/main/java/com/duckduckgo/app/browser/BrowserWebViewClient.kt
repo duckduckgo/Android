@@ -58,7 +58,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.uriloaded.DuckDuckGoUriLoadedManager
+import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -115,7 +115,7 @@ class BrowserWebViewClient @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val uriLoadedManager: DuckDuckGoUriLoadedManager,
+    private val uriLoadedManager: UriLoadedManager,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
