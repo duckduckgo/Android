@@ -214,29 +214,37 @@ class OnboardingStoreImpl @Inject constructor(
     }
 
     override fun getPrivacyProContent(content: ContentType): Int {
-        val cohort = extendedOnboardingFeatureToggles.privacyProOnboardingCopyNov24().getCohort()?.name
         return when (content) {
             TITLE -> {
-                when (cohort) {
-                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogTitle
-                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogTitle
-                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogTitle
+                when {
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
+                        R.string.onboardingPrivacyProProtectionDaxDialogTitle
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
+                        R.string.onboardingPrivacyProPirDaxDialogTitle
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
+                        R.string.onboardingPrivacyProVpnDaxDialogTitle
                     else -> R.string.onboardingPrivacyProDaxDialogTitle
                 }
             }
             DESCRIPTION -> {
-                when (cohort) {
-                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogDescription
-                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogDescription
-                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogDescription
+                when {
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
+                        R.string.onboardingPrivacyProProtectionDaxDialogDescription
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
+                        R.string.onboardingPrivacyProPirDaxDialogDescription
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
+                        R.string.onboardingPrivacyProVpnDaxDialogDescription
                     else -> R.string.onboardingPrivacyProDaxDialogDescription
                 }
             }
             PRIMARY_BUTTON -> {
-                when (cohort) {
-                    Cohorts.PROTECTION.name -> R.string.onboardingPrivacyProProtectionDaxDialogOkButton
-                    Cohorts.PIR.name -> R.string.onboardingPrivacyProPirDaxDialogOkButton
-                    Cohorts.VPN.name -> R.string.onboardingPrivacyProVpnDaxDialogOkButton
+                when {
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
+                        R.string.onboardingPrivacyProProtectionDaxDialogOkButton
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
+                        R.string.onboardingPrivacyProPirDaxDialogOkButton
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
+                        R.string.onboardingPrivacyProVpnDaxDialogOkButton
                     else -> R.string.onboardingPrivacyProDaxDialogOkButton
                 }
             }
