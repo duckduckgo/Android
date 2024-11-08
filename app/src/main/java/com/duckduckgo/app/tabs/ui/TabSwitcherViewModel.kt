@@ -66,7 +66,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        tabRepository.add()
+        repeat(100) {
+            tabRepository.add("https://cnn.com")
+        }
         command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)

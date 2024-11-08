@@ -59,9 +59,15 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -107,6 +113,9 @@ class BrowserViewModel @Inject constructor(
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs.distinctUntilChanged()
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val tabIds = tabRepository.flowTabs
+        .map { tabs -> tabs.map { it.tabId } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> {
         it?.let { state ->
@@ -309,6 +318,10 @@ class BrowserViewModel @Inject constructor(
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
         }
+    }
+
+    fun getTabById(tabId: String): TabEntity? = runBlocking(dispatchers.io()) {
+        tabRepository.getTabById(tabId)
     }
 }
 

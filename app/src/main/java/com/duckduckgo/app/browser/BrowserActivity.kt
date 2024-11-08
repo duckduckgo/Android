@@ -25,7 +25,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.view.KeyEvent
-import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -33,10 +32,12 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
@@ -45,7 +46,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -83,12 +83,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
-import com.google.android.material.appbar.AppBarLayout
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -155,46 +156,96 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val tabPagerAdapter: TabPagerAdapter = TabPagerAdapter()
 
     private val currentTab: BrowserTabFragment?
-        get() = tabPagerAdapter.getCurrentTabFragment()
+        get() = tabPagerAdapter.currentFragment
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
-    private inner class TabPagerAdapter : FragmentStateAdapter(this) {
-        private var requestedTabIdSelection: String? = null
+    private inner class TabPagerAdapter : FragmentStateAdapter(supportFragmentManager, lifecycle) {
+        private val tabIds = mutableListOf<String>()
 
-        override fun getItemCount(): Int = viewModel.tabs.value?.size ?: 0
+        private val selectedTabId: String?
+            get() = viewModel.selectedTab.value?.tabId
+
+        override fun getItemCount(): Int = tabIds.size
+
+        override fun getItemId(position: Int) = tabIds[position].hashCode().toLong()
+
+        override fun containsItem(itemId: Long) = tabIds.any { it.hashCode().toLong() == itemId }
+
+        val currentFragment: BrowserTabFragment?
+            get() = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>().firstOrNull { it.tabId == selectedTabId }
+
+        private val activeTabCount
+            get() = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>().filter { it.isInitialized }.size
 
         override fun createFragment(position: Int): Fragment {
-            val tab = viewModel.tabs.value?.get(position)!!
+            increaseOffscreenTabLimitIfNeeded()
+
+            val tab = viewModel.getTabById(tabIds[position])!!
             return BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, false)
         }
 
-        fun getCurrentTabFragment(): BrowserTabFragment? {
-            return supportFragmentManager.findFragmentByTag(viewModel.selectedTab.value?.tabId) as? BrowserTabFragment
-        }
+        // init {
+        //     lifecycleScope.launch {
+        //         delay(5000)
+        //         binding.fragmentPager.setCurrentItem(0, true)
+        //         repeat(MAX_ACTIVE_TABS) {
+        //             Timber.d("$$$ moving to #$it")
+        //             binding.fragmentPager.setCurrentItem(it, true)
+        //             delay(1000)
+        //         }
+        //     }
+        // }
 
-        fun onTabsUpdated() {
-            requestedTabIdSelection?.let {
-                if (setCurrentTab(it)) {
-                    requestedTabIdSelection = null
+        fun onTabsUpdated(newTabs: List<String>) {
+            if (tabIds != newTabs) {
+                val diffUtil = PagerDiffUtil(tabIds, newTabs)
+                val diff = DiffUtil.calculateDiff(diffUtil)
+                tabIds.clear()
+                tabIds.addAll(newTabs)
+                diff.dispatchUpdatesTo(this)
+
+                selectedTabId?.let {
+                    onSelectedTabChanged(it)
                 }
             }
-            notifyDataSetChanged()
         }
 
-        fun setCurrentTab(tabId: String): Boolean {
-            viewModel.tabs.value?.map { it.tabId }?.indexOf(tabId)?.let {
-                if (it != -1) {
-                    if (it != binding.fragmentPager.currentItem) {
-                        binding.fragmentPager.setCurrentItem(it, false)
-                        return true
-                    }
-                } else {
-                    requestedTabIdSelection = tabId
-                }
+        fun onSelectedTabChanged(tabId: String) {
+            val selectedTabIndex = tabIds.indexOfFirst { it == tabId }
+            if (selectedTabIndex != -1 && selectedTabIndex != binding.fragmentPager.currentItem) {
+                binding.fragmentPager.setCurrentItem(selectedTabIndex, false)
             }
-            return false
+        }
+
+        fun onPageChanged(position: Int) {
+            if (position < tabIds.size) {
+                viewModel.onTabSelected(tabIds[position])
+            }
+        }
+
+        private fun increaseOffscreenTabLimitIfNeeded() {
+            if (activeTabCount >= binding.fragmentPager.offscreenPageLimit * 2 - 1 && activeTabCount < MAX_ACTIVE_TABS) {
+                binding.fragmentPager.offscreenPageLimit += 1
+            }
+        }
+
+        inner class PagerDiffUtil(
+            private val oldList: List<String>,
+            private val newList: List<String>,
+        ) : DiffUtil.Callback() {
+            override fun getOldListSize() = oldList.size
+
+            override fun getNewListSize() = newList.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition] == newList[newItemPosition]
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return true
+            }
         }
     }
 
@@ -248,6 +299,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onStop()
     }
 
+    override fun onDestroy() {
+        binding.fragmentPager.adapter = null
+        binding.fragmentPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+
+        super.onDestroy()
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
@@ -275,61 +333,61 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun openNewTab(
-        tabId: String,
-        url: String? = null,
-        skipHome: Boolean,
-        isExternal: Boolean,
-    ): BrowserTabFragment {
-        Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
-        addOrReplaceNewTab(fragment, tabId)
-        // currentTab = fragment
-        return fragment
-    }
+    // private fun openNewTab(
+    //     tabId: String,
+    //     url: String? = null,
+    //     skipHome: Boolean,
+    //     isExternal: Boolean,
+    // ): BrowserTabFragment {
+    //     Timber.i("Opening new tab, url: $url, tabId: $tabId")
+    //     val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
+    //     addOrReplaceNewTab(fragment, tabId)
+    //     // currentTab = fragment
+    //     return fragment
+    // }
 
-    private fun addOrReplaceNewTab(
-        fragment: BrowserTabFragment,
-        tabId: String,
-    ) {
-        if (supportFragmentManager.isStateSaved) {
-            return
-        }
-        // val transaction = supportFragmentManager.beginTransaction()
-        // val tab = currentTab
-        // if (tab == null) {
-        //     transaction.replace(R.id.fragmentContainer, fragment, tabId)
-        // } else {
-        //     transaction.hide(tab)
-        //     transaction.add(R.id.fragmentContainer, fragment, tabId)
-        // }
-        // transaction.commit()
+    // private fun addOrReplaceNewTab(
+    //     fragment: BrowserTabFragment,
+    //     tabId: String,
+    // ) {
+    //     if (supportFragmentManager.isStateSaved) {
+    //         return
+    //     }
+    //     // val transaction = supportFragmentManager.beginTransaction()
+    //     // val tab = currentTab
+    //     // if (tab == null) {
+    //     //     transaction.replace(R.id.fragmentContainer, fragment, tabId)
+    //     // } else {
+    //     //     transaction.hide(tab)
+    //     //     transaction.add(R.id.fragmentContainer, fragment, tabId)
+    //     // }
+    //     // transaction.commit()
+    //
+    //     tabPagerAdapter.setCurrentTab(tabId)
+    // }
 
-        tabPagerAdapter.setCurrentTab(tabId)
-    }
-
-    private fun selectTab(tab: TabEntity?) {
-        Timber.v("Select tab: $tab")
-
-        if (tab == null) return
-
-        if (tab.tabId == currentTab?.tabId) return
-
-        lastActiveTabs.add(tab.tabId)
-
-        val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
-        // if (fragment == null) {
-        //     openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
-        //     return
-        // }
-        // val transaction = supportFragmentManager.beginTransaction()
-        // currentTab?.let {
-        //     transaction.hide(it)
-        // }
-        // transaction.show(fragment)
-        // transaction.commit()
-        // currentTab = fragment
-    }
+    // private fun selectTab(tab: TabEntity?) {
+    //     Timber.v("Select tab: $tab")
+    //
+    //     if (tab == null) return
+    //
+    //     if (tab.tabId == currentTab?.tabId) return
+    //
+    //     lastActiveTabs.add(tab.tabId)
+    //
+    //     val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
+    //     // if (fragment == null) {
+    //     //     openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
+    //     //     return
+    //     // }
+    //     // val transaction = supportFragmentManager.beginTransaction()
+    //     // currentTab?.let {
+    //     //     transaction.hide(it)
+    //     // }
+    //     // transaction.show(fragment)
+    //     // transaction.commit()
+    //     // currentTab = fragment
+    // }
 
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -448,13 +506,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         viewModel.selectedTab.observe(this) {
             if (it != null) {
-                tabPagerAdapter.setCurrentTab(it.tabId)
+                tabPagerAdapter.onSelectedTabChanged(it.tabId)
             }
         }
         viewModel.tabs.observe(this) {
             clearStaleTabs(it)
             removeOldTabs()
-            tabPagerAdapter.onTabsUpdated()
+        }
+
+        lifecycleScope.launch {
+            viewModel.tabIds.flowWithLifecycle(lifecycle).collectLatest { tabIds ->
+                tabPagerAdapter.onTabsUpdated(tabIds)
+            }
         }
     }
 
@@ -702,9 +765,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "WrongConstant")
     private fun initializeTabViewPager() {
         binding.fragmentPager.adapter = tabPagerAdapter
+        binding.fragmentPager.offscreenPageLimit = 1
+        binding.fragmentPager.registerOnPageChangeCallback(onTabPageChangeListener)
+    }
+
+    private val onTabPageChangeListener = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            tabPagerAdapter.onPageChanged(position)
+        }
     }
 
     private val Intent.launchedFromRecents: Boolean
