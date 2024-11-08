@@ -291,7 +291,7 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite.url)) {
+        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite)) {
             return null
         }
 
@@ -328,20 +328,10 @@ class CtaViewModel @Inject constructor(
                         entity.displayName.contains(mainNetwork)
                     }
                     ) {
-                        val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
-                            (
-                                (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(it.url.toUri())) ||
-                                    duckPlayer.isDuckPlayerUri(it.url) || duckPlayer.isSimulatedYoutubeNoCookie(it.url)
-                                )
-                        return when {
-                            isDuckPlayerUrl -> { // Temporary pixel
-                                pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
-                                null
-                            }
-                            highlightsOnboardingExperimentManager.isHighlightsEnabled() -> {
-                                OnboardingDaxDialogCta.DaxExperimentMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
-                            }
-                            else -> OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                            OnboardingDaxDialogCta.DaxExperimentMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        } else {
+                            OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                         }
                     }
                 }
@@ -378,8 +368,8 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isSiteNotAllowedForOnboarding(url: String): Boolean {
-        val uri = url.toUri()
+    private suspend fun isSiteNotAllowedForOnboarding(site: Site): Boolean {
+        val uri = site.url.toUri()
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
 
@@ -387,8 +377,17 @@ class CtaViewModel @Inject constructor(
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
                 (
                     (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
-                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
+                        duckPlayer.isDuckPlayerUri(site.url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
                     )
+
+        if (isDuckPlayerUrl) { // temporary pixel
+            val isMayorNetwork = !daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any {
+                site.entity?.displayName?.contains(it) ?: false
+            }
+            if (isMayorNetwork) {
+                pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
+            }
+        }
 
         return isDuckPlayerUrl
     }
