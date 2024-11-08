@@ -103,21 +103,33 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsHandledByUser.contains(
                 PermissionRequest.RESOURCE_AUDIO_CAPTURE,
             ) -> {
-                showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, { rememberChoice ->
-                    askForMicAndCameraPermissions(rememberChoice)
-                },)
+                showSitePermissionsRationaleDialog(
+                    R.string.sitePermissionsMicAndCameraDialogTitle,
+                    url,
+                    { rememberChoice ->
+                        askForMicAndCameraPermissions(rememberChoice)
+                    },
+                )
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(R.string.sitePermissionsMicDialogTitle, url, { rememberChoice ->
-                    askForMicPermissions(rememberChoice)
-                },)
+                showSitePermissionsRationaleDialog(
+                    R.string.sitePermissionsMicDialogTitle,
+                    url,
+                    { rememberChoice ->
+                        askForMicPermissions(rememberChoice)
+                    },
+                )
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, { rememberChoice ->
-                    askForCameraPermissions(rememberChoice)
-                },)
+                showSitePermissionsRationaleDialog(
+                    R.string.sitePermissionsCameraDialogTitle,
+                    url,
+                    { rememberChoice ->
+                        askForCameraPermissions(rememberChoice)
+                    },
+                )
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) -> {
@@ -148,10 +160,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         TextAlertDialogBuilder(activity)
             .setTitle(
-                String.format(
-                    activity.getString(R.string.sitePermissionsLocationDialogTitle),
-                    locationPermissionRequest.origin.websiteFromGeoLocationsApiOrigin(),
-                ),
+                String.format(activity.getString(R.string.sitePermissionsLocationDialogTitle), domain),
             )
             .setMessage(subtitle)
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)

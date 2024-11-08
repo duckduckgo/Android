@@ -26,7 +26,7 @@
     <!-- Location Permission -->
     <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access your location</string>
     <string name="sitePermissionsDialogRememberMeCheckBox">Remember my choice</string>
-    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="systemPermissionDialogLocationDeniedTitle">Allow DuckDuckGo to ask for location access on this device</string>
     <string name="systemPermissionDialogLocationDeniedContent">Sites can only use your location if you allow DuckDuckGo to ask for access.</string>
