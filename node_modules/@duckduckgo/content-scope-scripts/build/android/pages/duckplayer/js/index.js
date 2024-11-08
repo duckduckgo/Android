@@ -411,10 +411,7 @@
         const randMethodName = this.createRandMethodName();
         const key = await this.createRandKey();
         const iv = this.createRandIv();
-        const {
-          ciphertext,
-          tag
-        } = await new this.globals.Promise((resolve) => {
+        const { ciphertext, tag } = await new this.globals.Promise((resolve) => {
           this.generateRandomMethod(randMethodName, resolve);
           data.messageHandling = new SecureMessagingParams({
             methodName: randMethodName,
@@ -1634,13 +1631,7 @@
   });
   var THEME_QUERY = "(prefers-color-scheme: dark)";
   var REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-  function EnvironmentProvider({
-    children,
-    debugState,
-    env = "production",
-    willThrow = false,
-    injectName = "windows"
-  }) {
+  function EnvironmentProvider({ children, debugState, env = "production", willThrow = false, injectName = "windows" }) {
     const [theme, setTheme] = h2(window.matchMedia(THEME_QUERY).matches ? "dark" : "light");
     const [isReducedMotion, setReducedMotion] = h2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
     y2(() => {
@@ -1663,14 +1654,20 @@
       });
       return () => mediaQueryList.removeEventListener("change", listener);
     }, []);
-    return /* @__PURE__ */ _(EnvironmentContext.Provider, { value: {
-      isReducedMotion,
-      debugState,
-      isDarkMode: theme === "dark",
-      injectName,
-      willThrow,
-      env
-    } }, children);
+    return /* @__PURE__ */ _(
+      EnvironmentContext.Provider,
+      {
+        value: {
+          isReducedMotion,
+          debugState,
+          isDarkMode: theme === "dark",
+          injectName,
+          willThrow,
+          env
+        }
+      },
+      children
+    );
   }
   function UpdateEnvironment({ search }) {
     y2(() => {
@@ -1762,12 +1759,7 @@
      * @param {boolean} [params.autoplay] - optional timestamp
      * @param {boolean} [params.muted] - optionally start muted
      */
-    constructor({
-      videoId,
-      timestamp,
-      autoplay = true,
-      muted = false
-    }) {
+    constructor({ videoId, timestamp, autoplay = true, muted = false }) {
       this.videoId = videoId;
       this.timestamp = timestamp;
       this.autoplay = autoplay;
@@ -2252,9 +2244,15 @@
 
   // pages/duckplayer/app/components/PlayerContainer.jsx
   function PlayerContainer({ children, inset }) {
-    return /* @__PURE__ */ _("div", { class: (0, import_classnames.default)(PlayerContainer_default.container, {
-      [PlayerContainer_default.inset]: inset
-    }) }, children);
+    return /* @__PURE__ */ _(
+      "div",
+      {
+        class: (0, import_classnames.default)(PlayerContainer_default.container, {
+          [PlayerContainer_default.inset]: inset
+        })
+      },
+      children
+    );
   }
   function PlayerInternal({ children, inset }) {
     return /* @__PURE__ */ _("div", { class: (0, import_classnames.default)(PlayerContainer_default.internals, { [PlayerContainer_default.insetInternals]: inset }) }, children);
@@ -2280,14 +2278,7 @@
   };
 
   // pages/duckplayer/app/components/Button.jsx
-  function Button({
-    children,
-    formfactor = "mobile",
-    icon = false,
-    fill = false,
-    highlight = false,
-    buttonProps = {}
-  }) {
+  function Button({ children, formfactor = "mobile", icon = false, fill = false, highlight = false, buttonProps = {} }) {
     const classes = (0, import_classnames2.default)({
       [Button_default.button]: true,
       [Button_default.desktop]: formfactor === "desktop",
@@ -2295,24 +2286,9 @@
       [Button_default.fill]: fill === true,
       [Button_default.iconOnly]: icon === true
     });
-    return /* @__PURE__ */ _(
-      "button",
-      {
-        class: classes,
-        type: "button",
-        ...buttonProps
-      },
-      children
-    );
+    return /* @__PURE__ */ _("button", { class: classes, type: "button", ...buttonProps }, children);
   }
-  function ButtonLink({
-    children,
-    formfactor = "mobile",
-    icon = false,
-    fill = false,
-    highlight = false,
-    anchorProps = {}
-  }) {
+  function ButtonLink({ children, formfactor = "mobile", icon = false, fill = false, highlight = false, anchorProps = {} }) {
     const classes = (0, import_classnames2.default)({
       [Button_default.button]: true,
       [Button_default.desktop]: formfactor === "desktop",
@@ -2320,15 +2296,7 @@
       [Button_default.fill]: fill === true,
       [Button_default.iconOnly]: icon === true
     });
-    return /* @__PURE__ */ _(
-      "a",
-      {
-        class: classes,
-        type: "button",
-        ...anchorProps
-      },
-      children
-    );
+    return /* @__PURE__ */ _("a", { class: classes, type: "button", ...anchorProps }, children);
   }
   function Icon({ src }) {
     return /* @__PURE__ */ _("span", { class: Button_default.icon }, /* @__PURE__ */ _("img", { src, alt: "" }));
@@ -2468,15 +2436,7 @@
       [SwitchBarMobile_default.stateExiting]: state === "exiting",
       [SwitchBarMobile_default.stateHidden]: state === "completed"
     });
-    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": "true", onTransitionEnd }, /* @__PURE__ */ _("div", { class: SwitchBarMobile_default.labelRow, onClick: blockClick }, /* @__PURE__ */ _("label", { for: inputId, class: SwitchBarMobile_default.label }, /* @__PURE__ */ _("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled"))), /* @__PURE__ */ _(
-      Switch,
-      {
-        checked: state !== "showing",
-        onChange,
-        platformName,
-        id: inputId
-      }
-    )));
+    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": "true", onTransitionEnd }, /* @__PURE__ */ _("div", { class: SwitchBarMobile_default.labelRow, onClick: blockClick }, /* @__PURE__ */ _("label", { for: inputId, class: SwitchBarMobile_default.label }, /* @__PURE__ */ _("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled"))), /* @__PURE__ */ _(Switch, { checked: state !== "showing", onChange, platformName, id: inputId })));
   }
 
   // pages/duckplayer/app/components/InfoBar.module.css
@@ -2523,25 +2483,7 @@
       [SwitchBarDesktop_default.stateExiting]: state === "exiting",
       [SwitchBarDesktop_default.stateCompleted]: state === "completed"
     });
-    return /* @__PURE__ */ _(
-      "div",
-      {
-        class: classes,
-        "data-state": state,
-        "data-allow-animation": true,
-        onTransitionEnd: onDone
-      },
-      /* @__PURE__ */ _("label", { class: SwitchBarDesktop_default.label, onClick: blockClick }, /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.checkbox }, /* @__PURE__ */ _(
-        "input",
-        {
-          class: SwitchBarDesktop_default.input,
-          onChange,
-          name: "enabled",
-          type: "checkbox",
-          checked: state !== "showing"
-        }
-      )), /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.text }, t3("alwaysWatchHere")))
-    );
+    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": true, onTransitionEnd: onDone }, /* @__PURE__ */ _("label", { class: SwitchBarDesktop_default.label, onClick: blockClick }, /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.checkbox }, /* @__PURE__ */ _("input", { class: SwitchBarDesktop_default.input, onChange, name: "enabled", type: "checkbox", checked: state !== "showing" })), /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.text }, t3("alwaysWatchHere"))));
   }
 
   // pages/duckplayer/app/components/Tooltip.jsx
@@ -2687,14 +2629,7 @@
         ref: tooltipRef
       },
       /* @__PURE__ */ _(Icon, { src: info_data_default }),
-      /* @__PURE__ */ _(
-        Tooltip,
-        {
-          id: "tooltip1",
-          isVisible,
-          position: isBottom ? "bottom" : "top"
-        }
-      )
+      /* @__PURE__ */ _(Tooltip, { id: "tooltip1", isVisible, position: isBottom ? "bottom" : "top" })
     );
   }
   function ControlBarDesktop({ embed }) {
@@ -2709,7 +2644,7 @@
         icon: true,
         highlight: state === "exiting",
         anchorProps: {
-          "href": settingsUrl,
+          href: settingsUrl,
           target: "_blank",
           "aria-label": t3("openSettingsButton")
         }
@@ -3123,10 +3058,16 @@
       ["invalid-id"]: /* @__PURE__ */ _("span", { dangerouslySetInnerHTML: { __html: t3("invalidIdError") } })
     };
     const text = errors[kind] || errors["invalid-id"];
-    return /* @__PURE__ */ _("div", { class: (0, import_classnames9.default)(Player_default.root, {
-      [Player_default.desktop]: layout === "desktop",
-      [Player_default.mobile]: layout === "mobile"
-    }) }, /* @__PURE__ */ _("div", { className: Player_default.error }, /* @__PURE__ */ _("p", null, text)));
+    return /* @__PURE__ */ _(
+      "div",
+      {
+        class: (0, import_classnames9.default)(Player_default.root, {
+          [Player_default.desktop]: layout === "desktop",
+          [Player_default.mobile]: layout === "mobile"
+        })
+      },
+      /* @__PURE__ */ _("div", { className: Player_default.error }, /* @__PURE__ */ _("p", null, text))
+    );
   }
   function useIframeEffects(src) {
     const ref = A2(
@@ -3296,17 +3237,22 @@
     const settings = useSettings();
     const telemetry2 = useTelemetry();
     const features = createAppFeaturesFrom(settings);
-    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _(Background, null), features.focusMode(), /* @__PURE__ */ _(OrientationProvider, { onChange: (orientation) => {
-      if (orientation === "portrait") {
-        return FocusMode.enable();
+    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _(Background, null), features.focusMode(), /* @__PURE__ */ _(
+      OrientationProvider,
+      {
+        onChange: (orientation) => {
+          if (orientation === "portrait") {
+            return FocusMode.enable();
+          }
+          if (window.innerHeight < DISABLED_HEIGHT) {
+            FocusMode.disable();
+            telemetry2.landscapeImpression();
+            return;
+          }
+          return FocusMode.enable();
+        }
       }
-      if (window.innerHeight < DISABLED_HEIGHT) {
-        FocusMode.disable();
-        telemetry2.landscapeImpression();
-        return;
-      }
-      return FocusMode.enable();
-    } }), /* @__PURE__ */ _(MobileLayout, { embed }));
+    ), /* @__PURE__ */ _(MobileLayout, { embed }));
   }
   function MobileLayout({ embed }) {
     const platformName = usePlatformName();
@@ -3362,15 +3308,23 @@
     if (!root) throw new Error("could not render, root element missing");
     if (environment.display === "app") {
       B(
-        /* @__PURE__ */ _(
-          EnvironmentProvider,
+        /* @__PURE__ */ _(EnvironmentProvider, { debugState: environment.debugState, injectName: environment.injectName, willThrow: environment.willThrow }, /* @__PURE__ */ _(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ _(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ _(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ _(TelemetryContext.Provider, { value: telemetry2 }, /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ _(
+          TranslationProvider,
           {
-            debugState: environment.debugState,
-            injectName: environment.injectName,
-            willThrow: environment.willThrow
+            translationObject: duckplayer_default,
+            fallback: duckplayer_default,
+            textLength: environment.textLength
           },
-          /* @__PURE__ */ _(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ _(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ _(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ _(TelemetryContext.Provider, { value: telemetry2 }, /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ _(TranslationProvider, { translationObject: duckplayer_default, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(DesktopApp, { embed })), settings.layout === "mobile" && /* @__PURE__ */ _(TranslationProvider, { translationObject: strings, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(MobileApp, { embed })), /* @__PURE__ */ _(WillThrow, null))))))
-        ),
+          /* @__PURE__ */ _(DesktopApp, { embed })
+        ), settings.layout === "mobile" && /* @__PURE__ */ _(
+          TranslationProvider,
+          {
+            translationObject: strings,
+            fallback: duckplayer_default,
+            textLength: environment.textLength
+          },
+          /* @__PURE__ */ _(MobileApp, { embed })
+        ), /* @__PURE__ */ _(WillThrow, null))))))),
         root
       );
     } else if (environment.display === "components") {
