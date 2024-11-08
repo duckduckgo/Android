@@ -38,6 +38,8 @@ import com.duckduckgo.brokensite.api.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_DASHBOARD
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
@@ -285,4 +287,6 @@ private fun MutableLiveData<ViewState>.setProtectionsState(state: SiteProtection
 private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFlow = when (this) {
     MENU -> BrokenSiteModelReportFlow.MENU
     DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
+    TOGGLE_MENU -> BrokenSiteModelReportFlow.TOGGLE_MENU
+    TOGGLE_DASHBOARD -> BrokenSiteModelReportFlow.TOGGLE_DASHBOARD
 }

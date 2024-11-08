@@ -278,7 +278,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
 import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
+import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -521,6 +523,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webBrokenSiteForm: WebBrokenSiteForm
+
+    @Inject
+    lateinit var toggleReport: ToggleReport
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
@@ -2043,8 +2048,10 @@ class BrowserTabFragment :
     private fun launchToggleReportFeedback(opener: String = "") {
         // val context = context ?: return
         // TODO: Add logic to only fire toggle report if limiter conditions are met
-        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
+        //if (toggleReport.promptingIsEnabled() && repository.shouldPrompt()) {
+            globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
                 ?.let { startActivity(it) }
+     //   }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {

@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -27,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.datastore:datastore-core-android:1.1.1'
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
@@ -42,12 +44,19 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':privacy-protections-popup-api')
     implementation project(':broken-site-api')
+    api AndroidX.dataStore.preferences
 
     implementation Google.dagger
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
+
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
 
     implementation JakeWharton.timber
     implementation Square.moshi
