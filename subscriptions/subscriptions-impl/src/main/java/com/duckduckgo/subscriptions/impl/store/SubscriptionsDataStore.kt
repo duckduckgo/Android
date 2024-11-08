@@ -19,10 +19,7 @@ package com.duckduckgo.subscriptions.impl.store
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
-import javax.inject.Inject
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 
 interface SubscriptionsDataStore {
 
@@ -43,9 +40,11 @@ interface SubscriptionsDataStore {
     fun canUseEncryption(): Boolean
 }
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class SubscriptionsEncryptedDataStore @Inject constructor(
+/**
+ * THINK TWICE before using this class directly.
+ * Usages of this class should all go through [AuthRepository]
+ */
+internal class SubscriptionsEncryptedDataStore constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : SubscriptionsDataStore {
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
