@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -7,14 +8,19 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.PurchaseHistoryRecord
+import com.duckduckgo.authjwt.api.AuthJwtValidator
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.auth2.AuthClient
+import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -36,6 +42,8 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import java.lang.Exception
+import java.time.Instant
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -73,6 +81,17 @@ class RealSubscriptionsManagerTest {
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+
+    @SuppressLint("DenyListedApi")
+    private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val authClient: AuthClient = mock()
+    private val pkceGenerator: PkceGenerator = mock()
+    private val authJwtValidator: AuthJwtValidator = mock()
+    private val timeProvider: CurrentTimeProvider = object : CurrentTimeProvider {
+        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun currentTimeMillis(): Long = Instant.parse("2024-10-28T00:00:00Z").toEpochMilli()
+        override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
+    }
     private lateinit var subscriptionsManager: SubscriptionsManager
 
     @Before
@@ -89,6 +108,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
     }
 
@@ -435,6 +459,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.subscriptionStatus.test {
@@ -457,6 +486,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.subscriptionStatus.test {
@@ -483,6 +517,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.currentPurchaseState.test {
@@ -524,6 +563,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.currentPurchaseState.test {
@@ -555,6 +599,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.currentPurchaseState.test {
@@ -745,6 +794,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -781,6 +835,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         manager.subscriptionStatus.test {
@@ -941,6 +1000,11 @@ class RealSubscriptionsManagerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
+            { privacyProFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
