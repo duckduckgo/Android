@@ -128,7 +128,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
+    fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a YouTube watch URL.
@@ -180,7 +180,7 @@ interface DuckPlayer {
      * @param destinationUrl The destination URL.
      * @return True if the URL should launch Duck Player, false otherwise.
      */
-    suspend fun willNavigateToDuckPlayer(
+    fun willNavigateToDuckPlayer(
         destinationUrl: Uri,
     ): Boolean
 
