@@ -43,6 +43,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -79,7 +80,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -129,9 +129,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    private val lastActiveTabs = TabList()
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeature
 
-    private var currentTab: BrowserTabFragment? = null
+    private val tabManager by lazy {
+        TabManager(
+            activity = this,
+            swipingTabsFeature = swipingTabsFeature,
+            onNewTabRequested = viewModel::onNewTabRequested,
+        )
+    }
+
+    private var currentTab: BrowserTabFragment?
+        get() = tabManager.currentTab
+        set(value) {
+            tabManager.currentTab = value
+        }
 
     private val viewModel: BrowserViewModel by bindViewModel()
 
@@ -144,8 +157,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val binding: ActivityBrowserBinding by viewBinding()
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
-
-    private var openMessageInNewTabJob: Job? = null
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
@@ -196,7 +207,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onStop() {
-        openMessageInNewTabJob?.cancel()
+        tabManager.cancelOpenMessageInNewTab()
         super.onStop()
     }
 
@@ -230,69 +241,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.w(e.localizedMessage)
             }
         }
-    }
-
-    private fun openNewTab(
-        tabId: String,
-        url: String? = null,
-        skipHome: Boolean,
-        isExternal: Boolean,
-    ): BrowserTabFragment {
-        Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
-        addOrReplaceNewTab(fragment, tabId)
-        currentTab = fragment
-        return fragment
-    }
-
-    private fun addOrReplaceNewTab(
-        fragment: BrowserTabFragment,
-        tabId: String,
-    ) {
-        if (supportFragmentManager.isStateSaved) {
-            return
-        }
-        val transaction = supportFragmentManager.beginTransaction()
-        val tab = currentTab
-        if (tab == null) {
-            transaction.replace(R.id.fragmentContainer, fragment, tabId)
-        } else {
-            transaction.hide(tab)
-            transaction.add(R.id.fragmentContainer, fragment, tabId)
-        }
-        transaction.commit()
-    }
-
-    private fun selectTab(tab: TabEntity?) {
-        Timber.v("Select tab: $tab")
-
-        if (tab == null) return
-
-        if (tab.tabId == currentTab?.tabId) return
-
-        lastActiveTabs.add(tab.tabId)
-
-        val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
-        if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
-            return
-        }
-        val transaction = supportFragmentManager.beginTransaction()
-        currentTab?.let {
-            transaction.hide(it)
-        }
-        transaction.show(fragment)
-        transaction.commit()
-        currentTab = fragment
-    }
-
-    private fun removeTabs(fragments: List<BrowserTabFragment>) {
-        val transaction = supportFragmentManager.beginTransaction()
-        fragments.forEach {
-            transaction.remove(it)
-            lastActiveTabs.remove(it.tabId)
-        }
-        transaction.commit()
     }
 
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
@@ -403,12 +351,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         viewModel.selectedTab.observe(this) {
             if (it != null) {
-                selectTab(it)
+                tabManager.selectTab(it)
             }
         }
         viewModel.tabs.observe(this) {
-            clearStaleTabs(it)
-            removeOldTabs()
+            tabManager.clearStaleTabs(it)
+            tabManager.removeOldTabs()
             lifecycleScope.launch { viewModel.onTabsUpdated(it) }
         }
     }
@@ -417,33 +365,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
         viewModel.tabs.removeObservers(this)
-    }
-
-    private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
-        if (updatedTabs == null) {
-            return
-        }
-
-        val stale = supportFragmentManager
-            .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
-
-        if (stale.isNotEmpty()) {
-            removeTabs(stale)
-        }
-    }
-
-    private fun removeOldTabs() {
-        val candidatesToRemove = lastActiveTabs.dropLast(MAX_ACTIVE_TABS)
-        if (candidatesToRemove.isEmpty()) return
-
-        val tabsToRemove = supportFragmentManager.fragments
-            .mapNotNull { it as? BrowserTabFragment }
-            .filter { candidatesToRemove.contains(it.tabId) }
-
-        if (tabsToRemove.isNotEmpty()) {
-            removeTabs(tabsToRemove)
-        }
     }
 
     private fun processCommand(command: Command) {
@@ -512,11 +433,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         message: Message,
         sourceTabId: String?,
     ) {
-        openMessageInNewTabJob = lifecycleScope.launch {
-            val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
-            fragment.messageFromPreviousTab = message
-        }
+        tabManager.openMessageInNewTab(message, sourceTabId)
     }
 
     fun openExistingTab(tabId: String) {
@@ -613,10 +530,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
-        private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
-
-        private const val MAX_ACTIVE_TABS = 40
     }
 
     inner class BrowserStateRenderer {
@@ -759,14 +674,4 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,
     )
-}
-
-// Temporary class to keep track of latest visited tabs, keeping unique ids.
-private class TabList() : ArrayList<String>() {
-    override fun add(element: String): Boolean {
-        if (this.contains(element)) {
-            this.remove(element)
-        }
-        return super.add(element)
-    }
 }
