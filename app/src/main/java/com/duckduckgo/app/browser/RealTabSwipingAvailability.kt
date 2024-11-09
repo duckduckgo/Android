@@ -25,10 +25,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealTabSwipingAvailability @Inject constructor(
     swipingTabsFeature: SwipingTabsFeature,
-    private val dismissedCtaDao: DismissedCtaDao,
+    private val userStageStore: UserStageStore,
 ) : TabSwipingAvailability {
-    private val isOnboardingComplete: Boolean
-        get() = dismissedCtaDao.exists(CtaId.DAX_END)
-
-    override val isSwipingTabsEnabled: Boolean = swipingTabsFeature.self().isEnabled() && isOnboardingComplete
+    override val isSwipingTabsEnabled: Boolean = swipingTabsFeature.self().isEnabled() && userStageStore.daxOnboardingActive()
 }
