@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.fakes.FakeFeatureTogglesInventory
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -34,6 +35,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -58,7 +60,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
@@ -127,6 +133,10 @@ class CtaViewModelTest {
         CtaId.DAX_END,
     )
 
+    private lateinit var extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
+    private lateinit var extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin
+    private lateinit var inventory: FeatureTogglesInventory
+
     private lateinit var testee: CtaViewModel
 
     val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -135,6 +145,24 @@ class CtaViewModelTest {
 
     @Before
     fun before() = runTest {
+        extendedOnboardingFeatureToggles = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "extendedOnboarding",
+        ).build().create(ExtendedOnboardingFeatureToggles::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        extendedOnboardingFeatureToggles.highlights(),
+                        extendedOnboardingFeatureToggles.highlights(),
+                    ),
+                ),
+            ),
+            coroutineRule.testDispatcherProvider,
+        )
+        extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(inventory)
+
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -171,6 +199,7 @@ class CtaViewModelTest {
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
+            extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
         )
     }
 

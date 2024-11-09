@@ -132,6 +132,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.fakes.FakeFeatureTogglesInventory
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -150,6 +151,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -213,8 +215,13 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -496,6 +503,9 @@ class BrowserTabViewModelTest {
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
+    private lateinit var extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
+    private lateinit var extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin
+    private lateinit var inventory: FeatureTogglesInventory
 
     @Before
     fun before() = runTest {
@@ -522,6 +532,24 @@ class BrowserTabViewModelTest {
             coroutineRule.testDispatcherProvider,
             lazyFaviconManager,
         )
+
+        extendedOnboardingFeatureToggles = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "extendedOnboarding",
+        ).build().create(ExtendedOnboardingFeatureToggles::class.java)
+
+        inventory = RealFeatureTogglesInventory(
+            setOf(
+                FakeFeatureTogglesInventory(
+                    features = listOf(
+                        extendedOnboardingFeatureToggles.highlights(),
+                        extendedOnboardingFeatureToggles.highlights(),
+                    ),
+                ),
+            ),
+            coroutineRule.testDispatcherProvider,
+        )
+        extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(inventory)
 
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
@@ -564,6 +592,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
+            extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -2583,7 +2612,7 @@ class BrowserTabViewModelTest {
         val cta = DaxBubbleCta.DaxPrivacyProCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro>()
     }
 
     @Test

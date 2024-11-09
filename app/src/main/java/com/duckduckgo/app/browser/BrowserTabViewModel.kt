@@ -3511,9 +3511,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
         onUserDismissedCta(cta)
         return when (cta) {
-            is DaxBubbleCta.DaxPrivacyProCta, is DaxBubbleCta.DaxExperimentPrivacyProCta -> LaunchPrivacyPro(
-                "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri(),
-            )
+            is DaxBubbleCta.DaxPrivacyProCta, is DaxBubbleCta.DaxExperimentPrivacyProCta -> {
+                val cohortOrigin = ctaViewModel.getCohortOrigin()
+                LaunchPrivacyPro(
+                    "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding$cohortOrigin".toUri(),
+                )
+            }
             is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()

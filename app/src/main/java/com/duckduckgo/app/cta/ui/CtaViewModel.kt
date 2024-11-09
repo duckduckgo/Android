@@ -31,9 +31,11 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingPrimaryButtonMetricPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -198,7 +200,7 @@ class CtaViewModel @Inject constructor(
     suspend fun onUserClickCtaSkipButton(cta: Cta) {
         withContext(dispatchers.io()) {
             if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingPrimaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
+                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingSecondaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
                     pixel.fire(it.pixelName, it.params)
                 }
             }
@@ -328,9 +330,6 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun canShowPrivacyProCta(): Boolean {
-        Timber.e(
-            "NOELIA canShowPrivacyProCta - ${daxOnboardingActive()} - ${!hideTips()} - ${!daxDialogPrivacyProShown()} - ${extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled()}",
-        )
         return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
             extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled()
     }
@@ -525,6 +524,16 @@ class CtaViewModel @Inject constructor(
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
+
+    fun getCohortOrigin(): String {
+        return when {
+            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> "_${Cohorts.PROTECTION.cohortName}"
+            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) -> "_${Cohorts.PIR.cohortName}"
+            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) -> "_${Cohorts.VPN.cohortName}"
+            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.CONTROL) -> "_${Cohorts.CONTROL.cohortName}"
+            else -> ""
+        }
+    }
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
