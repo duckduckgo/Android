@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.DESCRIPTION
-import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.PRIMARY_BUTTON
 import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.TITLE
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
@@ -237,24 +236,12 @@ class OnboardingStoreImpl @Inject constructor(
                     else -> R.string.onboardingPrivacyProDaxDialogDescription
                 }
             }
-            PRIMARY_BUTTON -> {
-                when {
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
-                        R.string.onboardingPrivacyProProtectionDaxDialogOkButton
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
-                        R.string.onboardingPrivacyProPirDaxDialogOkButton
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
-                        R.string.onboardingPrivacyProVpnDaxDialogOkButton
-                    else -> R.string.onboardingPrivacyProDaxDialogOkButton
-                }
-            }
         }
     }
 
     enum class ContentType {
         TITLE,
         DESCRIPTION,
-        PRIMARY_BUTTON,
     }
 
     companion object {

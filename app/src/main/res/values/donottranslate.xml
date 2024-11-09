@@ -64,17 +64,11 @@
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
     <!-- Privacy Pro onboarding copy test -->
-    <string name="onboardingPrivacyProProtectionDaxDialogTitle">Protection…</string>
-    <string name="onboardingPrivacyProProtectionDaxDialogDescription"><![CDATA[DuckDuckGo Protection also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
-    <string name="onboardingPrivacyProProtectionDaxDialogOkButton">Get More</string>
-    <string name="onboardingPrivacyProProtectionDaxDialogCancelButton">Skip</string>
-    <string name="onboardingPrivacyProPirDaxDialogTitle">PIR…</string>
-    <string name="onboardingPrivacyProPirDaxDialogDescription"><![CDATA[DuckDuckGo PIR also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
-    <string name="onboardingPrivacyProPirDaxDialogOkButton">PIR More</string>
-    <string name="onboardingPrivacyProPirDaxDialogCancelButton">Skip</string>
-    <string name="onboardingPrivacyProVpnDaxDialogTitle">VPN…</string>
-    <string name="onboardingPrivacyProVpnDaxDialogDescription"><![CDATA[DuckDuckGo VPN also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
-    <string name="onboardingPrivacyProVpnDaxDialogOkButton">VPN More</string>
-    <string name="onboardingPrivacyProVpnDaxDialogCancelButton">Skip</string>
+    <string name="onboardingPrivacyProProtectionDaxDialogTitle">Oh, just one more step…</string>
+    <string name="onboardingPrivacyProProtectionDaxDialogDescription"><![CDATA[DuckDuckGo also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription</b>.]]></string>
+    <string name="onboardingPrivacyProPirDaxDialogTitle">Ready for a deal…?</string>
+    <string name="onboardingPrivacyProPirDaxDialogDescription"><![CDATA[Get 3 premium protections for the price of 1, including our <b>VPN</b>.<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProVpnDaxDialogTitle">Get even more protection…</string>
+    <string name="onboardingPrivacyProVpnDaxDialogDescription"><![CDATA[You can mask your device (IP address) from sites with our built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription</b>.]]></string>
 
 </resources>
