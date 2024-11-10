@@ -76,12 +76,12 @@ jobs:
           fileName: ddg-upload-firebase.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Get Latest Google Play Version
+      - name: Get Latest Google Play Version Code
         run: |
-          bundle exec fastlane supply --version_name
+          bundle exec fastlane run google_play_track_version_codes track:internal
 
       - name: Output Version
         run: |
-          output=$(bundle exec fastlane supply --version_name)
+          output=$(bundle exec fastlane run google_play_track_version_codes track:internal)
           echo "Latest version: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
