@@ -103,6 +103,7 @@ jobs:
       - name: Tag Nightly release
         id: tag_nightly_release
         run: |
+          git checkout develop
           git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
           git push origin ${{ steps.generate_version_name.outputs.version }}
 
