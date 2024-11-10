@@ -170,11 +170,6 @@ platform :android do
 
  end
 
- lane :get_play_internal_version_number do |options|
-   versionName = google_play_track_release_names(track: 'internal')
-   versionName
- end
-
  desc "Upload AAB to Play Store internal testing track and APK to Firebase"
  lane :deploy_dogfood do |options|
 
