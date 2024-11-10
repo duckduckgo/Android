@@ -78,10 +78,10 @@ jobs:
 
       - name: Get Latest Google Play Version Code
         run: |
-          bundle exec fastlane run google_play_track_version_codes track:internal
+          bundle exec fastlane run google_play_track_release_names track:internal
 
       - name: Output Version
         run: |
-          output=$(bundle exec fastlane run google_play_track_version_codes track:internal)
+          output=$(bundle exec fastlane run google_play_track_release_names track:internal)
           echo "Latest version: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
