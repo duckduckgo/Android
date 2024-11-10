@@ -76,6 +76,12 @@ jobs:
           fileName: ddg-upload-firebase.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Generate nightly version name
+        id: generate_version_name
+        run: |
+          output=$(gradle getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          echo "version=$output" >> $GITHUB_OUTPUT
+
       - name: Tag Nightly release
         id: tag_nightly_release
         run: |
