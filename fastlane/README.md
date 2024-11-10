@@ -39,6 +39,14 @@ Update Play Store release notes
 
 Update GitHub release notes
 
+### android get_play_version_number
+
+```sh
+[bundle exec] fastlane android get_play_version_number
+```
+
+
+
 ### android deploy_dogfood
 
 ```sh
