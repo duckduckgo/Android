@@ -69,7 +69,23 @@ class TabManager(
         }
     }
 
-    fun cancelOpenMessageInNewTab() {
+    fun openMessageInNewTab(
+        message: Message,
+        sourceTabId: String?,
+    ) {
+        openMessageInNewTabJob = activity.lifecycleScope.launch {
+            val tabId = onNewTabRequested(sourceTabId)
+            val fragment = openNewTab(
+                tabId = tabId,
+                url = null,
+                skipHome = false,
+                isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false,
+            )
+            fragment.messageFromPreviousTab = message
+        }
+    }
+
+    fun onCleanup() {
         openMessageInNewTabJob?.cancel()
     }
 
@@ -129,22 +145,6 @@ class TabManager(
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
         transaction.commit()
-    }
-
-    fun openMessageInNewTab(
-        message: Message,
-        sourceTabId: String?,
-    ) {
-        openMessageInNewTabJob = activity.lifecycleScope.launch {
-            val tabId = onNewTabRequested(sourceTabId)
-            val fragment = openNewTab(
-                tabId = tabId,
-                url = null,
-                skipHome = false,
-                isExternal = activity.intent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false,
-            )
-            fragment.messageFromPreviousTab = message
-        }
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {

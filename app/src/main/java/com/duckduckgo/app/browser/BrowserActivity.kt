@@ -208,7 +208,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onStop() {
-        tabManager.cancelOpenMessageInNewTab()
+        tabManager.onCleanup()
         super.onStop()
     }
 
