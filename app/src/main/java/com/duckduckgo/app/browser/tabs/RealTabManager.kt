@@ -105,7 +105,7 @@ class RealTabManager @Inject constructor(
         browserActivity.lifecycleScope.launch { browserActivity.viewModel.onNewTabRequested() }
     }
 
-    override fun openInNewTab(
+    override fun openQueryInNewTab(
         query: String,
         sourceTabId: String?,
     ) {

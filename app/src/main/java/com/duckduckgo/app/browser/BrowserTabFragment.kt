@@ -1499,7 +1499,7 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                tabManager.openInNewTab(it.query, it.sourceTabId)
+                tabManager.openQueryInNewTab(it.query, it.sourceTabId)
             }
 
             is Command.OpenMessageInNewTab -> {

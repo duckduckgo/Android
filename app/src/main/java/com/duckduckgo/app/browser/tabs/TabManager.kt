@@ -32,7 +32,7 @@ interface TabManager {
 
     fun openExistingTab(tabId: String)
     fun launchNewTab()
-    fun openInNewTab(
+    fun openQueryInNewTab(
         query: String,
         sourceTabId: String?,
     )
