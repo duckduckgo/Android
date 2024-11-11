@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
@@ -529,6 +530,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
+    @Inject
+    lateinit var tabManager: TabManager
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1495,7 +1499,7 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                tabManager.openInNewTab(it.query, it.sourceTabId)
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -1507,7 +1511,7 @@ class BrowserTabFragment :
                         isLaunchedFromExternalApp,
                     )
                 } else {
-                    browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                    tabManager.openMessageInNewTab(it.message, it.sourceTabId)
                 }
             }
 
@@ -1515,7 +1519,7 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
 
-            is Command.LaunchNewTab -> browserActivity?.launchNewTab()
+            is Command.LaunchNewTab -> tabManager.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
@@ -1750,7 +1754,7 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                browserActivity?.openExistingTab(it.tabId)
+                tabManager.openExistingTab(it.tabId)
             }
             else -> {
                 // NO OP

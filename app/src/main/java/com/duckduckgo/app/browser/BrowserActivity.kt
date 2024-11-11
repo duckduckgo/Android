@@ -23,7 +23,6 @@ import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
@@ -31,6 +30,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -43,7 +43,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.RealTabManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -58,6 +58,7 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -133,13 +134,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeature
 
-    private val tabManager by lazy {
-        TabManager(
-            activity = this,
-            swipingTabsFeature = swipingTabsFeature,
-            onNewTabRequested = viewModel::onNewTabRequested,
-        )
-    }
+    @Inject
+    lateinit var tabManager: RealTabManager
 
     private var currentTab: BrowserTabFragment?
         get() = tabManager.currentTab
@@ -147,7 +143,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabManager.currentTab = value
         }
 
-    private val viewModel: BrowserViewModel by bindViewModel()
+    val viewModel: BrowserViewModel by bindViewModel()
 
     private var instanceStateBundles: CombinedInstanceState? = null
 
@@ -294,13 +290,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
-            lifecycleScope.launch { viewModel.onNewTabRequested() }
+            tabManager.launchNewTab()
             return
         }
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
-            openExistingTab(existingTabId)
+            tabManager.openExistingTab(existingTabId)
             return
         }
 
@@ -411,32 +407,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()
-    }
-
-    fun launchNewTab() {
-        lifecycleScope.launch { viewModel.onNewTabRequested() }
-    }
-
-    fun openInNewTab(
-        query: String,
-        sourceTabId: String?,
-    ) {
-        lifecycleScope.launch {
-            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
-        }
-    }
-
-    fun openMessageInNewTab(
-        message: Message,
-        sourceTabId: String?,
-    ) {
-        tabManager.openMessageInNewTab(message, sourceTabId)
-    }
-
-    fun openExistingTab(tabId: String) {
-        lifecycleScope.launch {
-            viewModel.onTabSelected(tabId)
-        }
     }
 
     fun launchSettings() {
