@@ -278,9 +278,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
-import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
 import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
-import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -523,9 +521,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webBrokenSiteForm: WebBrokenSiteForm
-
-    @Inject
-    lateinit var toggleReport: ToggleReport
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
@@ -926,7 +921,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
-        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId, opener = "")
+        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { startActivity(it) }
@@ -953,7 +948,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        browserActivity?.launchPrivacyDashboard(toggle = false, opener = "")
+        browserActivity?.launchPrivacyDashboard(toggle = false)
         if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
             viewModel.onPrivacyShieldSelected()
         }
@@ -2037,7 +2032,7 @@ class BrowserTabFragment :
         val context = context ?: return
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId, opener = ""))
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId))
                 ?.let { startActivity(it) }
         } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
@@ -2045,13 +2040,9 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchToggleReportFeedback(opener: String = "") {
-        // val context = context ?: return
-        // TODO: Add logic to only fire toggle report if limiter conditions are met
-        //if (toggleReport.promptingIsEnabled() && repository.shouldPrompt()) {
+    private fun launchToggleReportFeedback(opener: String = "dashboard") {
             globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
                 ?.let { startActivity(it) }
-     //   }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {

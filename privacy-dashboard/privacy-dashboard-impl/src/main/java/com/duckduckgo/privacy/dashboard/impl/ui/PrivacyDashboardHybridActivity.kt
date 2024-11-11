@@ -161,7 +161,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is FetchToggleData -> fetchToggleData(it.toggleData)
             is LaunchToggleReport -> {
                 params?.tabId?.let { tabId ->
-                    globalActivityStarter.startIntent(this, PrivacyDashboardToggleReportScreen(tabId, opener = ""))
+                    globalActivityStarter.startIntent(this, PrivacyDashboardToggleReportScreen(tabId, opener = "dashboard"))
                         ?.let { startActivity(it) }
                 }
                 this@PrivacyDashboardHybridActivity.finish()

@@ -466,9 +466,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
     }
 
-    fun launchPrivacyDashboard(toggle: Boolean, opener: String) {
+    fun launchPrivacyDashboard(toggle: Boolean) {
         currentTab?.tabId?.let { tabId ->
-            val params = if (toggle) PrivacyDashboardToggleReportScreen(tabId, opener) else PrivacyDashboardPrimaryScreen(tabId, opener)
+            val params = if (toggle) PrivacyDashboardToggleReportScreen(tabId, opener = "dashboard") else PrivacyDashboardPrimaryScreen(tabId)
             val intent = globalActivityStarter.startIntent(this, params)
             intent?.let { startActivity(it) }
         }

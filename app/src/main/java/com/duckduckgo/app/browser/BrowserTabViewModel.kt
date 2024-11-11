@@ -289,6 +289,8 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportDataStore
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -435,6 +437,8 @@ class BrowserTabViewModel @Inject constructor(
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val toggleReport: ToggleReport,
+    private val toggleReportDataStore: SharedPreferencesToggleReportDataStore,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2468,10 +2472,21 @@ class BrowserTabViewModel @Inject constructor(
             if (isPrivacyProtectionDisabled(domain)) {
                 removeFromAllowList(domain, clickedFromCustomTab)
             } else {
+                performToggleReportCheck()
                 addToAllowList(domain, clickedFromCustomTab)
             }
 
             privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
+        }
+    }
+
+    private suspend fun performToggleReportCheck() {
+        val shouldPrompt = toggleReport.promptingIsEnabled() && toggleReportDataStore.shouldPrompt()
+
+        takeIf { shouldPrompt }?.let {
+            withContext(dispatchers.main()) {
+                command.value = ToggleReportFeedback(opener = "menu")
+            }
         }
     }
 
@@ -2491,7 +2506,6 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ToggleReportFeedback(opener = "menu")
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }

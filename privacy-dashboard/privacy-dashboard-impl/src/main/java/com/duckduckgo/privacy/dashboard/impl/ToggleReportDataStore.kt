@@ -59,9 +59,9 @@ interface ToggleReportDataStore {
 
         suspend fun storeMaxPromptCount(maxPromptCount: Int)
 
-        suspend fun insertTogglePromptDismiss(dismissTimestamp: String)
+        suspend fun insertTogglePromptDismiss()
 
-        suspend fun insertTogglePromptSend(sendTimestamp: String)
+        suspend fun insertTogglePromptSend()
 
         fun shouldPrompt(): Boolean
 }
@@ -182,7 +182,7 @@ class SharedPreferencesToggleReportDataStore @Inject constructor(
         }
     }
 
-    override suspend fun insertTogglePromptDismiss(dismissTimestamp: String) {
+    override suspend fun insertTogglePromptDismiss() {
         store.edit { prefs ->
             val currentSet = reportPromptsDismissed.value.toMutableSet()
             val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
@@ -191,12 +191,12 @@ class SharedPreferencesToggleReportDataStore @Inject constructor(
                 val storedTime = DatabaseDateFormatter.parseIso8601ToMillis(storedTimestamp)
                 (currentTimeMillis - storedTime > interval * 1000L)
             }
-            currentSet.add(dismissTimestamp)
+            currentSet.add(DatabaseDateFormatter.iso8601())
             prefs[TOGGLE_REPORT_PROMPTS_DISMISSED] = currentSet
         }
     }
 
-    override suspend fun insertTogglePromptSend(sendTimestamp: String) {
+    override suspend fun insertTogglePromptSend() {
         store.edit { prefs ->
             val currentSet = reportsSent.value.toMutableSet()
             val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
@@ -205,7 +205,7 @@ class SharedPreferencesToggleReportDataStore @Inject constructor(
                 val storedTime = DatabaseDateFormatter.parseIso8601ToMillis(storedTimestamp)
                 (currentTimeMillis - storedTime > interval * 1000L)
             }
-            currentSet.add(sendTimestamp)
+            currentSet.add(DatabaseDateFormatter.iso8601())
             prefs[TOGGLE_REPORTS_SENT] = currentSet
         }
     }

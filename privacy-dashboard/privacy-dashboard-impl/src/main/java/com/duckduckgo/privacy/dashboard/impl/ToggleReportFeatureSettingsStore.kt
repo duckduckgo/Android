@@ -35,7 +35,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(ToggleReportFeature::class)
 class ToggleReportFeatureSettingsStore@Inject constructor(
-    private val toggleReportFeatureRepository: ToggleReportFeatureRepository,
+    private val toggleReportDataStore: ToggleReportDataStore,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
@@ -46,11 +46,11 @@ class ToggleReportFeatureSettingsStore@Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             try {
                 jsonAdapter.fromJson(jsonString)?.let {
-                    toggleReportFeatureRepository.storeDismissLogicEnabled(it.dismissLogicEnabled)
-                    toggleReportFeatureRepository.storeDismissInterval(it.dismissInterval)
-                    toggleReportFeatureRepository.storePromptLimitLogicEnabled(it.promptLimitLogicEnabled)
-                    toggleReportFeatureRepository.storePromptInterval(it.promptInterval)
-                    toggleReportFeatureRepository.storeMaxPromptCount(it.maxPromptCount)
+                    toggleReportDataStore.storeDismissLogicEnabled(it.dismissLogicEnabled)
+                    toggleReportDataStore.storeDismissInterval(it.dismissInterval)
+                    toggleReportDataStore.storePromptLimitLogicEnabled(it.promptLimitLogicEnabled)
+                    toggleReportDataStore.storePromptInterval(it.promptInterval)
+                    toggleReportDataStore.storeMaxPromptCount(it.maxPromptCount)
                 }
             } catch (e: Exception) {
                 Timber.d("Failed to store ToggleReport settings", e)
