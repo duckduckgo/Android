@@ -43,9 +43,14 @@ import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
-import com.duckduckgo.privacy.dashboard.impl.pixels.*
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.AppPrivacyDashboardPayloadAdapter.ToggleReportOptions
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
