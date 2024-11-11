@@ -360,15 +360,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.tabs.observe(this) {
             tabManager.onTabsUpdated(it)
         }
-
-        lifecycleScope.launch {
-            viewModel.isOnboardingCompleted.flowWithLifecycle(lifecycle).collectLatest { isOnboardingCompleted ->
-                if (isOnboardingCompleted) {
-                    userStageStore.completeStage(UserStageStore.Stage.DAX_ONBOARDING)
-                } else {
-                }
-            }
-        }
     }
 
     private fun removeObservers() {
