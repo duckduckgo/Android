@@ -509,10 +509,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 tabPagerAdapter.onSelectedTabChanged(it.tabId)
             }
         }
-        viewModel.tabs.observe(this) {
-            clearStaleTabs(it)
-            removeOldTabs()
-        }
+        // viewModel.tabs.observe(this) {
+        //     clearStaleTabs(it)
+        //     removeOldTabs()
+        // }
 
         lifecycleScope.launch {
             viewModel.tabIds.flowWithLifecycle(lifecycle).collectLatest { tabIds ->
@@ -724,7 +724,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
 
-        private const val MAX_ACTIVE_TABS = 40
+        private const val MAX_ACTIVE_TABS = 10
     }
 
     inner class BrowserStateRenderer {
