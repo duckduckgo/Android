@@ -131,7 +131,6 @@ class TabManager(
         transaction.commit()
     }
 
-    // TODO: Handle the FF case
     fun openMessageInNewTab(
         message: Message,
         sourceTabId: String?,
