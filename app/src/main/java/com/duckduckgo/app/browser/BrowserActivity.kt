@@ -30,7 +30,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
@@ -43,6 +45,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -80,6 +83,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -151,7 +155,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrowserBinding by viewBinding()
 
+    val tabPager: ViewPager2 by lazy {
+        binding.tabPager
+    }
+
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
+
+    private val onTabPageChangeListener = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            tabManager.tabPagerAdapter.onPageChanged(position)
+        }
+    }
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
@@ -208,6 +223,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         currentTab = null
+
+        binding.tabPager.adapter = null
+        binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+
         super.onDestroy()
     }
 
@@ -349,6 +368,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         viewModel.tabs.observe(this) {
             tabManager.onTabsUpdated(it)
+        }
+
+        // listen to onboarding completion to enable/disable swiping
+        lifecycleScope.launch {
+            viewModel.isOnboardingCompleted.flowWithLifecycle(lifecycle).collectLatest { isOnboardingCompleted ->
+                binding.tabPager.isUserInputEnabled = isOnboardingCompleted
+            }
         }
     }
 
@@ -518,6 +544,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private fun showWebContent() {
             Timber.d("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            initializeTabs()
             configureObservers()
             binding.clearingInProgressView.gone()
 
@@ -533,6 +560,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility", "WrongConstant")
+    private fun initializeTabs() {
+        if (swipingTabsFeature.self().isEnabled()) {
+            binding.tabPager.adapter = tabManager.tabPagerAdapter
+            binding.tabPager.offscreenPageLimit = 1
+            binding.tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+
+            binding.fragmentContainer.gone()
+            binding.tabPager.show()
+        } else {
+            binding.fragmentContainer.show()
+            binding.tabPager.gone()
         }
     }
 
