@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SwipingTabsFeature
+import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,20 +39,30 @@ class RealTabManager @Inject constructor(
     activity: DaggerActivity,
     private val swipingTabsFeature: SwipingTabsFeature,
 ) : TabManager {
-    companion object {
-        private const val MAX_ACTIVE_TABS = 40
-    }
-
     private val browserActivity = activity as BrowserActivity
     private val lastActiveTabs = TabList()
     private val supportFragmentManager = activity.supportFragmentManager
     private var openMessageInNewTabJob: Job? = null
 
+    override val tabPagerAdapter by lazy {
+        TabPagerAdapter(
+            fragmentManager = supportFragmentManager,
+            lifecycle = browserActivity.lifecycle,
+            moveToTabIndex = { index, smoothScroll -> browserActivity.tabPager.setCurrentItem(index, smoothScroll) },
+            getCurrentTabIndex = { browserActivity.tabPager.currentItem },
+            getSelectedTabId = { browserActivity.viewModel.selectedTab.value?.tabId },
+            getTabById = { tabId -> browserActivity.viewModel.getTabById(tabId) },
+            onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
+            setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
+            getOffScreenPageLimit = { browserActivity.tabPager.offscreenPageLimit },
+        )
+    }
+
     private var _currentTab: BrowserTabFragment? = null
     override var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.self().isEnabled()) {
-                null
+                tabPagerAdapter.currentFragment
             } else {
                 _currentTab
             }
@@ -61,16 +72,18 @@ class RealTabManager @Inject constructor(
         }
 
     override fun onSelectedTabChanged(tab: TabEntity?) {
-        if (swipingTabsFeature.self().isEnabled()) {
-            return
-        } else if (tab != null) {
-            selectTab(tab)
+        if (tab != null) {
+            if (swipingTabsFeature.self().isEnabled()) {
+                tabPagerAdapter.onSelectedTabChanged(tab.tabId)
+            } else {
+                selectTab(tab)
+            }
         }
     }
 
     override fun onTabsUpdated(updatedTabs: List<TabEntity>) {
         if (swipingTabsFeature.self().isEnabled()) {
-            return
+            tabPagerAdapter.onTabsUpdated(updatedTabs.map { it.tabId })
         } else {
             clearStaleTabs(updatedTabs)
         }
@@ -121,14 +134,12 @@ class RealTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
-    private fun selectTab(tab: TabEntity?) {
+    private fun selectTab(tab: TabEntity) {
         if (swipingTabsFeature.self().isEnabled()) {
             return
         }
 
         Timber.v("Select tab: $tab")
-
-        if (tab == null) return
 
         if (tab.tabId == currentTab?.tabId) return
 
