@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -63,9 +64,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -81,7 +82,7 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val userStageStore: UserStageStore,
+    userStageStore: UserStageStore,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -109,16 +110,9 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
-    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
-    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
+    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs.distinctUntilChanged()
+    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    val tabIds = tabRepository.flowTabs
-        .map { tabs -> tabs.map { it.tabId } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-        .onEach {
-            onTabsUpdated(it)
-        }
 
     val isOnboardingCompleted: Flow<Boolean> = userStageStore.currentAppStage
         .map { it != AppStage.DAX_ONBOARDING }
@@ -317,6 +311,10 @@ class BrowserViewModel @Inject constructor(
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
         }
+    }
+
+    fun getTabById(tabId: String): TabEntity? = runBlocking(dispatchers.io()) {
+        tabRepository.getTabById(tabId)
     }
 }
 
