@@ -615,6 +615,8 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
+    var isInitialized = false
+
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -845,9 +847,8 @@ class BrowserTabFragment :
         configureOmnibar()
 
         if (savedInstanceState == null) {
-            viewModel.onViewReady()
-            messageFromPreviousTab?.let {
-                processMessage(it)
+            if (isActiveTab) {
+                initializeFragment()
             }
         } else {
             viewModel.onViewRecreated()
@@ -856,7 +857,7 @@ class BrowserTabFragment :
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
-                override fun onStop(owner: LifecycleOwner) {
+                override fun onPause(owner: LifecycleOwner) {
                     if (isVisible) {
                         updateOrDeleteWebViewPreview()
                     }
@@ -1145,8 +1146,21 @@ class BrowserTabFragment :
         startActivity(TabSwitcherActivity.intent(activity, tabId))
     }
 
+    private fun initializeFragment() {
+        if (!isInitialized) {
+            isInitialized = true
+
+            viewModel.onViewReady()
+            messageFromPreviousTab?.let {
+                processMessage(it)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+
+        initializeFragment()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
@@ -1158,7 +1172,7 @@ class BrowserTabFragment :
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible()) {
+        if (fragmentIsVisible() && isActiveTab) {
             viewModel.onViewVisible()
         }
 
@@ -2545,7 +2559,11 @@ class BrowserTabFragment :
             cancelPendingAutofillRequestsToChooseCredentials()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
+
+            // prevent a crash when the view is not initiliazed yet
+            if (view != null) {
+                binding.focusDummy.requestFocus()
+            }
         }
     }
 
