@@ -97,4 +97,13 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(false)
     fun showDisableDialogAutofillPrompt(): Toggle
+
+    /**
+     * Remote Flag that enables the ability to import passwords directly from Google Password Manager
+     * @return `true` when the remote config has "canImportFromGooglePasswordManager" autofill sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun canImportFromGooglePasswordManager(): Toggle
 }
