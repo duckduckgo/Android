@@ -2041,8 +2041,8 @@ class BrowserTabFragment :
     }
 
     private fun launchToggleReportFeedback(opener: String = "dashboard") {
-            globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
-                ?.let { startActivity(it) }
+        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
+            ?.let { startActivity(it) }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {

@@ -120,7 +120,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     private val params: PrivacyDashboardHybridScreenParams?
         get() = intent.getActivityParams(PrivacyDashboardHybridScreenParams::class.java)
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -133,7 +132,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
 
         val toggleOpener = params?.opener ?: ""
-
 
         dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
         configureObservers()
@@ -179,9 +177,11 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     private fun fetchToggleData(data: String) {
-        webView.post{
-            webView.evaluateJavascript("javascript:window.onGetToggleReportOptionsResponse($data);",
-                null)
+        webView.post {
+            webView.evaluateJavascript(
+                "javascript:window.onGetToggleReportOptionsResponse($data);",
+                null,
+            )
         }
     }
 

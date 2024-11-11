@@ -45,25 +45,25 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 interface ToggleReportDataStore {
-        fun getToggleReportRemoteConfigJson(): String
+    fun getToggleReportRemoteConfigJson(): String
 
-        suspend fun setToggleReportRemoteConfigJson(value: String)
+    suspend fun setToggleReportRemoteConfigJson(value: String)
 
-        suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean)
+    suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean)
 
-        suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean)
+    suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean)
 
-        suspend fun storeDismissInterval(dismissInterval: Int)
+    suspend fun storeDismissInterval(dismissInterval: Int)
 
-        suspend fun storePromptInterval(promptInterval: Int)
+    suspend fun storePromptInterval(promptInterval: Int)
 
-        suspend fun storeMaxPromptCount(maxPromptCount: Int)
+    suspend fun storeMaxPromptCount(maxPromptCount: Int)
 
-        suspend fun insertTogglePromptDismiss()
+    suspend fun insertTogglePromptDismiss()
 
-        suspend fun insertTogglePromptSend()
+    suspend fun insertTogglePromptSend()
 
-        fun canPrompt(): Boolean
+    fun canPrompt(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -142,7 +142,6 @@ class SharedPreferencesToggleReportDataStore @Inject constructor(
         }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, 3)
-
 
     override fun getToggleReportRemoteConfigJson(): String {
         return toggleReportRC.value

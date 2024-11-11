@@ -27,10 +27,10 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(ToggleReportFeature::class)
@@ -76,4 +76,4 @@ data class ToggleReportSetting(
     val promptInterval: Int,
     @field:Json(name = "maxPromptCount")
     val maxPromptCount: Int,
-    )
+)

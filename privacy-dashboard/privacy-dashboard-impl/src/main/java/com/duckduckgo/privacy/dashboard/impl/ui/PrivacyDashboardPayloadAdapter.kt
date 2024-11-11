@@ -52,7 +52,7 @@ class AppPrivacyDashboardPayloadAdapter @Inject constructor(
         return kotlin.runCatching { payloadAdapter.fromJson(payload) }.getOrNull()
     }
 
-    override fun onGetToggleReportOptions(payload: ToggleReportOptions) : String {
+    override fun onGetToggleReportOptions(payload: ToggleReportOptions): String {
         val payloadAdapter = moshi.adapter(ToggleReportOptions::class.java)
         return kotlin.runCatching { payloadAdapter.toJson(payload) }.getOrDefault("")
     }
@@ -75,14 +75,14 @@ class AppPrivacyDashboardPayloadAdapter @Inject constructor(
     )
 
     data class ToggleReportOptions(
-        val data: List<ToggleReportOption>
+        val data: List<ToggleReportOption>,
     ) {
         data class ToggleReportOption(
             val id: String,
-            val additional: Additional? = null
+            val additional: Additional? = null,
         )
         data class Additional(
-            val url: String? = null
+            val url: String? = null,
         )
     }
 }

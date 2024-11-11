@@ -67,7 +67,7 @@ class PrivacyDashboardRenderer(
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}&opener=${toggleOpener}")
+        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}&opener=$toggleOpener")
     }
 
     fun render(viewState: ViewState) {
