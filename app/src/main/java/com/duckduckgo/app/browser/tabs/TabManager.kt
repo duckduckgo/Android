@@ -53,7 +53,31 @@ class TabManager(
             _currentTab = value
         }
 
-    fun selectTab(tab: TabEntity?) {
+    fun onSelectedTabChanged(tab: TabEntity?) {
+        if (swipingTabsFeature.self().isEnabled()) {
+            return
+        } else if (tab != null) {
+            selectTab(tab)
+        }
+    }
+
+    fun onTabsUpdated(updatedTabs: List<TabEntity>) {
+        if (swipingTabsFeature.self().isEnabled()) {
+            return
+        } else {
+            clearStaleTabs(updatedTabs)
+        }
+    }
+
+    fun cancelOpenMessageInNewTab() {
+        openMessageInNewTabJob?.cancel()
+    }
+
+    private fun selectTab(tab: TabEntity?) {
+        if (swipingTabsFeature.self().isEnabled()) {
+            return
+        }
+
         Timber.v("Select tab: $tab")
 
         if (tab == null) return
@@ -107,6 +131,7 @@ class TabManager(
         transaction.commit()
     }
 
+    // TODO: Handle the FF case
     fun openMessageInNewTab(
         message: Message,
         sourceTabId: String?,
@@ -123,7 +148,27 @@ class TabManager(
         }
     }
 
-    fun removeOldTabs() {
+    private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
+        if (swipingTabsFeature.self().isEnabled()) {
+            return
+        }
+
+        if (updatedTabs == null) {
+            return
+        }
+
+        val stale = supportFragmentManager
+            .fragments.mapNotNull { it as? BrowserTabFragment }
+            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
+
+        if (stale.isNotEmpty()) {
+            removeTabs(stale)
+        }
+
+        removeOldTabs()
+    }
+
+    private fun removeOldTabs() {
         val candidatesToRemove = lastActiveTabs.dropLast(MAX_ACTIVE_TABS)
         if (candidatesToRemove.isEmpty()) return
 
@@ -136,20 +181,6 @@ class TabManager(
         }
     }
 
-    fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
-        if (updatedTabs == null) {
-            return
-        }
-
-        val stale = supportFragmentManager
-            .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
-
-        if (stale.isNotEmpty()) {
-            removeTabs(stale)
-        }
-    }
-
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
         val transaction = supportFragmentManager.beginTransaction()
         fragments.forEach {
@@ -157,10 +188,6 @@ class TabManager(
             lastActiveTabs.remove(it.tabId)
         }
         transaction.commit()
-    }
-
-    fun cancelOpenMessageInNewTab() {
-        openMessageInNewTabJob?.cancel()
     }
 
     // Temporary class to keep track of latest visited tabs, keeping unique ids.

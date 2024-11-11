@@ -31,6 +31,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -56,6 +57,7 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -63,7 +65,6 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -80,6 +81,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -131,6 +133,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeature
+
+    @Inject
+    lateinit var userStageStore: UserStageStore
 
     private val tabManager by lazy {
         TabManager(
@@ -350,14 +355,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         }
         viewModel.selectedTab.observe(this) {
-            if (it != null) {
-                tabManager.selectTab(it)
-            }
+            tabManager.onSelectedTabChanged(it)
         }
         viewModel.tabs.observe(this) {
-            tabManager.clearStaleTabs(it)
-            tabManager.removeOldTabs()
-            lifecycleScope.launch { viewModel.onTabsUpdated(it) }
+            tabManager.onTabsUpdated(it)
+        }
+
+        lifecycleScope.launch {
+            viewModel.isOnboardingCompleted.flowWithLifecycle(lifecycle).collectLatest { isOnboardingCompleted ->
+                if (isOnboardingCompleted) {
+                    userStageStore.completeStage(UserStageStore.Stage.DAX_ONBOARDING)
+                } else {
+                }
+            }
         }
     }
 
