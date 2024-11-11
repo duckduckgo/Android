@@ -20,5 +20,5 @@ interface ToggleReport {
     /**
      * Returns true if all the conditions are met for prompting the user to submit a toggle-off-prompted simplified breakage report.
      */
-    fun promptingIsEnabled(): Boolean
+    fun shouldPrompt(): Boolean
 }

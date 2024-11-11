@@ -2481,7 +2481,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun performToggleReportCheck() {
-        val shouldPrompt = toggleReport.promptingIsEnabled() && toggleReportDataStore.shouldPrompt()
+        val shouldPrompt = toggleReport.shouldPrompt()
 
         takeIf { shouldPrompt }?.let {
             withContext(dispatchers.main()) {

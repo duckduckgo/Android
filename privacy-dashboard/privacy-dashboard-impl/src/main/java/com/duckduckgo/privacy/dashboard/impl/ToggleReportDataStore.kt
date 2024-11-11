@@ -63,7 +63,7 @@ interface ToggleReportDataStore {
 
         suspend fun insertTogglePromptSend()
 
-        fun shouldPrompt(): Boolean
+        fun canPrompt(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -210,7 +210,7 @@ class SharedPreferencesToggleReportDataStore @Inject constructor(
         }
     }
 
-    override fun shouldPrompt(): Boolean {
+    override fun canPrompt(): Boolean {
         val currentTime = DatabaseDateFormatter.millisIso8601()
         val recentSends = reportsSent.value.count { sendTime ->
             currentTime - sendTime.toLong() <= reportPromptInterval.value * 1000L

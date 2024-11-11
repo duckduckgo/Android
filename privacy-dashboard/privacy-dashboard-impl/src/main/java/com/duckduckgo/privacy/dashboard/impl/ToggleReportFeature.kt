@@ -19,15 +19,14 @@ package com.duckduckgo.privacy.dashboard.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "toggleReport",
-    settingsStore = ToggleReportFeatureSettingsStore::class
+    settingsStore = ToggleReportFeatureSettingsStore::class,
 )
 interface ToggleReportFeature {
-    @DefaultValue(false)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 }
 

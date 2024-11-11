@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportDataStore
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
@@ -107,7 +108,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
-    private val toggleReportDataStore: ToggleReportDataStore,
+    private val toggleReport: ToggleReport,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -356,7 +357,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
 
             if (!event.isProtected) {
-                if (viewState.value!!.remoteFeatureSettings.toggleReport.equals(ToggleReportState.ENABLED) && toggleReportDataStore.shouldPrompt()) {
+                if (toggleReport.shouldPrompt()) {
                     command.send(LaunchToggleReport(opener = "dashboard"))
                 }
             }

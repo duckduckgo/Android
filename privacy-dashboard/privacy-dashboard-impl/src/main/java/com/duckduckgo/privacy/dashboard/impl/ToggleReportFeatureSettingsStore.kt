@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(ToggleReportFeature::class)
-class ToggleReportFeatureSettingsStore@Inject constructor(
+class ToggleReportFeatureSettingsStore @Inject constructor(
     private val toggleReportDataStore: ToggleReportDataStore,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -53,7 +53,7 @@ class ToggleReportFeatureSettingsStore@Inject constructor(
                     toggleReportDataStore.storeMaxPromptCount(it.maxPromptCount)
                 }
             } catch (e: Exception) {
-                Timber.d("Failed to store ToggleReport settings", e)
+                Timber.d("Katetest->Failed to store ToggleReport settings", e)
             }
         }
     }
