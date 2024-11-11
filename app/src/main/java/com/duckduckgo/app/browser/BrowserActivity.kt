@@ -42,7 +42,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.tabs.RealTabManager
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -133,7 +133,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var swipingTabsFeature: SwipingTabsFeature
 
     @Inject
-    lateinit var tabManager: RealTabManager
+    lateinit var tabManager: TabManager
 
     private var currentTab: BrowserTabFragment?
         get() = tabManager.currentTab
