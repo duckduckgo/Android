@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface NetpSubscriptionManager {
-    suspend fun getToken(): String?
     suspend fun getVpnStatus(): VpnStatus
     suspend fun vpnStatus(): Flow<VpnStatus>
     enum class VpnStatus {
@@ -54,10 +53,6 @@ class RealNetpSubscriptionManager @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
 ) : NetpSubscriptionManager {
-
-    override suspend fun getToken(): String? = withContext(dispatcherProvider.io()) {
-        subscriptions.getAccessToken()
-    }
 
     override suspend fun getVpnStatus(): VpnStatus {
         val hasValidEntitlement = hasValidEntitlement()
