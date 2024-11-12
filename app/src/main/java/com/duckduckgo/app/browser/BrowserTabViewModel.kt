@@ -289,8 +289,8 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
-import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
-import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportDataStore
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -437,8 +437,8 @@ class BrowserTabViewModel @Inject constructor(
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val toggleReport: ToggleReport,
-    private val toggleReportDataStore: SharedPreferencesToggleReportDataStore,
+    private val toggleReports: ToggleReports,
+    private val toggleReportsDataStore: SharedPreferencesToggleReportsDataStore,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2481,7 +2481,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun performToggleReportCheck() {
-        val shouldPrompt = toggleReport.shouldPrompt()
+        val shouldPrompt = toggleReports.shouldPrompt()
 
         takeIf { shouldPrompt }?.let {
             withContext(dispatchers.main()) {

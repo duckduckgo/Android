@@ -17,19 +17,27 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
-import com.duckduckgo.privacy.dashboard.impl.ToggleReportDataStore
-import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.privacy.dashboard.impl.ToggleReportsDataStore
+import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
+import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class ToggleReportImpl @Inject constructor(
-    private val toggleReportFeature: ToggleReportFeature,
-    private val toggleReportDataStore: ToggleReportDataStore,
-) : ToggleReport {
+class ToggleReportsImpl @Inject constructor(
+    private val toggleReportsFeature: ToggleReportsFeature,
+    private val toggleReportsDataStore: ToggleReportsDataStore,
+) : ToggleReports {
     override fun shouldPrompt(): Boolean {
-        // return (toggleReportFeature.isEnabled() && toggleReportDataStore.canPrompt())
-        return true
+        return (toggleReportsFeature.isEnabled() && toggleReportsDataStore.canPrompt())
+    }
+
+    override suspend fun onPromptDismissed() {
+        toggleReportsDataStore.insertTogglePromptDismiss()
+    }
+
+    override suspend fun onReportSent() {
+        toggleReportsDataStore.insertTogglePromptSend()
     }
 }

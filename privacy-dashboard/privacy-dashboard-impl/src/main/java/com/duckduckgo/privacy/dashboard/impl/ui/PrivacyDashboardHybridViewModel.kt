@@ -39,18 +39,13 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
-import com.duckduckgo.privacy.dashboard.api.ui.ToggleReport
-import com.duckduckgo.privacy.dashboard.impl.ToggleReportFeature
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_ADD
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_REMOVE
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.AppPrivacyDashboardPayloadAdapter.ToggleReportOptions
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
@@ -103,11 +98,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
-    private val toggleReportFeature: ToggleReportFeature,
+    private val toggleReportsFeature: ToggleReportsFeature,
+    private val toggleReports: ToggleReports,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
-    private val toggleReport: ToggleReport,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -218,7 +213,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     data class RemoteFeatureSettingsViewState(
         val primaryScreen: PrimaryScreenSettings,
         val webBreakageForm: WebBrokenSiteFormSettings,
-        val toggleReport: ToggleReportSettings,
     )
 
     enum class LayoutType(val value: String) {
@@ -233,16 +227,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val state: String,
     )
 
-    data class ToggleReportSettings(
-        val state: String,
-    )
-
     enum class WebBrokenSiteFormState(val value: String) {
-        ENABLED("enabled"),
-        DISABLED("disabled"),
-    }
-
-    enum class ToggleReportState(val value: String) {
         ENABLED("enabled"),
         DISABLED("disabled"),
     }
@@ -327,18 +312,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             }
         }
 
-        val toggleReportState = withContext(dispatcher.io()) {
-            if (toggleReportFeature.isEnabled()) {
-                ToggleReportState.ENABLED
-            } else {
-                ToggleReportState.DISABLED
-            }
-        }
-
         return RemoteFeatureSettingsViewState(
             primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
             webBreakageForm = WebBrokenSiteFormSettings(state = webBrokenSiteFormState.value),
-            toggleReport = ToggleReportSettings(state = toggleReportState.value),
         )
     }
 
@@ -355,11 +331,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
 
-            if (!event.isProtected) {
-                if (toggleReport.shouldPrompt()) {
-                    command.send(LaunchToggleReport(opener = "dashboard"))
-                }
-            }
+            // if (!event.isProtected) {
+            //     if (toggleReports.shouldPrompt()) {
+            //         command.send(LaunchToggleReport(opener = "dashboard"))
+            //     }
+            // }
 
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
@@ -410,6 +386,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                                 plugin.onToggleOff(origin)
                             }
                         }
+                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                            if (toggleReports.shouldPrompt()) {
+                                command.send(LaunchToggleReport(opener = "dashboard"))
+                            }
+                        }
                     }
                 }
                 privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(event.isProtected)
@@ -420,6 +401,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private companion object {
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
         val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
+        val CLOSE_ON_SUBMIT_TOGGLE_REPORT_DELAY = 200.milliseconds
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }
@@ -492,7 +474,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onGetToggleReportOptions() {
-        // TODO Add specific reportFlow param
         viewModelScope.launch(dispatcher.io()) {
             val site = site.value ?: return@launch
             val siteUrl = site.url
@@ -529,7 +510,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitToggleReport() {
+    fun onToggleReportPromptDismissed() {
+        viewModelScope.launch(dispatcher.io()) {
+            toggleReports.onPromptDismissed()
+        }
+    }
+
+    fun onSubmitToggleReport(opener: String) {
         viewModelScope.launch(dispatcher.io()) {
             val site = site.value ?: return@launch
             val siteUrl = site.url
@@ -558,14 +545,18 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 ).toJson(site.errorCodeEvents.toList()).toString(),
                 httpErrorCodes = site.httpErrorCodeEvents.distinct().joinToString(","),
                 loginSite = null,
-                reportFlow = ReportFlow.TOGGLE_DASHBOARD,
+                reportFlow = when (opener) {
+                    "menu" -> ReportFlow.TOGGLE_MENU
+                    else -> ReportFlow.TOGGLE_DASHBOARD
+                },
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = true)
-            delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
+            toggleReports.onReportSent()
+            delay(CLOSE_ON_SUBMIT_TOGGLE_REPORT_DELAY)
             command.send(GoBack)
         }
     }

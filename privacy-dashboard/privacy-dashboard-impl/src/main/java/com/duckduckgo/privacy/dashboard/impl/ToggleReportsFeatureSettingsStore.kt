@@ -33,9 +33,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
-@RemoteFeatureStoreNamed(ToggleReportFeature::class)
-class ToggleReportFeatureSettingsStore @Inject constructor(
-    private val toggleReportDataStore: ToggleReportDataStore,
+@RemoteFeatureStoreNamed(ToggleReportsFeature::class)
+class ToggleReportsFeatureSettingsStore @Inject constructor(
+    private val toggleReportsDataStore: ToggleReportsDataStore,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
@@ -46,26 +46,26 @@ class ToggleReportFeatureSettingsStore @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             try {
                 jsonAdapter.fromJson(jsonString)?.let {
-                    toggleReportDataStore.storeDismissLogicEnabled(it.dismissLogicEnabled)
-                    toggleReportDataStore.storeDismissInterval(it.dismissInterval)
-                    toggleReportDataStore.storePromptLimitLogicEnabled(it.promptLimitLogicEnabled)
-                    toggleReportDataStore.storePromptInterval(it.promptInterval)
-                    toggleReportDataStore.storeMaxPromptCount(it.maxPromptCount)
+                    toggleReportsDataStore.storeDismissLogicEnabled(it.dismissLogicEnabled)
+                    toggleReportsDataStore.storeDismissInterval(it.dismissInterval)
+                    toggleReportsDataStore.storePromptLimitLogicEnabled(it.promptLimitLogicEnabled)
+                    toggleReportsDataStore.storePromptInterval(it.promptInterval)
+                    toggleReportsDataStore.storeMaxPromptCount(it.maxPromptCount)
                 }
             } catch (e: Exception) {
-                Timber.d("Katetest->Failed to store ToggleReport settings", e)
+                Timber.d("Katetest->Failed to store ToggleReports settings", e)
             }
         }
     }
 
-    private fun buildJsonAdapter(): JsonAdapter<ToggleReportSetting> {
+    private fun buildJsonAdapter(): JsonAdapter<ToggleReportsSetting> {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        return moshi.adapter(ToggleReportSetting::class.java)
+        return moshi.adapter(ToggleReportsSetting::class.java)
     }
 }
 
 @JsonClass(generateAdapter = true)
-data class ToggleReportSetting(
+data class ToggleReportsSetting(
     @field:Json(name = "dismissLogicEnabled")
     val dismissLogicEnabled: Boolean,
     @field:Json(name = "dismissInterval")

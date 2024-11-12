@@ -108,8 +108,14 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
                 },
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
-                onSendToggleReport = { viewModel.onSubmitToggleReport() },
-                onRejectToggleReport = { this@PrivacyDashboardHybridActivity.finish() },
+                onSendToggleReport = {
+                    val opener = params?.opener ?: "dashboard"
+                    viewModel.onSubmitToggleReport(opener)
+                },
+                onRejectToggleReport = {
+                    viewModel.onToggleReportPromptDismissed()
+                    this@PrivacyDashboardHybridActivity.finish()
+                },
                 onSeeWhatIsSent = {},
             ),
         )

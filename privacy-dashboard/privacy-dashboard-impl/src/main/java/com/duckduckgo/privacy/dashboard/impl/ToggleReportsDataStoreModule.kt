@@ -28,16 +28,16 @@ import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object ToggleReportDataStoreModule {
+object ToggleReportsDataStoreModule {
 
-    private val Context.toggleReportDataStore: DataStore<Preferences> by preferencesDataStore(
+    private val Context.toggleReportsDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "toggle_report",
     )
 
     @Provides
-    @ToggleReport
-    fun provideToggleReportDataStore(context: Context): DataStore<Preferences> = context.toggleReportDataStore
+    @ToggleReports
+    fun provideToggleReportsDataStore(context: Context): DataStore<Preferences> = context.toggleReportsDataStore
 }
 
 @Qualifier
-annotation class ToggleReport
+annotation class ToggleReports

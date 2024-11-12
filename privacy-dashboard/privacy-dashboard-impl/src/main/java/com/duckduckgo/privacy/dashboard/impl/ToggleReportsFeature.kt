@@ -22,12 +22,12 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "toggleReport",
-    settingsStore = ToggleReportFeatureSettingsStore::class,
+    featureName = "toggleReports",
+    settingsStore = ToggleReportsFeatureSettingsStore::class,
 )
-interface ToggleReportFeature {
+interface ToggleReportsFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 }
 
-fun ToggleReportFeature.isEnabled(): Boolean = self().isEnabled()
+fun ToggleReportsFeature.isEnabled(): Boolean = self().isEnabled()
