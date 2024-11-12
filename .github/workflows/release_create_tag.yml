@@ -42,8 +42,7 @@ jobs:
 
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
-        run: |
-          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+        run: |        
           bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
 
       - name: Create Asana task when workflow failed
