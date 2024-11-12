@@ -105,6 +105,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             ) -> {
                 showSitePermissionsRationaleDialog(
                     R.string.sitePermissionsMicAndCameraDialogTitle,
+                    R.string.sitePermissionsMicAndCameraDialogSubtitle,
                     url,
                     { rememberChoice ->
                         askForMicAndCameraPermissions(rememberChoice)
@@ -115,6 +116,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(
                     R.string.sitePermissionsMicDialogTitle,
+                    R.string.sitePermissionsMicDialogSubtitle,
                     url,
                     { rememberChoice ->
                         askForMicPermissions(rememberChoice)
@@ -125,6 +127,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(
                     R.string.sitePermissionsCameraDialogTitle,
+                    R.string.sitePermissionsCameraDialogSubtitle,
                     url,
                     { rememberChoice ->
                         askForCameraPermissions(rememberChoice)
@@ -200,11 +203,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun showSitePermissionsRationaleDialog(
         @StringRes titleRes: Int,
+        @StringRes messageRes: Int,
         url: String,
         onPermissionAllowed: (Boolean) -> Unit,
     ) {
         TextAlertDialogBuilder(activity)
             .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
+            .setMessage(messageRes)
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
             .setNegativeButton(R.string.sitePermissionsDialogDenyButton, GHOST)
             .setCheckBoxText(R.string.sitePermissionsDialogRememberMeCheckBox)

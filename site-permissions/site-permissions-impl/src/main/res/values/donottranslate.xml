@@ -31,4 +31,10 @@
     <string name="systemPermissionDialogLocationDeniedTitle">Allow DuckDuckGo to ask for location access on this device</string>
     <string name="systemPermissionDialogLocationDeniedContent">Sites can only use your location if you allow DuckDuckGo to ask for access.</string>
     <string name="sitePermissionsLocationDeniedSnackBarMessage">Allow DuckDuckGo to ask for location access</string>
+
+    <!-- Site Permission -->
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">You can manage the microphone and camera access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="sitePermissionsMicDialogSubtitle">You can manage the microphone access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">You can manage the camera access permissions you’ve granted to individual sites in Settings.</string>
+
 </resources>
