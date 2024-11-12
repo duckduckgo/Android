@@ -44,7 +44,7 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          output=$(git describe --tags --abbrev=0)
+          output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | tail -n 1)
           echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
 
