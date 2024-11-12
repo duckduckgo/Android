@@ -201,10 +201,15 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.isEnabled
         set(value) {
             binding.internalEditText.isEnabled = value
-            binding.internalInputLayout.isEnabled = value
-            binding.root.alpha = if (value) ENABLED_OPACITY else DISABLED_OPACITY
             handleIsEditableChangeForEndIcon(value)
         }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        binding.internalInputLayout.isEnabled = enabled
+        binding.internalPasswordIcon.isEnabled = enabled
+        binding.root.alpha = if (enabled) ENABLED_OPACITY else DISABLED_OPACITY
+    }
 
     override var error: String?
         get() = binding.internalInputLayout.error.toString()
@@ -219,8 +224,6 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     private fun handleIsEditableChangeForEndIcon(isEditable: Boolean) {
-        binding.internalPasswordIcon.isEnabled = isEditable
-
         if (binding.internalInputLayout.endIconMode != END_ICON_NONE) {
             binding.internalInputLayout.isEndIconVisible = !isEditable
             if (isEditable && isPassword) {
