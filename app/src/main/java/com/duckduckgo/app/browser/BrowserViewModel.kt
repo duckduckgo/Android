@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
@@ -63,7 +64,9 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -110,9 +113,12 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs.distinctUntilChanged()
-    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
+    val tabs: LiveData<List<TabEntity>> = tabRepository.flowTabs
+        .distinctUntilChanged()
+        .onEach { onTabsUpdated(it.isEmpty()) }
+        .asLiveData()
 
     val isOnboardingCompleted: Flow<Boolean> = userStageStore.currentAppStage
         .map { it != AppStage.DAX_ONBOARDING }
@@ -195,8 +201,8 @@ class BrowserViewModel @Inject constructor(
         )
     }
 
-    suspend fun onTabsUpdated(tabs: List<String>) {
-        if (tabs.isEmpty()) {
+    suspend fun onTabsUpdated(areTabsEmpty: Boolean) {
+        if (areTabsEmpty) {
             Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.addDefaultTab()
             return
