@@ -71,6 +71,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
@@ -407,7 +408,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpThenAddQueryParam() = runTest {
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerSetOriginToSerpAuto() = runTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -422,8 +423,8 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
         openInNewTabFlow.emit(Off)
 
-        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
     }
 
     @Test
@@ -532,7 +533,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpAndOpenInNewTabThenAddQueryParam() = runTest {
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpAndOpenInNewTabThenSetOriginToSerpAuto() = runTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -548,8 +549,8 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
         openInNewTabFlow.emit(Off)
 
-        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
     }
 
     @UiThreadTest

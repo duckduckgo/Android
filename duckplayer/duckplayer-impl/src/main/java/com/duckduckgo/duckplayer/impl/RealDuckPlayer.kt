@@ -33,20 +33,18 @@ import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.DuckPlayer.*
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -113,6 +111,7 @@ class RealDuckPlayer @Inject constructor(
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
+    private var duckPlayerOrigin: DuckPlayerOrigin? = null
     private var isFeatureEnabled = false
     private var duckPlayerDisabledHelpLink = ""
 
@@ -289,8 +288,10 @@ class RealDuckPlayer @Inject constructor(
 
     private fun createDuckPlayerUriFromYoutube(uri: Uri): String {
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
-        val origin = uri.getQueryParameter(ORIGIN_QUERY_PARAM)?.let { it } ?: ORIGIN_QUERY_PARAM_AUTO
-        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}?$ORIGIN_QUERY_PARAM=$origin"
+        if (duckPlayerOrigin == null) {
+            duckPlayerOrigin = AUTO
+        }
+        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}"
     }
 
     override suspend fun intercept(
@@ -430,14 +431,14 @@ class RealDuckPlayer @Inject constructor(
                 withContext(dispatchers.main()) {
                     webView.loadUrl(youtubeUrl)
                 }
-                val origin = url.getQueryParameter(ORIGIN_QUERY_PARAM)
-                if (origin == ORIGIN_QUERY_PARAM_SERP || origin == ORIGIN_QUERY_PARAM_SERP_AUTO) {
+                if (url.getQueryParameter(ORIGIN_QUERY_PARAM) == ORIGIN_QUERY_PARAM_SERP || duckPlayerOrigin == SERP_AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
-                } else if (origin == ORIGIN_QUERY_PARAM_AUTO) {
+                } else if (duckPlayerOrigin == AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
-                } else if (origin != ORIGIN_QUERY_PARAM_OVERLAY) {
+                } else if (duckPlayerOrigin != OVERLAY) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
+                duckPlayerOrigin = null
             }
         }
         return WebResourceResponse(null, null, null)
@@ -483,5 +484,9 @@ class RealDuckPlayer @Inject constructor(
             isFeatureEnabled = duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled()
             duckPlayerDisabledHelpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink() ?: ""
         }
+    }
+
+    override fun setDuckPlayerOrigin(origin: DuckPlayerOrigin) {
+        duckPlayerOrigin = origin
     }
 }
