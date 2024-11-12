@@ -84,7 +84,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl"),
                 ),
                 cohorts = listOf(
@@ -97,7 +97,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
@@ -118,7 +118,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
@@ -139,7 +139,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
@@ -160,7 +160,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(nextUrl = "nextUrl"),
                 ),
             ),
@@ -184,7 +184,7 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(
+                settings = configAdapter.toJson(
                     Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(

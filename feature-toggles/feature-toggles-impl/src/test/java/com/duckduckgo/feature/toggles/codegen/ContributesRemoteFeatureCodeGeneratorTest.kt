@@ -3542,10 +3542,21 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 {
                     "hash": "1",
                     "state": "disabled",
+                    "settings": {
+                        "foo": "foo/value",
+                        "bar": {
+                            "key": "value",
+                            "number": 2,
+                            "boolean": true,
+                            "complex": {
+                                "boolean": true
+                            }
+                        }
+                    },
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "foo": "foo/value",
                                 "bar": {
                                     "key": "value",
@@ -3580,8 +3591,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        var stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
-        var config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
+        val topLevelStateConfig = testFeature.self().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        val topLevelConfig = testFeature.self().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        assertTrue(topLevelStateConfig.size == 2)
+        assertEquals("foo/value", topLevelStateConfig["foo"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelStateConfig["bar"])
+        assertTrue(topLevelConfig.size == 2)
+        assertEquals("foo/value", topLevelConfig["foo"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelConfig["bar"])
+
+        var stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        var config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("foo/value", stateConfig["foo"])
         assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), stateConfig["bar"])
@@ -3600,7 +3620,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "foo": "foo/value"                                
                             },
                             "rollout": {
@@ -3627,8 +3647,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
-        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 1)
         assertEquals("foo/value", stateConfig["foo"])
         assertNull(stateConfig["bar"])
@@ -3667,8 +3687,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
-        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.isEmpty())
         assertTrue(config.isEmpty())
 
@@ -3683,7 +3703,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "x": "x/value",
                                 "y": "y/value"
                             },
@@ -3711,8 +3731,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
-        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("x/value", stateConfig["x"])
         assertEquals("y/value", stateConfig["y"])

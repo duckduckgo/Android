@@ -55,7 +55,7 @@ class BlockListInterceptorApiPlugin @Inject constructor(
         }
 
         return activeExperiment?.let {
-            val config = activeExperiment.getConfig()?.let { jsonAdapter.fromJson(it) } ?: emptyMap()
+            val config = activeExperiment.getSettings()?.let { jsonAdapter.fromJson(it) } ?: emptyMap()
             val path = when {
                 activeExperiment.isEnabled(TREATMENT) -> config["treatmentUrl"]
                 activeExperiment.isEnabled(CONTROL) -> config["controlUrl"]

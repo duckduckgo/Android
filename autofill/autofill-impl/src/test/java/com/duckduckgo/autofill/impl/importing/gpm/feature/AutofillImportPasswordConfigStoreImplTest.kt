@@ -74,7 +74,7 @@ class AutofillImportPasswordConfigStoreImplTest {
         autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(
             State(
                 remoteEnableState = enabled,
-                config = adapter.toJson(config),
+                settings = adapter.toJson(config),
             ),
         )
     }

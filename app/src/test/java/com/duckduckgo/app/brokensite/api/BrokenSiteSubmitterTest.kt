@@ -613,7 +613,7 @@ class BrokenSiteSubmitterTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = configAdapter.toJson(Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl")),
+                settings = configAdapter.toJson(Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl")),
                 assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
             ),
         )

@@ -194,9 +194,9 @@ interface Toggle {
     fun getRawStoredState(): State?
 
     /**
-     * @return a JSON string containing the config of the feature or null if not present in the remote config
+     * @return a JSON string containing the `settings`` of the feature or null if not present in the remote config
      */
-    fun getConfig(): String?
+    fun getSettings(): String?
 
     /**
      * @return a [Cohort] if one has been assigned or `null` otherwise.
@@ -224,7 +224,7 @@ interface Toggle {
         val metadataInfo: String? = null,
         val cohorts: List<Cohort> = emptyList(),
         val assignedCohort: Cohort? = null,
-        val config: String? = null,
+        val settings: String? = null,
     ) {
         data class Target(
             val variantKey: String?,
@@ -521,7 +521,7 @@ internal class ToggleImpl constructor(
         )
     }
 
-    override fun getConfig(): String? = store.get(key)?.config
+    override fun getSettings(): String? = store.get(key)?.settings
 
     override fun getCohort(): Cohort? {
         return store.get(key)?.assignedCohort
