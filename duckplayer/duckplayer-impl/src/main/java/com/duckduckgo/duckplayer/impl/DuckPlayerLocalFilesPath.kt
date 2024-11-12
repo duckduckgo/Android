@@ -41,11 +41,11 @@ class RealDuckPlayerLocalFilesPath @Inject constructor(
 
     private fun getAllAssetFilePaths(directory: String): List<String> {
         val filePaths = mutableListOf<String>()
-        val files = assetManager.list(directory) ?: return emptyList()
+        val files = runCatching { assetManager.list(directory) }.getOrNull() ?: return emptyList()
 
         files.forEach {
             val fullPath = "$directory/$it"
-            if (assetManager.list(fullPath)?.isNotEmpty() == true) {
+            if (runCatching { assetManager.list(fullPath)?.isNotEmpty() }.getOrDefault(false) == true) {
                 filePaths.addAll(getAllAssetFilePaths(fullPath))
             } else {
                 filePaths.add(fullPath.removePrefix("duckplayer/"))
