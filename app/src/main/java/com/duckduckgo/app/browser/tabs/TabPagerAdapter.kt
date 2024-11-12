@@ -16,17 +16,21 @@
 
 package com.duckduckgo.app.browser.tabs
 
+import android.content.Intent
+import android.os.Message
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.tabs.model.TabEntity
 
 class TabPagerAdapter(
     lifecycle: Lifecycle,
     private val fragmentManager: FragmentManager,
+    private val activityIntent: Intent?,
     private val moveToTabIndex: (Int, Boolean) -> Unit,
     private val getCurrentTabIndex: () -> Int,
     private val getSelectedTabId: () -> String?,
@@ -36,6 +40,7 @@ class TabPagerAdapter(
     private val setOffScreenPageLimit: (Int) -> Unit,
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private val tabIds = mutableListOf<String>()
+    private var messageForNewFragment: Message? = null
 
     override fun getItemCount(): Int = tabIds.size
 
@@ -57,7 +62,17 @@ class TabPagerAdapter(
         increaseOffscreenTabLimitIfNeeded()
 
         val tab = getTabById(tabIds[position])!!
-        return BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, false)
+        val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false
+
+        if (messageForNewFragment != null) {
+            val message = messageForNewFragment
+            messageForNewFragment = null
+            return BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
+                this.messageFromPreviousTab = message
+            }
+        } else {
+            return BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+        }
     }
 
     // init {
@@ -71,6 +86,10 @@ class TabPagerAdapter(
     //         }
     //     }
     // }
+
+    fun setMessageForNewFragment(message: Message) {
+        messageForNewFragment = message
+    }
 
     fun onTabsUpdated(newTabs: List<String>) {
         if (tabIds != newTabs) {

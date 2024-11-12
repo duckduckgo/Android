@@ -48,6 +48,7 @@ class RealTabManager @Inject constructor(
         TabPagerAdapter(
             fragmentManager = supportFragmentManager,
             lifecycle = browserActivity.lifecycle,
+            activityIntent = browserActivity.intent,
             moveToTabIndex = { index, smoothScroll -> browserActivity.tabPager.setCurrentItem(index, smoothScroll) },
             getCurrentTabIndex = { browserActivity.tabPager.currentItem },
             getSelectedTabId = { browserActivity.viewModel.selectedTab.value?.tabId },
@@ -93,18 +94,25 @@ class RealTabManager @Inject constructor(
         message: Message,
         sourceTabId: String?,
     ) {
-        openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
-            val tabId = browserActivity.viewModel.onNewTabRequested(sourceTabId)
-            val fragment = openNewTab(
-                tabId = tabId,
-                url = null,
-                skipHome = false,
-                isExternal = browserActivity.intent?.getBooleanExtra(
-                    BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
-                    false,
-                ) ?: false,
-            )
-            fragment.messageFromPreviousTab = message
+        if (swipingTabsFeature.self().isEnabled()) {
+            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+                tabPagerAdapter.setMessageForNewFragment(message)
+                browserActivity.viewModel.onNewTabRequested(sourceTabId)
+            }
+        } else {
+            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+                val tabId = browserActivity.viewModel.onNewTabRequested(sourceTabId)
+                val fragment = openNewTab(
+                    tabId = tabId,
+                    url = null,
+                    skipHome = false,
+                    isExternal = browserActivity.intent?.getBooleanExtra(
+                        BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
+                        false,
+                    ) ?: false,
+                )
+                fragment.messageFromPreviousTab = message
+            }
         }
     }
 
@@ -135,10 +143,6 @@ class RealTabManager @Inject constructor(
     }
 
     private fun selectTab(tab: TabEntity) {
-        if (swipingTabsFeature.self().isEnabled()) {
-            return
-        }
-
         Timber.v("Select tab: $tab")
 
         if (tab.tabId == currentTab?.tabId) return
