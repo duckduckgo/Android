@@ -198,6 +198,8 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
@@ -5149,7 +5151,7 @@ class BrowserTabViewModelTest {
             false,
             { "someUrl" },
         )
-        verify(mockDuckPlayer).willNavigateToDuckPlayerFromOverlay()
+        verify(mockDuckPlayer).setDuckPlayerOrigin(OVERLAY)
     }
 
     @Test
@@ -5165,7 +5167,7 @@ class BrowserTabViewModelTest {
             false,
             { "someUrl" },
         )
-        verify(mockDuckPlayer).willNavigateToDuckPlayerAutomatically()
+        verify(mockDuckPlayer).setDuckPlayerOrigin(AUTO)
     }
 
     @Test

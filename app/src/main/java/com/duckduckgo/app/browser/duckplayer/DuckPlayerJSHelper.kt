@@ -35,6 +35,8 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
@@ -209,10 +211,10 @@ class DuckPlayerJSHelper @Inject constructor(
                 val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
                     if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
-                        duckPlayer.willNavigateToDuckPlayerAutomatically()
+                        duckPlayer.setDuckPlayerOrigin(AUTO)
                     } else {
-                        duckPlayer.willNavigateToDuckPlayerFromOverlay()
-                    }.toString()
+                        duckPlayer.setDuckPlayerOrigin(OVERLAY)
+                    }
                     if (openInNewTab && !isActiveCustomTab) {
                         OpenInNewTab(it, tabId)
                     } else {

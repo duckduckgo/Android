@@ -22,6 +22,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.fragment.app.FragmentManager
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -173,12 +177,26 @@ interface DuckPlayer {
         destinationUrl: Uri,
     ): Boolean
 
+    /**
+     * Checks whether a duck Player will be opened in a new tab based on RC flag and user settings
+     *
+     * @return True if should open Duck Player in a new tab, false otherwise.
+     */
     fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
 
+    /**
+     * Observes whether a duck Player will be opened in a new tab based on RC flag and user settings
+     *
+     * @return Flow. True if should open Duck Player in a new tab, false otherwise.
+     */
     fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab>
-    fun willNavigateToDuckPlayerFromSerp()
-    fun willNavigateToDuckPlayerAutomatically()
-    fun willNavigateToDuckPlayerFromOverlay()
+
+    /**
+     * Sets the DuckPlayer origin.
+     *
+     * @param origin The DuckPlayer origin. [SERP], [SERP_AUTO], [AUTO], or [OVERLAY]
+     */
+    fun setDuckPlayerOrigin(origin: DuckPlayerOrigin)
 
     /**
      * Data class representing user preferences for Duck Player.
@@ -201,5 +219,12 @@ interface DuckPlayer {
         data object On : OpenDuckPlayerInNewTab
         data object Off : OpenDuckPlayerInNewTab
         data object Unavailable : OpenDuckPlayerInNewTab
+    }
+
+    enum class DuckPlayerOrigin {
+        SERP,
+        SERP_AUTO,
+        AUTO,
+        OVERLAY,
     }
 }

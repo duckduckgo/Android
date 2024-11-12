@@ -33,15 +33,16 @@ import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.DuckPlayer.*
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
@@ -59,9 +60,6 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_YOUTUBE_MAIN_OVERLAY
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
-import com.duckduckgo.duckplayer.impl.RealDuckPlayer.DuckPlayerOrigin.AUTO
-import com.duckduckgo.duckplayer.impl.RealDuckPlayer.DuckPlayerOrigin.OVERLAY
-import com.duckduckgo.duckplayer.impl.RealDuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -488,22 +486,7 @@ class RealDuckPlayer @Inject constructor(
         }
     }
 
-    override fun willNavigateToDuckPlayerFromSerp() {
-        duckPlayerOrigin = SERP_AUTO
-    }
-
-    override fun willNavigateToDuckPlayerAutomatically() {
-        duckPlayerOrigin = AUTO
-    }
-
-    override fun willNavigateToDuckPlayerFromOverlay() {
-        duckPlayerOrigin = OVERLAY
-    }
-
-    enum class DuckPlayerOrigin {
-        SERP,
-        SERP_AUTO,
-        AUTO,
-        OVERLAY,
+    override fun setDuckPlayerOrigin(origin: DuckPlayerOrigin) {
+        duckPlayerOrigin = origin
     }
 }

@@ -71,6 +71,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
@@ -423,7 +424,7 @@ class BrowserWebViewClientTest {
         openInNewTabFlow.emit(Off)
 
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockDuckPlayer).willNavigateToDuckPlayerFromSerp()
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP)
     }
 
     @Test
@@ -549,7 +550,7 @@ class BrowserWebViewClientTest {
         openInNewTabFlow.emit(Off)
 
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockDuckPlayer).willNavigateToDuckPlayerFromSerp()
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP)
     }
 
     @UiThreadTest
