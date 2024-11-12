@@ -667,15 +667,8 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             if (subscription == null && !isSignedIn()) {
-                if (shouldUseAuthV2()) {
-                    val codeVerifier = pkceGenerator.generateCodeVerifier()
-                    val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
-                    val sessionId = authClient.authorize(codeChallenge)
-                    val authorizationCode = authClient.createAccount(sessionId)
-                    val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-                    saveTokens(validateTokens(tokens))
-                } else {
-                    createAccount()
+                createAccount()
+                if (!shouldUseAuthV2()) {
                     exchangeAuthToken(authRepository.getAuthToken()!!)
                 }
             }
@@ -772,12 +765,21 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun createAccount() {
         try {
-            val account = authService.createAccount("Bearer ${emailManager.getToken()}")
-            if (account.authToken.isEmpty()) {
-                pixelSender.reportPurchaseFailureAccountCreation()
+            if (shouldUseAuthV2()) {
+                val codeVerifier = pkceGenerator.generateCodeVerifier()
+                val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
+                val sessionId = authClient.authorize(codeChallenge)
+                val authorizationCode = authClient.createAccount(sessionId)
+                val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
+                saveTokens(validateTokens(tokens))
             } else {
-                authRepository.setAccount(Account(externalId = account.externalId, email = null))
-                authRepository.setAuthToken(account.authToken)
+                val account = authService.createAccount("Bearer ${emailManager.getToken()}")
+                if (account.authToken.isEmpty()) {
+                    pixelSender.reportPurchaseFailureAccountCreation()
+                } else {
+                    authRepository.setAccount(Account(externalId = account.externalId, email = null))
+                    authRepository.setAuthToken(account.authToken)
+                }
             }
         } catch (e: Exception) {
             when (e) {
