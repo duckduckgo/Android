@@ -71,6 +71,7 @@ dependencies {
     implementation "net.zetetic:android-database-sqlcipher:_"
 
     // Testing dependencies
+    testImplementation project(':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.core

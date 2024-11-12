@@ -36,6 +36,8 @@ import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGenera
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.time.ZoneId
@@ -3525,6 +3527,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `test config parsed correctly`() {
+        val moshi = Moshi.Builder().build()
+        val adapter = moshi.adapter<Map<String, Any>>(
+            Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java),
+        )
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3541,7 +3547,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "state": "enabled",
                             "config": {
                                 "foo": "foo/value",
-                                "bar": "bar/value"
+                                "bar": {
+                                    "key": "value",
+                                    "number": 2,
+                                    "boolean": true,
+                                    "complex": {
+                                        "boolean": true
+                                    }
+                                }
                             },
                             "rollout": {
                                 "steps": [
@@ -3567,14 +3580,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        var stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        var config = testFeature.fooFeature().getConfig()
+        var stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
+        var config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("foo/value", stateConfig["foo"])
-        assertEquals("bar/value", stateConfig["bar"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), stateConfig["bar"])
         assertTrue(config.size == 2)
         assertEquals("foo/value", config["foo"])
-        assertEquals("bar/value", config["bar"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), config["bar"])
 
         // Delete config key, should remove
         assertTrue(
@@ -3614,8 +3627,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 1)
         assertEquals("foo/value", stateConfig["foo"])
         assertNull(stateConfig["bar"])
@@ -3623,7 +3636,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("foo/value", config["foo"])
         assertNull(config["bar"])
 
-        // delete config, returns empty map
+        // delete config, returns empty
         assertTrue(
             privacyPlugin.store(
                 "testFeature",
@@ -3654,8 +3667,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.isEmpty())
         assertTrue(config.isEmpty())
 
@@ -3698,8 +3711,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.config?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getConfig()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("x/value", stateConfig["x"])
         assertEquals("y/value", stateConfig["y"])

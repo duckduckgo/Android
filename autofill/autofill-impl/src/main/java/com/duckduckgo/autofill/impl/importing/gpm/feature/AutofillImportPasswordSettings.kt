@@ -20,8 +20,11 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 interface AutofillImportPasswordConfigStore {
     suspend fun getConfig(): AutofillImportPasswordSettings
@@ -37,13 +40,18 @@ data class AutofillImportPasswordSettings(
 class AutofillImportPasswordConfigStoreImpl @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val dispatchers: DispatcherProvider,
+    private val moshi: Moshi,
 ) : AutofillImportPasswordConfigStore {
+
+    private val jsonAdapter: JsonAdapter<CanImportFromGooglePasswordManagerConfig> by lazy {
+        moshi.adapter(CanImportFromGooglePasswordManagerConfig::class.java)
+    }
 
     override suspend fun getConfig(): AutofillImportPasswordSettings {
         return withContext(dispatchers.io()) {
-            val config = autofillFeature.canImportFromGooglePasswordManager().getConfig()
-            val launchUrl = config[LAUNCH_URL_KEY] ?: LAUNCH_URL_DEFAULT
-            val javascriptConfig = config[JAVASCRIPT_CONFIG_KEY] ?: JAVASCRIPT_CONFIG_DEFAULT
+            val config = autofillFeature.canImportFromGooglePasswordManager().getConfig()?.let { jsonAdapter.fromJson(it) }
+            val launchUrl = config?.launchUrl ?: LAUNCH_URL_DEFAULT
+            val javascriptConfig = config?.javascriptConfig?.toString() ?: JAVASCRIPT_CONFIG_DEFAULT
 
             AutofillImportPasswordSettings(
                 canImportFromGooglePasswords = autofillFeature.canImportFromGooglePasswordManager().isEnabled(),
@@ -54,10 +62,12 @@ class AutofillImportPasswordConfigStoreImpl @Inject constructor(
     }
 
     companion object {
-        private const val JAVASCRIPT_CONFIG_KEY = "javascriptConfig"
-        const val JAVASCRIPT_CONFIG_DEFAULT = "\"{}\""
-
-        private const val LAUNCH_URL_KEY = "launchUrl"
-        const val LAUNCH_URL_DEFAULT = "https://passwords.google.com/options?ep=1"
+        internal const val JAVASCRIPT_CONFIG_DEFAULT = "\"{}\""
+        internal const val LAUNCH_URL_DEFAULT = "https://passwords.google.com/options?ep=1"
     }
+
+    private data class CanImportFromGooglePasswordManagerConfig(
+        val launchUrl: String? = null,
+        val javascriptConfig: JSONObject? = null,
+    )
 }

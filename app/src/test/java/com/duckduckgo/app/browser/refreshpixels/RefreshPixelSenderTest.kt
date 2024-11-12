@@ -10,8 +10,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
@@ -24,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
+import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -47,6 +46,15 @@ class RefreshPixelSenderTest {
 
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
+
+    private val moshi = Moshi.Builder().build()
+
+    private data class Config(
+        val treatmentUrl: String? = null,
+        val controlUrl: String? = null,
+        val nextUrl: String? = null,
+    )
+    private val configAdapter = moshi.adapter(Config::class.java)
 
     private lateinit var db: AppDatabase
     private lateinit var refreshDao: RefreshDao
@@ -304,10 +312,7 @@ class RefreshPixelSenderTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "treatmentUrl",
-                    CONTROL_URL to "controlUrl",
-                ),
+                config = configAdapter.toJson(Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl")),
                 assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
             ),
         )

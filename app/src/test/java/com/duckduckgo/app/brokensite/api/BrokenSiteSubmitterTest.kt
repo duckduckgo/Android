@@ -11,8 +11,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
@@ -43,6 +41,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -67,6 +66,15 @@ import org.mockito.kotlin.whenever
 class BrokenSiteSubmitterTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
+
+    private val moshi = Moshi.Builder().build()
+
+    private data class Config(
+        val treatmentUrl: String? = null,
+        val controlUrl: String? = null,
+        val nextUrl: String? = null,
+    )
+    private val configAdapter = moshi.adapter(Config::class.java)
 
     private val mockPixel: Pixel = mock()
 
@@ -605,10 +613,7 @@ class BrokenSiteSubmitterTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "treatmentUrl",
-                    CONTROL_URL to "controlUrl",
-                ),
+                config = configAdapter.toJson(Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl")),
                 assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
             ),
         )
