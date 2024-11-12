@@ -43,8 +43,8 @@ jobs:
 
       - name: Get latest tag
         id: get_latest_tag
-        run: |                  
-          output=$(git describe --tags --abbrev=0)
+        run: |
+          output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | tail -n 1)
           echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
 
@@ -103,6 +103,7 @@ jobs:
       - name: Tag Nightly release
         id: tag_nightly_release
         run: |
+          git checkout develop
           git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
           git push origin ${{ steps.generate_version_name.outputs.version }}
 
