@@ -237,10 +237,10 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenGetSitePermissionsForWebsiteCalledThenGetSitePermissionsByDomain() = runTest {
+    fun whenGetSitePermissionsForWebsiteCalledThenGetSitePermissionsByTheSameUrl() = runTest {
         repository.getSitePermissionsForWebsite(url)
 
-        verify(mockSitePermissionsDao).getSitePermissionsByDomain(domain)
+        verify(mockSitePermissionsDao).getSitePermissionsByDomain(url)
     }
 
     @Test
