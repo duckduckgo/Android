@@ -27,7 +27,6 @@ import android.widget.RelativeLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
@@ -96,18 +95,20 @@ class BottomAppBarBehavior<V : View>(
             // only hide the app bar in the browser layout
             if (target.id == R.id.browserWebView) {
                 toolbar.translationY = max(0f, min(toolbar.height.toFloat(), toolbar.translationY + dy))
+                offsetBottomByToolbar(browserLayout)
             }
-
-            offsetBottomByToolbar(target)
         }
     }
 
     private fun offsetBottomByToolbar(view: View?) {
-        if (view?.layoutParams is CoordinatorLayout.LayoutParams) {
-            view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                this.bottomMargin = omnibar.measuredHeight() - omnibar.getTranslation().roundToInt()
+        (view?.layoutParams as? CoordinatorLayout.LayoutParams)?.let { layoutParams ->
+            val newBottomMargin = omnibar.measuredHeight() - omnibar.getTranslation().roundToInt()
+            if (layoutParams.bottomMargin != newBottomMargin) {
+                layoutParams.bottomMargin = newBottomMargin
+                view.postOnAnimation {
+                    view.requestLayout()
+                }
             }
-            view.requestLayout()
         }
     }
 
