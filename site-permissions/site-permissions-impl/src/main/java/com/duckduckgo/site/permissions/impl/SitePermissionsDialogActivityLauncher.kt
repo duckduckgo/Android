@@ -107,6 +107,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsMicAndCameraDialogTitle,
                     R.string.sitePermissionsMicAndCameraDialogSubtitle,
                     url,
+                    SitePermissionsPixelValues.CAMERA_AND_MICROPHONE,
                     { rememberChoice ->
                         askForMicAndCameraPermissions(rememberChoice)
                     },
@@ -118,6 +119,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsMicDialogTitle,
                     R.string.sitePermissionsMicDialogSubtitle,
                     url,
+                    SitePermissionsPixelValues.MICROPHONE,
                     { rememberChoice ->
                         askForMicPermissions(rememberChoice)
                     },
@@ -129,6 +131,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     R.string.sitePermissionsCameraDialogTitle,
                     R.string.sitePermissionsCameraDialogSubtitle,
                     url,
+                    SitePermissionsPixelValues.CAMERA,
                     { rememberChoice ->
                         askForCameraPermissions(rememberChoice)
                     },
@@ -150,6 +153,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         locationPermissionRequest: LocationPermissionRequest,
         tabId: String,
     ) {
+        sendDialogImpressionPixel(SitePermissionsPixelValues.LOCATION)
         this.tabId = tabId
         this.activity = activity
 
@@ -174,22 +178,17 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     var rememberChoice = false
                     override fun onPositiveButtonClicked() {
                         if (rememberChoice) {
-                            pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                             storeFavicon(locationPermissionRequest.origin)
-                        } else {
-                            pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
                         }
-
+                        sendPositiveDialogClickPixel(SitePermissionsPixelValues.LOCATION, rememberChoice)
                         askForLocationPermissions()
                     }
 
                     override fun onNegativeButtonClicked() {
                         if (rememberChoice) {
-                            pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                             storeFavicon(locationPermissionRequest.origin)
-                        } else {
-                            pixel.fire(SitePermissionsPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                         }
+                        sendNegativeDialogClickPixel(SitePermissionsPixelValues.LOCATION, rememberChoice)
                         denyPermissions(rememberChoice)
                     }
 
@@ -205,8 +204,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         @StringRes titleRes: Int,
         @StringRes messageRes: Int,
         url: String,
+        pixelType: String,
         onPermissionAllowed: (Boolean) -> Unit,
     ) {
+        sendDialogImpressionPixel(pixelType)
         TextAlertDialogBuilder(activity)
             .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
             .setMessage(messageRes)
@@ -219,16 +220,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     var rememberChoice = false
                     override fun onPositiveButtonClicked() {
                         onPermissionAllowed(rememberChoice)
-                        if (rememberChoice) {
-                            storeFavicon(url)
-                        }
+                        sendNegativeDialogClickPixel(rememberChoice = rememberChoice, type = pixelType)
                     }
 
                     override fun onNegativeButtonClicked() {
                         denyPermissions(rememberChoice)
-                        if (rememberChoice) {
-                            storeFavicon(url)
-                        }
+                        sendNegativeDialogClickPixel(rememberChoice = rememberChoice, type = pixelType)
                     }
 
                     override fun onCheckedChanged(checked: Boolean) {
@@ -244,6 +241,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         activity: Activity,
         url: String,
     ) {
+        sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
         val domain = url.extractDomain() ?: url
 
         // Check if user allowed or denied per session
@@ -296,6 +294,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             sitePermissionsRepository.saveDrmForSession(domain, true)
                             grantPermissions()
                         }
+                        sendPositiveDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
                     }
 
                     override fun onNegativeButtonClicked() {
@@ -306,6 +305,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         } else {
                             sitePermissionsRepository.saveDrmForSession(domain, false)
                         }
+                        sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
                     }
 
                     override fun onCheckedChanged(checked: Boolean) {
@@ -328,6 +328,49 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         appCoroutineScope.launch(dispatcher.io()) {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)
         }
+    }
+
+    private fun sendDialogImpressionPixel(type: String) {
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_DIALOG_IMPRESSION,
+            mapOf(SitePermissionsPixelParameters.PERMISSION_TYPE to type),
+        )
+    }
+
+    private fun sendNegativeDialogClickPixel(
+        type: String,
+        rememberChoice: Boolean,
+    ) {
+        val selection = if (rememberChoice) {
+            SitePermissionsPixelValues.DENY_ALWAYS
+        } else {
+            SitePermissionsPixelValues.DENY_ONCE
+        }
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_DIALOG_CLICK,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to type,
+                SitePermissionsPixelParameters.PERMISSION_SELECTION to selection,
+            ),
+        )
+    }
+
+    private fun sendPositiveDialogClickPixel(
+        type: String,
+        rememberChoice: Boolean,
+    ) {
+        val selection = if (rememberChoice) {
+            SitePermissionsPixelValues.ALLOW_ALWAYS
+        } else {
+            SitePermissionsPixelValues.ALLOW_ONCE
+        }
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_DIALOG_CLICK,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to type,
+                SitePermissionsPixelParameters.PERMISSION_SELECTION to selection,
+            ),
+        )
     }
 
     private fun askForMicAndCameraPermissions(rememberChoice: Boolean) {
@@ -574,17 +617,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
         val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
     }
-}
-
-fun String.websiteFromGeoLocationsApiOrigin(): String {
-    val webPrefix = "www."
-    val uri = Uri.parse(this)
-    val host = uri.host ?: return this
-
-    return host
-        .takeIf { it.startsWith(webPrefix, ignoreCase = true) }
-        ?.drop(webPrefix.length)
-        ?: host
 }
 
 enum class SitePermissionsRequestedType {

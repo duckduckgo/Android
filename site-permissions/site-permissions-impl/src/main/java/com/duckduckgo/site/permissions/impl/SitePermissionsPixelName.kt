@@ -18,16 +18,7 @@ package com.duckduckgo.site.permissions.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-internal enum class SitePermissionsPixelName(override val pixelName: String) : Pixel.PixelName {
-    PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE("m_pc_syd_e"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_LATER("m_pc_syd_l"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_NEVER("m_pc_syd_n"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE("m_pc_s_l_e"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE("m_pc_s_l_d"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS("m_pc_sd_aa"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
+enum class SitePermissionsPixelName(override val pixelName: String) : Pixel.PixelName {
     PERMISSION_DIALOG_IMPRESSION("m_site_permissions_dialog_impresssion"),
     PERMISSION_DIALOG_CLICK("m_site_permissions_dialog_click"),
 }
