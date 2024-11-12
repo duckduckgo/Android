@@ -27,6 +27,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
@@ -34,9 +35,15 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
-        run: |
+        run: |        
           bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }}
 
       - name: Create Asana task when workflow failed
