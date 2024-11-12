@@ -70,7 +70,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
@@ -334,7 +334,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         return true
                     } else if (willOpenDuckPlayer && webView.url?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } == true) {
-                        duckPlayer.setDuckPlayerOrigin(SERP)
+                        duckPlayer.setDuckPlayerOrigin(SERP_AUTO)
                         if (openInNewTab) {
                             listener.openLinkInNewTab(url)
                             return true
