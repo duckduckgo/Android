@@ -331,12 +331,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
 
-            // if (!event.isProtected) {
-            //     if (toggleReports.shouldPrompt()) {
-            //         command.send(LaunchToggleReport(opener = "dashboard"))
-            //     }
-            // }
-
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (event.isProtected) {
