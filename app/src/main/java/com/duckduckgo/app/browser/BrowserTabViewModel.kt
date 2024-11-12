@@ -269,6 +269,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersPlugin
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -283,7 +284,6 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
@@ -394,7 +394,6 @@ class BrowserTabViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
-    private val gpc: Gpc,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
@@ -432,6 +431,7 @@ class BrowserTabViewModel @Inject constructor(
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val customHeadersPlugin: PluginPoint<CustomHeadersPlugin>,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1073,8 +1073,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
-        url?.let {
-            return gpc.getHeaders(url)
+        url?.let { requestUrl ->
+            val customHeaders = mutableMapOf<String, String>()
+            customHeadersPlugin.getPlugins().forEach {
+                customHeaders.putAll(it.getHeaders(requestUrl))
+            }
+            return customHeaders.toMap()
         }
         return emptyMap()
     }
