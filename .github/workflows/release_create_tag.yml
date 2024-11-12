@@ -27,6 +27,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
