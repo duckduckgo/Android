@@ -449,13 +449,14 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             url?.let {
+                val uri = url.toUri()
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
                         pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(url)) {
+                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                                 duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
                                     navigationHistory.saveToHistory(
                                         it,
@@ -463,7 +464,7 @@ class BrowserWebViewClient @Inject constructor(
                                     )
                                 }
                             } else {
-                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(uri)) {
                                     duckPlayer.duckPlayerNavigatedToYoutube()
                                 }
                                 navigationHistory.saveToHistory(url, navigationList.currentItem?.title)

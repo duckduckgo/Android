@@ -538,8 +538,7 @@ class BrowserTabViewModelTest {
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any<Uri>())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
@@ -1957,7 +1956,7 @@ class BrowserTabViewModelTest {
         val url = "http://youtube-nocookie.com/videoID=1234"
         val title = "Duck Player"
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(true)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn("duck://player/1234")
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
 

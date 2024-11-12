@@ -87,6 +87,8 @@ class RealDuckPlayerTest {
         mockDuckPlayerLocalFilesPath,
         mimeType,
         dispatcherProvider,
+        true,
+        coroutineRule.testScope,
     )
 
     @Before
@@ -124,8 +126,8 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenDuckPlayerStateIsDisabledWithHelpLink_getDuckPlayerStateReturnsDisabledWithHelpLink() = runTest {
-        setFeatureToggle(false)
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()).thenReturn("help_link")
+        setFeatureToggle(false)
 
         val result = testee.getDuckPlayerState()
 
@@ -777,5 +779,6 @@ class RealDuckPlayerTest {
     private fun setFeatureToggle(enabled: Boolean) {
         duckPlayerFeature.self().setRawStoredState(State(enabled))
         duckPlayerFeature.enableDuckPlayer().setRawStoredState(State(enabled))
+        testee.onPrivacyConfigDownloaded()
     }
 }

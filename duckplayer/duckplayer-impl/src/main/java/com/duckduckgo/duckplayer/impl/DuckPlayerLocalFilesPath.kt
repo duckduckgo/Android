@@ -17,51 +17,38 @@
 package com.duckduckgo.duckplayer.impl
 
 import android.content.res.AssetManager
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.IOException
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 
 interface DuckPlayerLocalFilesPath {
-    suspend fun assetsPath(): List<String>
+    fun assetsPath(): List<String>
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDuckPlayerLocalFilesPath @Inject constructor(
     private val assetManager: AssetManager,
-    @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
 ) : DuckPlayerLocalFilesPath {
 
-    private val assetsPathDeferred: Deferred<List<String>> = appCoroutineScope.async(dispatcherProvider.io()) {
-        getAllAssetFilePaths("duckplayer")
-    }
+    private val assetsPaths: List<String> = runBlocking(dispatcherProvider.io()) { getAllAssetFilePaths("duckplayer") }
 
-    override suspend fun assetsPath(): List<String> {
-        return withContext(dispatcherProvider.io()) {
-            assetsPathDeferred.await()
-        }
-    }
+    override fun assetsPath(): List<String> = assetsPaths
 
     private fun getAllAssetFilePaths(directory: String): List<String> {
         val filePaths = mutableListOf<String>()
-        val files = assetManager.list(directory) ?: return emptyList()
+        val files = runCatching { assetManager.list(directory) }.getOrNull() ?: return emptyList()
 
         files.forEach {
             val fullPath = "$directory/$it"
-            try {
-                assetManager.open(fullPath)
-                filePaths.add(fullPath.removePrefix("duckplayer/"))
-            } catch (e: IOException) {
+            if (runCatching { assetManager.list(fullPath)?.isNotEmpty() }.getOrDefault(false) == true) {
                 filePaths.addAll(getAllAssetFilePaths(fullPath))
+            } else {
+                filePaths.add(fullPath.removePrefix("duckplayer/"))
             }
         }
         return filePaths

@@ -70,7 +70,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
 @FlowPreview
@@ -148,7 +147,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -762,7 +761,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
