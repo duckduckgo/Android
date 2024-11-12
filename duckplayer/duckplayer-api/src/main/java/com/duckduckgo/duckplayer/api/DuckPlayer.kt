@@ -147,14 +147,6 @@ interface DuckPlayer {
     fun isYouTubeUrl(uri: Uri): Boolean
 
     /**
-     * Checks if a string is a YouTube no-cookie URI.
-     *
-     * @param uri The string to check.
-     * @return True if the string is a YouTube no-cookie URI, false otherwise.
-     */
-    suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean
-
-    /**
      * Notify Duck Player of a resource request and allow Duck Player to return the data.
      *
      * If the return value is null, it means Duck Player won't add any response data.

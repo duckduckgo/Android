@@ -266,10 +266,6 @@ class RealDuckPlayer @Inject constructor(
             )
     }
 
-    override suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean {
-        return isSimulatedYoutubeNoCookie(uri.toUri())
-    }
-
     private fun getDuckPlayerAssetsPath(url: Uri): String? {
         return url.path?.takeIf { it.isNotBlank() }?.removePrefix("/")?.let { "$DUCK_PLAYER_ASSETS_PATH$it" }
     }

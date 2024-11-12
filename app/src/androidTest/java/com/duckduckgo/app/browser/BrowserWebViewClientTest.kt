@@ -926,7 +926,7 @@ class BrowserWebViewClientTest {
             whenever(mockWebView.progress).thenReturn(100)
             whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
             whenever(mockWebView.settings).thenReturn(mock())
-            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isYoutubeWatchUrl(any())).thenReturn(false)
             testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)

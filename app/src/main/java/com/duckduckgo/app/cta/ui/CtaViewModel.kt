@@ -377,7 +377,7 @@ class CtaViewModel @Inject constructor(
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
                 (
                     (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
-                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(url)
+                        duckPlayer.isDuckPlayerUri(url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
                     )
 
         if (isDuckPlayerUrl) {
