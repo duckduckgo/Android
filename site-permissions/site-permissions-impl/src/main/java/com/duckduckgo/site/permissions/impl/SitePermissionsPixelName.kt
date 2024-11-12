@@ -28,4 +28,23 @@ internal enum class SitePermissionsPixelName(override val pixelName: String) : P
     PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
     PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
     PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
+    PERMISSION_DIALOG_IMPRESSION("m_site_permissions_dialog_impresssion"),
+    PERMISSION_DIALOG_CLICK("m_site_permissions_dialog_click"),
+}
+
+object SitePermissionsPixelParameters {
+    const val PERMISSION_TYPE = "type"
+    const val PERMISSION_SELECTION = "selection"
+}
+
+object SitePermissionsPixelValues {
+    const val LOCATION = "location"
+    const val CAMERA = "camera"
+    const val MICROPHONE = "microphone"
+    const val CAMERA_AND_MICROPHONE = "camera_and_microphone"
+    const val DRM = "drm"
+    const val ALLOW_ALWAYS = "allow_always"
+    const val ALLOW_ONCE = "allow_once"
+    const val DENY_ALWAYS = "deny_always"
+    const val DENY_ONCE = "deny_once"
 }
