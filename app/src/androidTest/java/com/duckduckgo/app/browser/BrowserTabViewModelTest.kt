@@ -58,6 +58,8 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
+import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
+import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -190,6 +192,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -206,7 +209,6 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -215,14 +217,9 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -252,7 +249,6 @@ import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.UUID
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -377,12 +373,6 @@ class BrowserTabViewModelTest {
 
     private val mockAppLinksHandler: AppLinksHandler = mock()
 
-    private val mockFeatureToggle: FeatureToggle = mock()
-
-    private val mockGpcRepository: GpcRepository = mock()
-
-    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-
     private val mockAmpLinks: AmpLinks = mock()
 
     private val mockTrackingParameters: TrackingParameters = mock()
@@ -499,6 +489,7 @@ class BrowserTabViewModelTest {
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
+    private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
 
     @Before
     fun before() = runTest {
@@ -625,7 +616,6 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             appCoroutineScope = TestScope(),
@@ -664,6 +654,7 @@ class BrowserTabViewModelTest {
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
+            customHeadersProvider = fakeCustomHeadersPlugin,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3243,7 +3234,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+        givenCustomHeadersProviderReturnsGpcHeader()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
         testee.onUserSubmittedQuery("foo")
@@ -3254,9 +3245,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         val url = "foo.com"
-        givenUrlCannotUseGpc(url)
+        givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
 
         testee.onUserSubmittedQuery("foo")
@@ -3267,20 +3258,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-
-        testee.onUserSubmittedQuery("foo")
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenOnDesktopSiteModeToggledIfGpcReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsGpcHeader()
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
@@ -3291,32 +3270,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
-        givenUrlCannotUseGpc("example.com")
-        loadUrl("http://m.example.com")
-        setDesktopBrowsingMode(false)
-        testee.onChangeBrowserModeClicked()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        loadUrl("http://m.example.com")
-        setDesktopBrowsingMode(false)
-        testee.onChangeBrowserModeClicked()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenExternalAppLinkClickedIfGpcReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsGpcHeader()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3327,8 +3282,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenExternalAppLinkClickedIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsNoHeaders()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3339,27 +3294,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
-        val url = "fallback"
-        givenUrlCannotUseGpc(url)
-        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), url)
+    fun whenUserSubmittedQueryIfAndroidFeaturesReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsAndroidFeaturesHeader()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
-        testee.nonHttpAppLinkClicked(intentType)
+        testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
-        assertTrue(command.headers.isEmpty())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(TEST_VALUE, command.headers[X_DUCKDUCKGO_ANDROID_HEADER])
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
+    fun whenUserSubmittedQueryIfAndroidFeaturesReturnsNoHeaderThenDoNotAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsNoHeaders()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
-        testee.nonHttpAppLinkClicked(intentType)
+        testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        val command = commandCaptor.lastValue as Navigate
         assertTrue(command.headers.isEmpty())
     }
 
@@ -5809,22 +5763,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
     }
 
-    private fun givenUrlCanUseGpc() {
-        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList())
+    private fun givenCustomHeadersProviderReturnsGpcHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(GPC_HEADER to GPC_HEADER_VALUE)
     }
 
-    private fun givenUrlCannotUseGpc(url: String) {
-        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
+    private fun givenCustomHeadersProviderReturnsNoHeaders() {
+        fakeCustomHeadersPlugin.headers = emptyMap()
     }
 
-    private fun givenGpcIsDisabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
+    private fun givenCustomHeadersProviderReturnsAndroidFeaturesHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE)
     }
 
     private suspend fun givenFireButtonPulsing() {
@@ -6056,6 +6004,12 @@ class BrowserTabViewModelTest {
         }
         override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
             toggleOn++
+        }
+    }
+
+    class FakeCustomHeadersProvider(var headers: Map<String, String>) : CustomHeadersProvider {
+        override fun getCustomHeaders(url: String): Map<String, String> {
+            return headers
         }
     }
 }

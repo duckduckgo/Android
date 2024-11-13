@@ -148,6 +148,7 @@ class BrowserWebViewClientTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
     private val mockUriLoadedManager: UriLoadedManager = mock()
+    private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mock())
 
     @UiThreadTest
     @Before
@@ -184,6 +185,7 @@ class BrowserWebViewClientTest {
             mockDuckPlayer,
             mockDuckDuckGoUrlDetector,
             mockUriLoadedManager,
+            mockAndroidFeaturesHeaderPlugin,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

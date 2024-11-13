@@ -115,6 +115,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val uriLoadedManager: UriLoadedManager,
+    private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -345,6 +346,11 @@ class BrowserWebViewClient @Inject constructor(
                         webViewClientListener?.openLinkInNewTab(url)
                         return true
                     } else {
+                        val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
+                        if (headers.isNotEmpty()) {
+                            loadUrl(webView, url.toString(), headers)
+                            return true
+                        }
                         return false
                     }
                 }
@@ -380,6 +386,14 @@ class BrowserWebViewClient @Inject constructor(
         } else {
             webView.loadUrl(url)
         }
+    }
+
+    private fun loadUrl(
+        webView: WebView,
+        url: String,
+        headers: Map<String, String>,
+    ) {
+        webView.loadUrl(url, headers)
     }
 
     @UiThread
