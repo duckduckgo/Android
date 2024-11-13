@@ -270,7 +270,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return matchType
     }
 
-    private fun LoginCredentials.prepareForReinsertion(): WebsiteLoginDetailsWithCredentials {
+    private fun LoginCredentials.prepareForBulkInsertion(): WebsiteLoginDetailsWithCredentials {
         val loginDetails = WebsiteLoginDetails(
             id = id,
             domain = domain,
@@ -287,7 +287,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
     override suspend fun reinsertCredentials(credentials: LoginCredentials) {
         withContext(dispatcherProvider.io()) {
-            secureStorage.addWebsiteLoginDetailsWithCredentials(credentials.prepareForReinsertion())?.also {
+            secureStorage.addWebsiteLoginDetailsWithCredentials(credentials.prepareForBulkInsertion())?.also {
                 syncCredentialsListener.onCredentialAdded(it.details.id!!)
             }
         }
@@ -295,10 +295,19 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
     override suspend fun reinsertCredentials(credentials: List<LoginCredentials>) {
         withContext(dispatcherProvider.io()) {
-            val mappedCredentials = credentials.map { it.prepareForReinsertion() }
+            val mappedCredentials = credentials.map { it.prepareForBulkInsertion() }
             secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
                 val ids = mappedCredentials.mapNotNull { it.details.id }
                 syncCredentialsListener.onCredentialsAdded(ids)
+            }
+        }
+    }
+
+    override suspend fun bulkInsert(credentials: List<LoginCredentials>): List<Long> {
+        return withContext(dispatcherProvider.io()) {
+            val mappedCredentials = credentials.map { it.prepareForBulkInsertion() }
+            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
+                syncCredentialsListener.onCredentialsAdded(it)
             }
         }
     }
