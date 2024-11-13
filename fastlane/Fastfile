@@ -124,6 +124,7 @@ platform :android do
 
          options_release_number = options[:release_number]
          options_release_notes = options[:release_notes]
+         options_release_notes = options[:release_notes]
          options_notes_type = options[:notes_type]
 
          newVersion = determine_version_number(

@@ -35,6 +35,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -144,14 +145,24 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
+        Timber.d("Permissions: permission requested ${request.resources.asList()}")
         webViewClientListener?.getCurrentTabId()?.let { tabId ->
             appCoroutineScope.launch(coroutineDispatcher.io()) {
                 val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
                 if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
+                    Timber.d("Permissions: permission requested not user handled")
                     webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
                 }
             }
         }
+    }
+
+    override fun onGeolocationPermissionsShowPrompt(
+        origin: String,
+        callback: GeolocationPermissions.Callback,
+    ) {
+        Timber.d("Permissions: location permission requested $origin")
+        onPermissionRequest(LocationPermissionRequest(origin, callback))
     }
 
     override fun onCloseWindow(window: WebView?) {
@@ -206,13 +217,6 @@ class BrowserChromeClient @Inject constructor(
         Timber.v("javascript dialog attempting to show but is not the active tab; suppressing dialog")
         result.cancel()
         return true
-    }
-
-    override fun onGeolocationPermissionsShowPrompt(
-        origin: String,
-        callback: GeolocationPermissions.Callback,
-    ) {
-        webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
 
     override fun getDefaultVideoPoster(): Bitmap {
