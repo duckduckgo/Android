@@ -196,7 +196,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.common.utils.plugins.headers.CustomHeadersPlugin
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -492,7 +492,7 @@ class BrowserTabViewModelTest {
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
-    private val fakeCustomHeadersPlugin = FakeCustomHeadersPluginPoint(emptyList())
+    private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
 
     @Before
     fun before() = runTest {
@@ -662,7 +662,7 @@ class BrowserTabViewModelTest {
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
-            customHeadersPlugin = fakeCustomHeadersPlugin,
+            customHeadersProvider = fakeCustomHeadersPlugin,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3582,7 +3582,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenGpcReturnsHeader()
+        givenCustomHeadersProviderReturnsGpcHeader()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
         testee.onUserSubmittedQuery("foo")
@@ -3595,7 +3595,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSubmittedQueryIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         val url = "foo.com"
-        givenGpcReturnsNoHeader()
+        givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
 
         testee.onUserSubmittedQuery("foo")
@@ -3607,7 +3607,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnDesktopSiteModeToggledIfGpcReturnsHeaderThenAddHeaderToUrl() {
-        givenGpcReturnsHeader()
+        givenCustomHeadersProviderReturnsGpcHeader()
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
@@ -3619,7 +3619,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenExternalAppLinkClickedIfGpcReturnsHeaderThenAddHeaderToUrl() {
-        givenGpcReturnsHeader()
+        givenCustomHeadersProviderReturnsGpcHeader()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3631,7 +3631,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenExternalAppLinkClickedIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
-        givenGpcReturnsNoHeader()
+        givenCustomHeadersProviderReturnsNoHeaders()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3643,7 +3643,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIfAndroidFeaturesReturnsHeaderThenAddHeaderToUrl() {
-        givenAndroidFeaturesReturnsHeader()
+        givenCustomHeadersProviderReturnsAndroidFeaturesHeader()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
         testee.onUserSubmittedQuery("foo")
@@ -3655,7 +3655,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIfAndroidFeaturesReturnsNoHeaderThenDoNotAddHeaderToUrl() {
-        givenAndroidFeaturesReturnsNoHeader()
+        givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
         testee.onUserSubmittedQuery("foo")
@@ -6111,20 +6111,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
     }
 
-    private fun givenGpcReturnsHeader() {
-        fakeCustomHeadersPlugin.plugins = listOf(FakeGpcHeaderWithHeaderPlugin())
+    private fun givenCustomHeadersProviderReturnsGpcHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(GPC_HEADER to GPC_HEADER_VALUE)
     }
 
-    private fun givenGpcReturnsNoHeader() {
-        fakeCustomHeadersPlugin.plugins = listOf(FakeGpcHeaderNoHeaderPlugin())
+    private fun givenCustomHeadersProviderReturnsNoHeaders() {
+        fakeCustomHeadersPlugin.headers = emptyMap()
     }
 
-    private fun givenAndroidFeaturesReturnsHeader() {
-        fakeCustomHeadersPlugin.plugins = listOf(FakeAndroidFeaturesHeaderWithHeaderPlugin())
-    }
-
-    private fun givenAndroidFeaturesReturnsNoHeader() {
-        fakeCustomHeadersPlugin.plugins = listOf(FakeAndroidFeaturesHeaderNoHeaderPlugin())
+    private fun givenCustomHeadersProviderReturnsAndroidFeaturesHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE)
     }
 
     private suspend fun givenFireButtonPulsing() {
@@ -6380,33 +6376,9 @@ class BrowserTabViewModelTest {
         }
     }
 
-    class FakeCustomHeadersPluginPoint(var plugins: List<CustomHeadersPlugin>) : PluginPoint<CustomHeadersPlugin> {
-        override fun getPlugins(): Collection<CustomHeadersPlugin> {
-            return plugins
-        }
-    }
-
-    class FakeGpcHeaderNoHeaderPlugin : CustomHeadersPlugin {
-        override fun getHeaders(url: String): Map<String, String> {
-            return emptyMap()
-        }
-    }
-
-    class FakeGpcHeaderWithHeaderPlugin : CustomHeadersPlugin {
-        override fun getHeaders(url: String): Map<String, String> {
-            return mapOf(GPC_HEADER to GPC_HEADER_VALUE)
-        }
-    }
-
-    class FakeAndroidFeaturesHeaderNoHeaderPlugin : CustomHeadersPlugin {
-        override fun getHeaders(url: String): Map<String, String> {
-            return emptyMap()
-        }
-    }
-
-    class FakeAndroidFeaturesHeaderWithHeaderPlugin : CustomHeadersPlugin {
-        override fun getHeaders(url: String): Map<String, String> {
-            return mapOf(X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE)
+    class FakeCustomHeadersProvider(var headers: Map<String, String>) : CustomHeadersProvider {
+        override fun getCustomHeaders(url: String): Map<String, String> {
+            return headers
         }
     }
 }

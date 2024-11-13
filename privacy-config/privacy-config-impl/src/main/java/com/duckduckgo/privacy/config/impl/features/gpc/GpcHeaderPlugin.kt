@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.common.utils.plugins.headers.CustomHeadersPlugin
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesMultibinding

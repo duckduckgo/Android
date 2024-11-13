@@ -269,7 +269,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.common.utils.plugins.headers.CustomHeadersPlugin
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -431,7 +431,7 @@ class BrowserTabViewModel @Inject constructor(
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val customHeadersPlugin: PluginPoint<CustomHeadersPlugin>,
+    private val customHeadersProvider: CustomHeadersProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1073,14 +1073,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
-        url?.let { requestUrl ->
-            val customHeaders = mutableMapOf<String, String>()
-            customHeadersPlugin.getPlugins().forEach {
-                customHeaders.putAll(it.getHeaders(requestUrl))
-            }
-            return customHeaders.toMap()
-        }
-        return emptyMap()
+        return url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
     }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
