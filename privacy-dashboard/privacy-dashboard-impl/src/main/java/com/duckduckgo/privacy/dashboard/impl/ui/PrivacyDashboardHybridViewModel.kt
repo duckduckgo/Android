@@ -40,7 +40,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
@@ -98,7 +97,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
-    private val toggleReportsFeature: ToggleReportsFeature,
     private val toggleReports: ToggleReports,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
@@ -395,7 +393,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private companion object {
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
         val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
-        val CLOSE_ON_SUBMIT_TOGGLE_REPORT_DELAY = 200.milliseconds
+        val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }
@@ -507,6 +505,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     fun onToggleReportPromptDismissed() {
         viewModelScope.launch(dispatcher.io()) {
             toggleReports.onPromptDismissed()
+            delay(CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY)
+            command.send(GoBack)
         }
     }
 
@@ -550,7 +550,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = true)
             toggleReports.onReportSent()
-            delay(CLOSE_ON_SUBMIT_TOGGLE_REPORT_DELAY)
+            delay(CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY)
             command.send(GoBack)
         }
     }

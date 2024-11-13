@@ -205,7 +205,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             jsPerformance = listOf(123.45),
         )
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()

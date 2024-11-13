@@ -52,6 +52,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -193,7 +194,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -241,7 +242,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -419,7 +420,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -468,7 +469,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 

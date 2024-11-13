@@ -218,7 +218,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 jsPerformance = null,
             )
 
-            testee.submitBrokenSiteFeedback(brokenSite)
+            testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
             val paramsCaptor = argumentCaptor<Map<String, String>>()
             val encodedParamsCaptor = argumentCaptor<Map<String, String>>()

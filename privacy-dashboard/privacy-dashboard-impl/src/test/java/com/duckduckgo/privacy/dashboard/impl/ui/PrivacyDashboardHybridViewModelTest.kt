@@ -40,10 +40,12 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
@@ -101,6 +103,8 @@ class PrivacyDashboardHybridViewModelTest {
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val pluginPoint = FakePluginPoint(protectionTogglePlugin)
 
+    private val toggleReports: ToggleReports = mock()
+
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
             userAllowListRepository = userAllowListRepository,
@@ -117,6 +121,7 @@ class PrivacyDashboardHybridViewModelTest {
             webBrokenSiteFormFeature = webBrokenSiteFormFeature,
             brokenSiteSender = brokenSiteSender,
             privacyProtectionTogglePlugin = pluginPoint,
+            toggleReports = toggleReports,
             moshi = Moshi.Builder().build(),
         )
     }
@@ -296,7 +301,9 @@ class PrivacyDashboardHybridViewModelTest {
             jsPerformance = jsPerformance.toList(),
         )
 
-        verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite)
+        val isToggleReport = false
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite, isToggleReport)
     }
 
     @Test
@@ -326,7 +333,32 @@ class PrivacyDashboardHybridViewModelTest {
             reportFlow = DASHBOARD,
         )
 
-        verify(brokenSiteSender).submitBrokenSiteFeedback(any())
+        verify(brokenSiteSender).submitBrokenSiteFeedback(any(), any())
+
+        testee.commands().test {
+            assertEquals(GoBack, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnSubmitToggleReportThenCommandIsSent() = runTest {
+        testee.onSiteChanged(site())
+
+        testee.onSubmitToggleReport(opener = "dashboard")
+
+        verify(brokenSiteSender).submitBrokenSiteFeedback(any(), any())
+        verify(toggleReports).onReportSent()
+
+        testee.commands().test {
+            assertEquals(GoBack, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenUserDismissesToggleReportPromptThenCommandIsSent() = runTest {
+        testee.onToggleReportPromptDismissed()
+
+        verify(toggleReports).onPromptDismissed()
 
         testee.commands().test {
             assertEquals(GoBack, awaitItem())
@@ -354,12 +386,13 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionsDisabledOnPrimaryScreenThenPixelIsSent() = runTest {
+    fun whenPrivacyProtectionsDisabledOnPrimaryScreenThenPixelIsSentAndToggleReportPromptStatusIsChecked() = runTest {
         testee.onSiteChanged(site(siteAllowed = false))
         testee.onPrivacyProtectionsClicked(privacyProtectionsClickedPayload(isProtected = false, screen = "primaryScreen"))
         advanceUntilIdle()
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
         verify(pixel, never()).fire(BROKEN_SITE_ALLOWLIST_ADD)
+        verify(toggleReports).shouldPrompt()
         assertEquals(1, protectionTogglePlugin.toggleOff)
     }
 
