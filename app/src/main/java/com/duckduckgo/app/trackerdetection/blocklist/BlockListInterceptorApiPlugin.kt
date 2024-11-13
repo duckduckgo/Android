@@ -55,7 +55,7 @@ class BlockListInterceptorApiPlugin @Inject constructor(
                 activeExperiment.isEnabled(TREATMENT) -> activeExperiment.getConfig()[TREATMENT_URL]
                 activeExperiment.isEnabled(CONTROL) -> activeExperiment.getConfig()[CONTROL_URL]
                 else -> activeExperiment.getConfig()[NEXT_URL]
-            } ?: chain.proceed(request.build())
+            } ?: return chain.proceed(request.build())
             chain.proceed(request.url("$TDS_BASE_URL$path").build())
         } ?: chain.proceed(request.build())
     }
