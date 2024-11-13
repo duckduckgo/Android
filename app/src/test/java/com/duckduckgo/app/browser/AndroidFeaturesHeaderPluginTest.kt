@@ -2,6 +2,7 @@ package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
 import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -17,20 +18,21 @@ class AndroidFeaturesHeaderPluginTest {
     private lateinit var testee: AndroidFeaturesHeaderPlugin
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val mockAndroidHeaderFeature: AndroidHeaderFeature = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     @Before
     fun setup() {
-        testee = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidHeaderFeature)
+        testee = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidBrowserConfigFeature)
     }
 
     @Test
     fun whenGetHeadersCalledWithDuckDuckGoUrlAndFeatureEnabledThenReturnCorrectHeader() {
         val url = "duckduckgo_search_url"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
-        whenever(mockAndroidHeaderFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.featuresRequestHeader()).thenReturn(mockEnabledToggle)
 
         val headers = testee.getHeaders(url)
 
@@ -41,7 +43,8 @@ class AndroidFeaturesHeaderPluginTest {
     fun whenGetHeadersCalledWithDuckDuckGoUrlAndFeatureDisabledThenReturnEmptyMap() {
         val url = "duckduckgo_search_url"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
-        whenever(mockAndroidHeaderFeature.self()).thenReturn(mockDisabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.featuresRequestHeader()).thenReturn(mockDisabledToggle)
 
         val headers = testee.getHeaders(url)
 
@@ -52,7 +55,8 @@ class AndroidFeaturesHeaderPluginTest {
     fun whenGetHeadersCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenReturnEmptyMap() {
         val url = "non_duckduckgo_search_url"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
-        whenever(mockAndroidHeaderFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.featuresRequestHeader()).thenReturn(mockEnabledToggle)
 
         val headers = testee.getHeaders(url)
 
@@ -63,7 +67,8 @@ class AndroidFeaturesHeaderPluginTest {
     fun whenGetHeadersCalledWithNonDuckDuckGoUrlAndFeatureDisabledThenReturnEmptyMap() {
         val url = "non_duckduckgo_search_url"
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
-        whenever(mockAndroidHeaderFeature.self()).thenReturn(mockDisabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.self()).thenReturn(mockEnabledToggle)
+        whenever(mockAndroidBrowserConfigFeature.featuresRequestHeader()).thenReturn(mockDisabledToggle)
 
         val headers = testee.getHeaders(url)
 
