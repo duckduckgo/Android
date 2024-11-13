@@ -220,7 +220,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     var rememberChoice = false
                     override fun onPositiveButtonClicked() {
                         onPermissionAllowed(rememberChoice)
-                        sendNegativeDialogClickPixel(rememberChoice = rememberChoice, type = pixelType)
+                        sendPositiveDialogClickPixel(rememberChoice = rememberChoice, type = pixelType)
                     }
 
                     override fun onNegativeButtonClicked() {
