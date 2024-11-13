@@ -72,7 +72,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 55,
+    version = 56,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -674,6 +674,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_55_TO_56: Migration = object : Migration(55, 56) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `lastAccessTime` TEXT")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -754,6 +760,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_52_TO_53,
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
+            MIGRATION_55_TO_56
         )
 
     @Deprecated(
