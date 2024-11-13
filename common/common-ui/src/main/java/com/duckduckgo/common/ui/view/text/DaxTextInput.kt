@@ -138,6 +138,9 @@ class DaxTextInput @JvmOverloads constructor(
                 binding.internalEditText.inputType = binding.internalEditText.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             }
 
+            val enabled = getBoolean(R.styleable.DaxTextInput_android_enabled, true)
+            isEnabled = enabled
+
             setFocusListener()
 
             recycle()
