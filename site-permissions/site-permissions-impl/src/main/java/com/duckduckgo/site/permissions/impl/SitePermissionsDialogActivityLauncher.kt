@@ -181,7 +181,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             storeFavicon(locationPermissionRequest.origin)
                         }
                         sendPositiveDialogClickPixel(SitePermissionsPixelValues.LOCATION, rememberChoice)
-                        askForLocationPermissions()
+                        askForLocationPermissions(rememberChoice)
                     }
 
                     override fun onNegativeButtonClicked() {
