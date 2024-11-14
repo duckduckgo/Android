@@ -8,7 +8,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="865"
+            line="867"
             column="68"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="900"
+            line="902"
             column="68"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="946"
+            line="948"
             column="68"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="951"
+            line="953"
             column="68"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1010"
+            line="1012"
             column="68"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1037"
+            line="1039"
             column="68"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1554"
+            line="1556"
             column="13"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1593"
+            line="1595"
             column="13"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1640"
+            line="1642"
             column="13"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1687"
+            line="1689"
             column="13"/>
     </issue>
 
@@ -118,7 +118,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1716"
+            line="1718"
             column="56"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1778"
+            line="1780"
             column="13"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1787"
+            line="1789"
             column="13"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1795"
+            line="1797"
             column="13"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1854"
+            line="1856"
             column="13"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1863"
+            line="1865"
             column="13"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1919"
+            line="1921"
             column="13"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1928"
+            line="1930"
             column="13"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="1969"
+            line="1971"
             column="13"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2010"
+            line="2012"
             column="13"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2051"
+            line="2053"
             column="13"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2092"
+            line="2094"
             column="13"/>
     </issue>
 
@@ -250,7 +250,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2123"
+            line="2125"
             column="13"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2153"
+            line="2155"
             column="13"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2183"
+            line="2185"
             column="13"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2225"
+            line="2227"
             column="13"/>
     </issue>
 
@@ -294,7 +294,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2259"
+            line="2261"
             column="43"/>
     </issue>
 
@@ -305,7 +305,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2455"
+            line="2457"
             column="13"/>
     </issue>
 
@@ -316,7 +316,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2505"
+            line="2507"
             column="23"/>
     </issue>
 
@@ -327,7 +327,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2555"
+            line="2557"
             column="24"/>
     </issue>
 
@@ -338,7 +338,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2561"
+            line="2563"
             column="20"/>
     </issue>
 
@@ -349,7 +349,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2568"
+            line="2570"
             column="20"/>
     </issue>
 
@@ -360,7 +360,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2617"
+            line="2619"
             column="23"/>
     </issue>
 
@@ -371,7 +371,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2652"
+            line="2654"
             column="23"/>
     </issue>
 
@@ -382,7 +382,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2681"
+            line="2683"
             column="20"/>
     </issue>
 
@@ -393,7 +393,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="2981"
+            line="2983"
             column="20"/>
     </issue>
 
@@ -404,7 +404,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3025"
+            line="3027"
             column="20"/>
     </issue>
 
@@ -415,7 +415,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3251"
+            line="3253"
             column="20"/>
     </issue>
 
@@ -426,7 +426,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3261"
+            line="3263"
             column="13"/>
     </issue>
 
@@ -437,7 +437,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3305"
+            line="3307"
             column="32"/>
     </issue>
 
@@ -448,7 +448,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3387"
+            line="3389"
             column="23"/>
     </issue>
 
@@ -459,7 +459,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3431"
+            line="3433"
             column="19"/>
     </issue>
 
@@ -470,7 +470,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3472"
+            line="3474"
             column="19"/>
     </issue>
 
@@ -481,51 +481,62 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3516"
+            line="3518"
             column="19"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        var stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine1="        val topLevelStateConfig = testFeature.self().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
+            line="3594"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        var stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3570"
+            line="3603"
             column="27"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()"
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3617"
+            line="3650"
             column="23"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()"
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3657"
+            line="3690"
             column="23"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!"
+        errorLine1="        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()"
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3701"
+            line="3734"
             column="23"/>
     </issue>
 
@@ -536,7 +547,7 @@
         errorLine2="               ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3732"
+            line="3765"
             column="16"/>
     </issue>
 
@@ -855,7 +866,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="48"
+            line="49"
             column="9"/>
     </issue>
 
@@ -866,7 +877,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="74"
+            line="75"
             column="9"/>
     </issue>
 
@@ -877,7 +888,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="100"
+            line="101"
             column="9"/>
     </issue>
 
@@ -888,7 +899,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="126"
+            line="127"
             column="9"/>
     </issue>
 
@@ -899,7 +910,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="152"
+            line="153"
             column="9"/>
     </issue>
 
@@ -910,7 +921,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="182"
+            line="183"
             column="9"/>
     </issue>
 
@@ -921,7 +932,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="208"
+            line="209"
             column="9"/>
     </issue>
 
@@ -932,7 +943,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="234"
+            line="235"
             column="9"/>
     </issue>
 
@@ -943,7 +954,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="260"
+            line="261"
             column="9"/>
     </issue>
 
@@ -965,7 +976,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="89"
+            line="168"
             column="9"/>
     </issue>
 
@@ -973,39 +984,6 @@
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        testFeature.fooFeature().setRawStoredState("
-        errorLine2="        ^">
-        <location
-            file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="96"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
-        errorLine2="        ^">
-        <location
-            file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="131"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        testFeature.fooFeature().setRawStoredState("
-        errorLine2="        ^">
-        <location
-            file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="138"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
@@ -1016,11 +994,22 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        testFeature.experimentFooFeature().setRawStoredState("
+        errorLine2="        ^">
+        <location
+            file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
+            line="192"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        testFeature.fooFeature().setRawStoredState("
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="182"
+            line="199"
             column="9"/>
     </issue>
 
@@ -1031,7 +1020,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="202"
+            line="217"
             column="9"/>
     </issue>
 
@@ -1042,7 +1031,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="209"
+            line="224"
             column="9"/>
     </issue>
 
@@ -1053,7 +1042,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="229"
+            line="242"
             column="9"/>
     </issue>
 
@@ -1064,7 +1053,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="236"
+            line="249"
             column="9"/>
     </issue>
 
@@ -1075,7 +1064,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="273"
+            line="264"
             column="9"/>
     </issue>
 
@@ -1086,7 +1075,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="280"
+            line="271"
             column="9"/>
     </issue>
 
