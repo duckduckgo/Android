@@ -36,4 +36,4 @@ jobs:
           echo -n '::notice title=Inputs::' && echo '${{ toJson(inputs) }}' | sed -z 's_\n_%0A_g'; echo
           message="Release ${{ env.APP_VERSION }} by @${{ github.actor }} has started."
           message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
-          ./send_chat_message.sh '${{env.emoji_info}}'" ${message}
+          ./send_chat_message.sh '${{env.emoji_info}}'" ${message}"
