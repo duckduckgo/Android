@@ -6,6 +6,7 @@ on:
 env:
   MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
   MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
+  APP_VERSION: "5.220.0"
 
 jobs:
   report-release-error:
@@ -25,7 +26,12 @@ jobs:
           fetch-depth: 0
           ref: feature/david/11-14-gha_notify_mattermost
 
-      - name: Run a script
+      - name: Make sure script can be executed
         run: |
-          chmod +x send_chat_message.sh
-          ./send_chat_message.sh "@acapatina please finish the graphs"
+          chmod +x send_chat_message.sh          
+
+      - name: Send Release start message
+        run: |
+          message="Release ${{ env.APP_VERSION }} by @${{ github.actor }} has started."
+          message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+          ./send_chat_message.sh ${message}
