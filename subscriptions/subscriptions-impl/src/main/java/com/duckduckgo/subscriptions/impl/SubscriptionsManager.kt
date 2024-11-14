@@ -112,6 +112,7 @@ interface SubscriptionsManager {
      *
      * @return [true] if successful, [false] otherwise
      */
+    @Deprecated("This method will be removed after migrating to auth v2")
     suspend fun fetchAndStoreAllData(): Boolean
 
     /**
@@ -127,11 +128,13 @@ interface SubscriptionsManager {
     /**
      * Exchanges the auth token for an access token and stores both tokens
      */
+    @Deprecated("This method will be removed after migrating to auth v2")
     suspend fun exchangeAuthToken(authToken: String): String
 
     /**
      * Returns the auth token and if expired, tries to refresh irt
      */
+    @Deprecated("This method will be removed after migrating to auth v2")
     suspend fun getAuthToken(): AuthTokenResult
 
     /**
@@ -414,6 +417,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    @Deprecated("This method will be removed after migrating to auth v2")
     override suspend fun exchangeAuthToken(authToken: String): String {
         val accessToken = authService.accessToken("Bearer $authToken").accessToken
         authRepository.setAccessToken(accessToken)
@@ -421,6 +425,7 @@ class RealSubscriptionsManager @Inject constructor(
         return accessToken
     }
 
+    @Deprecated("This method will be removed after migrating to auth v2")
     override suspend fun fetchAndStoreAllData(): Boolean {
         try {
             if (!isSignedIn()) return false
@@ -688,6 +693,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    @Deprecated("This method will be removed after migrating to auth v2")
     override suspend fun getAuthToken(): AuthTokenResult {
         if (isSignedInV2()) {
             return when (val accessToken = getAccessToken()) {
