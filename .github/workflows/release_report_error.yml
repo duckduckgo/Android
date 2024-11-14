@@ -11,6 +11,10 @@ jobs:
   report-release-error:
     name: Notify Mattermost
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/actions/scripts
 
     steps:
       - name: Checkout repository
