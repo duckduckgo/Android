@@ -72,12 +72,12 @@ jobs:
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
       - name: Upload bundle to Play Store
-        id: update_bundle_play
+        id: upload_bundle_play
         run: |
           bundle exec fastlane deploy_playstore
 
       - name: Upload Universal APK to Github
-        id: update_bundle_github
+        id: upload_bundle_github
         run: |
           bundle exec fastlane deploy_github
 
