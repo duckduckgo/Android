@@ -34,6 +34,11 @@ interface FeedbackCustomMetadataProvider {
         category: SubscriptionFeedbackCategory,
         appPackageId: String? = null,
     ): String
+
+    suspend fun getCustomMetadataEncoded(
+        category: SubscriptionFeedbackCategory,
+        appPackageId: String? = null,
+    ): String
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -48,17 +53,25 @@ class RealFeedbackCustomMetadataProvider @Inject constructor(
     ): String {
         return withContext(dispatcherProvider.io()) {
             when (category) {
-                VPN -> Base64.encodeToString(
-                    generateVPNCustomMetadata(appPackageId).toByteArray(),
-                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
-                )
-
-                SUBS_AND_PAYMENTS -> Base64.encodeToString(
-                    generateSubscriptionCustomMetadata().toByteArray(),
-                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
-                )
-
+                VPN -> generateVPNCustomMetadata(appPackageId)
+                SUBS_AND_PAYMENTS -> generateSubscriptionCustomMetadata()
                 else -> ""
+            }
+        }
+    }
+
+    override suspend fun getCustomMetadataEncoded(
+        category: SubscriptionFeedbackCategory,
+        appPackageId: String?,
+    ): String {
+        return getCustomMetadata(category, appPackageId).run {
+            if (this.isNotEmpty()) {
+                Base64.encodeToString(
+                    this.toByteArray(),
+                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                )
+            } else {
+                ""
             }
         }
     }

@@ -21,6 +21,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
@@ -66,7 +67,8 @@ class RealSubscriptionsManagerTest {
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
     private val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore()
-    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider)
+    private val serpPromo = FakeSerpPromo()
+    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
     private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
@@ -928,7 +930,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
-        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider)
+        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,

@@ -40,7 +40,6 @@ interface FeedbackService {
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
         @Field("atb") atb: String,
-        @Field("loading_bar_exp") loadingBarExperiment: String?,
     )
 
     companion object {

@@ -18,8 +18,10 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
 import android.text.Annotation
+import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -34,23 +36,48 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackSubmitBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
-import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout.content_feedback_submit) {
-
     private val binding: ContentFeedbackSubmitBinding by viewBinding()
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var pixelSender: PrivacyProUnifiedFeedbackPixelSender
+    lateinit var privacyProFeature: PrivacyProFeature
+
+    private val submitTextWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(
+            s: CharSequence,
+            start: Int,
+            count: Int,
+            after: Int,
+        ) {
+        }
+
+        override fun onTextChanged(
+            s: CharSequence,
+            start: Int,
+            before: Int,
+            count: Int,
+        ) {
+            // get the content of both the edit text
+            val description = binding.feedbackSubmitDescription.text.trim()
+
+            // check whether both the fields are empty or not
+            binding.feedbackSubmitButton.isEnabled = description.isNotEmpty()
+        }
+
+        override fun afterTextChanged(s: Editable) {
+        }
+    }
 
     override fun onViewCreated(
         view: View,
@@ -59,6 +86,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         super.onViewCreated(view, savedInstanceState)
         val listener = activity as Listener
         val reportType = requireArguments().getSerializable(EXTRA_REPORT_TYPE) as SubscriptionFeedbackReportType
+        binding.feedbackSubmitDescription.addTextChangedListener(submitTextWatcher)
 
         if (reportType == REPORT_PROBLEM) {
             binding.feedbackSubmitHeader.show()
@@ -69,25 +97,39 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
             ) {
                 listener.onFaqsOpened()
             }
-            binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackSubmitVpnDescriptionHeader).uppercase()
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
+
+            if (privacyProFeature.allowEmailFeedback().isEnabled()) {
+                binding.showEmail()
+            } else {
+                binding.hideEmail()
+            }
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
+            binding.hideEmail()
             if (reportType == GENERAL_FEEDBACK) {
-                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionGeneralFeedback).uppercase()
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
             } else {
-                binding.feedbackSubmitDescriptionHeader.primaryText = getString(R.string.feedbackActionFeatureRequest).uppercase()
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitFeatureRequestDescriptionHint)
             }
         }
 
         binding.feedbackSubmitButton.setOnClickListener {
-            listener.onUserSubmit(binding.feedbackSubmitDescription.text)
+            listener.onUserSubmit(binding.feedbackSubmitDescription.text.trim(), binding.feedbackSubmitEmail.text.trim())
         }
 
         binding.feedbackSubmitDescription.showKeyboard()
+    }
+
+    private fun ContentFeedbackSubmitBinding.showEmail() {
+        feedbackSubmitEmailByLine.show()
+        feedbackSubmitEmail.show()
+    }
+
+    private fun ContentFeedbackSubmitBinding.hideEmail() {
+        feedbackSubmitEmailByLine.gone()
+        feedbackSubmitEmail.gone()
     }
 
     private fun DaxTextView.setClickableLink(
@@ -133,7 +175,11 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
     }
 
     interface Listener {
-        fun onUserSubmit(description: String)
+        fun onUserSubmit(
+            description: String,
+            email: String? = null,
+        )
+
         fun onFaqsOpened()
     }
 

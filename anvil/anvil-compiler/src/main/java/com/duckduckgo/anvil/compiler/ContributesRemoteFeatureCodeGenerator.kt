@@ -498,6 +498,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             minSupportedVersion = feature.minSupportedVersion,
                             targets = emptyList(),
                             cohorts = emptyList(),
+                            settings = feature.settings?.toString(),
                         )
                     )
         
@@ -528,7 +529,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         weight = cohort.weight,
                                     )
                                 } ?: emptyList()
-                                val config = jsonToggle?.config ?: emptyMap()
+                                val settings = jsonToggle?.settings?.toString()
                                 this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -539,7 +540,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         assignedCohort = previousAssignedCohort,
                                         targets = targets,
                                         cohorts = cohorts,
-                                        config = config,                                        
+                                        settings = settings,                                        
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -781,10 +782,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "cohorts",
                         List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
                     )
-                    .addParameter(
-                        "config",
-                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()),
-                    )
+                    .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
                     .build(),
             )
             .addProperty(
@@ -819,8 +817,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
             .addProperty(
                 PropertySpec
-                    .builder("config", Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()))
-                    .initializer("config")
+                    .builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
+                    .initializer("settings")
                     .build(),
             )
             .build()

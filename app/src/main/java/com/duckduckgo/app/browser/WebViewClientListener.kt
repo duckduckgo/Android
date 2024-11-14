@@ -21,7 +21,6 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Message
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
@@ -44,11 +43,6 @@ interface WebViewClientListener {
     fun onSitePermissionRequested(
         request: PermissionRequest,
         sitePermissionsAllowedToAsk: SitePermissions,
-    )
-
-    fun onSiteLocationPermissionRequested(
-        origin: String,
-        callback: GeolocationPermissions.Callback,
     )
 
     fun titleReceived(newTitle: String)

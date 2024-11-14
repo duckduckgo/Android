@@ -19,14 +19,24 @@ package com.duckduckgo.app.generalsettings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -49,6 +59,10 @@ internal class GeneralSettingsViewModelTest {
 
     private lateinit var fakeAppSettingsDataStore: FakeSettingsDataStore
 
+    private lateinit var fakeShowOnAppLaunchOptionDataStore: FakeShowOnAppLaunchOptionDataStore
+
+    private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
+
     @Mock
     private lateinit var mockPixel: Pixel
 
@@ -64,25 +78,20 @@ internal class GeneralSettingsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    val dispatcherProvider = coroutineTestRule.testDispatcherProvider
+    private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        runTest {
+        runBlocking {
             whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
+            whenever(mockHistory.isHistoryFeatureAvailable()).thenReturn(false)
 
             fakeAppSettingsDataStore = FakeSettingsDataStore()
 
-            testee = GeneralSettingsViewModel(
-                fakeAppSettingsDataStore,
-                mockPixel,
-                mockHistory,
-                mockVoiceSearchAvailability,
-                mockVoiceSearchRepository,
-                dispatcherProvider,
-            )
+            fakeShowOnAppLaunchOptionDataStore = FakeShowOnAppLaunchOptionDataStore()
+            fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
         }
     }
 
@@ -95,6 +104,8 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
+        initTestee()
+
         testee.onAutocompleteSettingChanged(true)
 
         assertTrue(fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled)
@@ -102,6 +113,8 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
+        initTestee()
+
         testee.onAutocompleteSettingChanged(false)
 
         assertFalse(fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled)
@@ -109,6 +122,8 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenAutocompleteSwitchedOffThenRecentlyVisitedSitesIsUpdated() = runTest {
+        initTestee()
+
         testee.onAutocompleteSettingChanged(false)
 
         verify(mockHistory).setHistoryUserEnabled(false)
@@ -116,6 +131,8 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenAutocompleteRecentlyVisitedSitesSwitchedOnThenHistoryUpdated() = runTest {
+        initTestee()
+
         testee.onAutocompleteRecentlyVisitedSitesSettingChanged(true)
 
         verify(mockHistory).setHistoryUserEnabled(true)
@@ -123,6 +140,8 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenAutocompleteRecentlyVisitedSitesSwitchedOffThenHistoryUpdated() = runTest {
+        initTestee()
+
         whenever(mockHistory.isHistoryUserEnabled()).thenReturn(false)
         testee.onAutocompleteRecentlyVisitedSitesSettingChanged(false)
 
@@ -132,9 +151,12 @@ internal class GeneralSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
         fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         val viewState = defaultViewState()
+
+        initTestee()
 
         testee.onVoiceSearchChanged(true)
 
@@ -146,26 +168,129 @@ internal class GeneralSettingsViewModelTest {
 
     @Test
     fun whenVoiceSearchEnabledThenSettingsUpdated() = runTest {
+        initTestee()
+
         testee.onVoiceSearchChanged(true)
+
         verify(mockVoiceSearchRepository).setVoiceSearchUserEnabled(true)
     }
 
     @Test
     fun whenVoiceSearchDisabledThenSettingsUpdated() = runTest {
+        initTestee()
+
         testee.onVoiceSearchChanged(false)
         verify(mockVoiceSearchRepository).setVoiceSearchUserEnabled(false)
     }
 
     @Test
     fun whenVoiceSearchEnabledThenFirePixel() = runTest {
+        initTestee()
+
         testee.onVoiceSearchChanged(true)
         verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON)
     }
 
     @Test
     fun whenVoiceSearchDisabledThenFirePixel() = runTest {
+        initTestee()
+
         testee.onVoiceSearchChanged(false)
         verify(mockPixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF)
+    }
+
+    @Test
+    fun whenShowOnAppLaunchClickedThenLaunchShowOnAppLaunchScreenCommandEmitted() = runTest {
+        initTestee()
+
+        testee.onShowOnAppLaunchButtonClick()
+
+        testee.commands.test {
+            assertEquals(LaunchShowOnAppLaunchScreen, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchSetToLastOpenedTabThenShowOnAppLaunchOptionIsLastOpenedTab() = runTest {
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        initTestee()
+
+        testee.viewState.test {
+            assertEquals(LastOpenedTab, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchSetToNewTabPageThenShowOnAppLaunchOptionIsNewTabPage() = runTest {
+        initTestee()
+
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.viewState.test {
+            assertEquals(NewTabPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchSetToSpecificPageThenShowOnAppLaunchOptionIsSpecificPage() = runTest {
+        val specificPage = SpecificPage("example.com")
+
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(specificPage)
+
+        initTestee()
+
+        testee.viewState.test {
+            assertEquals(specificPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchUpdatedThenViewStateIsUpdated() = runTest {
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        initTestee()
+
+        testee.viewState.test {
+            awaitItem()
+
+            fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+            assertEquals(NewTabPage, awaitItem()?.showOnAppLaunchSelectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchClickedThenPixelFiredEmitted() = runTest {
+        initTestee()
+
+        testee.onShowOnAppLaunchButtonClick()
+
+        verify(mockPixel).fire(SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
+    }
+
+    @Test
+    fun whenLaunchedThenShowOnAppLaunchIsNotVisibleByDefault() = runTest {
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(!state!!.isShowOnAppLaunchOptionVisible)
+        }
+    }
+
+    @Test
+    fun whenShowOnAppLaunchFeatureIsDisabledThenIsShowOnAppLaunchOptionIsVisible() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(Toggle.State(enable = true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state!!.isShowOnAppLaunchOptionVisible)
+        }
     }
 
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
@@ -174,5 +299,20 @@ internal class GeneralSettingsViewModelTest {
         storeHistoryEnabled = false,
         showVoiceSearch = false,
         voiceSearchEnabled = false,
+        isShowOnAppLaunchOptionVisible = fakeShowOnAppLaunchFeatureToggle.self().isEnabled(),
+        showOnAppLaunchSelectedOption = LastOpenedTab,
     )
+
+    private fun initTestee() {
+        testee = GeneralSettingsViewModel(
+            fakeAppSettingsDataStore,
+            mockPixel,
+            mockHistory,
+            mockVoiceSearchAvailability,
+            mockVoiceSearchRepository,
+            dispatcherProvider,
+            fakeShowOnAppLaunchFeatureToggle,
+            fakeShowOnAppLaunchOptionDataStore,
+        )
+    }
 }

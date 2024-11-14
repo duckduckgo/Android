@@ -90,7 +90,7 @@ internal class WgVpnRoutes {
         val wgVpnRoutesIncludingLocal: Map<String, Int> = mapOf(
             "0.0.0.0" to 5,
             "8.0.0.0" to 7,
-            // Excluded range: 10.0.0.0 -> 10.255.255.255
+            "10.0.0.0" to 8,
             "11.0.0.0" to 8,
             "12.0.0.0" to 6,
             "16.0.0.0" to 4,

@@ -60,9 +60,7 @@ interface Pixel {
         const val LOCALE = "locale"
         const val FROM_ONBOARDING = "from_onboarding"
         const val ADDRESS_BAR = "address_bar"
-
-        // Loading Bar Experiment
-        const val LOADING_BAR_EXPERIMENT = "loading_bar_exp"
+        const val LAUNCH_SCREEN = "launch_screen"
     }
 
     object PixelValues {

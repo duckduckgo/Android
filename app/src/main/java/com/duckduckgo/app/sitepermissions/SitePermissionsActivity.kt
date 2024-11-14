@@ -27,7 +27,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
@@ -68,7 +67,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
-                    val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
+                    val sitePermissionsWebsites = state.sitesPermissionsAllowed.map { it.domain }
                     updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled, state.askDrmEnabled)
                 }
         }
@@ -81,14 +80,13 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is ShowRemovedAllConfirmationSnackbar -> showRemovedAllSnackbar(command.removedSitePermissions, command.removedLocationPermissions)
+            is ShowRemovedAllConfirmationSnackbar -> showRemovedAllSnackbar(command.removedSitePermissions)
             is LaunchWebsiteAllowed -> launchWebsiteAllowed(command.domain)
         }
     }
 
     private fun showRemovedAllSnackbar(
         removedSitePermissions: List<SitePermissionsEntity>,
-        removedLocationPermissions: List<LocationPermissionEntity>,
     ) {
         val message = HtmlCompat.fromHtml(getString(R.string.sitePermissionsRemoveAllWebsitesSnackbarText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         Snackbar.make(
@@ -96,7 +94,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions, removedLocationPermissions)
+            viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions)
         }.show()
     }
 

@@ -41,6 +41,7 @@ import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCancelled
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
@@ -128,8 +129,11 @@ class SubscriptionFeedbackActivity :
         viewModel.onSubcategorySelected(subCategory)
     }
 
-    override fun onUserSubmit(description: String) {
-        viewModel.onSubmitFeedback(description)
+    override fun onUserSubmit(
+        description: String,
+        email: String?,
+    ) {
+        viewModel.onSubmitFeedback(description, email)
     }
 
     override fun onFaqsOpened() {
@@ -151,6 +155,9 @@ class SubscriptionFeedbackActivity :
 
     private fun handleCommands(command: Command) {
         when (command) {
+            is FeedbackFailed ->
+                Toast.makeText(applicationContext, R.string.feedbackSubmitFailedMessage, Toast.LENGTH_LONG).show()
+
             is FeedbackCancelled -> finish()
             is FeedbackCompleted -> {
                 Toast.makeText(applicationContext, R.string.feedbackSubmitCompletedMessage, Toast.LENGTH_LONG).show()

@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -27,17 +28,21 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
+import dagger.Module
+import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
+    suspend fun getExternalID(): String?
     suspend fun setAccessToken(accessToken: String?)
     suspend fun getAccessToken(): String?
     suspend fun setAuthToken(authToken: String?)
@@ -53,11 +58,24 @@ interface AuthRepository {
     suspend fun canSupportEncryption(): Boolean
 }
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealAuthRepository @Inject constructor(
+@Module
+@ContributesTo(AppScope::class)
+object AuthRepositoryModule {
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideAuthRepository(
+        dispatcherProvider: DispatcherProvider,
+        sharedPreferencesProvider: SharedPreferencesProvider,
+        serpPromo: SerpPromo,
+    ): AuthRepository {
+        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo)
+    }
+}
+
+internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
+    private val serpPromo: SerpPromo,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -77,8 +95,13 @@ class RealAuthRepository @Inject constructor(
         return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
     }
 
+    override suspend fun getExternalID(): String? = withContext(dispatcherProvider.io()) {
+        return@withContext subscriptionsDataStore.externalId
+    }
+
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessToken = accessToken
+        serpPromo.injectCookie(accessToken)
     }
 
     override suspend fun setAuthToken(authToken: String?) = withContext(dispatcherProvider.io()) {

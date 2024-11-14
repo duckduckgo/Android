@@ -811,4 +811,10 @@
     <string name="settingsAddressBarPositionTop">Boven</string>
     <string name="settingsAddressBarPositionBottom">Onderkant</string>
 
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Weergeven bij het starten van de app</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Laatst geopende tabblad</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nieuwe tabbladpagina</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Specifieke pagina</string>
+
 </resources>

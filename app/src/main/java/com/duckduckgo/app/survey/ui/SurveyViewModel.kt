@@ -31,7 +31,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -45,7 +44,6 @@ class SurveyViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val surveyRepository: SurveyRepository,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : ViewModel() {
 
     sealed class Command {
@@ -86,11 +84,6 @@ class SurveyViewModel @Inject constructor(
             .appendQueryParameter(SurveyParams.MODEL, appBuildConfig.model)
             .appendQueryParameter(SurveyParams.SOURCE, source.name.lowercase())
             .appendQueryParameter(SurveyParams.LAST_ACTIVE_DATE, lastActiveDay)
-
-        // Loading Bar Experiment
-        if (loadingBarExperimentManager.isExperimentEnabled()) {
-            urlBuilder.appendQueryParameter(SurveyParams.COHORT, loadingBarExperimentManager.variant.toString())
-        }
 
         return urlBuilder.build().toString()
     }
@@ -133,6 +126,5 @@ class SurveyViewModel @Inject constructor(
         const val MODEL = "mo"
         const val LAST_ACTIVE_DATE = "da"
         const val SOURCE = "src"
-        const val COHORT = "loading_bar_exp"
     }
 }

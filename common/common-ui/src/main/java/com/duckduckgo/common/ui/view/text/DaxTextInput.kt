@@ -71,6 +71,7 @@ interface TextInput {
         @DrawableRes endIconRes: Int,
         contentDescription: String? = null,
     )
+    fun setSelectAllOnFocus(boolean: Boolean)
 
     fun removeEndIcon()
 
@@ -137,6 +138,9 @@ class DaxTextInput @JvmOverloads constructor(
                 binding.internalEditText.inputType = binding.internalEditText.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             }
 
+            val enabled = getBoolean(R.styleable.DaxTextInput_android_enabled, true)
+            isEnabled = enabled
+
             setFocusListener()
 
             recycle()
@@ -200,10 +204,15 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.isEnabled
         set(value) {
             binding.internalEditText.isEnabled = value
-            binding.internalInputLayout.isEnabled = value
-            binding.root.alpha = if (value) ENABLED_OPACITY else DISABLED_OPACITY
             handleIsEditableChangeForEndIcon(value)
         }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        binding.internalInputLayout.isEnabled = enabled
+        binding.internalPasswordIcon.isEnabled = enabled
+        binding.root.alpha = if (enabled) ENABLED_OPACITY else DISABLED_OPACITY
+    }
 
     override var error: String?
         get() = binding.internalInputLayout.error.toString()
@@ -218,8 +227,6 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     private fun handleIsEditableChangeForEndIcon(isEditable: Boolean) {
-        binding.internalPasswordIcon.isEnabled = isEditable
-
         if (binding.internalInputLayout.endIconMode != END_ICON_NONE) {
             binding.internalInputLayout.isEndIconVisible = !isEditable
             if (isEditable && isPassword) {
@@ -262,6 +269,10 @@ class DaxTextInput @JvmOverloads constructor(
         ContextCompat.getDrawable(context, endIconRes)?.let {
             setupEndIconDrawable(it, contentDescription.orEmpty())
         }
+    }
+
+    override fun setSelectAllOnFocus(boolean: Boolean) {
+        binding.internalEditText.setSelectAllOnFocus(boolean)
     }
 
     override fun removeEndIcon() {

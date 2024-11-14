@@ -413,7 +413,12 @@ body[data-display=app] {
 /* pages/duckplayer/app/components/Tooltip.module.css */
 .Tooltip_tooltip {
   position: absolute;
-  background: linear-gradient(0deg, rgba(48, 48, 48, 0.35), rgba(48, 48, 48, 0.35)), rgba(33, 33, 33, 0.55);
+  background:
+    linear-gradient(
+      0deg,
+      rgba(48, 48, 48, 0.35),
+      rgba(48, 48, 48, 0.35)),
+    rgba(33, 33, 33, 0.55);
   background-blend-mode: normal, luminosity;
   box-shadow: inset 0px 0px 1px #ffffff;
   filter: drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 0px 1px #000000) drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
@@ -543,7 +548,12 @@ body[data-display=app] {
   position: absolute;
   inset: 0;
   height: 100%;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.48) 32.23%, #000 93.87%);
+  background:
+    linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.00) 0%,
+      rgba(0, 0, 0, 0.48) 32.23%,
+      #000 93.87%);
   transition: all .3s ease-in-out;
 }
 .Background_bg::after {
@@ -551,7 +561,12 @@ body[data-display=app] {
   position: absolute;
   inset: 0;
   height: 100%;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.90) 34.34%, #000 100%);
+  background:
+    linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.48) 0%,
+      rgba(0, 0, 0, 0.90) 34.34%,
+      #000 100%);
   opacity: 0;
   visibility: hidden;
   transition: all .3s ease-in-out;

@@ -20,11 +20,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -69,6 +72,8 @@ class BrowserViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -288,6 +293,14 @@ class BrowserViewModel @Inject constructor(
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
             tabRepository.select(tabId)
+        }
+    }
+
+    fun handleShowOnAppLaunchOption() {
+        if (showOnAppLaunchFeature.self().isEnabled()) {
+            viewModelScope.launch {
+                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+            }
         }
     }
 }

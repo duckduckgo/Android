@@ -8,6 +8,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -18,7 +19,8 @@ class RealAuthRepositoryTest {
     val coroutineRule = CoroutineTestRule()
 
     private val authStore = FakeSubscriptionsDataStore()
-    private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider)
+    private val serpPromo = FakeSerpPromo()
+    private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider, serpPromo)
 
     @Test
     fun whenClearAccountThenClearData() = runTest {
@@ -35,6 +37,13 @@ class RealAuthRepositoryTest {
         assertNull(authStore.authToken)
         assertNull(authStore.externalId)
         assertNull(authStore.email)
+    }
+
+    @Test
+    fun whenSetAccessTokenThenInjectSerpPromoCookie() = runTest {
+        authRepository.setAccessToken("token")
+
+        assertEquals("token", serpPromo.cookie)
     }
 
     @Test
@@ -113,6 +122,7 @@ class RealAuthRepositoryTest {
         val repository: AuthRepository = RealAuthRepository(
             FakeSubscriptionsDataStore(supportEncryption = false),
             coroutineRule.testDispatcherProvider,
+            serpPromo,
         )
         assertFalse(repository.canSupportEncryption())
     }

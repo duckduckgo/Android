@@ -546,8 +546,8 @@
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for This Site</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Grant %1$s permission to access location?</string>
-    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
     <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Always</string>
     <string name="preciseLocationSiteDialogAllowOnce">Only for This Session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Deny Always</string>
@@ -672,10 +672,10 @@
     <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissions for \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Ask</string>
+    <string name="permissionsPerWebsiteAskSetting">Ask every time</string>
     <string name="permissionsPerWebsiteDenySetting">Deny</string>
     <string name="permissionsPerWebsiteAllowSetting">Allow</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">\"Ask\" disabled for all sites</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Disabled for all sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permission for %2$s</string>
 
     <!-- Notify Me View on Downloads -->
@@ -809,5 +809,11 @@
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Bottom</string>
+
+    <!-- Show on App Launch Option -->
+    <string name="showOnAppLaunchOptionTitle">Show on App Launch</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Last Opened Tab</string>
+    <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
+    <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
 </resources>

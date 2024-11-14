@@ -144,6 +144,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED("ms_private_search_more_search_settings_pressed"),
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
+    SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
+    SETTINGS_GENERAL_APP_LAUNCH_LAST_OPENED_TAB_SELECTED("m_settings_general_app_launch_last_opened_tab_selected"),
+    SETTINGS_GENERAL_APP_LAUNCH_NEW_TAB_PAGE_SELECTED("m_settings_general_app_launch_new_tab_page_selected"),
+    SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED("m_settings_general_app_launch_specific_page_selected"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -274,16 +278,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),
 
-    PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE("m_pc_syd_e"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_LATER("m_pc_syd_l"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_NEVER("m_pc_syd_n"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE("m_pc_s_l_e"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE("m_pc_s_l_d"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS("m_pc_sd_aa"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
-
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
@@ -374,4 +368,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     URI_LOADED("m_uri_loaded"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
+
+    FEATURES_ENABLED_AT_SEARCH_TIME("features"),
 }

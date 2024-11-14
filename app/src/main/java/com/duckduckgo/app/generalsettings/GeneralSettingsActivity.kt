@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings
 
 import android.os.Bundle
+import android.view.View.OnClickListener
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -24,7 +25,16 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -55,6 +65,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         viewModel.onVoiceSearchChanged(isChecked)
     }
 
+    private val showOnAppLaunchClickListener = OnClickListener {
+        viewModel.onShowOnAppLaunchButtonClick()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,6 +83,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         binding.autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
+        binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
     }
 
     private fun observeViewModel() {
@@ -94,7 +109,32 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                     }
+
+                    binding.showOnAppLaunchButton.isVisible = it.isShowOnAppLaunchOptionVisible
+                    setShowOnAppLaunchOptionSecondaryText(viewState.showOnAppLaunchSelectedOption)
                 }
             }.launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun setShowOnAppLaunchOptionSecondaryText(showOnAppLaunchOption: ShowOnAppLaunchOption) {
+        val optionString = when (showOnAppLaunchOption) {
+            is LastOpenedTab -> getString(R.string.showOnAppLaunchOptionLastOpenedTab)
+            is NewTabPage -> getString(R.string.showOnAppLaunchOptionNewTabPage)
+            is SpecificPage -> showOnAppLaunchOption.url
+        }
+        binding.showOnAppLaunchButton.setSecondaryText(optionString)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            LaunchShowOnAppLaunchScreen -> {
+                globalActivityStarter.start(this, ShowOnAppLaunchScreenNoParams, fadeTransitionConfig())
+            }
+        }
     }
 }
