@@ -4,24 +4,27 @@ on:
   workflow_dispatch:
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
+  MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
 
 jobs:
   report-release-error:
-    name: Create Asana Task
-    runs-on: ubuntu-20.04
+    name: Notify Mattermost
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./github/scripts
 
     steps:
-      - name: Create Asana task when workflow failed
-        uses: honeycombio/gha-create-asana-task@main
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Production Release
-          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
+
+      - name: Run a script
+        run: |
+          chmod +x send_chat_message.sh
+          ./send_chat_message.sh "This is a test"
