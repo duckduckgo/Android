@@ -49,7 +49,11 @@ class AutofillImportPasswordConfigStoreImpl @Inject constructor(
 
     override suspend fun getConfig(): AutofillImportPasswordSettings {
         return withContext(dispatchers.io()) {
-            val config = autofillFeature.canImportFromGooglePasswordManager().getSettings()?.let { jsonAdapter.fromJson(it) }
+            val config = autofillFeature.canImportFromGooglePasswordManager().getSettings()?.let {
+                runCatching {
+                    jsonAdapter.fromJson(it)
+                }.getOrNull()
+            }
             val launchUrl = config?.launchUrl ?: LAUNCH_URL_DEFAULT
             val javascriptConfig = config?.javascriptConfig?.toString() ?: JAVASCRIPT_CONFIG_DEFAULT
 
