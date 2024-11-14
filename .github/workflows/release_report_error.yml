@@ -23,6 +23,7 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
+          ref: feature/david/11-14-gha_notify_mattermost
 
       - name: Run a script
         run: |
