@@ -776,7 +776,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
 
         testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
@@ -791,7 +791,7 @@ class CtaViewModelTest {
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
         whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
 
         testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
