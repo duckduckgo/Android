@@ -41,8 +41,6 @@ interface TabRepository {
 
     val liveSelectedTab: LiveData<TabEntity>
 
-    val flowSelectedTab: Flow<TabEntity>
-
     val tabSwitcherData: Flow<TabSwitcherData>
 
     /**
@@ -118,4 +116,10 @@ interface TabRepository {
     suspend fun setIsUserNew(isUserNew: Boolean)
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
+
+    suspend fun getOpenTabCount(): Int
+
+    suspend fun getActiveTabCountWithinDays(days: Int): Int
+
+    suspend fun getInactiveTabCountBetweenDays(startDay: Int, endDay: Int = -1)
 }
