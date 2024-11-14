@@ -56,6 +56,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.*
@@ -122,6 +123,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     LocationPermissionTypeConverter::class,
     QueryParamsTypeConverter::class,
     EntityTypeConverter::class,
+    LocalDateTimeTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
