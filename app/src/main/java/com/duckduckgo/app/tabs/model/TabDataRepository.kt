@@ -47,6 +47,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
@@ -190,6 +192,27 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun setTabLayoutType(layoutType: LayoutType) {
         tabSwitcherDataStore.setTabLayoutType(layoutType)
+    }
+
+    override suspend fun getOpenTabCount(): Int {
+        return tabsDao.tabs().size
+    }
+
+    override suspend fun getActiveTabCountWithinDays(days: Long): Int {
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val xDaysAgo = now.minusDays(days)
+        return tabsDao.tabs().filter {
+            it.lastAccessTime?.isAfter(xDaysAgo) == true
+        }.size
+    }
+
+    override suspend fun getInactiveTabCountBetweenDays(daysStart: Long, daysEnd: Long): Int {
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val start = now.minusDays(daysStart)
+        val end = now.minusDays(daysEnd)
+        return tabsDao.tabs().filter {
+            it.lastAccessTime?.isBefore(start) == true && it.lastAccessTime?.isAfter(end) == true
+        }.size
     }
 
     override suspend fun addNewTabAfterExistingTab(
@@ -341,8 +364,7 @@ class TabDataRepository @Inject constructor(
                 Timber.w("Cannot find tab for tab ID")
                 return@scheduleDirect
             }
-            tab.tabPreviewFile = fileName
-            tabsDao.updateTab(tab)
+            tabsDao.updateTab(tab.copy(tabPreviewFile = fileName))
 
             Timber.i("Updated tab preview image. $tabId now uses $fileName")
             deleteOldPreviewImages(tabId, fileName)

@@ -40,16 +40,16 @@ import java.time.LocalDateTime
     ],
 )
 data class TabEntity(
-    @PrimaryKey var tabId: String,
-    var url: String? = null,
-    var title: String? = null,
-    var skipHome: Boolean = false,
-    var viewed: Boolean = true,
-    var position: Int,
-    var tabPreviewFile: String? = null,
-    var sourceTabId: String? = null,
-    var deletable: Boolean = false,
-    var lastAccessTime: LocalDateTime? = null,
+    @PrimaryKey val tabId: String,
+    val url: String? = null,
+    val title: String? = null,
+    val skipHome: Boolean = false,
+    val viewed: Boolean = true,
+    val position: Int,
+    val tabPreviewFile: String? = null,
+    val sourceTabId: String? = null,
+    val deletable: Boolean = false,
+    val lastAccessTime: LocalDateTime? = null,
 )
 
 val TabEntity.isBlank: Boolean
