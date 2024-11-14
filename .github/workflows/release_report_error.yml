@@ -7,6 +7,7 @@ env:
   MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
   MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
   APP_VERSION: "5.220.0"
+  emoji_start: ":flight_departure:" # 🛫 or ':soon:' 🔜
   emoji_info: ":information_source:" # ℹ️
 
 jobs:
@@ -31,9 +32,22 @@ jobs:
         run: |
           chmod +x send_chat_message.sh          
 
-      - name: Send Release start message
+      - name: Send Release started message
+        run: |        
+          ./send_chat_message.sh '${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release task created message
+        run: |
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release tag created
+        run: |
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release task created message
         run: |
           echo -n '::notice title=Inputs::' && echo '${{ toJson(inputs) }}' | sed -z 's_\n_%0A_g'; echo
-          message="Release ${{ env.APP_VERSION }} by @${{ github.actor }} has started."
-          message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+          message="Release ${{ env.APP_VERSION }} task created"
+          message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"          
           ./send_chat_message.sh '${{env.emoji_info}}'" ${message}"
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
