@@ -7,6 +7,7 @@ env:
   MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
   MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
   APP_VERSION: "5.220.0"
+  emoji_info: ":information_source:" # ℹ️
 
 jobs:
   report-release-error:
@@ -32,6 +33,7 @@ jobs:
 
       - name: Send Release start message
         run: |
+          echo -n '::notice title=Inputs::' && echo '${{ toJson(inputs) }}' | sed -z 's_\n_%0A_g'; echo
           message="Release ${{ env.APP_VERSION }} by @${{ github.actor }} has started."
           message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
-          ./send_chat_message.sh ${message}
+          ./send_chat_message.sh '${{env.emoji_info}}'" ${message}
