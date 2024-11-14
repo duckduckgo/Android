@@ -290,7 +290,6 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -438,7 +437,6 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val toggleReports: ToggleReports,
-    private val toggleReportsDataStore: SharedPreferencesToggleReportsDataStore,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,

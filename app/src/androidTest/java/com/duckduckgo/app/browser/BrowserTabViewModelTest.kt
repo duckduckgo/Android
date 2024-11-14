@@ -227,6 +227,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -501,6 +502,7 @@ class BrowserTabViewModelTest {
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
+    private val mockToggleReports: ToggleReports = mock()
 
     @Before
     fun before() = runTest {
@@ -673,6 +675,7 @@ class BrowserTabViewModelTest {
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
+            toggleReports = mockToggleReports,
         )
 
         testee.loadData("abc", null, false, false)
