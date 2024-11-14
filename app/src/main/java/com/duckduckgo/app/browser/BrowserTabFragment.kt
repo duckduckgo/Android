@@ -1600,7 +1600,7 @@ class BrowserTabFragment :
             }
 
             is Command.ToggleReportFeedback -> {
-                launchToggleReportFeedback()
+                launchToggleReportFeedback(it.opener)
             }
 
             is Command.ShowFullScreen -> {
@@ -2040,7 +2040,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchToggleReportFeedback(opener: String = "dashboard") {
+    private fun launchToggleReportFeedback(opener: String) {
         globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
             ?.let { startActivity(it) }
     }

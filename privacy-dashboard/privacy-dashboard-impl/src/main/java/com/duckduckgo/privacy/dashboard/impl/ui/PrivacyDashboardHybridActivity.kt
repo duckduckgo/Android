@@ -53,6 +53,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.Initial
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivacyDashboardHybridScreenParams::class)
@@ -110,6 +111,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
                     val opener = params?.opener ?: "dashboard"
+                    Timber.v("Katetest-> opener passed to onSubmitToggleReport: $opener")
                     viewModel.onSubmitToggleReport(opener)
                 },
                 onRejectToggleReport = {
@@ -138,6 +140,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
 
         val toggleOpener = params?.opener ?: ""
+        Timber.v("Katetest-> opener in dashboard onCreate: $toggleOpener")
 
         dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
         configureObservers()

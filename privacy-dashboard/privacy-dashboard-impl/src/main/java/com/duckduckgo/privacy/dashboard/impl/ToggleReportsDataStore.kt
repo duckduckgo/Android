@@ -220,10 +220,14 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         fun checkRecentSends() = reportsSent.value.count { sendTime ->
             currentTimeMillis - sendTime.toLong() <= reportPromptInterval.value * 1000L
         } < maxPromptCount.value
-        Timber.v("KateTest--> checkRecentSends: ${checkRecentSends()}")
+        Timber.v("KateTest--> checkRecentSends: ${checkRecentSends()} WITH " +
+            "reportPromptInterval: ${reportPromptInterval.value} AND" +
+            " reportsSentCount: ${reportsSent.value.count()}")
         fun checkDismissInterval() = currentTimeMillis - (reportPromptsDismissed.value.maxOrNull()?.toLong() ?: 0) >
             reportDismissInterval.value * 1000L
-        Timber.v("KateTest--> checkDismissInterval: ${checkDismissInterval()}")
+        Timber.v("KateTest--> checkDismissInterval: ${checkDismissInterval()} WITH " +
+            "reportDismissInterval: ${reportDismissInterval.value} AND reportPromptsDismissed:" +
+            " ${reportPromptsDismissed.value.maxOrNull()}")
         return when {
             promptLimitLogicEnabled.value && dismissLogicEnabled.value ->
                 checkRecentSends() && checkDismissInterval()
