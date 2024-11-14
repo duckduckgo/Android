@@ -81,12 +81,6 @@ jobs:
         run: |
           bundle exec fastlane deploy_github
 
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
-          path: duckduckgo.apk
-
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         uses: duckduckgo/native-github-asana-sync@v1.1
