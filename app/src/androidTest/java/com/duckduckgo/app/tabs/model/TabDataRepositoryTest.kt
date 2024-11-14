@@ -46,6 +46,8 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class TabDataRepositoryTest {
 
@@ -418,6 +420,153 @@ class TabDataRepositoryTest {
         }
 
         job.cancel()
+    }
+
+    @Test
+    fun getOpenTabCountReturnsCorrectCount() = runTest {
+        // Arrange: Add some tabs to the repository
+        whenever(mockDao.tabs()).thenReturn(listOf(
+            TabEntity(tabId = "tab1"),
+            TabEntity(tabId = "tab2"),
+            TabEntity(tabId = "tab3")
+        ))
+        val testee = tabDataRepository()
+
+        // Act: Call getOpenTabCount()
+        val openTabCount = testee.getOpenTabCount()
+
+        // Assert: Verify the count is correct
+        assertEquals(3, openTabCount)
+    }
+
+    @Test
+    fun getActiveTabCountReturnsZeroWhenNoTabs() = runTest {
+        // Arrange: No tabs in the repository
+        whenever(mockDao.tabs()).thenReturn(emptyList())
+        val testee = tabDataRepository()
+
+        // Act: Call getActiveTabCount()
+        val inactiveTabCount = testee.getActiveTabCount(7)
+
+        // Assert: Verify the count is zero
+        assertEquals(0, inactiveTabCount)
+    }
+
+    @Test
+    fun getActiveTabCountReturnsZeroWhenNullTabs() = runTest {
+        // Arrange: Only null tabs in the repository
+        val tab1 = TabEntity(tabId = "tab1")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1))
+        val testee = tabDataRepository()
+
+        // Act: Call getActiveTabCount()
+        val inactiveTabCount = testee.getActiveTabCount(7)
+
+        // Assert: Verify the count is zero
+        assertEquals(0, inactiveTabCount)
+    }
+
+    @Test
+    fun getActiveTabCountReturnsCorrectCountWhenTabsYoungerThanSpecifiedDay() = runTest {
+        // Arrange: No tabs in the repository
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(6))
+        val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(8))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(10))
+        val tab4 = TabEntity(tabId = "tab4")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
+        val testee = tabDataRepository()
+
+        // Act: Call getActiveTabCount()
+        val inactiveTabCount = testee.getActiveTabCount(9)
+
+        // Assert: Verify the count is 2
+        assertEquals(2, inactiveTabCount)
+    }
+
+    @Test
+    fun getInactiveTabCountReturnsZeroWhenNoTabs() = runTest {
+        // Arrange: No tabs in the repository
+        whenever(mockDao.tabs()).thenReturn(emptyList())
+        val testee = tabDataRepository()
+
+        // Act: Call getInactiveTabCount()
+        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+
+        // Assert: Verify the count is zero
+        assertEquals(0, inactiveTabCount)
+    }
+
+    @Test
+    fun getInactiveTabCountReturnsCorrectCountWhenAllTabsOlderThanSpecifiedDay() = runTest {
+        // Arrange: Add some tabs with different last access times
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(8))
+        val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9))
+        val tab4 = TabEntity(tabId = "tab4")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
+        val testee = tabDataRepository()
+
+        // Act: Call getInactiveTabCount()
+        val inactiveTabCount = testee.getInactiveTabCount(9)
+
+        // Assert: Verify the count is correct
+        assertEquals(2, inactiveTabCount)
+    }
+
+    @Test
+    fun getInactiveTabCountReturnsCorrectCountWhenAllTabsInactiveWithinRange() = runTest {
+        // Arrange: Add some tabs with different last access times
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(8))
+        val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9))
+        val tab4 = TabEntity(tabId = "tab4")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
+        val testee = tabDataRepository()
+
+        // Act: Call getInactiveTabCount()
+        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+
+        // Assert: Verify the count is correct
+        assertEquals(3, inactiveTabCount)
+    }
+
+    @Test
+    fun getInactiveTabCountReturnsZeroWhenNoTabsInactiveWithinRange() = runTest {
+        // Arrange: Add some tabs with different last access times
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(5))
+        val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(6))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(13))
+        val tab4 = TabEntity(tabId = "tab4")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3))
+        val testee = tabDataRepository()
+
+        // Act: Call getInactiveTabCount()
+        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+
+        // Assert: Verify the count is zero
+        assertEquals(0, inactiveTabCount)
+    }
+
+    @Test
+    fun getInactiveTabCountReturnsCorrectCountWhenSomeTabsInactiveWithinRange() = runTest {
+        // Arrange: Add some tabs with different last access times
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(5))
+        val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(15))
+        val tab4 = TabEntity(tabId = "tab4")
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3))
+        val testee = tabDataRepository()
+
+        // Act: Call getInactiveTabCount()
+        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+
+        // Assert: Verify the count is correct
+        assertEquals(1, inactiveTabCount)
     }
 
     private fun tabDataRepository(

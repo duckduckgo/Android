@@ -45,7 +45,7 @@ data class TabEntity(
     val title: String? = null,
     val skipHome: Boolean = false,
     val viewed: Boolean = true,
-    val position: Int,
+    val position: Int = 0,
     val tabPreviewFile: String? = null,
     val sourceTabId: String? = null,
     val deletable: Boolean = false,
