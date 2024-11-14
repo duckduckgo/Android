@@ -27,10 +27,10 @@ if [ -z "${MM_TEAM_ID:-}" ]; then
 fi
 
 message="${1:-test}"
-channel_name="${2:-david-test-channel}"
-username="${3:-dax}"
-priority="${4:-empty}" # empty, important, or urgent
-request_ack="${5:-false}"
+channel_name="david-test-channel"
+username="dax"
+priority="empty" # empty, important, or urgent
+request_ack="false"
 # Same icon as https://dub.duckduckgo.com/orgs/duckduckgo/teams/ci/edit. Uploaded with `s3cmd put --acl-public dax-ci-avatar.png 's3://ddg-chef/dax-ci-avatar.png`
 icon_url='https://ddg-chef.s3.amazonaws.com/dax-ci-avatar.png'
 
