@@ -27,7 +27,7 @@ if [ -z "${MM_TEAM_ID:-}" ]; then
 fi
 
 message="$1"
-channel_name="${2:-jenkins}"
+channel_name="${2:-thermostat}"
 username="${3:-dax}"
 priority="${4:-empty}" # empty, important, or urgent
 request_ack="${5:-false}"
