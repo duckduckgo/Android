@@ -62,7 +62,38 @@ jobs:
           fileName: api.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Assemble the bundle
+        run: ./gradlew bundleRelease -PuseUploadSigning
+
+      - name: Capture App Bundle Path
+        id: capture_output
+        run: |
+          output=$(find app/build/outputs/bundle/playRelease -name "*.aab")
+          echo "bundle_path=$output" >> $GITHUB_OUTPUT
+
+      - name: Upload bundle to Play Store
+        id: update_bundle_play
+        run: |
+          bundle exec fastlane deploy_playstore
+
       - name: Upload Universal APK to Github
         id: update_bundle_github
         run: |
           bundle exec fastlane deploy_github
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
+          path: duckduckgo.apk
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Production Release
+          asana-task-description: The Production Release to Play Store and Github workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
