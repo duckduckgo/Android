@@ -28,4 +28,4 @@ jobs:
       - name: Run a script
         run: |
           chmod +x send_chat_message.sh
-          ./send_chat_message.sh "This is a test"
+          ./send_chat_message.sh "@acaptina please finish the graphs"
