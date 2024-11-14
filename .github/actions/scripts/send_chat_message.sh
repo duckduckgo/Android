@@ -26,7 +26,7 @@ if [ -z "${MM_TEAM_ID:-}" ]; then
   exit 1
 fi
 
-message="$1"
+message="${1:-test}"
 channel_name="${2:-thermostat}"
 username="${3:-dax}"
 priority="${4:-empty}" # empty, important, or urgent
