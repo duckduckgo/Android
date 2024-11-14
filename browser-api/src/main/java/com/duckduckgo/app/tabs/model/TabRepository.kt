@@ -41,6 +41,8 @@ interface TabRepository {
 
     val liveSelectedTab: LiveData<TabEntity>
 
+    val flowSelectedTab: Flow<TabEntity>
+
     val tabSwitcherData: Flow<TabSwitcherData>
 
     /**
@@ -70,6 +72,8 @@ interface TabRepository {
     )
 
     suspend fun updateTabPosition(from: Int, to: Int)
+
+    suspend fun updateTabLastAccess(tabId: String)
 
     /**
      * @return record if it exists, otherwise a new one

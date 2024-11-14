@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter.Companion.timestamp
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
@@ -164,6 +165,13 @@ abstract class TabsDao {
     fun lastTab(): TabEntity? {
         return tabs().lastOrNull()
     }
+
+
+    @Query("update tabs set lastAccessTime=:lastAccessTime where tabId=:tabId")
+    abstract fun updateTabLastAccess(
+        tabId: String,
+        lastAccessTime: String? = timestamp(),
+    )
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
     abstract fun updateUrlAndTitle(

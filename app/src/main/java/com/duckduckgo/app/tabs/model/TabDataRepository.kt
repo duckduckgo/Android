@@ -228,6 +228,12 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateTabLastAccess(tabId: String) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.updateTabLastAccess(tabId)
+        }
+    }
+
     override fun retrieveSiteData(tabId: String): MutableLiveData<Site> {
         val storedData = siteData[tabId]
         if (storedData != null) {
