@@ -2479,9 +2479,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun performToggleReportCheck() {
-        val shouldPrompt = toggleReports.shouldPrompt()
-
-        takeIf { shouldPrompt }?.let {
+        if (toggleReports.shouldPrompt()) {
             withContext(dispatchers.main()) {
                 command.value = ToggleReportFeedback(opener = "menu")
             }
