@@ -48,6 +48,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.AppPrivacyDashboardPayloadAdapter.ToggleReportOptions
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchAppFeedback
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
@@ -111,6 +112,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
         class FetchToggleData(val toggleData: String) : Command()
+        data object LaunchAppFeedback : Command()
         data object GoBack : Command()
     }
 
@@ -280,6 +282,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
                 command.send(LaunchReportBrokenSite(siteData))
             }
+        }
+    }
+
+    fun launchAppFeedbackFlow() {
+        viewModelScope.launch(dispatcher.io()) {
+            command.send(LaunchAppFeedback)
         }
     }
 

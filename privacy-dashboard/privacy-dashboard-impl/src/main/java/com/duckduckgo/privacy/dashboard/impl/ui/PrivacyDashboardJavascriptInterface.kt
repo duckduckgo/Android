@@ -29,6 +29,7 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onSendToggleReport: () -> Unit,
     val onRejectToggleReport: () -> Unit,
     val onSeeWhatIsSent: () -> Unit,
+    val onShowNativeFeedback: () -> Unit,
 ) {
     @JavascriptInterface
     fun toggleAllowlist(payload: String) {
@@ -78,6 +79,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun seeWhatIsSent() {
         onSeeWhatIsSent()
+    }
+
+    @JavascriptInterface
+    fun showNativeFeedback() {
+        onShowNativeFeedback()
     }
 
     companion object {

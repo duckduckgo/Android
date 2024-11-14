@@ -42,6 +42,7 @@ sealed class RendererViewHolder {
         val onSendToggleReport: () -> Unit,
         val onRejectToggleReport: () -> Unit,
         val onSeeWhatIsSent: () -> Unit,
+        val onShowNativeFeedback: () -> Unit,
     ) : RendererViewHolder()
 }
 
@@ -66,6 +67,7 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.onSendToggleReport,
                 renderer.onRejectToggleReport,
                 renderer.onSeeWhatIsSent,
+                renderer.onShowNativeFeedback,
             )
         }
     }

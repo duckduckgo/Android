@@ -41,6 +41,7 @@ class PrivacyDashboardRenderer(
     private val onSendToggleReport: () -> Unit,
     private val onRejectToggleReport: () -> Unit,
     private val onSeeWhatIsSent: () -> Unit,
+    private val onShowNativeFeedback: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
@@ -64,6 +65,7 @@ class PrivacyDashboardRenderer(
                 onSendToggleReport = onSendToggleReport,
                 onRejectToggleReport = onRejectToggleReport,
                 onSeeWhatIsSent = onSeeWhatIsSent,
+                onShowNativeFeedback = onShowNativeFeedback,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
