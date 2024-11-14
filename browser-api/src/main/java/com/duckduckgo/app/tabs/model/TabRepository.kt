@@ -119,7 +119,7 @@ interface TabRepository {
 
     suspend fun getOpenTabCount(): Int
 
-    suspend fun getActiveTabCountWithinDays(days: Long): Int
+    suspend fun getActiveTabCount(maxDaysSinceOpened: Long): Int
 
-    suspend fun getInactiveTabCountBetweenDays(startDaysBack: Long, endDaysBack: Long = Long.MAX_VALUE): Int
+    suspend fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long? = null): Int
 }

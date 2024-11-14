@@ -198,20 +198,20 @@ class TabDataRepository @Inject constructor(
         return tabsDao.tabs().size
     }
 
-    override suspend fun getActiveTabCountWithinDays(days: Long): Int {
+    override suspend fun getActiveTabCount(maxDaysSinceOpened: Long): Int {
         val now = LocalDateTime.now(ZoneOffset.UTC)
-        val xDaysAgo = now.minusDays(days)
+        val maxDaysAgo = now.minusDays(maxDaysSinceOpened)
         return tabsDao.tabs().filter {
-            it.lastAccessTime?.isAfter(xDaysAgo) == true
+            it.lastAccessTime?.isAfter(maxDaysAgo) == true
         }.size
     }
 
-    override suspend fun getInactiveTabCountBetweenDays(daysStart: Long, daysEnd: Long): Int {
+    override suspend fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long?): Int {
         val now = LocalDateTime.now(ZoneOffset.UTC)
-        val start = now.minusDays(daysStart)
-        val end = now.minusDays(daysEnd)
+        val start = now.minusDays(atLeastDaysOld)
+        val end = atMostDaysOld?.let { now.minusDays(it) }
         return tabsDao.tabs().filter {
-            it.lastAccessTime?.isBefore(start) == true && it.lastAccessTime?.isAfter(end) == true
+            it.lastAccessTime?.isBefore(start) == true && (end == null || it.lastAccessTime?.isAfter(end) == true)
         }.size
     }
 
