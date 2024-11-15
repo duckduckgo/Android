@@ -862,7 +862,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         override fun countTabsAccessedWithinRange(
             accessOlderThan: Long,
-            accessNotMoreThan: Long?
+            accessNotMoreThan: Long?,
         ): Int {
             TODO("Not yet implemented")
         }
