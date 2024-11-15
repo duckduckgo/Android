@@ -23,6 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +44,12 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Error
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Success
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.UserCancelled
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -160,6 +167,25 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        logcat { "onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
+
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.let {
+                when (IntentCompat.getParcelableExtra(it, RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)) {
+                    is Success -> {
+                        observePasswordInputUpdates()
+                    }
+                    Error -> {
+                        "Failed to import passwords due to an error".showSnackbar()
+                    }
+                    is UserCancelled, null -> {
+                    }
+                }
+            }
+        }
+    }
+
     private fun observePasswordInputUpdates() {
         passwordImportWatcher += lifecycleScope.launch {
             credentialImporter.getImportStatus().collect {
@@ -265,6 +291,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 val googlePasswordsUrl = autofillImportPasswordConfigStore.getConfig().launchUrlGooglePasswords
                 startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, googlePasswordsUrl))
             }
+        }
+        binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
+            val intent = globalActivityStarter.startIntent(this, AutofillImportViaGooglePasswordManagerScreen)
+            importGooglePasswordsFlowLauncher.launch(intent)
         }
 
         binding.importPasswordsImportCsv.setClickListener {

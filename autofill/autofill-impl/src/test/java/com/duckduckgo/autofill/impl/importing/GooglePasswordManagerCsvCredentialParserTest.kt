@@ -1,6 +1,5 @@
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Success
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
@@ -74,9 +73,9 @@ class GooglePasswordManagerCsvCredentialParserTest {
         val csv = "gpm_import_password_has_a_comma".readFile()
         with(testee.parseCsv(csv) as Success) {
             assertEquals(1, credentials.size)
-            val expected = LoginCredentials(
-                domain = "https://example.com",
-                domainTitle = "example.com",
+            val expected = GoogleCsvLoginCredential(
+                url = "https://example.com",
+                title = "example.com",
                 username = "user",
                 password = "password, a comma it has",
                 notes = "notes",
@@ -127,7 +126,7 @@ class GooglePasswordManagerCsvCredentialParserTest {
         val csv = "gpm_import_missing_title".readFile()
         with(testee.parseCsv(csv) as Success) {
             assertEquals(1, credentials.size)
-            credentials.first().verifyMatches(creds1.copy(domainTitle = null))
+            credentials.first().verifyMatches(creds1.copy(title = null))
         }
     }
 
@@ -136,32 +135,32 @@ class GooglePasswordManagerCsvCredentialParserTest {
         val csv = "gpm_import_missing_domain".readFile()
         with(testee.parseCsv(csv) as Success) {
             assertEquals(1, credentials.size)
-            credentials.first().verifyMatches(creds1.copy(domain = null))
+            credentials.first().verifyMatches(creds1.copy(url = null))
         }
     }
 
-    private fun LoginCredentials.verifyMatchesCreds1() = verifyMatches(creds1)
-    private fun LoginCredentials.verifyMatchesCreds2() = verifyMatches(creds2)
+    private fun GoogleCsvLoginCredential.verifyMatchesCreds1() = verifyMatches(creds1)
+    private fun GoogleCsvLoginCredential.verifyMatchesCreds2() = verifyMatches(creds2)
 
-    private fun LoginCredentials.verifyMatches(expected: LoginCredentials) {
-        assertEquals(expected.domainTitle, domainTitle)
-        assertEquals(expected.domain, domain)
+    private fun GoogleCsvLoginCredential.verifyMatches(expected: GoogleCsvLoginCredential) {
+        assertEquals(expected.title, title)
+        assertEquals(expected.url, url)
         assertEquals(expected.username, username)
         assertEquals(expected.password, password)
         assertEquals(expected.notes, notes)
     }
 
-    private val creds1 = LoginCredentials(
-        domain = "https://example.com",
-        domainTitle = "example.com",
+    private val creds1 = GoogleCsvLoginCredential(
+        url = "https://example.com",
+        title = "example.com",
         username = "user",
         password = "password",
         notes = "note",
     )
 
-    private val creds2 = LoginCredentials(
-        domain = "https://example.net",
-        domainTitle = "example.net",
+    private val creds2 = GoogleCsvLoginCredential(
+        url = "https://example.net",
+        title = "example.net",
         username = "user2",
         password = "password2",
         notes = "note2",

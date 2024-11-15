@@ -1,6 +1,5 @@
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -31,13 +30,13 @@ class DefaultImportedCredentialValidatorTest {
 
     @Test
     fun whenDomainMissingThenIsValid() {
-        val missingDomain = fullyPopulatedCredentials().copy(domain = null)
+        val missingDomain = fullyPopulatedCredentials().copy(url = null)
         assertTrue(testee.isValid(missingDomain))
     }
 
     @Test
     fun whenTitleIsMissingThenIsValid() {
-        val missingTitle = fullyPopulatedCredentials().copy(domainTitle = null)
+        val missingTitle = fullyPopulatedCredentials().copy(title = null)
         assertTrue(testee.isValid(missingTitle))
     }
 
@@ -58,12 +57,12 @@ class DefaultImportedCredentialValidatorTest {
 
     @Test
     fun whenDomainOnlyFieldPopulatedThenIsValid() {
-        assertTrue(testee.isValid(emptyCredentials().copy(domain = "example.com")))
+        assertTrue(testee.isValid(emptyCredentials().copy(url = "example.com")))
     }
 
     @Test
     fun whenTitleIsOnlyFieldPopulatedThenIsValid() {
-        assertTrue(testee.isValid(emptyCredentials().copy(domainTitle = "title")))
+        assertTrue(testee.isValid(emptyCredentials().copy(title = "title")))
     }
 
     @Test
@@ -73,26 +72,26 @@ class DefaultImportedCredentialValidatorTest {
 
     @Test
     fun whenDomainIsAppPasswordThenIsNotValid() {
-        val appPassword = fullyPopulatedCredentials().copy(domain = "android://Jz-U_hg==@com.netflix.mediaclient/")
+        val appPassword = fullyPopulatedCredentials().copy(url = "android://Jz-U_hg==@com.netflix.mediaclient/")
         assertFalse(testee.isValid(appPassword))
     }
 
-    private fun fullyPopulatedCredentials(): LoginCredentials {
-        return LoginCredentials(
+    private fun fullyPopulatedCredentials(): GoogleCsvLoginCredential {
+        return GoogleCsvLoginCredential(
             username = "username",
             password = "password",
-            domain = "example.com",
-            domainTitle = "example title",
+            url = "example.com",
+            title = "example title",
             notes = "notes",
         )
     }
 
-    private fun emptyCredentials(): LoginCredentials {
-        return LoginCredentials(
+    private fun emptyCredentials(): GoogleCsvLoginCredential {
+        return GoogleCsvLoginCredential(
             username = null,
             password = null,
-            domain = null,
-            domainTitle = null,
+            url = null,
+            title = null,
             notes = null,
         )
     }

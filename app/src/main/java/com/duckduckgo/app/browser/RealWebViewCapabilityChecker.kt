@@ -24,12 +24,12 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class RealWebViewCapabilityChecker @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val webViewVersionProvider: WebViewVersionProvider,
