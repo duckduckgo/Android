@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import javax.swing.text.TableView.TableRow
 
 /** Primary interface for sending anonymous analytics events (pixels). */
 interface Pixel {

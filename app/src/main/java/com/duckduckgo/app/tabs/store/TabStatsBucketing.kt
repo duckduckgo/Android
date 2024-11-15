@@ -51,7 +51,7 @@ interface TabStatsBucketing {
             126..150,
             151..250,
             251..500,
-            501..Int.MAX_VALUE
+            501..Int.MAX_VALUE,
         )
 
         val ACTIVITY_BUCKETS = listOf(
@@ -59,14 +59,14 @@ interface TabStatsBucketing {
             1..5,
             6..10,
             11..20,
-            21..Int.MAX_VALUE
+            21..Int.MAX_VALUE,
         )
     }
 }
 
 @ContributesBinding(AppScope::class)
 class DefaultTabStatsBucketing @Inject constructor(
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
 ) : TabStatsBucketing {
     override suspend fun getTabCountBucket(): String {
         val count = tabRepository.getOpenTabCount()

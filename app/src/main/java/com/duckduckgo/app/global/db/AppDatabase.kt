@@ -762,7 +762,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_52_TO_53,
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
-            MIGRATION_55_TO_56
+            MIGRATION_55_TO_56,
         )
 
     @Deprecated(

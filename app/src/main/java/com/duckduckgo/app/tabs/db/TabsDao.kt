@@ -20,13 +20,12 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter.Companion.timestamp
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SingleInstanceIn(AppScope::class)
@@ -167,7 +166,6 @@ abstract class TabsDao {
     fun lastTab(): TabEntity? {
         return tabs().lastOrNull()
     }
-
 
     @Query("update tabs set lastAccessTime=:lastAccessTime where tabId=:tabId")
     abstract fun updateTabLastAccess(
