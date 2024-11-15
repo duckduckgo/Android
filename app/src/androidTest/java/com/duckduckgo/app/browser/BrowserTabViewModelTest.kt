@@ -132,7 +132,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
-import com.duckduckgo.app.fakes.FakeFeatureTogglesInventory
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -218,10 +217,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -474,7 +471,10 @@ class BrowserTabViewModelTest {
 
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
-    private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+    private val mockDisabledToggle: Toggle = mock {
+        on { it.isEnabled() } doReturn false
+        on { it.isEnabled(any()) } doReturn false
+    }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
@@ -503,9 +503,9 @@ class BrowserTabViewModelTest {
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
-    private lateinit var extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
-    private lateinit var extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin
-    private lateinit var inventory: FeatureTogglesInventory
+    private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
+        .create(ExtendedOnboardingFeatureToggles::class.java)
+    private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
 
     @Before
     fun before() = runTest {
@@ -533,24 +533,7 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
-        extendedOnboardingFeatureToggles = FeatureToggles.Builder(
-            FakeToggleStore(),
-            featureName = "extendedOnboarding",
-        ).build().create(ExtendedOnboardingFeatureToggles::class.java)
-
-        inventory = RealFeatureTogglesInventory(
-            setOf(
-                FakeFeatureTogglesInventory(
-                    features = listOf(
-                        extendedOnboardingFeatureToggles.highlights(),
-                        extendedOnboardingFeatureToggles.highlights(),
-                    ),
-                ),
-            ),
-            coroutineRule.testDispatcherProvider,
-        )
-        extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(inventory)
-
+        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockDisabledToggle)
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
@@ -2609,7 +2592,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchPrivacyPro() {
-        val cta = DaxBubbleCta.DaxPrivacyProCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxPrivacyProCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            R.string.onboardingPrivacyProDaxDialogTitle,
+            R.string.onboardingPrivacyProDaxDialogDescription,
+        )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchPrivacyPro>()
@@ -6089,6 +6077,7 @@ class BrowserTabViewModelTest {
         override suspend fun onToggleOff(origin: PrivacyToggleOrigin) {
             toggleOff++
         }
+
         override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
             toggleOn++
         }

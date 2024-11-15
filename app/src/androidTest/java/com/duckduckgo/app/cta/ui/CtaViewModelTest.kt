@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.fakes.FakeFeatureTogglesInventory
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -62,9 +61,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
@@ -133,9 +130,9 @@ class CtaViewModelTest {
         CtaId.DAX_END,
     )
 
-    private lateinit var extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
-    private lateinit var extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin
-    private lateinit var inventory: FeatureTogglesInventory
+    private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
+        .create(ExtendedOnboardingFeatureToggles::class.java)
+    private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
 
     private lateinit var testee: CtaViewModel
 
@@ -145,31 +142,13 @@ class CtaViewModelTest {
 
     @Before
     fun before() = runTest {
-        extendedOnboardingFeatureToggles = FeatureToggles.Builder(
-            FakeToggleStore(),
-            featureName = "extendedOnboarding",
-        ).build().create(ExtendedOnboardingFeatureToggles::class.java)
-
-        inventory = RealFeatureTogglesInventory(
-            setOf(
-                FakeFeatureTogglesInventory(
-                    features = listOf(
-                        extendedOnboardingFeatureToggles.highlights(),
-                        extendedOnboardingFeatureToggles.highlights(),
-                    ),
-                ),
-            ),
-            coroutineRule.testDispatcherProvider,
-        )
-        extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(inventory)
-
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
@@ -774,7 +753,7 @@ class CtaViewModelTest {
     fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabThenReturnPrivacyProCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockEnabledToggle)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
