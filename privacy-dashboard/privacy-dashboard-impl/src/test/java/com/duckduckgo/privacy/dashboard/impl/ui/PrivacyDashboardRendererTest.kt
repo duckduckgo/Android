@@ -72,6 +72,7 @@ class PrivacyDashboardRendererTest {
         {},
         {},
         {},
+        {},
     )
 
     @Test

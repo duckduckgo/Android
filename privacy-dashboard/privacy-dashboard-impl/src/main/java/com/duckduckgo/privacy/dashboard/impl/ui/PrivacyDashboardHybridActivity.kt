@@ -170,7 +170,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             }
             is LaunchAppFeedback -> {
                 Timber.v("Katetest-> About to launch feedback activity")
-                globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let {startActivity(it)}
+                globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
             }
             is FetchToggleData -> fetchToggleData(it.toggleData)
             is LaunchToggleReport -> {
