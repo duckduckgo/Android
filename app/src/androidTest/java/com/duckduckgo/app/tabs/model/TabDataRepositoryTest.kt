@@ -432,7 +432,6 @@ class TabDataRepositoryTest {
         ))
         val testee = tabDataRepository()
 
-        // Act: Call getOpenTabCount()
         val openTabCount = testee.getOpenTabCount()
 
         // Assert: Verify the count is correct
@@ -445,8 +444,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(emptyList())
         val testee = tabDataRepository()
 
-        // Act: Call getActiveTabCount()
-        val inactiveTabCount = testee.getActiveTabCount(7)
+        val inactiveTabCount = testee.countTabsWithinDayRange(0,7)
 
         // Assert: Verify the count is zero
         assertEquals(0, inactiveTabCount)
@@ -459,8 +457,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1))
         val testee = tabDataRepository()
 
-        // Act: Call getActiveTabCount()
-        val inactiveTabCount = testee.getActiveTabCount(7)
+        val inactiveTabCount = testee.countTabsWithinDayRange(0,7)
 
         // Assert: Verify the count is zero
         assertEquals(0, inactiveTabCount)
@@ -477,8 +474,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
-        // Act: Call getActiveTabCount()
-        val inactiveTabCount = testee.getActiveTabCount(9)
+        val inactiveTabCount = testee.countTabsWithinDayRange(0,9)
 
         // Assert: Verify the count is 2
         assertEquals(2, inactiveTabCount)
@@ -490,8 +486,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(emptyList())
         val testee = tabDataRepository()
 
-        // Act: Call getInactiveTabCount()
-        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+        val inactiveTabCount = testee.countTabsWithinDayRange(7, 12)
 
         // Assert: Verify the count is zero
         assertEquals(0, inactiveTabCount)
@@ -508,8 +503,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
-        // Act: Call getInactiveTabCount()
-        val inactiveTabCount = testee.getInactiveTabCount(9)
+        val inactiveTabCount = testee.countTabsWithinDayRange(9)
 
         // Assert: Verify the count is correct
         assertEquals(2, inactiveTabCount)
@@ -526,8 +520,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
-        // Act: Call getInactiveTabCount()
-        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+        val inactiveTabCount = testee.countTabsWithinDayRange(7, 12)
 
         // Assert: Verify the count is correct
         assertEquals(3, inactiveTabCount)
@@ -544,8 +537,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
-        // Act: Call getInactiveTabCount()
-        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+        val inactiveTabCount = testee.countTabsWithinDayRange(7, 12)
 
         // Assert: Verify the count is zero
         assertEquals(0, inactiveTabCount)
@@ -562,8 +554,7 @@ class TabDataRepositoryTest {
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
-        // Act: Call getInactiveTabCount()
-        val inactiveTabCount = testee.getInactiveTabCount(7, 12)
+        val inactiveTabCount = testee.countTabsWithinDayRange(7, 12)
 
         // Assert: Verify the count is correct
         assertEquals(1, inactiveTabCount)

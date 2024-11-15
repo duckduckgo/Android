@@ -17,13 +17,11 @@
 package com.duckduckgo.app.tabs.store
 
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ACTIVE_TABS_DAYS_LIMIT
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.BUCKETS
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.EXACTLY_1_BUCKET
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.MORE_THAN_20_BUCKET
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ONE_WEEK_INACTIVE_LIMIT
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.THREE_WEEKS_INACTIVE_LIMIT
-import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.TWO_WEEKS_INACTIVE_LIMIT
+import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ACTIVITY_BUCKETS
+import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ONE_WEEK_IN_DAYS
+import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.TAB_COUNT_BUCKETS
+import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.THREE_WEEKS_IN_DAYS
+import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.TWO_WEEKS_IN_DAYS
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -36,15 +34,11 @@ interface TabStatsBucketing {
     suspend fun get3WeeksInactiveTabBucket(): String
 
     companion object {
-        const val ACTIVE_TABS_DAYS_LIMIT = 7L
-        val ONE_WEEK_INACTIVE_LIMIT = 8L..14
-        val TWO_WEEKS_INACTIVE_LIMIT = 15L..21
-        const val THREE_WEEKS_INACTIVE_LIMIT = 22L
+        const val ONE_WEEK_IN_DAYS = 7L
+        const val TWO_WEEKS_IN_DAYS = 14L
+        const val THREE_WEEKS_IN_DAYS = 21L
 
-        const val EXACTLY_1_BUCKET = "1"
-        const val MORE_THAN_20_BUCKET = ">20"
-
-        val BUCKETS = listOf(
+        val TAB_COUNT_BUCKETS = listOf(
             0..1,
             2..5,
             6..10,
@@ -59,6 +53,14 @@ interface TabStatsBucketing {
             251..500,
             501..Int.MAX_VALUE
         )
+
+        val ACTIVITY_BUCKETS = listOf(
+            0..0,
+            1..5,
+            6..10,
+            11..20,
+            21..Int.MAX_VALUE
+        )
     }
 }
 
@@ -68,49 +70,39 @@ class DefaultTabStatsBucketing @Inject constructor(
 ) : TabStatsBucketing {
     override suspend fun getTabCountBucket(): String {
         val count = tabRepository.getOpenTabCount()
-        val bucket = BUCKETS.first { bucket ->
-            count in bucket
-        }
-        return when (bucket) {
-            BUCKETS.first() -> {
-                EXACTLY_1_BUCKET
-            }
-            BUCKETS.last() -> {
-                "${bucket.first}+"
-            }
-            else -> {
-                "${bucket.first}-${bucket.last}"
-            }
-        }
+        return getBucketLabel(count, TAB_COUNT_BUCKETS)
     }
 
     override suspend fun get7DaysActiveTabBucket(): String {
-        val count = tabRepository.getActiveTabCount(ACTIVE_TABS_DAYS_LIMIT)
-        return getTabActivityBucket(count)
+        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = 0, accessNotMoreThan = ONE_WEEK_IN_DAYS)
+        return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get1WeeksInactiveTabBucket(): String {
-        val count = tabRepository.getInactiveTabCount(ONE_WEEK_INACTIVE_LIMIT.first, ONE_WEEK_INACTIVE_LIMIT.last)
-        return getTabActivityBucket(count)
+        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = ONE_WEEK_IN_DAYS, accessNotMoreThan = TWO_WEEKS_IN_DAYS)
+        return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get2WeeksInactiveTabBucket(): String {
-        val count = tabRepository.getInactiveTabCount(TWO_WEEKS_INACTIVE_LIMIT.first, TWO_WEEKS_INACTIVE_LIMIT.last)
-        return getTabActivityBucket(count)
+        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = TWO_WEEKS_IN_DAYS, accessNotMoreThan = THREE_WEEKS_IN_DAYS)
+        return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get3WeeksInactiveTabBucket(): String {
-        val count = tabRepository.getInactiveTabCount(THREE_WEEKS_INACTIVE_LIMIT)
-        return getTabActivityBucket(count)
+        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = THREE_WEEKS_IN_DAYS)
+        return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
-    private fun getTabActivityBucket(count: Int): String {
-        val bucket = BUCKETS.first { bucket ->
+    private fun getBucketLabel(count: Int, buckets: List<IntRange>): String {
+        val bucket = buckets.first { bucket ->
             count in bucket
         }
-        return when {
-            bucket.last > 20 -> {
-                MORE_THAN_20_BUCKET
+        return when (bucket) {
+            buckets.first() -> {
+                bucket.last.toString()
+            }
+            buckets.last() -> {
+                "${bucket.first}+"
             }
             else -> {
                 "${bucket.first}-${bucket.last}"

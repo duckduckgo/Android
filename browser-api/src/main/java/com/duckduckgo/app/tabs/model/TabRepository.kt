@@ -119,7 +119,12 @@ interface TabRepository {
 
     fun getOpenTabCount(): Int
 
-    fun getActiveTabCount(maxDaysSinceOpened: Long): Int
-
-    fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long? = null): Int
+    /**
+     * Returns the number of tabs, given a range of days within which the tab was last accessed.
+     *
+     * @param accessOlderThan the minimum number of days (exclusive) since the tab was last accessed
+     * @param accessNotMoreThan the maximum number of days (inclusive) since the tab was last accessed (optional)
+     * @return the number of tabs that are inactive
+     */
+    fun countTabsWithinDayRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
 }
