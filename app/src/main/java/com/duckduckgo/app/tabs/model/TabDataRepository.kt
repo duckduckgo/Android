@@ -194,11 +194,11 @@ class TabDataRepository @Inject constructor(
         tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
-    override suspend fun getOpenTabCount(): Int {
+    override fun getOpenTabCount(): Int {
         return tabsDao.tabs().size
     }
 
-    override suspend fun getActiveTabCount(maxDaysSinceOpened: Long): Int {
+    override fun getActiveTabCount(maxDaysSinceOpened: Long): Int {
         val now = LocalDateTime.now(ZoneOffset.UTC)
         val maxDaysAgo = now.minusDays(maxDaysSinceOpened)
         return tabsDao.tabs().filter {
@@ -206,7 +206,7 @@ class TabDataRepository @Inject constructor(
         }.size
     }
 
-    override suspend fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long?): Int {
+    override fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long?): Int {
         val now = LocalDateTime.now(ZoneOffset.UTC)
         val start = now.minusDays(atLeastDaysOld)
         val end = atMostDaysOld?.let { now.minusDays(it) }

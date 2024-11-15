@@ -541,7 +541,7 @@ class TabDataRepositoryTest {
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(6))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(13))
         val tab4 = TabEntity(tabId = "tab4")
-        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3))
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
         // Act: Call getInactiveTabCount()
@@ -559,7 +559,7 @@ class TabDataRepositoryTest {
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(15))
         val tab4 = TabEntity(tabId = "tab4")
-        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3))
+        whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
 
         // Act: Call getInactiveTabCount()

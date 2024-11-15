@@ -117,9 +117,9 @@ interface TabRepository {
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
 
-    suspend fun getOpenTabCount(): Int
+    fun getOpenTabCount(): Int
 
-    suspend fun getActiveTabCount(maxDaysSinceOpened: Long): Int
+    fun getActiveTabCount(maxDaysSinceOpened: Long): Int
 
-    suspend fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long? = null): Int
+    fun getInactiveTabCount(atLeastDaysOld: Long, atMostDaysOld: Long? = null): Int
 }
