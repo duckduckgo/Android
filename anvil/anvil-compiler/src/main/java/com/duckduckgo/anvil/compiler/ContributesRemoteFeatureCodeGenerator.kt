@@ -118,7 +118,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
-                                .localeProvider({ appBuildConfig.deviceLocale })
                                 .callback(callback)
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
@@ -521,6 +520,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         variantKey = target.variantKey,
                                         localeCountry = target.localeCountry,
                                         localeLanguage = target.localeLanguage,
+                                        isReturningUser = target.isReturningUser,
+                                        isPrivacyProEligible = target.isPrivacyProEligible,
                                     )
                                 } ?: emptyList()
                                 val cohorts = jsonToggle?.cohorts?.map { cohort ->
@@ -727,11 +728,22 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addParameter("variantKey", String::class.asClassName())
                     .addParameter("localeCountry", String::class.asClassName())
                     .addParameter("localeLanguage", String::class.asClassName())
+                    .addParameter("isReturningUser", Boolean::class.asClassName().copy(nullable = true))
+                    .addParameter("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
                     .build(),
             )
             .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
             .addProperty(PropertySpec.builder("localeCountry", String::class.asClassName()).initializer("localeCountry").build())
             .addProperty(PropertySpec.builder("localeLanguage", String::class.asClassName()).initializer("localeLanguage").build())
+            .addProperty(
+                PropertySpec.builder("isReturningUser", Boolean::class.asClassName().copy(nullable = true)).initializer("isReturningUser").build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
+                    .initializer("isPrivacyProEligible")
+                    .build(),
+            )
             .build()
     }
 
