@@ -2833,11 +2833,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun fireDailyLaunchPixel() {
-        val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabCountBucket() }
-        val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.get7DaysActiveTabBucket() }
-        val inactive1w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.get1WeeksInactiveTabBucket() }
-        val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.get2WeeksInactiveTabBucket() }
-        val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.get3WeeksInactiveTabBucket() }
+        val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getNumberOfOpenTabs() }
+        val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveLastWeek() }
+        val inactive1w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveOneWeekAgo() }
+        val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveTwoWeeksAgo() }
+        val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo() }
 
         viewModelScope.launch {
             val params = mapOf(

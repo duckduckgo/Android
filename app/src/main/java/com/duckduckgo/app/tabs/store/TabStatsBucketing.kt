@@ -27,11 +27,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface TabStatsBucketing {
-    suspend fun getTabCountBucket(): String
-    suspend fun get7DaysActiveTabBucket(): String
-    suspend fun get1WeeksInactiveTabBucket(): String
-    suspend fun get2WeeksInactiveTabBucket(): String
-    suspend fun get3WeeksInactiveTabBucket(): String
+    suspend fun getNumberOfOpenTabs(): String
+    suspend fun getTabsActiveLastWeek(): String
+    suspend fun getTabsActiveOneWeekAgo(): String
+    suspend fun getTabsActiveTwoWeeksAgo(): String
+    suspend fun getTabsActiveMoreThanThreeWeeksAgo(): String
 
     companion object {
         const val ONE_WEEK_IN_DAYS = 7L
@@ -68,27 +68,27 @@ interface TabStatsBucketing {
 class DefaultTabStatsBucketing @Inject constructor(
     private val tabRepository: TabRepository,
 ) : TabStatsBucketing {
-    override suspend fun getTabCountBucket(): String {
+    override suspend fun getNumberOfOpenTabs(): String {
         val count = tabRepository.getOpenTabCount()
         return getBucketLabel(count, TAB_COUNT_BUCKETS)
     }
 
-    override suspend fun get7DaysActiveTabBucket(): String {
+    override suspend fun getTabsActiveLastWeek(): String {
         val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = 0, accessNotMoreThan = ONE_WEEK_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
-    override suspend fun get1WeeksInactiveTabBucket(): String {
+    override suspend fun getTabsActiveOneWeekAgo(): String {
         val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = ONE_WEEK_IN_DAYS, accessNotMoreThan = TWO_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
-    override suspend fun get2WeeksInactiveTabBucket(): String {
+    override suspend fun getTabsActiveTwoWeeksAgo(): String {
         val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = TWO_WEEKS_IN_DAYS, accessNotMoreThan = THREE_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
-    override suspend fun get3WeeksInactiveTabBucket(): String {
+    override suspend fun getTabsActiveMoreThanThreeWeeksAgo(): String {
         val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = THREE_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }

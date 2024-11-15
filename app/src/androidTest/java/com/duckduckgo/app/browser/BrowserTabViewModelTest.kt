@@ -5452,11 +5452,11 @@ class BrowserTabViewModelTest {
         val inactive2w = "6-10"
         val inactive3w = "0"
 
-        whenever(mockTabStatsBucketing.getTabCountBucket()).thenReturn(tabCount)
-        whenever(mockTabStatsBucketing.get7DaysActiveTabBucket()).thenReturn(active7d)
-        whenever(mockTabStatsBucketing.get1WeeksInactiveTabBucket()).thenReturn(inactive1w)
-        whenever(mockTabStatsBucketing.get2WeeksInactiveTabBucket()).thenReturn(inactive2w)
-        whenever(mockTabStatsBucketing.get3WeeksInactiveTabBucket()).thenReturn(inactive3w)
+        whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
 
         val params = mapOf(
             PixelParameter.TAB_COUNT to tabCount,
