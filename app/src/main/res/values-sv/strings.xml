@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
     <string name="preciseLocationSystemDialogNeverAllow">Fråga inte igen för denna webbplats</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Bevilja åtkomst till enhetens platsinf\bormation för %1$s?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Vi använder bara din anonyma plats för att ge dig bättre resultat, närmare dig. Du kan alltid ändra dig senare.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinf\bormation som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi använder bara din anonyma plats för att ge dig bättre resultat, närmare dig. Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinformation som du har beviljat för enskilda webbplatser.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
-    <string name="permissionsPerWebsiteAskSetting">Fråga</string>
+    <string name="permissionsPerWebsiteAskSetting">Fråga varje gång</string>
     <string name="permissionsPerWebsiteDenySetting">Neka</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">”Fråga” inaktiverat för alla webbplatser</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Inaktiverat för alla webbplatser</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
 
     <!-- Notify Me View on Downloads -->
