@@ -38,6 +38,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -255,6 +256,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -263,6 +265,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -5445,12 +5448,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() = runTest {
+        val tabCount = "61-80"
+        val active7d = "21+"
+        val inactive1w = "11-20"
+        val inactive2w = "6-10"
+        val inactive3w = "0"
+
+        whenever(mockTabStatsBucketing.getTabCountBucket()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.get7DaysActiveTabBucket()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.get1WeeksInactiveTabBucket()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.get2WeeksInactiveTabBucket()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.get3WeeksInactiveTabBucket()).thenReturn(inactive3w)
+
+        val params = mapOf(
+            PixelParameter.TAB_COUNT to tabCount,
+            PixelParameter.TAB_ACTIVE_7D to active7d,
+            PixelParameter.TAB_INACTIVE_1W to inactive1w,
+            PixelParameter.TAB_INACTIVE_2W to inactive2w,
+            PixelParameter.TAB_INACTIVE_3W to inactive3w,
+        )
+
         testee.userLaunchingTabSwitcher()
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
     }
 
     @Test
