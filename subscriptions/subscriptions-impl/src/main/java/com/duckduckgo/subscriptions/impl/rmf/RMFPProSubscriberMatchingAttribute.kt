@@ -40,7 +40,7 @@ class RMFPProSubscriberMatchingAttribute @Inject constructor(
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
-            is ProSubscriberMatchingAttribute -> subscriptions.isSubscribed() == matchingAttribute.remoteValue
+            is ProSubscriberMatchingAttribute -> subscriptions.isSignedIn() == matchingAttribute.remoteValue
             else -> null
         }
     }
@@ -57,10 +57,6 @@ class RMFPProSubscriberMatchingAttribute @Inject constructor(
             }
             else -> null
         }
-    }
-
-    private suspend fun Subscriptions.isSubscribed(): Boolean {
-        return getAccessToken() != null
     }
 }
 
