@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Talán később</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ehhez a webhelyhez ne kérje újra</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Megadod %1$s számára a helyhozzáférési engedélyt?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Csak az anonim helyedet használjuk a jobb, hozzád közelebbi eredmények érdekében. Később bármikor meggondolhatod magad.</string>
     <string name="preciseLocationSiteDialogSubtitle">Az egyes webhelyeknek megadott helyhozzáférési engedélyeket a Beállításokban kezelheted.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Az anonim tartózkodási helyedet csak arra használjuk, hogy jobb, hozzád közelebbi találatokat tudjunk adni. A Beállításokban kezelheted az egyes webhelyeknek megadott helyhozzáférési engedélyeket.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Mindig</string>
     <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
     <string name="preciseLocationSiteDialogDenyAlways">Mindig megtagad</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Még nincsenek oldalak</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Minden webhely engedélye eltávolítva</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Engedélyek a következőhöz: „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Rákérdezés</string>
+    <string name="permissionsPerWebsiteAskSetting">Kérdezzen rá minden alkalommal</string>
     <string name="permissionsPerWebsiteDenySetting">Megtagadás</string>
     <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">A „Rákérdezés” minden webhelyen letiltva</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Letiltva minden webhely számára</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
 
     <!-- Notify Me View on Downloads -->
