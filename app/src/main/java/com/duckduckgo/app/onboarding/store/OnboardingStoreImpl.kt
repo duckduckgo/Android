@@ -21,17 +21,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
-import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.DESCRIPTION
-import com.duckduckgo.app.onboarding.store.OnboardingStoreImpl.ContentType.TITLE
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.mobile.android.R.drawable
 import java.util.Locale
 import javax.inject.Inject
 
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : OnboardingStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -210,38 +205,6 @@ class OnboardingStoreImpl @Inject constructor(
                 link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
             ),
         )
-    }
-
-    override fun getPrivacyProContent(content: ContentType): Int {
-        return when (content) {
-            TITLE -> {
-                when {
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
-                        R.string.onboardingPrivacyProProtectionDaxDialogTitle
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
-                        R.string.onboardingPrivacyProPirDaxDialogTitle
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
-                        R.string.onboardingPrivacyProVpnDaxDialogTitle
-                    else -> R.string.onboardingPrivacyProDaxDialogTitle
-                }
-            }
-            DESCRIPTION -> {
-                when {
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
-                        R.string.onboardingPrivacyProProtectionDaxDialogDescription
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
-                        R.string.onboardingPrivacyProPirDaxDialogDescription
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
-                        R.string.onboardingPrivacyProVpnDaxDialogDescription
-                    else -> R.string.onboardingPrivacyProDaxDialogDescription
-                }
-            }
-        }
-    }
-
-    enum class ContentType {
-        TITLE,
-        DESCRIPTION,
     }
 
     companion object {

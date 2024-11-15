@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -29,7 +30,10 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
@@ -56,7 +60,14 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -257,6 +268,7 @@ class CtaViewModel @Inject constructor(
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 null
             }
+
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                     DaxBubbleCta.DaxExperimentIntroSearchOptionsCta(onboardingStore, appInstallStore)
@@ -283,9 +295,73 @@ class CtaViewModel @Inject constructor(
 
             canShowPrivacyProCta() -> {
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                    DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore)
+                    when {
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
+                            DaxBubbleCta.DaxExperimentPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProProtectionDaxDialogTitle,
+                                R.string.onboardingPrivacyProProtectionDaxDialogDescription,
+                            )
+
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
+                            DaxBubbleCta.DaxExperimentPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProPirDaxDialogTitle,
+                                R.string.onboardingPrivacyProPirDaxDialogDescription,
+                            )
+
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
+                            DaxBubbleCta.DaxExperimentPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProVpnDaxDialogTitle,
+                                R.string.onboardingPrivacyProVpnDaxDialogDescription,
+                            )
+
+                        else ->
+                            DaxBubbleCta.DaxExperimentPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProDaxDialogTitle,
+                                R.string.onboardingPrivacyProDaxDialogDescription,
+                            )
+                    }
                 } else {
-                    DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
+                    when {
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
+                            DaxBubbleCta.DaxPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProProtectionDaxDialogTitle,
+                                R.string.onboardingPrivacyProProtectionDaxDialogDescription,
+                            )
+
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
+                            DaxBubbleCta.DaxPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProPirDaxDialogTitle,
+                                R.string.onboardingPrivacyProPirDaxDialogDescription,
+                            )
+
+                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
+                            DaxBubbleCta.DaxPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProVpnDaxDialogTitle,
+                                R.string.onboardingPrivacyProVpnDaxDialogDescription,
+                            )
+
+                        else ->
+                            DaxBubbleCta.DaxPrivacyProCta(
+                                onboardingStore,
+                                appInstallStore,
+                                R.string.onboardingPrivacyProDaxDialogTitle,
+                                R.string.onboardingPrivacyProDaxDialogDescription,
+                            )
+                    }
                 }
             }
 
@@ -325,6 +401,7 @@ class CtaViewModel @Inject constructor(
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 false
             }
+
             else -> true
         }
     }
