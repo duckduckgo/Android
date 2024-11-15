@@ -136,6 +136,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
+            val userSignedIn = syncAccountRepository.isSignedIn()
             when (val result = syncAccountRepository.processCode(qrCode)) {
                 is Error -> {
                     emitError(result, qrCode)
@@ -143,7 +144,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
                 is Success -> {
                     syncPixels.fireLoginPixel()
-                    command.send(LoginSuccess)
+                    val commandSuccess = if (userSignedIn) SwitchAccountSuccess else LoginSuccess
+                    command.send(commandSuccess)
                 }
             }
         }

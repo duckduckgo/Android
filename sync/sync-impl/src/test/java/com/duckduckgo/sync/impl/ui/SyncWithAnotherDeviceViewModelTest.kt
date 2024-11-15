@@ -169,6 +169,34 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
+    fun whenSignedInUserScansRecoveryCodeAndLoginSucceedsThenReturnSwitchAccount() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
+            val command = awaitItem()
+            assertTrue(command is SwitchAccountSuccess)
+            verify(syncPixels, times(1)).fireLoginPixel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
+        whenever(syncRepository.isSignedIn()).thenReturn(false)
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
+            val command = awaitItem()
+            assertTrue(command is LoginSuccess)
+            verify(syncPixels, times(1)).fireLoginPixel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenUserScansRecoveryQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = LOGIN_FAILED.code))
         testee.commands().test {

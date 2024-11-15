@@ -140,7 +140,8 @@ object TestSyncFixtures {
     )
     val loginSuccessResponse: Response<LoginResponse> = Response.success(loginResponseBody)
 
-    val listOfDevices = listOf(Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor))
+    val aDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+    val listOfDevices = listOf(aDevice)
     val deviceResponse = DeviceResponse(DeviceEntries(listOfDevices))
     val getDevicesBodySuccessResponse: Response<DeviceResponse> = Response.success(deviceResponse)
     val getDevicesBodyErrorResponse: Response<DeviceResponse> = Response.error(
