@@ -16,10 +16,10 @@ class RMFPProSubscriberMatchingAttributeTest {
 
     @Test
     fun evaluateWithWrongAttributeThenNull() = runTest {
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
         Assert.assertNull(attribute.evaluate(FakeStringMatchingAttribute { "" }))
 
-        whenever(subscriptions.getAccessToken()).thenReturn("token")
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
         Assert.assertNull(attribute.evaluate(FakeStringMatchingAttribute { "" }))
 
         Assert.assertNull(attribute.map("wrong", JsonMatchingAttribute(value = false)))
@@ -28,16 +28,16 @@ class RMFPProSubscriberMatchingAttributeTest {
 
     @Test
     fun evaluateWithProEligibleMatchingAttributeThenValue() = runTest {
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
         Assert.assertTrue(attribute.evaluate(attribute.map("pproSubscriber", JsonMatchingAttribute(value = false))!!)!!)
 
-        whenever(subscriptions.getAccessToken()).thenReturn("token")
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
         Assert.assertTrue(attribute.evaluate(attribute.map("pproSubscriber", JsonMatchingAttribute(value = true))!!)!!)
 
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
         Assert.assertFalse(attribute.evaluate(attribute.map("pproSubscriber", JsonMatchingAttribute(value = true))!!)!!)
 
-        whenever(subscriptions.getAccessToken()).thenReturn("token")
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
         Assert.assertFalse(attribute.evaluate(attribute.map("pproSubscriber", JsonMatchingAttribute(value = false))!!)!!)
     }
 

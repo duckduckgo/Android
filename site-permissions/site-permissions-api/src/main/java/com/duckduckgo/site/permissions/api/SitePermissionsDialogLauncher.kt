@@ -18,7 +18,7 @@ interface SitePermissionsDialogLauncher {
     fun registerPermissionLauncher(caller: ActivityResultCaller)
 
     /**
-     * This method should be called if website requests site permissions (audio or video). It will launch dialogs flow for asking the user.
+     * This method should be called if website requests site permissions (audio, video, location or DRM). It will launch dialogs flow for asking the user.
      *
      * @param activity where this method is called from
      * @param url URL taken from the permissions request object

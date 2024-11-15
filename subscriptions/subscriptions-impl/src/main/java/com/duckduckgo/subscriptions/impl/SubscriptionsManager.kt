@@ -133,6 +133,11 @@ interface SubscriptionsManager {
     suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
+     * Checks if user is signed in or not
+     */
+    suspend fun isSignedIn(): Boolean
+
+    /**
      * Flow to know if a user is signed in or not
      */
     val isSignedIn: Flow<Boolean>
@@ -205,7 +210,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
-    private suspend fun isSignedIn(): Boolean {
+    override suspend fun isSignedIn(): Boolean {
         return !authRepository.getAuthToken().isNullOrBlank() && !authRepository.getAccessToken().isNullOrBlank()
     }
 

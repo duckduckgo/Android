@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'kotlin-parcelize'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -59,6 +60,8 @@ dependencies {
 
     implementation "androidx.datastore:datastore-preferences:_"
 
+    implementation "de.siegmar:fastcsv:_"
+
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
@@ -71,6 +74,7 @@ dependencies {
     implementation "net.zetetic:android-database-sqlcipher:_"
 
     // Testing dependencies
+    testImplementation project(':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.core

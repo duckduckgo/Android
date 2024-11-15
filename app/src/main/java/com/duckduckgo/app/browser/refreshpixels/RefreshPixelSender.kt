@@ -22,16 +22,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.app.pixels.AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
 import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -49,7 +46,6 @@ interface RefreshPixelSender {
 class DuckDuckGoRefreshPixelSender @Inject constructor(
     private val pixel: Pixel,
     private val dao: RefreshDao,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val currentTimeProvider: CurrentTimeProvider,
     private val blockListPixelsPlugin: BlockListPixelsPlugin,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -58,47 +54,18 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
 
     override fun sendMenuRefreshPixels() {
         sendTimeBasedPixels()
-
-        // Loading Bar Experiment
-        if (loadingBarExperimentManager.isExperimentEnabled()) {
-            pixel.fire(
-                AppPixelName.MENU_ACTION_REFRESH_PRESSED,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-            )
-            pixel.fire(
-                AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                type = Daily(),
-            )
-        } else {
-            pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED)
-            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
-        }
+        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED)
+        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
     }
 
     override fun sendPullToRefreshPixels() {
         sendTimeBasedPixels()
-
-        // Loading Bar Experiment
-        if (loadingBarExperimentManager.isExperimentEnabled()) {
-            pixel.fire(
-                AppPixelName.BROWSER_PULL_TO_REFRESH,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-            )
-            pixel.fire(
-                AppPixelName.REFRESH_ACTION_DAILY_PIXEL,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-                type = Daily(),
-            )
-        } else {
-            pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH)
-            pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
-        }
+        pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH)
+        pixel.fire(AppPixelName.REFRESH_ACTION_DAILY_PIXEL, type = Daily())
     }
 
     override fun sendCustomTabRefreshPixel() {
         sendTimeBasedPixels()
-
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
     }
 

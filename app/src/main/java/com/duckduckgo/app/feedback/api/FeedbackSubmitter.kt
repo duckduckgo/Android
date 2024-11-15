@@ -28,13 +28,10 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -66,7 +63,6 @@ class FireAndForgetFeedbackSubmitter(
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(
         mainReason: MainReason,
@@ -139,16 +135,7 @@ class FireAndForgetFeedbackSubmitter(
 
     private fun sendPixel(pixelName: String) {
         Timber.d("Firing feedback pixel: $pixelName")
-
-        // Loading Bar Experiment
-        if (loadingBarExperimentManager.isExperimentEnabled()) {
-            pixel.fire(
-                pixelName,
-                mapOf(LOADING_BAR_EXPERIMENT to loadingBarExperimentManager.variant.toBinaryString()),
-            )
-        } else {
-            pixel.fire(pixelName)
-        }
+        pixel.fire(pixelName)
     }
 
     private suspend fun submitFeedback(
@@ -171,11 +158,6 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = appBuildConfig.sdkInt,
             atb = atbWithVariant(),
-            loadingBarExperiment = if (loadingBarExperimentManager.isExperimentEnabled()) {
-                loadingBarExperimentManager.variant.toBinaryString()
-            } else {
-                null
-            },
         )
     }
 

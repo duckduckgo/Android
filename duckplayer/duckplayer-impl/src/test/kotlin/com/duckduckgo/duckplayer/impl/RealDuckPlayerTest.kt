@@ -29,6 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -87,6 +88,8 @@ class RealDuckPlayerTest {
         mockDuckPlayerLocalFilesPath,
         mimeType,
         dispatcherProvider,
+        true,
+        coroutineRule.testScope,
     )
 
     @Before
@@ -124,8 +127,8 @@ class RealDuckPlayerTest {
 
     @Test
     fun whenDuckPlayerStateIsDisabledWithHelpLink_getDuckPlayerStateReturnsDisabledWithHelpLink() = runTest {
-        setFeatureToggle(false)
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()).thenReturn("help_link")
+        setFeatureToggle(false)
 
         val result = testee.getDuckPlayerState()
 
@@ -554,9 +557,10 @@ class RealDuckPlayerTest {
     @Test
     fun whenUriIsDuckPlayerUriWithOriginAuto_interceptProcessesDuckPlayerUri() = runTest {
         val request: WebResourceRequest = mock()
-        val url: Uri = Uri.parse("duck://player/12345?origin=auto")
+        val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        testee.setDuckPlayerOrigin(AUTO)
 
         val result = testee.intercept(request, url, webView)
 
@@ -653,7 +657,7 @@ class RealDuckPlayerTest {
 
         val result = testee.intercept(request, url, webView)
 
-        verify(webView).loadUrl("duck://player/12345?origin=auto")
+        verify(webView).loadUrl("duck://player/12345")
         assertNotNull(result)
     }
 
@@ -695,7 +699,7 @@ class RealDuckPlayerTest {
 
         val result = testee.intercept(request, url, webView)
 
-        verify(webView).loadUrl("duck://player/123456?origin=auto")
+        verify(webView).loadUrl("duck://player/123456")
         assertNotNull(result)
     }
 
@@ -777,5 +781,6 @@ class RealDuckPlayerTest {
     private fun setFeatureToggle(enabled: Boolean) {
         duckPlayerFeature.self().setRawStoredState(State(enabled))
         duckPlayerFeature.enableDuckPlayer().setRawStoredState(State(enabled))
+        testee.onPrivacyConfigDownloaded()
     }
 }

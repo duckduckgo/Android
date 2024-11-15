@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.experiments.impl.loadingbarexperiment
+package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.subscriptions.api.Subscriptions
 
-enum class LoadingBarExperimentPixels(override val pixelName: String) : Pixel.PixelName {
-    LOADING_BAR_EXPERIMENT_ENROLLMENT_TEST("m_loading_bar_exp_enrollment_test"),
-    LOADING_BAR_EXPERIMENT_ENROLLMENT_CONTROL("m_loading_bar_exp_enrollment_control"),
+suspend fun Subscriptions.isUpsellEligible(): Boolean {
+    return !isSignedIn() && isEligible()
 }
