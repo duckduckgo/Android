@@ -175,6 +175,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -494,6 +495,7 @@ class BrowserTabViewModelTest {
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockTabStatsBucketing: TabStatsBucketing = mock()
 
     @Before
     fun before() = runTest {
@@ -661,6 +663,7 @@ class BrowserTabViewModelTest {
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
             brokenSitePrompt = mockBrokenSitePrompt,
+            tabStatsBucketing = mockTabStatsBucketing,
         )
 
         testee.loadData("abc", null, false, false)
