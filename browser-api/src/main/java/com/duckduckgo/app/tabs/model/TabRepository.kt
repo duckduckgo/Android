@@ -126,5 +126,5 @@ interface TabRepository {
      * @param accessNotMoreThan the maximum number of days (inclusive) since the tab was last accessed (optional)
      * @return the number of tabs that are inactive
      */
-    fun countTabsWithinDayRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
+    fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
 }

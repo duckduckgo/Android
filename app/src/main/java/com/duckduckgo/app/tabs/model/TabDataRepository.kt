@@ -198,7 +198,7 @@ class TabDataRepository @Inject constructor(
         return tabsDao.tabs().size
     }
 
-    override fun countTabsWithinDayRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
+    override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
         val now = LocalDateTime.now(ZoneOffset.UTC)
         val start = now.minusDays(accessOlderThan)
         val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive

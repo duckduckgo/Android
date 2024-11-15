@@ -74,22 +74,22 @@ class DefaultTabStatsBucketing @Inject constructor(
     }
 
     override suspend fun get7DaysActiveTabBucket(): String {
-        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = 0, accessNotMoreThan = ONE_WEEK_IN_DAYS)
+        val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = 0, accessNotMoreThan = ONE_WEEK_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get1WeeksInactiveTabBucket(): String {
-        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = ONE_WEEK_IN_DAYS, accessNotMoreThan = TWO_WEEKS_IN_DAYS)
+        val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = ONE_WEEK_IN_DAYS, accessNotMoreThan = TWO_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get2WeeksInactiveTabBucket(): String {
-        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = TWO_WEEKS_IN_DAYS, accessNotMoreThan = THREE_WEEKS_IN_DAYS)
+        val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = TWO_WEEKS_IN_DAYS, accessNotMoreThan = THREE_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
     override suspend fun get3WeeksInactiveTabBucket(): String {
-        val count = tabRepository.countTabsWithinDayRange(accessOlderThan = THREE_WEEKS_IN_DAYS)
+        val count = tabRepository.countTabsAccessedWithinRange(accessOlderThan = THREE_WEEKS_IN_DAYS)
         return getBucketLabel(count, ACTIVITY_BUCKETS)
     }
 
