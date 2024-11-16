@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Võib-olla hiljem</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ära küsi enam selle saidi jaoks</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Anda %1$s luba asukohale juurdepääsuks?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Kasutame sinu anonüümset asukohta ainult sulle paremate tulemuste pakkumiseks. Hiljem saad alati oma meelt muuta.</string>
     <string name="preciseLocationSiteDialogSubtitle">Saad hallata asukohale juurdepääsu luba, mille sa oled andnud üksikutele saitidele valikus Seaded.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Kasutame sinu anonüümset asukohta ainult selleks, et pakkuda paremaid tulemusi, mis on sulle lähemal. Saad hallata asukohale juurdepääsu luba, mille sa oled andnud üksikutele saitidele valikus Seaded.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alati</string>
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Saite pole veel</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Kõikide saitide load on eemaldatud</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Saidi „%1$s“ load </string>
-    <string name="permissionsPerWebsiteAskSetting">Küsi</string>
+    <string name="permissionsPerWebsiteAskSetting">Küsi iga kord</string>
     <string name="permissionsPerWebsiteDenySetting">Keela</string>
     <string name="permissionsPerWebsiteAllowSetting">Luba</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">„Küsi“ on kõigil saitidel keelatud</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Kõigi saitide jaoks keelatud</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Luba %1$s saidile %2$s</string>
 
     <!-- Notify Me View on Downloads -->
