@@ -1559,6 +1559,73 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test multiple languages`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.US.country)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "localeCountry": "US",
+                                        "localeLanguage": "en"
+                                    },
+                                    {
+                                        "localeCountry": "FR",
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+
+        featureTogglesCallback.locale = Locale.US
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+
+        featureTogglesCallback.locale = Locale.FRANCE
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
     fun `test feature with multiple targets not matching`() {
         val feature = generatedFeatureNewInstance()
 
