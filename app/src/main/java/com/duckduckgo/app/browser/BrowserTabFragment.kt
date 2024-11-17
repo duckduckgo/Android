@@ -848,7 +848,7 @@ class BrowserTabFragment :
 
         if (savedInstanceState == null) {
             if (isActiveTab) {
-                initializeFragment()
+                initFragmentIfNecessary()
             }
         } else {
             viewModel.onViewRecreated()
@@ -868,6 +868,11 @@ class BrowserTabFragment :
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
+        }
+
+        newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
+            (v as FrameLayout).requestDisallowInterceptTouchEvent(true)
+            return@setOnTouchListener true
         }
     }
 
@@ -1146,7 +1151,7 @@ class BrowserTabFragment :
         startActivity(TabSwitcherActivity.intent(activity, tabId))
     }
 
-    private fun initializeFragment() {
+    private fun initFragmentIfNecessary() {
         if (!isInitialized) {
             isInitialized = true
 
@@ -1160,7 +1165,7 @@ class BrowserTabFragment :
     override fun onResume() {
         super.onResume()
 
-        initializeFragment()
+        initFragmentIfNecessary()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
@@ -1330,6 +1335,10 @@ class BrowserTabFragment :
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
+                    }
+
+                    if (isActiveTab) {
+                        initFragmentIfNecessary()
                     }
                 }
             },
