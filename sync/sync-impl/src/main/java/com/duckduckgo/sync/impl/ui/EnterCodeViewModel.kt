@@ -94,7 +94,12 @@ class EnterCodeViewModel @Inject constructor(
         val userSignedIn = syncAccountRepository.isSignedIn()
         when (val result = syncAccountRepository.processCode(pastedCode)) {
             is Result.Success -> {
-                val commandSuccess = if (userSignedIn) SwitchAccountSuccess else LoginSuccess
+                val commandSuccess = if (userSignedIn) {
+                    syncPixels.fireUserSwitchedAccount()
+                    SwitchAccountSuccess
+                } else {
+                    LoginSuccess
+                }
                 command.send(commandSuccess)
             }
             is Result.Error -> {
@@ -132,6 +137,7 @@ class EnterCodeViewModel @Inject constructor(
 
     fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
         viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserAcceptedSwitchingAccount()
             val result = syncAccountRepository.logoutAndJoinNewAccount(encodedStringCode)
             if (result is Error) {
                 when (result.code) {
@@ -147,9 +153,17 @@ class EnterCodeViewModel @Inject constructor(
                     )
                 }
             } else {
-                syncPixels.fireLoginPixel()
+                syncPixels.fireUserSwitchedAccount()
                 command.send(SwitchAccountSuccess)
             }
         }
+    }
+
+    fun onUserCancelledJoiningNewAccount() {
+        syncPixels.fireUserCancelledSwitchingAccount()
+    }
+
+    fun onUserAskedToSwitchAccount() {
+        syncPixels.fireAskUserToSwitchAccount()
     }
 }

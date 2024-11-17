@@ -35,6 +35,13 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_COPIED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_SHARED.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_ASK_USER_TO_SWITCH_ACCOUNT.pixelName to PixelParameter.removeAll(),
+            SyncPixelName.SYNC_USER_ACCEPTED_SWITCHING_ACCOUNT.pixelName to PixelParameter.removeAll(),
+            SyncPixelName.SYNC_USER_CANCELLED_SWITCHING_ACCOUNT.pixelName to PixelParameter.removeAll(),
+            SyncPixelName.SYNC_USER_SWITCHED_ACCOUNT.pixelName to PixelParameter.removeAll(),
+            SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR.pixelName to PixelParameter.removeAll(),
+            SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR.pixelName to PixelParameter.removeAll(),
         )
     }
 }
