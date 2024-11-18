@@ -730,7 +730,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getAccessToken(): AccessTokenResult {
         return when {
-            isSignedInV2() -> try {
+            isSignedIn() && shouldUseAuthV2() -> try {
                 AccessTokenResult.Success(getValidAccessTokenV2())
             } catch (e: Exception) {
                 AccessTokenResult.Failure("Token not found")
@@ -741,7 +741,12 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun getValidAccessTokenV2(): String {
-        check(isSignedInV2())
+        check(isSignedIn())
+        check(shouldUseAuthV2())
+
+        if (!isSignedInV2() && isSignedInV1()) {
+            migrateToAuthV2()
+        }
 
         val accessToken = authRepository.getAccessTokenV2()
             ?.takeIf { isAccessTokenUsable(it) }
@@ -758,6 +763,18 @@ class RealSubscriptionsManager @Inject constructor(
 
             newAccessToken.jwt
         }
+    }
+
+    private suspend fun migrateToAuthV2() {
+        val accessTokenV1 = checkNotNull(authRepository.getAccessToken())
+        val codeVerifier = pkceGenerator.generateCodeVerifier()
+        val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
+        val sessionId = authClient.authorize(codeChallenge)
+        val authorizationCode = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
+        val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
+        saveTokens(validateTokens(tokens))
+        authRepository.setAccessToken(null)
+        authRepository.setAuthToken(null)
     }
 
     private fun isAccessTokenUsable(accessToken: AccessToken): Boolean {

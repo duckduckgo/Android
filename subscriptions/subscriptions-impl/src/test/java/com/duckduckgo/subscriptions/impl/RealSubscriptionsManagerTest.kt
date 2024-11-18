@@ -752,6 +752,23 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetAccessTokenIfSignedInWithV1ThenExchangesTokenForV2AndReturnsTrue() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn(useAuthV2 = false)
+        givenV1AccessTokenExchangeSuccess()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        assertEquals(FAKE_ACCESS_TOKEN_V2, (result as AccessTokenResult.Success).accessToken)
+        assertEquals(FAKE_ACCESS_TOKEN_V2, authRepository.getAccessTokenV2()?.jwt)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authRepository.getRefreshTokenV2()?.jwt)
+        assertNull(authRepository.getAccessToken())
+        assertNull(authRepository.getAuthToken())
+    }
+
+    @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenSucceedsWithEntitlements()
@@ -1219,8 +1236,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.refreshTokenV2ExpiresAt = null
     }
 
-    private fun givenUserIsSignedIn() {
-        if (authApiV2Enabled) {
+    private fun givenUserIsSignedIn(useAuthV2: Boolean = authApiV2Enabled) {
+        if (useAuthV2) {
             authDataStore.accessTokenV2 = FAKE_ACCESS_TOKEN_V2
             authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
             authDataStore.refreshTokenV2 = FAKE_REFRESH_TOKEN_V2
@@ -1364,6 +1381,14 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             .thenReturn(TokenPair(newAccessToken, FAKE_REFRESH_TOKEN_V2))
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
+        givenValidateV2TokensSucceeds()
+    }
+
+    private suspend fun givenV1AccessTokenExchangeSuccess() {
+        whenever(authClient.authorize(any())).thenReturn("fake session id")
+        whenever(authClient.exchangeV1AccessToken(any(), any())).thenReturn("fake authorization code")
+        whenever(authClient.getTokens(any(), any(), any())).thenReturn(TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2))
+        whenever(authClient.getJwks()).thenReturn("fake jwks")
         givenValidateV2TokensSucceeds()
     }
 
