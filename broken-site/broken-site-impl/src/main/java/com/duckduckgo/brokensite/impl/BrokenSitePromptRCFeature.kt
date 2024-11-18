@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
     settingsStore = BrokenSitePromptRCFeatureStore::class,
 )
 interface BrokenSitePromptRCFeature {
-    // TODO (cbarreiro) Implement broken site prompt
     @InternalAlwaysEnabled
     @DefaultValue(false)
     fun self(): Toggle
