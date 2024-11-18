@@ -211,4 +211,45 @@ class AuthClientImplTest {
             assertEquals(400, e.code())
         }
     }
+
+    @Test
+    fun `when exchange token success then returns authorization code`() = runTest {
+        val sessionId = "fake auth session id"
+        val authorizationCode = "fake_authorization_code"
+        val accessTokenV1 = "fake v1 access token"
+
+        val mockResponse: Response<Unit> = mock {
+            on { code() } doReturn 302
+            on { headers() } doReturn Headers.headersOf("Location", "https://example.com?code=$authorizationCode")
+            on { isSuccessful } doReturn false // Retrofit treats non-2xx responses as unsuccessful
+        }
+
+        whenever(authService.exchange(any(), any())).thenReturn(mockResponse)
+
+        val response = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
+
+        assertEquals(authorizationCode, response)
+
+        verify(authService).exchange(
+            authorization = "Bearer $accessTokenV1",
+            cookie = "ddg_auth_session_id=$sessionId",
+        )
+    }
+
+    @Test
+    fun `when exchange token HTTP error then throws HttpException`() = runTest {
+        val errorResponse = Response.error<Unit>(
+            400,
+            "{}".toResponseBody("application/json".toMediaTypeOrNull()),
+        )
+
+        whenever(authService.exchange(any(), any())).thenReturn(errorResponse)
+
+        try {
+            authClient.exchangeV1AccessToken("fake v1 access token", "fake auth session id")
+            fail("Expected HttpException to be thrown")
+        } catch (e: HttpException) {
+            assertEquals(400, e.code())
+        }
+    }
 }

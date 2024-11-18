@@ -83,6 +83,18 @@ interface AuthClient {
         signature: String,
         googleSignedData: String,
     ): String
+
+    /**
+     * Attempts to sign in using V1 access token.
+     *
+     * @param accessTokenV1 access token obtained from auth API v1
+     * @param sessionId authorization session id
+     * @return authorization code required to fetch access token
+     */
+    suspend fun exchangeV1AccessToken(
+        accessTokenV1: String,
+        sessionId: String,
+    ): String
 }
 
 data class TokenPair(
@@ -181,6 +193,17 @@ class AuthClientImpl @Inject constructor(
             ),
         )
 
+        return response.getAuthorizationCode()
+    }
+
+    override suspend fun exchangeV1AccessToken(
+        accessTokenV1: String,
+        sessionId: String,
+    ): String {
+        val response = authService.exchange(
+            authorization = "Bearer $accessTokenV1",
+            cookie = "ddg_auth_session_id=$sessionId",
+        )
         return response.getAuthorizationCode()
     }
 

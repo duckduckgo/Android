@@ -59,6 +59,12 @@ interface AuthService {
         @Header("Cookie") cookie: String,
         @Body body: StoreLoginBody,
     ): Response<Unit>
+
+    @POST("https://quack.duckduckgo.com/api/auth/v2/exchange")
+    suspend fun exchange(
+        @Header("Authorization") authorization: String,
+        @Header("Cookie") cookie: String,
+    ): Response<Unit>
 }
 
 data class TokensResponse(
