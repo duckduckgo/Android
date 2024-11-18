@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Talvez mais tarde</string>
     <string name="preciseLocationSystemDialogNeverAllow">Não pedir novamente por este site</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Conceder %1$s permissão para aceder a localização?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Só utilizamos a tua localização anónima para apresentar resultados melhores mais perto de ti. Podes sempre mudar de ideias mais tarde.</string>
     <string name="preciseLocationSiteDialogSubtitle">Pode gerir as permissões de acesso à localização concedidas a sites individuais nas Definições.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Só utilizamos a tua localização anónima para apresentar resultados melhores mais perto de ti. Podes gerir as permissões de acesso à localização concedidas a sites individuais nas Definições.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Sempre</string>
     <string name="preciseLocationSiteDialogAllowOnce">Apenas para esta sessão</string>
     <string name="preciseLocationSiteDialogDenyAlways">Negar sempre</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Ainda não há sites</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">As permissões foram removidas para todos os sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissões para \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Perguntar</string>
+    <string name="permissionsPerWebsiteAskSetting">Pergunte todas as vezes</string>
     <string name="permissionsPerWebsiteDenySetting">Recusar</string>
     <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">A funcionalidade \"Perguntar\" foi desativada para todos os sites</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Desativado para todos os sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permissão para %2$s utilizar %1$s</string>
 
     <!-- Notify Me View on Downloads -->
