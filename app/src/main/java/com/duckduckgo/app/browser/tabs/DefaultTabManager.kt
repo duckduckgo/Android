@@ -31,11 +31,12 @@ import dagger.android.DaggerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
-class RealTabManager @Inject constructor(
+class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
     private val swipingTabsFeature: SwipingTabsFeature,
 ) : TabManager {
@@ -53,6 +54,7 @@ class RealTabManager @Inject constructor(
             getCurrentTabIndex = { browserActivity.tabPager.currentItem },
             getSelectedTabId = { browserActivity.viewModel.selectedTab.value?.tabId },
             getTabById = { tabId -> browserActivity.viewModel.getTabById(tabId) },
+            requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
             getOffScreenPageLimit = { browserActivity.tabPager.offscreenPageLimit },
@@ -140,6 +142,11 @@ class RealTabManager @Inject constructor(
 
     override fun onCleanup() {
         openMessageInNewTabJob?.cancel()
+    }
+
+    private fun requestNewTab(): TabEntity {
+        val tabId = runBlocking { browserActivity.viewModel.onNewTabRequested() }
+        return browserActivity.viewModel.getTabById(tabId)!!
     }
 
     private fun selectTab(tab: TabEntity) {
