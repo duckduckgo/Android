@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -36,6 +37,7 @@ import timber.log.Timber
 class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialImporter: CredentialImporter,
     private val dispatchers: DispatcherProvider,
+    private val importPasswordsPixelSender: ImportPasswordsPixelSender,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -54,6 +56,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
                 is ImportResult.Finished -> {
                     Timber.d("Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped.")
+                    fireImportSuccessPixel(savedCredentials = it.savedCredentials, numberSkipped = it.numberSkipped)
                     _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
                 }
             }
@@ -61,10 +64,20 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     }
 
     fun onImportFlowFinishedWithError(reason: UserCannotImportReason) {
+        fireImportFailedPixel(reason)
         _viewState.value = ViewState(viewMode = ViewMode.ImportError)
     }
 
-    fun onImportFlowCancelledByUser() {
+    fun onImportFlowCancelledByUser(stage: String) {
+        importPasswordsPixelSender.onUserCancelledImportWebFlow(stage)
+    }
+
+    private fun fireImportSuccessPixel(savedCredentials: Int, numberSkipped: Int) {
+        importPasswordsPixelSender.onImportSuccessful(savedCredentials = savedCredentials, numberSkipped = numberSkipped)
+    }
+
+    private fun fireImportFailedPixel(reason: UserCannotImportReason) {
+        importPasswordsPixelSender.onImportFailed(reason)
     }
 
     private val _viewState = MutableStateFlow(ViewState())

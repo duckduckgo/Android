@@ -142,6 +142,15 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_TOGGLED_ON_SEARCH("m_autofill_toggled_on"),
     AUTOFILL_TOGGLED_OFF_SEARCH("m_autofill_toggled_off"),
 
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED("autofill_import_google_passwords_import_button_tapped"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN("autofill_import_google_passwords_import_button_shown"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU("autofill_import_google_passwords_overflow_menu_tapped"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_ERROR_PARSING("autofill_import_google_passwords_result_parsing"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_USER_CANCELLED("autofill_import_google_passwords_result_user_cancelled"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS("autofill_import_google_passwords_result_success"),
+
     AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON("m_autofill_logins_import_no_passwords"),
     AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU("m_autofill_logins_import"),
     AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER("m_autofill_logins_import_get_desktop"),

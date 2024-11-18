@@ -38,7 +38,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -47,8 +46,6 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListMo
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
@@ -65,6 +62,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.ShowUserReportSentMessage
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
@@ -129,7 +127,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     lateinit var screenPromotionPlugins: PluginPoint<PasswordsScreenPromotionPlugin>
 
     @Inject
-    lateinit var pixel: Pixel
+    lateinit var importPasswordsPixelSender: ImportPasswordsPixelSender
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -246,11 +244,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun configureImportPasswordsButton() {
         binding.emptyStateLayout.importPasswordsFromGoogleButton.setOnClickListener {
             viewModel.onImportPasswordsFromGooglePasswordManager()
+            importPasswordsPixelSender.onImportPasswordsButtonTapped()
         }
 
         binding.emptyStateLayout.importPasswordsViaDesktopSyncButton.setOnClickListener {
             launchImportPasswordsFromDesktopSyncScreen()
-            pixel.fire(AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON)
+            importPasswordsPixelSender.onImportPasswordsViaDesktopSyncButtonTapped()
         }
     }
 
@@ -299,12 +298,13 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.importGooglePasswords -> {
                             viewModel.onImportPasswordsFromGooglePasswordManager()
+                            importPasswordsPixelSender.onImportPasswordsOverflowMenuTapped()
                             true
                         }
 
                         R.id.syncDesktopPasswords -> {
                             launchImportPasswordsFromDesktopSyncScreen()
-                            pixel.fire(AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU)
+                            importPasswordsPixelSender.onImportPasswordsViaDesktopSyncOverflowMenuTapped()
                             true
                         }
 
