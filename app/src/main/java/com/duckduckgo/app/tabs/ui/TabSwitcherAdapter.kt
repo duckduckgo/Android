@@ -49,7 +49,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHo
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.swap
 import java.io.File
-import java.util.Collections.swap
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -63,6 +62,7 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabEntity>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
+    private var isDeletingEnabled: Boolean = true
 
     init {
         setHasStableIds(true)
@@ -129,6 +129,12 @@ class TabSwitcherAdapter(
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (isDeletingEnabled) {
+            holder.close.show()
+        } else {
+            holder.close.visibility = View.GONE
+        }
+
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
             return
@@ -200,6 +206,11 @@ class TabSwitcherAdapter(
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun onIsDeletingEnabledChanged(isDeletingEnabled: Boolean) {
+        this.isDeletingEnabled = isDeletingEnabled
+        notifyDataSetChanged()
     }
 
     fun getTab(position: Int): TabEntity? = list.getOrNull(position)

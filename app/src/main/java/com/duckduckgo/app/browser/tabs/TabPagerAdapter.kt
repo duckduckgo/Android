@@ -35,6 +35,7 @@ class TabPagerAdapter(
     private val getCurrentTabIndex: () -> Int,
     private val getSelectedTabId: () -> String?,
     private val getTabById: (String) -> TabEntity?,
+    private val requestNewTab: () -> TabEntity,
     private val onTabSelected: (String) -> Unit,
     private val getOffScreenPageLimit: () -> Int,
     private val setOffScreenPageLimit: (Int) -> Unit,
@@ -61,7 +62,7 @@ class TabPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         increaseOffscreenTabLimitIfNeeded()
 
-        val tab = getTabById(tabIds[position])!!
+        val tab = getTabById(tabIds[position]) ?: requestNewTab()
         val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false
 
         if (messageForNewFragment != null) {
