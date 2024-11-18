@@ -370,6 +370,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
                         }
                     } else {
+                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                            if (toggleReports.shouldPrompt()) {
+                                command.send(LaunchToggleReport(opener = "dashboard"))
+                            }
+                        }
                         val pixelName = when (event.eventOrigin.screen) {
                             PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_ADD
                             BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_ADD
@@ -384,11 +389,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                             }
                             privacyProtectionTogglePlugin.getPlugins().forEach { plugin ->
                                 plugin.onToggleOff(origin)
-                            }
-                        }
-                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
-                            if (toggleReports.shouldPrompt()) {
-                                command.send(LaunchToggleReport(opener = "dashboard"))
                             }
                         }
                     }
