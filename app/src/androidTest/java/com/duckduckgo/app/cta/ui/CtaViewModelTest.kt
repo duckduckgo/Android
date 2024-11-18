@@ -34,6 +34,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -46,6 +47,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -62,6 +64,7 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
@@ -853,6 +856,19 @@ class CtaViewModelTest {
         val value = testee.getFireDialogCta()
 
         assertTrue(value is OnboardingDaxDialogCta.DaxExperimentFireButtonCta)
+    }
+
+    @Test
+    fun givenPrivacyProExperimentWhenControlCohortThenAppendItToOriginForPrivacyProSubscriptionURL() = runTest {
+        val controlCohort = Cohort(Cohorts.CONTROL.cohortName, 1)
+        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()).thenReturn(controlCohort)
+
+        assertEquals(testee.getCohortOrigin(), "_control")
+    }
+
+    @Test
+    fun whenPrivacyProExperimentIsDisabledThenCohortIsNotAppendToPrivacyProSubscriptionURL() = runTest {
+        assertEquals(testee.getCohortOrigin(), "")
     }
 
     private suspend fun givenDaxOnboardingActive() {

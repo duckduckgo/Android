@@ -603,11 +603,12 @@ class CtaViewModel @Inject constructor(
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
     fun getCohortOrigin(): String {
-        return when {
-            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> "_${Cohorts.PROTECTION.cohortName}"
-            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) -> "_${Cohorts.PIR.cohortName}"
-            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) -> "_${Cohorts.VPN.cohortName}"
-            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.CONTROL) -> "_${Cohorts.CONTROL.cohortName}"
+        val cohort = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()
+        return when (cohort?.name) {
+            Cohorts.PROTECTION.cohortName -> "_${Cohorts.PROTECTION.cohortName}"
+            Cohorts.PIR.cohortName -> "_${Cohorts.PIR.cohortName}"
+            Cohorts.VPN.cohortName -> "_${Cohorts.VPN.cohortName}"
+            Cohorts.CONTROL.cohortName -> "_${Cohorts.CONTROL.cohortName}"
             else -> ""
         }
     }

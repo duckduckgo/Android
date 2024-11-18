@@ -78,19 +78,19 @@ class ExtendedOnboardingPixelsPlugin @Inject constructor(private val toggle: Ext
                 metric = "dialogShown",
                 value = "1",
                 toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = Int.MAX_VALUE)),
+                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
             ),
             MetricsPixel(
                 metric = "primaryButtonSelected",
                 value = "1",
                 toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = Int.MAX_VALUE)),
+                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
             ),
             MetricsPixel(
                 metric = "secondaryButtonSelected",
                 value = "1",
                 toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = Int.MAX_VALUE)),
+                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
             ),
         )
     }
