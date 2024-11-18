@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
     <string name="preciseLocationSystemDialogNeverAllow">Für diese Website nicht erneut fragen</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">%1$s Zugriffsberechtigung auf den Gerätestandort erteilen?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Wir verwenden deinen anonymen Standort nur, um dir genauere, standortbasierte Ergebnisse zu liefern. Diese Einstellung kann jederzeit rückgängig gemacht werden.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Wir verwenden deinen anonymen Standort nur, um dir bessere Ergebnisse in deiner Nähe zu liefern. Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Immer</string>
     <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
     <string name="preciseLocationSiteDialogDenyAlways">Immer ablehnen</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Noch keine Websites</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Berechtigungen für alle Websites entfernt</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Berechtigungen für „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Fragen</string>
+    <string name="permissionsPerWebsiteAskSetting">Jedes Mal fragen</string>
     <string name="permissionsPerWebsiteDenySetting">Ablehnen</string>
     <string name="permissionsPerWebsiteAllowSetting">Zulassen</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">„Fragen“ für alle Seiten deaktiviert</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Für alle Websites deaktiviert</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-Berechtigung für %2$s</string>
 
     <!-- Notify Me View on Downloads -->
