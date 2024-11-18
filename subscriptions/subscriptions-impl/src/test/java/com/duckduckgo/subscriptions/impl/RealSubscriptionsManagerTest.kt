@@ -59,6 +59,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.*
 import org.junit.Assume.assumeFalse
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,11 +97,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val authClient: AuthClient = mock()
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
     private val authJwtValidator: AuthJwtValidator = mock()
-    private val timeProvider: CurrentTimeProvider = object : CurrentTimeProvider {
-        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
-        override fun currentTimeMillis(): Long = Instant.parse("2024-10-28T00:00:00Z").toEpochMilli()
-        override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
-    }
+    private val timeProvider = FakeTimeProvider()
     private lateinit var subscriptionsManager: SubscriptionsManager
 
     @Before
@@ -691,6 +688,70 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredThenGetNewTokenAndReturnSuccess() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+    }
+
+    @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsThenGetNewTokenAndReturnFailure() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+    }
+
+    @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorThenGetNewTokenUsingStoreLoginAndReturnSuccess() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(authenticationError = true)
+        givenPurchaseStored()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+    }
+
+    @Test
+    fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorAndStoreRecoveryNotPossibleThenSignOutAndReturnFailure() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(authenticationError = true)
+        givenPurchaseStored()
+        givenStoreLoginFails()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertFalse(subscriptionsManager.isSignedIn())
+        assertNull(authRepository.getAccessTokenV2())
+        assertNull(authRepository.getRefreshTokenV2())
+        assertNull(authRepository.getAccount())
+        assertNull(authRepository.getSubscription())
+    }
+
+    @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenSucceedsWithEntitlements()
@@ -1161,9 +1222,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private fun givenUserIsSignedIn() {
         if (authApiV2Enabled) {
             authDataStore.accessTokenV2 = FAKE_ACCESS_TOKEN_V2
-            authDataStore.accessTokenV2ExpiresAt = Instant.now() + Duration.ofHours(4)
+            authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
             authDataStore.refreshTokenV2 = FAKE_REFRESH_TOKEN_V2
-            authDataStore.refreshTokenV2ExpiresAt = Instant.now() + Duration.ofDays(30)
+            authDataStore.refreshTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofDays(30)
             authDataStore.externalId = "1234"
         } else {
             authDataStore.accessToken = "accessToken"
@@ -1287,7 +1348,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.purchaseHistory).thenReturn(listOf(purchaseRecord))
     }
 
-    private suspend fun givenStoreLoginSucceeds() {
+    private suspend fun givenStoreLoginSucceeds(newAccessToken: String = FAKE_ACCESS_TOKEN_V2) {
         whenever(authService.storeLogin(any())).thenReturn(
             StoreLoginResponse(
                 authToken = "authToken",
@@ -1300,7 +1361,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(authClient.authorize(any())).thenReturn("fake session id")
         whenever(authClient.storeLogin(any(), any(), any())).thenReturn("fake authorization code")
         whenever(authClient.getTokens(any(), any(), any()))
-            .thenReturn(TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2))
+            .thenReturn(TokenPair(newAccessToken, FAKE_REFRESH_TOKEN_V2))
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
         givenValidateV2TokensSucceeds()
@@ -1338,12 +1399,25 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
     }
 
-    private suspend fun givenV2AccessTokenRefreshSucceeds() {
+    private suspend fun givenV2AccessTokenRefreshSucceeds(
+        newAccessToken: String = FAKE_ACCESS_TOKEN_V2,
+        newRefreshToken: String = FAKE_REFRESH_TOKEN_V2,
+    ) {
         whenever(authClient.getTokens(any()))
-            .thenReturn(TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2))
+            .thenReturn(TokenPair(newAccessToken, newRefreshToken))
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
         givenValidateV2TokensSucceeds()
+    }
+
+    private suspend fun givenV2AccessTokenRefreshFails(authenticationError: Boolean = false) {
+        val exception = if (authenticationError) {
+            val responseBody = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+            HttpException(Response.error<Void>(401, responseBody))
+        } else {
+            RuntimeException()
+        }
+        whenever(authClient.getTokens(any())).thenThrow(exception)
     }
 
     private suspend fun givenValidateV2TokensSucceeds() {
@@ -1364,6 +1438,19 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 accountExternalId = "1234",
             ),
         )
+    }
+
+    private suspend fun givenAccessTokenIsExpired() {
+        val accessToken = authRepository.getAccessTokenV2() ?: return
+        authRepository.setAccessTokenV2(accessToken.copy(expiresAt = timeProvider.currentTime - Duration.ofHours(1)))
+    }
+
+    private class FakeTimeProvider : CurrentTimeProvider {
+        var currentTime: Instant = Instant.parse("2024-10-28T00:00:00Z")
+
+        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
+        override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 
     private companion object {
