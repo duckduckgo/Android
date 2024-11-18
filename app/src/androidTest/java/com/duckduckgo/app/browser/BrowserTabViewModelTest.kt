@@ -1998,6 +1998,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPrivacyProtectionMenuClickedToTurnOffProtectionsThenTogglePromptIsShownWhenCheckIsTrue() = runTest {
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        verify(mockToggleReports).shouldPrompt()
+    }
+
+    @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")

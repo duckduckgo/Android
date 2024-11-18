@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
+import com.duckduckgo.app.pixels.AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -58,6 +59,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -538,7 +540,7 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenSubmitReportThenSendBothPixels() {
+    fun whenSubmitReportThenSendBothBrokenSitePixelsButNotTogglePixel() {
         val brokenSite = getBrokenSite()
         testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
@@ -548,6 +550,8 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
         val params = paramsCaptor.firstValue
         assertEquals(brokenSite.siteUrl, params[Pixel.PixelParameter.URL])
+
+        verify(mockPixel, never()).fire(eq(PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName), any(), any(), eq(Count))
     }
 
     @Test
@@ -605,6 +609,18 @@ class BrokenSiteSubmitterTest {
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals("tdsNextExperimentTest_treatment", paramsCaptor.lastValue["blockListExperiment"])
+    }
+
+    @Test
+    fun whenToggleReportSendTogglePixelWithoutUnnecessaryParams() {
+        val brokenSite = getBrokenSite()
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = true)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.lastValue
+        assertEquals(brokenSite.siteUrl, params["siteUrl"])
+        assertFalse(params.containsKey("protectionsState"))
     }
 
     private fun assignToExperiment() {
