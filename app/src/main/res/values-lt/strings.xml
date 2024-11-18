@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nebeprašykite šioje svetainėje</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Suteikti %1$s leidimą pasiekti vietą?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Jūsų anoniminę vietą naudojame tik norėdami pateikti geresnius rezultatus, esančius arčiau jūsų. Vėliau visada galite tai pakeisti.</string>
     <string name="preciseLocationSiteDialogSubtitle">Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Jūsų anoniminę buvimo vietą naudojame tik tam, kad galėtume pateikti geresnius rezultatus arčiau jūsų. Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Visada</string>
     <string name="preciseLocationSiteDialogAllowOnce">Tik šiam seansui</string>
     <string name="preciseLocationSiteDialogDenyAlways">Visada atsisakyti</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Pašalinti visų svetainių leidimai</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Leidimai „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Klausti</string>
+    <string name="permissionsPerWebsiteAskSetting">Klausti kiekvieną kartą</string>
     <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
     <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">„Klausti“ išjungta visose svetainėse</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Išjungta visose svetainėse</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
 
     <!-- Notify Me View on Downloads -->

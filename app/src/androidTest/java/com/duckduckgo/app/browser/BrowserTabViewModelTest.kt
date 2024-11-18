@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -125,6 +126,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -185,6 +187,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -490,6 +493,7 @@ class BrowserTabViewModelTest {
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
+    private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
 
     @Before
     fun before() = runTest {
@@ -557,6 +561,7 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            brokenSitePrompt = mockBrokenSitePrompt,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -655,6 +660,7 @@ class BrowserTabViewModelTest {
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
+            brokenSitePrompt = mockBrokenSitePrompt,
         )
 
         testee.loadData("abc", null, false, false)
@@ -2422,6 +2428,13 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runTest {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+    }
+
+    @Test
+    fun whenCloseAndSelectSourceTabSelectedThenTabDeletedFromRepository() = runTest {
+        givenOneActiveTabSelected()
+        testee.closeAndSelectSourceTab()
         verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
@@ -5000,6 +5013,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockBrokenSitePrompt, never()).pageRefreshed(any())
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
+    }
+
+    @Test
     fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
         verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
@@ -5624,6 +5649,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenNewPageAndBrokenSitePromptVisibleThenHideCta() = runTest {
+        setCta(BrokenSitePromptDialogCta())
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        assertCommandIssued<HideBrokenSitePromptCta>()
     }
 
     @Test
