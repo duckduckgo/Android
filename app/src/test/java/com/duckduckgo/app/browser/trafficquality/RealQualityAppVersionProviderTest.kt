@@ -51,6 +51,6 @@ class RealQualityAppVersionProviderTest {
         whenever(appBuildConfig.versionName).thenReturn(versionName)
         whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(20))
         val appVersion = testee.provide()
-        assertTrue(appVersion == versionName)
+        assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
     }
 }
