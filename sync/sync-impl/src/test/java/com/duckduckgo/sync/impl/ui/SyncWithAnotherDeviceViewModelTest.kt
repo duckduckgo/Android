@@ -144,7 +144,7 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenUserScansRecoveryCodeButSignedInThenCommandIsAskToSwithAccount() = runTest {
+    fun whenUserScansRecoveryCodeButSignedInThenCommandIsAskToSwitchAccount() = runTest {
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)

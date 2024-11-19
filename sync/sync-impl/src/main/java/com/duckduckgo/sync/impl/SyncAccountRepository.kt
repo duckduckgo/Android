@@ -109,7 +109,7 @@ class AppSyncAccountRepository @Inject constructor(
 
     private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
         if (isSignedIn()) {
-            return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in", payload = recoveryCode)
+            return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in")
                 .alsoFireAlreadySignedInErrorPixel()
         }
 
@@ -324,10 +324,11 @@ class AppSyncAccountRepository @Inject constructor(
     override fun isSignedIn() = syncStore.isSignedIn()
 
     override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
-        logout(syncStore.deviceId.orEmpty()).takeIf { it is Error }?.let {
-            return it
+        val thisDeviceId = syncStore.deviceId.orEmpty()
+        return when (val result = logout(thisDeviceId)) {
+            is Error -> result
+            is Result.Success -> processCode(stringCode)
         }
-        return processCode(stringCode)
     }
 
     private fun performCreateAccount(): Result<Boolean> {
@@ -562,7 +563,6 @@ sealed class Result<out R> {
     data class Error(
         val code: Int = GENERIC_ERROR.code,
         val reason: String = "",
-        val payload: Any? = null,
     ) : Result<Nothing>()
 
     override fun toString(): String {

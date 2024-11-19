@@ -30,7 +30,8 @@
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
 
-    <string name="sync_dialog_switch_account_primary_button">Switch Account</string>
+    <string name="sync_dialog_switch_account_header">This device is already synced.</string>
+    <string name="sync_dialog_switch_account_primary_button">Switch Sync</string>
     <string name="sync_dialog_switch_account_secondary_button">Cancel</string>
-    <string name="sync_dialog_switch_account_description">"You\'re already signed in to another account. Would you like to sign out and switch accounts?"</string>
+    <string name="sync_dialog_switch_account_description">This device is currently synced and backed up. Are you sure you want to sync it with a different backup or device?\nSwitching won\'t remove any data already synced to this device.</string>
 </resources>

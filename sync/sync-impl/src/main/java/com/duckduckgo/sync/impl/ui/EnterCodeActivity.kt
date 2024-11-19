@@ -132,7 +132,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_dialog_switch_account_header)
             .setMessage(R.string.sync_dialog_switch_account_description)
             .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
             .setNegativeButton(R.string.sync_dialog_switch_account_secondary_button)
