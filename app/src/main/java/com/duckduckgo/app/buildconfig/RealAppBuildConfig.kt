@@ -65,6 +65,6 @@ class RealAppBuildConfig @Inject constructor(
     override val variantName: String?
         get() = variantManager.get().getVariantKey()
 
-    override val buildDateTime: Long
+    override val buildDateTimeMillis: Long
         get() = BuildConfig.BUILD_DATE_MILLIS
 }

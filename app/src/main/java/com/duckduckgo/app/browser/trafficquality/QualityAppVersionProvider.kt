@@ -31,7 +31,7 @@ interface QualityAppVersionProvider {
 @ContributesBinding(AppScope::class)
 class RealQualityAppVersionProvider @Inject constructor(private val appBuildConfig: AppBuildConfig) : QualityAppVersionProvider {
     override fun provide(): String {
-        val appBuildDateMillis = appBuildConfig.buildDateTime
+        val appBuildDateMillis = appBuildConfig.buildDateTimeMillis
 
         if (appBuildDateMillis == 0L) {
             return APP_VERSION_QUALITY_DEFAULT_VALUE
