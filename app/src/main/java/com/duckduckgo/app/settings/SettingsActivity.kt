@@ -50,6 +50,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
@@ -108,6 +109,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         _duckPlayerSettingsPlugin.getPlugins()
     }
 
+    @Inject
+    lateinit var newSettingsFeature: NewSettingsFeature
+
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
@@ -125,6 +129,11 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (newSettingsFeature.self().isEnabled()) {
+            globalActivityStarter.start(this, NewSettingsScreenNoParams)
+            finish()
+        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
