@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscri
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
+import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.PkceGeneratorImpl
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
@@ -98,6 +99,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
     private val authJwtValidator: AuthJwtValidator = mock()
     private val timeProvider = FakeTimeProvider()
+    private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private lateinit var subscriptionsManager: SubscriptionsManager
 
     @Before
@@ -119,6 +121,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
     }
 
@@ -516,6 +519,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.subscriptionStatus.test {
@@ -543,6 +547,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.subscriptionStatus.test {
@@ -575,6 +580,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.currentPurchaseState.test {
@@ -621,6 +627,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.currentPurchaseState.test {
@@ -657,6 +664,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.currentPurchaseState.test {
@@ -950,6 +958,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -991,6 +1000,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         manager.subscriptionStatus.test {
@@ -1157,6 +1167,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authJwtValidator,
             pkceGenerator,
             timeProvider,
+            backgroundTokenRefresh,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())

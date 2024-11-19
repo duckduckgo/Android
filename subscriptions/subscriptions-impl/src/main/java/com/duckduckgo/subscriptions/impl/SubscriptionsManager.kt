@@ -40,6 +40,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
+import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -148,9 +149,14 @@ interface SubscriptionsManager {
     suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
-     * Checks if user is signed in or not
+     * Checks if user is signed in or not (using either auth API v1 or v2)
      */
     suspend fun isSignedIn(): Boolean
+
+    /**
+     * Checks if user is signed in or not using auth API v2
+     */
+    suspend fun isSignedInV2(): Boolean
 
     /**
      * Flow to know if a user is signed in or not
@@ -202,6 +208,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val authJwtValidator: AuthJwtValidator,
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
+    private val backgroundTokenRefresh: BackgroundTokenRefresh,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -238,7 +245,7 @@ class RealSubscriptionsManager @Inject constructor(
         return !authRepository.getAuthToken().isNullOrBlank() && !authRepository.getAccessToken().isNullOrBlank()
     }
 
-    private suspend fun isSignedInV2(): Boolean {
+    override suspend fun isSignedInV2(): Boolean {
         return authRepository.getRefreshTokenV2() != null
     }
 
@@ -531,6 +538,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
         authRepository.setEntitlements(accessTokenClaims.entitlements.toEntitlements())
         authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
+        backgroundTokenRefresh.schedule()
     }
 
     private fun extractError(e: Exception): String {
