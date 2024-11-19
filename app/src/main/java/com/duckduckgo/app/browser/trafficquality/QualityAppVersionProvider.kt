@@ -41,7 +41,7 @@ class RealQualityAppVersionProvider @Inject constructor(private val appBuildConf
         val now = LocalDateTime.now()
         val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
 
-        if (daysSinceBuild < DAYS_UNTIL_DEFAULT_VALUE) {
+        if (daysSinceBuild < DAYS_AFTER_APP_BUILD_WITH_DEFAULT_VALUE) {
             return APP_VERSION_QUALITY_DEFAULT_VALUE
         }
 
@@ -54,7 +54,7 @@ class RealQualityAppVersionProvider @Inject constructor(private val appBuildConf
 
     companion object {
         const val APP_VERSION_QUALITY_DEFAULT_VALUE = "other_versions"
-        const val DAYS_UNTIL_DEFAULT_VALUE = 6
-        const val DAYS_FOR_APP_VERSION_LOGGING = DAYS_UNTIL_DEFAULT_VALUE + 10
+        const val DAYS_AFTER_APP_BUILD_WITH_DEFAULT_VALUE = 6
+        const val DAYS_FOR_APP_VERSION_LOGGING = DAYS_AFTER_APP_BUILD_WITH_DEFAULT_VALUE + 10
     }
 }
