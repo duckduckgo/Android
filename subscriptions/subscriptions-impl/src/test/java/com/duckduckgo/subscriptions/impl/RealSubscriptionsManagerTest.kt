@@ -280,6 +280,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenFetchAndStoreAllDataIfSubscriptionFailsWith401ThenSignOutAndReturnNull() = runTest {
+        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
+
         givenUserIsSignedIn()
         givenSubscriptionFails(httpResponseCode = 401)
 

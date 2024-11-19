@@ -435,7 +435,7 @@ class RealSubscriptionsManager @Inject constructor(
     @Deprecated("This method will be removed after migrating to auth v2")
     override suspend fun fetchAndStoreAllData(): Boolean {
         try {
-            if (!isSignedIn()) return false
+            if (!isSignedInV1()) return false
 
             val subscription = try {
                 subscriptionsService.subscription()
