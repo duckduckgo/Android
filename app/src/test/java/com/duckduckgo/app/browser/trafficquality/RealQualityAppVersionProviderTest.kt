@@ -4,6 +4,7 @@ import com.duckduckgo.app.browser.trafficquality.RealQualityAppVersionProvider.C
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import java.time.LocalDateTime
+import java.time.ZoneId
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -24,24 +25,31 @@ class RealQualityAppVersionProviderTest {
     }
 
     @Test
+    fun whenBuildDateEmptyThenReturnDefault() {
+        whenever(appBuildConfig.buildDateTime).thenReturn(0L)
+        val appVersion = testee.provide()
+        assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
+    }
+
+    @Test
     fun whenBuildDateTodayThenReturnDefault() {
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now())
+        givenBuildDateDaysAgo(0)
         val appVersion = testee.provide()
         assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
     }
 
     @Test
     fun whenNotYetTimeToLogThenReturnDefault() {
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(2))
+        givenBuildDateDaysAgo(2)
         val appVersion = testee.provide()
         assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
     }
 
     @Test
     fun whenTimeToLogThenReturnAppVersion() {
+        givenBuildDateDaysAgo(6)
         val versionName = "5.212.0"
-        whenever(appBuildConfig.versionName).thenReturn(versionName)
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(6))
+        givenVersionName(versionName)
         val appVersion = testee.provide()
         assertTrue(appVersion == versionName)
     }
@@ -49,8 +57,8 @@ class RealQualityAppVersionProviderTest {
     @Test
     fun whenTimeToLogAndNotOverLoggingPeriodThenReturnAppVersion() {
         val versionName = "5.212.0"
-        whenever(appBuildConfig.versionName).thenReturn(versionName)
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(8))
+        givenVersionName(versionName)
+        givenBuildDateDaysAgo(8)
         val appVersion = testee.provide()
         assertTrue(appVersion == versionName)
     }
@@ -58,8 +66,8 @@ class RealQualityAppVersionProviderTest {
     @Test
     fun whenTimeToLogAndOverLoggingPeriodThenReturnDefault() {
         val versionName = "5.212.0"
-        whenever(appBuildConfig.versionName).thenReturn(versionName)
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(20))
+        givenVersionName(versionName)
+        givenBuildDateDaysAgo(20)
         val appVersion = testee.provide()
         assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
     }
@@ -67,9 +75,18 @@ class RealQualityAppVersionProviderTest {
     @Test
     fun whenTimeToLogAndJustOnLoggingPeriodThenReturnVersionName() {
         val versionName = "5.212.0"
-        whenever(appBuildConfig.versionName).thenReturn(versionName)
-        whenever(appBuildConfig.buildDateTime).thenReturn(LocalDateTime.now().minusDays(16))
+        givenVersionName(versionName)
+        givenBuildDateDaysAgo(16)
         val appVersion = testee.provide()
         assertTrue(appVersion == versionName)
+    }
+
+    private fun givenBuildDateDaysAgo(days: Long) {
+        val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        whenever(appBuildConfig.buildDateTime).thenReturn(daysAgo)
+    }
+
+    private fun givenVersionName(versionName: String) {
+        whenever(appBuildConfig.versionName).thenReturn(versionName)
     }
 }

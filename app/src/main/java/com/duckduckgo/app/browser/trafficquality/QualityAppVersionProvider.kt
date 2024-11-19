@@ -20,6 +20,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -30,7 +31,13 @@ interface QualityAppVersionProvider {
 @ContributesBinding(AppScope::class)
 class RealQualityAppVersionProvider @Inject constructor(private val appBuildConfig: AppBuildConfig) : QualityAppVersionProvider {
     override fun provide(): String {
-        val appBuildDate = appBuildConfig.buildDateTime
+        val appBuildDateMillis = appBuildConfig.buildDateTime
+
+        if (appBuildDateMillis == 0L) {
+            return APP_VERSION_QUALITY_DEFAULT_VALUE
+        }
+
+        val appBuildDate = LocalDateTime.ofEpochSecond(appBuildDateMillis / 1000, 0, ZoneOffset.UTC)
         val now = LocalDateTime.now()
         val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
 

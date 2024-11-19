@@ -16,7 +16,6 @@
 
 package com.duckduckgo.appbuildconfig.api
 
-import java.time.LocalDateTime
 import java.util.*
 
 interface AppBuildConfig {
@@ -33,7 +32,7 @@ interface AppBuildConfig {
     val model: String
     val deviceLocale: Locale
     val isDefaultVariantForced: Boolean
-    val buildDateTime: LocalDateTime
+    val buildDateTime: Long
 
     /**
      * You should call [variantName] in a background thread

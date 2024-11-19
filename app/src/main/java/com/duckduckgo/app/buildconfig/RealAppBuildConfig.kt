@@ -25,8 +25,6 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import java.lang.IllegalStateException
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.*
 import javax.inject.Inject
 
@@ -67,10 +65,6 @@ class RealAppBuildConfig @Inject constructor(
     override val variantName: String?
         get() = variantManager.get().getVariantKey()
 
-    override val buildDateTime: LocalDateTime
-        get() = if (BuildConfig.BUILD_DATE_MILLIS == 0L) {
-            LocalDateTime.now()
-        } else {
-            LocalDateTime.ofEpochSecond(BuildConfig.BUILD_DATE_MILLIS / 1000, 0, ZoneOffset.UTC)
-        }
+    override val buildDateTime: Long
+        get() = BuildConfig.BUILD_DATE_MILLIS
 }
