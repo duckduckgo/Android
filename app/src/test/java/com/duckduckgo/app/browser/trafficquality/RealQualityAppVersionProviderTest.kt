@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.trafficquality
 
+import com.duckduckgo.app.browser.trafficquality.RealQualityAppVersionProvider.Companion.APP_VERSION_QUALITY_DEFAULT_VALUE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import java.time.LocalDateTime

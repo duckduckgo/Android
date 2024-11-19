@@ -44,8 +44,10 @@ class RealQualityAppVersionProvider @Inject constructor(private val appBuildConf
 
         return appBuildConfig.versionName
     }
-}
 
-const val APP_VERSION_QUALITY_DEFAULT_VALUE = "other_versions"
-const val DAYS_UNTIL_DEFAULT_VALUE = 6
-const val DAYS_FOR_APP_VERSION_LOGGING = DAYS_UNTIL_DEFAULT_VALUE + 10
+    companion object {
+        const val APP_VERSION_QUALITY_DEFAULT_VALUE = "other_versions"
+        const val DAYS_UNTIL_DEFAULT_VALUE = 6
+        const val DAYS_FOR_APP_VERSION_LOGGING = DAYS_UNTIL_DEFAULT_VALUE + 10
+    }
+}
