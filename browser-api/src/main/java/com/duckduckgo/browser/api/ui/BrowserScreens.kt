@@ -39,6 +39,11 @@ sealed class BrowserScreens {
     object SettingsScreenNoParams : GlobalActivityStarter.ActivityParams
 
     /**
+     * Use this model to launch the New Settings screen
+     */
+    object NewSettingsScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
      * Use this model to launch the New Tab Settings screen
      */
     object NewTabSettingsScreenNoParams : GlobalActivityStarter.ActivityParams
