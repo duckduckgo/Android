@@ -57,6 +57,9 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        if (project.hasProperty('build-date-time')) {
+            buildConfigField "long", "BUILD_DATE_TIME", System.currentTimeMillis()
+        }
         namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
