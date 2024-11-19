@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.trafficquality
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 interface QualityAppVersionProvider {
@@ -28,10 +30,22 @@ interface QualityAppVersionProvider {
 @ContributesBinding(AppScope::class)
 class RealQualityAppVersionProvider @Inject constructor(private val appBuildConfig: AppBuildConfig) : QualityAppVersionProvider {
     override fun provide(): String {
-        return APP_VERSION_QUALITY_DEFAULT_VALUE
+        val appBuildDate = appBuildConfig.buildDateTime
+        val now = LocalDateTime.now()
+        val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
+
+        if (daysSinceBuild < DAYS_UNTIL_DEFAULT_VALUE) {
+            return APP_VERSION_QUALITY_DEFAULT_VALUE
+        }
+
+        if (daysSinceBuild > DAYS_FOR_APP_VERSION_LOGGING) {
+            return APP_VERSION_QUALITY_DEFAULT_VALUE
+        }
+
+        return appBuildConfig.versionName
     }
 }
 
 const val APP_VERSION_QUALITY_DEFAULT_VALUE = "other_versions"
-const val DAYS_AFTER_BUILD_DATE_DEFAULT_VALUE = 6
-const val DAYS_FOR_APP_VERSION_LOGGING = 10
+const val DAYS_UNTIL_DEFAULT_VALUE = 6
+const val DAYS_FOR_APP_VERSION_LOGGING = DAYS_UNTIL_DEFAULT_VALUE + 10
