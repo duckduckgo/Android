@@ -39,7 +39,7 @@ class AndroidAppVersionPixelSenderTest {
         pixelSender.onSearchRetentionAtbRefreshed("v123-1", "v123-2")
 
         verify(mockPixel).fire(
-            AppPixelName.FEATURES_ENABLED_AT_SEARCH_TIME,
+            AppPixelName.APP_VERSION_AT_SEARCH_TIME,
             mapOf(
                 AndroidAppVersionPixelSender.PARAM_APP_VERSION to APP_VERSION_QUALITY_DEFAULT_VALUE,
             ),

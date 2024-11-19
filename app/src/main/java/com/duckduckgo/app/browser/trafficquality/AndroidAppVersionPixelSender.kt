@@ -39,7 +39,7 @@ class AndroidAppVersionPixelSender @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             val params = mutableMapOf<String, String>()
             params[PARAM_APP_VERSION] = appVersionProvider.provide()
-            pixel.fire(AppPixelName.FEATURES_ENABLED_AT_SEARCH_TIME, params)
+            pixel.fire(AppPixelName.APP_VERSION_AT_SEARCH_TIME, params)
         }
     }
 
