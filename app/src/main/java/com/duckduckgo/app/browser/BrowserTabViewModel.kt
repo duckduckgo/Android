@@ -2839,7 +2839,7 @@ class BrowserTabViewModel @Inject constructor(
         val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveTwoWeeksAgo() }
         val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo() }
 
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             val params = mapOf(
                 PixelParameter.TAB_COUNT to tabCount.await(),
                 PixelParameter.TAB_ACTIVE_7D to activeTabCount.await(),
