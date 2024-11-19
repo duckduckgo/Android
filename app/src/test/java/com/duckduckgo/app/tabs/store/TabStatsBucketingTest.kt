@@ -16,7 +16,7 @@ package com.duckduckgo.app.tabs.store
  */
 
 import com.duckduckgo.app.tabs.model.TabRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -35,224 +35,224 @@ class DefaultTabStatsBucketingTest {
     }
 
     @Test
-    fun testGetNumberOfOpenTabsExactly1() = runBlocking {
+    fun testGetNumberOfOpenTabsExactly1() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(1)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("1", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabsZero() = runBlocking {
+    fun testGetNumberOfOpenTabsZero() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(0)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("1", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs() = runBlocking {
+    fun testGetNumberOfOpenTabs() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(5)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("2-5", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs6To10() = runBlocking {
+    fun testGetNumberOfOpenTabs6To10() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(8)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("6-10", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs11To20() = runBlocking {
+    fun testGetNumberOfOpenTabs11To20() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(11)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("11-20", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabsMoreThan20() = runBlocking {
+    fun testGetNumberOfOpenTabsMoreThan20() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(40)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("21-40", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs41To60() = runBlocking {
+    fun testGetNumberOfOpenTabs41To60() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(50)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("41-60", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs61To80() = runBlocking {
+    fun testGetNumberOfOpenTabs61To80() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(70)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("61-80", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs81To100() = runBlocking {
+    fun testGetNumberOfOpenTabs81To100() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(90)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("81-100", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs101To125() = runBlocking {
+    fun testGetNumberOfOpenTabs101To125() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(110)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("101-125", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs126To150() = runBlocking {
+    fun testGetNumberOfOpenTabs126To150() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(130)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("126-150", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs151To250() = runBlocking {
+    fun testGetNumberOfOpenTabs151To250() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(200)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("151-250", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabs251To500() = runBlocking {
+    fun testGetNumberOfOpenTabs251To500() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(300)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("251-500", result)
     }
 
     @Test
-    fun testGetNumberOfOpenTabsMaxValue() = runBlocking {
+    fun testGetNumberOfOpenTabsMaxValue() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(600)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
         assertEquals("501+", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeekZero() = runBlocking {
+    fun testGetTabsActiveLastWeekZero() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(0)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("0", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeekExactly1() = runBlocking {
+    fun testGetTabsActiveLastWeekExactly1() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(1)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeek1To5() = runBlocking {
+    fun testGetTabsActiveLastWeek1To5() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(2)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeek6To10() = runBlocking {
+    fun testGetTabsActiveLastWeek6To10() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(10)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("6-10", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeek11To20() = runBlocking {
+    fun testGetTabsActiveLastWeek11To20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(15)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("11-20", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeekMoreThan20() = runBlocking {
+    fun testGetTabsActiveLastWeekMoreThan20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(25)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("21+", result)
     }
 
     @Test
-    fun testGetTabsActiveLastWeekALotMoreThan20() = runBlocking {
+    fun testGetTabsActiveLastWeekALotMoreThan20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(0, TabStatsBucketing.ONE_WEEK_IN_DAYS)).thenReturn(250)
         val result = defaultTabStatsBucketing.getTabsActiveLastWeek()
         assertEquals("21+", result)
     }
 
     @Test
-    fun testGetTabsActiveOneWeekAgoZero() = runBlocking {
+    fun testGetTabsActiveOneWeekAgoZero() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(0)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("0", result)
     }
 
     @Test
-    fun testGet1WeeksInactiveTabBucketExactly1() = runBlocking {
+    fun testGet1WeeksInactiveTabBucketExactly1() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(1)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGet1WeeksInactiveTabBucket1To5() = runBlocking {
+    fun testGet1WeeksInactiveTabBucket1To5() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(3)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveOneWeekAgo6To10() = runBlocking {
+    fun testGetTabsActiveOneWeekAgo6To10() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(8)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("6-10", result)
     }
 
     @Test
-    fun testGetTabsActiveOneWeekAgo11To20() = runBlocking {
+    fun testGetTabsActiveOneWeekAgo11To20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(15)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("11-20", result)
     }
 
     @Test
-    fun testGetTabsActiveOneWeekAgoMoreThan20() = runBlocking {
+    fun testGetTabsActiveOneWeekAgoMoreThan20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.ONE_WEEK_IN_DAYS, TabStatsBucketing.TWO_WEEKS_IN_DAYS)).thenReturn(25)
         val result = defaultTabStatsBucketing.getTabsActiveOneWeekAgo()
         assertEquals("21+", result)
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgoZero() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgoZero() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(0)
         val result = defaultTabStatsBucketing.getTabsActiveTwoWeeksAgo()
         assertEquals("0", result)
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgoExactly1() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgoExactly1() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(1)
         val result = defaultTabStatsBucketing.getTabsActiveTwoWeeksAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgo1To5() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgo1To5() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(5)
         val result = defaultTabStatsBucketing.getTabsActiveTwoWeeksAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgo6To10() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgo6To10() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(6)
         val result = defaultTabStatsBucketing.getTabsActiveTwoWeeksAgo()
         assertEquals("6-10", result)
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgo11To20() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgo11To20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(
             20,
         )
@@ -261,7 +261,7 @@ class DefaultTabStatsBucketingTest {
     }
 
     @Test
-    fun testGetTabsActiveTwoWeeksAgoMoreThan20() = runBlocking {
+    fun testGetTabsActiveTwoWeeksAgoMoreThan20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.TWO_WEEKS_IN_DAYS, TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(
             199,
         )
@@ -270,42 +270,42 @@ class DefaultTabStatsBucketingTest {
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgoZero() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgoZero() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(0)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("0", result)
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgoExactly1() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgoExactly1() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(1)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgo1To5() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgo1To5() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(5)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("1-5", result)
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgo6To10() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgo6To10() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(10)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("6-10", result)
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgo11To20() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgo11To20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(11)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("11-20", result)
     }
 
     @Test
-    fun testGetTabsActiveMoreThanThreeWeeksAgoMoreThan20() = runBlocking {
+    fun testGetTabsActiveMoreThanThreeWeeksAgoMoreThan20() = runTest {
         whenever(tabRepository.countTabsAccessedWithinRange(TabStatsBucketing.THREE_WEEKS_IN_DAYS)).thenReturn(21)
         val result = defaultTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()
         assertEquals("21+", result)
