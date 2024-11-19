@@ -232,6 +232,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -246,6 +247,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -344,6 +346,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -430,6 +433,7 @@ class BrowserTabViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
     private val brokenSitePrompt: BrokenSitePrompt,
+    private val tabStatsBucketing: TabStatsBucketing,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2825,7 +2829,26 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        fireDailyLaunchPixel()
+    }
+
+    private fun fireDailyLaunchPixel() {
+        val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getNumberOfOpenTabs() }
+        val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveLastWeek() }
+        val inactive1w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveOneWeekAgo() }
+        val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveTwoWeeksAgo() }
+        val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo() }
+
+        viewModelScope.launch(dispatchers.io()) {
+            val params = mapOf(
+                PixelParameter.TAB_COUNT to tabCount.await(),
+                PixelParameter.TAB_ACTIVE_7D to activeTabCount.await(),
+                PixelParameter.TAB_INACTIVE_1W to inactive1w.await(),
+                PixelParameter.TAB_INACTIVE_2W to inactive2w.await(),
+                PixelParameter.TAB_INACTIVE_3W to inactive3w.await(),
+            )
+            pixel.fire(TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+        }
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {

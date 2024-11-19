@@ -175,6 +175,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -494,6 +495,7 @@ class BrowserTabViewModelTest {
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockTabStatsBucketing: TabStatsBucketing = mock()
 
     @Before
     fun before() = runTest {
@@ -661,6 +663,7 @@ class BrowserTabViewModelTest {
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
             brokenSitePrompt = mockBrokenSitePrompt,
+            tabStatsBucketing = mockTabStatsBucketing,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5442,12 +5445,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() = runTest {
+        val tabCount = "61-80"
+        val active7d = "21+"
+        val inactive1w = "11-20"
+        val inactive2w = "6-10"
+        val inactive3w = "0"
+
+        whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+
+        val params = mapOf(
+            PixelParameter.TAB_COUNT to tabCount,
+            PixelParameter.TAB_ACTIVE_7D to active7d,
+            PixelParameter.TAB_INACTIVE_1W to inactive1w,
+            PixelParameter.TAB_INACTIVE_2W to inactive2w,
+            PixelParameter.TAB_INACTIVE_3W to inactive3w,
+        )
+
         testee.userLaunchingTabSwitcher()
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
     }
 
     @Test
