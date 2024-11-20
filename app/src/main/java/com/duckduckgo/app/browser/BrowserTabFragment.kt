@@ -135,7 +135,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -187,7 +186,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -497,9 +495,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var changeOmnibarPositionFeature: ChangeOmnibarPositionFeature
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
@@ -862,21 +857,6 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibar() {
-        if (changeOmnibarPositionFeature.refactor().isEnabled()) {
-            configureNewOmnibar()
-        } else {
-            configureLegacyOmnibar()
-        }
-    }
-
-    private fun configureLegacyOmnibar() {
-        configureFindInPage()
-        configureOmnibarTextInput()
-        configureItemPressedListener()
-        configureCustomTab()
-    }
-
-    private fun configureNewOmnibar() {
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
@@ -892,16 +872,10 @@ class BrowserTabFragment :
     }
 
     private fun onUserSubmittedText(text: String) {
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.sendPixelsOnEnterKeyPressed()
-        }
         userEnteredQuery(text)
     }
 
     private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.onOmnibarInputStateChanged(text, hasFocus, true)
-        }
         viewModel.triggerAutocomplete(text, hasFocus, true)
     }
 
@@ -921,15 +895,9 @@ class BrowserTabFragment :
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
 
-    private fun onOmnibarFireButtonPressed(isPulseAnimationPlaying: Boolean) {
+    private fun onOmnibarFireButtonPressed() {
         browserActivity?.launchFire()
         viewModel.onFireMenuSelected()
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            pixel.fire(
-                AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                mapOf(FIRE_BUTTON_STATE to isPulseAnimationPlaying.toString()),
-            )
-        }
     }
 
     private fun onOmnibarBrowserMenuButtonPressed() {
@@ -942,9 +910,6 @@ class BrowserTabFragment :
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         browserActivity?.launchPrivacyDashboard(toggle = false)
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.onPrivacyShieldSelected()
-        }
     }
 
     private fun onOmnibarVoiceSearchPressed() {
@@ -2356,8 +2321,8 @@ class BrowserTabFragment :
                     onOmnibarTabsButtonLongPressed()
                 }
 
-                override fun onFireButtonPressed(isPulseAnimationPlaying: Boolean) {
-                    onOmnibarFireButtonPressed(isPulseAnimationPlaying)
+                override fun onFireButtonPressed() {
+                    onOmnibarFireButtonPressed()
                 }
 
                 override fun onBrowserMenuPressed() {
@@ -2402,9 +2367,6 @@ class BrowserTabFragment :
                 }
 
                 override fun onTouchEvent(event: MotionEvent) {
-                    if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-                        viewModel.onUserTouchedOmnibarTextInput(event.action)
-                    }
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
@@ -2426,9 +2388,6 @@ class BrowserTabFragment :
         hasFocus: Boolean,
         query: String,
     ) {
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.onOmnibarInputStateChanged(query, hasFocus, false)
-        }
         viewModel.triggerAutocomplete(query, hasFocus, false)
         if (hasFocus) {
             cancelPendingAutofillRequestsToChooseCredentials()
@@ -2439,9 +2398,6 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarBackKeyPressed() {
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.sendPixelsOnBackKeyPressed()
-        }
         omnibar.omnibarTextInput.hideKeyboard()
         binding.focusDummy.requestFocus()
     }
@@ -3650,15 +3606,6 @@ class BrowserTabFragment :
                 lastSeenOmnibarViewState = viewState
 
                 omnibar.renderOmnibarViewState(viewState)
-
-                if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-                    lastSeenBrowserViewState?.let {
-                        omnibar.renderBrowserViewState(it, tabDisplayedInCustomTabScreen)
-                    }
-                    if (viewState.isEditing) {
-                        omnibar.cancelTrackersAnimation()
-                    }
-                }
             }
         }
 
