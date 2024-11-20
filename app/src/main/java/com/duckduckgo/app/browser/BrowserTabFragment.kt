@@ -783,7 +783,9 @@ class BrowserTabFragment :
                 }
 
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
-                is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
+                is VoiceSearchLauncher.Event.VoiceSearchDisabled -> {
+                    viewModel.voiceSearchDisabled()
+                }
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
