@@ -59,10 +59,12 @@ jobs:
       - name: Notify if no changes
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
-          echo "No new commits since the last tag. Skipping release notes update."
-          exit 0
+          echo "No new commits since the last tag. Skipping nightly release."
+          echo "No new commits since the last tag. Skipping nightly release." >> $GITHUB_STEP_SUMMARY
+          exit 0   
 
       - name: Decode upload keys
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
         with:
           secret: ${{ secrets.UPLOAD_RELEASE_PROPERTIES }}
@@ -70,6 +72,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode key file
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
         with:
           secret: ${{ secrets.UPLOAD_RELEASE_KEY }}
@@ -77,6 +80,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode Play Store credentials file
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
         with:
           secret: ${{ secrets.UPLOAD_PLAY_CREDENTIALS }}
@@ -84,6 +88,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Decode Firebase credentials file
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
         with:
           secret: ${{ secrets.UPLOAD_FIREBASE_CREDENTIALS }}
@@ -91,30 +96,36 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Clean project
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         run: |
           gradle clean          
 
       - name: Assemble the bundle
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }}
 
       - name: Generate nightly version name
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
           output=$(gradle getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         id: capture_output
         run: |
           output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
       - name: Upload bundle to Play Store Internal track
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         id: create_app_bundle
         run: |
           bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
 
       - name: Tag Nightly release
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         id: tag_nightly_release
         run: |
           git checkout develop
@@ -122,10 +133,16 @@ jobs:
           git push origin ${{ steps.generate_version_name.outputs.version }}
 
       - name: Upload APK as artifact
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
           path: duckduckgo.apk
+
+      - name: Set successful summary
+        if: steps.check_for_changes.outputs.has_changes == 'true'
+        run: |
+          echo "### Nightly release completed! :rocket:" >> $GITHUB_STEP_SUMMARY    
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
