@@ -60,6 +60,7 @@ class DevSettingsViewModel @Inject constructor(
         object ShowSavedSitesClearedConfirmation : Command()
         object ChangePrivacyConfigUrl : Command()
         object CustomTabs : Command()
+        data object Notifications : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -136,5 +137,9 @@ class DevSettingsViewModel @Inject constructor(
             savedSitesRepository.deleteAll()
             command.send(Command.ShowSavedSitesClearedConfirmation)
         }
+    }
+
+    fun notificationsClicked() {
+        viewModelScope.launch { command.send(Command.Notifications) }
     }
 }
