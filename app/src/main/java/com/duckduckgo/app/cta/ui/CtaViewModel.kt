@@ -106,8 +106,8 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-    private fun requiredDaxOnboardingCtas(): Array<CtaId> {
-        val shouldShowPrivacyProCta = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled()
+    private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
+        val shouldShowPrivacyProCta = subscriptions.isEligible()
         return if (shouldShowPrivacyProCta) {
             arrayOf(
                 CtaId.DAX_INTRO,
@@ -294,74 +294,31 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowPrivacyProCta() -> {
+                val titleRes: Int
+                val descriptionRes: Int
+                when {
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.STEP) -> {
+                        titleRes = R.string.onboardingPrivacyProStepDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProStepDaxDialogDescription
+                    }
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> {
+                        titleRes = R.string.onboardingPrivacyProProtectionDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProProtectionDaxDialogDescription
+                    }
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.DEAL) -> {
+                        titleRes = R.string.onboardingPrivacyProDealDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProDealDaxDialogDescription
+                    }
+                    else -> {
+                        titleRes = R.string.onboardingPrivacyProDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProDaxDialogDescription
+                    }
+                }
+
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                    when {
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
-                            DaxBubbleCta.DaxExperimentPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProProtectionDaxDialogTitle,
-                                R.string.onboardingPrivacyProProtectionDaxDialogDescription,
-                            )
-
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
-                            DaxBubbleCta.DaxExperimentPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProPirDaxDialogTitle,
-                                R.string.onboardingPrivacyProPirDaxDialogDescription,
-                            )
-
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
-                            DaxBubbleCta.DaxExperimentPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProVpnDaxDialogTitle,
-                                R.string.onboardingPrivacyProVpnDaxDialogDescription,
-                            )
-
-                        else ->
-                            DaxBubbleCta.DaxExperimentPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProDaxDialogTitle,
-                                R.string.onboardingPrivacyProDaxDialogDescription,
-                            )
-                    }
+                    DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
                 } else {
-                    when {
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) ->
-                            DaxBubbleCta.DaxPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProProtectionDaxDialogTitle,
-                                R.string.onboardingPrivacyProProtectionDaxDialogDescription,
-                            )
-
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PIR) ->
-                            DaxBubbleCta.DaxPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProPirDaxDialogTitle,
-                                R.string.onboardingPrivacyProPirDaxDialogDescription,
-                            )
-
-                        extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.VPN) ->
-                            DaxBubbleCta.DaxPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProVpnDaxDialogTitle,
-                                R.string.onboardingPrivacyProVpnDaxDialogDescription,
-                            )
-
-                        else ->
-                            DaxBubbleCta.DaxPrivacyProCta(
-                                onboardingStore,
-                                appInstallStore,
-                                R.string.onboardingPrivacyProDaxDialogTitle,
-                                R.string.onboardingPrivacyProDaxDialogDescription,
-                            )
-                    }
+                    DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
                 }
             }
 
@@ -408,7 +365,7 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun canShowPrivacyProCta(): Boolean {
         return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
-            extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled()
+            subscriptions.isEligible()
     }
 
     @WorkerThread
@@ -556,7 +513,7 @@ class CtaViewModel @Inject constructor(
     private suspend fun pulseAnimationDisabled(): Boolean =
         !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()
 
-    private fun allOnboardingCtasShown(): Boolean {
+    private suspend fun allOnboardingCtasShown(): Boolean {
         return requiredDaxOnboardingCtas().all { dismissedCtaDao.exists(it) }
     }
 
@@ -605,9 +562,9 @@ class CtaViewModel @Inject constructor(
     fun getCohortOrigin(): String {
         val cohort = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()
         return when (cohort?.name) {
+            Cohorts.STEP.cohortName -> "_${Cohorts.STEP.cohortName}"
             Cohorts.PROTECTION.cohortName -> "_${Cohorts.PROTECTION.cohortName}"
-            Cohorts.PIR.cohortName -> "_${Cohorts.PIR.cohortName}"
-            Cohorts.VPN.cohortName -> "_${Cohorts.VPN.cohortName}"
+            Cohorts.DEAL.cohortName -> "_${Cohorts.DEAL.cohortName}"
             Cohorts.CONTROL.cohortName -> "_${Cohorts.CONTROL.cohortName}"
             else -> ""
         }

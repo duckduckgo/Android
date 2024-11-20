@@ -52,8 +52,8 @@ interface ExtendedOnboardingFeatureToggles {
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         PROTECTION("protection"),
-        PIR("pir"),
-        VPN("vpn"),
+        DEAL("deal"),
+        STEP("step"),
     }
 }
 
