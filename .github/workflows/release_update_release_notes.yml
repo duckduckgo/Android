@@ -10,6 +10,7 @@ on:
       release-notes:
         description: 'Release notes for the version'
         required: true
+        type: string
         default: 'Bug fixes and other improvements'
 
 env:
