@@ -17,6 +17,7 @@
 package com.duckduckgo.app.dev.settings.notifications
 
 import android.app.Notification
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -43,14 +44,17 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class NotificationViewModel @Inject constructor(
+    private val applicationContext: Context,
     private val dispatcher: DispatcherProvider,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val factory: NotificationFactory,
     private val surveyRepository: SurveyRepository,
+    private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
 ) : ViewModel() {
 
     data class ViewState(
         val scheduledNotifications: List<NotificationItem> = emptyList(),
+        val vpnNotifications: List<NotificationItem> = emptyList(),
     ) {
 
         data class NotificationItem(
@@ -93,7 +97,19 @@ class NotificationViewModel @Inject constructor(
                 )
             }
 
-            _viewState.update { it.copy(scheduledNotifications = scheduledNotificationItems) }
+            val netPDisabledNotificationItem = NotificationItem(
+                id = 0,
+                title = "NetP Disabled",
+                subtitle = "NetP is disabled",
+                notification = netPDisabledNotificationBuilder.buildVpnAccessRevokedNotification(applicationContext),
+            )
+
+            _viewState.update {
+                it.copy(
+                    scheduledNotifications = scheduledNotificationItems,
+                    vpnNotifications = listOf(netPDisabledNotificationItem),
+                )
+            }
         }
     }
 

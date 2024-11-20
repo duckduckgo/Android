@@ -82,6 +82,16 @@ class NotificationsActivity : DuckDuckGoActivity() {
                 binding.scheduledNotificationsContainer.addView(it)
             }
         }
+
+        viewState.vpnNotifications.forEach { notificationItem ->
+            buildNotificationItem(
+                title = notificationItem.title,
+                subtitle = notificationItem.subtitle,
+                onClick = { viewModel.onNotificationItemClick(notificationItem) },
+            ).also {
+                binding.vpnNotificationsContainer.addView(it)
+            }
+        }
     }
 
     private fun buildNotificationItem(
