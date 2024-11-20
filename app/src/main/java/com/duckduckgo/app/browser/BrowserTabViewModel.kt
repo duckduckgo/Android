@@ -309,8 +309,6 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
@@ -405,8 +403,6 @@ class BrowserTabViewModel @Inject constructor(
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadStateListener,
-    private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
@@ -592,7 +588,6 @@ class BrowserTabViewModel @Inject constructor(
 
     init {
         initializeViewStates()
-        logVoiceSearchAvailability()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
@@ -748,10 +743,6 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun logVoiceSearchAvailability() {
-        if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -2442,7 +2433,6 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
-            val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
