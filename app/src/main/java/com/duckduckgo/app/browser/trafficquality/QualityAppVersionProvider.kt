@@ -38,7 +38,7 @@ class RealQualityAppVersionProvider @Inject constructor(private val appBuildConf
         }
 
         val appBuildDate = LocalDateTime.ofEpochSecond(appBuildDateMillis / 1000, 0, ZoneOffset.UTC)
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(ZoneOffset.UTC)
         val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
 
         if (daysSinceBuild < DAYS_AFTER_APP_BUILD_WITH_DEFAULT_VALUE) {
