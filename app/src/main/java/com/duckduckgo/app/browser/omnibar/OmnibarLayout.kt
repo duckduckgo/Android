@@ -52,6 +52,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
@@ -114,6 +115,7 @@ class OmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class Outline(val enabled: Boolean) : Decoration()
+        data class DisableVoiceSearch(val url: String) : Decoration()
     }
 
     sealed class StateChange {
@@ -529,6 +531,10 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is HighlightOmnibarItem -> {
                 viewModel.onHighlightItem(decoration)
+            }
+
+            is DisableVoiceSearch -> {
+                viewModel.onVoiceSearchDisabled(decoration.url)
             }
         }
     }

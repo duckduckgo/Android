@@ -3176,12 +3176,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun voiceSearchDisabled() {
-        // browserViewState.value = currentBrowserViewState().copy(
-        //     showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
-        // )
-    }
-
     private fun getDataForPermissionState(
         featureName: String,
         method: String,
