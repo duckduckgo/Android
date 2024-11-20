@@ -91,5 +91,6 @@
 
     <!-- Notifications -->
     <string name="devSettingsNotificationsScheduledTitle">Scheduled Notifications</string>
+    <string name="devSettingsNotificationsVPNTitle">VPN Notifications</string>
 
 </resources>
