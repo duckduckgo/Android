@@ -322,14 +322,14 @@ class Omnibar(
         viewState: BrowserViewState,
         voiceSearchPressed: () -> Unit,
     ) {
-        if (viewState.showVoiceSearch) {
-            voiceSearchButton.visibility = VISIBLE
-            voiceSearchButton.setOnClickListener {
-                voiceSearchPressed()
-            }
-        } else {
-            voiceSearchButton.visibility = GONE
-        }
+        // if (viewState.showVoiceSearch) {
+        //     voiceSearchButton.visibility = VISIBLE
+        //     voiceSearchButton.setOnClickListener {
+        //         voiceSearchPressed()
+        //     }
+        // } else {
+        //     voiceSearchButton.visibility = GONE
+        // }
     }
 
     fun isPulseAnimationPlaying(): Boolean {
@@ -392,9 +392,6 @@ class Omnibar(
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
             ),
         )
-        if (viewState.showDuckPlayerIcon) {
-            isScrollingEnabled = false
-        }
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {

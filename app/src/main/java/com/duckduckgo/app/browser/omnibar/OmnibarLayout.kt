@@ -348,7 +348,7 @@ class OmnibarLayout @JvmOverloads constructor(
             if (isAttachedToWindow) {
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
-            omnibarItemPressedListener?.onFireButtonPressed(isPulseAnimationPlaying())
+            omnibarItemPressedListener?.onFireButtonPressed()
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
