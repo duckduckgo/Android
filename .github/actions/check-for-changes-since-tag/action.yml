@@ -22,8 +22,9 @@ runs:
       run: |      
         # Check if there are any new commits since the tag
         new_commits=$(git rev-list ${{ inputs.tag }}..HEAD --count)
+        echo "$new_commits commits since ${{ inputs.tag }} tag"
         
-        if [ $new_commits -gt 0 ]; then
+        if [ $new_commits -gt 0 ]; then        
           echo "has_changes=true" >> $GITHUB_OUTPUT
         else
           echo "has_changes=false" >> $GITHUB_OUTPUT
