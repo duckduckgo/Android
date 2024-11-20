@@ -51,7 +51,7 @@ jobs:
 
       - name: Check for changes
         id: check_for_changes
-        uses: ./.github/actions/check-for-changes
+        uses: ./.github/actions/check-for-changes-since-tag
         with:
            github_token: ${{ secrets.GT_DAXMOBILE }}
            tag: ${{ steps.get_latest_tag.outputs.latest_tag }}
