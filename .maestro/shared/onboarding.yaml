@@ -1,15 +1,7 @@
 appId: com.duckduckgo.mobile.android
 ---
 - assertVisible:
-    text: ".*Ready for a better, more private internet?.*"
+    text: ".*kinda creepy.*"
 - tapOn: "let's do it!"
 - assertVisible:
-    text: ".*Privacy protections activated.*"
-- scrollUntilVisible:
-    element:
-      text: "choose your browser"
-    direction: DOWN
-- tapOn: "choose your browser"
-- tapOn: "cancel"
-- assertVisible:
-    text: ".*Try a search!.*"
+    text: ".*try visiting one of your favorite sites.*"
