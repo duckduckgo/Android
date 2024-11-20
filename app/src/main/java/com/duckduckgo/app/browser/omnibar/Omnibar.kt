@@ -91,7 +91,7 @@ class Omnibar(
     interface ItemPressedListener {
         fun onTabsButtonPressed()
         fun onTabsButtonLongPressed()
-        fun onFireButtonPressed(isPulseAnimationPlaying: Boolean)
+        fun onFireButtonPressed()
         fun onBrowserMenuPressed()
         fun onPrivacyShieldPressed()
         fun onClearTextPressed()

@@ -2031,49 +2031,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onOmnibarInputStateChanged(
-        query: String,
-        hasFocus: Boolean,
-        hasQueryChanged: Boolean,
-    ) {
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = !hasFocus || query.isBlank()
-        val showPrivacyShield = !hasFocus
-        val showSearchIcon = hasFocus
-
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            isEditing = hasFocus,
-            forceExpand = true,
-            shouldMoveCaretToStart = !hasFocus,
-        )
-
-        val currentBrowserViewState = currentBrowserViewState()
-        browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
-            showSearchIcon = showSearchIcon,
-            showTabsButton = showControls,
-            fireButton = if (showControls) {
-                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
-            } else {
-                HighlightableButton.Gone
-            },
-            showMenuButton = if (showControls) {
-                HighlightableButton.Visible()
-            } else {
-                HighlightableButton.Gone
-            },
-            showClearButton = showClearButton,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = hasFocus,
-                query = query,
-                hasQueryChanged = hasQueryChanged,
-                urlLoaded = url ?: "",
-            ),
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
-            showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
-        )
-    }
-
     fun onBookmarkMenuClicked() {
         val url = url ?: return
         viewModelScope.launch {

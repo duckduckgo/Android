@@ -28,10 +28,6 @@ data class BrowserViewState(
     val isDesktopBrowsingMode: Boolean = false,
     val canChangeBrowsingMode: Boolean = false,
     val showPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
-    val showSearchIcon: Boolean = false,
-    val showClearButton: Boolean = false,
-    val showVoiceSearch: Boolean = false,
-    val showTabsButton: Boolean = true,
     val fireButton: HighlightableButton = HighlightableButton.Visible(),
     val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
     val canSharePage: Boolean = false,
@@ -47,7 +43,6 @@ data class BrowserViewState(
     val canReportSite: Boolean = false,
     val addToHomeEnabled: Boolean = false,
     val addToHomeVisible: Boolean = false,
-    val showDaxIcon: Boolean = false,
     val isEmailSignedIn: Boolean = false,
     var previousAppLink: SpecialUrlDetector.UrlType.AppLink? = null,
     val canFindInPage: Boolean = false,
@@ -58,7 +53,6 @@ data class BrowserViewState(
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
     val sslError: SSLErrorType = SSLErrorType.NONE,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
-    val showDuckPlayerIcon: Boolean = false,
 )
 
 sealed class HighlightableButton {
