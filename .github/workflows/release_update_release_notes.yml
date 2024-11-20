@@ -42,10 +42,10 @@ jobs:
           fileName: api.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
-      - name: Update release notes in Play Store
-        id: update_play_store_release_notes
-        run: |
-          bundle exec fastlane update_release_notes_playstore release_number:${{ github.event.inputs.app-version }} release_notes:"${{ github.event.inputs.release-notes }}"          
+#      - name: Update release notes in Play Store
+#        id: update_play_store_release_notes
+#        run: |
+#          bundle exec fastlane update_release_notes_playstore release_number:${{ github.event.inputs.app-version }} release_notes:"${{ github.event.inputs.release-notes }}"
 
       - name: Update release notes in Github
         id: update_gh_release_notes
