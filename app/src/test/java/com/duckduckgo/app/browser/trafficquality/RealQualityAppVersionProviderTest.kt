@@ -26,7 +26,7 @@ class RealQualityAppVersionProviderTest {
 
     @Test
     fun whenBuildDateEmptyThenReturnDefault() {
-        whenever(appBuildConfig.buildDateTime).thenReturn(0L)
+        whenever(appBuildConfig.buildDateTimeMillis).thenReturn(0L)
         val appVersion = testee.provide()
         assertTrue(appVersion == APP_VERSION_QUALITY_DEFAULT_VALUE)
     }
@@ -83,7 +83,7 @@ class RealQualityAppVersionProviderTest {
 
     private fun givenBuildDateDaysAgo(days: Long) {
         val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        whenever(appBuildConfig.buildDateTime).thenReturn(daysAgo)
+        whenever(appBuildConfig.buildDateTimeMillis).thenReturn(daysAgo)
     }
 
     private fun givenVersionName(versionName: String) {
