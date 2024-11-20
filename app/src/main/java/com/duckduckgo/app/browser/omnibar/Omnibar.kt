@@ -210,13 +210,6 @@ class Omnibar(
         newOmnibar.setExpanded(expanded)
     }
 
-    fun setExpanded(
-        expanded: Boolean,
-        animate: Boolean,
-    ) {
-        newOmnibar.setExpanded(expanded, animate)
-    }
-
     fun configureItemPressedListeners(listener: ItemPressedListener) {
         newOmnibar.setOmnibarItemPressedListener(listener)
     }
@@ -252,10 +245,7 @@ class Omnibar(
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
     }
 
-    fun setPrivacyShield(
-        isCustomTab: Boolean,
-        privacyShield: PrivacyShield,
-    ) {
+    fun setPrivacyShield(privacyShield: PrivacyShield) {
         newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
     }
 
