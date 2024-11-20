@@ -60,7 +60,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
           echo "No new commits since the last tag. Skipping release notes update."
-          exit 1
+          exit 0
 
       - name: Decode upload keys
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
