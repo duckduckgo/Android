@@ -1,0 +1,30 @@
+name: 'Check for code changes after a specific tag'
+description: 'Checks if there are any new commits since the specified tag'
+
+inputs:
+  github_token:
+    description: 'GitHub token'
+    required: true
+  tag:
+    description: 'Tag to check'
+    required: true
+
+outputs:
+  has_changes:
+    description: Whether there are new commits since the last tag
+    value: ${{ steps.check_for_changes.outputs.has_changes }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: check_for_changes
+      shell: bash
+      run: |      
+        # Check if there are any new commits since the tag
+        new_commits=$(git rev-list ${{ inputs.tag }}..HEAD --count)
+        
+        if [ $new_commits -gt 0 ]; then
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        fi

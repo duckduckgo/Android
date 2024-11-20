@@ -48,6 +48,19 @@ jobs:
           echo "Latest tag: $output"
           echo "latest_tag=$output" >> $GITHUB_OUTPUT
 
+      - name: Check for changes
+        id: check_for_changes
+        uses: ./.github/actions/check-for-changes
+        with:
+           github_token: ${{ secrets.GT_DAXMOBILE }}
+           tag: ${{ steps.get_latest_tag.outputs.latest_tag }}
+
+      - name: Notify if no changes
+        if: steps.check_for_changes.outputs.has_changes == 'false'
+        run: |
+          echo "No new commits since the last tag. Skipping release notes update."
+          exit 1
+
       - name: Decode upload keys
         uses: davidSchuppa/base64Secret-toFile-action@199e78f212c854d2284fada7f3cd3aba3e37d208
         with:
