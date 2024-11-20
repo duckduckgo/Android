@@ -38,7 +38,7 @@
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
     <string name="devSettingsScreenCustomTabs">Custom Tabs</string>
-    <string name="devSettingsScreenNotificationTitle">Notifications</string>
+    <string name="devSettingsScreenNotificationsTitle">Notifications</string>
     <string name="devSettingsScreenNotificationsSubtitle">Trigger notifications for testing</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
     <string name="devSettingsScreenCustomTabsSubtitle">Load a Custom Tab for a specified URL</string>
@@ -88,5 +88,8 @@
     <string name="customTabsInvalidUrl">Invalid URL</string>
     <string name="customTabsEmptyUrl">Enter a URL</string>
     <string name="customTabsDefaultBrowserTitle">Default Browser</string>
+
+    <!-- Notifications -->
+    <string name="devSettingsNotificationsScheduledTitle">Scheduled Notifications</string>
 
 </resources>
