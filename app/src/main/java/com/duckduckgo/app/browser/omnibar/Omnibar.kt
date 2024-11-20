@@ -78,44 +78,17 @@ import timber.log.Timber
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    private val refactorFlagEnabled: Boolean,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                if (refactorFlagEnabled) {
-                    Timber.d("Omnibar: using NewOmnibar anchored TOP")
-                    binding.rootView.removeView(binding.legacyOmnibarBottom)
-                    binding.rootView.removeView(binding.legacyOmnibar)
-                    binding.rootView.removeView(binding.newOmnibarBottom)
-                } else {
-                    Timber.d("Omnibar: using LegacyOmnibar anchored TOP")
-                    binding.rootView.removeView(binding.newOmnibarBottom)
-                    binding.rootView.removeView(binding.newOmnibar)
-                    binding.rootView.removeView(binding.legacyOmnibarBottom)
-                }
+                binding.rootView.removeView(binding.newOmnibarBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
-                if (refactorFlagEnabled) {
-                    Timber.d("Omnibar: using NewOmnibar anchored BOTTOM")
-                    binding.rootView.removeView(binding.legacyOmnibarBottom)
-                    binding.rootView.removeView(binding.legacyOmnibar)
-                    binding.rootView.removeView(binding.newOmnibar)
-
-                    // prevent the touch event leaking to the webView below
-                    binding.newOmnibarBottom.setOnTouchListener { _, _ -> true }
-                } else {
-                    Timber.d("Omnibar: using LegacyOmnibar anchored BOTTOM")
-                    binding.rootView.removeView(binding.newOmnibarBottom)
-                    binding.rootView.removeView(binding.newOmnibar)
-                    binding.rootView.removeView(binding.legacyOmnibar)
-
-                    // prevent the touch event leaking to the webView below
-                    binding.legacyOmnibarBottom.setOnTouchListener { _, _ -> true }
-                }
+                binding.rootView.removeView(binding.newOmnibar)
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
@@ -191,18 +164,6 @@ class Omnibar(
         }
     }
 
-    private val legacyOmnibar: LegacyOmnibarView by lazy {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                binding.legacyOmnibar
-            }
-
-            OmnibarPosition.BOTTOM -> {
-                binding.legacyOmnibarBottom
-            }
-        }
-    }
-
     private fun removeAppBarBehavior(view: View) {
         view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = null
@@ -210,315 +171,125 @@ class Omnibar(
     }
 
     val findInPage: IncludeFindInPageBinding by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.findInPage
-        } else {
-            legacyOmnibar.findInPage
-        }
+        newOmnibar.findInPage
     }
 
     val omnibarTextInput: KeyboardAwareEditText by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.omnibarTextInput
-        } else {
-            legacyOmnibar.omnibarTextInput
-        }
+        newOmnibar.omnibarTextInput
     }
 
     val tabsMenu: TabSwitcherButton by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.tabsMenu
-        } else {
-            legacyOmnibar.tabsMenu
-        }
+        newOmnibar.tabsMenu
     }
 
     val fireIconMenu: FrameLayout by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.fireIconMenu
-        } else {
-            legacyOmnibar.fireIconMenu
-        }
+        newOmnibar.fireIconMenu
     }
 
     val browserMenu: FrameLayout by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.browserMenu
-        } else {
-            legacyOmnibar.browserMenu
-        }
+        newOmnibar.browserMenu
     }
 
     val omniBarContainer: View by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.omniBarContainer
-        } else {
-            legacyOmnibar.omniBarContainer
-        }
+        newOmnibar.omniBarContainer
     }
 
     val toolbar: Toolbar by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.toolbar
-        } else {
-            legacyOmnibar.toolbar
-        }
+        newOmnibar.toolbar
     }
 
     val toolbarContainer: View by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.toolbarContainer
-        } else {
-            legacyOmnibar.toolbarContainer
-        }
+        newOmnibar.toolbarContainer
     }
 
     val customTabToolbarContainer: IncludeCustomTabToolbarBinding by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.customTabToolbarContainer
-        } else {
-            legacyOmnibar.customTabToolbarContainer
-        }
+        newOmnibar.customTabToolbarContainer
     }
 
     val browserMenuImageView: ImageView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.browserMenuImageView
-        } else {
-            legacyOmnibar.browserMenuImageView
-        }
+        newOmnibar.browserMenuImageView
     }
 
     val shieldIcon: LottieAnimationView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.shieldIcon
-        } else {
-            legacyOmnibar.shieldIcon
-        }
+        newOmnibar.shieldIcon
     }
 
     val pageLoadingIndicator: ProgressBar by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.pageLoadingIndicator
-        } else {
-            legacyOmnibar.pageLoadingIndicator
-        }
+        newOmnibar.pageLoadingIndicator
     }
 
     val searchIcon: ImageView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.searchIcon
-        } else {
-            legacyOmnibar.searchIcon
-        }
+        newOmnibar.searchIcon
     }
 
     val daxIcon: ImageView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.daxIcon
-        } else {
-            legacyOmnibar.daxIcon
-        }
+        newOmnibar.daxIcon
     }
 
     val clearTextButton: ImageView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.clearTextButton
-        } else {
-            legacyOmnibar.clearTextButton
-        }
+        newOmnibar.clearTextButton
     }
 
     val placeholder: View by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.placeholder
-        } else {
-            legacyOmnibar.placeholder
-        }
+        newOmnibar.placeholder
     }
 
     val voiceSearchButton: ImageView by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.voiceSearchButton
-        } else {
-            legacyOmnibar.voiceSearchButton
-        }
+        newOmnibar.voiceSearchButton
     }
 
     val spacer: View by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.spacer
-        } else {
-            legacyOmnibar.spacer
-        }
+        newOmnibar.spacer
     }
 
     val textInputRootView: View by lazy {
-        if (refactorFlagEnabled) {
-            newOmnibar.omnibarTextInput.rootView
-        } else {
-            legacyOmnibar.omnibarTextInput.rootView
-        }
+        newOmnibar.omnibarTextInput.rootView
     }
 
     var isScrollingEnabled: Boolean
         get() =
-            if (refactorFlagEnabled) {
-                newOmnibar.isScrollingEnabled
-            } else {
-                legacyOmnibar.isScrollingEnabled
-            }
+            newOmnibar.isScrollingEnabled
         set(value) {
-            if (refactorFlagEnabled) {
-                newOmnibar.isScrollingEnabled = value
-            } else {
-                legacyOmnibar.isScrollingEnabled = value
-            }
+            newOmnibar.isScrollingEnabled = value
         }
 
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             Error -> {
-                if (refactorFlagEnabled) {
-                    newOmnibar.decorate(Mode(viewMode))
-                } else {
-                    setExpanded(true)
-                    shieldIcon.isInvisible = true
-                }
+                newOmnibar.decorate(Mode(viewMode))
             }
 
             NewTab -> {
-                if (refactorFlagEnabled) {
-                    newOmnibar.decorate(Mode(viewMode))
-                } else {
-                    isScrollingEnabled = false
-                }
+                newOmnibar.decorate(Mode(viewMode))
             }
 
             SSLWarning -> {
-                if (refactorFlagEnabled) {
-                    newOmnibar.decorate(Mode(viewMode))
-                } else {
-                    setExpanded(true)
-                    shieldIcon.isInvisible = true
-                    searchIcon.isInvisible = true
-                    daxIcon.isInvisible = true
-                }
+                newOmnibar.decorate(Mode(viewMode))
             }
 
             else -> {
-                if (refactorFlagEnabled) {
-                    newOmnibar.decorate(Mode(viewMode))
-                }
+                newOmnibar.decorate(Mode(viewMode))
             }
         }
     }
 
     fun setExpanded(expanded: Boolean) {
-        if (refactorFlagEnabled) {
-            newOmnibar.setExpanded(expanded)
-        } else {
-            legacyOmnibar.setExpanded(expanded)
-        }
+        newOmnibar.setExpanded(expanded)
     }
 
     fun setExpanded(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        if (refactorFlagEnabled) {
-            newOmnibar.setExpanded(expanded, animate)
-        } else {
-            legacyOmnibar.setExpanded(expanded, animate)
-        }
+        newOmnibar.setExpanded(expanded, animate)
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
-        if (refactorFlagEnabled) {
-            newOmnibar.setOmnibarItemPressedListener(listener)
-        } else {
-            tabsMenu.setOnClickListener {
-                listener.onTabsButtonPressed()
-            }
-            tabsMenu.setOnLongClickListener {
-                listener.onTabsButtonLongPressed()
-                return@setOnLongClickListener true
-            }
-            fireIconMenu.setOnClickListener {
-                listener.onFireButtonPressed(legacyOmnibar.isPulseAnimationPlaying())
-            }
-            browserMenu.setOnClickListener {
-                listener.onBrowserMenuPressed()
-            }
-            shieldIcon.setOnClickListener {
-                listener.onPrivacyShieldPressed()
-            }
-            clearTextButton.setOnClickListener {
-                listener.onClearTextPressed()
-            }
-        }
+        newOmnibar.setOmnibarItemPressedListener(listener)
     }
 
     fun addTextListener(listener: TextListener) {
-        if (refactorFlagEnabled) {
-            newOmnibar.setOmnibarTextListener(listener)
-        } else {
-            omnibarTextInput.onFocusChangeListener =
-                View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                    listener.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
-                    if (hasFocus) {
-                        showOutline(true)
-                    } else {
-                        showOutline(false)
-                    }
-                }
-
-            omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
-                override fun onBackKey(): Boolean {
-                    listener.onBackKeyPressed()
-                    return false
-                }
-            }
-
-            omnibarTextInput.setOnEditorActionListener(
-                TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                    if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                        listener.onEnterPressed()
-                        return@OnEditorActionListener true
-                    }
-                    false
-                },
-            )
-
-            omnibarTextInput.setOnTouchListener { _, event ->
-                listener.onTouchEvent(event)
-                false
-            }
-
-            omnibarTextInput.replaceTextChangedListener(
-                object : TextChangedWatcher() {
-                    override fun afterTextChanged(editable: Editable) {
-                        listener.onOmnibarTextChanged(
-                            OmnibarTextState(
-                                omnibarTextInput.text.toString(),
-                                omnibarTextInput.hasFocus(),
-                            ),
-                        )
-                    }
-                },
-            )
-
-            omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
-                override fun showSuggestions() {
-                    listener.onShowSuggestions(
-                        OmnibarTextState(
-                            omnibarTextInput.text.toString(),
-                            omnibarTextInput.hasFocus(),
-                        ),
-                    )
-                }
-            }
-        }
+        newOmnibar.setOmnibarTextListener(listener)
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
@@ -543,52 +314,19 @@ class Omnibar(
         viewState: LoadingViewState,
         onAnimationEnd: (Animator?) -> Unit,
     ) {
-        if (refactorFlagEnabled) {
-            newOmnibar.reduce(StateChange.LoadingStateChange(viewState, onAnimationEnd))
-        } else {
-            legacyOmnibar.onNewProgress(viewState.progress, onAnimationEnd)
-        }
+        newOmnibar.reduce(StateChange.LoadingStateChange(viewState, onAnimationEnd))
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
         Timber.d("Omnibar: renderOmnibarViewState $viewState")
-        if (refactorFlagEnabled) {
-            newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
-        } else {
-            if (viewState.navigationChange) {
-                setExpanded(true, true)
-            } else if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                setText(viewState.omnibarText)
-                if (viewState.forceExpand) {
-                    setExpanded(true, true)
-                }
-                if (viewState.shouldMoveCaretToEnd) {
-                    setTextSelection(viewState.omnibarText.length)
-                }
-            }
-            if (viewState.shouldMoveCaretToStart) {
-                setTextSelection(0)
-            }
-        }
+        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
     }
-
-    private fun shouldUpdateOmnibarTextInput(
-        viewState: OmnibarViewState,
-        omnibarInput: String?,
-    ) =
-        (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(
-            omnibarInput,
-        )
 
     fun setPrivacyShield(
         isCustomTab: Boolean,
         privacyShield: PrivacyShield,
     ) {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
-        } else {
-            legacyOmnibar.setPrivacyShield(isCustomTab, privacyShield)
-        }
+        newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
     }
 
     fun renderVoiceSearch(
@@ -606,11 +344,7 @@ class Omnibar(
     }
 
     fun isPulseAnimationPlaying(): Boolean {
-        return if (refactorFlagEnabled) {
-            newOmnibar.isPulseAnimationPlaying()
-        } else {
-            legacyOmnibar.isPulseAnimationPlaying()
-        }
+        return newOmnibar.isPulseAnimationPlaying()
     }
 
     fun hideFindInPage() {
@@ -663,66 +397,27 @@ class Omnibar(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,
     ) {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(
-                HighlightOmnibarItem(
-                    fireButton = viewState.fireButton.isHighlighted(),
-                    privacyShield = viewState.showPrivacyShield.isHighlighted(),
-                ),
-            )
-        } else {
-            legacyOmnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
-        }
-
+        newOmnibar.decorate(
+            HighlightOmnibarItem(
+                fireButton = viewState.fireButton.isHighlighted(),
+                privacyShield = viewState.showPrivacyShield.isHighlighted(),
+            ),
+        )
         if (viewState.showDuckPlayerIcon) {
             isScrollingEnabled = false
         }
     }
 
-    fun animateTabsCount() {
-        if (!refactorFlagEnabled) {
-            tabsMenu.animateCount()
-        }
-    }
-
-    fun renderTabIcon(tabs: List<TabEntity>) {
-        if (!refactorFlagEnabled) {
-            tabsMenu.count = tabs.count()
-            tabsMenu.hasUnread = tabs.firstOrNull { !it.viewed } != null
-        }
-    }
-
-    fun incrementTabs(onTabsIncremented: () -> Unit) {
-        if (!refactorFlagEnabled) {
-            setExpanded(true, true)
-            tabsMenu.increment {
-                onTabsIncremented()
-            }
-        }
-    }
-
     fun createCookiesAnimation(isCosmetic: Boolean) {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
-        } else {
-            legacyOmnibar.createCookiesAnimation(isCosmetic)
-        }
+        newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
     }
 
     fun cancelTrackersAnimation() {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.CancelAnimations)
-        } else {
-            legacyOmnibar.cancelTrackersAnimation()
-        }
+        newOmnibar.decorate(Decoration.CancelAnimations)
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.LaunchTrackersAnimation(events))
-        } else {
-            legacyOmnibar.startTrackersAnimation(events)
-        }
+        newOmnibar.decorate(Decoration.LaunchTrackersAnimation(events))
     }
 
     fun configureCustomTab(
@@ -732,70 +427,7 @@ class Omnibar(
         onTabClosePressed: () -> Unit,
         onPrivacyShieldPressed: () -> Unit,
     ) {
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
-        } else {
-            configureLegacyCustomTab(context, customTabToolbarColor, customTabDomainText, onTabClosePressed, onPrivacyShieldPressed)
-        }
-    }
-
-    private fun configureLegacyCustomTab(
-        context: Context,
-        customTabToolbarColor: Int,
-        customTabDomainText: String?,
-        onTabClosePressed: () -> Unit,
-        onPrivacyShieldPressed: () -> Unit,
-    ) {
-        omniBarContainer.hide()
-        fireIconMenu.hide()
-        tabsMenu.hide()
-
-        toolbar.background = ColorDrawable(customTabToolbarColor)
-        toolbarContainer.background = ColorDrawable(customTabToolbarColor)
-
-        customTabToolbarContainer.customTabToolbar.show()
-
-        customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-            onTabClosePressed()
-        }
-
-        customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-            onPrivacyShieldPressed()
-        }
-
-        customTabToolbarContainer.customTabDomain.text = customTabDomainText
-        customTabToolbarContainer.customTabDomainOnly.text = customTabDomainText
-        customTabToolbarContainer.customTabDomainOnly.show()
-
-        val foregroundColor = calculateBlackOrWhite(context, customTabToolbarColor)
-        customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-        customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-        customTabToolbarContainer.customTabDomainOnly.setTextColor(
-            foregroundColor,
-        )
-        customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-        browserMenuImageView.setColorFilter(foregroundColor)
-    }
-
-    private fun calculateBlackOrWhite(
-        context: Context,
-        color: Int,
-    ): Int {
-        // Handle the case where we did not receive a color.
-        if (color == 0) {
-            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
-        }
-
-        if (color == Color.WHITE || Color.alpha(color) < 128) {
-            return Color.BLACK
-        }
-        val greyValue =
-            (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
-        return if (greyValue < 186) {
-            Color.WHITE
-        } else {
-            Color.BLACK
-        }
+        newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(
@@ -805,36 +437,14 @@ class Omnibar(
     ) {
         val redirectedDomain = url?.extractDomain()
 
-        if (refactorFlagEnabled) {
-            newOmnibar.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
-        } else {
-            customTabToolbarContainer.customTabTitle.text = title
-
-            redirectedDomain?.let {
-                customTabToolbarContainer.customTabDomain.text = redirectedDomain
-            }
-
-            customTabToolbarContainer.customTabTitle.show()
-            customTabToolbarContainer.customTabDomainOnly.hide()
-            customTabToolbarContainer.customTabDomain.show()
-            customTabToolbarContainer.customTabShieldIcon.isInvisible = showDuckPlayerIcon
-            customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = showDuckPlayerIcon
-        }
+        newOmnibar.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
     }
 
     fun show() {
-        if (refactorFlagEnabled) {
-            newOmnibar.show()
-        } else {
-            legacyOmnibar.show()
-        }
+        newOmnibar.show()
     }
 
     fun hide() {
-        if (refactorFlagEnabled) {
-            newOmnibar.gone()
-        } else {
-            legacyOmnibar.gone()
-        }
+        newOmnibar.gone()
     }
 }

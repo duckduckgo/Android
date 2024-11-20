@@ -20,12 +20,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-        android:id="@+id/legacyOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:omnibarPosition="top" />
-
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
@@ -137,13 +131,6 @@
             android:focusableInTouchMode="true" />
 
     </RelativeLayout>
-
-    <com.duckduckgo.app.browser.omnibar.LegacyOmnibarView
-        android:id="@+id/legacyOmnibarBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
 
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibarBottom"
