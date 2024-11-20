@@ -821,7 +821,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1119,7 +1119,6 @@ class BrowserTabFragment :
         viewModel.onMessageReceived()
         message.sendToTarget()
 
-        omnibar.animateTabsCount()
         viewModel.onMessageProcessed()
     }
 
@@ -1289,15 +1288,6 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(
-            viewLifecycleOwner,
-            Observer {
-                it?.let {
-                    omnibar.renderTabIcon(it)
-                }
-            },
-        )
-
         viewModel.liveSelectedTab.distinctUntilChanged().observe(
             viewLifecycleOwner,
             Observer {
@@ -1980,9 +1970,6 @@ class BrowserTabFragment :
     }
 
     private fun openInNewBackgroundTab() {
-        omnibar.incrementTabs {
-            addTabsObserver()
-        }
         viewModel.tabs.removeObservers(this)
     }
 
