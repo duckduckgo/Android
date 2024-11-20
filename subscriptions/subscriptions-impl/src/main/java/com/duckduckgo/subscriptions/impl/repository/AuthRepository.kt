@@ -43,7 +43,6 @@ import java.time.Instant
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
-    suspend fun getExternalID(): String?
     suspend fun setAccessTokenV2(accessToken: AccessToken?)
     suspend fun getAccessTokenV2(): AccessToken?
     suspend fun setRefreshTokenV2(refreshToken: RefreshToken?)
@@ -120,10 +119,6 @@ internal class RealAuthRepository constructor(
 
     override suspend fun getEntitlements(): List<Entitlement> {
         return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
-    }
-
-    override suspend fun getExternalID(): String? = withContext(dispatcherProvider.io()) {
-        return@withContext subscriptionsDataStore.externalId
     }
 
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
