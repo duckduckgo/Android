@@ -13,11 +13,18 @@ tags:
 - tapOn: "Got It"
 - tapOn: "New Window"
 - tapOn: 
-    id: "com.duckduckgo.mobile.android:id/tabCount"
-- tapOn: "URL Spoofing"
+    id: "com.duckduckgo.mobile.android.debug:id/tabCount"
+- assertVisible:
+    text: "URL Spoofing - New Window Rewrite"
+- tapOn: "URL Spoofing - New Window Rewrite"
 - tapOn: "Spoof"
-# Now check the address bar hasn't been updated too early resulting in spoofed content
+- tapOn: 
+    id: "com.duckduckgo.mobile.android.debug:id/tabCount"
+- assertVisible:
+    text: "DuckDuckGo"
+- tapOn: "DuckDuckGo"
+# Now check the address bar hasn't been spoofed
 - copyTextFrom:
     id: "omnibarTextInput"
-#- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"}
-- assertNotVisible: "Privacy Test Pages" 
+- assertTrue: ${maestro.copiedText == "https://broken.third-party.site/security/abs/no-content"}
+- assertNotVisible: "Your address bar has been spoofed"
