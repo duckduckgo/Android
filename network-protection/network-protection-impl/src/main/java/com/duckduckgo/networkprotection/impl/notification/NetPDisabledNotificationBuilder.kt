@@ -25,6 +25,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -32,6 +33,7 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.impl.subscription.isExpired
+import com.duckduckgo.settings.api.Settings
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -58,6 +60,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
     private val globalActivityStarter: GlobalActivityStarter,
     private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val settings: Settings,
 ) : NetPDisabledNotificationBuilder {
     private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
@@ -178,7 +181,11 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     override fun buildVpnAccessRevokedNotification(context: Context): Notification {
         registerChannel(context)
 
-        val intent = globalActivityStarter.startIntent(context, SettingsScreenNoParams)
+        val intent = if(settings.isNewSettingsEnabled) {
+            globalActivityStarter.startIntent(context, NewSettingsScreenNoParams)
+        } else {
+            globalActivityStarter.startIntent(context, SettingsScreenNoParams)
+        }
         val pendingIntent: PendingIntent? = android.app.TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

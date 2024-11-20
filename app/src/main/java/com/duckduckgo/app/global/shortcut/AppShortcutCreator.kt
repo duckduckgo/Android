@@ -29,13 +29,17 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.settings.NewSettingsActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
+import com.duckduckgo.settings.api.Settings
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -74,6 +78,8 @@ class AppShortcutCreator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatchers: DispatcherProvider,
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val settings: Settings,
 ) {
 
     fun configureAppShortcuts() {
@@ -136,7 +142,11 @@ class AppShortcutCreator @Inject constructor(
 
     private fun buildAndroidDesignSystemShortcut(context: Context): ShortcutInfo {
         val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val settingsActivity = SettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        val settingsActivity = if(settings.isNewSettingsEnabled) {
+            NewSettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        }else {
+            SettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        }
         val adsActivity = AppComponentsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
         val stackBuilder = TaskStackBuilder.create(context)

@@ -25,12 +25,16 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.NewSettingsActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.Settings
 import com.duckduckgo.mobile.android.R as CommonR
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -89,6 +93,8 @@ class ClearDataNotificationPlugin @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val settings: Settings,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -113,9 +119,16 @@ class ClearDataNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = SettingsActivity.intent(context).apply {
-            putExtra(SettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
-        }
+        val intent =
+            if (settings.isNewSettingsEnabled) {
+                globalActivityStarter.startIntent(context, NewSettingsScreenNoParams)?.apply {
+                    putExtra(NewSettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+                }
+            } else {
+                SettingsActivity.intent(context).apply {
+                    putExtra(SettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+                }
+            }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

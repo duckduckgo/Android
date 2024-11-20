@@ -25,6 +25,7 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
@@ -34,6 +35,7 @@ import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.Settings
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -46,6 +48,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +61,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
+    private val settings: Lazy<Settings>,
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
@@ -83,7 +87,11 @@ class RealSubscriptions @Inject constructor(
 
     override fun launchPrivacyPro(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
-        val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
+        val settings = if (settings.get().isNewSettingsEnabled) {
+            globalActivityStarter.startIntent(context, NewSettingsScreenNoParams) ?: return
+        } else {
+            globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
+        }
         val privacyPro = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
@@ -169,7 +177,10 @@ class PrivacyProFeatureStore @Inject constructor(
         }
     }
 
-    private fun SharedPreferences.save(key: String, state: State) {
+    private fun SharedPreferences.save(
+        key: String,
+        state: State
+    ) {
         coroutineScope.launch(dispatcherProvider.io()) {
             edit(commit = true) { putString(key, stateAdapter.toJson(state)) }
         }

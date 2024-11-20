@@ -20,12 +20,14 @@ import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.settings.api.Settings
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -36,6 +38,7 @@ import javax.inject.Inject
 class SettingsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val setting: SettingsNewTabShortcutSetting,
+    private val settings: Settings,
 ) : NewTabPageShortcutPlugin {
 
     inner class SettingsShortcut() : NewTabShortcut {
@@ -49,7 +52,11 @@ class SettingsNewTabShortcutPlugin @Inject constructor(
     }
 
     override fun onClick(context: Context) {
-        globalActivityStarter.start(context, SettingsScreenNoParams)
+        if (settings.isNewSettingsEnabled) {
+            globalActivityStarter.start(context, NewSettingsScreenNoParams)
+        } else {
+            globalActivityStarter.start(context, SettingsScreenNoParams)
+        }
     }
 
     override suspend fun isUserEnabled(): Boolean {

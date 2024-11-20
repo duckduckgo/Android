@@ -66,6 +66,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -77,6 +78,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.settings.api.Settings
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -128,6 +130,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var settings: Settings
 
     private val lastActiveTabs = TabList()
 
@@ -526,7 +531,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchSettings() {
-        startActivity(SettingsActivity.intent(this))
+        if(settings.isNewSettingsEnabled) {
+            globalActivityStarter.start(this, NewSettingsScreenNoParams)
+        } else {
+            startActivity(SettingsActivity.intent(this))
+        }
     }
 
     fun launchSitePermissionsSettings() {
