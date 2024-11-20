@@ -60,7 +60,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
           echo "No new commits since the last tag. Skipping nightly release."
-          echo "No new commits since the last tag. Skipping nightly release." >> $GITHUB_STEP_SUMMARY
+          echo "### Nightly release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
           exit 0   
 
       - name: Decode upload keys
