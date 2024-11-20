@@ -777,14 +777,14 @@ class BrowserTabFragment :
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
-                    omnibar.omnibarTextInput.setText(it.result)
+                    omnibar.setText(it.result)
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
 
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
                 is VoiceSearchLauncher.Event.VoiceSearchDisabled -> {
-                    viewModel.voiceSearchDisabled()
+                    omnibar.voiceSearchDisabled(viewModel.url)
                 }
             }
         }

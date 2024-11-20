@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
@@ -322,14 +323,14 @@ class Omnibar(
         viewState: BrowserViewState,
         voiceSearchPressed: () -> Unit,
     ) {
-        // if (viewState.showVoiceSearch) {
-        //     voiceSearchButton.visibility = VISIBLE
-        //     voiceSearchButton.setOnClickListener {
-        //         voiceSearchPressed()
-        //     }
-        // } else {
-        //     voiceSearchButton.visibility = GONE
-        // }
+        if (viewState.showVoiceSearch) {
+            voiceSearchButton.visibility = VISIBLE
+            voiceSearchButton.setOnClickListener {
+                voiceSearchPressed()
+            }
+        } else {
+            voiceSearchButton.visibility = GONE
+        }
     }
 
     fun isPulseAnimationPlaying(): Boolean {
@@ -432,5 +433,9 @@ class Omnibar(
 
     fun hide() {
         newOmnibar.gone()
+    }
+
+    fun voiceSearchDisabled(url: String?) {
+        newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 }

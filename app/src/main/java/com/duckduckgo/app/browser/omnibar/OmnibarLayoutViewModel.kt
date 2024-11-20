@@ -224,7 +224,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
-    private fun getLeadingIconState(hasFocus: Boolean, url: String): LeadingIconState {
+    private fun getLeadingIconState(
+        hasFocus: Boolean,
+        url: String,
+    ): LeadingIconState {
         return when (_viewState.value.viewMode) {
             Error -> GLOBE
             NewTab -> SEARCH
@@ -610,5 +613,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         return URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(
             text,
         )
+    }
+
+    fun onVoiceSearchDisabled(url: String) {
+        Timber.d("Omnibar: onVoiceSearchDisabled")
+        _viewState.update {
+            it.copy(
+                showVoiceSearch = shouldShowVoiceSearch(
+                    urlLoaded = url,
+                ),
+            )
+        }
     }
 }
