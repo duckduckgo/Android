@@ -371,6 +371,4 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     URI_LOADED("m_uri_loaded"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
-
-    FEATURES_ENABLED_AT_SEARCH_TIME("features"),
 }
