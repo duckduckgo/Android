@@ -175,7 +175,10 @@ class PrivacyProFeatureStore @Inject constructor(
         }
     }
 
-    private fun SharedPreferences.save(key: String, state: State) {
+    private fun SharedPreferences.save(
+        key: String,
+        state: State,
+    ) {
         coroutineScope.launch(dispatcherProvider.io()) {
             edit(commit = true) { putString(key, stateAdapter.toJson(state)) }
         }

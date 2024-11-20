@@ -34,9 +34,9 @@ import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class NotificationsActivity : DuckDuckGoActivity() {
@@ -74,7 +74,6 @@ class NotificationsActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         viewState.scheduledNotifications.forEach { notificationItem ->
             buildNotificationItem(
-
                 title = notificationItem.title,
                 subtitle = notificationItem.subtitle,
                 onClick = { viewModel.onNotificationItemClick(notificationItem) },
@@ -108,7 +107,7 @@ class NotificationsActivity : DuckDuckGoActivity() {
 
     private fun addNotification(
         id: Int,
-        notification: Notification
+        notification: Notification,
     ) {
         NotificationManagerCompat.from(this)
             .checkPermissionAndNotify(context = this, id = id, notification = notification)

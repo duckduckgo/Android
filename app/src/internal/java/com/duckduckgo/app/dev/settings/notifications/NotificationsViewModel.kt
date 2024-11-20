@@ -61,7 +61,7 @@ class NotificationViewModel @Inject constructor(
             val id: Int,
             val title: String,
             val subtitle: String,
-            val notification: Notification
+            val notification: Notification,
         )
     }
 
