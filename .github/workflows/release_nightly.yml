@@ -22,7 +22,6 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
-          ref: feature/david/11-20-gha_only_execute_nightly_if_changes_made
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -60,7 +59,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
           echo "No new commits since the last tag. Skipping nightly release."
-          echo "### Nightly release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "No new commits since the last tag. Skipping nightly release." >> $GITHUB_STEP_SUMMARY
           exit 0   
 
       - name: Decode upload keys

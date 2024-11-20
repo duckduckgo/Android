@@ -25,7 +25,7 @@ runs:
         echo "$new_commits commits since ${{ inputs.tag }} tag"
         
         if [ $new_commits -gt 0 ]; then        
-          echo "has_changes=false" >> $GITHUB_OUTPUT
-        else
           echo "has_changes=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
         fi
