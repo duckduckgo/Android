@@ -16,15 +16,11 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -32,9 +28,7 @@ import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.TabSwitcherButton
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
@@ -98,6 +92,7 @@ class Omnibar(
         fun onClearTextPressed()
         fun onCustomTabClosePressed()
         fun onCustomTabPrivacyDashboardPressed()
+        fun onVoiceSearchPressed()
     }
 
     interface FindInPageListener {
@@ -160,7 +155,7 @@ class Omnibar(
         }
     }
 
-    val findInPage: IncludeFindInPageBinding by lazy {
+    private val findInPage: IncludeFindInPageBinding by lazy {
         newOmnibar.findInPage
     }
 
@@ -168,19 +163,7 @@ class Omnibar(
         newOmnibar.omnibarTextInput
     }
 
-    val tabsMenu: TabSwitcherButton by lazy {
-        newOmnibar.tabsMenu
-    }
-
-    val fireIconMenu: FrameLayout by lazy {
-        newOmnibar.fireIconMenu
-    }
-
-    val browserMenu: FrameLayout by lazy {
-        newOmnibar.browserMenu
-    }
-
-    val omniBarContainer: View by lazy {
+    private val omniBarContainer: View by lazy {
         newOmnibar.omniBarContainer
     }
 
@@ -188,48 +171,8 @@ class Omnibar(
         newOmnibar.toolbar
     }
 
-    val toolbarContainer: View by lazy {
-        newOmnibar.toolbarContainer
-    }
-
-    val customTabToolbarContainer: IncludeCustomTabToolbarBinding by lazy {
-        newOmnibar.customTabToolbarContainer
-    }
-
-    val browserMenuImageView: ImageView by lazy {
-        newOmnibar.browserMenuImageView
-    }
-
     val shieldIcon: LottieAnimationView by lazy {
         newOmnibar.shieldIcon
-    }
-
-    val pageLoadingIndicator: ProgressBar by lazy {
-        newOmnibar.pageLoadingIndicator
-    }
-
-    val searchIcon: ImageView by lazy {
-        newOmnibar.searchIcon
-    }
-
-    val daxIcon: ImageView by lazy {
-        newOmnibar.daxIcon
-    }
-
-    val clearTextButton: ImageView by lazy {
-        newOmnibar.clearTextButton
-    }
-
-    val placeholder: View by lazy {
-        newOmnibar.placeholder
-    }
-
-    val voiceSearchButton: ImageView by lazy {
-        newOmnibar.voiceSearchButton
-    }
-
-    val spacer: View by lazy {
-        newOmnibar.spacer
     }
 
     val textInputRootView: View by lazy {
@@ -300,11 +243,8 @@ class Omnibar(
         )
     }
 
-    fun renderLoadingViewState(
-        viewState: LoadingViewState,
-        onAnimationEnd: (Animator?) -> Unit,
-    ) {
-        newOmnibar.reduce(StateChange.LoadingStateChange(viewState, onAnimationEnd))
+    fun renderLoadingViewState(viewState: LoadingViewState) {
+        newOmnibar.reduce(StateChange.LoadingStateChange(viewState))
     }
 
     fun renderOmnibarViewState(viewState: OmnibarViewState) {
@@ -317,20 +257,6 @@ class Omnibar(
         privacyShield: PrivacyShield,
     ) {
         newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
-    }
-
-    fun renderVoiceSearch(
-        viewState: BrowserViewState,
-        voiceSearchPressed: () -> Unit,
-    ) {
-        if (viewState.showVoiceSearch) {
-            voiceSearchButton.visibility = VISIBLE
-            voiceSearchButton.setOnClickListener {
-                voiceSearchPressed()
-            }
-        } else {
-            voiceSearchButton.visibility = GONE
-        }
     }
 
     fun isPulseAnimationPlaying(): Boolean {

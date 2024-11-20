@@ -107,6 +107,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
         val scrollingEnabled: Boolean = true,
+        val isLoading: Boolean = false,
+        val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
     )
@@ -525,6 +527,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 url = loadingState.url,
+                isLoading = loadingState.isLoading,
+                loadingProgress = loadingState.progress,
                 leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url),
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = _viewState.value.hasFocus,

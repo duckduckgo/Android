@@ -2346,6 +2346,10 @@ class BrowserTabFragment :
                 override fun onCustomTabPrivacyDashboardPressed() {
                     onOmnibarCustomTabPrivacyDashboardPressed()
                 }
+
+                override fun onVoiceSearchPressed() {
+                    onOmnibarVoiceSearchPressed()
+                }
             },
         )
     }
@@ -3624,10 +3628,7 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
 
-                omnibar.pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show()
-                    omnibar.renderLoadingViewState(viewState) { if (!viewState.isLoading) hide() }
-                }
+                omnibar.renderLoadingViewState(viewState)
 
                 if (viewState.privacyOn) {
                     if (lastSeenOmnibarViewState?.isEditing == true) {
@@ -3727,12 +3728,6 @@ class BrowserTabFragment :
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
-                omnibar.renderVoiceSearch(
-                    viewState,
-                    {
-                        onOmnibarVoiceSearchPressed()
-                    },
-                )
 
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 

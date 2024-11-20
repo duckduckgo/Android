@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
@@ -120,10 +119,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     sealed class StateChange {
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
-        data class LoadingStateChange(
-            val loadingViewState: LoadingViewState,
-            val onAnimationEnd: (Animator?) -> Unit,
-        ) : StateChange()
+        data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
     private val omnibarPosition: OmnibarPosition
@@ -367,6 +363,9 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             omnibarItemPressedListener?.onClearTextPressed()
         }
+        voiceSearchButton.setOnClickListener {
+            omnibarItemPressedListener?.onVoiceSearchPressed()
+        }
     }
 
     private fun render(viewState: ViewState) {
@@ -472,6 +471,15 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarTextInput.setSelection(0)
         }
 
+        if (viewState.isLoading) {
+            pageLoadingIndicator.show()
+        }
+        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
+            if (!viewState.isLoading) {
+                pageLoadingIndicator.hide()
+            }
+        }
+
         isScrollingEnabled = viewState.scrollingEnabled
 
         renderTabIcon(viewState)
@@ -549,16 +557,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun reduceDeferred(stateChange: StateChange) {
-        when (stateChange) {
-            is StateChange.LoadingStateChange -> {
-                viewModel.onExternalStateChange(stateChange)
-                onNewProgress(stateChange.loadingViewState.progress, stateChange.onAnimationEnd)
-            }
-
-            else -> {
-                viewModel.onExternalStateChange(stateChange)
-            }
-        }
+        viewModel.onExternalStateChange(stateChange)
     }
 
     override fun setExpanded(expanded: Boolean) {
@@ -650,11 +649,7 @@ class OmnibarLayout @JvmOverloads constructor(
         )
     }
 
-    private fun onNewProgress(
-        newProgress: Int,
-        onAnimationEnd: (Animator?) -> Unit,
-    ) {
-        smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
+    private fun onNewProgress(newProgress: Int) {
     }
 
     private fun renderPrivacyShield(
