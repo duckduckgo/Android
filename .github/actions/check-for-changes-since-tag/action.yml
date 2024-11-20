@@ -2,9 +2,6 @@ name: 'Check for code changes after a specific tag'
 description: 'Checks if there are any new commits to the develop branch since the specified tag'
 
 inputs:
-  github_token:
-    description: 'GitHub token'
-    required: true
   tag:
     description: 'Tag to check'
     required: true
