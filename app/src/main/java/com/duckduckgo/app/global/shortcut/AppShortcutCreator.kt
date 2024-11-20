@@ -33,7 +33,6 @@ import com.duckduckgo.app.settings.NewSettingsActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -142,9 +141,9 @@ class AppShortcutCreator @Inject constructor(
 
     private fun buildAndroidDesignSystemShortcut(context: Context): ShortcutInfo {
         val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val settingsActivity = if(settings.isNewSettingsEnabled) {
+        val settingsActivity = if (settings.isNewSettingsEnabled) {
             NewSettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        }else {
+        } else {
             SettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
         }
         val adsActivity = AppComponentsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }

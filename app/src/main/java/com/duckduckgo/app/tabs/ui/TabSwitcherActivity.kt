@@ -467,7 +467,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun showSettings() {
-        if(settings.isNewSettingsEnabled) {
+        if (settings.isNewSettingsEnabled) {
             globalActivityStarter.start(this, NewSettingsScreenNoParams)
         } else {
             startActivity(SettingsActivity.intent(this))

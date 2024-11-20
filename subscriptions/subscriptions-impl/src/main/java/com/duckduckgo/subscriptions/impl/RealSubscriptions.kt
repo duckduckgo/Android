@@ -179,7 +179,7 @@ class PrivacyProFeatureStore @Inject constructor(
 
     private fun SharedPreferences.save(
         key: String,
-        state: State
+        state: State,
     ) {
         coroutineScope.launch(dispatcherProvider.io()) {
             edit(commit = true) { putString(key, stateAdapter.toJson(state)) }

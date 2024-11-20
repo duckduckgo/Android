@@ -27,7 +27,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class RealSettings @Inject constructor(
     private val updatedSettingsFeature: UpdatedSettingsFeature,
-): Settings {
+) : Settings {
 
     override val isNewSettingsEnabled: Boolean
         get() = updatedSettingsFeature.self().isEnabled()

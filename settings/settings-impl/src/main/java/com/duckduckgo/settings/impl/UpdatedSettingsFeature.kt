@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
     scope = AppScope::class,
     featureName = "updatedSettings",
 )
-interface UpdatedSettingsFeature{
+interface UpdatedSettingsFeature {
 
     @DefaultValue(false)
     fun self(): Toggle

@@ -181,7 +181,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     override fun buildVpnAccessRevokedNotification(context: Context): Notification {
         registerChannel(context)
 
-        val intent = if(settings.isNewSettingsEnabled) {
+        val intent = if (settings.isNewSettingsEnabled) {
             globalActivityStarter.startIntent(context, NewSettingsScreenNoParams)
         } else {
             globalActivityStarter.startIntent(context, SettingsScreenNoParams)

@@ -531,7 +531,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchSettings() {
-        if(settings.isNewSettingsEnabled) {
+        if (settings.isNewSettingsEnabled) {
             globalActivityStarter.start(this, NewSettingsScreenNoParams)
         } else {
             startActivity(SettingsActivity.intent(this))

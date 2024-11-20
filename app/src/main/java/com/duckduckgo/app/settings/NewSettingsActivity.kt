@@ -73,7 +73,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
-
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NewSettingsScreenNoParams::class, screenName = "newSettings")
 class NewSettingsActivity : DuckDuckGoActivity() {
@@ -271,7 +270,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.cookiePopupProtectionEnabled))
             viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
         } else {
-            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.cookiePopupProtectionDescription))
+            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(
+                getString(com.duckduckgo.app.browser.R.string.cookiePopupProtectionDescription),
+            )
             viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
         }
     }
