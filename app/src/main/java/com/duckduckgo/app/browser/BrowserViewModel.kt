@@ -69,7 +69,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
@@ -154,6 +153,13 @@ class BrowserViewModel @Inject constructor(
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+
+        // viewModelScope.launch {
+        //     repeat(50) {
+        //         delay(1000)
+        //         tabRepository.add("cnn.com")
+        //     }
+        // }
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
@@ -307,7 +313,9 @@ class BrowserViewModel @Inject constructor(
 
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
-            tabRepository.select(tabId)
+            if (tabId != tabRepository.getSelectedTab()?.tabId) {
+                tabRepository.select(tabId)
+            }
         }
     }
 
@@ -317,10 +325,6 @@ class BrowserViewModel @Inject constructor(
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
         }
-    }
-
-    fun getTabById(tabId: String): TabEntity? = runBlocking(dispatchers.io()) {
-        tabRepository.getTabById(tabId)
     }
 }
 
