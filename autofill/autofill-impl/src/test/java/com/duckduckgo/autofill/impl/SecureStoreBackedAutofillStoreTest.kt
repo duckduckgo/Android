@@ -558,8 +558,9 @@ class SecureStoreBackedAutofillStoreTest {
             return credentialWithId
         }
 
-        override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>) {
+        override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>): List<Long> {
             credentials.forEach { addWebsiteLoginDetailsWithCredentials(it) }
+            return credentials.map { it.details.id!! }
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {

@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Quizá más tarde</string>
     <string name="preciseLocationSystemDialogNeverAllow">No volver a preguntar para este sitio</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">¿Permitir a %1$s acceder a la ubicación?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Solo utilizamos tu ubicación anónima para ofrecer mejores resultados, más cerca de ti. Siempre puedes cambiar de opinión más tarde.</string>
     <string name="preciseLocationSiteDialogSubtitle">Puedes gestionar los permisos de acceso a la ubicación que has concedido a sitios específicos en Ajustes.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Solo utilizamos tu ubicación anónima para ofrecer mejores resultados, más cerca de ti. Puedes gestionar los permisos de acceso a la ubicación que has concedido a sitios específicos en Ajustes.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Siempre</string>
     <string name="preciseLocationSiteDialogAllowOnce">Solo para esta sesión</string>
     <string name="preciseLocationSiteDialogDenyAlways">Rechazar siempre</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Aún no hay sitios</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisos eliminados para todos los sitios</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisos para \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Solicitar</string>
+    <string name="permissionsPerWebsiteAskSetting">Preguntar cada vez</string>
     <string name="permissionsPerWebsiteDenySetting">Rechazar</string>
     <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">\"Preguntar\" desactivado para todos los sitios</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Desactivado para todos los sitios</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permiso para %2$s</string>
 
     <!-- Notify Me View on Downloads -->

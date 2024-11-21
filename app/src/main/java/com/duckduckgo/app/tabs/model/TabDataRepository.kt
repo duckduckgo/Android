@@ -35,6 +35,8 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -194,6 +196,19 @@ class TabDataRepository @Inject constructor(
         tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
+    override fun getOpenTabCount(): Int {
+        return tabsDao.tabs().size
+    }
+
+    override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val start = now.minusDays(accessOlderThan)
+        val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive
+        return tabsDao.tabs().filter {
+            it.lastAccessTime?.isBefore(start) == true && (end == null || it.lastAccessTime?.isAfter(end) == true)
+        }.size
+    }
+
     override suspend fun addNewTabAfterExistingTab(
         url: String?,
         tabId: String,
@@ -227,6 +242,12 @@ class TabDataRepository @Inject constructor(
     override suspend fun updateTabPosition(from: Int, to: Int) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateTabsOrder(from, to)
+        }
+    }
+
+    override suspend fun updateTabLastAccess(tabId: String) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.updateTabLastAccess(tabId)
         }
     }
 
@@ -338,8 +359,7 @@ class TabDataRepository @Inject constructor(
                 Timber.w("Cannot find tab for tab ID")
                 return@scheduleDirect
             }
-            tab.tabPreviewFile = fileName
-            tabsDao.updateTab(tab)
+            tabsDao.updateTab(tab.copy(tabPreviewFile = fileName))
 
             Timber.i("Updated tab preview image. $tabId now uses $fileName")
             deleteOldPreviewImages(tabId, fileName)

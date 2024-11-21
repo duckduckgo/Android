@@ -39,6 +39,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsDisabledWith3rdPartyOnAndUserNotEligibleToPProThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = DISABLED, stopReason = SELF_STOP())) {}
 
@@ -49,7 +50,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsDisabledWith3rdPartyOnAndUserIsSubscriberToPProThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn("123")
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
 
         val result = plugin.getView(context, VpnState(state = DISABLED, stopReason = SELF_STOP())) {}
 
@@ -60,7 +61,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsDisabledWith3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNotNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = DISABLED, stopReason = SELF_STOP())) {}
 
@@ -71,7 +72,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsDisabledBy3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = DISABLED, stopReason = REVOKED)) {}
 
@@ -82,7 +83,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsEnablingWith3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = ENABLING)) {}
 
@@ -93,7 +94,7 @@ class PproUpsellDisabledMessagePluginTest {
     fun whenVPNIsEnabledAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = ENABLED)) {}
 

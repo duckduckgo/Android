@@ -13,31 +13,31 @@ class DefaultAutofillEngagementBucketingTest {
 
     @Test
     fun whenZeroSavedPasswordsThenBucketIsNone() {
-        assertEquals(NONE, testee.bucketNumberOfSavedPasswords(0))
+        assertEquals(NONE, testee.bucketNumberOfCredentials(0))
     }
 
     @Test
     fun whenBetweenOneAndThreeSavedPasswordThenBucketIsFew() {
-        assertEquals(FEW, testee.bucketNumberOfSavedPasswords(1))
-        assertEquals(FEW, testee.bucketNumberOfSavedPasswords(2))
-        assertEquals(FEW, testee.bucketNumberOfSavedPasswords(3))
+        assertEquals(FEW, testee.bucketNumberOfCredentials(1))
+        assertEquals(FEW, testee.bucketNumberOfCredentials(2))
+        assertEquals(FEW, testee.bucketNumberOfCredentials(3))
     }
 
     @Test
     fun whenBetweenFourAndTenSavedPasswordThenBucketIsSome() {
-        assertEquals(SOME, testee.bucketNumberOfSavedPasswords(4))
-        assertEquals(SOME, testee.bucketNumberOfSavedPasswords(10))
+        assertEquals(SOME, testee.bucketNumberOfCredentials(4))
+        assertEquals(SOME, testee.bucketNumberOfCredentials(10))
     }
 
     @Test
     fun whenBetweenElevenAndFortyNineSavedPasswordThenBucketIsMany() {
-        assertEquals(MANY, testee.bucketNumberOfSavedPasswords(11))
-        assertEquals(MANY, testee.bucketNumberOfSavedPasswords(49))
+        assertEquals(MANY, testee.bucketNumberOfCredentials(11))
+        assertEquals(MANY, testee.bucketNumberOfCredentials(49))
     }
 
     @Test
     fun whenFiftyOrOverThenBucketIsMany() {
-        assertEquals(LOTS, testee.bucketNumberOfSavedPasswords(50))
-        assertEquals(LOTS, testee.bucketNumberOfSavedPasswords(Int.MAX_VALUE))
+        assertEquals(LOTS, testee.bucketNumberOfCredentials(50))
+        assertEquals(LOTS, testee.bucketNumberOfCredentials(Int.MAX_VALUE))
     }
 }

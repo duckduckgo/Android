@@ -73,6 +73,8 @@ interface TabRepository {
 
     suspend fun updateTabPosition(from: Int, to: Int)
 
+    suspend fun updateTabLastAccess(tabId: String)
+
     /**
      * @return record if it exists, otherwise a new one
      */
@@ -116,4 +118,15 @@ interface TabRepository {
     suspend fun setIsUserNew(isUserNew: Boolean)
 
     suspend fun setTabLayoutType(layoutType: LayoutType)
+
+    fun getOpenTabCount(): Int
+
+    /**
+     * Returns the number of tabs, given a range of days within which the tab was last accessed.
+     *
+     * @param accessOlderThan the minimum number of days (exclusive) since the tab was last accessed
+     * @param accessNotMoreThan the maximum number of days (inclusive) since the tab was last accessed (optional)
+     * @return the number of tabs that are inactive
+     */
+    fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
 }

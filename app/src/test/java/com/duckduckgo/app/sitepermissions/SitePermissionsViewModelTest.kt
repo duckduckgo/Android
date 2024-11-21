@@ -18,11 +18,6 @@ package com.duckduckgo.app.sitepermissions
 
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -46,15 +41,9 @@ class SitePermissionsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
-    private val mockLocationPermissionsRepository: LocationPermissionsRepository = mock()
-    private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val viewModel = SitePermissionsViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
-        locationPermissionsRepository = mockLocationPermissionsRepository,
-        geolocationPermissions = mockGeoLocationPermissions,
-        settingsDataStore = mockSettingsDataStore,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
@@ -74,25 +63,15 @@ class SitePermissionsViewModelTest {
     }
 
     @Test
-    fun whenAllowedSitesLoadedThenViewStateEmittedLocationWebsites() = runTest {
-        viewModel.viewState.test {
-            val sitePermissions = awaitItem().locationPermissionsAllowed
-            assertEquals(1, sitePermissions.size)
-        }
-    }
-
-    @Test
-    fun whenRemoveAllWebsitesThenClearAllLocationWebsitesIsCalled() = runTest {
-        viewModel.removeAllSitesSelected()
-
-        verify(mockGeoLocationPermissions).clearAll()
-    }
-
-    @Test
     fun whenRemoveAllWebsitesThenDeleteAllSitePermissionsIsCalled() = runTest {
-        viewModel.removeAllSitesSelected()
+        viewModel.viewState.test {
+            viewModel.removeAllSitesSelected()
 
-        verify(mockSitePermissionsRepository).deleteAll()
+            verify(mockSitePermissionsRepository).deleteAll()
+
+            val sitePermissions = expectMostRecentItem().sitesPermissionsAllowed
+            assertEquals(2, sitePermissions.size)
+        }
     }
 
     @Test
@@ -164,6 +143,16 @@ class SitePermissionsViewModelTest {
     }
 
     @Test
+    fun whenToggleOffAskForDRMThenViewStateEmitted() = runTest {
+        viewModel.permissionToggleSelected(false, R.string.sitePermissionsSettingsDRM)
+
+        viewModel.viewState.test {
+            val drmEnabled = awaitItem().askDrmEnabled
+            assertFalse(drmEnabled)
+        }
+    }
+
+    @Test
     fun whenWebsiteIsTappedThenNavigateToPermissionsPerWebsiteScreen() = runTest {
         val testDomain = "website1.com"
         viewModel.allowedSiteSelected(testDomain)
@@ -174,16 +163,20 @@ class SitePermissionsViewModelTest {
     }
 
     private fun loadWebsites() {
-        val locationPermissions = listOf(LocationPermissionEntity("www.website1.com", LocationPermissionType.ALLOW_ONCE))
         val sitePermissions = listOf(SitePermissionsEntity("www.website2.com"), SitePermissionsEntity("www.website3.com"))
-        whenever(mockLocationPermissionsRepository.getLocationPermissionsFlow()).thenReturn(flowOf(locationPermissions))
         whenever(mockSitePermissionsRepository.sitePermissionsWebsitesFlow()).thenReturn(flowOf(sitePermissions))
         whenever(mockSitePermissionsRepository.sitePermissionsAllowedFlow()).thenReturn(flowOf(emptyList()))
     }
 
-    private fun loadPermissionsSettings(micEnabled: Boolean = true, cameraEnabled: Boolean = true, locationEnabled: Boolean = true) {
-        whenever(mockSettingsDataStore.appLocationPermission).thenReturn(locationEnabled)
+    private fun loadPermissionsSettings(
+        micEnabled: Boolean = true,
+        cameraEnabled: Boolean = true,
+        locationEnabled: Boolean = true,
+        drmEnabled: Boolean = true,
+    ) {
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsRepository.askCameraEnabled).thenReturn(cameraEnabled)
+        whenever(mockSitePermissionsRepository.askLocationEnabled).thenReturn(locationEnabled)
+        whenever(mockSitePermissionsRepository.askDrmEnabled).thenReturn(drmEnabled)
     }
 }

@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Možno neskôr</string>
     <string name="preciseLocationSystemDialogNeverAllow">Pre túto stránku sa už nepýtajte</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Udeliť %1$s povolenie na prístup k polohe?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Anonymnú polohu používame iba na poskytovanie lepších výsledkov z vášho okolia. Toto nastavenie môžete kedykoľvek zmeniť.</string>
     <string name="preciseLocationSiteDialogSubtitle">Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Používame vašu anonymnú polohu len na to, aby sme vám mohli ponúknuť lepšie výsledky, ktoré sú bližšie k vám. Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Iba pre túto reláciu</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vždy odmietnuť</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Povolenia boli odstránené pre všetky lokality</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Povolenia pre „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Opýtať sa</string>
+    <string name="permissionsPerWebsiteAskSetting">Vždy sa opýtať</string>
     <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
     <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Možnosť „Spýtať sa“ je pre všetky lokality vypnutá</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázané pre všetky lokality</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s povolenie pre %2$s</string>
 
     <!-- Notify Me View on Downloads -->

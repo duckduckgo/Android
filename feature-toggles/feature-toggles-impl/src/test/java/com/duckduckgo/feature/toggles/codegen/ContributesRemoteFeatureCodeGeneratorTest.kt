@@ -33,9 +33,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGeneratorTest.Cohorts.BLUE
 import com.duckduckgo.feature.toggles.codegen.ContributesRemoteFeatureCodeGeneratorTest.Cohorts.CONTROL
+import com.duckduckgo.feature.toggles.fakes.FakeFeatureTogglesCallback
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.time.ZoneId
@@ -64,6 +67,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var variantManager: FakeVariantManager
     private lateinit var toggleStore: FakeToggleStore
+    private val featureTogglesCallback = FakeFeatureTogglesCallback()
 
     @Before
     fun setup() {
@@ -74,16 +78,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             toggleStore,
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
-            localeProvider = { appBuildConfig.deviceLocale },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
+            callback = featureTogglesCallback,
         ).build().create(TestTriggerFeature::class.java)
         anotherTestFeature = FeatureToggles.Builder(
             toggleStore,
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
-            localeProvider = { appBuildConfig.deviceLocale },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
@@ -1521,7 +1524,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.FRANCE.language, Locale.US.country))
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.US.country)
 
         // all disabled
         assertTrue(
@@ -1550,7 +1553,74 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr")),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null)),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test multiple languages`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.US.country)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "localeCountry": "US",
+                                        "localeLanguage": "en"
+                                    },
+                                    {
+                                        "localeCountry": "FR",
+                                        "localeLanguage": "fr"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+
+        featureTogglesCallback.locale = Locale.US
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+
+        featureTogglesCallback.locale = Locale.FRANCE
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(null, "US", "en", null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null),
+            ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1560,7 +1630,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+        featureTogglesCallback.locale = Locale.FRANCE
 
         // all disabled
         assertTrue(
@@ -1586,10 +1656,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.self().isEnabled())
-        assertFalse(testFeature.fooFeature().isEnabled())
+        // foo feature is not an experiment and the target has a variantKey. As this is a mistake, that target is invalidated, hence assertTrue
+        assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr")),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null)),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1633,9 +1703,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null),
-                Toggle.State.Target(null, "US", null),
-                Toggle.State.Target(null, null, "fr"),
+                Toggle.State.Target("mc", null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null),
+                Toggle.State.Target(null, null, "fr", null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1646,7 +1716,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+        featureTogglesCallback.locale = Locale.FRANCE
 
         // all disabled
         assertTrue(
@@ -1666,7 +1736,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                         "localeCountry": "US"
                                     },
                                     {
-                                        "localeLanguage": "fr"
+                                        "localeLanguage": "zh"
                                     }
                                 ]
                             }
@@ -1680,9 +1750,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null),
-                Toggle.State.Target(null, "US", null),
-                Toggle.State.Target(null, null, "fr"),
+                Toggle.State.Target("mc", null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null),
+                Toggle.State.Target(null, null, "zh", null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1772,8 +1842,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1781,8 +1851,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1790,7 +1860,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.variantFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1848,8 +1918,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1858,7 +1928,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1913,8 +1983,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -1923,7 +1993,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -1964,7 +2034,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2005,7 +2075,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2046,7 +2116,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("mc", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2087,7 +2157,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2118,7 +2188,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US"),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US", null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2148,7 +2218,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2178,7 +2248,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2220,7 +2290,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2846,7 +2916,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.FRANCE.language, Locale.US.country))
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.US.country)
 
         assertTrue(
             privacyPlugin.store(
@@ -2891,15 +2961,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
 
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale(Locale.US.language, Locale.FRANCE.country))
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
 
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+        featureTogglesCallback.locale = Locale.US
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
 
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+        featureTogglesCallback.locale = Locale.FRANCE
         assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnabled(BLUE))
 
@@ -3525,6 +3595,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `test config parsed correctly`() {
+        val moshi = Moshi.Builder().build()
+        val adapter = moshi.adapter<Map<String, Any>>(
+            Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java),
+        )
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3536,12 +3610,30 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 {
                     "hash": "1",
                     "state": "disabled",
+                    "settings": {
+                        "foo": "foo/value",
+                        "bar": {
+                            "key": "value",
+                            "number": 2,
+                            "boolean": true,
+                            "complex": {
+                                "boolean": true
+                            }
+                        }
+                    },
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "foo": "foo/value",
-                                "bar": "bar/value"
+                                "bar": {
+                                    "key": "value",
+                                    "number": 2,
+                                    "boolean": true,
+                                    "complex": {
+                                        "boolean": true
+                                    }
+                                }
                             },
                             "rollout": {
                                 "steps": [
@@ -3567,14 +3659,23 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        var stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        var config = testFeature.fooFeature().getConfig()
+        val topLevelStateConfig = testFeature.self().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        val topLevelConfig = testFeature.self().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
+        assertTrue(topLevelStateConfig.size == 2)
+        assertEquals("foo/value", topLevelStateConfig["foo"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelStateConfig["bar"])
+        assertTrue(topLevelConfig.size == 2)
+        assertEquals("foo/value", topLevelConfig["foo"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), topLevelConfig["bar"])
+
+        var stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        var config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("foo/value", stateConfig["foo"])
-        assertEquals("bar/value", stateConfig["bar"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), stateConfig["bar"])
         assertTrue(config.size == 2)
         assertEquals("foo/value", config["foo"])
-        assertEquals("bar/value", config["bar"])
+        assertEquals(mapOf("key" to "value", "number" to 2.0, "boolean" to true, "complex" to mapOf("boolean" to true)), config["bar"])
 
         // Delete config key, should remove
         assertTrue(
@@ -3587,7 +3688,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "foo": "foo/value"                                
                             },
                             "rollout": {
@@ -3614,8 +3715,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 1)
         assertEquals("foo/value", stateConfig["foo"])
         assertNull(stateConfig["bar"])
@@ -3623,7 +3724,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("foo/value", config["foo"])
         assertNull(config["bar"])
 
-        // delete config, returns empty map
+        // delete config, returns empty
         assertTrue(
             privacyPlugin.store(
                 "testFeature",
@@ -3654,8 +3755,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.isEmpty())
         assertTrue(config.isEmpty())
 
@@ -3670,7 +3771,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "fooFeature": {
                             "state": "enabled",
-                            "config": {
+                            "settings": {
                                 "x": "x/value",
                                 "y": "y/value"
                             },
@@ -3698,8 +3799,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        stateConfig = testFeature.fooFeature().getRawStoredState()?.config!!
-        config = testFeature.fooFeature().getConfig()
+        stateConfig = testFeature.fooFeature().getRawStoredState()?.settings?.let { adapter.fromJson(it) } ?: emptyMap()
+        config = testFeature.fooFeature().getSettings()?.let { adapter.fromJson(it) } ?: emptyMap()
         assertTrue(stateConfig.size == 2)
         assertEquals("x/value", stateConfig["x"])
         assertEquals("y/value", stateConfig["y"])

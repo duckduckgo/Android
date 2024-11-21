@@ -35,6 +35,7 @@ enum class CtaId {
     DAX_END,
     DAX_FIRE_BUTTON_PULSE,
     DEVICE_SHIELD_CTA,
+    BROKEN_SITE_PROMPT,
     UNKNOWN,
 }
 

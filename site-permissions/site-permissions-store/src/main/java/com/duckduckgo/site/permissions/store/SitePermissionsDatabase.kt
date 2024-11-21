@@ -29,7 +29,7 @@ import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissi
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 4,
     entities = [
         SitePermissionsEntity::class,
         SitePermissionAllowedEntity::class,
@@ -49,4 +49,10 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE 'site_permissions' ADD COLUMN 'askLocationSetting' TEXT NOT NULL DEFAULT 'ASK_EVERY_TIME'")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_3_4)

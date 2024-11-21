@@ -70,10 +70,7 @@ interface BlockList {
     }
 
     companion object {
-        const val EXPERIMENT_PREFIX = "tds"
-        const val TREATMENT_URL = "treatmentUrl"
-        const val CONTROL_URL = "controlUrl"
-        const val NEXT_URL = "nextUrl"
+        internal const val EXPERIMENT_PREFIX = "tds"
     }
 }
 

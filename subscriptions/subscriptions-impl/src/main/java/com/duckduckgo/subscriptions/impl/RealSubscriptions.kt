@@ -59,6 +59,9 @@ class RealSubscriptions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
 ) : Subscriptions {
+    override suspend fun isSignedIn(): Boolean =
+        subscriptionsManager.isSignedIn()
+
     override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
             is AccessTokenResult.Success -> result.accessToken

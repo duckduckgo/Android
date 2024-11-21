@@ -47,8 +47,20 @@ interface SettingsDataStore {
     @Deprecated(message = "Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith(expression = "automaticFireproofSetting"))
     var appLoginDetection: Boolean
     var automaticFireproofSetting: AutomaticFireproofSetting
+
+    @Deprecated(
+        message = "Not used anymore after migration to SitePermissionsRepository - https://app.asana.com/0/1174433894299346/1206170291275949/f",
+        replaceWith = ReplaceWith(expression = "SitePermissionsRepository.askLocationEnabled"),
+    )
     var appLocationPermission: Boolean
+
+    @Deprecated(
+        message = "Not used anymore after migration to SitePermissionsRepository - https://app.asana.com/0/1174433894299346/1206170291275949/f",
+        replaceWith = ReplaceWith(expression = "SitePermissionsRepository.askLocationEnabled"),
+    )
     var appLocationPermissionDeniedForever: Boolean
+    var appLocationPermissionMigrated: Boolean
+
     var globalPrivacyControlEnabled: Boolean
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
@@ -120,6 +132,10 @@ class SettingsSharedPreferences @Inject constructor(
     override var appLocationPermissionDeniedForever: Boolean
         get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, false)
         set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, enabled) }
+
+    override var appLocationPermissionMigrated: Boolean
+        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_MIGRATED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_MIGRATED, enabled) }
 
     override var appIcon: AppIcon
         get() {
@@ -248,6 +264,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
+        const val KEY_SITE_LOCATION_PERMISSION_MIGRATED = "KEY_SITE_LOCATION_PERMISSION_MIGRATED"
         const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
         const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"

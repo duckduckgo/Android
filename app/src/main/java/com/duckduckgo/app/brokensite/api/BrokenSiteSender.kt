@@ -32,6 +32,7 @@ import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
+import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
@@ -220,4 +221,5 @@ class BrokenSiteSubmitter @Inject constructor(
 private fun ReportFlow.toStringValue(): String = when (this) {
     DASHBOARD -> "dashboard"
     MENU -> "menu"
+    PROMPT -> "prompt"
 }

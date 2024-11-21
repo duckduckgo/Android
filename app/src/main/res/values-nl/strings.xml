@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Later misschien</string>
     <string name="preciseLocationSystemDialogNeverAllow">Niet opnieuw vragen voor deze site</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">%1$s toestemming geven om je locatie te gebruiken?</string>
-    <string name="preciseLocationDDGDialogSubtitle">We gebruik je anonieme locatie alleen om betere resultaten dichter bij je in de buurt te bieden. Je kunt dit later altijd weer uitschakelen.</string>
     <string name="preciseLocationSiteDialogSubtitle">De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
+    <string name="preciseLocationDDGDialogSubtitle">We gebruiken je anonieme locatie alleen om betere resultaten bij je in de buurt aan te bieden. De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Altijd</string>
     <string name="preciseLocationSiteDialogAllowOnce">Alleen voor deze sessie</string>
     <string name="preciseLocationSiteDialogDenyAlways">Altijd weigeren</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Toestemmingen verwijderd voor alle sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Toestemmingen voor \'%1$s\' </string>
-    <string name="permissionsPerWebsiteAskSetting">Vragen</string>
+    <string name="permissionsPerWebsiteAskSetting">Elke keer vragen</string>
     <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
     <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">\"Vragen\" uitgeschakeld voor alle sites</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Uitgeschakeld voor alle sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Toestemming voor %1$s voor %2$s</string>
 
     <!-- Notify Me View on Downloads -->

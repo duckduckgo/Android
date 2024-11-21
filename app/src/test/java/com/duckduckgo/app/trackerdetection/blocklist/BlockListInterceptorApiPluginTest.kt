@@ -22,9 +22,6 @@ import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_PATH
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.NEXT_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -34,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
+import com.squareup.moshi.Moshi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -49,6 +47,14 @@ class BlockListInterceptorApiPluginTest {
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var interceptor: BlockListInterceptorApiPlugin
+    private val moshi = Moshi.Builder().build()
+
+    private data class Config(
+        val treatmentUrl: String? = null,
+        val controlUrl: String? = null,
+        val nextUrl: String? = null,
+    )
+    private val configAdapter = moshi.adapter(Config::class.java)
 
     @Before
     fun setup() {
@@ -69,7 +75,7 @@ class BlockListInterceptorApiPluginTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        interceptor = BlockListInterceptorApiPlugin(inventory)
+        interceptor = BlockListInterceptorApiPlugin(inventory, moshi)
     }
 
     @Test
@@ -78,9 +84,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "treatmentUrl",
-                    CONTROL_URL to "controlUrl",
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl"),
                 ),
                 cohorts = listOf(
                     State.Cohort(name = CONTROL.cohortName, weight = 0),
@@ -92,9 +97,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "anotherTreatmentUrl",
-                    CONTROL_URL to "anotherControlUrl",
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
                     State.Cohort(name = CONTROL.cohortName, weight = 0),
@@ -114,9 +118,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "anotherTreatmentUrl",
-                    CONTROL_URL to "anotherControlUrl",
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
                     State.Cohort(name = CONTROL.cohortName, weight = 0),
@@ -136,9 +139,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "anotherTreatmentUrl",
-                    CONTROL_URL to "anotherControlUrl",
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
                     State.Cohort(name = CONTROL.cohortName, weight = 1),
@@ -158,8 +160,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    NEXT_URL to "nextUrl",
+                settings = configAdapter.toJson(
+                    Config(nextUrl = "nextUrl"),
                 ),
             ),
         )
@@ -182,9 +184,8 @@ class BlockListInterceptorApiPluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "anotherTreatmentUrl",
-                    CONTROL_URL to "anotherControlUrl",
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
                 ),
                 cohorts = listOf(
                     State.Cohort(name = CONTROL.cohortName, weight = 1),

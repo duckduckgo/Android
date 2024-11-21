@@ -72,10 +72,6 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
         startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
     }
 
-    private suspend fun Subscriptions.isUpsellEligible(): Boolean {
-        return getAccessToken() == null && isEligible()
-    }
-
     companion object {
         internal const val PRIORITY_PPRO_DISABLED = PRIORITY_DISABLED - 1
         private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"

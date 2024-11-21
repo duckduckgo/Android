@@ -168,6 +168,8 @@ class DefaultTabManager @Inject constructor(
 
         lastActiveTabs.add(tab.tabId)
 
+        browserActivity.viewModel.onTabActivated(tab.tabId)
+
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(

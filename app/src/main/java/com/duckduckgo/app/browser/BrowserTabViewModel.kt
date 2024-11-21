@@ -28,7 +28,6 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -77,14 +76,12 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
-import com.duckduckgo.app.browser.commands.Command.AskDomainPermission
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
-import com.duckduckgo.app.browser.commands.Command.CheckSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
 import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
@@ -101,6 +98,7 @@ import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
@@ -120,7 +118,6 @@ import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
-import com.duckduckgo.app.browser.commands.Command.RequestSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
 import com.duckduckgo.app.browser.commands.Command.ResetHistory
 import com.duckduckgo.app.browser.commands.Command.SaveCredentials
@@ -202,6 +199,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -220,9 +218,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -236,6 +232,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -250,6 +247,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -257,9 +255,11 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -269,6 +269,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -277,14 +278,12 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
@@ -302,6 +301,7 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -346,6 +346,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -379,8 +380,6 @@ class BrowserTabViewModel @Inject constructor(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -395,7 +394,6 @@ class BrowserTabViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
-    private val gpc: Gpc,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
@@ -428,12 +426,14 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
-    private val loadingBarExperimentManager: LoadingBarExperimentManager,
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val customHeadersProvider: CustomHeadersProvider,
+    private val brokenSitePrompt: BrokenSitePrompt,
+    private val tabStatsBucketing: TabStatsBucketing,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -447,11 +447,6 @@ class BrowserTabViewModel @Inject constructor(
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
-
-    data class LocationPermission(
-        val origin: String,
-        val callback: GeolocationPermissions.Callback,
-    )
 
     data class FileChooserRequestedParams(
         val filePickingMode: Int,
@@ -498,7 +493,7 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
-    private var locationPermission: LocationPermission? = null
+    private var locationPermissionRequest: LocationPermissionRequest? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
@@ -834,6 +829,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewHidden() {
+        ctaViewState.value?.cta.let {
+            if (it is BrokenSitePromptDialogCta) {
+                command.value = HideBrokenSitePromptCta(it)
+            }
+        }
         skipHome = false
         viewModelScope.launch {
             downloadCallback
@@ -999,6 +999,11 @@ class BrowserTabViewModel @Inject constructor(
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
+            is BrokenSitePromptDialogCta -> {
+                viewModelScope.launch(dispatchers.main()) {
+                    command.value = HideBrokenSitePromptCta(currentCtaViewState().cta as BrokenSitePromptDialogCta)
+                }
+            }
         }
 
         command.value = HideKeyboard
@@ -1075,10 +1080,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
-        url?.let {
-            return gpc.getHeaders(url)
-        }
-        return emptyMap()
+        return url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
     }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
@@ -1176,7 +1178,9 @@ class BrowserTabViewModel @Inject constructor(
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
-        viewModelScope.launch { removeCurrentTabFromRepository() }
+        viewModelScope.launch {
+            removeCurrentTabFromRepository()
+        }
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -1186,7 +1190,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun closeAndSelectSourceTab() {
-        viewModelScope.launch { removeAndSelectTabFromRepository() }
+        viewModelScope.launch {
+            removeAndSelectTabFromRepository()
+        }
     }
 
     private suspend fun removeAndSelectTabFromRepository() {
@@ -1217,6 +1223,9 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
+            site?.uri?.let {
+                brokenSitePrompt.pageRefreshed(it)
+            }
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }
     }
@@ -1344,7 +1353,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
-        if (loadingBarExperimentManager.isExperimentEnabled() || settingsDataStore.omnibarPosition == BOTTOM) {
+        if (settingsDataStore.omnibarPosition == BOTTOM) {
             showOmniBar()
         }
 
@@ -1370,6 +1379,13 @@ class BrowserTabViewModel @Inject constructor(
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
+                    ctaViewState.value?.cta?.let { cta ->
+                        if (cta is BrokenSitePromptDialogCta) {
+                            withContext(dispatchers.main()) {
+                                command.value = HideBrokenSitePromptCta(cta)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1387,6 +1403,11 @@ class BrowserTabViewModel @Inject constructor(
                         withContext(dispatchers.main()) {
                             urlUpdated(stateChange.url)
                         }
+                    }
+                }
+                ctaViewState.value?.cta?.let { cta ->
+                    if (cta is BrokenSitePromptDialogCta) {
+                        command.value = HideBrokenSitePromptCta(cta)
                     }
                 }
             }
@@ -1607,39 +1628,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
-            viewModelScope.launch(dispatchers.io()) {
-                onDeviceLocationDisabled()
-            }
-            return
+        if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
+            Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+            command.postValue(ShowDomainHasPermissionMessage(domain))
         }
-
-        if (!appSettingsPreferencesStore.appLocationPermission) {
-            return
-        }
-
-        val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
-        permissionEntity?.let {
-            if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                Timber.d("Location Permission: domain $domain site url ${site?.url}")
-                if (!locationPermissionMessages.containsKey(domain)) {
-                    setDomainHasLocationPermissionShown(domain)
-                    if (shouldShowLocationPermissionMessage()) {
-                        Timber.d("Show location permission for $domain")
-                        command.postValue(ShowDomainHasPermissionMessage(domain))
-                    }
-                }
-            }
-        }
-    }
-
-    private fun shouldShowLocationPermissionMessage(): Boolean {
-        val url = site?.url ?: return true
-        return !duckDuckGoUrlDetector.isDuckDuckGoChatUrl(url)
-    }
-
-    private fun setDomainHasLocationPermissionShown(domain: String) {
-        locationPermissionMessages[domain] = true
     }
 
     private fun urlUpdated(url: String) {
@@ -1746,51 +1738,16 @@ class BrowserTabViewModel @Inject constructor(
         request: PermissionRequest,
         sitePermissionsAllowedToAsk: SitePermissions,
     ) {
+        if (request is LocationPermissionRequest) {
+            if (!sameEffectiveTldPlusOne(site, request.origin)) {
+                Timber.d("Permissions: sameEffectiveTldPlusOne false")
+                request.deny()
+                return
+            }
+        }
+
         viewModelScope.launch(dispatchers.io()) {
             command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))
-        }
-    }
-
-    override fun onSiteLocationPermissionRequested(
-        origin: String,
-        callback: GeolocationPermissions.Callback,
-    ) {
-        locationPermission = LocationPermission(origin, callback)
-
-        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
-            viewModelScope.launch(dispatchers.io()) {
-                onDeviceLocationDisabled()
-            }
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        if (!sameEffectiveTldPlusOne(site, origin)) {
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        if (!appSettingsPreferencesStore.appLocationPermission) {
-            onSiteLocationPermissionAlwaysDenied()
-            return
-        }
-
-        viewModelScope.launch {
-            val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
-            val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
-            if (permissionEntity == null) {
-                if (locationPermissionSession.containsKey(origin)) {
-                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
-                } else {
-                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
-                }
-            } else {
-                if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
-                    onSiteLocationPermissionAlwaysDenied()
-                } else {
-                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
-                }
-            }
         }
     }
 
@@ -1805,144 +1762,6 @@ class BrowserTabViewModel @Inject constructor(
         val originETldPlusOne = originDomain.topPrivateDomain()
 
         return siteETldPlusOne == originETldPlusOne
-    }
-
-    fun onSiteLocationPermissionSelected(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        locationPermission?.let { locationPermission ->
-            when (permission) {
-                LocationPermissionType.ALLOW_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysAllowed()
-                    setDomainHasLocationPermissionShown(domain)
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
-                    viewModelScope.launch {
-                        locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistCachedFavicon(tabId, domain)
-                    }
-                }
-
-                LocationPermissionType.ALLOW_ONCE -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
-                    locationPermissionSession[domain] = permission
-                    locationPermission.callback.invoke(locationPermission.origin, true, false)
-                }
-
-                LocationPermissionType.DENY_ALWAYS -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
-                    onSiteLocationPermissionAlwaysDenied()
-                    viewModelScope.launch {
-                        locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistCachedFavicon(tabId, domain)
-                    }
-                }
-
-                LocationPermissionType.DENY_ONCE -> {
-                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
-                    locationPermissionSession[domain] = permission
-                    locationPermission.callback.invoke(locationPermission.origin, false, false)
-                }
-            }
-        }
-    }
-
-    private fun onSiteLocationPermissionAlwaysAllowed() {
-        locationPermission?.let { locationPermission ->
-            geoLocationPermissions.allow(locationPermission.origin)
-            locationPermission.callback.invoke(locationPermission.origin, true, false)
-        }
-    }
-
-    fun onSiteLocationPermissionAlwaysDenied() {
-        locationPermission?.let { locationPermission ->
-            geoLocationPermissions.clear(locationPermission.origin)
-            locationPermission.callback.invoke(locationPermission.origin, false, false)
-        }
-    }
-
-    private suspend fun onDeviceLocationDisabled() {
-        geoLocationPermissions.clearAll()
-    }
-
-    private fun reactToSitePermission(permission: LocationPermissionType) {
-        locationPermission?.let { locationPermission ->
-            when (permission) {
-                LocationPermissionType.ALLOW_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysAllowed()
-                }
-
-                LocationPermissionType.ALLOW_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission))
-                }
-
-                LocationPermissionType.DENY_ALWAYS -> {
-                    onSiteLocationPermissionAlwaysDenied()
-                }
-
-                LocationPermissionType.DENY_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission))
-                }
-            }
-        }
-    }
-
-    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
-        locationPermission?.let { locationPermission ->
-            if (permission == LocationPermissionType.ALLOW_ONCE) {
-                locationPermission.callback.invoke(locationPermission.origin, true, false)
-            } else {
-                locationPermission.callback.invoke(locationPermission.origin, false, false)
-            }
-        }
-    }
-
-    fun onSystemLocationPermissionAllowed() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
-        command.postValue(RequestSystemLocationPermission)
-    }
-
-    fun onSystemLocationPermissionNotAllowed() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
-        onSiteLocationPermissionAlwaysDenied()
-    }
-
-    fun onSystemLocationPermissionNeverAllowed() {
-        locationPermission?.let { locationPermission ->
-            onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
-            pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-        }
-    }
-
-    fun onSystemLocationPermissionGranted() {
-        locationPermission?.let { locationPermission ->
-            appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
-            appSettingsPreferencesStore.appLocationPermission = true
-            pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
-            viewModelScope.launch {
-                val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
-                if (permissionEntity == null) {
-                    command.postValue(AskDomainPermission(locationPermission))
-                } else {
-                    reactToSitePermission(permissionEntity.permission)
-                }
-            }
-        }
-    }
-
-    fun onSystemLocationPermissionDeniedOneTime() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        onSiteLocationPermissionAlwaysDenied()
-    }
-
-    fun onSystemLocationPermissionDeniedTwice() {
-        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        onSystemLocationPermissionDeniedForever()
-    }
-
-    fun onSystemLocationPermissionDeniedForever() {
-        appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
-        onSiteLocationPermissionAlwaysDenied()
     }
 
     private fun registerSiteVisit() {
@@ -2858,11 +2677,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        ctaViewModel.onUserClickCtaOkButton(cta)
+        viewModelScope.launch {
+            ctaViewModel.onUserClickCtaOkButton(cta)
+        }
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
+            is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
             else -> null
         }
         onboardingCommand?.let {
@@ -2876,6 +2698,8 @@ class BrowserTabViewModel @Inject constructor(
             if (cta is DaxBubbleCta.DaxPrivacyProCta) {
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            } else if (cta is BrokenSitePromptDialogCta) {
+                onBrokenSiteCtaDismissButtonClicked(cta)
             }
             if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
                 pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
@@ -3012,7 +2836,26 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        fireDailyLaunchPixel()
+    }
+
+    private fun fireDailyLaunchPixel() {
+        val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getNumberOfOpenTabs() }
+        val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveLastWeek() }
+        val inactive1w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveOneWeekAgo() }
+        val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveTwoWeeksAgo() }
+        val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo() }
+
+        viewModelScope.launch(dispatchers.io()) {
+            val params = mapOf(
+                PixelParameter.TAB_COUNT to tabCount.await(),
+                PixelParameter.TAB_ACTIVE_7D to activeTabCount.await(),
+                PixelParameter.TAB_INACTIVE_1W to inactive1w.await(),
+                PixelParameter.TAB_INACTIVE_2W to inactive2w.await(),
+                PixelParameter.TAB_INACTIVE_3W to inactive3w.await(),
+            )
+            pixel.fire(TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+        }
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {
@@ -3614,6 +3457,21 @@ class BrowserTabViewModel @Inject constructor(
                 sslError = NONE,
             )
         }
+    }
+
+    private fun onBrokenSiteCtaDismissButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        viewModelScope.launch {
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
+    }
+
+    private fun onBrokenSiteCtaOkButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        viewModelScope.launch {
+            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = PROMPT))
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.dispatchers
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,6 +43,7 @@ class IntentDispatcherViewModelTest {
     private val mockCustomTabDetector: CustomTabDetector = mock()
     private val mockIntent: Intent = mock()
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
 
@@ -51,6 +53,7 @@ class IntentDispatcherViewModelTest {
             customTabDetector = mockCustomTabDetector,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             emailProtectionLinkVerifier = emailProtectionLinkVerifier,
+            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
         )
     }
 
@@ -170,6 +173,23 @@ class IntentDispatcherViewModelTest {
             val state = awaitItem()
             assertTrue(state.customTabRequested)
             assertEquals(intentTextWithSpaces, state.intentText)
+        }
+    }
+
+    @Test
+    fun `when Intent received with session and intent text is a DDG domain then custom tab is not requested`() = runTest {
+        val text = "some DDG url"
+        val toolbarColor = 100
+        configureHasSession(true)
+        whenever(mockIntent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)).thenReturn(toolbarColor)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(text)).thenReturn(true)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
         }
     }
 

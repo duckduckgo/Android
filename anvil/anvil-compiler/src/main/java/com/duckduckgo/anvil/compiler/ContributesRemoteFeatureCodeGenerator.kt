@@ -118,7 +118,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
-                                .localeProvider({ appBuildConfig.deviceLocale })
                                 .callback(callback)
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
@@ -498,6 +497,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             minSupportedVersion = feature.minSupportedVersion,
                             targets = emptyList(),
                             cohorts = emptyList(),
+                            settings = feature.settings?.toString(),
                         )
                     )
         
@@ -520,6 +520,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         variantKey = target.variantKey,
                                         localeCountry = target.localeCountry,
                                         localeLanguage = target.localeLanguage,
+                                        isReturningUser = target.isReturningUser,
+                                        isPrivacyProEligible = target.isPrivacyProEligible,
                                     )
                                 } ?: emptyList()
                                 val cohorts = jsonToggle?.cohorts?.map { cohort ->
@@ -528,7 +530,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         weight = cohort.weight,
                                     )
                                 } ?: emptyList()
-                                val config = jsonToggle?.config ?: emptyMap()
+                                val settings = jsonToggle?.settings?.toString()
                                 this.feature.get().invokeMethod(subfeature.key).setRawStoredState(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -539,7 +541,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         assignedCohort = previousAssignedCohort,
                                         targets = targets,
                                         cohorts = cohorts,
-                                        config = config,                                        
+                                        settings = settings,                                        
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -726,11 +728,22 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addParameter("variantKey", String::class.asClassName())
                     .addParameter("localeCountry", String::class.asClassName())
                     .addParameter("localeLanguage", String::class.asClassName())
+                    .addParameter("isReturningUser", Boolean::class.asClassName().copy(nullable = true))
+                    .addParameter("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
                     .build(),
             )
             .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
             .addProperty(PropertySpec.builder("localeCountry", String::class.asClassName()).initializer("localeCountry").build())
             .addProperty(PropertySpec.builder("localeLanguage", String::class.asClassName()).initializer("localeLanguage").build())
+            .addProperty(
+                PropertySpec.builder("isReturningUser", Boolean::class.asClassName().copy(nullable = true)).initializer("isReturningUser").build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
+                    .initializer("isPrivacyProEligible")
+                    .build(),
+            )
             .build()
     }
 
@@ -781,10 +794,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "cohorts",
                         List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
                     )
-                    .addParameter(
-                        "config",
-                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()),
-                    )
+                    .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
                     .build(),
             )
             .addProperty(
@@ -819,8 +829,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
             .addProperty(
                 PropertySpec
-                    .builder("config", Map::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName()))
-                    .initializer("config")
+                    .builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
+                    .initializer("settings")
                     .build(),
             )
             .build()
