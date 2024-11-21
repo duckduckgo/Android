@@ -46,13 +46,13 @@
     <string name="credentialManagementEditPasswordHint">Password</string>
     <string name="credentialManagementEditWebsiteHint">URL del sito Web</string>
     <string name="credentialManagementEditNotesHint">Note</string>
-    <string name="credentialManagementEditButtonDelete">Cancella</string>
+    <string name="credentialManagementEditButtonDelete">Elimina</string>
     <string name="credentialManagementEditButtonSaveChanges">Salva modifiche</string>
     <string name="credentialManagementEditButtonCopyUsername">Copia nome utente</string>
     <string name="credentialManagementEditButtonCopyPassword">Copia password</string>
 
     <string name="credentialManagementViewMenuEdit">Modifica</string>
-    <string name="credentialManagementViewMenuDelete">Cancella</string>
+    <string name="credentialManagementViewMenuDelete">Elimina</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
 
@@ -62,7 +62,7 @@
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
-    <string name="autofillDeleteLoginDialogDelete">Cancella</string>
+    <string name="autofillDeleteLoginDialogDelete">Elimina</string>
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
