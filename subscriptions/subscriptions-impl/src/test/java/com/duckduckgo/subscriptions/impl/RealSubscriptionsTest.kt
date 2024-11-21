@@ -26,12 +26,14 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.Settings
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
+import dagger.Lazy
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -58,12 +60,14 @@ class RealSubscriptionsTest {
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val pixel: SubscriptionPixelSender = mock()
+    private val settings: Lazy<Settings> = mock()
     private lateinit var subscriptions: RealSubscriptions
 
     @Before
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel)
+        whenever(settings.get()).thenReturn(mock())
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel, settings)
     }
 
     @Test
