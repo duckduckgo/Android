@@ -62,12 +62,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -113,15 +109,15 @@ class BrowserViewModel @Inject constructor(
         get() = viewState.value!!
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
-    val tabs: LiveData<List<TabEntity>> = tabRepository.flowTabs
-        .distinctUntilChanged()
-        .onEach { onTabsUpdated(it.isEmpty()) }
-        .asLiveData()
 
-    val isOnboardingCompleted: Flow<Boolean> = userStageStore.currentAppStage
+    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
+
+    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs.distinctUntilChanged()
+
+    val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
+        .distinctUntilChanged()
         .map { it != AppStage.DAX_ONBOARDING }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+        .asLiveData()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -153,13 +149,6 @@ class BrowserViewModel @Inject constructor(
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
-
-        // viewModelScope.launch {
-        //     repeat(50) {
-        //         delay(1000)
-        //         tabRepository.add("cnn.com")
-        //     }
-        // }
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {

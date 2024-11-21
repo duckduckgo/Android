@@ -31,7 +31,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.postDelayed
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -85,7 +84,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -168,18 +166,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             super.onPageSelected(position)
             tabManager.tabPagerAdapter.onPageChanged(position)
         }
-    }
-
-    init {
-        // lifecycleScope.launch {
-        //     delay(5000)
-        //     binding.tabPager.setCurrentItem(0, true)
-        //     repeat(MAX_ACTIVE_TABS) {
-        //         Timber.d("$$$ moving to #$it")
-        //         binding.tabPager.setCurrentItem(it, true)
-        //         delay(1000)
-        //     }
-        // }
     }
 
     @VisibleForTesting
@@ -377,18 +363,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this) {
             processCommand(it)
         }
+
         viewModel.selectedTab.observe(this) {
             tabManager.onSelectedTabChanged(it)
         }
+
         viewModel.tabs.observe(this) {
             updateTabs(it)
+
+            lifecycleScope.launch {
+                viewModel.onTabsUpdated(it.isEmpty())
+            }
         }
 
         // listen to onboarding completion to enable/disable swiping
-        lifecycleScope.launch {
-            viewModel.isOnboardingCompleted.flowWithLifecycle(lifecycle).collectLatest { isOnboardingCompleted ->
-                binding.tabPager.isUserInputEnabled = isOnboardingCompleted
-            }
+        viewModel.isOnboardingCompleted.observe(this) { isOnboardingCompleted ->
+            binding.tabPager.isUserInputEnabled = isOnboardingCompleted
         }
     }
 
@@ -396,6 +386,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
         viewModel.tabs.removeObservers(this)
+        viewModel.isOnboardingCompleted.removeObservers(this)
     }
 
     private fun processCommand(command: Command) {
