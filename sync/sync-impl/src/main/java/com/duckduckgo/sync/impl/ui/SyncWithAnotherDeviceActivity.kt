@@ -145,7 +145,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
                         viewModel.onUserAcceptedJoiningNewAccount(it.encodedStringCode)
                     }
 
-                    override fun onDialogCancelled() {
+                    override fun onNegativeButtonClicked() {
                         viewModel.onUserCancelledJoiningNewAccount()
                     }
                 },
