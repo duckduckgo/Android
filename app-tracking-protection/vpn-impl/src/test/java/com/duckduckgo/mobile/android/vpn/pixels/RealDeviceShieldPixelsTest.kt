@@ -76,12 +76,10 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenReportExactly28DaysApartThenFireMonthlyPixel() {
+    fun whenReportExactly28DaysApartThenDoNotFireMonthlyPixel() {
         val pixelName = DeviceShieldPixelNames.ATP_ENABLE_MONTHLY.pixelName
 
         deviceShieldPixels.reportEnabled()
-
-        verify(pixel).fire(pixelName)
 
         val pastDate = Instant.now()
             .minus(28, ChronoUnit.DAYS)
@@ -94,7 +92,7 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenReportEnable28DaysApartDoNotReportMonthlyPixel() {
+    fun whenReportEnableMoreThan28DaysApartReportMonthlyPixel() {
         val pixelName = DeviceShieldPixelNames.ATP_ENABLE_MONTHLY.pixelName
 
         deviceShieldPixels.reportEnabled()
