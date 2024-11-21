@@ -23,6 +23,7 @@ import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -35,6 +36,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsChecker.Companion.TAG_WORKER_SUBSCRIPTION_CHECK
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.Instant
 import java.util.concurrent.TimeUnit.HOURS
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
@@ -66,21 +68,13 @@ class RealSubscriptionsChecker @Inject constructor(
     }
 
     override suspend fun runChecker() {
-        if (subscriptionsManager.subscriptionStatus() != UNKNOWN) {
-            PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(1, HOURS)
-                .addTag(TAG_WORKER_SUBSCRIPTION_CHECK)
-                .setConstraints(
-                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build(),
-                )
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
-                .build().run {
-                    workManager.enqueueUniquePeriodicWork(
-                        TAG_WORKER_SUBSCRIPTION_CHECK,
-                        ExistingPeriodicWorkPolicy.REPLACE,
-                        this,
-                    )
-                }
-        }
+        if (!subscriptionsManager.isSignedIn()) return
+
+        workManager.enqueueUniquePeriodicWork(
+            TAG_WORKER_SUBSCRIPTION_CHECK,
+            ExistingPeriodicWorkPolicy.REPLACE,
+            buildSubscriptionCheckPeriodicWorkRequest(),
+        )
     }
 
     companion object {
@@ -101,11 +95,28 @@ class SubscriptionsCheckWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            if (subscriptionsManager.subscriptionStatus() != UNKNOWN) {
-                subscriptionsManager.fetchAndStoreAllData()
-                val subscription = subscriptionsManager.getSubscription()
-                if (subscription?.status == null || subscription.status == UNKNOWN) {
-                    workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+            if (subscriptionsManager.isSignedIn()) {
+                if (subscriptionsManager.isSignedInV2()) {
+                    subscriptionsManager.refreshSubscriptionData()
+                    val subscription = subscriptionsManager.getSubscription()
+                    if (subscription?.isActive() == true) {
+                        // No need to refresh active subscription in the background. Delay next refresh to the expiry/renewal time.
+                        // It will still get refreshed when the app goes to the foreground.
+                        val expiresOrRenewsAt = Instant.ofEpochMilli(subscription.expiresOrRenewsAt)
+                        if (expiresOrRenewsAt > Instant.now()) {
+                            workManager.enqueueUniquePeriodicWork(
+                                TAG_WORKER_SUBSCRIPTION_CHECK,
+                                ExistingPeriodicWorkPolicy.UPDATE,
+                                buildSubscriptionCheckPeriodicWorkRequest(nextScheduleTimeOverride = expiresOrRenewsAt),
+                            )
+                        }
+                    }
+                } else {
+                    subscriptionsManager.fetchAndStoreAllData()
+                    val subscription = subscriptionsManager.getSubscription()
+                    if (subscription?.status == null || subscription.status == UNKNOWN) {
+                        workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+                    }
                 }
             } else {
                 workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
@@ -116,3 +127,17 @@ class SubscriptionsCheckWorker(
         }
     }
 }
+
+private fun buildSubscriptionCheckPeriodicWorkRequest(nextScheduleTimeOverride: Instant? = null): PeriodicWorkRequest =
+    PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(1, HOURS)
+        .addTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+        .setConstraints(
+            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build(),
+        )
+        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
+        .apply {
+            if (nextScheduleTimeOverride != null) {
+                setNextScheduleTimeOverride(nextScheduleTimeOverride.toEpochMilli())
+            }
+        }
+        .build()

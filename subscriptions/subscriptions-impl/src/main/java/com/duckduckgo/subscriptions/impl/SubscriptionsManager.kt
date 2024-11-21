@@ -122,6 +122,11 @@ interface SubscriptionsManager {
     suspend fun getSubscription(): Subscription?
 
     /**
+     * Fetches subscription information from BE and saves it in internal storage
+     */
+    suspend fun refreshSubscriptionData()
+
+    /**
      * Gets the account details from internal storage
      */
     suspend fun getAccount(): Account?
@@ -506,7 +511,7 @@ class RealSubscriptionsManager @Inject constructor(
         saveTokens(newTokens)
     }
 
-    private suspend fun refreshSubscriptionData() {
+    override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
 
         authRepository.setSubscription(
