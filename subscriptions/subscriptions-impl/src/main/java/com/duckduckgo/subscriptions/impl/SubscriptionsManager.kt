@@ -127,6 +127,12 @@ interface SubscriptionsManager {
     suspend fun refreshSubscriptionData()
 
     /**
+     * Gets new access token from BE and saves it in internal storage.
+     * This operation also updates account email and entitlements.
+     */
+    suspend fun refreshAccessToken()
+
+    /**
      * Gets the account details from internal storage
      */
     suspend fun getAccount(): Account?
@@ -480,7 +486,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun refreshAccessToken() {
+    override suspend fun refreshAccessToken() {
         val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
 
         val newTokens = try {
