@@ -36,9 +36,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsChecker.Companion.TAG_WORKER_SUBSCRIPTION_CHECK
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.Duration
 import java.time.Instant
-import java.util.concurrent.TimeUnit.HOURS
-import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -72,7 +71,7 @@ class RealSubscriptionsChecker @Inject constructor(
 
         workManager.enqueueUniquePeriodicWork(
             TAG_WORKER_SUBSCRIPTION_CHECK,
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             buildSubscriptionCheckPeriodicWorkRequest(),
         )
     }
@@ -115,11 +114,11 @@ class SubscriptionsCheckWorker(
                     subscriptionsManager.fetchAndStoreAllData()
                     val subscription = subscriptionsManager.getSubscription()
                     if (subscription?.status == null || subscription.status == UNKNOWN) {
-                        workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+                        workManager.cancelUniqueWork(TAG_WORKER_SUBSCRIPTION_CHECK)
                     }
                 }
             } else {
-                workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+                workManager.cancelUniqueWork(TAG_WORKER_SUBSCRIPTION_CHECK)
             }
             Result.success()
         } catch (e: Exception) {
@@ -129,12 +128,11 @@ class SubscriptionsCheckWorker(
 }
 
 private fun buildSubscriptionCheckPeriodicWorkRequest(nextScheduleTimeOverride: Instant? = null): PeriodicWorkRequest =
-    PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(1, HOURS)
-        .addTag(TAG_WORKER_SUBSCRIPTION_CHECK)
+    PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(Duration.ofHours(1))
         .setConstraints(
             Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build(),
         )
-        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
+        .setBackoffCriteria(BackoffPolicy.LINEAR, Duration.ofMinutes(10))
         .apply {
             if (nextScheduleTimeOverride != null) {
                 setNextScheduleTimeOverride(nextScheduleTimeOverride.toEpochMilli())
