@@ -26,6 +26,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.tabs.model.TabEntity
+import timber.log.Timber
 
 class TabPagerAdapter(
     lifecycle: Lifecycle,
@@ -63,7 +64,7 @@ class TabPagerAdapter(
         increaseOffscreenTabLimitIfNeeded()
 
         val tab = getTabById(tabIds[position]) ?: requestNewTab()
-        val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false
+        val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         if (messageForNewFragment != null) {
             val message = messageForNewFragment
@@ -76,24 +77,15 @@ class TabPagerAdapter(
         }
     }
 
-    // init {
-    //     lifecycleScope.launch {
-    //         delay(5000)
-    //         binding.fragmentPager.setCurrentItem(0, true)
-    //         repeat(MAX_ACTIVE_TABS) {
-    //             Timber.d("$$$ moving to #$it")
-    //             binding.fragmentPager.setCurrentItem(it, true)
-    //             delay(1000)
-    //         }
-    //     }
-    // }
-
     fun setMessageForNewFragment(message: Message) {
         messageForNewFragment = message
     }
 
     fun onTabsUpdated(newTabs: List<String>) {
         if (tabIds != newTabs) {
+            Timber.i("$$$ oldIds: ${tabIds.joinToString(",")}")
+            Timber.i("$$$ newIds: ${newTabs.joinToString(",")}")
+
             val diffUtil = PagerDiffUtil(tabIds, newTabs)
             val diff = DiffUtil.calculateDiff(diffUtil)
             tabIds.clear()
@@ -108,13 +100,17 @@ class TabPagerAdapter(
 
     fun onSelectedTabChanged(tabId: String) {
         val selectedTabIndex = tabIds.indexOfFirst { it == tabId }
+        Timber.i("$$$ onSelectedTabChanged: selectedTabIndex $selectedTabIndex; currentTabIndex ${getCurrentTabIndex()}")
         if (selectedTabIndex != -1 && selectedTabIndex != getCurrentTabIndex()) {
+            Timber.i("$$$ onSelectedTabChanged:tabIds ${tabIds.joinToString(",")}")
+            Timber.i("$$$ onSelectedTabChanged: moving to index $selectedTabIndex ($tabId)")
             moveToTabIndex(selectedTabIndex, false)
         }
     }
 
     fun onPageChanged(position: Int) {
         if (position < tabIds.size) {
+            Timber.i("$$$ onPageChanged: moving to position $position (${tabIds[position]})")
             onTabSelected(tabIds[position])
         }
     }
@@ -139,7 +135,7 @@ class TabPagerAdapter(
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return true
+            return areItemsTheSame(oldItemPosition, newItemPosition)
         }
     }
 }
