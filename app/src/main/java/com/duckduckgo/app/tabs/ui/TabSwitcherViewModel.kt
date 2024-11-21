@@ -71,7 +71,12 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        tabRepository.add()
+        val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+        if (emptyTab != null) {
+            tabRepository.select(tabId = emptyTab)
+        } else {
+            tabRepository.add()
+        }
         command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)
