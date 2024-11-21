@@ -30,8 +30,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.postDelayed
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -45,7 +47,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
-import com.duckduckgo.app.browser.tabs.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -67,6 +68,7 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -166,6 +168,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
             super.onPageSelected(position)
             tabManager.tabPagerAdapter.onPageChanged(position)
         }
+    }
+
+    init {
+        // lifecycleScope.launch {
+        //     delay(5000)
+        //     binding.tabPager.setCurrentItem(0, true)
+        //     repeat(MAX_ACTIVE_TABS) {
+        //         Timber.d("$$$ moving to #$it")
+        //         binding.tabPager.setCurrentItem(it, true)
+        //         delay(1000)
+        //     }
+        // }
     }
 
     @VisibleForTesting
@@ -367,7 +381,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabManager.onSelectedTabChanged(it)
         }
         viewModel.tabs.observe(this) {
-            tabManager.onTabsUpdated(it)
+            updateTabs(it)
         }
 
         // listen to onboarding completion to enable/disable swiping
@@ -677,8 +691,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
         playStoreUtils.launchPlayStore()
     }
 
+    fun onMoveToTabRequested(index: Int, smoothScroll: Boolean) {
+        binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+        binding.tabPager.setCurrentItem(index, smoothScroll)
+        binding.tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+    }
+
     private data class CombinedInstanceState(
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,
     )
+
+    private fun updateTabs(entities: List<TabEntity>) {
+        val recyclerView = tabPager.getChildAt(0) as RecyclerView
+        val state = recyclerView.layoutManager?.onSaveInstanceState()
+        recyclerView.itemAnimator = null
+        tabManager.onTabsUpdated(entities)
+        recyclerView.layoutManager?.onRestoreInstanceState(state)
+    }
 }

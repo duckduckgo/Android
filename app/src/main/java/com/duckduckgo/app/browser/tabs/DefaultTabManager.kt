@@ -24,12 +24,15 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import dagger.android.DaggerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -39,6 +42,7 @@ import timber.log.Timber
 class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
     private val swipingTabsFeature: SwipingTabsFeature,
+    private val tabRepository: TabRepository,
 ) : TabManager {
     private val browserActivity = activity as BrowserActivity
     private val lastActiveTabs = TabList()
@@ -50,10 +54,10 @@ class DefaultTabManager @Inject constructor(
             fragmentManager = supportFragmentManager,
             lifecycle = browserActivity.lifecycle,
             activityIntent = browserActivity.intent,
-            moveToTabIndex = { index, smoothScroll -> browserActivity.tabPager.setCurrentItem(index, smoothScroll) },
+            moveToTabIndex = { index, smoothScroll -> browserActivity.onMoveToTabRequested(index, smoothScroll) },
             getCurrentTabIndex = { browserActivity.tabPager.currentItem },
-            getSelectedTabId = { browserActivity.viewModel.selectedTab.value?.tabId },
-            getTabById = { tabId -> browserActivity.viewModel.getTabById(tabId) },
+            getSelectedTabId = { runBlocking { tabRepository.flowSelectedTab.firstOrNull()?.tabId } },
+            getTabById = { tabId -> runBlocking { tabRepository.flowTabs.first().firstOrNull { it.tabId == tabId } } },
             requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
@@ -145,8 +149,10 @@ class DefaultTabManager @Inject constructor(
     }
 
     private fun requestNewTab(): TabEntity {
-        val tabId = runBlocking { browserActivity.viewModel.onNewTabRequested() }
-        return browserActivity.viewModel.getTabById(tabId)!!
+        return runBlocking {
+            val tabId = browserActivity.viewModel.onNewTabRequested()
+            tabRepository.flowTabs.first().first { it.tabId == tabId }
+        }
     }
 
     private fun selectTab(tab: TabEntity) {
