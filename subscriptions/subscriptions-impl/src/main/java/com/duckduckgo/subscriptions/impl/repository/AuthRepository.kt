@@ -94,6 +94,7 @@ internal class RealAuthRepository constructor(
     override suspend fun setAccessTokenV2(accessToken: AccessToken?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessTokenV2 = accessToken?.jwt
         subscriptionsDataStore.accessTokenV2ExpiresAt = accessToken?.expiresAt
+        updateSerpPromoCookie()
     }
 
     override suspend fun getAccessTokenV2(): AccessToken? {
@@ -123,7 +124,7 @@ internal class RealAuthRepository constructor(
 
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessToken = accessToken
-        serpPromo.injectCookie(accessToken)
+        updateSerpPromoCookie()
     }
 
     override suspend fun setAuthToken(authToken: String?) = withContext(dispatcherProvider.io()) {
@@ -188,6 +189,11 @@ internal class RealAuthRepository constructor(
 
     override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.canUseEncryption()
+    }
+
+    private suspend fun updateSerpPromoCookie() {
+        val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }
+        serpPromo.injectCookie(accessToken)
     }
 }
 
