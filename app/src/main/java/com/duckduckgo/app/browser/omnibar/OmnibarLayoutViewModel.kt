@@ -518,6 +518,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
             AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
         )
+        _viewState.update {
+            it.copy(
+                omnibarText = it.url,
+                updateOmnibarText = true,
+            )
+        }
     }
 
     fun onEnterKeyPressed() {
