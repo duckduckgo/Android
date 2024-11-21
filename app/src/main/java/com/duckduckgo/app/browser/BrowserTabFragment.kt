@@ -825,13 +825,16 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
+        Timber.d("Resuming webview: $tabId")
         webView?.let {
             if (it.isShown) it.onResume()
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
@@ -874,6 +877,7 @@ class BrowserTabFragment :
             (v as FrameLayout).requestDisallowInterceptTouchEvent(true)
             return@setOnTouchListener true
         }
+        binding.legacyOmnibar.setOnTouchListener { v, event -> false }
     }
 
     private fun configureOmnibar() {
