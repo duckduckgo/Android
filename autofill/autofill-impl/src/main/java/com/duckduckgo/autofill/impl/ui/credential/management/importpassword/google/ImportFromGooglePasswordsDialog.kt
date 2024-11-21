@@ -32,10 +32,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
@@ -43,6 +41,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.ImportError
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.ImportSuccess
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
@@ -66,7 +65,7 @@ import timber.log.Timber
 class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     @Inject
-    lateinit var pixel: Pixel
+    lateinit var importPasswordsPixelSender: ImportPasswordsPixelSender
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
@@ -97,10 +96,8 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    activityResult.data?.let { data ->
-                        processImportFlowResult(data)
-                    }
+                activityResult.data?.let { data ->
+                    processImportFlowResult(data)
                 }
             }
         }
@@ -111,7 +108,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             when (it) {
                 is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully()
                 is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError(it.reason)
-                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser()
+                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(it.stage)
                 else -> {}
             }
         }
@@ -190,6 +187,8 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        importPasswordsPixelSender.onImportPasswordsDialogDisplayed()
+
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
@@ -233,10 +232,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun onImportGcmButtonClicked() {
-        launchImportGcmFlow()
-    }
-
-    private fun launchImportGcmFlow() {
         authorizationGracePeriod.requestExtendedGracePeriod()
 
         val intent = globalActivityStarter.startIntent(
@@ -244,6 +239,11 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen,
         )
         importGooglePasswordsFlowLauncher.launch(intent)
+
+        importPasswordsPixelSender.onImportPasswordsDialogImportButtonClicked()
+
+        // we don't want the eventual dismissal of this dialog to count as a cancellation
+        ignoreCancellationEvents = true
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -251,6 +251,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             Timber.v("onCancel: Ignoring cancellation event")
             return
         }
+
+        importPasswordsPixelSender.onUserCancelledImportPasswordsDialog()
+
         dismiss()
     }
 

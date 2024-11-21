@@ -43,6 +43,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportGooglePasswordsWebflowBinding
 import com.duckduckgo.autofill.impl.importing.blob.GooglePasswordBlobConsumer
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
@@ -113,6 +114,9 @@ class ImportGooglePasswordsWebFlowFragment :
 
     @Inject
     lateinit var browserAutofillConfigurator: BrowserAutofill.Configurator
+
+    @Inject
+    lateinit var importPasswordConfig: AutofillImportPasswordConfigStore
 
     private var binding: FragmentImportGooglePasswordsWebflowBinding? = null
 
@@ -283,8 +287,10 @@ class ImportGooglePasswordsWebFlowFragment :
 
     @SuppressLint("RequiresFeature")
     private suspend fun configurePasswordImportJavascript(webView: WebView) {
-        val script = passwordImporterScriptLoader.getScript()
-        WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        if (importPasswordConfig.getConfig().canInjectJavascript) {
+            val script = passwordImporterScriptLoader.getScript()
+            WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        }
     }
 
     private fun getToolbar() = (activity as ImportGooglePasswordsWebFlowActivity).binding.includeToolbar.toolbar

@@ -9,7 +9,6 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredenti
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult.Success
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordSettings
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Companion.ENCRYPTED_PASSPHRASE_ERROR_URL
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
@@ -34,12 +33,14 @@ class ImportGooglePasswordsWebFlowViewModelTest {
     private val credentialImporter: CredentialImporter = mock()
     private val csvCredentialConverter: CsvCredentialConverter = mock()
     private val autofillImportConfigStore: AutofillImportPasswordConfigStore = mock()
+    private val urlToStageMapper: ImportGooglePasswordUrlToStageMapper = mock()
 
     private val testee = ImportGooglePasswordsWebFlowViewModel(
         dispatchers = coroutineTestRule.testDispatcherProvider,
         credentialImporter = credentialImporter,
         csvCredentialConverter = csvCredentialConverter,
         autofillImportConfigStore = autofillImportConfigStore,
+        urlToStageMapper = urlToStageMapper,
     )
 
     @Test
@@ -77,6 +78,7 @@ class ImportGooglePasswordsWebFlowViewModelTest {
 
     @Test
     fun whenBackButtonPressedAndCannotGoBackThenUserCancelledImportFlowState() = runTest {
+        whenever(urlToStageMapper.getStage(any())).thenReturn("stage")
         testee.onBackButtonPressed(url = "https://example.com", canGoBack = false)
         testee.viewState.test {
             awaitItem() as UserCancelledImportFlow
@@ -92,18 +94,12 @@ class ImportGooglePasswordsWebFlowViewModelTest {
     }
 
     @Test
-    fun whenCloseButtonPressedAndNotEncryptionErrorPageThenUserCancelledImportFlowState() = runTest {
+    fun whenCloseButtonPressedThenUserCancelledImportFlowState() = runTest {
+        val expectedStage = "stage"
+        whenever(urlToStageMapper.getStage(any())).thenReturn(expectedStage)
         testee.onCloseButtonPressed("https://example.com")
         testee.viewState.test {
-            awaitItem() as UserCancelledImportFlow
-        }
-    }
-
-    @Test
-    fun whenCloseButtonPressedOnEncryptionErrorPageThenUserCancelledImportFlowState() = runTest {
-        testee.onCloseButtonPressed(ENCRYPTED_PASSPHRASE_ERROR_URL)
-        testee.viewState.test {
-            awaitItem() as UserFinishedCannotImport
+            assertEquals(expectedStage, (awaitItem() as UserCancelledImportFlow).stage)
         }
     }
 
@@ -117,6 +113,8 @@ class ImportGooglePasswordsWebFlowViewModelTest {
                 canImportFromGooglePasswords = canImportFromGooglePasswords,
                 launchUrlGooglePasswords = launchUrlGooglePasswords,
                 javascriptConfigGooglePasswords = javascriptConfigGooglePasswords,
+                canInjectJavascript = true,
+                urlMappings = emptyList(),
             ),
         )
     }

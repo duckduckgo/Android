@@ -5,8 +5,8 @@ import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.EncryptedPassphrase
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.ImportSuccess
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
@@ -29,10 +29,13 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule(StandardTestDispatcher())
 
+    private val importPasswordsPixelSender: ImportPasswordsPixelSender = mock()
+
     private val credentialImporter: CredentialImporter = mock()
     private val testee = ImportFromGooglePasswordsDialogViewModel(
         credentialImporter = credentialImporter,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        importPasswordsPixelSender = importPasswordsPixelSender,
     )
 
     @Before
@@ -43,14 +46,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenParsingErrorOnImportThenViewModeUpdatedToError() = runTest {
         testee.onImportFlowFinishedWithError(ErrorParsingCsv)
-        testee.viewState.test {
-            assertTrue(awaitItem().viewMode is ViewMode.ImportError)
-        }
-    }
-
-    @Test
-    fun whenEncryptionErrorOnImportThenViewModeUpdatedToError() = runTest {
-        testee.onImportFlowFinishedWithError(EncryptedPassphrase)
         testee.viewState.test {
             assertTrue(awaitItem().viewMode is ViewMode.ImportError)
         }

@@ -24,11 +24,11 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.EncryptedPassphrase
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.Initializing
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,12 +36,13 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
-@ContributesViewModel(ActivityScope::class)
+@ContributesViewModel(FragmentScope::class)
 class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val credentialImporter: CredentialImporter,
     private val csvCredentialConverter: CsvCredentialConverter,
     private val autofillImportConfigStore: AutofillImportPasswordConfigStore,
+    private val urlToStageMapper: ImportGooglePasswordUrlToStageMapper,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ViewState>(Initializing)
@@ -71,11 +72,7 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     }
 
     fun onCloseButtonPressed(url: String?) {
-        if (url?.startsWith(ENCRYPTED_PASSPHRASE_ERROR_URL) == true) {
-            _viewState.value = ViewState.UserFinishedCannotImport(EncryptedPassphrase)
-        } else {
-            terminateFlowAsCancellation(url ?: "unknown")
-        }
+        terminateFlowAsCancellation(url ?: "unknown")
     }
 
     fun onBackButtonPressed(
@@ -91,8 +88,10 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
         _viewState.value = ViewState.NavigatingBack
     }
 
-    private fun terminateFlowAsCancellation(stage: String) {
-        _viewState.value = ViewState.UserCancelledImportFlow(stage)
+    private fun terminateFlowAsCancellation(url: String) {
+        viewModelScope.launch {
+            _viewState.value = UserCancelledImportFlow(urlToStageMapper.getStage(url))
+        }
     }
 
     fun firstPageLoading() {
@@ -112,16 +111,9 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     sealed interface UserCannotImportReason : Parcelable {
         @Parcelize
         data object ErrorParsingCsv : UserCannotImportReason
-
-        @Parcelize
-        data object EncryptedPassphrase : UserCannotImportReason
     }
 
     sealed interface BackButtonAction {
         data object NavigateBack : BackButtonAction
-    }
-
-    companion object {
-        const val ENCRYPTED_PASSPHRASE_ERROR_URL = "https://passwords.google.com/error/sync-passphrase"
     }
 }

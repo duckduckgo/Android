@@ -93,7 +93,7 @@ class AutofillSurveyImplTest {
 
     @Test
     fun whenSurveyLaunchedThenSavedPasswordQueryParamAdded() = runTest {
-        whenever(passwordBucketing.bucketNumberOfSavedPasswords(any())).thenReturn("fromBucketing")
+        whenever(passwordBucketing.bucketNumberOfCredentials(any())).thenReturn("fromBucketing")
         val survey = getAvailableSurvey()
         val savedPasswordsBucket = survey.url.toUri().getQueryParameter("saved_passwords")
         assertEquals("fromBucketing", savedPasswordsBucket)

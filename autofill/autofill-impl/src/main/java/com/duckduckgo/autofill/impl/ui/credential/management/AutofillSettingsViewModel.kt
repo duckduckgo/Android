@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_SAVE_CREDENTIAL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
@@ -796,8 +797,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun recordImportGooglePasswordButtonShown() {
         if (!importGooglePasswordButtonShownPixelSent) {
             importGooglePasswordButtonShownPixelSent = true
-
-            // pixel to show import button would fire here
+            pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN)
         }
     }
 
