@@ -45,7 +45,14 @@ import com.duckduckgo.autofill.impl.databinding.FragmentImportGooglePasswordsWeb
 import com.duckduckgo.autofill.impl.importing.blob.GooglePasswordBlobConsumer
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.*
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.Initializing
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedCannotImport
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedImportFlow
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.WebContentShowing
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowWebViewClient.NewPageCallback
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillCallback
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillEventListener
@@ -155,7 +162,7 @@ class ImportGooglePasswordsWebFlowFragment :
                 when (viewState) {
                     is UserFinishedImportFlow -> exitFlowAsSuccess()
                     is UserCancelledImportFlow -> exitFlowAsCancellation(viewState.stage)
-                    is UserFinishedCannotImport -> exitFlowAsImpossibleToImport()
+                    is UserFinishedCannotImport -> exitFlowAsImpossibleToImport(viewState.reason)
                     is NavigatingBack -> binding?.webView?.goBack()
                     is LoadStartPage -> loadFirstWebpage(viewState.initialLaunchUrl)
                     is WebContentShowing, Initializing -> {
@@ -177,9 +184,9 @@ class ImportGooglePasswordsWebFlowFragment :
         setFragmentResult(RESULT_KEY, resultBundle)
     }
 
-    private fun exitFlowAsImpossibleToImport() {
+    private fun exitFlowAsImpossibleToImport(reason: UserCannotImportReason) {
         val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Error)
+            it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Error(reason))
         }
         setFragmentResult(RESULT_KEY, resultBundle)
     }
