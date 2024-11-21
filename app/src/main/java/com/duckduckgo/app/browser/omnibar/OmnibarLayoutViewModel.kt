@@ -501,6 +501,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
+        Timber.d("Omnibar: onUserTouchedOmnibarTextInput")
         if (touchAction == ACTION_UP) {
             firePixelBasedOnCurrentUrl(
                 AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
