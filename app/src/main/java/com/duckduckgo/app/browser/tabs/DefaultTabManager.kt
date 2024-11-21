@@ -56,10 +56,10 @@ class DefaultTabManager @Inject constructor(
             activityIntent = browserActivity.intent,
             moveToTabIndex = { index, smoothScroll -> browserActivity.onMoveToTabRequested(index, smoothScroll) },
             getCurrentTabIndex = { browserActivity.tabPager.currentItem },
-            getSelectedTabId = { runBlocking { tabRepository.flowSelectedTab.firstOrNull()?.tabId } },
-            getTabById = { tabId -> runBlocking { tabRepository.flowTabs.first().firstOrNull { it.tabId == tabId } } },
+            getSelectedTabId = ::getSelectedTab,
+            getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
-            onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
+            onTabSelected = ::getTabById,
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
             getOffScreenPageLimit = { browserActivity.tabPager.offscreenPageLimit },
         )
@@ -115,7 +115,7 @@ class DefaultTabManager @Inject constructor(
                     isExternal = browserActivity.intent?.getBooleanExtra(
                         BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
                         false,
-                    ) ?: false,
+                    ) == true,
                 )
                 fragment.messageFromPreviousTab = message
             }
@@ -148,11 +148,17 @@ class DefaultTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
-    private fun requestNewTab(): TabEntity {
-        return runBlocking {
-            val tabId = browserActivity.viewModel.onNewTabRequested()
-            tabRepository.flowTabs.first().first { it.tabId == tabId }
-        }
+    private fun requestNewTab(): TabEntity = runBlocking {
+        val tabId = browserActivity.viewModel.onNewTabRequested()
+        tabRepository.flowTabs.first().first { it.tabId == tabId }
+    }
+
+    private fun getSelectedTab(): String? = runBlocking {
+        tabRepository.flowSelectedTab.firstOrNull()?.tabId
+    }
+
+    private fun getTabById(tabId: String): TabEntity? = runBlocking {
+        tabRepository.flowTabs.first().firstOrNull { it.tabId == tabId }
     }
 
     private fun selectTab(tab: TabEntity) {
@@ -171,7 +177,7 @@ class DefaultTabManager @Inject constructor(
                 isExternal = browserActivity.intent?.getBooleanExtra(
                     BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
                     false,
-                ) ?: false,
+                ) == true,
             )
             return
         }
