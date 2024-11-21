@@ -967,6 +967,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         verify(mockRepo).setAccount(null)
         verify(mockRepo).setAuthToken(null)
         verify(mockRepo).setAccessToken(null)
+        verify(mockRepo).setEntitlements(emptyList())
+        verify(mockRepo).setAccessTokenV2(null)
+        verify(mockRepo).setRefreshTokenV2(null)
     }
 
     @Test

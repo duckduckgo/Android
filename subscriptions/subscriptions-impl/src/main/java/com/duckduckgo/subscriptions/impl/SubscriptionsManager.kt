@@ -333,6 +333,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setAccessToken(null)
         authRepository.setAccount(null)
         authRepository.setSubscription(null)
+        authRepository.setEntitlements(emptyList())
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
