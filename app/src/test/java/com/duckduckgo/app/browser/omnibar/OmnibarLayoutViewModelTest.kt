@@ -815,6 +815,18 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenOmnibarTextClearedAndBackPressedThenUrlIsShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        testee.onClearTextButtonPressed()
+        testee.onBackKeyPressed()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
