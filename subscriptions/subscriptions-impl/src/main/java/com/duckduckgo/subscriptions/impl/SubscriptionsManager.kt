@@ -666,7 +666,10 @@ class RealSubscriptionsManager @Inject constructor(
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
 
             // refresh any existing account / subscription data
-            fetchAndStoreAllData()
+            when {
+                isSignedInV2() -> refreshSubscriptionData()
+                isSignedInV1() -> fetchAndStoreAllData()
+            }
 
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
