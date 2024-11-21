@@ -20,6 +20,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import java.time.LocalDateTime
 
 @Entity(
     tableName = "tabs",
@@ -37,16 +40,25 @@ import androidx.room.PrimaryKey
     ],
 )
 data class TabEntity(
-    @PrimaryKey var tabId: String,
-    var url: String? = null,
-    var title: String? = null,
-    var skipHome: Boolean = false,
-    var viewed: Boolean = true,
-    var position: Int,
-    var tabPreviewFile: String? = null,
-    var sourceTabId: String? = null,
-    var deletable: Boolean = false,
+    @PrimaryKey val tabId: String,
+    val url: String? = null,
+    val title: String? = null,
+    val skipHome: Boolean = false,
+    val viewed: Boolean = true,
+    val position: Int = 0,
+    val tabPreviewFile: String? = null,
+    val sourceTabId: String? = null,
+    val deletable: Boolean = false,
+    val lastAccessTime: LocalDateTime? = null,
 )
 
 val TabEntity.isBlank: Boolean
     get() = title == null && url == null
+
+class LocalDateTimeTypeConverter {
+    @TypeConverter
+    fun convertForDb(date: LocalDateTime): String = DatabaseDateFormatter.timestamp(date)
+
+    @TypeConverter
+    fun convertFromDb(value: String?): LocalDateTime? = value?.let { LocalDateTime.parse(it) }
+}

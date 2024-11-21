@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.flowOf
 
 @ContributesBinding(AppScope::class)
 class SubscriptionsDummy @Inject constructor() : Subscriptions {
+    override suspend fun isSignedIn(): Boolean = false
+
     override suspend fun getAccessToken(): String? = null
 
     override fun getEntitlementStatus(): Flow<List<Product>> = flowOf(emptyList())

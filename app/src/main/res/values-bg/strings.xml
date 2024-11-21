@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Може би по-късно</string>
     <string name="preciseLocationSystemDialogNeverAllow">Не питай отново за този сайт</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Давате ли разрешение на %1$s за достъп до местоположението?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Използваме анонимното Ви местоположение само за да Ви осигурим по-добри резултати близо до мястото, на което се намирате. Можете винаги да промените решението си по-късно.</string>
     <string name="preciseLocationSiteDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до местоположението, които сте дали на отделни сайтове.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Използваме анонимното Ви местоположение само за да Ви осигурим по-добри резултати близо до мястото, на което се намирате. В Настройки можете да управлявате разрешенията за достъп до местоположението, които сте дали на отделни сайтове.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Винаги</string>
     <string name="preciseLocationSiteDialogAllowOnce">Само за тази сесия</string>
     <string name="preciseLocationSiteDialogDenyAlways">Винаги да се отказва</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Питане</string>
+    <string name="permissionsPerWebsiteAskSetting">Питай всеки път</string>
     <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Опцията „Питай“ е деактивирана за всички сайтове</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Деактивирано за всички сайтове</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
 
     <!-- Notify Me View on Downloads -->

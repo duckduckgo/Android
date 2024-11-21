@@ -31,7 +31,7 @@ interface WebsiteLoginCredentialsDao {
     fun insert(loginCredentials: WebsiteLoginCredentialsEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(loginCredentials: List<WebsiteLoginCredentialsEntity>)
+    fun insert(loginCredentials: List<WebsiteLoginCredentialsEntity>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(loginCredentials: WebsiteLoginCredentialsEntity)

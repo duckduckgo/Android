@@ -22,6 +22,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.fragment.app.FragmentManager
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -31,9 +35,6 @@ const val YOUTUBE_HOST = "youtube.com"
 const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
 const val ORIGIN_QUERY_PARAM = "origin"
 const val ORIGIN_QUERY_PARAM_SERP = "serp"
-const val ORIGIN_QUERY_PARAM_SERP_AUTO = "serp_auto"
-const val ORIGIN_QUERY_PARAM_OVERLAY = "overlay"
-const val ORIGIN_QUERY_PARAM_AUTO = "auto"
 
 /**
  * DuckPlayer interface provides a set of methods for interacting with the DuckPlayer.
@@ -128,7 +129,7 @@ interface DuckPlayer {
      * @param uri The URI to check.
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
-    suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
+    fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean
 
     /**
      * Checks if a URI is a YouTube watch URL.
@@ -145,14 +146,6 @@ interface DuckPlayer {
      * @return True if the URI is a YouTube no-cookie URI, false otherwise.
      */
     fun isYouTubeUrl(uri: Uri): Boolean
-
-    /**
-     * Checks if a string is a YouTube no-cookie URI.
-     *
-     * @param uri The string to check.
-     * @return True if the string is a YouTube no-cookie URI, false otherwise.
-     */
-    suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean
 
     /**
      * Notify Duck Player of a resource request and allow Duck Player to return the data.
@@ -180,13 +173,30 @@ interface DuckPlayer {
      * @param destinationUrl The destination URL.
      * @return True if the URL should launch Duck Player, false otherwise.
      */
-    suspend fun willNavigateToDuckPlayer(
+    fun willNavigateToDuckPlayer(
         destinationUrl: Uri,
     ): Boolean
 
+    /**
+     * Checks whether a duck Player will be opened in a new tab based on RC flag and user settings
+     *
+     * @return True if should open Duck Player in a new tab, false otherwise.
+     */
     fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab
 
+    /**
+     * Observes whether a duck Player will be opened in a new tab based on RC flag and user settings
+     *
+     * @return Flow. True if should open Duck Player in a new tab, false otherwise.
+     */
     fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab>
+
+    /**
+     * Sets the DuckPlayer origin.
+     *
+     * @param origin The DuckPlayer origin. [SERP], [SERP_AUTO], [AUTO], or [OVERLAY]
+     */
+    fun setDuckPlayerOrigin(origin: DuckPlayerOrigin)
 
     /**
      * Data class representing user preferences for Duck Player.
@@ -209,5 +219,12 @@ interface DuckPlayer {
         data object On : OpenDuckPlayerInNewTab
         data object Off : OpenDuckPlayerInNewTab
         data object Unavailable : OpenDuckPlayerInNewTab
+    }
+
+    enum class DuckPlayerOrigin {
+        SERP,
+        SERP_AUTO,
+        AUTO,
+        OVERLAY,
     }
 }

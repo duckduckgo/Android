@@ -18,6 +18,7 @@
     <declare-styleable name="DaxTextInput">
         <attr name="android:hint" />
         <attr name="android:text" />
+        <attr name="android:enabled" />
         <attr name="android:minLines" />
         <attr name="capitalizeKeyboard" format="boolean" />
         <attr name="clickable" format="boolean" />
