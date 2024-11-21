@@ -26,6 +26,6 @@
 
     <include
         android:id="@+id/includeSettings"
-        layout="@layout/content_settings" />
+        layout="@layout/content_settings_new" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
