@@ -49,6 +49,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
     ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE("m_onboarding_skip_major_network_unique"),
+    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),

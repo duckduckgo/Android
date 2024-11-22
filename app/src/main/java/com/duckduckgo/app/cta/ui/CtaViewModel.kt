@@ -41,6 +41,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboar
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingPrimaryButtonMetricPixel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -49,6 +50,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -90,6 +92,7 @@ class CtaViewModel @Inject constructor(
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin,
+    private val userBrowserProperties: UserBrowserProperties,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -156,6 +159,20 @@ class CtaViewModel @Inject constructor(
                 extendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel()?.getPixelDefinitions()?.forEach {
                     pixel.fire(it.pixelName, it.params)
                 }
+            }
+        }
+
+        // Temporary pixel
+        val isVisitSiteSuggestionsCta = cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
+            cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
+        if (isVisitSiteSuggestionsCta) {
+            if (userBrowserProperties.daysSinceInstalled() <= 3) {
+                onboardingStore.clearVisitSiteCtaDisplayCount()
+                val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
+                pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
+                onboardingStore.visitSiteCtaDisplayCount = count + 1
+            } else {
+                onboardingStore.clearVisitSiteCtaDisplayCount()
             }
         }
     }
