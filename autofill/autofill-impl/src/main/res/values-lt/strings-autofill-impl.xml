@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Bet kuriuo metu galite išjungti slaptažodžių išsaugojimą.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Atidaryti nustatymus</string>
+
+    <string name="newTabPageShortcutPasswords">Slaptažodžiai</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importuoti slaptažodžius iš „Google“</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš „Google“</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importuok slaptažodžius iš „Google“</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importuok slaptažodžius iš „Google“</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">„DuckDuckGo“ slaptažodžių sinchronizavimas</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importuok savo slaptažodžius iš „Google“</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Atidaryk „Google“ slaptažodžius</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuoti iš darbalaukio naršyklės</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importuoti į „DuckDuckGo“</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importavimas baigtas</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Supratau</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Nepavyko importuoti slaptažodžio</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Praleista (dublikatas arba netinkamas): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importuoti slaptažodžiai: <b>%1$d</b>]]></string>
+
 </resources>
