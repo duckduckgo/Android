@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Du kan stänga av lösenordssparande när som helst.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Öppna inställningar</string>
+
+    <string name="newTabPageShortcutPasswords">Lösenord</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importera Google-lösenord</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lösenord har importerats från Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lösenord har importerats från CSV-fil</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importera lösenord från Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importera lösenord från Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronisera DuckDuckGo-lösenord</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronisera DuckDuckGo-lösenord</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importera dina Google-lösenord</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Öppna Google Lösenordshantering</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Välj en CSV-fil</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importera från webbläsare för dator</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importera till DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importen är klar</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Jag fattar</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Lösenordsimporten misslyckades</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Hoppade över (dubblett eller ogiltig): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importerade lösenord: <b>%1$d</b>]]></string>
+
 </resources>
