@@ -23,8 +23,8 @@ object SubscriptionsConstants {
     val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
 
     // List of plans
-    const val YEARLY_PLAN = "ddg-privacy-pro-yearly-renews-us"
-    const val MONTHLY_PLAN = "ddg-privacy-pro-monthly-renews-us"
+    const val YEARLY_PLAN_US = "ddg-privacy-pro-yearly-renews-us"
+    const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
 
     // List of features
     const val NETP = "vpn"
@@ -48,9 +48,9 @@ object SubscriptionsConstants {
 }
 
 internal fun String.productIdToBillingPeriod(): String? {
-    return if (this == SubscriptionsConstants.MONTHLY_PLAN) {
+    return if (this == SubscriptionsConstants.MONTHLY_PLAN_US) {
         "monthly"
-    } else if (this == SubscriptionsConstants.YEARLY_PLAN) {
+    } else if (this == SubscriptionsConstants.YEARLY_PLAN_US) {
         "annual"
     } else {
         null

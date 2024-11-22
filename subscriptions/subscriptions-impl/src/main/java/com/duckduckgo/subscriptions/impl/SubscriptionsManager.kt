@@ -34,8 +34,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
@@ -649,8 +649,8 @@ class RealSubscriptionsManager @Inject constructor(
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
             ?.run {
-                val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN } ?: return@run null
-                val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN } ?: return@run null
+                val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN_US } ?: return@run null
+                val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN_US } ?: return@run null
 
                 SubscriptionOffer(
                     monthlyPlanId = monthlyOffer.basePlanId,
