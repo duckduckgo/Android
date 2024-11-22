@@ -133,6 +133,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
+        viewModel.onUserAskedToSwitchAccount()
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_dialog_switch_account_header)
             .setMessage(R.string.sync_dialog_switch_account_description)
@@ -142,6 +143,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onUserAcceptedJoiningNewAccount(it.encodedStringCode)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserCancelledJoiningNewAccount()
                     }
                 },
             ).show()

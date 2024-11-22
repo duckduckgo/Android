@@ -47,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -169,6 +170,34 @@ internal class EnterCodeViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is SwitchAccountSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedInUserScansRecoveryCodeAndLoginSucceedsThenReturnSwitchAccount() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+
+        testee.commands().test {
+            testee.onPasteCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is SwitchAccountSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+
+        testee.commands().test {
+            testee.onPasteCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is LoginSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }

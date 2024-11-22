@@ -74,7 +74,10 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val syncFeature: SyncFeature,
 ) : SyncAccountRepository {
+
+    private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
     override fun isSyncSupported(): Boolean {
         return syncStore.isEncryptionSupported()
@@ -108,9 +111,20 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+        var wasUserLogout = false
         if (isSignedIn()) {
-            return Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in")
-                .alsoFireAlreadySignedInErrorPixel()
+            val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
+            val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
+            if (allowSwitchAccount && connectedDevicesCached.size == 1) {
+                val thisDeviceId = syncStore.deviceId.orEmpty()
+                val result = logout(thisDeviceId)
+                if (result is Error) {
+                    return result
+                }
+                wasUserLogout = true
+            } else {
+                return error
+            }
         }
 
         val primaryKey = recoveryCode.primaryKey
@@ -120,6 +134,9 @@ class AppSyncAccountRepository @Inject constructor(
 
         return performLogin(userId, deviceId, deviceName, primaryKey).onFailure {
             it.alsoFireLoginErrorPixel()
+            if (wasUserLogout) {
+                syncPixels.fireUserSwitchedLoginError()
+            }
             return it.copy(code = LOGIN_FAILED.code)
         }
     }
@@ -288,6 +305,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.getDevices(token)) {
             is Error -> {
+                connectedDevicesCached.clear()
                 result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
             }
 
@@ -315,6 +333,11 @@ class AppSyncAccountRepository @Inject constructor(
                         }
                     }.sortedWith { a, b ->
                         if (a.thisDevice) -1 else 1
+                    }.also {
+                        connectedDevicesCached.apply {
+                            clear()
+                            addAll(it)
+                        }
                     },
                 )
             }
@@ -326,8 +349,17 @@ class AppSyncAccountRepository @Inject constructor(
     override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
         val thisDeviceId = syncStore.deviceId.orEmpty()
         return when (val result = logout(thisDeviceId)) {
-            is Error -> result
-            is Result.Success -> processCode(stringCode)
+            is Error -> {
+                syncPixels.fireUserSwitchedLogoutError()
+                result
+            }
+            is Result.Success -> {
+                val loginResult = processCode(stringCode)
+                if (loginResult is Error) {
+                    syncPixels.fireUserSwitchedLoginError()
+                }
+                loginResult
+            }
         }
     }
 

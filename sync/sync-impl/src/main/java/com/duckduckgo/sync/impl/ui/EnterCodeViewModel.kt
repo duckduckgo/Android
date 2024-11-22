@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import javax.inject.*
@@ -90,9 +91,17 @@ class EnterCodeViewModel @Inject constructor(
     private suspend fun authFlow(
         pastedCode: String,
     ) {
-        val result = syncAccountRepository.processCode(pastedCode)
-        when (result) {
-            is Result.Success -> command.send(Command.LoginSuccess)
+        val userSignedIn = syncAccountRepository.isSignedIn()
+        when (val result = syncAccountRepository.processCode(pastedCode)) {
+            is Result.Success -> {
+                val commandSuccess = if (userSignedIn) {
+                    syncPixels.fireUserSwitchedAccount()
+                    SwitchAccountSuccess
+                } else {
+                    LoginSuccess
+                }
+                command.send(commandSuccess)
+            }
             is Result.Error -> {
                 processError(result, pastedCode)
             }
@@ -128,6 +137,7 @@ class EnterCodeViewModel @Inject constructor(
 
     fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
         viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserAcceptedSwitchingAccount()
             val result = syncAccountRepository.logoutAndJoinNewAccount(encodedStringCode)
             if (result is Error) {
                 when (result.code) {
@@ -143,9 +153,17 @@ class EnterCodeViewModel @Inject constructor(
                     )
                 }
             } else {
-                syncPixels.fireLoginPixel()
+                syncPixels.fireUserSwitchedAccount()
                 command.send(SwitchAccountSuccess)
             }
         }
+    }
+
+    fun onUserCancelledJoiningNewAccount() {
+        syncPixels.fireUserCancelledSwitchingAccount()
+    }
+
+    fun onUserAskedToSwitchAccount() {
+        syncPixels.fireAskUserToSwitchAccount()
     }
 }

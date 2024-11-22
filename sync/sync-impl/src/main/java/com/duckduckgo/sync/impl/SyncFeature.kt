@@ -45,6 +45,6 @@ interface SyncFeature {
     @Toggle.DefaultValue(true)
     fun gzipPatchRequests(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun seamlessAccountSwitching(): Toggle
 }
