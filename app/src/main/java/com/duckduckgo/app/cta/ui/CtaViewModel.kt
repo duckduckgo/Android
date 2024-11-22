@@ -167,7 +167,6 @@ class CtaViewModel @Inject constructor(
             cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
         if (isVisitSiteSuggestionsCta) {
             if (userBrowserProperties.daysSinceInstalled() <= 3) {
-                onboardingStore.clearVisitSiteCtaDisplayCount()
                 val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
                 pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
                 onboardingStore.visitSiteCtaDisplayCount = count + 1
