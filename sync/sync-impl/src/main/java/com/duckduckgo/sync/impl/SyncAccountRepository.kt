@@ -111,6 +111,7 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+        var wasUserLogout = false
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
@@ -120,6 +121,7 @@ class AppSyncAccountRepository @Inject constructor(
                 if (result is Error) {
                     return result
                 }
+                wasUserLogout = true
             } else {
                 return error
             }
@@ -132,6 +134,9 @@ class AppSyncAccountRepository @Inject constructor(
 
         return performLogin(userId, deviceId, deviceName, primaryKey).onFailure {
             it.alsoFireLoginErrorPixel()
+            if (wasUserLogout) {
+                syncPixels.fireUserSwitchedLoginError()
+            }
             return it.copy(code = LOGIN_FAILED.code)
         }
     }
@@ -344,8 +349,17 @@ class AppSyncAccountRepository @Inject constructor(
     override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
         val thisDeviceId = syncStore.deviceId.orEmpty()
         return when (val result = logout(thisDeviceId)) {
-            is Error -> result
-            is Result.Success -> processCode(stringCode)
+            is Error -> {
+                syncPixels.fireUserSwitchedLogoutError()
+                result
+            }
+            is Result.Success -> {
+                val loginResult = processCode(stringCode)
+                if (loginResult is Error) {
+                    syncPixels.fireUserSwitchedLoginError()
+                }
+                loginResult
+            }
         }
     }
 

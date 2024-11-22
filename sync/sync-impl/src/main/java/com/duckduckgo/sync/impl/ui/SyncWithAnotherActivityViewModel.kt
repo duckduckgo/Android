@@ -144,7 +144,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
                 is Success -> {
                     syncPixels.fireLoginPixel()
-                    val commandSuccess = if (userSignedIn) SwitchAccountSuccess else LoginSuccess
+                    val commandSuccess = if (userSignedIn) {
+                        syncPixels.fireUserSwitchedAccount()
+                        SwitchAccountSuccess
+                    } else {
+                        LoginSuccess
+                    }
                     command.send(commandSuccess)
                 }
             }
@@ -177,6 +182,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
         viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserAcceptedSwitchingAccount()
             val result = syncAccountRepository.logoutAndJoinNewAccount(encodedStringCode)
             if (result is Error) {
                 when (result.code) {
@@ -193,6 +199,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 }
             } else {
                 syncPixels.fireLoginPixel()
+                syncPixels.fireUserSwitchedAccount()
                 command.send(SwitchAccountSuccess)
             }
         }
@@ -212,5 +219,13 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onUserCancelledJoiningNewAccount() {
+        syncPixels.fireUserCancelledSwitchingAccount()
+    }
+
+    fun onUserAskedToSwitchAccount() {
+        syncPixels.fireAskUserToSwitchAccount()
     }
 }
