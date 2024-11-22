@@ -193,7 +193,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
     }
 
     override suspend fun lastPromptWasAccepted(): Boolean {
-        Timber.v("KateTest--> lastPromptWasAccepted called in datastore")
         return store.data.first()[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] ?: false
     }
 
@@ -207,7 +206,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
 
     override suspend fun canPrompt(): Boolean {
         val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
-        Timber.v("KateTest--> currentTime as DBdateFormatter.MillisIso08601: $currentTimeMillis")
 
         suspend fun checkRecentSends(): Boolean {
             val reportsSent = getReportsSent()
@@ -218,24 +216,12 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
             } < maxPromptCount
         }
 
-        Timber.v(
-            "KateTest--> checkRecentSends: ${checkRecentSends()} WITH " +
-                "reportPromptInterval: ${getPromptInterval()} AND" +
-                " reportsSentCount: ${getReportsSent().count()}",
-        )
-
         suspend fun checkDismissInterval(): Boolean {
             val promptsDismissed = getPromptsDismissed()
             val dismissInterval = getDismissInterval()
             return currentTimeMillis - (promptsDismissed.maxOfOrNull { it.toLong() } ?: 0) >
                 dismissInterval * 1000L
         }
-
-        Timber.v(
-            "KateTest--> checkDismissInterval: ${checkDismissInterval()} WITH " +
-                "reportDismissInterval: ${getDismissInterval()} AND reportPromptsDismissed:" +
-                " ${getPromptsDismissed().maxOfOrNull { it }}",
-        )
 
         return when {
             getPromptLimitLogicEnabled() && getDismissLogicEnabled() ->

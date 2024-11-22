@@ -2253,7 +2253,7 @@ class BrowserTabViewModel @Inject constructor(
                 removeFromAllowList(domain, clickedFromCustomTab)
             } else {
                 performToggleReportCheck()
-                Timber.v("KateTest--> lastPromptAccepted = ${toggleReports.lastPromptAccepted()} directly before addToAllowList call")
+                Timber.v("KateTest--> lastPromptAccepted = ${toggleReports.lastPromptAccepted()} before addToAllowList")
                 addToAllowList(domain, clickedFromCustomTab)
             }
 

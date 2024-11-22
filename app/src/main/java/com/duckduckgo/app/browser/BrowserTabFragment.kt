@@ -772,7 +772,7 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("Katetest-> onCreate called for tabId=$tabId")
+        Timber.d("onCreate called for tabId=$tabId")
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -1135,8 +1135,6 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-
-        Timber.v("Katetest-> onResume called")
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()

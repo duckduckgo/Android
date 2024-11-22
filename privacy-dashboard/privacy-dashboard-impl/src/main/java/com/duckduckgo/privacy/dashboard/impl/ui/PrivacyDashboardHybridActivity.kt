@@ -115,7 +115,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
                     val opener = params?.opener ?: DashboardOpener.DASHBOARD
-                    Timber.v("Katetest-> opener passed to onSubmitToggleReport: ${opener.value}")
                     viewModel.onSubmitToggleReport(opener)
                 },
                 onRejectToggleReport = {
@@ -144,7 +143,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
 
         val toggleOpener = params?.opener ?: DashboardOpener.NONE
-        Timber.v("Katetest-> opener in dashboard onCreate: $toggleOpener")
 
         dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
         configureObservers()
@@ -170,7 +168,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
             is LaunchAppFeedback -> {
-                Timber.v("Katetest-> About to launch feedback activity")
                 globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
             }
             is FetchToggleData -> fetchToggleData(it.toggleData)
@@ -185,7 +182,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             GoBack -> {
                 Timber.v("Katetest-> GoBack CMD called")
                 if (webView.canGoBack()) {
-                    Timber.v("Katetest-> Webview can go back and will")
+                    Timber.v("Katetest-> Webview can go back")
                     webView.goBack()
                 } else {
                     finish()
@@ -263,9 +260,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         if (params is PrivacyDashboardToggleReportScreen) {
-            Timber.v("Katetest->OnBackPressed")
             viewModel.onToggleReportPromptDismissed()
-            Timber.v("Katetest->onPromptDismissed called")
         }
         if (webView.canGoBack()) {
             webView.goBack()

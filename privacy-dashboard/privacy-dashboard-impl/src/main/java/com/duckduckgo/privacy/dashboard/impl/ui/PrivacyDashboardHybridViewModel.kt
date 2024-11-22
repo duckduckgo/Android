@@ -503,6 +503,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     ToggleReportOptions.ToggleReportOption(id = "openerContext"),
                     ToggleReportOptions.ToggleReportOption(id = "userRefreshCount"),
                     ToggleReportOptions.ToggleReportOption(id = "jsPerformance"),
+                    ToggleReportOptions.ToggleReportOption(id = "locale"),
                 ),
             )
             privacyDashboardPayloadAdapter.onGetToggleReportOptions(options).takeIf { it.isNotEmpty() }?.let {
