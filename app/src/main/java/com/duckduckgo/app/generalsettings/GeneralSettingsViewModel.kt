@@ -154,7 +154,7 @@ class GeneralSettingsViewModel @Inject constructor(
     private fun observeShowOnAppLaunchOption() {
         showOnAppLaunchOptionDataStore.optionFlow
             .onEach { showOnAppLaunchOption ->
-                _viewState.update { it!!.copy(showOnAppLaunchSelectedOption = showOnAppLaunchOption) }
+                _viewState.update { it?.copy(showOnAppLaunchSelectedOption = showOnAppLaunchOption) }
             }.launchIn(viewModelScope)
     }
 
