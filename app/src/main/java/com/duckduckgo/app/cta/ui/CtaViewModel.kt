@@ -163,8 +163,9 @@ class CtaViewModel @Inject constructor(
         }
 
         // Temporary pixel
-        val isVisitSiteSuggestionsCta = cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
-            cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
+        val isVisitSiteSuggestionsCta =
+            cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
+                cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
         if (isVisitSiteSuggestionsCta) {
             if (userBrowserProperties.daysSinceInstalled() <= 3) {
                 val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
