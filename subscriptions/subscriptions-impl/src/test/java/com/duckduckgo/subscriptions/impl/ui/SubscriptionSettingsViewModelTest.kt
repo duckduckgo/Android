@@ -58,7 +58,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -85,7 +85,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -112,7 +112,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -139,7 +139,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.YEARLY_PLAN,
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -191,7 +191,7 @@ class SubscriptionSettingsViewModelTest {
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -219,7 +219,7 @@ class SubscriptionSettingsViewModelTest {
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
@@ -247,7 +247,7 @@ class SubscriptionSettingsViewModelTest {
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,

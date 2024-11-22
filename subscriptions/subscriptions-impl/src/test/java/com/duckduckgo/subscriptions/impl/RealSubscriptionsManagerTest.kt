@@ -16,8 +16,8 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
@@ -1124,12 +1124,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             }
 
             val monthlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN)
+                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN_US)
                 whenever(offer.pricingPhases).thenReturn(pricingPhases)
             }
 
             val yearlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN)
+                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN_US)
                 whenever(offer.pricingPhases).thenReturn(pricingPhases)
             }
 
@@ -1141,9 +1141,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
 
         with(subscriptionOffer) {
-            assertEquals(MONTHLY_PLAN, monthlyPlanId)
+            assertEquals(MONTHLY_PLAN_US, monthlyPlanId)
             assertEquals("1$", monthlyFormattedPrice)
-            assertEquals(YEARLY_PLAN, yearlyPlanId)
+            assertEquals(YEARLY_PLAN_US, yearlyPlanId)
             assertEquals("1$", yearlyFormattedPrice)
         }
     }
@@ -1221,7 +1221,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateTokenSucceedsNoEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
-                productId = MONTHLY_PLAN,
+                productId = MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
                 platform = "android",
@@ -1234,7 +1234,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateTokenSucceedsWithEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
-                productId = MONTHLY_PLAN,
+                productId = MONTHLY_PLAN_US,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
                 platform = "android",
