@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.impl.model.Entitlement
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface SubscriptionsService {
@@ -45,6 +46,9 @@ interface SubscriptionsService {
     suspend fun feedback(
         @Body feedbackBody: FeedbackBody,
     ): FeedbackResponse
+
+    @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
+    suspend fun features(@Path("sku") sku: String): FeaturesResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -91,4 +95,8 @@ data class FeedbackBody(
 
 data class FeedbackResponse(
     val message: String,
+)
+
+data class FeaturesResponse(
+    val features: List<String>,
 )
