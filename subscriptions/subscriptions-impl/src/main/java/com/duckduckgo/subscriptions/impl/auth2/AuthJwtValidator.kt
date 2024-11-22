@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.authjwt.api
+package com.duckduckgo.subscriptions.impl.auth2
 
 import java.time.Instant
 

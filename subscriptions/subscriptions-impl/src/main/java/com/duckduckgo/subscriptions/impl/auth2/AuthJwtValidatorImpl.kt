@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.authjwt.impl
+package com.duckduckgo.subscriptions.impl.auth2
 
-import com.duckduckgo.authjwt.api.AccessTokenClaims
-import com.duckduckgo.authjwt.api.AuthJwtValidator
-import com.duckduckgo.authjwt.api.Entitlement
-import com.duckduckgo.authjwt.api.RefreshTokenClaims
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.jsonwebtoken.Claims
-import io.jsonwebtoken.JwsHeader
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Jwks
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -85,14 +78,14 @@ class AuthJwtValidatorImpl @Inject constructor(
         requiredAudience: String,
         requiredScope: String,
     ): Claims {
-        val jwks = Jwks.setParser()
+        val jwks = io.jsonwebtoken.security.Jwks.setParser()
             .build()
             .parse(jwkSet)
             .getKeys()
 
-        return Jwts.parser()
+        return io.jsonwebtoken.Jwts.parser()
             .keyLocator { header ->
-                val keyId = (header as JwsHeader).keyId
+                val keyId = (header as io.jsonwebtoken.JwsHeader).keyId
                 jwks.first { it.id == keyId }.toKey()
             }
             .clock { Date(timeProvider.currentTimeMillis()) }

@@ -19,9 +19,6 @@ package com.duckduckgo.subscriptions.impl
 import android.app.Activity
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.authjwt.api.AccessTokenClaims
-import com.duckduckgo.authjwt.api.AuthJwtValidator
-import com.duckduckgo.authjwt.api.RefreshTokenClaims
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,9 +36,12 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscri
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
+import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
+import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -911,5 +911,5 @@ data class ValidatedTokenPair(
     val refreshTokenClaims: RefreshTokenClaims,
 )
 
-private fun List<com.duckduckgo.authjwt.api.Entitlement>.toEntitlements(): List<Entitlement> =
+private fun List<com.duckduckgo.subscriptions.impl.auth2.Entitlement>.toEntitlements(): List<Entitlement> =
     map { entitlement -> Entitlement(entitlement.name, entitlement.product) }

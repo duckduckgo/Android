@@ -58,7 +58,6 @@ dependencies {
     implementation project(':remote-messaging-api') // remote feature flag
     implementation project(':survey-api')
     implementation project(':vpn-api')
-    implementation project(':auth-jwt-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
@@ -78,6 +77,12 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
     implementation AndroidX.security.crypto
+
+    implementation "io.jsonwebtoken:jjwt-api:_"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
+        exclude(group: 'org.json', module: 'json') // provided by Android natively
+    }
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')

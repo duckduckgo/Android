@@ -7,10 +7,6 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.PurchaseHistoryRecord
-import com.duckduckgo.authjwt.api.AccessTokenClaims
-import com.duckduckgo.authjwt.api.AuthJwtValidator
-import com.duckduckgo.authjwt.api.Entitlement
-import com.duckduckgo.authjwt.api.RefreshTokenClaims
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -22,10 +18,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
+import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth2.Entitlement
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.PkceGeneratorImpl
+import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
