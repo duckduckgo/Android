@@ -72,6 +72,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
+import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
+import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -134,9 +136,11 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val syncWithAnotherDeviceFlow = registerForActivityResult(SyncWithAnotherDeviceContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onDeviceConnected()
+    private val syncWithAnotherDeviceFlow = registerForActivityResult(SyncWithAnotherDeviceContract()) { result ->
+        when (result) {
+            DeviceConnected -> viewModel.onDeviceConnected()
+            SwitchAccountSuccess -> viewModel.onLoginSuccess()
+            else -> {}
         }
     }
 

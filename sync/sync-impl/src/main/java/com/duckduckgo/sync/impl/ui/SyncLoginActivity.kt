@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -46,8 +47,8 @@ class SyncLoginActivity : DuckDuckGoActivity() {
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
+    ) { result ->
+        if (result != EnterCodeContractOutput.Error) {
             viewModel.onLoginSuccess()
         }
     }
