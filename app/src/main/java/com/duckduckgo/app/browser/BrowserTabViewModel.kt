@@ -999,6 +999,7 @@ class BrowserTabViewModel @Inject constructor(
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
+
             is BrokenSitePromptDialogCta -> {
                 viewModelScope.launch(dispatchers.main()) {
                     command.value = HideBrokenSitePromptCta(currentCtaViewState().cta as BrokenSitePromptDialogCta)
@@ -2621,6 +2622,7 @@ class BrowserTabViewModel @Inject constructor(
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
+        onUserDismissedCta(ctaViewState.value?.cta)
     }
 
     fun onCtaShown() {
@@ -2703,9 +2705,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedCta(cta: Cta) {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+    fun onUserDismissedCta(cta: Cta?) {
+        cta?.let {
+            viewModelScope.launch {
+                ctaViewModel.onUserDismissedCta(it)
+            }
         }
     }
 
@@ -2831,6 +2835,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
+        onUserDismissedCta(ctaViewState.value?.cta)
     }
 
     private fun fireDailyLaunchPixel() {
@@ -3740,8 +3745,10 @@ class BrowserTabViewModel @Inject constructor(
         return when {
             lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
                 R.drawable.onboarding_experiment_background_bitmap_light
+
             !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
                 R.drawable.onboarding_experiment_background_bitmap_dark
+
             lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
             else -> R.drawable.onboarding_background_bitmap_dark
         }
