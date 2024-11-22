@@ -29,15 +29,21 @@ class ToggleReportsImpl @Inject constructor(
     private val toggleReportsFeature: ToggleReportsFeature,
     private val toggleReportsDataStore: ToggleReportsDataStore,
 ) : ToggleReports {
-    override fun shouldPrompt(): Boolean {
+    override suspend fun shouldPrompt(): Boolean {
         return (toggleReportsFeature.isEnabled() && toggleReportsDataStore.canPrompt())
     }
 
     override suspend fun onPromptDismissed() {
         toggleReportsDataStore.insertTogglePromptDismiss()
+        toggleReportsDataStore.setLastPromptWasAccepted(false)
     }
 
     override suspend fun onReportSent() {
         toggleReportsDataStore.insertTogglePromptSend()
+        toggleReportsDataStore.setLastPromptWasAccepted(true)
+    }
+
+    override suspend fun lastPromptAccepted(): Boolean {
+        return toggleReportsDataStore.lastPromptWasAccepted()
     }
 }

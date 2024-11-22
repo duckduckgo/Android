@@ -269,6 +269,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
@@ -771,7 +772,7 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("onCreate called for tabId=$tabId")
+        Timber.d("Katetest-> onCreate called for tabId=$tabId")
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -1134,6 +1135,8 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
+
+        Timber.v("Katetest-> onResume called")
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
@@ -1526,7 +1529,7 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
-            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
+            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain, it.toggleReportSent)
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -1917,7 +1920,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchToggleReportFeedback(opener: String) {
+    private fun launchToggleReportFeedback(opener: DashboardOpener) {
         globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
             ?.let { startActivity(it) }
     }
@@ -3076,11 +3079,22 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun privacyProtectionDisabledConfirmation(domain: String) {
-        binding.rootView.makeSnackbarWithNoBottomInset(
-            HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
-            Snackbar.LENGTH_LONG,
-        ).show()
+    private fun privacyProtectionDisabledConfirmation(domain: String, toggleReportSent: Boolean) {
+        if (!toggleReportSent) {
+            Timber.v("KateTest--> toggleReportSent = false")
+            binding.rootView.makeSnackbarWithNoBottomInset(
+                HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+                Snackbar.LENGTH_LONG,
+            ).show()
+        } else {
+            Timber.v("KateTest--> toggleReportSent = true")
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.rootView.makeSnackbarWithNoBottomInset(
+                    HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledAndReportSentConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+                    Snackbar.LENGTH_LONG,
+                ).show()
+            }, TOGGLE_REPORT_TOAST_DELAY,)
+        }
     }
 
     private fun launchSharePageChooser(
@@ -3537,6 +3551,8 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
+
+        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
 
         fun newInstance(
             tabId: String,

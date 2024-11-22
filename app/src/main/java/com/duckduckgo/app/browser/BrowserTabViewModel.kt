@@ -282,6 +282,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
@@ -2252,6 +2253,7 @@ class BrowserTabViewModel @Inject constructor(
                 removeFromAllowList(domain, clickedFromCustomTab)
             } else {
                 performToggleReportCheck()
+                Timber.v("KateTest--> lastPromptAccepted = ${toggleReports.lastPromptAccepted()} directly before addToAllowList call")
                 addToAllowList(domain, clickedFromCustomTab)
             }
 
@@ -2262,7 +2264,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun performToggleReportCheck() {
         if (toggleReports.shouldPrompt()) {
             withContext(dispatchers.main()) {
-                command.value = ToggleReportFeedback(opener = "menu")
+                command.value = ToggleReportFeedback(opener = DashboardOpener.MENU)
             }
         }
     }
@@ -2283,7 +2285,9 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
+            val toggleReportJustSent = toggleReports.lastPromptAccepted()
+            Timber.v("KateTest--> lastPromptAccepted = $toggleReportJustSent inside addToAllowList")
+            command.value = ShowPrivacyProtectionDisabledConfirmation(domain, toggleReportJustSent)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }

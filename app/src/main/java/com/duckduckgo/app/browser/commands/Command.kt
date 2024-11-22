@@ -41,6 +41,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
@@ -78,7 +79,7 @@ sealed class Command {
     class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
     class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
     class ShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
-    class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
+    class ShowPrivacyProtectionDisabledConfirmation(val domain: String, val toggleReportSent: Boolean) : Command()
     object AskToDisableLoginDetection : Command()
     class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
     class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
@@ -100,7 +101,7 @@ sealed class Command {
     class CopyLink(val url: String) : Command()
     class FindInPageCommand(val searchTerm: String) : Command()
     class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
-    class ToggleReportFeedback(val opener: String) : Command()
+    class ToggleReportFeedback(val opener: DashboardOpener) : Command()
     object DismissFindInPage : Command()
     class ShowFileChooser(
         val filePathCallback: ValueCallback<Array<Uri>>,

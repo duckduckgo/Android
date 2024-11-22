@@ -38,6 +38,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
@@ -113,8 +114,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
-                    val opener = params?.opener ?: "dashboard"
-                    Timber.v("Katetest-> opener passed to onSubmitToggleReport: $opener")
+                    val opener = params?.opener ?: DashboardOpener.DASHBOARD
+                    Timber.v("Katetest-> opener passed to onSubmitToggleReport: ${opener.value}")
                     viewModel.onSubmitToggleReport(opener)
                 },
                 onRejectToggleReport = {
@@ -142,7 +143,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is PrivacyDashboardToggleReportScreen -> InitialScreen.TOGGLE_REPORT
         }
 
-        val toggleOpener = params?.opener ?: ""
+        val toggleOpener = params?.opener ?: DashboardOpener.NONE
         Timber.v("Katetest-> opener in dashboard onCreate: $toggleOpener")
 
         dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
@@ -175,14 +176,16 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is FetchToggleData -> fetchToggleData(it.toggleData)
             is LaunchToggleReport -> {
                 params?.tabId?.let { tabId ->
-                    globalActivityStarter.startIntent(this, PrivacyDashboardToggleReportScreen(tabId, opener = "dashboard"))
+                    globalActivityStarter.startIntent(this, PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD))
                         ?.let { startActivity(it) }
                 }
             }
             is OpenURL -> openUrl(it.url)
             is OpenSettings -> openSettings(it.target)
             GoBack -> {
+                Timber.v("Katetest-> GoBack CMD called")
                 if (webView.canGoBack()) {
+                    Timber.v("Katetest-> Webview can go back and will")
                     webView.goBack()
                 } else {
                     finish()
@@ -259,6 +262,11 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        if (params is PrivacyDashboardToggleReportScreen) {
+            Timber.v("Katetest->OnBackPressed")
+            viewModel.onToggleReportPromptDismissed()
+            Timber.v("Katetest->onPromptDismissed called")
+        }
         if (webView.canGoBack()) {
             webView.goBack()
         } else {

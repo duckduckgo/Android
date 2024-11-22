@@ -21,61 +21,68 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_DISMISS_INTERVAL
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_MAX_PROMPT_COUNT
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPTS_DISMISSED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPT_INTERVAL
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED
-import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_RC
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_SENT
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
 
 interface ToggleReportsDataStore {
-    fun getToggleReportsRemoteConfigJson(): String
-
-    suspend fun setToggleReportsRemoteConfigJson(value: String)
 
     suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean)
 
+    suspend fun getDismissLogicEnabled(): Boolean
+
     suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean)
+
+    suspend fun getPromptLimitLogicEnabled(): Boolean
 
     suspend fun storeDismissInterval(dismissInterval: Int)
 
+    suspend fun getDismissInterval(): Int
+
     suspend fun storePromptInterval(promptInterval: Int)
+
+    suspend fun getPromptInterval(): Int
 
     suspend fun storeMaxPromptCount(maxPromptCount: Int)
 
+    suspend fun getMaxPromptCount(): Int
+
     suspend fun insertTogglePromptDismiss()
+
+    suspend fun getReportsSent(): List<String>
 
     suspend fun insertTogglePromptSend()
 
-    fun canPrompt(): Boolean
+    suspend fun getPromptsDismissed(): List<String>
+
+    suspend fun lastPromptWasAccepted(): Boolean
+
+    suspend fun setLastPromptWasAccepted(accepted: Boolean)
+
+    suspend fun canPrompt(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesToggleReportsDataStore @Inject constructor(
     @ToggleReports private val store: DataStore<Preferences>,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    // @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ToggleReportsDataStore {
 
     private object Keys {
-        val TOGGLE_REPORTS_RC = stringPreferencesKey(name = "TOGGLE_REPORTS_RC")
         val TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED = booleanPreferencesKey(name = "TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED")
         val TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED = booleanPreferencesKey(name = "TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED")
         val TOGGLE_REPORTS_SENT = stringSetPreferencesKey(name = "TOGGLE_REPORTS_SENT")
@@ -83,73 +90,12 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         val TOGGLE_REPORTS_DISMISS_INTERVAL = intPreferencesKey(name = "TOGGLE_REPORTS_DISMISS_INTERVAL")
         val TOGGLE_REPORTS_PROMPT_INTERVAL = intPreferencesKey(name = "TOGGLE_REPORTS_PROMPT_INTERVAL")
         val TOGGLE_REPORTS_MAX_PROMPT_COUNT = intPreferencesKey(name = "TOGGLE_REPORTS_MAX_PROMPT_COUNT")
+        val TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED = booleanPreferencesKey(name = "TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED")
     }
 
-    private val toggleReportsRC: StateFlow<String> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_RC] ?: "{}"
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "{}")
-
-    private val promptLimitLogicEnabled: StateFlow<Boolean> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED] ?: true
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
-
-    private val dismissLogicEnabled: StateFlow<Boolean> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED] ?: true
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
-
-    private val reportsSent: StateFlow<List<String>> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_SENT]?.toList() ?: listOf()
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, listOf())
-
-    private val reportPromptsDismissed: StateFlow<List<String>> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: listOf()
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, listOf())
-
-    // Default to 48 hours
-    private val reportDismissInterval: StateFlow<Int> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_DISMISS_INTERVAL] ?: 172800
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 172800)
-
-    // Default to 48 hours
-    private val reportPromptInterval: StateFlow<Int> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_PROMPT_INTERVAL] ?: 172800
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 172800)
-
-    // Default to max 3 accepted prompts
-    private val maxPromptCount: StateFlow<Int> = store.data
-        .map { prefs ->
-            prefs[TOGGLE_REPORTS_MAX_PROMPT_COUNT] ?: 3
-        }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, 3)
-
-    override fun getToggleReportsRemoteConfigJson(): String {
-        return toggleReportsRC.value
-    }
-
-    override suspend fun setToggleReportsRemoteConfigJson(value: String) {
-        store.edit { prefs -> prefs[TOGGLE_REPORTS_RC] = value }
+    private companion object {
+        const val DEFAULT_INTERVAL = 172800
+        const val DEFAULT_MAX_PROMPT = 3
     }
 
     override suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean) {
@@ -158,10 +104,18 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getDismissLogicEnabled(): Boolean {
+        return store.data.first()[TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED] ?: false
+    }
+
     override suspend fun storeDismissInterval(dismissInterval: Int) {
         store.edit { prefs ->
             prefs[TOGGLE_REPORTS_DISMISS_INTERVAL] = dismissInterval
         }
+    }
+
+    override suspend fun getDismissInterval(): Int {
+        return store.data.first()[TOGGLE_REPORTS_DISMISS_INTERVAL] ?: DEFAULT_INTERVAL
     }
 
     override suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean) {
@@ -170,10 +124,18 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getPromptLimitLogicEnabled(): Boolean {
+        return store.data.first()[TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED] ?: false
+    }
+
     override suspend fun storePromptInterval(promptInterval: Int) {
         store.edit { prefs ->
             prefs[TOGGLE_REPORTS_PROMPT_INTERVAL] = promptInterval
         }
+    }
+
+    override suspend fun getPromptInterval(): Int {
+        return store.data.first()[TOGGLE_REPORTS_PROMPT_INTERVAL] ?: DEFAULT_INTERVAL
     }
 
     override suspend fun storeMaxPromptCount(maxPromptCount: Int) {
@@ -182,11 +144,15 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getMaxPromptCount(): Int {
+        return store.data.first()[TOGGLE_REPORTS_MAX_PROMPT_COUNT] ?: DEFAULT_MAX_PROMPT
+    }
+
     override suspend fun insertTogglePromptDismiss() {
         store.edit { prefs ->
-            val currentSet = reportPromptsDismissed.value.toMutableSet()
+            val currentSet = getPromptsDismissed().toMutableSet()
             val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
-            val interval = reportDismissInterval.value
+            val interval = getDismissInterval()
             currentSet.removeAll { storedTimestamp ->
                 val storedTime = storedTimestamp.toLong()
                 (currentTimeMillis - storedTime > interval * 1000L)
@@ -198,11 +164,17 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getPromptsDismissed(): List<String> {
+        return store.data.first().let { prefs ->
+            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
+        }
+    }
+
     override suspend fun insertTogglePromptSend() {
         store.edit { prefs ->
-            val currentSet = reportsSent.value.toMutableSet()
+            val currentSet = getReportsSent().toMutableSet()
             val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
-            val interval = reportPromptInterval.value
+            val interval = getPromptInterval()
             currentSet.removeAll { storedTimestamp ->
                 val storedTime = storedTimestamp.toLong()
                 (currentTimeMillis - storedTime > interval * 1000L)
@@ -214,29 +186,62 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
-    override fun canPrompt(): Boolean {
+    override suspend fun getReportsSent(): List<String> {
+        return store.data.first().let { prefs ->
+            prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
+        }
+    }
+
+    override suspend fun lastPromptWasAccepted(): Boolean {
+        Timber.v("KateTest--> lastPromptWasAccepted called in datastore")
+        return store.data.first()[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] ?: false
+    }
+
+    override suspend fun setLastPromptWasAccepted(accepted: Boolean) {
+        Timber.v("KateTest--> lastPromptAccepted stored: $accepted")
+        store.edit {
+                prefs ->
+            prefs[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] = accepted
+        }
+    }
+
+    override suspend fun canPrompt(): Boolean {
         val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
         Timber.v("KateTest--> currentTime as DBdateFormatter.MillisIso08601: $currentTimeMillis")
-        fun checkRecentSends() = reportsSent.value.count { sendTime ->
-            currentTimeMillis - sendTime.toLong() <= reportPromptInterval.value * 1000L
-        } < maxPromptCount.value
+
+        suspend fun checkRecentSends(): Boolean {
+            val reportsSent = getReportsSent()
+            val promptInterval = getPromptInterval()
+            val maxPromptCount = getMaxPromptCount()
+            return reportsSent.count { sendTime ->
+                currentTimeMillis - sendTime.toLong() <= promptInterval * 1000L
+            } < maxPromptCount
+        }
+
         Timber.v(
             "KateTest--> checkRecentSends: ${checkRecentSends()} WITH " +
-                "reportPromptInterval: ${reportPromptInterval.value} AND" +
-                " reportsSentCount: ${reportsSent.value.count()}",
+                "reportPromptInterval: ${getPromptInterval()} AND" +
+                " reportsSentCount: ${getReportsSent().count()}",
         )
-        fun checkDismissInterval() = currentTimeMillis - (reportPromptsDismissed.value.maxOrNull()?.toLong() ?: 0) >
-            reportDismissInterval.value * 1000L
+
+        suspend fun checkDismissInterval(): Boolean {
+            val promptsDismissed = getPromptsDismissed()
+            val dismissInterval = getDismissInterval()
+            return currentTimeMillis - (promptsDismissed.maxOfOrNull { it.toLong() } ?: 0) >
+                dismissInterval * 1000L
+        }
+
         Timber.v(
             "KateTest--> checkDismissInterval: ${checkDismissInterval()} WITH " +
-                "reportDismissInterval: ${reportDismissInterval.value} AND reportPromptsDismissed:" +
-                " ${reportPromptsDismissed.value.maxOrNull()}",
+                "reportDismissInterval: ${getDismissInterval()} AND reportPromptsDismissed:" +
+                " ${getPromptsDismissed().maxOfOrNull { it }}",
         )
+
         return when {
-            promptLimitLogicEnabled.value && dismissLogicEnabled.value ->
+            getPromptLimitLogicEnabled() && getDismissLogicEnabled() ->
                 checkRecentSends() && checkDismissInterval()
-            promptLimitLogicEnabled.value -> checkRecentSends()
-            dismissLogicEnabled.value -> checkDismissInterval()
+            getPromptLimitLogicEnabled() -> checkRecentSends()
+            getDismissLogicEnabled() -> checkDismissInterval()
             else -> true
         }
     }

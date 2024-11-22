@@ -75,6 +75,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
@@ -466,7 +467,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchPrivacyDashboard(toggle: Boolean) {
         currentTab?.tabId?.let { tabId ->
-            val params = if (toggle) PrivacyDashboardToggleReportScreen(tabId, opener = "dashboard") else PrivacyDashboardPrimaryScreen(tabId)
+            val params = if (toggle) {
+                PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
+            } else {
+                PrivacyDashboardPrimaryScreen(
+                    tabId,
+                )
+            }
             val intent = globalActivityStarter.startIntent(this, params)
             intent?.let { startActivity(it) }
         }

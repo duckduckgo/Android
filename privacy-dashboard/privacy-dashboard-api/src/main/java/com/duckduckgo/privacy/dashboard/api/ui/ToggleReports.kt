@@ -20,7 +20,7 @@ interface ToggleReports {
     /**
      * Returns true if all the conditions are met for prompting the user to submit a toggle-off-prompted simplified breakage report.
      */
-    fun shouldPrompt(): Boolean
+    suspend fun shouldPrompt(): Boolean
 
     /**
      * Adds a record to the datastore that a toggle-off prompt for a report was dismissed.
@@ -31,4 +31,9 @@ interface ToggleReports {
      * Adds a record to the datastore that a report was sent as the result of a toggle-off prompt.
      */
     suspend fun onReportSent()
+
+    /**
+     * Returns true if last prompt resulted in user submitting a report.
+     */
+    suspend fun lastPromptAccepted(): Boolean
 }

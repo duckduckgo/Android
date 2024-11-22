@@ -25,7 +25,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -51,19 +50,7 @@ class ToggleReportsDataStoreTest {
 
     @Before
     fun setUp() {
-        testee = SharedPreferencesToggleReportsDataStore(testDataStore, coroutineRule.testScope)
-    }
-
-    @Test
-    fun whenDatabaseIsEmptyThenReturnsDefaultJson() = runTest {
-        assertEquals("{}", testee.getToggleReportsRemoteConfigJson())
-    }
-
-    @Test
-    fun whenJsonIsSetThenReturnsCorrectValue() = runTest {
-        val testJson = """{"test": "value"}"""
-        testee.setToggleReportsRemoteConfigJson(testJson)
-        assertEquals(testJson, testee.getToggleReportsRemoteConfigJson())
+        testee = SharedPreferencesToggleReportsDataStore(testDataStore)
     }
 
     @Test

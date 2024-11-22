@@ -40,6 +40,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
@@ -343,7 +344,7 @@ class PrivacyDashboardHybridViewModelTest {
     fun whenUserClicksOnSubmitToggleReportThenCommandIsSent() = runTest {
         testee.onSiteChanged(site())
 
-        testee.onSubmitToggleReport(opener = "dashboard")
+        testee.onSubmitToggleReport(opener = DashboardOpener.DASHBOARD)
 
         verify(brokenSiteSender).submitBrokenSiteFeedback(any(), any())
         verify(toggleReports).onReportSent()

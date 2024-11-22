@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
@@ -108,7 +109,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
-        class LaunchToggleReport(val opener: String) : Command()
+        class LaunchToggleReport(val opener: DashboardOpener) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
         class FetchToggleData(val toggleData: String) : Command()
@@ -365,16 +366,16 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     }
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
+                    if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                        if (toggleReports.shouldPrompt()) {
+                            command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
+                        }
+                    }
                     if (dashboardOpenedFromCustomTab) {
                         if (event.eventOrigin.screen == PRIMARY_SCREEN) {
                             pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
                         }
                     } else {
-                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
-                            if (toggleReports.shouldPrompt()) {
-                                command.send(LaunchToggleReport(opener = "dashboard"))
-                            }
-                        }
                         val pixelName = when (event.eventOrigin.screen) {
                             PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_ADD
                             BREAKAGE_FORM -> BROKEN_SITE_ALLOWLIST_ADD
@@ -514,11 +515,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             toggleReports.onPromptDismissed()
             delay(CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY)
-            command.send(GoBack)
         }
     }
 
-    fun onSubmitToggleReport(opener: String) {
+    fun onSubmitToggleReport(opener: DashboardOpener) {
         viewModelScope.launch(dispatcher.io()) {
             val site = site.value ?: return@launch
             val siteUrl = site.url
@@ -548,7 +548,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 httpErrorCodes = site.httpErrorCodeEvents.distinct().joinToString(","),
                 loginSite = null,
                 reportFlow = when (opener) {
-                    "menu" -> ReportFlow.TOGGLE_MENU
+                    DashboardOpener.MENU -> ReportFlow.TOGGLE_MENU
                     else -> ReportFlow.TOGGLE_DASHBOARD
                 },
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,

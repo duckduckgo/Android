@@ -31,3 +31,5 @@ interface ToggleReportsFeature {
 }
 
 fun ToggleReportsFeature.isEnabled(): Boolean = self().isEnabled()
+
+fun ToggleReportsFeature.getSettings(): String? = self().getSettings()
