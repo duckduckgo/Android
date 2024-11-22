@@ -28,11 +28,20 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = Autoconsent::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 class RealAutoconsent @Inject constructor(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
     private val settingsRepository: AutoconsentSettingsRepository,
@@ -40,7 +49,7 @@ class RealAutoconsent @Inject constructor(
     private val autoconsent: AutoconsentFeature,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
-) : Autoconsent {
+) : Autoconsent, PrivacyConfigCallbackPlugin {
 
     private lateinit var autoconsentJs: String
 
@@ -107,5 +116,9 @@ class RealAutoconsent @Inject constructor(
             autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
         }
         return autoconsentJs
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        settingsRepository.invalidateCache()
     }
 }

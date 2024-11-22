@@ -54,6 +54,7 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
 class FakeSettingsRepository : AutoconsentSettingsRepository {
     override var userSetting: Boolean = false
     override var firstPopupHandled: Boolean = false
+    override fun invalidateCache() {}
 }
 
 class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemporary {
