@@ -83,9 +83,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         }
 
         with(binding.manageEmailCard) {
-            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
-            emailButton.setText(string.restoreSubscriptionEmailButton)
-            emailButton.setOnClickListener {
+            emailCard.setOnClickListener {
                 viewModel.restoreFromEmail()
             }
         }

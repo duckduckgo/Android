@@ -33,7 +33,7 @@
         <activity
                 android:name=".ui.RestoreSubscriptionActivity"
                 android:exported="false"
-                android:label="Activate Subscription"
+                android:label="I Have a Subscription"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
 

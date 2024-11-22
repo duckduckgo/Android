@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/keyline_5"
-                    app:srcCompat="@drawable/ic_sync_desktop"
+                    app:srcCompat="@drawable/ic_privacy_pro_add_device"
                     tools:ignore="ContentDescription" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -52,24 +52,22 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:layout_marginStart="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_5"
+                    android:layout_marginBottom="@dimen/keyline_6"
                     android:gravity="center"
                     app:typography="h1"
                     android:text="@string/restoreSubscriptionTitle"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/keyline_5"
-                    android:gravity="center"
-                    app:typography="body1"
-                    app:textType="secondary"
-                    android:text="@string/restoreSubscriptionDescription"
-                    tools:ignore="HardcodedText"/>
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <include
                 android:id="@+id/manageEmailCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:layout_marginTop="@dimen/keyline_7"
                 layout="@layout/card_manage_email" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
