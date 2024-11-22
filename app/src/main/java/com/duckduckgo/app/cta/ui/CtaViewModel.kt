@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -29,9 +30,17 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingPrimaryButtonMetricPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -51,7 +60,14 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -73,6 +89,7 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val brokenSitePrompt: BrokenSitePrompt,
+    private val extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -89,8 +106,9 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-    private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
-        if (extendedOnboardingFeatureToggles.privacyProCta().isEnabled()) {
+    private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
+        val shouldShowPrivacyProCta = subscriptions.isEligible()
+        return if (shouldShowPrivacyProCta) {
             arrayOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
@@ -130,9 +148,15 @@ class CtaViewModel @Inject constructor(
         if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
             dismissedCtaDao.insert(DismissedCta(cta.ctaId))
         }
-
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.ctaShown()
+        }
+        withContext(dispatchers.io()) {
+            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
+                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel()?.getPixelDefinitions()?.forEach {
+                    pixel.fire(it.pixelName, it.params)
+                }
+            }
         }
     }
 
@@ -172,9 +196,25 @@ class CtaViewModel @Inject constructor(
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
         }
-
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
+        }
+        withContext(dispatchers.io()) {
+            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
+                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingPrimaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
+                    pixel.fire(it.pixelName, it.params)
+                }
+            }
+        }
+    }
+
+    suspend fun onUserClickCtaSkipButton(cta: Cta) {
+        withContext(dispatchers.io()) {
+            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
+                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingSecondaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
+                    pixel.fire(it.pixelName, it.params)
+                }
+            }
         }
     }
 
@@ -228,6 +268,7 @@ class CtaViewModel @Inject constructor(
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 null
             }
+
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                     DaxBubbleCta.DaxExperimentIntroSearchOptionsCta(onboardingStore, appInstallStore)
@@ -252,8 +293,33 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            canShowPrivacyProCta() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled() -> {
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore)
+            canShowPrivacyProCta() -> {
+                val titleRes: Int
+                val descriptionRes: Int
+                when {
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.STEP) -> {
+                        titleRes = R.string.onboardingPrivacyProStepDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProStepDaxDialogDescription
+                    }
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> {
+                        titleRes = R.string.onboardingPrivacyProProtectionDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProProtectionDaxDialogDescription
+                    }
+                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.DEAL) -> {
+                        titleRes = R.string.onboardingPrivacyProDealDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProDealDaxDialogDescription
+                    }
+                    else -> {
+                        titleRes = R.string.onboardingPrivacyProDaxDialogTitle
+                        descriptionRes = R.string.onboardingPrivacyProDaxDialogDescription
+                    }
+                }
+
+                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
+                    DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
+                } else {
+                    DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
+                }
             }
 
             canShowWidgetCta() -> {
@@ -292,12 +358,14 @@ class CtaViewModel @Inject constructor(
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
                 false
             }
+
             else -> true
         }
     }
 
     private suspend fun canShowPrivacyProCta(): Boolean {
-        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown()
+        return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
+            subscriptions.isEligible()
     }
 
     @WorkerThread
@@ -446,11 +514,7 @@ class CtaViewModel @Inject constructor(
         !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()
 
     private suspend fun allOnboardingCtasShown(): Boolean {
-        return withContext(dispatchers.io()) {
-            requiredDaxOnboardingCtas.all {
-                dismissedCtaDao.exists(it)
-            }
-        }
+        return requiredDaxOnboardingCtas().all { dismissedCtaDao.exists(it) }
     }
 
     private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs.distinctUntilChanged()
@@ -494,6 +558,17 @@ class CtaViewModel @Inject constructor(
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
+
+    fun getCohortOrigin(): String {
+        val cohort = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()
+        return when (cohort?.name) {
+            Cohorts.STEP.cohortName -> "_${Cohorts.STEP.cohortName}"
+            Cohorts.PROTECTION.cohortName -> "_${Cohorts.PROTECTION.cohortName}"
+            Cohorts.DEAL.cohortName -> "_${Cohorts.DEAL.cohortName}"
+            Cohorts.CONTROL.cohortName -> "_${Cohorts.CONTROL.cohortName}"
+            else -> ""
+        }
+    }
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
