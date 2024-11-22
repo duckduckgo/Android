@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -27,7 +28,6 @@ import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -58,6 +58,8 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
+import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
+import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -75,6 +77,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -116,7 +119,6 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -124,6 +126,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -141,10 +144,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -175,6 +175,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -187,6 +188,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -194,10 +196,13 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
@@ -206,9 +211,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailab
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
+import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -217,14 +221,9 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -240,6 +239,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -253,7 +253,6 @@ import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.UUID
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -299,6 +298,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @FlowPreview
 class BrowserTabViewModelTest {
 
@@ -377,12 +377,6 @@ class BrowserTabViewModelTest {
 
     private val mockAppLinksHandler: AppLinksHandler = mock()
 
-    private val mockFeatureToggle: FeatureToggle = mock()
-
-    private val mockGpcRepository: GpcRepository = mock()
-
-    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-
     private val mockAmpLinks: AmpLinks = mock()
 
     private val mockTrackingParameters: TrackingParameters = mock()
@@ -410,8 +404,6 @@ class BrowserTabViewModelTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-
-    private var loadingBarExperimentManager: LoadingBarExperimentManager = mock()
 
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
 
@@ -501,6 +493,9 @@ class BrowserTabViewModelTest {
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
+    private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
+    private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockTabStatsBucketing: TabStatsBucketing = mock()
 
     @Before
     fun before() = runTest {
@@ -542,13 +537,13 @@ class BrowserTabViewModelTest {
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any<Uri>())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
         whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -568,6 +563,7 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            brokenSitePrompt = mockBrokenSitePrompt,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -624,16 +620,9 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
             savedSitesRepository = mockSavedSitesRepository,
-            locationPermissionsRepository = LocationPermissionsRepositoryImpl(
-                locationPermissionsDao,
-                lazyFaviconManager,
-                coroutineRule.testDispatcherProvider,
-            ),
-            geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            gpc = RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             appCoroutineScope = TestScope(),
@@ -667,12 +656,14 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
-            loadingBarExperimentManager = loadingBarExperimentManager,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
+            customHeadersProvider = fakeCustomHeadersPlugin,
+            brokenSitePrompt = mockBrokenSitePrompt,
+            tabStatsBucketing = mockTabStatsBucketing,
         )
 
         testee.loadData("abc", null, false, false)
@@ -1962,7 +1953,7 @@ class BrowserTabViewModelTest {
         val url = "http://youtube-nocookie.com/videoID=1234"
         val title = "Duck Player"
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyUri())).thenReturn(true)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(true)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie(any())).thenReturn("duck://player/1234")
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
 
@@ -2440,6 +2431,13 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runTest {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+    }
+
+    @Test
+    fun whenCloseAndSelectSourceTabSelectedThenTabDeletedFromRepository() = runTest {
+        givenOneActiveTabSelected()
+        testee.closeAndSelectSourceTab()
         verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
@@ -2990,260 +2988,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDeviceLocationSharingIsDisabledThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(false)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = runTest {
-        givenDeviceLocationSharingIsEnabled(true)
-        givenCurrentSite("https://wwww.example.com/")
-        givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
-
-        verify(geoLocationPermissions).clear("https://wwww.anotherexample.com/")
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssued<Command.CheckSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssued<Command.CheckSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionThenPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-
-        givenNewPermissionRequestFromDomain(domain)
-
-        assertCommandIssuedTimes<Command.CheckSystemLocationPermission>(times = 1)
-    }
-
-    @Test
-    fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(false)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedOneTime()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShouldBeEnabled() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockSettingsStore).appLocationPermission = true
-    }
-
-    @Test
-    fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
-    }
-
-    @Test
-    fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(geoLocationPermissions, atLeastOnce()).allow(domain)
-    }
-
-    @Test
-    fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(geoLocationPermissions, atLeastOnce()).clear(domain)
-    }
-
-    @Test
-    fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainPermission>()
-    }
-
-    @Test
-    fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainPermission>()
-    }
-
-    @Test
-    fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        assertCommandIssued<Command.AskDomainPermission>()
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionNotAllowed()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionNeverAllowed()
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-        verify(geoLocationPermissions).clear(domain)
-        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionAllowed()
-
-        assertCommandIssued<Command.RequestSystemLocationPermission>()
-    }
-
-    @Test
-    fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSiteLocationPermissionAlwaysDenied()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
     fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            true,
+        )
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3257,7 +3008,10 @@ class BrowserTabViewModelTest {
     fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            false,
+        )
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3294,7 +3048,10 @@ class BrowserTabViewModelTest {
     fun whenUserRefreshesASiteLocationMessageIsNotShownAgain() = runTest {
         val domain = "https://www.example.com/"
 
-        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)).thenReturn(
+            true,
+        )
+
         givenCurrentSite(domain)
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3302,73 +3059,6 @@ class BrowserTabViewModelTest {
         loadUrl("https://www.example.com", isBrowserShowing = true)
         loadUrl("https://www.example.com", isBrowserShowing = true)
         assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
-    }
-
-    @Test
-    fun whenUserSelectsPermissionAndRefreshesPageThenLocationMessageIsNotShown() = runTest {
-        val domain = "http://example.com"
-
-        givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-
-        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-
-        loadUrl(domain, isBrowserShowing = true)
-
-        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedOneTime()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedForeverThenSiteLocationPermissionIsAlwaysDenied() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedForever()
-
-        verify(geoLocationPermissions).clear(domain)
-    }
-
-    @Test
-    fun whenSystemLocationPermissionIsDeniedForeverThenSettingsFlagIsUpdated() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionDeniedForever()
-
-        verify(mockSettingsStore).appLocationPermissionDeniedForever = true
-    }
-
-    @Test
-    fun whenSystemLocationIsGrantedThenSettingsFlagIsUpdated() = runTest {
-        val domain = "https://www.example.com/"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        verify(mockSettingsStore).appLocationPermissionDeniedForever = false
     }
 
     @Test
@@ -3488,38 +3178,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteLocationPermissionSelectedAndPermissionIsAllowAlwaysThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        val permission = LocationPermissionType.ALLOW_ALWAYS
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSiteLocationPermissionSelected(url, permission)
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
-    }
-
-    @Test
-    fun whenOnSiteLocationPermissionSelectedAndPermissionIsDenyAlwaysThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        val permission = LocationPermissionType.DENY_ALWAYS
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSiteLocationPermissionSelected(url, permission)
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
-    }
-
-    @Test
-    fun whenOnSystemLocationPermissionNeverAllowedThenPersistFavicon() = runTest {
-        val url = "http://example.com"
-        givenNewPermissionRequestFromDomain(url)
-
-        testee.onSystemLocationPermissionNeverAllowed()
-
-        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
-    }
-
-    @Test
     fun whenBookmarkAddedThenPersistFavicon() = runTest {
         val url = "http://example.com"
         val title = "A title"
@@ -3592,7 +3250,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+        givenCustomHeadersProviderReturnsGpcHeader()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
         testee.onUserSubmittedQuery("foo")
@@ -3603,9 +3261,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         val url = "foo.com"
-        givenUrlCannotUseGpc(url)
+        givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
 
         testee.onUserSubmittedQuery("foo")
@@ -3616,20 +3274,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-
-        testee.onUserSubmittedQuery("foo")
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenOnDesktopSiteModeToggledIfGpcReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsGpcHeader()
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
@@ -3640,32 +3286,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
-        givenUrlCannotUseGpc("example.com")
-        loadUrl("http://m.example.com")
-        setDesktopBrowsingMode(false)
-        testee.onChangeBrowserModeClicked()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        loadUrl("http://m.example.com")
-        setDesktopBrowsingMode(false)
-        testee.onChangeBrowserModeClicked()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue as Navigate
-        assertTrue(command.headers.isEmpty())
-    }
-
-    @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenExternalAppLinkClickedIfGpcReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsGpcHeader()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3676,8 +3298,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() {
-        givenUrlCanUseGpc()
+    fun whenExternalAppLinkClickedIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsNoHeaders()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -3688,27 +3310,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
-        val url = "fallback"
-        givenUrlCannotUseGpc(url)
-        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), url)
+    fun whenUserSubmittedQueryIfAndroidFeaturesReturnsHeaderThenAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsAndroidFeaturesHeader()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
-        testee.nonHttpAppLinkClicked(intentType)
+        testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
-        assertTrue(command.headers.isEmpty())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(TEST_VALUE, command.headers[X_DUCKDUCKGO_ANDROID_HEADER])
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        givenGpcIsDisabled()
-        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
+    fun whenUserSubmittedQueryIfAndroidFeaturesReturnsNoHeaderThenDoNotAddHeaderToUrl() {
+        givenCustomHeadersProviderReturnsNoHeaders()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
-        testee.nonHttpAppLinkClicked(intentType)
+        testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        val command = commandCaptor.lastValue as Navigate
         assertTrue(command.headers.isEmpty())
     }
 
@@ -5140,6 +4761,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabThenSetOrigin() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Off)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
+            { "someUrl" },
+        )
+        verify(mockDuckPlayer).setDuckPlayerOrigin(OVERLAY)
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageOpenDuckPlayerWithDuckPlayerAlwaysEnabledUrlAndOpenInNewTabThenSetOrigin() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = Enabled))
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(Off)
+        testee.processJsCallbackMessage(
+            DUCK_PLAYER_FEATURE_NAME,
+            "openDuckPlayer",
+            "id",
+            JSONObject("""{ href: "duck://player/1234" }"""),
+            false,
+            { "someUrl" },
+        )
+        verify(mockDuckPlayer).setDuckPlayerOrigin(AUTO)
+    }
+
+    @Test
     fun whenProcessJsCallbackMessageOpenDuckPlayerWithUrlAndOpenInNewTabUnavailableThenNavigate() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
@@ -5360,6 +5013,18 @@ class BrowserTabViewModelTest {
             testee.onPrivacyProtectionsPopupUiEvent(event)
             verify(mockPrivacyProtectionsPopupManager).onUiEvent(event)
         }
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockBrokenSitePrompt, never()).pageRefreshed(any())
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
     }
 
     @Test
@@ -5780,12 +5445,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() = runTest {
+        val tabCount = "61-80"
+        val active7d = "21+"
+        val inactive1w = "11-20"
+        val inactive2w = "6-10"
+        val inactive3w = "0"
+
+        whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+
+        val params = mapOf(
+            PixelParameter.TAB_COUNT to tabCount,
+            PixelParameter.TAB_ACTIVE_7D to active7d,
+            PixelParameter.TAB_INACTIVE_1W to inactive1w,
+            PixelParameter.TAB_INACTIVE_2W to inactive2w,
+            PixelParameter.TAB_INACTIVE_3W to inactive3w,
+        )
+
         testee.userLaunchingTabSwitcher()
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
     }
 
     @Test
@@ -5990,6 +5675,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewPageAndBrokenSitePromptVisibleThenHideCta() = runTest {
+        setCta(BrokenSitePromptDialogCta())
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        assertCommandIssued<HideBrokenSitePromptCta>()
+    }
+
+    @Test
     fun whenUrlUpdatedWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
@@ -6018,45 +5713,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<ShareLink> {
             assertEquals("https://youtube.com/watch?v=1234", this.url)
         }
-    }
-
-    @Test
-    fun whenExperimentEnabledShowOmnibarImmediately() = runTest {
-        setBrowserShowing(true)
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockDisabledToggle)
-        val observer = mock<(OmnibarViewState) -> Unit>()
-        testee.omnibarViewState.observeForever { observer(it) }
-
-        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
-
-        val captor = argumentCaptor<OmnibarViewState>()
-        verify(observer, times(4)).invoke(captor.capture())
-
-        assertFalse(captor.allValues[0].navigationChange)
-        assertTrue(captor.allValues[1].navigationChange)
-        assertFalse(captor.allValues[2].navigationChange)
-        assertFalse(captor.allValues[3].navigationChange)
-
-        testee.omnibarViewState.removeObserver { observer(it) }
-    }
-
-    @Test
-    fun whenExperimentDisabledDoNotShowOmnibarImmediately() = runTest {
-        setBrowserShowing(true)
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-        val observer = mock<(OmnibarViewState) -> Unit>()
-        testee.omnibarViewState.observeForever { observer(it) }
-
-        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
-
-        val captor = argumentCaptor<OmnibarViewState>()
-        verify(observer, times(2)).invoke(captor.capture())
-
-        assertFalse(captor.allValues[0].navigationChange)
-        assertFalse(captor.allValues[1].navigationChange)
-
-        testee.omnibarViewState.removeObserver { observer(it) }
     }
 
     @Test
@@ -6165,22 +5821,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
     }
 
-    private fun givenUrlCanUseGpc() {
-        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList())
+    private fun givenCustomHeadersProviderReturnsGpcHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(GPC_HEADER to GPC_HEADER_VALUE)
     }
 
-    private fun givenUrlCannotUseGpc(url: String) {
-        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
+    private fun givenCustomHeadersProviderReturnsNoHeaders() {
+        fakeCustomHeadersPlugin.headers = emptyMap()
     }
 
-    private fun givenGpcIsDisabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
-        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
+    private fun givenCustomHeadersProviderReturnsAndroidFeaturesHeader() {
+        fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE)
     }
 
     private suspend fun givenFireButtonPulsing() {
@@ -6189,33 +5839,12 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
     }
 
-    private fun givenNewPermissionRequestFromDomain(domain: String) {
-        testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
-    }
-
     private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
         whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
     }
 
     private fun givenLocationPermissionIsEnabled(state: Boolean) {
         whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
-    }
-
-    private fun givenUserAlreadySelectedPermissionForDomain(
-        domain: String,
-        permission: LocationPermissionType,
-    ) {
-        locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
-    }
-
-    class StubPermissionCallback : GeolocationPermissions.Callback {
-        override fun invoke(
-            p0: String?,
-            p1: Boolean,
-            p2: Boolean,
-        ) {
-            // nothing to see
-        }
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -6433,6 +6062,12 @@ class BrowserTabViewModelTest {
         }
         override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
             toggleOn++
+        }
+    }
+
+    class FakeCustomHeadersProvider(var headers: Map<String, String>) : CustomHeadersProvider {
+        override fun getCustomHeaders(url: String): Map<String, String> {
+            return headers
         }
     }
 }

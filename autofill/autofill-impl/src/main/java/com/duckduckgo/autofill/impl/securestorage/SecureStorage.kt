@@ -61,10 +61,11 @@ interface SecureStorage {
      * This method adds a list of raw plaintext [WebsiteLoginDetailsWithCredentials] into the [SecureStorage].
      * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      *
+     * @return List of IDs that were inserted
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>)
+    suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>): List<Long>
 
     /**
      * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
@@ -192,9 +193,9 @@ class RealSecureStorage @Inject constructor(
     }
 
     @Throws(SecureStorageException::class)
-    override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>) {
-        withContext(dispatchers.io()) {
-            secureStorageRepository.await()?.addWebsiteLoginCredentials(credentials.map { it.toDataEntity() })
+    override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>): List<Long> {
+        return withContext(dispatchers.io()) {
+            secureStorageRepository.await()?.addWebsiteLoginCredentials(credentials.map { it.toDataEntity() }) ?: emptyList()
         }
     }
 

@@ -70,7 +70,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -100,7 +99,6 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
-import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -118,8 +116,6 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
-import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -170,6 +166,7 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -186,7 +183,6 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -267,7 +263,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -298,7 +293,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -523,9 +517,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
-
-    @Inject
-    lateinit var loadingBarExperimentManager: LoadingBarExperimentManager
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -1665,9 +1656,6 @@ class BrowserTabFragment :
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
-            is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainPermission -> askSiteLocationPermission(it.locationPermission)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1719,6 +1707,7 @@ class BrowserTabFragment :
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
+            is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -1911,116 +1900,6 @@ class BrowserTabFragment :
                 thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
             }
         }
-    }
-
-    private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkSystemLocationPermission(
-        domain: String,
-        deniedForever: Boolean,
-    ) {
-        if (locationPermissionsHaveNotBeenGranted()) {
-            if (deniedForever) {
-                viewModel.onSystemLocationPermissionDeniedForever()
-            } else {
-                showSystemLocationPermissionDialog(domain)
-            }
-        } else {
-            viewModel.onSystemLocationPermissionGranted()
-        }
-    }
-
-    private fun showSystemLocationPermissionDialog(domain: String) {
-        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater)
-
-        val originUrl = domain.websiteFromGeoLocationsApiOrigin()
-        val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
-        binding.systemPermissionDialogSubtitle.text = subtitle
-
-        val dialog = CustomAlertDialogBuilder(requireActivity())
-            .setView(binding)
-            .build()
-
-        binding.allowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionAllowed()
-            dialog.dismiss()
-        }
-
-        binding.denyLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNotAllowed()
-            dialog.dismiss()
-        }
-
-        binding.neverAllowLocationPermission.setOnClickListener {
-            viewModel.onSystemLocationPermissionNeverAllowed()
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun requestLocationPermissions() {
-        requestPermissions(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ),
-            PERMISSION_REQUEST_GEO_LOCATION,
-        )
-    }
-
-    private fun askSiteLocationPermission(locationPermission: LocationPermission) {
-        if (!isActiveCustomTab() && !isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
-            return
-        }
-
-        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
-
-        val domain = locationPermission.origin
-        val title = domain.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
-        binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
-            getString(R.string.preciseLocationDDGDialogSubtitle)
-        } else {
-            getString(R.string.preciseLocationSiteDialogSubtitle)
-        }
-
-        val dialog = MaterialAlertDialogBuilder(requireActivity())
-            .setView(binding.root)
-            .setOnCancelListener {
-                // Called when user clicks outside the dialog - deny to be safe
-                locationPermission.callback.invoke(locationPermission.origin, false, false)
-            }
-            .create()
-
-        binding.siteAllowAlwaysLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-            dialog.dismiss()
-        }
-
-        binding.siteAllowOnceLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
-            dialog.dismiss()
-        }
-
-        binding.siteDenyOnceLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
-            dialog.dismiss()
-        }
-
-        binding.siteDenyAlwaysLocationPermission.setOnClickListener {
-            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
-            dialog.dismiss()
-        }
-
-        dialog.show()
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -2699,6 +2578,10 @@ class BrowserTabFragment :
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
         onboardingCta.hideOnboardingCta(binding)
+    }
+
+    private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
+        brokenSitePromptDialogCta.hideOnboardingCta(binding)
     }
 
     private fun hideDaxBubbleCta() {
@@ -3526,18 +3409,6 @@ class BrowserTabFragment :
                     omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
-
-            PERMISSION_REQUEST_GEO_LOCATION -> {
-                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    viewModel.onSystemLocationPermissionGranted()
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        viewModel.onSystemLocationPermissionDeniedOneTime()
-                    } else {
-                        viewModel.onSystemLocationPermissionDeniedTwice()
-                    }
-                }
-            }
         }
     }
 
@@ -3636,7 +3507,6 @@ class BrowserTabFragment :
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
-        private const val DDG_DOMAIN = "duckduckgo.com"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
@@ -3646,7 +3516,6 @@ class BrowserTabFragment :
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
-        private const val PERMISSION_REQUEST_GEO_LOCATION = 300
 
         private const val URL_BUNDLE_KEY = "url"
 
@@ -3988,6 +3857,7 @@ class BrowserTabFragment :
                 -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
+                is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
@@ -4057,6 +3927,17 @@ class BrowserTabFragment :
             }
             viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun showBrokenSitePromptCta(configuration: BrokenSitePromptDialogCta) {
+            hideNewTab()
+            configuration.showBrokenSitePromptCta(
+                binding,
+                onReportBrokenSiteClicked = { viewModel.onUserClickCtaOkButton(configuration) },
+                onDismissCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                onCtaShown = { viewModel.onCtaShown() },
+            )
         }
 
         private fun showHomeCta(

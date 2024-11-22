@@ -3,8 +3,6 @@ package com.duckduckgo.app.trackerdetection.blocklist
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -14,6 +12,7 @@ import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.DASHBOARD
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.MENU
+import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -30,6 +29,15 @@ class BlockListPrivacyTogglePluginTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
+
+    private val moshi = Moshi.Builder().build()
+
+    private data class Config(
+        val treatmentUrl: String? = null,
+        val controlUrl: String? = null,
+        val nextUrl: String? = null,
+    )
+    private val configAdapter = moshi.adapter(Config::class.java)
 
     private val pixel: Pixel = mock()
     private lateinit var testBlockListFeature: TestBlockListFeature
@@ -88,10 +96,7 @@ class BlockListPrivacyTogglePluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
-                config = mapOf(
-                    TREATMENT_URL to "treatmentUrl",
-                    CONTROL_URL to "controlUrl",
-                ),
+                settings = configAdapter.toJson(Config(treatmentUrl = "treatmentUrl", controlUrl = "controlUrl")),
                 assignedCohort = State.Cohort(name = TREATMENT.cohortName, weight = 1, enrollmentDateET = enrollmentDateET),
             ),
         )

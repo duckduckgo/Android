@@ -303,6 +303,12 @@ class BrowserViewModel @Inject constructor(
             }
         }
     }
+
+    fun onTabActivated(tabId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.updateTabLastAccess(tabId)
+        }
+    }
 }
 
 /**

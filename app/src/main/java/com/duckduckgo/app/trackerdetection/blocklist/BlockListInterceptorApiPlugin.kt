@@ -20,12 +20,12 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.CONTROL_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.NEXT_URL
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Companion.TREATMENT_URL
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -38,8 +38,12 @@ import okhttp3.Response
 )
 class BlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
+    private val moshi: Moshi,
 ) : Interceptor, ApiInterceptorPlugin {
 
+    private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
+        moshi.adapter(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
+    }
     override fun intercept(chain: Chain): Response {
         val request = chain.request().newBuilder()
         val url = chain.request().url
@@ -51,11 +55,16 @@ class BlockListInterceptorApiPlugin @Inject constructor(
         }
 
         return activeExperiment?.let {
+            val config = activeExperiment.getSettings()?.let {
+                runCatching {
+                    jsonAdapter.fromJson(it)
+                }.getOrDefault(emptyMap())
+            } ?: emptyMap()
             val path = when {
-                activeExperiment.isEnabled(TREATMENT) -> activeExperiment.getConfig()[TREATMENT_URL]
-                activeExperiment.isEnabled(CONTROL) -> activeExperiment.getConfig()[CONTROL_URL]
-                else -> activeExperiment.getConfig()[NEXT_URL]
-            } ?: chain.proceed(request.build())
+                activeExperiment.isEnabled(TREATMENT) -> config["treatmentUrl"]
+                activeExperiment.isEnabled(CONTROL) -> config["controlUrl"]
+                else -> config["nextUrl"]
+            } ?: return chain.proceed(request.build())
             chain.proceed(request.url("$TDS_BASE_URL$path").build())
         } ?: chain.proceed(request.build())
     }

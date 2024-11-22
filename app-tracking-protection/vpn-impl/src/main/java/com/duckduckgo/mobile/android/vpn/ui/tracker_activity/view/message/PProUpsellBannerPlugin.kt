@@ -89,10 +89,6 @@ class PProUpsellBannerPlugin @Inject constructor(
         startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
     }
 
-    private suspend fun Subscriptions.isUpsellEligible(): Boolean {
-        return getAccessToken() == null && isEligible()
-    }
-
     companion object {
         internal const val PRIORITY_PPRO_UPSELL_BANNER = PRIORITY_ACTION_REQUIRED - 1
         private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_pro_android_apptp_banner"

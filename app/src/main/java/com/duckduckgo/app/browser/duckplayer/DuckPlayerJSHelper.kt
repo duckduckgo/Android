@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.duckplayer
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenDuckPlayerOverlayInfo
@@ -36,12 +35,11 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -212,15 +210,15 @@ class DuckPlayerJSHelper @Inject constructor(
             "openDuckPlayer" -> {
                 val openInNewTab = duckPlayer.shouldOpenDuckPlayerInNewTab() is On
                 return data?.getString("href")?.let {
-                    val newUrl = if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_AUTO).build()
+                    if (duckPlayer.getUserPreferences().privatePlayerMode == Enabled) {
+                        duckPlayer.setDuckPlayerOrigin(AUTO)
                     } else {
-                        it.toUri().buildUpon().appendQueryParameter(ORIGIN_QUERY_PARAM, ORIGIN_QUERY_PARAM_OVERLAY).build()
-                    }.toString()
+                        duckPlayer.setDuckPlayerOrigin(OVERLAY)
+                    }
                     if (openInNewTab && !isActiveCustomTab) {
-                        OpenInNewTab(newUrl, tabId)
+                        OpenInNewTab(it, tabId)
                     } else {
-                        Navigate(newUrl, mapOf())
+                        Navigate(it, mapOf())
                     }
                 }
             }

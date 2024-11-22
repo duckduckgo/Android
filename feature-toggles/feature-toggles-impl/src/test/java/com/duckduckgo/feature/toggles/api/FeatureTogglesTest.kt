@@ -22,7 +22,6 @@ import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
-import com.duckduckgo.feature.toggles.api.Toggle.State.Target
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
 import java.lang.IllegalStateException
 import kotlinx.coroutines.test.runTest
@@ -156,7 +155,7 @@ class FeatureTogglesTest {
         toggleStore.set(
             "test_forcesDefaultVariant",
             State(
-                targets = listOf(Target("na", localeCountry = null, localeLanguage = null)),
+                targets = listOf(State.Target("na", localeCountry = null, localeLanguage = null, null, null)),
             ),
         )
         assertNull(provider.variantKey)
@@ -428,7 +427,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target("ma", localeCountry = null, localeLanguage = null)),
+            targets = listOf(State.Target("ma", localeCountry = null, localeLanguage = null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -446,7 +445,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null)),
+            targets = listOf(State.Target(provider.variantKey!!, localeCountry = null, localeLanguage = null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -464,7 +463,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target("zz", localeCountry = null, localeLanguage = null)),
+            targets = listOf(State.Target("zz", localeCountry = null, localeLanguage = null, null, null)),
         )
 
         // Use directly the store because setRawStoredState() populates the local state when the remote state is null
@@ -491,8 +490,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                State.Target("mb", localeCountry = null, localeLanguage = null, null, null),
             ),
         )
 
@@ -512,8 +511,8 @@ class FeatureTogglesTest {
             remoteEnableState = null,
             enable = true,
             targets = listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null),
-                Toggle.State.Target("zz", localeCountry = null, localeLanguage = null),
+                State.Target("ma", localeCountry = null, localeLanguage = null, null, null),
+                State.Target("zz", localeCountry = null, localeLanguage = null, null, null),
             ),
         )
 
@@ -620,6 +619,10 @@ private class FakeFeatureTogglesCallback : FeatureTogglesCallback {
         this.cohortName = cohortName
         this.enrollmentDate = enrollmentDate
         times++
+    }
+
+    override fun matchesToggleTargets(targets: List<Any>): Boolean {
+        return true
     }
 }
 

@@ -35,6 +35,7 @@ class PProUpsellBannerPluginTest {
     @Test
     fun whenVPNIsDisabledAndUserNotEligibleToPProThenGetViewReturnsNull() = runTest {
         whenever(subscriptions.isEligible()).thenReturn(false)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
 
         val result = plugin.getView(context, VpnState(state = DISABLED)) {}
 
@@ -44,7 +45,7 @@ class PProUpsellBannerPluginTest {
     @Test
     fun whenVPNIsEnabledAndUserIsSubscriberToPProThenGetViewReturnsNull() = runTest {
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn("123")
+        whenever(subscriptions.isSignedIn()).thenReturn(true)
 
         val result = plugin.getView(context, VpnState(state = ENABLED)) {}
 
@@ -54,7 +55,7 @@ class PProUpsellBannerPluginTest {
     @Test
     fun whenBannerDismissedThenGetViewReturnsNull() = runTest {
         whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.isSignedIn()).thenReturn(false)
         vpnStore.dismissPproUpsellBanner()
 
         val result = plugin.getView(context, VpnState(state = ENABLED)) {}
