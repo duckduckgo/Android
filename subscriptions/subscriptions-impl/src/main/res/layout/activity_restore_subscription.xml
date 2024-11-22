@@ -62,29 +62,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <include
-                android:id="@+id/manageEmailCard"
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
                 android:layout_marginTop="@dimen/keyline_7"
-                layout="@layout/card_manage_email" />
+                app:primaryText="@string/restoreSubscriptionEmailTitle"
+                app:secondaryText="@string/restoreSubscriptionEmailDescription"
+                app:leadingIconSize="extra_large"
+                app:leadingIcon="@drawable/ic_privacy_pro_add_device_email" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/getStarted"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_5"
-                android:text="@string/restoreSubscriptionGooglePlayDescription"
-                app:textType="secondary"
-                app:typography="body2" />
+                app:primaryText="@string/restoreSubscriptionEmailGetStarted"
+                app:leadingIconSize="extra_large"
+                app:leadingIcon="@drawable/transparent" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-                android:id="@+id/googlePlay"
-                android:layout_width="wrap_content"
+<!--            <include-->
+<!--                android:id="@+id/manageEmailCard"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="?attr/selectableItemBackground"-->
+<!--                android:layout_marginTop="@dimen/keyline_7"-->
+<!--                layout="@layout/card_manage_email" />-->
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/keyline_2"
-                android:text="@string/restoreSubscriptionGooglePlayButton"
-                app:buttonSize="small" />
+                android:layout_marginTop="@dimen/keyline_7"
+                app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
+                app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
+                app:leadingIconSize="extra_large"
+                app:leadingIcon="@drawable/ic_privacy_pro_add_device_play_store" />
 
         </LinearLayout>
     </ScrollView>

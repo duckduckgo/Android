@@ -32,8 +32,8 @@
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
     <string name="purchaseRestored">Your purchases have been restored.</string>
     <string name="restoreSubscriptionTitle">Add your Privacy Pro subscription to this device</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Your subscription is automatically available in DuckDuckGo on any device signed in to your Google Play account.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Add via Google Play Account</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restore your subscription on Android devices using your Google Play account.</string>
     <string name="restoreSubscriptionEmailTitle">Add via Email</string>
     <string name="restoreSubscriptionEmailDescription">Link an email address to your subscription to add Privacy Pro to this device.</string>
     <string name="restoreSubscriptionEmailGetStarted">Get Started</string>

@@ -78,15 +78,15 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.googlePlay.setOnClickListener {
-            viewModel.restoreFromStore()
-        }
+        // binding.googlePlay.setOnClickListener {
+        //     viewModel.restoreFromStore()
+        // }
 
-        with(binding.manageEmailCard) {
-            emailCard.setOnClickListener {
-                viewModel.restoreFromEmail()
-            }
-        }
+        // with(binding.manageEmailCard) {
+        //     emailCard.setOnClickListener {
+        //         viewModel.restoreFromEmail()
+        //     }
+        // }
     }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
