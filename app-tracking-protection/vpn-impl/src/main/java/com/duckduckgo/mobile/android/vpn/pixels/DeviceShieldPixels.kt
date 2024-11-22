@@ -24,10 +24,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -414,6 +417,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportEnabled() {
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_ENABLE_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_DAILY)
+        tryToFireMonthlyPixel(DeviceShieldPixelNames.ATP_ENABLE_MONTHLY)
     }
 
     override fun reportDisabled() {
@@ -924,6 +928,45 @@ class RealDeviceShieldPixels @Inject constructor(
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
+            if (enqueue) {
+                this.pixel.enqueueFire(pixelName, payload)
+                    .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            } else {
+                this.pixel.fire(pixelName, payload)
+                    .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            }
+        }
+    }
+
+    private fun tryToFireMonthlyPixel(
+        pixel: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap(),
+    ) {
+        tryToFireMonthlyPixel(pixel.pixelName, payload, pixel.enqueue)
+    }
+
+    private fun tryToFireMonthlyPixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap(),
+        enqueue: Boolean = false,
+    ) {
+        fun isMoreThan28DaysApart(date1: String, date2: String): Boolean {
+            // Parse the strings into LocalDate objects
+            val firstDate = LocalDate.parse(date1)
+            val secondDate = LocalDate.parse(date2)
+
+            // Calculate the difference in days
+            val daysBetween = ChronoUnit.DAYS.between(firstDate, secondDate).absoluteValue
+
+            // Check if the difference is more than 28 days
+            return daysBetween > 28
+        }
+
+        val now = getUtcIsoLocalDate()
+        val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
+
+        // check if pixel was already sent in the current day
+        if (timestamp == null || isMoreThan28DaysApart(now, timestamp)) {
             if (enqueue) {
                 this.pixel.enqueueFire(pixelName, payload)
                     .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
