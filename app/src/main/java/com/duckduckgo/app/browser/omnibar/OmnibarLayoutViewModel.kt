@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
@@ -90,6 +91,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
         val hasFocus: Boolean = false,
+        val query: String = "",
         val omnibarText: String = "",
         val url: String = "",
         val expanded: Boolean = false,
@@ -171,6 +173,20 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
+                val shouldUpdateOmnibarText = it.viewMode is Browser
+                Timber.d("Omnibar: lost focus in Browser mode $shouldUpdateOmnibarText")
+                val omnibarText = if (shouldUpdateOmnibarText) {
+                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
+                        Timber.d("Omnibar: is DDG url, showing query ${it.query}")
+                        it.query
+                    } else {
+                        Timber.d("Omnibar: is url, showing URL ${it.url}")
+                        it.url
+                    }
+                } else {
+                    Timber.d("Omnibar: not browser mode, not changing omnibar text")
+                    it.omnibarText
+                }
                 it.copy(
                     hasFocus = false,
                     expanded = false,
@@ -187,6 +203,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                         urlLoaded = _viewState.value.url,
                     ),
                     shouldMoveCaretToStart = true,
+                    updateOmnibarText = shouldUpdateOmnibarText,
+                    omnibarText = omnibarText,
                 )
             }
         }
@@ -386,14 +404,30 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onInputStateChanged(
         query: String,
         hasFocus: Boolean,
+        clearQuery: Boolean,
     ) {
-        Timber.d("Omnibar: onInputStateChanged")
+        Timber.d("Omnibar: onInputStateChanged to $query clearQuery $clearQuery")
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
         _viewState.update {
+            val deletion = it.query.length == 1 && clearQuery
+            val shouldUpdateQuery = query.isNotBlank() && !clearQuery || deletion
+            val updatedQuery = if (shouldUpdateQuery) {
+                Timber.d("Omnibar: onInputStateChanged updating query to $query")
+                query
+            } else {
+                Timber.d("Omnibar: onInputStateChanged not updating query, stays as ${it.query}")
+                it.query
+            }
+            val omnibarText = if (deletion) {
+                it.url
+            } else {
+                query
+            }
             it.copy(
-                omnibarText = query,
+                query = updatedQuery,
+                omnibarText = omnibarText,
                 updateOmnibarText = false,
                 hasFocus = hasFocus,
                 showBrowserMenu = showControls,

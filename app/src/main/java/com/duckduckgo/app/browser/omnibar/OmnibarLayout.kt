@@ -296,11 +296,13 @@ class OmnibarLayout @JvmOverloads constructor(
 
         omnibarTextInput.replaceTextChangedListener(
             object : TextChangedWatcher() {
+                var clearQuery = true
                 override fun afterTextChanged(editable: Editable) {
                     if (isAttachedToWindow) {
                         viewModel.onInputStateChanged(
                             omnibarTextInput.text.toString(),
                             omnibarTextInput.hasFocus(),
+                            clearQuery,
                         )
                     }
                     omnibarTextListener?.onOmnibarTextChanged(
@@ -309,6 +311,11 @@ class OmnibarLayout @JvmOverloads constructor(
                             omnibarTextInput.hasFocus(),
                         ),
                     )
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                    Timber.d("Omnibar: $count characters beginning at $start are about to be replaced by new text with length $after")
+                    clearQuery = start == 0 && after == 0
                 }
             },
         )
@@ -445,7 +452,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
-        Timber.d("Omnibar: render browserMode $viewState")
         renderOutline(viewState.hasFocus)
         if (viewState.updateOmnibarText) {
             omnibarTextInput.setText(viewState.omnibarText)

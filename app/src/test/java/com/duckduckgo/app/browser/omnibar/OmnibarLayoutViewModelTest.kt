@@ -627,7 +627,7 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryEmptyThenViewStateCorrect() = runTest {
         val query = ""
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus)
+        testee.onInputStateChanged(query, hasFocus, shouldUpdate)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -645,7 +645,7 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryNotEmptyThenViewStateCorrect() = runTest {
         val query = "query"
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus)
+        testee.onInputStateChanged(query, hasFocus, shouldUpdate)
 
         testee.viewState.test {
             val viewState = awaitItem()
