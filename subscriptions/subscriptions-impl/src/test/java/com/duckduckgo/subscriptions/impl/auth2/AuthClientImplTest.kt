@@ -252,4 +252,16 @@ class AuthClientImplTest {
             assertEquals(400, e.code())
         }
     }
+
+    @Test
+    fun `when logout error then does not throw any exception`() = runTest {
+        val errorResponse = Response.error<Unit>(
+            400,
+            "{}".toResponseBody("application/json".toMediaTypeOrNull()),
+        )
+
+        whenever(authService.logout(any())).thenThrow(HttpException(errorResponse))
+
+        authClient.tryLogout("fake v2 access token")
+    }
 }

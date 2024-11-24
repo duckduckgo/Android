@@ -327,6 +327,9 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun signOut() {
+        authRepository.getAccessTokenV2()?.run {
+            coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
+        }
         authRepository.setAccessTokenV2(null)
         authRepository.setRefreshTokenV2(null)
         authRepository.setAuthToken(null)

@@ -65,6 +65,9 @@ interface AuthService {
         @Header("Authorization") authorization: String,
         @Header("Cookie") cookie: String,
     ): Response<Unit>
+
+    @POST("https://quack.duckduckgo.com/api/auth/v2/logout")
+    suspend fun logout(@Header("Authorization") authorization: String)
 }
 
 data class TokensResponse(

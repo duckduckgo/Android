@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.logcat
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -95,6 +96,14 @@ interface AuthClient {
         accessTokenV1: String,
         sessionId: String,
     ): String
+
+    /**
+     * Invalidates the current access token + refresh token pair based on the access token provided.
+     * This is meant to work on a best-effort basis, so this method does not throw if the request fails.
+     *
+     * @param accessTokenV2 access token obtained from auth API v2
+     */
+    suspend fun tryLogout(accessTokenV2: String)
 }
 
 data class TokenPair(
@@ -205,6 +214,14 @@ class AuthClientImpl @Inject constructor(
             cookie = "ddg_auth_session_id=$sessionId",
         )
         return response.getAuthorizationCode()
+    }
+
+    override suspend fun tryLogout(accessTokenV2: String) {
+        try {
+            authService.logout(authorization = "Bearer $accessTokenV2")
+        } catch (e: Exception) {
+            logcat { "Logout request failed" }
+        }
     }
 
     private fun Response<Unit>.getAuthorizationCode(): String {
