@@ -25,7 +25,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
@@ -41,7 +40,7 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
-import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.LegacySettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -50,8 +49,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
-import com.duckduckgo.browser.api.ui.BrowserScreens.NewSettingsScreenNoParams
-import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.CheckListItem
@@ -66,6 +63,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -77,9 +75,9 @@ import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SettingsScreenNoParams::class, screenName = "settings")
-class SettingsActivity : DuckDuckGoActivity() {
+class LegacySettingsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: SettingsViewModel by bindViewModel()
+    private val viewModel: LegacySettingsViewModel by bindViewModel()
     private val binding: ActivitySettingsBinding by viewBinding()
 
     @Inject
@@ -129,11 +127,6 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (newSettingsFeature.self().isEnabled()) {
-            globalActivityStarter.start(this, NewSettingsScreenNoParams)
-            finish()
-        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -310,7 +303,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
+    private fun updateDefaultBrowserViewVisibility(it: LegacySettingsViewModel.ViewState) {
         with(viewsPrivacy.setAsDefaultBrowserSetting) {
             visibility = if (it.showDefaultBrowserSetting) {
                 if (it.isAppDefaultBrowser) {
@@ -446,7 +439,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun intent(context: Context): Intent {
-            return Intent(context, SettingsActivity::class.java)
+            return Intent(context, LegacySettingsActivity::class.java)
         }
     }
 }

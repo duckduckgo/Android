@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
-class SettingsViewModel @Inject constructor(
+class LegacySettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
@@ -222,7 +222,7 @@ class SettingsViewModel @Inject constructor(
             } else {
                 Command.LaunchEmailProtectionNotSupported
             }
-            this@SettingsViewModel.command.send(command)
+            this@LegacySettingsViewModel.command.send(command)
         }
         pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
