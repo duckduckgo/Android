@@ -70,7 +70,7 @@
                 app:secondaryText="@string/restoreSubscriptionEmailDescription"
                 app:leadingIcon="@drawable/ic_email_yellow90_16"
                 app:leadingIconBackground="circular"
-                app:leadingIconBackgroundColor="@color/yellow20" />
+                app:leadingIconBackgroundResource="@drawable/list_item_image_circular_background_yellow20" />
 
             <LinearLayout
                 android:layout_width="match_parent"

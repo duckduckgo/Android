@@ -82,29 +82,28 @@ class OneLineListItem @JvmOverloads constructor(
                 setLeadingIconVisibility(false)
             }
 
-            val leadingIconBackground = if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
-                ImageBackground.from(
-                    getInt(
-                        R.styleable.OneLineListItem_leadingIconBackground,
-                        0,
-                    ),
-                )
-            } else {
-                ImageBackground.None
-            }
-
-            val leadingIconBackgroundColor = getInt(
-                R.styleable.OneLineListItem_leadingIconBackgroundColor,
-                0,
-            )
-
             val leadingIconSize = if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {
                 LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
             } else {
                 Medium
             }
 
-            setLeadingIconSize(leadingIconSize, leadingIconBackground, leadingIconBackgroundColor)
+            if (hasValue(R.styleable.OneLineListItem_leadingIconBackgroundResource)) {
+                val backgroundResource = getDrawable(R.styleable.OneLineListItem_leadingIconBackgroundResource)
+                setLeadingIconSize(leadingIconSize, backgroundResource)
+            } else {
+                val leadingIconBackgroundType = if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
+                    ImageBackground.from(
+                        getInt(
+                            R.styleable.OneLineListItem_leadingIconBackground,
+                            0,
+                        ),
+                    )
+                } else {
+                    ImageBackground.None
+                }
+                setLeadingIconSize(leadingIconSize, leadingIconBackgroundType)
+            }
 
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.OneLineListItem_showSwitch, false)

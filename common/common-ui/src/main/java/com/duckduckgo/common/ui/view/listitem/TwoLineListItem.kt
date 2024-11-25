@@ -88,29 +88,28 @@ class TwoLineListItem @JvmOverloads constructor(
                 hideLeadingItems()
             }
 
-            val leadingIconBackground = if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
-                ImageBackground.from(
-                    getInt(
-                        R.styleable.TwoLineListItem_leadingIconBackground,
-                        0,
-                    ),
-                )
-            } else {
-                ImageBackground.None
-            }
-
-            val leadingIconBackgroundColor = getInt(
-                R.styleable.TwoLineListItem_leadingIconBackgroundColor,
-                0,
-            )
-
             val leadingIconSize = if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
                 LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
             } else {
                 Medium
             }
 
-            setLeadingIconSize(leadingIconSize, leadingIconBackground, leadingIconBackgroundColor)
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconBackgroundResource)) {
+                val backgroundResource = getDrawable(R.styleable.TwoLineListItem_leadingIconBackgroundResource)
+                setLeadingIconSize(leadingIconSize, backgroundResource)
+            } else {
+                val leadingIconBackgroundType = if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
+                    ImageBackground.from(
+                        getInt(
+                            R.styleable.TwoLineListItem_leadingIconBackground,
+                            0,
+                        ),
+                    )
+                } else {
+                    ImageBackground.None
+                }
+                setLeadingIconSize(leadingIconSize, leadingIconBackgroundType)
+            }
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))

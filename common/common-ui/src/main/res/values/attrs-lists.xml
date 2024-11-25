@@ -36,6 +36,7 @@
     <attr name="showBetaPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
+    <attr name="leadingIconBackgroundResource" format="integer"/>
     <attr name="leadingIconBackground">
         <!-- No background. -->
         <enum name="none" value="0" />
@@ -69,8 +70,8 @@
         <attr name="primaryTextColorOverlay"/>
         <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackgroundResource"/>
         <attr name="leadingIconBackground"/>
-        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showSwitch"/>
@@ -85,8 +86,8 @@
         <attr name="secondaryText"/>
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackgroundResource"/>
         <attr name="leadingIconBackground"/>
-        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>

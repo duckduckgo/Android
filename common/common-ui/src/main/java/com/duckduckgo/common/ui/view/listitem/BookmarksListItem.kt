@@ -99,6 +99,8 @@ class BookmarksListItem @JvmOverloads constructor(
                 hideLeadingItems()
             }
 
+            // todo update this as well?
+
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
                 val type = ImageBackground.from(
                     getInt(

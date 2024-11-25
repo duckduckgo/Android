@@ -18,15 +18,12 @@ package com.duckduckgo.common.ui.view.listitem
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -146,29 +143,39 @@ abstract class DaxListItem(
     /** Sets the leading icon size and the background type
      * The need to be set together because the size of the leading background container
      * depends on the size of the image
-     *
-     * @param backgroundColorInt tints the background shape with the provided color. If color value equals 0, defaults to base icon colors.
      */
-    fun setLeadingIconSize(imageSize: LeadingIconSize, type: ImageBackground, @ColorInt backgroundColorInt: Int) {
+    fun setLeadingIconSize(imageSize: LeadingIconSize, type: ImageBackground) {
         val iconSize = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
         val backgroundSize = if (type == ImageBackground.None) {
             iconSize
         } else {
             resources.getDimensionPixelSize(R.dimen.listItemImageContainerSize)
         }
+        val backgroundResource = ImageBackground.background(type)
+        val drawable = ContextCompat.getDrawable(context, backgroundResource)
 
+        setLeadingIconSize(iconSize, backgroundSize, drawable)
+    }
+
+    /** Sets the leading icon size and the background type
+     * The need to be set together because the size of the leading background container
+     * depends on the size of the image
+     */
+    fun setLeadingIconSize(imageSize: LeadingIconSize, backgroundResourceDrawable: Drawable?) {
+        val iconSize = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+        val backgroundSize = resources.getDimensionPixelSize(R.dimen.listItemImageContainerSize)
+
+        setLeadingIconSize(iconSize, backgroundSize, backgroundResourceDrawable)
+    }
+
+    private fun setLeadingIconSize(iconSize: Int, backgroundSize: Int, backgroundResourceDrawable: Drawable?) {
         leadingIcon.layoutParams.width = iconSize
         leadingIcon.layoutParams.height = iconSize
 
-        ContextCompat.getDrawable(context, ImageBackground.background(type))?.let { backgroundDrawable ->
-            if (backgroundColorInt != 0) {
-                backgroundDrawable.mutate()
-                backgroundDrawable.colorFilter = PorterDuffColorFilter(backgroundColorInt, PorterDuff.Mode.SRC)
-            }
-            leadingIconContainer.background = backgroundDrawable
-        }
         leadingIconContainer.layoutParams.width = backgroundSize
         leadingIconContainer.layoutParams.height = backgroundSize
+
+        leadingIconContainer.background = backgroundResourceDrawable
     }
 
     /** Returns the binding of the leading icon */
