@@ -70,6 +70,7 @@
         <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showSwitch"/>
@@ -85,6 +86,7 @@
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>

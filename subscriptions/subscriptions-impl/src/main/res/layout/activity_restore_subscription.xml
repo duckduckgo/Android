@@ -69,7 +69,8 @@
                 app:primaryText="@string/restoreSubscriptionEmailTitle"
                 app:secondaryText="@string/restoreSubscriptionEmailDescription"
                 app:leadingIcon="@drawable/ic_email_yellow90_16"
-                app:leadingIconBackground="circular" />
+                app:leadingIconBackground="circular"
+                app:leadingIconBackgroundColor="@color/yellow20" />
 
             <LinearLayout
                 android:layout_width="match_parent"

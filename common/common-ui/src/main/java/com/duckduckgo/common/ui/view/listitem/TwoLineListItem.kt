@@ -99,13 +99,18 @@ class TwoLineListItem @JvmOverloads constructor(
                 ImageBackground.None
             }
 
+            val leadingIconBackgroundColor = getInt(
+                R.styleable.TwoLineListItem_leadingIconBackgroundColor,
+                0,
+            )
+
             val leadingIconSize = if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
                 LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
             } else {
                 Medium
             }
 
-            setLeadingIconSize(leadingIconSize, leadingIconBackground)
+            setLeadingIconSize(leadingIconSize, leadingIconBackground, leadingIconBackgroundColor)
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
