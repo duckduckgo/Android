@@ -22,14 +22,28 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.NewSettingsFeature
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SettingsScreenNoParams::class, screenName = "settings")
 class SettingsActivity : DuckDuckGoActivity() {
 
+    @Inject
+    lateinit var newSettingsFeature: NewSettingsFeature
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (newSettingsFeature.self().isEnabled()) {
+            startActivity(NewSettingsActivity.intent(this))
+        } else {
+            startActivity(LegacySettingsActivity.intent(this))
+        }
+        finish()
+    }
 
     companion object {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
