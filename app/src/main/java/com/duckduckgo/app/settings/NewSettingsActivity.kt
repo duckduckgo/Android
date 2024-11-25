@@ -40,7 +40,7 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
-import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -77,7 +77,7 @@ import timber.log.Timber
 @ContributeToActivityStarter(NewSettingsScreenNoParams::class, screenName = "newSettings")
 class NewSettingsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: SettingsViewModel by bindViewModel()
+    private val viewModel: NewSettingsViewModel by bindViewModel()
     private val binding: ActivitySettingsNewBinding by viewBinding()
 
     @Inject
@@ -302,7 +302,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
+    private fun updateDefaultBrowserViewVisibility(it: NewSettingsViewModel.ViewState) {
         with(viewsPrivacy.setAsDefaultBrowserSetting) {
             visibility = if (it.showDefaultBrowserSetting) {
                 if (it.isAppDefaultBrowser) {
