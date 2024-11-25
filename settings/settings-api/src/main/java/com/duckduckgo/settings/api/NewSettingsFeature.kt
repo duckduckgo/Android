@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.settings.api
+
+import com.duckduckgo.feature.toggles.api.Toggle
+
+interface NewSettingsFeature {
+
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }
-
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    /* Temporary while developing new settings screen */
-    implementation project(':feature-toggles-api')
-
-    implementation project(':navigation-api')
-    implementation Google.dagger
-    implementation AndroidX.core.ktx
-}
-
-android {
-    namespace 'com.duckduckgo.settings.api'
-}
-
