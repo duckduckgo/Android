@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Du kannst das Speichern von Passwörtern jederzeit deaktivieren.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Einstellungen öffnen</string>
+
+    <string name="newTabPageShortcutPasswords">Passwörter</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Google-Passwörter importieren</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d Passwörter von Google importiert</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d Passwörter aus CSV importiert</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Passwörter von Google importieren</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Passwörter von Google importieren</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-Passwörter synchronisieren</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-Passwörter synchronisieren</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Google-Passwörter importieren</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Google-Passwörter öffnen</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">CSV-Datei wählen</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Aus Desktop-Browser importieren</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">In DuckDuckGo importieren</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import abgeschlossen</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Verstanden</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Passwortimport fehlgeschlagen</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Übersprungen (doppelt oder ungültig): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passwörter importiert: ** **<b>%1$d</b>]]></string>
+
 </resources>
