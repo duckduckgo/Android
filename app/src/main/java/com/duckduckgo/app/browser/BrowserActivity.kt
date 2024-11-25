@@ -30,7 +30,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.core.view.postDelayed
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -67,7 +66,6 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -214,6 +212,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+
+        // lifecycleScope.launch {
+        //     repeat(100) {
+        //         viewModel.onOpenInNewTabRequested("cnn.com")
+        //         kotlinx.coroutines.delay(1000)
+        //     }
+        // }
     }
 
     override fun onStop() {
@@ -693,11 +698,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val newInstanceState: Bundle?,
     )
 
-    private fun updateTabs(entities: List<TabEntity>) {
+    private fun updateTabs(tabIds: List<String>) {
         val recyclerView = tabPager.getChildAt(0) as RecyclerView
         val state = recyclerView.layoutManager?.onSaveInstanceState()
         recyclerView.itemAnimator = null
-        tabManager.onTabsUpdated(entities)
+        tabManager.onTabsUpdated(tabIds)
         recyclerView.layoutManager?.onRestoreInstanceState(state)
     }
 }

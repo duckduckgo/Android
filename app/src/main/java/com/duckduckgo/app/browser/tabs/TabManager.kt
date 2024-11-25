@@ -29,7 +29,7 @@ interface TabManager {
     val tabPagerAdapter: TabPagerAdapter
 
     fun onSelectedTabChanged(tab: TabEntity?)
-    fun onTabsUpdated(updatedTabs: List<TabEntity>)
+    fun onTabsUpdated(updatedTabIds: List<String>)
 
     fun openMessageInNewTab(message: Message, sourceTabId: String?)
     fun openExistingTab(tabId: String)

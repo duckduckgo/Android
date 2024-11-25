@@ -20,16 +20,15 @@ import android.content.Intent
 import android.os.Message
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.tabs.model.TabEntity
-import timber.log.Timber
 
 class TabPagerAdapter(
-    lifecycle: Lifecycle,
+    lifecycleOwner: LifecycleOwner,
     private val fragmentManager: FragmentManager,
     private val activityIntent: Intent?,
     private val moveToTabIndex: (Int, Boolean) -> Unit,
@@ -40,7 +39,7 @@ class TabPagerAdapter(
     private val onTabSelected: (String) -> Unit,
     private val getOffScreenPageLimit: () -> Int,
     private val setOffScreenPageLimit: (Int) -> Unit,
-) : FragmentStateAdapter(fragmentManager, lifecycle) {
+) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle) {
     private val tabIds = mutableListOf<String>()
     private var messageForNewFragment: Message? = null
 
@@ -73,7 +72,10 @@ class TabPagerAdapter(
                 this.messageFromPreviousTab = message
             }
         } else {
-            return BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+            val existingFragment = fragmentManager.fragments
+                .filterIsInstance<BrowserTabFragment>()
+                .firstOrNull { it.tabId == tab.tabId }
+            return existingFragment ?: BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
         }
     }
 
@@ -81,36 +83,53 @@ class TabPagerAdapter(
         messageForNewFragment = message
     }
 
+    // var waiting = false
+    // fun onTabsUpdated(newTabs: List<String>) = lifecycleOwner.lifecycleScope.launch {
+    //     fun updateTabs(tabs: List<String>, selectedId: String?) {
+    //         val diffUtil = PagerDiffUtil(tabIds, tabs)
+    //         val diff = DiffUtil.calculateDiff(diffUtil)
+    //         tabIds.clear()
+    //         tabIds.addAll(tabs)
+    //         diff.dispatchUpdatesTo(this@TabPagerAdapter)
+    //
+    //         if (selectedId != null) {
+    //             onSelectedTabChanged(selectedId)
+    //         }
+    //     }
+    //
+    //     if (tabIds != newTabs && !waiting) {
+    //         val selectedId = getSelectedTabId()
+    //         if (tabIds.isEmpty() && selectedId != null) {
+    //             updateTabs(listOf(selectedId), selectedId)
+    //             waiting = true
+    //             delay(5000)
+    //         }
+    //         updateTabs(newTabs, selectedId)
+    //         waiting = false
+    //     }
+    // }
+
     fun onTabsUpdated(newTabs: List<String>) {
-        if (tabIds != newTabs) {
-            Timber.i("$$$ oldIds: ${tabIds.joinToString(",")}")
-            Timber.i("$$$ newIds: ${newTabs.joinToString(",")}")
+        val diffUtil = PagerDiffUtil(tabIds, newTabs)
+        val diff = DiffUtil.calculateDiff(diffUtil)
+        tabIds.clear()
+        tabIds.addAll(newTabs)
+        diff.dispatchUpdatesTo(this)
 
-            val diffUtil = PagerDiffUtil(tabIds, newTabs)
-            val diff = DiffUtil.calculateDiff(diffUtil)
-            tabIds.clear()
-            tabIds.addAll(newTabs)
-            diff.dispatchUpdatesTo(this)
-
-            getSelectedTabId()?.let {
-                onSelectedTabChanged(it)
-            }
+        getSelectedTabId()?.let { selectedId ->
+            onSelectedTabChanged(selectedId)
         }
     }
 
     fun onSelectedTabChanged(tabId: String) {
         val selectedTabIndex = tabIds.indexOfFirst { it == tabId }
-        Timber.i("$$$ onSelectedTabChanged: selectedTabIndex $selectedTabIndex; currentTabIndex ${getCurrentTabIndex()}")
         if (selectedTabIndex != -1 && selectedTabIndex != getCurrentTabIndex()) {
-            Timber.i("$$$ onSelectedTabChanged:tabIds ${tabIds.joinToString(",")}")
-            Timber.i("$$$ onSelectedTabChanged: moving to index $selectedTabIndex ($tabId)")
             moveToTabIndex(selectedTabIndex, false)
         }
     }
 
     fun onPageChanged(position: Int) {
         if (position < tabIds.size) {
-            Timber.i("$$$ onPageChanged: moving to position $position (${tabIds[position]})")
             onTabSelected(tabIds[position])
         }
     }

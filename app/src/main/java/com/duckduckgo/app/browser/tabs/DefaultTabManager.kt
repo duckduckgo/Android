@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.SwipingTabsFeature
 import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -33,6 +34,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -43,23 +45,27 @@ class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
     private val swipingTabsFeature: SwipingTabsFeature,
     private val tabRepository: TabRepository,
+    private val dispatchers: DispatcherProvider,
 ) : TabManager {
     private val browserActivity = activity as BrowserActivity
     private val lastActiveTabs = TabList()
     private val supportFragmentManager = activity.supportFragmentManager
     private var openMessageInNewTabJob: Job? = null
 
+    private val keepSingleTab: Boolean
+        get() = !browserActivity.tabPager.isUserInputEnabled
+
     override val tabPagerAdapter by lazy {
         TabPagerAdapter(
             fragmentManager = supportFragmentManager,
-            lifecycle = browserActivity.lifecycle,
+            lifecycleOwner = browserActivity,
             activityIntent = browserActivity.intent,
             moveToTabIndex = { index, smoothScroll -> browserActivity.onMoveToTabRequested(index, smoothScroll) },
             getCurrentTabIndex = { browserActivity.tabPager.currentItem },
             getSelectedTabId = ::getSelectedTab,
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
-            onTabSelected = ::getTabById,
+            onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
             getOffScreenPageLimit = { browserActivity.tabPager.offscreenPageLimit },
         )
@@ -82,17 +88,26 @@ class DefaultTabManager @Inject constructor(
         if (tab != null) {
             if (swipingTabsFeature.self().isEnabled()) {
                 tabPagerAdapter.onSelectedTabChanged(tab.tabId)
+                if (keepSingleTab) {
+                    tabPagerAdapter.onTabsUpdated(listOf(tab.tabId))
+                }
             } else {
                 selectTab(tab)
             }
         }
     }
 
-    override fun onTabsUpdated(updatedTabs: List<TabEntity>) {
+    override fun onTabsUpdated(updatedTabIds: List<String>) {
         if (swipingTabsFeature.self().isEnabled()) {
-            tabPagerAdapter.onTabsUpdated(updatedTabs.map { it.tabId })
+            if (keepSingleTab) {
+                updatedTabIds.firstOrNull { it == getSelectedTab() }?.let {
+                    tabPagerAdapter.onTabsUpdated(listOf(it))
+                }
+            } else {
+                tabPagerAdapter.onTabsUpdated(updatedTabIds.map { it })
+            }
         } else {
-            clearStaleTabs(updatedTabs)
+            clearStaleTabs(updatedTabIds)
         }
     }
 
@@ -148,16 +163,27 @@ class DefaultTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
-    private fun requestNewTab(): TabEntity = runBlocking {
+    private fun requestNewTab(): TabEntity = runBlocking(dispatchers.io()) {
+        Timber.d("$$$ runBlocking requestNewTab")
         val tabId = browserActivity.viewModel.onNewTabRequested()
-        tabRepository.flowTabs.first().first { it.tabId == tabId }
+        return@runBlocking tabRepository.flowTabs.transformWhile { result ->
+            result.firstOrNull { it.tabId == tabId }?.let { entity ->
+                emit(entity)
+                Timber.d("$$$ requestNewTab: TAB FOUND")
+                return@transformWhile true
+            }
+            Timber.d("$$$ requestNewTab: TAB NOT FOUND")
+            return@transformWhile false
+        }.first()
     }
 
-    private fun getSelectedTab(): String? = runBlocking {
+    private fun getSelectedTab(): String? = runBlocking(dispatchers.io()) {
+        Timber.d("$$$ runBlocking getSelectedTab")
         tabRepository.flowSelectedTab.firstOrNull()?.tabId
     }
 
-    private fun getTabById(tabId: String): TabEntity? = runBlocking {
+    private fun getTabById(tabId: String): TabEntity? = runBlocking(dispatchers.io()) {
+        Timber.d("$$$ runBlocking getTabById")
         tabRepository.flowTabs.first().firstOrNull { it.tabId == tabId }
     }
 
@@ -223,7 +249,7 @@ class DefaultTabManager @Inject constructor(
         transaction.commit()
     }
 
-    private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
+    private fun clearStaleTabs(updatedTabs: List<String>?) {
         if (swipingTabsFeature.self().isEnabled()) {
             return
         }
@@ -234,7 +260,7 @@ class DefaultTabManager @Inject constructor(
 
         val stale = supportFragmentManager
             .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
+            .filter { fragment -> updatedTabs.none { it == fragment.tabId } }
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)

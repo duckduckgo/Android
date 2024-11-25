@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -112,7 +113,9 @@ class BrowserViewModel @Inject constructor(
 
     val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
 
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs.distinctUntilChanged()
+    val tabs: LiveData<List<String>> = tabRepository.liveTabs
+        .map { tabs -> tabs.map { tab -> tab.tabId } }
+        .distinctUntilChanged()
 
     val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
         .distinctUntilChanged()
