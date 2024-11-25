@@ -107,7 +107,7 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
-        val shouldShowPrivacyProCta = subscriptions.isEligible()
+        val shouldShowPrivacyProCta = subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
         return if (shouldShowPrivacyProCta) {
             arrayOf(
                 CtaId.DAX_INTRO,
@@ -365,7 +365,7 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun canShowPrivacyProCta(): Boolean {
         return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
-            subscriptions.isEligible()
+            subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
     }
 
     @WorkerThread
