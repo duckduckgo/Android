@@ -58,7 +58,7 @@
     <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
     <string name="privacyProFaq">Need help with Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
+    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
     <string name="subscriptionStatusSubscribed">Subscribed</string>
     <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
 
