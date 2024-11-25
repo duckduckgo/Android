@@ -49,7 +49,7 @@
                     android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_2"
                     android:layout_marginStart="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_5"
                     android:layout_marginBottom="@dimen/keyline_6"
@@ -65,27 +65,30 @@
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_7"
+                android:paddingVertical="@dimen/keyline_1"
                 app:primaryText="@string/restoreSubscriptionEmailTitle"
                 app:secondaryText="@string/restoreSubscriptionEmailDescription"
-                app:leadingIconSize="extra_large"
-                app:leadingIcon="@drawable/ic_privacy_pro_add_device_email" />
+                app:leadingIcon="@drawable/ic_email_yellow90_16"
+                app:leadingIconBackground="circular" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/getStarted"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/restoreSubscriptionEmailGetStarted"
-                app:leadingIconSize="extra_large"
-                app:leadingIcon="@drawable/transparent" />
+                android:orientation="horizontal">
 
-<!--            <include-->
-<!--                android:id="@+id/manageEmailCard"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:background="?attr/selectableItemBackground"-->
-<!--                android:layout_marginTop="@dimen/keyline_7"-->
-<!--                layout="@layout/card_manage_email" />-->
+                <Space
+                    android:layout_width="@dimen/listItemImageContainerSize"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/keyline_4" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/getStarted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/keyline_1"
+                    app:primaryText="@string/restoreSubscriptionEmailGetStarted" />
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
@@ -94,11 +97,30 @@
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_7"
+                android:paddingVertical="@dimen/keyline_1"
                 app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
                 app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
-                app:leadingIconSize="extra_large"
-                app:leadingIcon="@drawable/ic_privacy_pro_add_device_play_store" />
+                app:leadingIcon="@drawable/ic_platform_playstore_16"
+                app:leadingIconBackground="circular" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Space
+                    android:layout_width="@dimen/listItemImageContainerSize"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/keyline_4" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/restoreFromPlayStore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/keyline_1"
+                    app:primaryText="@string/restoreSubscriptionGooglePlayGetStarted" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

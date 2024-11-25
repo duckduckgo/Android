@@ -123,8 +123,10 @@
 
     <color name="purple50">#5132A9</color>
 
+    <color name="yellow90">#92540C</color>
     <color name="yellow50_14">#24FFCC33</color>
     <color name="yellow50">#FFCC33</color>
+    <color name="yellow20">#FFE8A3</color>
     <color name="yellow10">#FFF0C2</color>
 
     <color name="green50">#4CBA3C</color>
