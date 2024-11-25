@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-@file:Suppress("RemoveExplicitTypeArguments")
-
-package com.duckduckgo.app.tabs.model
+package com.duckduckgo.tabs.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -31,12 +29,18 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.test.blockingObserve
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.channels.Channel
@@ -44,11 +48,23 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class TabDataRepositoryTest {
 
     @get:Rule
@@ -206,6 +222,7 @@ class TabDataRepositoryTest {
         val existingTabs = listOf(tab0)
 
         whenever(mockDao.tabs()).thenReturn(existingTabs)
+        whenever(mockDao.lastTab()).thenReturn(existingTabs.last())
 
         testee.add("http://www.example.com")
 
@@ -468,7 +485,7 @@ class TabDataRepositoryTest {
     @Test
     fun getActiveTabCountReturnsCorrectCountWhenTabsYoungerThanSpecifiedDay() = runTest {
         // Arrange: No tabs in the repository
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(6))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(8))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(10))
@@ -497,7 +514,7 @@ class TabDataRepositoryTest {
     @Test
     fun getInactiveTabCountReturnsCorrectCountWhenAllTabsOlderThanSpecifiedDay() = runTest {
         // Arrange: Add some tabs with different last access times
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(8))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9))
@@ -514,7 +531,7 @@ class TabDataRepositoryTest {
     @Test
     fun getInactiveTabCountReturnsCorrectCountWhenAllTabsInactiveWithinRange() = runTest {
         // Arrange: Add some tabs with different last access times
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(8))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9))
@@ -531,7 +548,7 @@ class TabDataRepositoryTest {
     @Test
     fun getInactiveTabCountReturnsZeroWhenNoTabsInactiveWithinRange() = runTest {
         // Arrange: Add some tabs with different last access times
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(5))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(6))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(13))
@@ -548,7 +565,7 @@ class TabDataRepositoryTest {
     @Test
     fun getInactiveTabCountReturnsCorrectCountWhenSomeTabsInactiveWithinRange() = runTest {
         // Arrange: Add some tabs with different last access times
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(5))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
         val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(15))
@@ -572,6 +589,7 @@ class TabDataRepositoryTest {
         faviconManager: FaviconManager = mock(),
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
+        timeProvider: CurrentTimeProvider = FakeTimeProvider(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -588,6 +606,7 @@ class TabDataRepositoryTest {
             webViewPreviewPersister,
             faviconManager,
             tabSwitcherDataStore,
+            timeProvider,
             coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
         )
@@ -608,7 +627,19 @@ class TabDataRepositoryTest {
         return mockDao
     }
 
+    private fun now(): LocalDateTime {
+        return FakeTimeProvider().localDateTimeNow()
+    }
+
     companion object {
         const val TAB_ID = "abcd"
+    }
+
+    private class FakeTimeProvider : CurrentTimeProvider {
+        var currentTime: Instant = Instant.parse("2024-10-16T00:00:00.00Z")
+
+        override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
+        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun localDateTimeNow(): LocalDateTime = currentTime.atZone(ZoneOffset.UTC).toLocalDateTime()
     }
 }
