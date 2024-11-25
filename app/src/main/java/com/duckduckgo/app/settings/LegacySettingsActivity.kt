@@ -74,7 +74,6 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SettingsScreenNoParams::class, screenName = "settings")
 class LegacySettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: LegacySettingsViewModel by bindViewModel()
