@@ -77,7 +77,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
-    override val flowSelectedTab: Flow<TabEntity> = tabsDao.flowSelectedTab()
+    override val flowSelectedTab: Flow<TabEntity?> = tabsDao.flowSelectedTab()
 
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
@@ -330,7 +330,6 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
-            Timber.d("$$$ select(): Tab selected: $tabId")
         }
     }
 

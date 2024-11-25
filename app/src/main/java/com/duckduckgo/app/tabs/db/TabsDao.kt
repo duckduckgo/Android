@@ -41,7 +41,7 @@ abstract class TabsDao {
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
     @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
-    abstract fun flowSelectedTab(): Flow<TabEntity>
+    abstract fun flowSelectedTab(): Flow<TabEntity?>
 
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun tabs(): List<TabEntity>
