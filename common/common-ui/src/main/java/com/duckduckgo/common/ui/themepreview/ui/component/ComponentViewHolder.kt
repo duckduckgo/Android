@@ -384,6 +384,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class SettingsListItemComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_settings))
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -408,6 +411,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
                 Component.EXPANDABLE_LAYOUT -> ExpandableComponentViewHolder(parent)
+                Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
