@@ -27,55 +27,49 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingPrivacy" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/setAsDefaultBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsDefaultBrowserTitle"
-        app:secondaryText="@string/settingsDefaultBrowserNotSetDescription"/>
+        app:leadingIcon="@drawable/ic_default_browser_mobile_color_24"
+        app:primaryText="@string/settingsDefaultBrowserTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/privateSearchSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:itemState="enabled"
-        app:primaryText="@string/settingsPrivateSearchTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsPrivateSearchDescription" />
+        app:isOn="true"
+        app:leadingIcon="@drawable/ic_find_search_color_24"
+        app:primaryText="@string/settingsPrivateSearchTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/webTrackingProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:itemState="enabled"
-        app:primaryText="@string/settingsWebTrackingProtectionTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsWebTrackingProtectionDescription" />
+        app:isOn="true"
+        app:leadingIcon="@drawable/ic_shield_color_24"
+        app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/cookiePopupProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:itemState="enabled"
-        app:primaryText="@string/cookiePopupProtectionTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/cookiePopupProtectionDescription" />
+        app:leadingIcon="@drawable/ic_cookie_color_24"
+        app:primaryText="@string/cookiePopupProtectionTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
-        android:id="@+id/appTrackingProtectionSetting"
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+        android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/atp_SettingsTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled" />
+        app:leadingIcon="@drawable/ic_lock_color_24"
+        app:primaryText="@string/atp_SettingsTitle" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_email_protection_color_24"
         app:primaryText="@string/settingsEmailProtectionTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsEmailProtectionSubtitle"
         app:showBetaPill="true" />
 
 </LinearLayout>
