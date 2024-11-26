@@ -333,6 +333,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun getTab(tabId: String): TabEntity? {
+        return withContext(dispatchers.io()) { tabsDao.tab(tabId) }
+    }
+
     override fun updateTabFavicon(
         tabId: String,
         fileName: String?,

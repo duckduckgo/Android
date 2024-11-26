@@ -1172,7 +1172,7 @@ class BrowserTabFragment :
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible() && isActiveTab) {
+        if (fragmentIsVisible()) {
             viewModel.onViewVisible()
         }
 
@@ -1358,7 +1358,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.NewTab)
+        omnibar.setViewMode(ViewMode.NewTab)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1374,7 +1374,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Browser(viewModel.url))
+        omnibar.setViewMode(ViewMode.Browser(viewModel.url))
     }
 
     private fun showError(
@@ -1385,7 +1385,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Error)
+        omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1406,7 +1406,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.setViewMode(Omnibar.ViewMode.SSLWarning)
+        omnibar.setViewMode(ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->

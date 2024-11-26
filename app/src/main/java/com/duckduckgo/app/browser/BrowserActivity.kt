@@ -30,8 +30,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -73,6 +74,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -82,6 +84,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -160,9 +163,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
     private val onTabPageChangeListener = object : ViewPager2.OnPageChangeCallback() {
+        private var wasSwipingStarted = false
+
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            tabManager.tabPagerAdapter.onPageChanged(position)
+            Timber.d("### onPageChanged requested for: $position")
+            if (wasSwipingStarted) {
+                Timber.d("### onPageChanged: $position")
+                tabManager.tabPagerAdapter.onPageChanged(position)
+                wasSwipingStarted = false
+            }
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            super.onPageScrollStateChanged(state)
+            if (state == ViewPager2.SCROLL_STATE_DRAGGING) {
+                wasSwipingStarted = true
+            }
         }
     }
 
@@ -369,28 +386,29 @@ open class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         }
 
-        viewModel.selectedTab.observe(this) {
-            tabManager.onSelectedTabChanged(it)
+        lifecycleScope.launch {
+            viewModel.tabs.flowWithLifecycle(lifecycle).collectLatest {
+                tabManager.onTabsUpdated(it)
+                lifecycleScope.launch {
+                    viewModel.onTabsUpdated(it.isEmpty())
+                }
+            }
         }
 
-        viewModel.tabs.observe(this) {
-            updateTabs(it)
-
-            lifecycleScope.launch {
-                viewModel.onTabsUpdated(it.isEmpty())
+        lifecycleScope.launch {
+            viewModel.selectedTab.flowWithLifecycle(lifecycle).collectLatest {
+                tabManager.onSelectedTabChanged(it)
             }
         }
 
         // listen to onboarding completion to enable/disable swiping
         viewModel.isOnboardingCompleted.observe(this) { isOnboardingCompleted ->
-            binding.tabPager.isUserInputEnabled = isOnboardingCompleted
+            tabPager.isUserInputEnabled = isOnboardingCompleted
         }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
-        viewModel.selectedTab.removeObservers(this)
-        viewModel.tabs.removeObservers(this)
         viewModel.isOnboardingCompleted.removeObservers(this)
     }
 
@@ -576,15 +594,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @SuppressLint("ClickableViewAccessibility", "WrongConstant")
     private fun initializeTabs() {
         if (swipingTabsFeature.self().isEnabled()) {
-            binding.tabPager.adapter = tabManager.tabPagerAdapter
-            binding.tabPager.offscreenPageLimit = 1
-            binding.tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+            tabPager.adapter = tabManager.tabPagerAdapter
+            tabPager.offscreenPageLimit = 1
+            tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+            tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2).toPx().toInt()))
 
             binding.fragmentContainer.gone()
-            binding.tabPager.show()
+            tabPager.show()
         } else {
             binding.fragmentContainer.show()
-            binding.tabPager.gone()
+            tabPager.gone()
         }
     }
 
@@ -687,22 +706,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         playStoreUtils.launchPlayStore()
     }
 
-    fun onMoveToTabRequested(index: Int, smoothScroll: Boolean) {
-        binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
-        binding.tabPager.setCurrentItem(index, smoothScroll)
-        binding.tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+    fun onMoveToTabRequested(index: Int) {
+        Timber.d("### onMoveToTabRequested: $index")
+
+        tabPager.currentItem = index
     }
 
     private data class CombinedInstanceState(
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,
     )
-
-    private fun updateTabs(tabIds: List<String>) {
-        val recyclerView = tabPager.getChildAt(0) as RecyclerView
-        val state = recyclerView.layoutManager?.onSaveInstanceState()
-        recyclerView.itemAnimator = null
-        tabManager.onTabsUpdated(tabIds)
-        recyclerView.layoutManager?.onRestoreInstanceState(state)
-    }
 }

@@ -33,7 +33,6 @@ import dagger.android.DaggerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -60,9 +59,8 @@ class DefaultTabManager @Inject constructor(
             fragmentManager = supportFragmentManager,
             lifecycleOwner = browserActivity,
             activityIntent = browserActivity.intent,
-            moveToTabIndex = { index, smoothScroll -> browserActivity.onMoveToTabRequested(index, smoothScroll) },
-            getCurrentTabIndex = { browserActivity.tabPager.currentItem },
-            getSelectedTabId = ::getSelectedTab,
+            moveToTabIndex = { index -> browserActivity.onMoveToTabRequested(index) },
+            getSelectedTabId = ::getSelectedTabId,
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
@@ -84,27 +82,27 @@ class DefaultTabManager @Inject constructor(
             _currentTab = value
         }
 
-    override fun onSelectedTabChanged(tab: TabEntity?) {
-        if (tab != null) {
-            if (swipingTabsFeature.self().isEnabled()) {
-                tabPagerAdapter.onSelectedTabChanged(tab.tabId)
-                if (keepSingleTab) {
-                    tabPagerAdapter.onTabsUpdated(listOf(tab.tabId))
-                }
-            } else {
-                selectTab(tab)
+    override fun onSelectedTabChanged(tabId: String) {
+        if (swipingTabsFeature.self().isEnabled()) {
+            Timber.d("### TabManager.onSelectedTabChanged: $tabId")
+            tabPagerAdapter.onSelectedTabChanged(tabId)
+            if (keepSingleTab) {
+                tabPagerAdapter.onTabsUpdated(listOf(tabId))
             }
+        } else {
+            selectTab(tabId)
         }
     }
 
     override fun onTabsUpdated(updatedTabIds: List<String>) {
+        Timber.d("### TabManager.onTabsUpdated: $updatedTabIds")
         if (swipingTabsFeature.self().isEnabled()) {
             if (keepSingleTab) {
-                updatedTabIds.firstOrNull { it == getSelectedTab() }?.let {
+                updatedTabIds.firstOrNull { it == getSelectedTabId() }?.let {
                     tabPagerAdapter.onTabsUpdated(listOf(it))
                 }
             } else {
-                tabPagerAdapter.onTabsUpdated(updatedTabIds.map { it })
+                tabPagerAdapter.onTabsUpdated(updatedTabIds)
             }
         } else {
             clearStaleTabs(updatedTabIds)
@@ -164,58 +162,53 @@ class DefaultTabManager @Inject constructor(
     }
 
     private fun requestNewTab(): TabEntity = runBlocking(dispatchers.io()) {
-        Timber.d("$$$ runBlocking requestNewTab")
         val tabId = browserActivity.viewModel.onNewTabRequested()
         return@runBlocking tabRepository.flowTabs.transformWhile { result ->
             result.firstOrNull { it.tabId == tabId }?.let { entity ->
                 emit(entity)
-                Timber.d("$$$ requestNewTab: TAB FOUND")
                 return@transformWhile true
             }
-            Timber.d("$$$ requestNewTab: TAB NOT FOUND")
             return@transformWhile false
         }.first()
     }
 
-    private fun getSelectedTab(): String? = runBlocking(dispatchers.io()) {
-        Timber.d("$$$ runBlocking getSelectedTab")
-        tabRepository.flowSelectedTab.firstOrNull()?.tabId
+    private fun getSelectedTabId(): String? = runBlocking {
+        tabRepository.getSelectedTab()?.tabId
     }
 
-    private fun getTabById(tabId: String): TabEntity? = runBlocking(dispatchers.io()) {
-        Timber.d("$$$ runBlocking getTabById")
-        tabRepository.flowTabs.first().firstOrNull { it.tabId == tabId }
+    private fun getTabById(tabId: String): TabEntity? = runBlocking {
+        tabRepository.getTab(tabId)
     }
 
-    private fun selectTab(tab: TabEntity) {
-        Timber.v("Select tab: $tab")
+    private fun selectTab(tabId: String) = browserActivity.lifecycleScope.launch {
+        if (tabId != currentTab?.tabId) {
+            lastActiveTabs.add(tabId)
 
-        if (tab.tabId == currentTab?.tabId) return
+            browserActivity.viewModel.onTabActivated(tabId)
 
-        lastActiveTabs.add(tab.tabId)
-
-        browserActivity.viewModel.onTabActivated(tab.tabId)
-
-        val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
-        if (fragment == null) {
-            openNewTab(
-                tabId = tab.tabId,
-                url = tab.url,
-                skipHome = tab.skipHome,
-                isExternal = browserActivity.intent?.getBooleanExtra(
-                    BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
-                    false,
-                ) == true,
-            )
-            return
+            val fragment = supportFragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
+            if (fragment == null) {
+                tabRepository.getTab(tabId)?.let { tab ->
+                    openNewTab(
+                        tabId = tab.tabId,
+                        url = tab.url,
+                        skipHome = tab.skipHome,
+                        isExternal = browserActivity.intent?.getBooleanExtra(
+                            BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
+                            false,
+                        ) == true,
+                    )
+                }
+                return@launch
+            }
+            val transaction = supportFragmentManager.beginTransaction()
+            currentTab?.let {
+                transaction.hide(it)
+            }
+            transaction.show(fragment)
+            transaction.commit()
+            currentTab = fragment
         }
-        val transaction = supportFragmentManager.beginTransaction()
-        currentTab?.let {
-            transaction.hide(it)
-        }
-        transaction.show(fragment)
-        transaction.commit()
-        currentTab = fragment
     }
 
     private fun openNewTab(

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.tabs.model.TabEntity
 
 interface TabManager {
     companion object {
@@ -28,7 +27,7 @@ interface TabManager {
     var currentTab: BrowserTabFragment?
     val tabPagerAdapter: TabPagerAdapter
 
-    fun onSelectedTabChanged(tab: TabEntity?)
+    fun onSelectedTabChanged(tabId: String)
     fun onTabsUpdated(updatedTabIds: List<String>)
 
     fun openMessageInNewTab(message: Message, sourceTabId: String?)

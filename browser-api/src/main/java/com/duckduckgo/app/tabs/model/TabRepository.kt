@@ -101,6 +101,8 @@ interface TabRepository {
 
     suspend fun select(tabId: String)
 
+    suspend fun getTab(tabId: String): TabEntity?
+
     fun updateTabPreviewImage(
         tabId: String,
         fileName: String?,

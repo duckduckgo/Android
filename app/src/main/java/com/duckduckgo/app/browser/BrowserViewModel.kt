@@ -21,8 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -53,7 +51,6 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -63,7 +60,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -111,10 +111,14 @@ class BrowserViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    val selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab.distinctUntilChanged()
+    val selectedTab: Flow<String> = tabRepository.flowSelectedTab
+        .map { tab -> tab?.tabId }
+        .filterNotNull()
+        .distinctUntilChanged()
 
-    val tabs: LiveData<List<String>> = tabRepository.liveTabs
+    val tabs: Flow<List<String>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> tab.tabId } }
+        .filterNot { it.isEmpty() }
         .distinctUntilChanged()
 
     val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
