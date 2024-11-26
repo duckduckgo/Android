@@ -245,7 +245,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
                     subscriptionOptions = SubscriptionOptionsJson(
                         options = listOf(yearlyJson, monthlyJson),
-                        features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
+                        features = offer.features.map(::FeatureJson),
                     )
                 }
             }

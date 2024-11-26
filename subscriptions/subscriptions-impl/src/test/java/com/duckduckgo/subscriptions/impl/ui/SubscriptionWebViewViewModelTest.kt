@@ -204,6 +204,7 @@ class SubscriptionWebViewViewModelTest {
                 monthlyFormattedPrice = "$1",
                 yearlyPlanId = "yearly",
                 yearlyFormattedPrice = "$10",
+                features = setOf(SubscriptionsConstants.NETP),
             ),
         )
 
@@ -252,6 +253,7 @@ class SubscriptionWebViewViewModelTest {
                 monthlyFormattedPrice = "$1",
                 yearlyPlanId = "yearly",
                 yearlyFormattedPrice = "$10",
+                features = setOf(SubscriptionsConstants.NETP),
             ),
         )
 
