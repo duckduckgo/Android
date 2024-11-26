@@ -627,7 +627,8 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryEmptyThenViewStateCorrect() = runTest {
         val query = ""
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus, shouldUpdate)
+        val clearQuery = true
+        testee.onInputStateChanged(query, hasFocus, clearQuery)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -645,7 +646,8 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryNotEmptyThenViewStateCorrect() = runTest {
         val query = "query"
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus, shouldUpdate)
+        val clearQuery = true
+        testee.onInputStateChanged(query, hasFocus, clearQuery)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -824,6 +826,32 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun whenClearingInputWhileInSiteThenURLisShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        val hasFocus = true
+        val clearQuery = true
+        testee.onInputStateChanged("", hasFocus, clearQuery)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun whenClearingInputWhileInSERPThenURLisShown() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val hasFocus = true
+        val clearQuery = true
+        testee.onInputStateChanged("", hasFocus, clearQuery)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == SERP_URL)
         }
     }
 
