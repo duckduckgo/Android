@@ -31,13 +31,14 @@ class StatusIndicator @JvmOverloads constructor(
     private val binding: ViewStatusIndicatorBinding by viewBinding()
 
     fun setStatus(isOn: Boolean) {
-        if(isOn) {
+        if (isOn) {
             binding.icon.isEnabled = true
             // TODO copy changes
             binding.label.text = "On"
         } else {
             binding.icon.isEnabled = false
             // TODO copy changes
-            binding.label.text = "Off"        }
+            binding.label.text = "Off"
+        }
     }
 }
