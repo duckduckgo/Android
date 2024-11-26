@@ -832,6 +832,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenClearingInputWhileInSiteThenURLisShown() = runTest {
         givenSiteLoaded(RANDOM_URL)
+        testee.onClearTextButtonPressed()
         val hasFocus = true
         val clearQuery = true
         testee.onInputStateChanged("", hasFocus, clearQuery)
@@ -845,6 +846,9 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenClearingInputWhileInSERPThenURLisShown() = runTest {
         givenSiteLoaded(SERP_URL)
+
+        testee.onClearTextButtonPressed()
+
         val hasFocus = true
         val clearQuery = true
         testee.onInputStateChanged("", hasFocus, clearQuery)
