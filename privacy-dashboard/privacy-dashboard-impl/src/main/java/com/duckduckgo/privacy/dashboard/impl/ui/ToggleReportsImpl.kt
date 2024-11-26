@@ -34,15 +34,9 @@ class ToggleReportsImpl @Inject constructor(
 
     override suspend fun onPromptDismissed() {
         toggleReportsDataStore.insertTogglePromptDismiss()
-        toggleReportsDataStore.setLastPromptWasAccepted(false)
     }
 
     override suspend fun onReportSent() {
         toggleReportsDataStore.insertTogglePromptSend()
-        toggleReportsDataStore.setLastPromptWasAccepted(true)
-    }
-
-    override suspend fun lastPromptAccepted(): Boolean {
-        return toggleReportsDataStore.lastPromptWasAccepted()
     }
 }

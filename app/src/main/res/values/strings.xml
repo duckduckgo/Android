@@ -62,7 +62,6 @@
     <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection enabled for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection disabled for %1$s</string>
-    <string name="privacyProtectionDisabledAndReportSentConfirmationMessage" instruction="Placeholder is a website">Privacy Protection disabled for %1$s and report sent.</string>
     <string name="undoSnackbarAction">Undo</string>
 
     <!-- Downloading files -->

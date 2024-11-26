@@ -1527,7 +1527,7 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
-            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain, it.toggleReportSent)
+            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -3077,22 +3077,11 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun privacyProtectionDisabledConfirmation(domain: String, toggleReportSent: Boolean) {
-        if (!toggleReportSent) {
-            Timber.v("KateTest--> toggleReportSent = false")
-            binding.rootView.makeSnackbarWithNoBottomInset(
-                HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
-                Snackbar.LENGTH_LONG,
+    private fun privacyProtectionDisabledConfirmation(domain: String) {
+        binding.rootView.makeSnackbarWithNoBottomInset(
+            HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG,
             ).show()
-        } else {
-            Timber.v("KateTest--> toggleReportSent = true")
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.rootView.makeSnackbarWithNoBottomInset(
-                    HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledAndReportSentConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
-                    Snackbar.LENGTH_LONG,
-                ).show()
-            }, TOGGLE_REPORT_TOAST_DELAY,)
-        }
     }
 
     private fun launchSharePageChooser(

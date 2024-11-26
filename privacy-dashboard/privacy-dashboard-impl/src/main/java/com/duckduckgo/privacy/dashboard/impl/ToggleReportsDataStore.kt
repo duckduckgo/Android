@@ -25,7 +25,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
-import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPTS_DISMISSED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_SENT
 import com.squareup.anvil.annotations.ContributesBinding
@@ -59,10 +58,6 @@ interface ToggleReportsDataStore {
     suspend fun insertTogglePromptSend()
 
     suspend fun getPromptsDismissed(): List<String>
-
-    suspend fun lastPromptWasAccepted(): Boolean
-
-    suspend fun setLastPromptWasAccepted(accepted: Boolean)
 
     suspend fun canPrompt(): Boolean
 }
@@ -98,7 +93,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
     private object Keys {
         val TOGGLE_REPORTS_SENT = stringSetPreferencesKey(name = "TOGGLE_REPORTS_SENT")
         val TOGGLE_REPORTS_PROMPTS_DISMISSED = stringSetPreferencesKey(name = "TOGGLE_REPORTS_PROMPTS_DISMISSED")
-        val TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED = booleanPreferencesKey(name = "TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED")
     }
 
     private companion object {
@@ -190,20 +184,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
                 prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
             }
         }
-
-    override suspend fun lastPromptWasAccepted(): Boolean =
-        withContext(dispatcherProvider.io()) {
-            return@withContext store.data.first()[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] ?: false
-        }
-
-    override suspend fun setLastPromptWasAccepted(accepted: Boolean) {
-        Timber.v("KateTest--> lastPromptAccepted stored: $accepted")
-        withContext(dispatcherProvider.io()) {
-            store.edit { prefs ->
-                prefs[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] = accepted
-            }
-        }
-    }
 
     override suspend fun canPrompt(): Boolean =
         withContext(dispatcherProvider.io()) {
