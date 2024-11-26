@@ -42,6 +42,8 @@ interface SubscriptionsDataStore {
     var entitlements: String?
     var productId: String?
 
+    var subscriptionFeatures: String?
+
     fun canUseEncryption(): Boolean
 }
 
@@ -185,6 +187,14 @@ internal class SubscriptionsEncryptedDataStore constructor(
             }
         }
 
+    override var subscriptionFeatures: String?
+        get() = encryptedPreferences?.getString(KEY_SUBSCRIPTION_FEATURES, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_SUBSCRIPTION_FEATURES, value)
+            }
+        }
+
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
@@ -206,5 +216,6 @@ internal class SubscriptionsEncryptedDataStore constructor(
         const val KEY_ENTITLEMENTS = "KEY_ENTITLEMENTS"
         const val KEY_STATUS = "KEY_STATUS"
         const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
+        const val KEY_SUBSCRIPTION_FEATURES = "KEY_SUBSCRIPTION_FEATURES"
     }
 }
