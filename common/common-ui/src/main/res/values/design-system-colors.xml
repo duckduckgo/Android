@@ -101,6 +101,7 @@
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="alertGreen">#21C000</color>
     <color name="alertRedOnLightDefault">#EB102D</color>
     <color name="alertRedOnLightDefault_18">#2EEB102D</color>
     <color name="alertRedOnLightPressed">#C10D25</color>
