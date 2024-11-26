@@ -119,8 +119,14 @@
                 android:id="@+id/manageEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:primaryText="@string/addEmailPrimaryText"
-                tools:secondaryText="@string/addEmailSecondaryText"/>
+                app:primaryText="@string/editEmailPrimaryText" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/addToDevice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/addToDevicePrimaryText"
+                tools:secondaryText="@string/addToDeviceSecondaryText" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/learnMore"

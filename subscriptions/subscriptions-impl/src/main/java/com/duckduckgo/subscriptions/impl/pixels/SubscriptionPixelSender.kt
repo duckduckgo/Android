@@ -22,7 +22,6 @@ import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ADD_DEVICE_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
@@ -77,7 +76,6 @@ interface SubscriptionPixelSender {
     fun reportRestoreAfterPurchaseAttemptSuccess()
     fun reportSubscriptionActivated()
     fun reportOnboardingAddDeviceClick()
-    fun reportAddDeviceEnterEmailClick()
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
     fun reportOnboardingIdtrClick()
@@ -163,9 +161,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportOnboardingAddDeviceClick() =
         fire(ONBOARDING_ADD_DEVICE_CLICK)
-
-    override fun reportAddDeviceEnterEmailClick() =
-        fire(ADD_DEVICE_ENTER_EMAIL_CLICK)
 
     override fun reportOnboardingVpnClick() =
         fire(ONBOARDING_VPN_CLICK)
