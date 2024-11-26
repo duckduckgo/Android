@@ -18,6 +18,9 @@ package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.TestSyncFixtures.aDevice
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
@@ -65,9 +68,8 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
-import java.lang.RuntimeException
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -77,6 +79,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -93,13 +96,25 @@ class AppSyncAccountRepositoryTest {
     private var syncStore: SyncStore = mock()
     private var syncEngine: SyncEngine = mock()
     private var syncPixels: SyncPixels = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
+        this.seamlessAccountSwitching().setRawStoredState(State(true))
+    }
 
     private lateinit var syncRepo: SyncAccountRepository
 
     @Before
     fun before() {
-        syncRepo =
-            AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine, syncPixels, TestScope(), DefaultDispatcherProvider())
+        syncRepo = AppSyncAccountRepository(
+            syncDeviceIds,
+            nativeLib,
+            syncApi,
+            syncStore,
+            syncEngine,
+            syncPixels,
+            TestScope(),
+            DefaultDispatcherProvider(),
+            syncFeature,
+        )
     }
 
     @Test
@@ -220,6 +235,62 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertEquals(Result.Success(true), result)
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = token,
+        )
+    }
+
+    @Test
+    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenSwitchAccountIfOnly1DeviceConnected() {
+        givenAuthenticatedDevice()
+        givenAccountWithConnectedDevices(1)
+        doAnswer {
+            givenUnauthenticatedDevice() // simulate logout locally
+            logoutSuccess
+        }.`when`(syncApi).logout(token, deviceId)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
+
+        verify(syncApi).logout(token, deviceId)
+        verify(syncApi).login(userId, hashedPassword, deviceId, deviceName, deviceFactor)
+
+        assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenReturnErrorIfMultipleDevicesConnected() {
+        givenAuthenticatedDevice()
+        givenAccountWithConnectedDevices(2)
+        doAnswer {
+            givenUnauthenticatedDevice() // simulate logout locally
+            logoutSuccess
+        }.`when`(syncApi).logout(token, deviceId)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
+
+        assertEquals((result as Error).code, ALREADY_SIGNED_IN.code)
+    }
+
+    @Test
+    fun whenLogoutAndJoinNewAccountSucceedsThenReturnSuccess() {
+        givenAuthenticatedDevice()
+        doAnswer {
+            givenUnauthenticatedDevice() // simulate logout locally
+            logoutSuccess
+        }.`when`(syncApi).logout(token, deviceId)
+        prepareForLoginSuccess()
+
+        val result = syncRepo.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)
+
+        assertTrue(result is Result.Success)
+        verify(syncStore).clearAll()
         verify(syncStore).storeCredentials(
             userId = userId,
             deviceId = deviceId,
@@ -522,6 +593,10 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.isSignedIn()).thenReturn(true)
     }
 
+    private fun givenUnauthenticatedDevice() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+    }
+
     private fun prepareToProvideDeviceIds() {
         whenever(syncDeviceIds.userId()).thenReturn(userId)
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
@@ -544,5 +619,16 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenAnswer {
             EncryptResult(0, it.arguments.first() as String)
         }
+    }
+
+    private fun givenAccountWithConnectedDevices(size: Int) {
+        prepareForEncryption()
+        val listOfDevices = mutableListOf<Device>()
+        for (i in 0 until size) {
+            listOfDevices.add(aDevice.copy(deviceId = "device$i"))
+        }
+        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOfDevices))
+
+        syncRepo.getConnectedDevices() as Success
     }
 }

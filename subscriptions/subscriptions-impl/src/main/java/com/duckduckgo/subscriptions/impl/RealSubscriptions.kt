@@ -140,7 +140,7 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(true)
     fun allowEmailFeedback(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun serpPromoCookie(): Toggle
 }
 
