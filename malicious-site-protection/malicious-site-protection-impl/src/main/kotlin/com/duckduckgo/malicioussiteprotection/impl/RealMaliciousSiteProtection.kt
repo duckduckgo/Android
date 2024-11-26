@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.phishingandmalwaredetection.impl
+package com.duckduckgo.malicioussiteprotection.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.phishingandmalwaredetection.api.PhishingAndMalwareDetector
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -44,13 +44,13 @@ import org.json.JSONObject
  * limitations under the License.
  */
 
-@ContributesBinding(AppScope::class, PhishingAndMalwareDetector::class)
-class RealPhishingAndMalwareDetector @Inject constructor(
+@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
+class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : PhishingAndMalwareDetector, PrivacyConfigCallbackPlugin {
+) : MaliciousSiteProtection, PrivacyConfigCallbackPlugin {
 
     private var isFeatureEnabled = false
     private var hashPrefixUpdateFrequency = 20L

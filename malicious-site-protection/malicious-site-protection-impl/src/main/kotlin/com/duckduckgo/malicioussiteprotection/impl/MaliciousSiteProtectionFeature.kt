@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.phishingandmalwaredetection.impl
+package com.duckduckgo.malicioussiteprotection.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "maliciousSiteProtection",
 )
 /**
- * This is the class that represents the phishingAndMalwareDetection feature flags
+ * This is the class that represents the maliciousSiteProtection feature flags
  */
 interface MaliciousSiteProtectionFeature {
     /**
-     * @return `true` when the remote config has the global "phishingAndMalwareDetection" feature flag enabled
+     * @return `true` when the remote config has the global "maliciousSiteProtection" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @InternalAlwaysEnabled
+    @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
