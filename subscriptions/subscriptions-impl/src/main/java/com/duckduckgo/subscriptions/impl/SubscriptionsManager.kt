@@ -657,6 +657,7 @@ class RealSubscriptionsManager @Inject constructor(
                     monthlyFormattedPrice = monthlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
                     yearlyPlanId = yearlyOffer.basePlanId,
                     yearlyFormattedPrice = yearlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
+                    features = setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.PIR, SubscriptionsConstants.ITR),
                 )
             }
 
@@ -904,6 +905,7 @@ data class SubscriptionOffer(
     val monthlyFormattedPrice: String,
     val yearlyPlanId: String,
     val yearlyFormattedPrice: String,
+    val features: Set<String>,
 )
 
 data class ValidatedTokenPair(
