@@ -25,11 +25,14 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -57,7 +60,12 @@ class ProSettingViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val status: SubscriptionStatus = UNKNOWN)
+    data class ViewState(
+        val status: SubscriptionStatus = UNKNOWN,
+        val region: SubscriptionRegion? = null,
+    ) {
+        enum class SubscriptionRegion { US, ROW }
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -79,8 +87,13 @@ class ProSettingViewModel @Inject constructor(
         super.onCreate(owner)
         subscriptionsManager.subscriptionStatus
             .distinctUntilChanged()
-            .onEach {
-                _viewState.emit(viewState.value.copy(status = it))
+            .onEach { subscriptionStatus ->
+                val region = when (subscriptionsManager.getSubscriptionOffer()?.monthlyPlanId) {
+                    MONTHLY_PLAN_ROW -> SubscriptionRegion.ROW
+                    MONTHLY_PLAN_US -> SubscriptionRegion.US
+                    else -> null
+                }
+                _viewState.emit(viewState.value.copy(status = subscriptionStatus, region = region))
             }.launchIn(viewModelScope)
     }
 
