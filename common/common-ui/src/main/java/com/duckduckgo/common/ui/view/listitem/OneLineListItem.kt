@@ -101,6 +101,10 @@ class OneLineListItem @JvmOverloads constructor(
 
             setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
+            if (hasValue(R.styleable.OneLineListItem_leadingIconBackgroundColor)) {
+                setLeadingIconBackgroundColorStateList(getColorStateList(R.styleable.OneLineListItem_leadingIconBackgroundColor))
+            }
+
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.OneLineListItem_showSwitch, false)
             when {

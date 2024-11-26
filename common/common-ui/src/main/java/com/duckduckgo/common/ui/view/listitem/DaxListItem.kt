@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.view.listitem
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
@@ -159,6 +160,18 @@ abstract class DaxListItem(
         leadingIconContainer.setBackgroundResource(ImageBackground.background(type))
         leadingIconContainer.layoutParams.width = backgroundSize
         leadingIconContainer.layoutParams.height = backgroundSize
+    }
+
+    fun setLeadingIconBackgroundColor(@ColorRes backgroundColorRes: Int) {
+        val stateList = ContextCompat.getColorStateList(context, backgroundColorRes)
+        setLeadingIconBackgroundColorStateList(stateList)
+    }
+
+    fun setLeadingIconBackgroundColorStateList(stateList: ColorStateList?) {
+        leadingIconContainer.background?.mutate()?.apply {
+            setTintMode(PorterDuff.Mode.SRC)
+            setTintList(stateList)
+        }
     }
 
     /** Returns the binding of the leading icon */

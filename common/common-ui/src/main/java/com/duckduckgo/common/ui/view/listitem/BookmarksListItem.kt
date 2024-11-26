@@ -114,6 +114,10 @@ class BookmarksListItem @JvmOverloads constructor(
                 setLeadingIconSize(imageSize)
             }
 
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconBackgroundColor)) {
+                setLeadingIconBackgroundColorStateList(getColorStateList(R.styleable.TwoLineListItem_leadingIconBackgroundColor))
+            }
+
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }

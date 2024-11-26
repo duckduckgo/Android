@@ -44,6 +44,7 @@
         <!-- Rectangular shape, with optional rounded corners. -->
         <enum name="rounded" value="2" />
     </attr>
+    <attr name="leadingIconBackgroundColor" format="color"/>
     <attr name="leadingIconSize">
         <!-- Small 16dp -->
         <enum name="small" value="0" />
@@ -70,6 +71,7 @@
         <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showSwitch"/>
@@ -85,6 +87,7 @@
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconBackgroundColor"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>

@@ -107,6 +107,10 @@ class TwoLineListItem @JvmOverloads constructor(
 
             setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconBackgroundColor)) {
+                setLeadingIconBackgroundColorStateList(getColorStateList(R.styleable.TwoLineListItem_leadingIconBackgroundColor))
+            }
+
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
