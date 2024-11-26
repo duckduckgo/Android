@@ -16,6 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+
 object SubscriptionsConstants {
 
     // List of subscriptions
@@ -25,6 +30,8 @@ object SubscriptionsConstants {
     // List of plans
     const val YEARLY_PLAN_US = "ddg-privacy-pro-yearly-renews-us"
     const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
+    const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
+    const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"
@@ -33,6 +40,7 @@ object SubscriptionsConstants {
 
     const val NETP = "Network Protection"
     const val ITR = "Identity Theft Restoration"
+    const val ROW_ITR = "Global Identity Theft Restoration"
     const val PIR = "Data Broker Protection"
 
     // Platform
@@ -52,11 +60,9 @@ object SubscriptionsConstants {
 }
 
 internal fun String.productIdToBillingPeriod(): String? {
-    return if (this == SubscriptionsConstants.MONTHLY_PLAN_US) {
-        "monthly"
-    } else if (this == SubscriptionsConstants.YEARLY_PLAN_US) {
-        "annual"
-    } else {
-        null
+    return when (this) {
+        MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> "monthly"
+        YEARLY_PLAN_US, YEARLY_PLAN_ROW -> "annual"
+        else -> null
     }
 }

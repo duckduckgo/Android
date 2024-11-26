@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -179,7 +180,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch {
             val commandToSend = when (feature) {
                 NETP, LEGACY_FE_NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
-                ITR, LEGACY_FE_ITR -> GoToITR
+                ITR, LEGACY_FE_ITR, ROW_ITR -> GoToITR
                 PIR, LEGACY_FE_PIR -> GoToPIR
                 else -> null
             }
