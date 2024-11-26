@@ -2253,7 +2253,6 @@ class BrowserTabViewModel @Inject constructor(
                 removeFromAllowList(domain, clickedFromCustomTab)
             } else {
                 performToggleReportCheck()
-                Timber.v("KateTest--> lastPromptAccepted = ${toggleReports.lastPromptAccepted()} before addToAllowList")
                 addToAllowList(domain, clickedFromCustomTab)
             }
 
@@ -2263,9 +2262,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun performToggleReportCheck() {
         if (toggleReports.shouldPrompt()) {
+            Timber.v("Katetest-> shouldPrompt==TRUE")
             withContext(dispatchers.main()) {
                 command.value = ToggleReportFeedback(opener = DashboardOpener.MENU)
             }
+        } else {
+            Timber.v("Katetest-> shouldPrompt==FALSE")
         }
     }
 
@@ -2285,9 +2287,7 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            val toggleReportJustSent = toggleReports.lastPromptAccepted()
-            Timber.v("KateTest--> lastPromptAccepted = $toggleReportJustSent inside addToAllowList")
-            command.value = ShowPrivacyProtectionDisabledConfirmation(domain, toggleReportJustSent)
+            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }

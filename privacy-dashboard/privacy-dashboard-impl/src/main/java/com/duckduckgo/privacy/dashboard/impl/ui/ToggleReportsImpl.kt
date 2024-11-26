@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportsDataStore
 import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
-import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -30,20 +29,14 @@ class ToggleReportsImpl @Inject constructor(
     private val toggleReportsDataStore: ToggleReportsDataStore,
 ) : ToggleReports {
     override suspend fun shouldPrompt(): Boolean {
-        return (toggleReportsFeature.isEnabled() && toggleReportsDataStore.canPrompt())
+        return (toggleReportsFeature.self().isEnabled() && toggleReportsDataStore.canPrompt())
     }
 
     override suspend fun onPromptDismissed() {
         toggleReportsDataStore.insertTogglePromptDismiss()
-        toggleReportsDataStore.setLastPromptWasAccepted(false)
     }
 
     override suspend fun onReportSent() {
         toggleReportsDataStore.insertTogglePromptSend()
-        toggleReportsDataStore.setLastPromptWasAccepted(true)
-    }
-
-    override suspend fun lastPromptAccepted(): Boolean {
-        return toggleReportsDataStore.lastPromptWasAccepted()
     }
 }

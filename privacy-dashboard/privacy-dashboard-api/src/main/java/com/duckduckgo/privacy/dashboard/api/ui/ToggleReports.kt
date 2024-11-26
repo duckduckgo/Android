@@ -31,9 +31,4 @@ interface ToggleReports {
      * Adds a record to the datastore that a report was sent as the result of a toggle-off prompt.
      */
     suspend fun onReportSent()
-
-    /**
-     * Returns true if last prompt resulted in user submitting a report.
-     */
-    suspend fun lastPromptAccepted(): Boolean
 }
