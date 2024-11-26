@@ -61,6 +61,8 @@ interface AuthRepository {
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
+    suspend fun setFeatures(basePlanId: String, features: Set<String>)
+    suspend fun getFeatures(basePlanId: String): Set<String>
 }
 
 @Module
@@ -84,6 +86,15 @@ internal class RealAuthRepository constructor(
 ) : AuthRepository {
 
     private val moshi = Builder().build()
+
+    private val featuresAdapter by lazy {
+        val type = Types.newParameterizedType(
+            Map::class.java,
+            String::class.java,
+            Set::class.java,
+        )
+        moshi.adapter<Map<String, Set<String>>>(type)
+    }
 
     private inline fun <reified T> Moshi.listToJson(list: List<T>): String {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).toJson(list)
@@ -191,6 +202,24 @@ internal class RealAuthRepository constructor(
     override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.canUseEncryption()
     }
+
+    override suspend fun setFeatures(
+        basePlanId: String,
+        features: Set<String>,
+    ) {
+        val featuresMap = subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.toMutableMap() ?: mutableMapOf()
+
+        featuresMap[basePlanId] = features
+
+        subscriptionsDataStore.subscriptionFeatures = featuresAdapter.toJson(featuresMap)
+    }
+
+    override suspend fun getFeatures(basePlanId: String): Set<String> =
+        subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.get(basePlanId) ?: emptySet()
 
     private suspend fun updateSerpPromoCookie() {
         val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }

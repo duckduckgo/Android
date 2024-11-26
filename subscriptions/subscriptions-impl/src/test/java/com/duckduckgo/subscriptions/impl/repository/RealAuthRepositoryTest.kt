@@ -138,4 +138,43 @@ class RealAuthRepositoryTest {
         )
         assertFalse(repository.canSupportEncryption())
     }
+
+    @Test
+    fun whenSetFeaturesAndStoredValueIsNullThenSaveJson() = runTest {
+        authStore.subscriptionFeatures = null
+
+        authRepository.setFeatures(basePlanId = "plan1", features = setOf("feature1", "feature2"))
+
+        assertEquals("""{"plan1":["feature1","feature2"]}""", authStore.subscriptionFeatures)
+    }
+
+    @Test
+    fun whenSetFeaturesAndStoredValueIsNotNullThenUpdateJson() = runTest {
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
+
+        authRepository.setFeatures(basePlanId = "plan2", features = setOf("feature1", "feature2"))
+
+        assertEquals(
+            """{"plan1":["feature1","feature2"],"plan2":["feature1","feature2"]}""",
+            authStore.subscriptionFeatures,
+        )
+    }
+
+    @Test
+    fun whenGetFeaturesThenReturnsCorrectValue() = runTest {
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"],"plan2":["feature3"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan1")
+
+        assertEquals(setOf("feature1", "feature2"), result)
+    }
+
+    @Test
+    fun whenGetFeaturesAndBasePlanNotFoundThenReturnEmptySet() = runTest {
+        authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
+
+        val result = authRepository.getFeatures(basePlanId = "plan2")
+
+        assertEquals(emptySet<String>(), result)
+    }
 }
