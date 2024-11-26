@@ -63,7 +63,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Assemble the bundle
-        run: ./gradlew bundleRelease -PuseUploadSigning
+        run: ./gradlew bundleRelease -PuseUploadSigning -Pbuild-date-time
 
       - name: Capture App Bundle Path
         id: capture_output
