@@ -35,20 +35,4 @@ interface MaliciousSiteProtectionFeature {
     @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(false)
     fun self(): Toggle
-
-    /**
-     * @return `true` when the remote config has the "allowBypass" feature flag enabled, meaning
-     * that we allow the error page to be shown and bypassed by users
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(false)
-    fun allowBypass(): Toggle
-
-    /**
-     * @return `true` when the remote config has the "allowPreferencesToggle" feature flag enabled, meaning
-     * that we allow the user to disable the feature from the preferences
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(false)
-    fun allowPreferencesToggle(): Toggle
 }
