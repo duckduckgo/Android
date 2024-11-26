@@ -655,7 +655,7 @@ class RealSubscriptionsManager @Inject constructor(
                 val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
                     authRepository.getFeatures(monthlyOffer.basePlanId)
                 } else {
-                    setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.PIR, SubscriptionsConstants.ITR)
+                    setOf(SubscriptionsConstants.LEGACY_FE_NETP, SubscriptionsConstants.LEGACY_FE_PIR, SubscriptionsConstants.LEGACY_FE_ITR)
                 }
 
                 if (features.isEmpty()) return@run null

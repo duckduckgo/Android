@@ -27,9 +27,13 @@ object SubscriptionsConstants {
     const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
 
     // List of features
-    const val NETP = "vpn"
-    const val ITR = "identity-theft-restoration"
-    const val PIR = "personal-information-removal"
+    const val LEGACY_FE_NETP = "vpn"
+    const val LEGACY_FE_ITR = "identity-theft-restoration"
+    const val LEGACY_FE_PIR = "personal-information-removal"
+
+    const val NETP = "Network Protection"
+    const val ITR = "Identity Theft Restoration"
+    const val PIR = "Data Broker Protection"
 
     // Platform
     const val PLATFORM = "android"
