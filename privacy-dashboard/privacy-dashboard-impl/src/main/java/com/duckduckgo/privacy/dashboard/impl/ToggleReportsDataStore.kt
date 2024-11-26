@@ -22,32 +22,41 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_DISMISS_INTERVAL
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_MAX_PROMPT_COUNT
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPTS_DISMISSED
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPT_INTERVAL
+import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_SENT
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface ToggleReportsDataStore {
 
+    suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean)
+
     suspend fun getDismissLogicEnabled(): Boolean
+
+    suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean)
 
     suspend fun getPromptLimitLogicEnabled(): Boolean
 
+    suspend fun storeDismissInterval(dismissInterval: Int)
+
     suspend fun getDismissInterval(): Int
 
+    suspend fun storePromptInterval(promptInterval: Int)
+
     suspend fun getPromptInterval(): Int
+
+    suspend fun storeMaxPromptCount(maxPromptCount: Int)
 
     suspend fun getMaxPromptCount(): Int
 
@@ -66,36 +75,20 @@ interface ToggleReportsDataStore {
     suspend fun canPrompt(): Boolean
 }
 
-@JsonClass(generateAdapter = true)
-data class ToggleReportsSetting(
-    @field:Json(name = "dismissLogicEnabled")
-    val dismissLogicEnabled: Boolean,
-    @field:Json(name = "dismissInterval")
-    val dismissInterval: Int,
-    @field:Json(name = "promptLimitLogicEnabled")
-    val promptLimitLogicEnabled: Boolean,
-    @field:Json(name = "promptInterval")
-    val promptInterval: Int,
-    @field:Json(name = "maxPromptCount")
-    val maxPromptCount: Int,
-)
-
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesToggleReportsDataStore @Inject constructor(
     @ToggleReports private val store: DataStore<Preferences>,
-    private val moshi: Moshi,
-    private val toggleReportsFeature: ToggleReportsFeature,
-    private val dispatcherProvider: DispatcherProvider,
+    // @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ToggleReportsDataStore {
 
-    private val jsonAdapter by lazy {
-        moshi.adapter(ToggleReportsSetting::class.java)
-    }
-
     private object Keys {
+        val TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED = booleanPreferencesKey(name = "TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED")
+        val TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED = booleanPreferencesKey(name = "TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED")
         val TOGGLE_REPORTS_SENT = stringSetPreferencesKey(name = "TOGGLE_REPORTS_SENT")
         val TOGGLE_REPORTS_PROMPTS_DISMISSED = stringSetPreferencesKey(name = "TOGGLE_REPORTS_PROMPTS_DISMISSED")
+        val TOGGLE_REPORTS_DISMISS_INTERVAL = intPreferencesKey(name = "TOGGLE_REPORTS_DISMISS_INTERVAL")
+        val TOGGLE_REPORTS_PROMPT_INTERVAL = intPreferencesKey(name = "TOGGLE_REPORTS_PROMPT_INTERVAL")
         val TOGGLE_REPORTS_MAX_PROMPT_COUNT = intPreferencesKey(name = "TOGGLE_REPORTS_MAX_PROMPT_COUNT")
         val TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED = booleanPreferencesKey(name = "TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED")
     }
@@ -105,89 +98,113 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         const val DEFAULT_MAX_PROMPT = 3
     }
 
-    override suspend fun getDismissLogicEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext toggleReportsFeature.self().getSettings()?.let { jsonAdapter.fromJson(it) }?.dismissLogicEnabled ?: false
-    }
-
-    override suspend fun getDismissInterval(): Int = withContext(dispatcherProvider.io()) {
-        return@withContext toggleReportsFeature.self().getSettings()?.let { jsonAdapter.fromJson(it) }?.dismissInterval ?: DEFAULT_INTERVAL
-    }
-
-    override suspend fun getPromptLimitLogicEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext toggleReportsFeature.self().getSettings()?.let { jsonAdapter.fromJson(it) }?.promptLimitLogicEnabled ?: false
-    }
-
-    override suspend fun getPromptInterval(): Int = withContext(dispatcherProvider.io()) {
-        return@withContext toggleReportsFeature.self().getSettings()?.let { jsonAdapter.fromJson(it) }?.promptInterval ?: DEFAULT_INTERVAL
-    }
-
-    override suspend fun getMaxPromptCount(): Int = withContext(dispatcherProvider.io()) {
-        return@withContext store.data.first()[TOGGLE_REPORTS_MAX_PROMPT_COUNT] ?: DEFAULT_MAX_PROMPT
-    }
-
-    override suspend fun insertTogglePromptDismiss() {
-        withContext(dispatcherProvider.io()) {
-            store.edit { prefs ->
-                val currentSet = getPromptsDismissed().toMutableSet()
-                val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
-                val interval = getDismissInterval()
-                currentSet.removeAll { storedTimestamp ->
-                    val storedTime = storedTimestamp.toLong()
-                    (currentTimeMillis - storedTime > interval * 1000L)
-                }
-                val dismissTime = DatabaseDateFormatter.millisIso8601().toString()
-                currentSet.add(dismissTime)
-                Timber.v("KateTest--> dismissTime stored: $dismissTime")
-                prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED] = currentSet
-            }
+    override suspend fun storeDismissLogicEnabled(dismissLogicEnabled: Boolean) {
+        store.edit { prefs ->
+            prefs[TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED] = dismissLogicEnabled
         }
     }
 
-    override suspend fun getPromptsDismissed(): List<String> = withContext(dispatcherProvider.io()) {
-        return@withContext store.data.first().let { prefs ->
+    override suspend fun getDismissLogicEnabled(): Boolean {
+        return store.data.first()[TOGGLE_REPORTS_DISMISS_LOGIC_ENABLED] ?: false
+    }
+
+    override suspend fun storeDismissInterval(dismissInterval: Int) {
+        store.edit { prefs ->
+            prefs[TOGGLE_REPORTS_DISMISS_INTERVAL] = dismissInterval
+        }
+    }
+
+    override suspend fun getDismissInterval(): Int {
+        return store.data.first()[TOGGLE_REPORTS_DISMISS_INTERVAL] ?: DEFAULT_INTERVAL
+    }
+
+    override suspend fun storePromptLimitLogicEnabled(promptLimitLogicEnabled: Boolean) {
+        store.edit { prefs ->
+            prefs[TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED] = promptLimitLogicEnabled
+        }
+    }
+
+    override suspend fun getPromptLimitLogicEnabled(): Boolean {
+        return store.data.first()[TOGGLE_REPORTS_PROMPT_LIMIT_LOGIC_ENABLED] ?: false
+    }
+
+    override suspend fun storePromptInterval(promptInterval: Int) {
+        store.edit { prefs ->
+            prefs[TOGGLE_REPORTS_PROMPT_INTERVAL] = promptInterval
+        }
+    }
+
+    override suspend fun getPromptInterval(): Int {
+        return store.data.first()[TOGGLE_REPORTS_PROMPT_INTERVAL] ?: DEFAULT_INTERVAL
+    }
+
+    override suspend fun storeMaxPromptCount(maxPromptCount: Int) {
+        store.edit { prefs ->
+            prefs[TOGGLE_REPORTS_MAX_PROMPT_COUNT] = maxPromptCount
+        }
+    }
+
+    override suspend fun getMaxPromptCount(): Int {
+        return store.data.first()[TOGGLE_REPORTS_MAX_PROMPT_COUNT] ?: DEFAULT_MAX_PROMPT
+    }
+
+    override suspend fun insertTogglePromptDismiss() {
+        store.edit { prefs ->
+            val currentSet = getPromptsDismissed().toMutableSet()
+            val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
+            val interval = getDismissInterval()
+            currentSet.removeAll { storedTimestamp ->
+                val storedTime = storedTimestamp.toLong()
+                (currentTimeMillis - storedTime > interval * 1000L)
+            }
+            val dismissTime = DatabaseDateFormatter.millisIso8601().toString()
+            currentSet.add(dismissTime)
+            Timber.v("KateTest--> dismissTime stored: $dismissTime")
+            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED] = currentSet
+        }
+    }
+
+    override suspend fun getPromptsDismissed(): List<String> {
+        return store.data.first().let { prefs ->
             prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
         }
     }
 
     override suspend fun insertTogglePromptSend() {
-        withContext(dispatcherProvider.io()) {
-            store.edit { prefs ->
-                val currentSet = getReportsSent().toMutableSet()
-                val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
-                val interval = getPromptInterval()
-                currentSet.removeAll { storedTimestamp ->
-                    val storedTime = storedTimestamp.toLong()
-                    (currentTimeMillis - storedTime > interval * 1000L)
-                }
-                val sendTime = DatabaseDateFormatter.millisIso8601().toString()
-                Timber.v("KateTest--> sendTime stored: $sendTime")
-                currentSet.add(sendTime)
-                prefs[TOGGLE_REPORTS_SENT] = currentSet
+        store.edit { prefs ->
+            val currentSet = getReportsSent().toMutableSet()
+            val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
+            val interval = getPromptInterval()
+            currentSet.removeAll { storedTimestamp ->
+                val storedTime = storedTimestamp.toLong()
+                (currentTimeMillis - storedTime > interval * 1000L)
             }
+            val sendTime = DatabaseDateFormatter.millisIso8601().toString()
+            Timber.v("KateTest--> sendTime stored: $sendTime")
+            currentSet.add(sendTime)
+            prefs[TOGGLE_REPORTS_SENT] = currentSet
         }
     }
 
-    override suspend fun getReportsSent(): List<String> = withContext(dispatcherProvider.io()) {
-        return@withContext store.data.first().let { prefs ->
+    override suspend fun getReportsSent(): List<String> {
+        return store.data.first().let { prefs ->
             prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
         }
     }
 
-    override suspend fun lastPromptWasAccepted(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext store.data.first()[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] ?: false
+    override suspend fun lastPromptWasAccepted(): Boolean {
+        return store.data.first()[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] ?: false
     }
 
     override suspend fun setLastPromptWasAccepted(accepted: Boolean) {
         Timber.v("KateTest--> lastPromptAccepted stored: $accepted")
-        withContext(dispatcherProvider.io()) {
-            store.edit {
-                    prefs ->
-                prefs[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] = accepted
-            }
+        store.edit {
+                prefs ->
+            prefs[TOGGLE_REPORTS_LAST_PROMPT_WAS_ACCEPTED] = accepted
         }
     }
 
-    override suspend fun canPrompt(): Boolean = withContext(dispatcherProvider.io()) {
+    override suspend fun canPrompt(): Boolean {
         val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
 
         suspend fun checkRecentSends(): Boolean {
@@ -206,7 +223,7 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
                 dismissInterval * 1000L
         }
 
-        return@withContext when {
+        return when {
             getPromptLimitLogicEnabled() && getDismissLogicEnabled() ->
                 checkRecentSends() && checkDismissInterval()
             getPromptLimitLogicEnabled() -> checkRecentSends()

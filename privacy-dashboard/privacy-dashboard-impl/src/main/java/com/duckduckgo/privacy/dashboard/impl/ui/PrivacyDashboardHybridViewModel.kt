@@ -42,6 +42,7 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
+import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
@@ -278,7 +279,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
-            if (!webBrokenSiteFormFeature.self().isEnabled()) {
+            if (!webBrokenSiteFormFeature.isEnabled()) {
                 val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
                 command.send(LaunchReportBrokenSite(siteData))
             }
@@ -311,7 +312,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     private suspend fun createRemoteFeatureSettings(): RemoteFeatureSettingsViewState {
         val webBrokenSiteFormState = withContext(dispatcher.io()) {
-            if (webBrokenSiteFormFeature.self().isEnabled()) {
+            if (webBrokenSiteFormFeature.isEnabled()) {
                 WebBrokenSiteFormState.ENABLED
             } else {
                 WebBrokenSiteFormState.DISABLED
@@ -431,7 +432,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         reportFlow: ReportFlow,
     ) {
         viewModelScope.launch(dispatcher.io()) {
-            if (!webBrokenSiteFormFeature.self().isEnabled()) return@launch
+            if (!webBrokenSiteFormFeature.isEnabled()) return@launch
             val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
             val site = site.value ?: return@launch
             val siteUrl = site.url
