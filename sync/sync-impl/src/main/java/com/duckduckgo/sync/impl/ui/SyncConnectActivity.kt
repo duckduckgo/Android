@@ -39,6 +39,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,8 +51,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
+    ) { result ->
+        if (result != EnterCodeContractOutput.Error) {
             viewModel.onLoginSuccess()
         }
     }

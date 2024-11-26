@@ -81,6 +81,13 @@ interface SyncPixels {
         feature: SyncableType,
         apiError: Error,
     )
+
+    fun fireAskUserToSwitchAccount()
+    fun fireUserAcceptedSwitchingAccount()
+    fun fireUserCancelledSwitchingAccount()
+    fun fireUserSwitchedAccount()
+    fun fireUserSwitchedLogoutError()
+    fun fireUserSwitchedLoginError()
 }
 
 @ContributesBinding(AppScope::class)
@@ -255,6 +262,30 @@ class RealSyncPixels @Inject constructor(
         }
     }
 
+    override fun fireUserSwitchedAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_ACCOUNT)
+    }
+
+    override fun fireAskUserToSwitchAccount() {
+        pixel.fire(SyncPixelName.SYNC_ASK_USER_TO_SWITCH_ACCOUNT)
+    }
+
+    override fun fireUserAcceptedSwitchingAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_ACCEPTED_SWITCHING_ACCOUNT)
+    }
+
+    override fun fireUserCancelledSwitchingAccount() {
+        pixel.fire(SyncPixelName.SYNC_USER_CANCELLED_SWITCHING_ACCOUNT)
+    }
+
+    override fun fireUserSwitchedLoginError() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR)
+    }
+
+    override fun fireUserSwitchedLogoutError() {
+        pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
     }
@@ -302,6 +333,12 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN("sync_get_other_devices"),
     SYNC_GET_OTHER_DEVICES_LINK_COPIED("sync_get_other_devices_copy"),
     SYNC_GET_OTHER_DEVICES_LINK_SHARED("sync_get_other_devices_share"),
+    SYNC_ASK_USER_TO_SWITCH_ACCOUNT("sync_ask_user_to_switch_account"),
+    SYNC_USER_ACCEPTED_SWITCHING_ACCOUNT("sync_user_accepted_switching_account"),
+    SYNC_USER_CANCELLED_SWITCHING_ACCOUNT("sync_user_cancelled_switching_account"),
+    SYNC_USER_SWITCHED_ACCOUNT("sync_user_switched_account"),
+    SYNC_USER_SWITCHED_LOGOUT_ERROR("sync_user_switched_logout_error"),
+    SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
 }
 
 object SyncPixelParameters {

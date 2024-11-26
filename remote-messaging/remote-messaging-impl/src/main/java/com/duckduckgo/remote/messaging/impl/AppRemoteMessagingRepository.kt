@@ -37,6 +37,12 @@ class AppRemoteMessagingRepository(
     private val messageMapper: MessageMapper,
 ) : RemoteMessagingRepository {
 
+    override fun getMessageById(id: String): RemoteMessage? {
+        return remoteMessagesDao.messagesById(id)?.let {
+            messageMapper.fromMessage(it.message)
+        }
+    }
+
     override fun activeMessage(message: RemoteMessage?) {
         if (message == null) {
             remoteMessagesDao.updateActiveMessageStateAndDeleteNeverShownMessages()

@@ -32,6 +32,13 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.google.android.material.snackbar.Snackbar
@@ -45,10 +52,8 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
-        }
+    ) { result ->
+        viewModel.onEnterCodeResult(result)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,20 +100,26 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            Command.ReadTextCode -> {
+            ReadTextCode -> {
                 enterCodeLauncher.launch(RECOVERY_CODE)
             }
-            Command.LoginSuccess -> {
+            is LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
             }
-            Command.FinishWithError -> {
+            FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
-
-            is Command.ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
-            is Command.ShowError -> showError(it)
+            is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
+            is ShowError -> showError(it)
+            is AskToSwitchAccount -> askUserToSwitchAccount(it)
+            SwitchAccountSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_USER_SWITCHED_ACCOUNT, true)
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
         }
     }
 
@@ -121,7 +132,27 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showError(it: Command.ShowError) {
+    private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
+        viewModel.onUserAskedToSwitchAccount()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_switch_account_header)
+            .setMessage(R.string.sync_dialog_switch_account_description)
+            .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
+            .setNegativeButton(R.string.sync_dialog_switch_account_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAcceptedJoiningNewAccount(it.encodedStringCode)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserCancelledJoiningNewAccount()
+                    }
+                },
+            ).show()
+    }
+
+    private fun showError(it: ShowError) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_dialog_error_title)
             .setMessage(getString(it.message) + "\n" + it.reason)
@@ -136,6 +167,8 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
+
         internal fun intent(context: Context): Intent {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java)
         }

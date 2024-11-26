@@ -23,6 +23,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -55,6 +56,7 @@ class RealSerpPromo @Inject constructor(
     @InternalApi private val cookieManager: CookieManagerWrapper,
     private val dispatcherProvider: DispatcherProvider,
     private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptions: Lazy<Subscriptions>, // break dep cycle
 ) : SerpPromo, MainProcessLifecycleObserver {
 
     override suspend fun injectCookie(cookieValue: String?) = withContext(dispatcherProvider.io()) {
@@ -73,11 +75,8 @@ class RealSerpPromo @Inject constructor(
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
             if (privacyProFeature.get().serpPromoCookie().isEnabled()) {
                 kotlin.runCatching {
-                    val cookies = cookieManager.getCookie(HTTPS_WWW_SUBSCRIPTION_DDG_COM) ?: ""
-                    val pproCookies = cookies.split(";").filter { it.contains(SERP_PPRO_PROMO_COOKIE_NAME) }
-                    if (pproCookies.isEmpty()) {
-                        injectCookie("")
-                    }
+                    val accessToken = subscriptions.get().getAccessToken() ?: ""
+                    injectCookie(accessToken)
                 }
             }
         }
