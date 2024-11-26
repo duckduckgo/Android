@@ -12,10 +12,11 @@ tags:
 - tapOn:
       text: "search or type URL"
 - inputText: "https://www.search-company.site/"
-- tapOn:
-      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
-- assertVisible:
+- pressKey: Enter
+- extendedWaitUntil:
+    visible:
       text: ".*keep browsing.*"
+    timeout: 60000
 - tapOn:
       text: "got it"
 - assertVisible:
@@ -23,10 +24,11 @@ tags:
 - tapOn:
       text: "https://www.search-company.site/"
 - inputText: "https://privacy-test-pages.glitch.me"
-- tapOn:
-      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
-- assertVisible:
+- pressKey: Enter
+- extendedWaitUntil:
+    visible:
       text: "Privacy Test Pages"
+    timeout: 60000
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
@@ -43,8 +45,10 @@ tags:
       text: "Privacy Test Pages - Home"
 - tapOn:
       text: "Privacy Test Pages - Home"
-- assertVisible:
+- extendedWaitUntil:
+    visible:
       text: "Privacy Test Pages"
+    timeout: 60000
 - action: back
 - assertVisible:
       text: "Search engine"

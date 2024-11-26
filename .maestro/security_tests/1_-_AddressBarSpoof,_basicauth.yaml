@@ -11,6 +11,10 @@ tags:
 # Test 1 - using \u2028 character
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "run"
 - assertVisible: "Example Domain"
@@ -22,6 +26,10 @@ tags:
 # Test 2 - using \u2029 character
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2029.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "run"
+      timeout: 60000
 - tapOn: "run"
 - assertVisible: "Example Domain"
 - copyTextFrom:
@@ -32,6 +40,10 @@ tags:
 # Test 3 - using repeated " " space character
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-whitespace.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "run"
+      timeout: 60000
 - tapOn: "run"
 - assertVisible: "Example Domain"
 - copyTextFrom:

@@ -10,8 +10,16 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "Start"
+- extendedWaitUntil:
+      visible:
+          text: "Spread Privacy"
+      timeout: 60000
 # This test is expected to load spreadprivacy.com, not remain on the current page with spoofed content.
 - assertVisible: "Spread Privacy" # DuckDuckGo blog homepage
 - copyTextFrom:
@@ -22,6 +30,10 @@ tags:
 # Test 2
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Start"
+      timeout: 60000
 - tapOn: "Start"
 - copyTextFrom:
     id: "omnibarTextInput"

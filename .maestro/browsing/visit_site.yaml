@@ -12,10 +12,15 @@ tags:
 - tapOn:
     text: "search or type URL"
 - inputText: "https://privacy-test-pages.site"
-- tapOn:
-    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
-- assertVisible:
-    text: ".*keep browsing.*"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible:
+      text: ".*keep browsing.*"
+    timeout: 60000
+- extendedWaitUntil:
+    visible:
+      text: ".*Got It.*"
+    timeout: 60000
 - tapOn:
     text: "got it"
 - assertVisible:

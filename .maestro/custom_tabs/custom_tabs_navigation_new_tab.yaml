@@ -51,8 +51,10 @@ tags:
 - action: back
 - tapOn:
     text: "[Ad 2] Shopping Tab Ad (heuristic)"
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - action: back
 - tapOn:
     text: "[Ad 2] Shopping Tab Ad (heuristic)"

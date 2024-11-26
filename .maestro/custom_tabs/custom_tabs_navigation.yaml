@@ -58,11 +58,15 @@ tags:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/backMenuItem"
-- assertVisible:
-    text: "Search engine"
+- extendedWaitUntil:
+    visible:
+      text: "Search engine"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000

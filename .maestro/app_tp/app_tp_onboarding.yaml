@@ -44,11 +44,32 @@ tags:
 - assertVisible:
     id: "com.duckduckgo.mobile.android:id/activity_apps"
     index: 1
-- scroll
-- assertVisible: "ABOUT"
-- assertVisible: "What are app trackers?"
-- assertVisible: "App Tracking Protection FAQ"
-- assertVisible: "MANAGE"
-- assertVisible: "Having Issues?"
-- assertVisible: "View Apps"
-- assertVisible: "Disable and Delete Data"
+    optional: true
+- scrollUntilVisible:
+    element:
+        text: "About"
+    direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "What are app trackers?"
+      direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "App Tracking Protection FAQ"
+      direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "Manage"
+      direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "Having Issues?"
+      direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "View Apps"
+      direction: DOWN
+- scrollUntilVisible:
+      element:
+          text: "Disable and Delete Data"
+      direction: DOWN

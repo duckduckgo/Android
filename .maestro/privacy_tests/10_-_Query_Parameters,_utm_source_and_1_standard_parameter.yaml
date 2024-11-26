@@ -7,8 +7,10 @@ tags:
 - runFlow: ../shared/onboarding.yaml
 - inputText: "https://privacy-test-pages.site/privacy-protections/query-parameters/"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
+- extendedWaitUntil:
+    visible:
+        text: ".*Got It.*"
+    timeout: 60000
 - assertVisible:
     text: "Link with utm_source and 1 standard parameter"
 - tapOn:

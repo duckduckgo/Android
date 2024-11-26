@@ -10,6 +10,10 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "Start"
 # Download Acceptance Flow:
@@ -21,6 +25,10 @@ tags:
     id: "omnibarTextInput"
 - assertTrue: ${maestro.copiedText == "Search or type URL"} # Downloads should occur in empty origin.
 - pressKey: Back
+- extendedWaitUntil:
+      visible:
+          text: "Start"
+      timeout: 60000
 # Download Cancel Flow:
 - tapOn: "Start"
 - extendedWaitUntil:

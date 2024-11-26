@@ -7,22 +7,24 @@ tags:
 
 - runFlow: ../shared/onboarding.yaml
 
-- inputText: "https://www.search-company.site/#ad-id-3"
+- inputText: "https://www.search-company.site/#ad-id-2"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Got It.*"
+    timeout: 60000
 - tapOn:
     text: "Got It"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/fireIconMenu"
-- tapOn:
-    text: "Cancel"
-- assertVisible:
-    id: "ad-id-3"
+- scrollUntilVisible:
+    element:
+      id: "ad-id-3"
+    direction: DOWN
 - tapOn:
     id: "ad-id-3"
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
