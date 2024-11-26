@@ -32,6 +32,9 @@ import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
@@ -175,9 +178,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
         val feature = runCatching { data.getString("feature") }.getOrNull() ?: return
         viewModelScope.launch {
             val commandToSend = when (feature) {
-                NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
-                ITR -> GoToITR
-                PIR -> GoToPIR
+                NETP, LEGACY_FE_NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
+                ITR, LEGACY_FE_ITR -> GoToITR
+                PIR, LEGACY_FE_PIR -> GoToPIR
                 else -> null
             }
             if (hasPurchasedSubscription()) {
