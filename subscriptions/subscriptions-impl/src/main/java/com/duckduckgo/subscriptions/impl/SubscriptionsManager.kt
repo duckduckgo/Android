@@ -34,7 +34,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
@@ -648,17 +655,32 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionOffer(): SubscriptionOffer? =
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
-            ?.run {
-                val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN_US } ?: return@run null
-                val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN_US } ?: return@run null
-
+            ?.subscriptionOfferDetails
+            .orEmpty()
+            .associateBy { it.basePlanId }
+            .let { availablePlans ->
+                when {
+                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        availablePlans.getValue(MONTHLY_PLAN_US) to availablePlans.getValue(YEARLY_PLAN_US)
+                    }
+                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) && isLaunchedRow() -> {
+                        availablePlans.getValue(MONTHLY_PLAN_ROW) to availablePlans.getValue(YEARLY_PLAN_ROW)
+                    }
+                    else -> null
+                }
+            }
+            ?.let { (monthlyOffer, yearlyOffer) ->
                 val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
                     authRepository.getFeatures(monthlyOffer.basePlanId)
                 } else {
-                    setOf(SubscriptionsConstants.LEGACY_FE_NETP, SubscriptionsConstants.LEGACY_FE_PIR, SubscriptionsConstants.LEGACY_FE_ITR)
+                    when (monthlyOffer.basePlanId) {
+                        MONTHLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
+                        MONTHLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
+                        else -> throw IllegalStateException()
+                    }
                 }
 
-                if (features.isEmpty()) return@run null
+                if (features.isEmpty()) return@let null
 
                 SubscriptionOffer(
                     monthlyPlanId = monthlyOffer.basePlanId,
@@ -847,6 +869,9 @@ class RealSubscriptionsManager @Inject constructor(
             throw e
         }
     }
+
+    private fun isLaunchedRow(): Boolean =
+        privacyProFeature.get().isLaunchedROW().isEnabled()
 
     private fun parseError(e: HttpException): ResponseError? {
         return try {

@@ -73,6 +73,7 @@ interface Subscriptions {
 enum class Product(val value: String) {
     NetP("Network Protection"),
     ITR("Identity Theft Restoration"),
+    ROW_ITR("Global Identity Theft Restoration"),
     PIR("Data Broker Protection"),
 }
 
