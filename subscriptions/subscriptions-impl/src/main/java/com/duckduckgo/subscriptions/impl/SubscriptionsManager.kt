@@ -652,12 +652,20 @@ class RealSubscriptionsManager @Inject constructor(
                 val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN_US } ?: return@run null
                 val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN_US } ?: return@run null
 
+                val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
+                    authRepository.getFeatures(monthlyOffer.basePlanId)
+                } else {
+                    setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.PIR, SubscriptionsConstants.ITR)
+                }
+
+                if (features.isEmpty()) return@run null
+
                 SubscriptionOffer(
                     monthlyPlanId = monthlyOffer.basePlanId,
                     monthlyFormattedPrice = monthlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
                     yearlyPlanId = yearlyOffer.basePlanId,
                     yearlyFormattedPrice = yearlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
-                    features = setOf(SubscriptionsConstants.NETP, SubscriptionsConstants.PIR, SubscriptionsConstants.ITR),
+                    features = features,
                 )
             }
 
