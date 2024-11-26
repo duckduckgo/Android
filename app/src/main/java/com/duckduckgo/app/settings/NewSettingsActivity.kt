@@ -50,7 +50,6 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -65,11 +64,11 @@ import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class NewSettingsActivity : DuckDuckGoActivity() {
@@ -204,7 +203,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateDefaultBrowserViewVisibility(it)
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
-                        it.appTrackingProtectionOnboardingShown,
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
@@ -247,11 +245,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {
-        if (emailAddress.isNullOrEmpty()) {
-            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-        } else {
-            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-        }
+        viewsPrivacy.emailSetting.setStatus(isOn = !emailAddress.isNullOrEmpty())
     }
 
     private fun updateSyncSetting(visible: Boolean) {
@@ -261,11 +255,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateAutoconsent(enabled: Boolean) {
-        if (enabled) {
-            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-        } else {
-            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-        }
+        viewsPrivacy.cookiePopupProtectionSetting.setStatus(isOn = enabled)
     }
 
     private fun processCommand(it: Command?) {
@@ -296,11 +286,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun updateDefaultBrowserViewVisibility(it: NewSettingsViewModel.ViewState) {
         with(viewsPrivacy.setAsDefaultBrowserSetting) {
             visibility = if (it.showDefaultBrowserSetting) {
-                if (it.isAppDefaultBrowser) {
-                    setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-                } else {
-                    setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                }
+                setStatus(isOn = it.isAppDefaultBrowser)
                 View.VISIBLE
             } else {
                 View.GONE
@@ -308,21 +294,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDeviceShieldSettings(
-        appTPEnabled: Boolean,
-        appTrackingProtectionOnboardingShown: Boolean,
-    ) {
-        with(viewsPrivacy) {
-            if (appTPEnabled) {
-                vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-            } else {
-                if (appTrackingProtectionOnboardingShown) {
-                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.WARNING)
-                } else {
-                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                }
-            }
-        }
+    private fun updateDeviceShieldSettings(appTPEnabled: Boolean) {
+        viewsPrivacy.vpnSetting.setStatus(isOn = appTPEnabled)
     }
 
     private fun launchDefaultAppScreen() {
