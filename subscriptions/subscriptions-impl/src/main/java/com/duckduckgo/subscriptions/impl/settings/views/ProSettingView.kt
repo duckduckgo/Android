@@ -49,6 +49,8 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.ROW
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.US
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
@@ -158,7 +160,13 @@ class ProSettingView @JvmOverloads constructor(
             }
             else -> {
                 binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+                binding.subscriptionBuy.setSecondaryText(
+                    when (viewState.region) {
+                        ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
+                        US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
+                        else -> ""
+                    },
+                )
                 binding.subscriptionBuy.setItemStatus(DISABLED)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
                 binding.subscriptionBuyContainer.show()
