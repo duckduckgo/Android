@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Poate mai târziu</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nu întreba din nou pentru acest site</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Acorzi %1$s permisiunea de a accesa locația?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Folosim locația ta anonimă doar pentru a oferi rezultate mai bune, mai aproape de tine. Poți oricând să te răzgândești mai târziu.</string>
     <string name="preciseLocationSiteDialogSubtitle">Poți gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale în Setări.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Utilizăm locația ta anonimă doar pentru a oferi rezultate mai bune, mai aproape de tine. Poți gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale în Setări.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Întotdeauna</string>
     <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
     <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Niciun site încă</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisiuni eliminate pentru toate site-urile</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisiuni pentru „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Cere</string>
+    <string name="permissionsPerWebsiteAskSetting">Întreabă de fiecare dată</string>
     <string name="permissionsPerWebsiteDenySetting">Refuză</string>
     <string name="permissionsPerWebsiteAllowSetting">Permite</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">„Întreabă” este dezactivat pentru toate site-urile</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Dezactivat pentru toate site-urile</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permisiune %1$s pentru %2$s</string>
 
     <!-- Notify Me View on Downloads -->
