@@ -162,6 +162,7 @@
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing" tools:ignore="MissingTranslation">Data Clearing</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Add Widget to HomeScreen</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>

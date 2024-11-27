@@ -146,7 +146,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(viewsMain) {
-            homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
@@ -158,6 +157,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(viewsNextSteps) {
+            addWidgetToHomeScreenSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
         }
     }
 
