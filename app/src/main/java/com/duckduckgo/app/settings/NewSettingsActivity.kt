@@ -56,13 +56,11 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProte
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchMacOs
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWindows
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -79,7 +77,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -87,7 +84,6 @@ import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -315,8 +311,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchMacOs -> launchMacOsScreen()
-            is LaunchWindows -> launchWindowsScreen()
             is LaunchSyncSettings -> launchSyncSettings()
             is LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
             is LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
@@ -370,16 +364,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun launchEmailProtectionNotSupported() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, EmailProtectionUnsupportedScreenNoParams, options)
-    }
-
-    private fun launchMacOsScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, MacOsScreenWithEmptyParams, options)
-    }
-
-    private fun launchWindowsScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, WindowsScreenWithEmptyParams, options)
     }
 
     private fun launchSyncSettings() {
