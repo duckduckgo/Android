@@ -109,8 +109,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private val viewsMain
         get() = binding.includeSettings.contentSettingsMain
 
-    private val viewsMore
-        get() = binding.includeSettings.contentSettingsMore
+    private val viewsNextSteps
+        get() = binding.includeSettings.contentSettingsNextSteps
 
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
@@ -157,9 +157,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
         }
 
-        with(viewsMore) {
-            macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
-            windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
+        with(viewsNextSteps) {
         }
     }
 

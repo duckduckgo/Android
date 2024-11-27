@@ -258,18 +258,6 @@ class NewSettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
 
-    fun onMacOsSettingClicked() {
-        viewModelScope.launch { command.send(LaunchMacOs) }
-        pixel.fire(SETTINGS_MAC_APP_PRESSED)
-    }
-
-    fun windowsSettingClicked() {
-        viewModelScope.launch {
-            command.send(LaunchWindows)
-        }
-        pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
-    }
-
     fun onAppTPSettingClicked() {
         viewModelScope.launch {
             if (appTrackingProtection.isOnboarded()) {

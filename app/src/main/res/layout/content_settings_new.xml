@@ -52,8 +52,8 @@
             android:layout_height="wrap_content" />
 
         <include
-            android:id="@+id/contentSettingsMore"
-            layout="@layout/content_settings_other"
+            android:id="@+id/contentSettingsNextSteps"
+            layout="@layout/content_settings_next_steps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

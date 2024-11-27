@@ -134,6 +134,7 @@
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
     <string name="settingsHeadingMore">More From DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Next Steps</string>
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
