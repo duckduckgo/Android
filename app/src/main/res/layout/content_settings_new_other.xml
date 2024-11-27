@@ -33,4 +33,11 @@
         app:primaryText="@string/settingsHeadingAbout"
         app:leadingIcon="@drawable/ic_dax_icon" />
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/shareFeedbackSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/leaveFeedback"
+        app:leadingIcon="@drawable/ic_heart_gray_color_24" />
+
 </LinearLayout>

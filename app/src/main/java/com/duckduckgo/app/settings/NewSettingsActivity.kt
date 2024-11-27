@@ -27,9 +27,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
+import com.duckduckgo.app.about.FeedbackContract
 import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
@@ -40,6 +42,27 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchMacOs
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWindows
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -62,8 +85,10 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -101,6 +126,16 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
     private val duckPlayerSettingsPlugin by lazy {
         _duckPlayerSettingsPlugin.getPlugins()
+    }
+
+    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
+        if (resultOk) {
+            Snackbar.make(
+                binding.root,
+                R.string.thanksForTheFeedback,
+                Snackbar.LENGTH_LONG,
+            ).show()
+        }
     }
 
     private val viewsPrivacy
@@ -166,6 +201,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
         with(viewsOther) {
             aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
+            shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
         }
     }
 
@@ -271,25 +307,27 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
-            is Command.LaunchAutofillSettings -> launchAutofillSettings()
-            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
-            is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
-            is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
-            is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
-            is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is Command.LaunchMacOs -> launchMacOsScreen()
-            is Command.LaunchWindows -> launchWindowsScreen()
-            is Command.LaunchSyncSettings -> launchSyncSettings()
-            is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
-            is Command.LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
-            is Command.LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
-            is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
-            is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
-            is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
-            is Command.LaunchAboutScreen -> launchAboutScreen()
-            is Command.LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
+            is LaunchDefaultBrowser -> launchDefaultAppScreen()
+            is LaunchAutofillSettings -> launchAutofillSettings()
+            is LaunchAccessibilitySettings -> launchAccessibilitySettings()
+            is LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
+            is LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
+            is LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
+            is LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
+            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
+            is LaunchMacOs -> launchMacOsScreen()
+            is LaunchWindows -> launchWindowsScreen()
+            is LaunchSyncSettings -> launchSyncSettings()
+            is LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
+            is LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
+            is LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
+            is LaunchFireButtonScreen -> launchFireButtonScreen()
+            is LaunchPermissionsScreen -> launchPermissionsScreen()
+            is LaunchAppearanceScreen -> launchAppearanceScreen()
+            is LaunchAboutScreen -> launchAboutScreen()
+            is LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
+            is LaunchFeedback -> launchFeedback()
+            is LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
             null -> TODO()
         }
     }
@@ -402,6 +440,17 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun launchGeneralSettingsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, GeneralSettingsScreenNoParams, options)
+    }
+
+    private fun launchFeedback() {
+        feedbackFlow.launch(null)
+    }
+
+    private fun launchPproUnifiedFeedback() {
+        globalActivityStarter.start(
+            this,
+            GeneralPrivacyProFeedbackScreenNoParams,
+        )
     }
 
     companion object {
