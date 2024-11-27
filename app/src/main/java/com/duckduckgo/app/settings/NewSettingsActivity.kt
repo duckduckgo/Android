@@ -112,6 +112,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private val viewsNextSteps
         get() = binding.includeSettings.contentSettingsNextSteps
 
+    private val viewsOther
+        get() = binding.includeSettings.contentSettingsOther
+
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
@@ -152,7 +155,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
-            aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
         }
 
@@ -160,6 +162,10 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             addWidgetToHomeScreenSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             addressBarPositionSetting.setOnClickListener { viewModel.onChangeAddressBarPositionClicked() }
             enableVoiceSearchSetting.setOnClickListener { viewModel.onEnableVoiceSearchClicked() }
+        }
+
+        with(viewsOther) {
+            aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
         }
     }
 

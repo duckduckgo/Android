@@ -26,4 +26,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/aboutSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsHeadingAbout"
+        app:leadingIcon="@drawable/ic_dax_icon" />
+
 </LinearLayout>
