@@ -20,6 +20,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 interface NewSettingsFeature {
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 }
