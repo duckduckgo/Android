@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.dashboard.impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -187,7 +186,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
 
     override suspend fun canPrompt(): Boolean =
         withContext(dispatcherProvider.io()) {
-
             val currentTimeMillis = DatabaseDateFormatter.millisIso8601()
 
             suspend fun checkRecentSends(): Boolean {
@@ -203,14 +201,18 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
             suspend fun checkDismissInterval(): Boolean {
                 val promptsDismissed = getPromptsDismissed()
                 val dismissInterval = getDismissInterval()
-                Timber.v("Katetest-> dismissInterval: $dismissInterval, " +
-                    "lastPromptDismissed: ${promptsDismissed.maxOrNull()}")
+                Timber.v(
+                    "Katetest-> dismissInterval: $dismissInterval, " +
+                        "lastPromptDismissed: ${promptsDismissed.maxOrNull()}",
+                )
                 return currentTimeMillis - (promptsDismissed.maxOfOrNull { it.toLong() } ?: 0) >
                     dismissInterval * 1000L
             }
-            Timber.v("Katetest-> promptLimitEnabled: ${getPromptLimitLogicEnabled()}, " +
-                "dismissLogicEnabled: ${getDismissLogicEnabled()}, checkRecentSends: ${checkRecentSends()}, " +
-                "checkDismissInterval: ${checkDismissInterval()}")
+            Timber.v(
+                "Katetest-> promptLimitEnabled: ${getPromptLimitLogicEnabled()}, " +
+                    "dismissLogicEnabled: ${getDismissLogicEnabled()}, checkRecentSends: ${checkRecentSends()}, " +
+                    "checkDismissInterval: ${checkDismissInterval()}",
+            )
             return@withContext when {
                 getPromptLimitLogicEnabled() && getDismissLogicEnabled() ->
                     checkRecentSends() && checkDismissInterval()

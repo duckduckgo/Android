@@ -22,7 +22,10 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore
+import com.duckduckgo.privacy.dashboard.impl.ToggleReportsFeature
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -31,6 +34,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -46,52 +51,93 @@ class ToggleReportsDataStoreTest {
         produceFile = { context.preferencesDataStoreFile("toggle_reports") },
     )
 
+    private val moshi = Moshi.Builder().build()
+    private val dispatcherProvider = coroutineRule.testDispatcherProvider
+    private lateinit var mockToggleReportsFeature: ToggleReportsFeature
+    private lateinit var mockSelfToggle: Toggle
+
     private lateinit var testee: SharedPreferencesToggleReportsDataStore
 
     @Before
-    fun setUp() {
-        testee = SharedPreferencesToggleReportsDataStore(testDataStore)
+    fun setup() {
+        mockToggleReportsFeature = mock(ToggleReportsFeature::class.java)
+        mockSelfToggle = mock(Toggle::class.java)
+
+        val defaultSettings = """
+        {
+            "dismissInterval": 1000000,
+            "promptInterval": 1000000,
+            "maxPromptCount": 3,
+            "dismissLogicEnabled": true,
+            "promptLimitLogicEnabled": true
+        }
+        """
+        whenever(mockToggleReportsFeature.self()).thenReturn(mockSelfToggle)
+        whenever(mockSelfToggle.getSettings()).thenReturn(defaultSettings)
+
+        testee = SharedPreferencesToggleReportsDataStore(testDataStore, moshi, mockToggleReportsFeature, dispatcherProvider)
     }
 
     @Test
-    fun whenDismissLogicAndPromptLimitLogicDisabledThenCanPrompt() = runTest {
-        testee.storeDismissLogicEnabled(false)
-        testee.storePromptLimitLogicEnabled(false)
+    fun whenDismissLogicAndPromptLimitLogicDisabledThenCanPromptReturnsTrue() = runTest {
+        val customSettings = """
+        {
+            "dismissInterval": 1000000,
+            "promptInterval": 1000000,
+            "maxPromptCount": 3,
+            "dismissLogicEnabled": false,
+            "promptLimitLogicEnabled": false
+        }
+        """
+        whenever(mockSelfToggle.getSettings()).thenReturn(customSettings)
+        assertTrue(testee.canPrompt())
+    }
+
+    @Test
+    fun whenNoStoredDismissalsOrSendsThenCanPromptReturnsTrue() = runTest {
         assertTrue(testee.canPrompt())
     }
 
     @Test
     fun whenDismissIntervalNotPassedThenCanPromptReturnsFalse() = runTest {
-        testee.storeDismissInterval(1000000) // Set a very long interval
-        testee.storeDismissLogicEnabled(true)
-        testee.storePromptLimitLogicEnabled(false)
         testee.insertTogglePromptDismiss()
         assertFalse(testee.canPrompt())
     }
 
     @Test
     fun whenDismissIntervalPassedThenCanPromptReturnsTrue() = runTest {
-        testee.storeDismissInterval(0)
-        testee.storeDismissLogicEnabled(true)
-        testee.storePromptLimitLogicEnabled(false)
+        val customSettings = """
+        {
+            "dismissInterval": 0,
+            "promptInterval": 1000000,
+            "maxPromptCount": 3,
+            "dismissLogicEnabled": true,
+            "promptLimitLogicEnabled": true
+        }
+        """
+        whenever(mockSelfToggle.getSettings()).thenReturn(customSettings)
         testee.insertTogglePromptDismiss()
         assertTrue(testee.canPrompt())
     }
 
     @Test
     fun whenPromptIntervalPassedThenCanPromptReturnsTrue() = runTest {
-        testee.storePromptInterval(0)
-        testee.storePromptLimitLogicEnabled(true)
-        testee.storeDismissLogicEnabled(false)
+        val customSettings = """
+        {
+            "dismissInterval": 1000000,
+            "promptInterval": 0,
+            "maxPromptCount": 3,
+            "dismissLogicEnabled": true,
+            "promptLimitLogicEnabled": true
+        }
+        """
+        whenever(mockSelfToggle.getSettings()).thenReturn(customSettings)
         testee.insertTogglePromptSend()
         assertTrue(testee.canPrompt())
     }
 
     @Test
     fun whenMaxPromptCountIsReachedThenCanPromptReturnsFalse() = runTest {
-        testee.storeMaxPromptCount(3)
-        testee.storePromptLimitLogicEnabled(true)
-        testee.storeDismissLogicEnabled(false)
         testee.insertTogglePromptSend()
         assertTrue(testee.canPrompt())
         testee.insertTogglePromptSend()
@@ -102,11 +148,16 @@ class ToggleReportsDataStoreTest {
 
     @Test
     fun whenAllConditionsAreFavorableThenCanPromptReturnsTrue() = runTest {
-        testee.storePromptLimitLogicEnabled(true)
-        testee.storeDismissLogicEnabled(true)
-        testee.storeMaxPromptCount(5)
-        testee.storeDismissInterval(0)
-        testee.storePromptInterval(0)
+        val customSettings = """
+        {
+            "dismissInterval": 0,
+            "promptInterval": 0,
+            "maxPromptCount": 5,
+            "dismissLogicEnabled": true,
+            "promptLimitLogicEnabled": true
+        }
+        """
+        whenever(mockSelfToggle.getSettings()).thenReturn(customSettings)
         assertTrue(testee.canPrompt())
     }
 }

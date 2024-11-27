@@ -3081,7 +3081,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-            ).show()
+        ).show()
     }
 
     private fun launchSharePageChooser(
