@@ -96,7 +96,13 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onSubmitBrokenSiteReport = { payload ->
                     val reportFlow = when (params) {
                         is PrivacyDashboardPrimaryScreen, null -> ReportFlow.DASHBOARD
-                        is BrokenSiteForm -> ReportFlow.MENU
+                        is BrokenSiteForm -> {
+                            if ((params as BrokenSiteForm).reportFlow == BrokenSiteForm.BrokenSiteFormReportFlow.MENU) {
+                                ReportFlow.MENU
+                            } else {
+                                ReportFlow.PROMPT
+                            }
+                        }
                     }
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
                 },
