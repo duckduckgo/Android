@@ -46,8 +46,8 @@
         </LinearLayout>
 
         <include
-            android:id="@+id/contentSettingsSettings"
-            layout="@layout/content_settings_settings"
+            android:id="@+id/contentSettingsMain"
+            layout="@layout/content_settings_main_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

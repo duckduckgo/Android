@@ -106,8 +106,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
-    private val viewsSettings
-        get() = binding.includeSettings.contentSettingsSettings
+    private val viewsMain
+        get() = binding.includeSettings.contentSettingsMain
 
     private val viewsMore
         get() = binding.includeSettings.contentSettingsMore
@@ -145,7 +145,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
 
-        with(viewsSettings) {
+        with(viewsMain) {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
@@ -173,10 +173,10 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
 
         if (duckPlayerSettingsPlugin.isEmpty()) {
-            viewsSettings.settingsSectionDuckPlayer.gone()
+            viewsMain.settingsSectionDuckPlayer.gone()
         } else {
             duckPlayerSettingsPlugin.forEach { plugin ->
-                viewsSettings.settingsSectionDuckPlayer.addView(plugin.getView(this))
+                viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
     }
@@ -230,13 +230,13 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
         if (isDuckPlayerEnabled) {
-            viewsSettings.settingsSectionDuckPlayer.show()
+            viewsMain.settingsSectionDuckPlayer.show()
         } else {
-            viewsSettings.settingsSectionDuckPlayer.gone()
+            viewsMain.settingsSectionDuckPlayer.gone()
         }
     }
 
-    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsSettings.autofillLoginsSetting) {
+    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {
         visibility = if (autofillEnabled) {
             View.VISIBLE
         } else {
@@ -249,7 +249,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateSyncSetting(visible: Boolean) {
-        with(viewsSettings.syncSetting) {
+        with(viewsMain.syncSetting) {
             isVisible = visible
         }
     }
