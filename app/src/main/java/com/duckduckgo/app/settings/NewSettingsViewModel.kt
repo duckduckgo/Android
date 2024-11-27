@@ -203,6 +203,10 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(LaunchAddHomeScreenWidget) }
     }
 
+    fun onChangeAddressBarPositionClicked() {
+        viewModelScope.launch { command.send(LaunchAppearanceScreen) }
+    }
+
     fun onDefaultBrowserSettingClicked() {
         val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
         viewModelScope.launch {

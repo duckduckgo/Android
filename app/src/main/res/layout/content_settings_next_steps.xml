@@ -39,4 +39,11 @@
         app:leadingIcon="@drawable/ic_add_widget_color_24"
         app:primaryText="@string/settingsAddWidget" />
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/addressBarPositionSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_address_bar_position_bottom_color_24"
+        app:primaryText="@string/settingsAddressBarPosition" />
+
 </LinearLayout>

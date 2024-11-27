@@ -158,6 +158,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
         with(viewsNextSteps) {
             addWidgetToHomeScreenSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+            addressBarPositionSetting.setOnClickListener { viewModel.onChangeAddressBarPositionClicked() }
         }
     }
 
