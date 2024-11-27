@@ -63,7 +63,6 @@ import com.squareup.moshi.Types
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -369,7 +368,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     userAllowListRepository.addDomainToUserAllowList(domain)
                     if (event.eventOrigin.screen == PRIMARY_SCREEN) {
                         if (toggleReports.shouldPrompt()) {
-                            withContext(Dispatchers.Main) {
+                            viewModelScope.launch(dispatcher.main()) {
                                 command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
                             }
                         }
