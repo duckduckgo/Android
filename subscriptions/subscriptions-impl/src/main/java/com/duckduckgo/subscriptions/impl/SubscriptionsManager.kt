@@ -47,7 +47,6 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -551,7 +550,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
         authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
         authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
-        authRepository.setEntitlements(accessTokenClaims.entitlements.toEntitlements())
+        authRepository.setEntitlements(accessTokenClaims.entitlements)
         authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
         backgroundTokenRefresh.schedule()
     }
@@ -913,6 +912,3 @@ data class ValidatedTokenPair(
     val refreshToken: String,
     val refreshTokenClaims: RefreshTokenClaims,
 )
-
-private fun List<com.duckduckgo.subscriptions.impl.auth2.Entitlement>.toEntitlements(): List<Entitlement> =
-    map { entitlement -> Entitlement(entitlement.name, entitlement.product) }

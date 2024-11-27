@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.auth2
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.squareup.anvil.annotations.ContributesBinding
 import io.jsonwebtoken.Claims
 import java.util.*
