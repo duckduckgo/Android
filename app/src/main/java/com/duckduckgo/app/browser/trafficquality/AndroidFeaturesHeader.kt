@@ -18,11 +18,7 @@ package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
-import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderSettingStore
-import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderStore
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,14 +37,13 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
             duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         ) {
             val headerValue = androidFeaturesHeaderProvider.provide()
-            return if (headerValue != null){
+            return if (headerValue != null) {
                 mapOf(
                     X_DUCKDUCKGO_ANDROID_HEADER to headerValue,
                 )
             } else {
                 emptyMap()
             }
-
         }
         return emptyMap()
     }

@@ -28,7 +28,7 @@ interface FeaturesRequestHeaderStore {
 }
 
 private data class TrafficQualitySettingsJson(
-    val versions: List<TrafficQualityAppVersion>
+    val versions: List<TrafficQualityAppVersion>,
 )
 
 data class TrafficQualityAppVersion(
@@ -48,7 +48,7 @@ data class TrafficQualityAppVersionFeatures(
 @ContributesBinding(AppScope::class)
 class FeaturesRequestHeaderSettingStore @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val moshi: Moshi
+    private val moshi: Moshi,
 ) : FeaturesRequestHeaderStore {
 
     private val jsonAdapter: JsonAdapter<TrafficQualitySettingsJson> by lazy {

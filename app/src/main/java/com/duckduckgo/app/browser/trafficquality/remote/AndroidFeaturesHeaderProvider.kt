@@ -23,8 +23,8 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 interface AndroidFeaturesHeaderProvider {
     fun provide(): String?
@@ -38,38 +38,60 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     private val gpc: Gpc,
     private val appTrackingProtection: AppTrackingProtection,
     private val networkProtectionState: NetworkProtectionState,
-): AndroidFeaturesHeaderProvider {
+) : AndroidFeaturesHeaderProvider {
     override fun provide(): String? {
-        return runBlocking {
-            val versionConfig = featuresRequestHeaderStore.getConfig(appBuildConfig.versionCode)
-            if (versionConfig != null){
-                val params = mutableMapOf<String, String>()
-                if (versionConfig.features.cpm){
-                    params[CPM_HEADER] = autoconsent.isAutoconsentEnabled().toString()
-                }
-                if (versionConfig.features.gpc){
-                    params[GPC_HEADER] = gpc.isEnabled().toString()
-                }
-                if (versionConfig.features.appTP){
-                    params[APP_TP_HEADER] = appTrackingProtection.isEnabled().toString()
-                }
+        val versionConfig = featuresRequestHeaderStore.getConfig(appBuildConfig.versionCode)
+        if (versionConfig != null) {
+            if (isTooSoonToLog(versionConfig)) {
+                return null
+            }
+            if (isTooLateToLog(versionConfig)) {
+                return null
+            }
+            return mapFeatures(versionConfig)
+        } else {
+            return null
+        }
+    }
 
-                if (versionConfig.features.netP){
-                    params[NET_P_HEADER] = networkProtectionState.isEnabled().toString()
-                }
-                val randomIndex = (0 until params.size).random()
-                params.keys.toList()[randomIndex]
-            } else {
+    private fun isTooSoonToLog(versionConfig: TrafficQualityAppVersion): Boolean {
+        return false
+    }
+
+    private fun isTooLateToLog(versionConfig: TrafficQualityAppVersion): Boolean {
+        return false
+    }
+
+    private fun mapFeatures(versionConfig: TrafficQualityAppVersion): String? {
+        return runBlocking {
+            val params = mutableMapOf<String, String>()
+            if (versionConfig.features.cpm) {
+                params[CPM_HEADER] = autoconsent.isAutoconsentEnabled().toString()
+            }
+            if (versionConfig.features.gpc) {
+                params[GPC_HEADER] = gpc.isEnabled().toString()
+            }
+            if (versionConfig.features.appTP) {
+                params[APP_TP_HEADER] = appTrackingProtection.isEnabled().toString()
+            }
+
+            if (versionConfig.features.netP) {
+                params[NET_P_HEADER] = networkProtectionState.isEnabled().toString()
+            }
+
+            if (params.isEmpty()) {
                 null
+            } else {
+                val randomIndex = (0 until params.size).random()
+                params.keys.toList()[randomIndex].plus("=").plus(params.values.toList()[randomIndex])
             }
         }
-
     }
 
     companion object {
         private const val CPM_HEADER = "cpm_enabled"
         private const val GPC_HEADER = "gpc_enabled"
-        private const val APP_TP_HEADER = "vpn_enabled"
-        private const val NET_P_HEADER = "atp_enabled"
+        private const val APP_TP_HEADER = "atp_enabled"
+        private const val NET_P_HEADER = "vpn_enabled"
     }
 }
