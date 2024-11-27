@@ -20,8 +20,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
+import com.duckduckgo.app.settings.LegacySettingsViewModel.Command
+import com.duckduckgo.app.settings.LegacySettingsViewModel.Companion.EMAIL_PROTECTION_URL
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -52,7 +52,7 @@ class SettingsViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var testee: SettingsViewModel
+    private lateinit var testee: LegacySettingsViewModel
 
     @Mock
     private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
@@ -95,7 +95,7 @@ class SettingsViewModelTest {
             whenever(subscriptions.isEligible()).thenReturn(true)
         }
 
-        testee = SettingsViewModel(
+        testee = LegacySettingsViewModel(
             mockDefaultBrowserDetector,
             appTrackingProtection,
             mockPixel,
