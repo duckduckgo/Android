@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Настройки на абонамент</string>
     <string name="subscriptionSettingSubscribe">Защитете връзката и самоличността си с Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">Включва нашите функции VPN, Personal Information Removal и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Включва нашите функции VPN и Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Вземете Privacy Pro</string>
     <string name="subscriptionSettingRestore">Имам абонамент</string>
     <string name="subscriptionSettingWaiting">Вашият абонамент се активира</string>
