@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
+package com.duckduckgo.subscriptions.impl.model
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
+data class Entitlement(
+    /**
+     * Name of the entitlement.
+     */
+    val name: String,
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(17)
-}
+    /**
+     * Name of the product represented by this entitlement.
+     */
+    val product: String,
+)

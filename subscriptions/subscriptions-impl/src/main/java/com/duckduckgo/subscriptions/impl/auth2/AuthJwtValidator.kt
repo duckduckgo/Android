@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.authjwt.api
+package com.duckduckgo.subscriptions.impl.auth2
 
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import java.time.Instant
 
 /**
@@ -75,16 +76,4 @@ data class RefreshTokenClaims(
      * The External ID of the account authorized by this token.
      */
     val accountExternalId: String,
-)
-
-data class Entitlement(
-    /**
-     * Name of the product represented by this entitlement.
-     */
-    val product: String,
-
-    /**
-     * Name of the entitlement.
-     */
-    val name: String,
 )
