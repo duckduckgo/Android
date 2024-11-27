@@ -2617,17 +2617,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun userRequestedOpeningNewTab(longPress: Boolean = false) {
+        command.value = GenerateWebViewPreviewImage
+
         val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
         if (emptyTab != null) {
             viewModelScope.launch {
                 tabRepository.select(tabId = emptyTab)
             }
-        } else if (!url.isNullOrEmpty() || (tabs.value?.size ?: 0) > 1) {
-            command.value = GenerateWebViewPreviewImage
+        } else {
             command.value = LaunchNewTab
-            if (longPress) {
-                pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
-            }
+        }
+        if (longPress) {
+            pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
         onUserDismissedCta(ctaViewState.value?.cta)
     }
