@@ -135,9 +135,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
-    lateinit var swipingTabsFeature: SwipingTabsFeature
-
-    @Inject
     lateinit var tabManager: TabManager
 
     private var currentTab: BrowserTabFragment?
