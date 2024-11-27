@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Paramètres d\'abonnement</string>
     <string name="subscriptionSettingSubscribe">Protégez votre connexion et votre identité avec Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">Comprend notre VPN, Personal Information Removal et Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Comprend notre VPN et Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Obtenir Privacy Pro</string>
     <string name="subscriptionSettingRestore">J\'ai un abonnement</string>
     <string name="subscriptionSettingWaiting">Votre abonnement est en cours d’activation</string>
