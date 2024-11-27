@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Nastavenia predplatného</string>
     <string name="subscriptionSettingSubscribe">Chráň si pripojenie a totožnosť pomocou Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">Zahŕňa naše služby VPN, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Zahŕňa našu VPN a Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
     <string name="subscriptionSettingRestore">Mám predplatné</string>
     <string name="subscriptionSettingWaiting">Vaše predplatné sa aktivuje</string>
@@ -79,7 +80,7 @@
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Máš všetko pripravené.</string>
     <string name="purchaseCompletedText">Tvoj nákup bol úspešný.</string>
-    <string name="purchaseRecoveredText">Už si mal/-a predplatné a my sme to za teba obnovili.</string>
+    <string name="purchaseRecoveredText">Už si mal/-a predplatné a my sme ho pre teba obnovili.</string>
     <string name="purchaseErrorTitle">Vyskytla sa chyba</string>
     <string name="purchaseError">Máme problémy s pripojením. Prosím, skús to neskôr znova.</string>
 
