@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Abonnementinstellingen</string>
     <string name="subscriptionSettingSubscribe">Bescherm je verbinding en identiteit met Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">Inclusief onze VPN, Personal Information Removal en Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Inclusief onze VPN en Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Privacy Pro kopen</string>
     <string name="subscriptionSettingRestore">Ik heb een abonnement</string>
     <string name="subscriptionSettingWaiting">Je abonnement wordt geactiveerd</string>
