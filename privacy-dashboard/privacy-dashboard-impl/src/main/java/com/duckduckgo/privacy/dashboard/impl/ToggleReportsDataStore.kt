@@ -36,7 +36,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 interface ToggleReportsDataStore {
 
@@ -146,7 +145,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
                 }
                 val dismissTime = DatabaseDateFormatter.millisIso8601().toString()
                 currentSet.add(dismissTime)
-                Timber.v("KateTest--> dismissTime stored: $dismissTime")
                 prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED] = currentSet
             }
         }
@@ -170,7 +168,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
                     (currentTimeMillis - storedTime > interval * 1000L)
                 }
                 val sendTime = DatabaseDateFormatter.millisIso8601().toString()
-                Timber.v("KateTest--> sendTime stored: $sendTime")
                 currentSet.add(sendTime)
                 prefs[TOGGLE_REPORTS_SENT] = currentSet
             }
@@ -192,7 +189,6 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
                 val reportsSent = getReportsSent()
                 val promptInterval = getPromptInterval()
                 val maxPromptCount = getMaxPromptCount()
-                Timber.v("Katetest-> reportSendCount: ${reportsSent.count()}, max: $maxPromptCount")
                 return reportsSent.count { sendTime ->
                     currentTimeMillis - sendTime.toLong() <= promptInterval * 1000L
                 } < maxPromptCount
@@ -201,18 +197,10 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
             suspend fun checkDismissInterval(): Boolean {
                 val promptsDismissed = getPromptsDismissed()
                 val dismissInterval = getDismissInterval()
-                Timber.v(
-                    "Katetest-> dismissInterval: $dismissInterval, " +
-                        "lastPromptDismissed: ${promptsDismissed.maxOrNull()}",
-                )
                 return currentTimeMillis - (promptsDismissed.maxOfOrNull { it.toLong() } ?: 0) >
                     dismissInterval * 1000L
             }
-            Timber.v(
-                "Katetest-> promptLimitEnabled: ${getPromptLimitLogicEnabled()}, " +
-                    "dismissLogicEnabled: ${getDismissLogicEnabled()}, checkRecentSends: ${checkRecentSends()}, " +
-                    "checkDismissInterval: ${checkDismissInterval()}",
-            )
+
             return@withContext when {
                 getPromptLimitLogicEnabled() && getDismissLogicEnabled() ->
                     checkRecentSends() && checkDismissInterval()

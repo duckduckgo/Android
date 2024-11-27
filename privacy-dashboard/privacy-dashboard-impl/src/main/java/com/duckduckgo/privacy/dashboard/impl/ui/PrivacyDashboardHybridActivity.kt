@@ -56,7 +56,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.Initial
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivacyDashboardHybridScreenParams::class)
@@ -180,9 +179,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is OpenURL -> openUrl(it.url)
             is OpenSettings -> openSettings(it.target)
             GoBack -> {
-                Timber.v("Katetest-> GoBack CMD called")
                 if (webView.canGoBack()) {
-                    Timber.v("Katetest-> Webview can go back")
                     webView.goBack()
                 } else {
                     finish()

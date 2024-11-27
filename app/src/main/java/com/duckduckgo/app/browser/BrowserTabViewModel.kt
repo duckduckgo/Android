@@ -2262,12 +2262,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun performToggleReportCheck() {
         if (toggleReports.shouldPrompt()) {
-            Timber.v("Katetest-> shouldPrompt==TRUE")
             withContext(dispatchers.main()) {
                 command.value = ToggleReportFeedback(opener = DashboardOpener.MENU)
             }
-        } else {
-            Timber.v("Katetest-> shouldPrompt==FALSE")
         }
     }
 
