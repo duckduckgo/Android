@@ -47,11 +47,11 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting

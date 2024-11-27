@@ -28,6 +28,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
@@ -245,8 +246,3 @@ fun List<Entitlement>.toProductList(): List<Product> {
         emptyList()
     }
 }
-
-data class Entitlement(
-    val name: String,
-    val product: String,
-)
