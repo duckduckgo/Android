@@ -26,6 +26,7 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
+import androidx.core.view.isGone
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +44,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -52,6 +54,9 @@ import kotlinx.coroutines.flow.onEach
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AboutScreenNoParams::class)
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var settingsFeature: NewSettingsFeature
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
@@ -74,6 +79,8 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        binding.includeContent.aboutProvideFeedback.isGone = settingsFeature.self().isEnabled()
 
         configureUiEventHandlers()
         observeViewModel()
