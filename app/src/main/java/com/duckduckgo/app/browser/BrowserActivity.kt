@@ -82,11 +82,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -133,6 +133,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var isSwipingTabsFeatureEnabled: IsSwipingTabsFeatureEnabled
 
     @Inject
     lateinit var tabManager: TabManager
@@ -590,7 +593,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @SuppressLint("ClickableViewAccessibility", "WrongConstant")
     private fun initializeTabs() {
-        if (swipingTabsFeature.self().isEnabled()) {
+        if (isSwipingTabsFeatureEnabled()) {
             tabPager.adapter = tabManager.tabPagerAdapter
             tabPager.offscreenPageLimit = 1
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
