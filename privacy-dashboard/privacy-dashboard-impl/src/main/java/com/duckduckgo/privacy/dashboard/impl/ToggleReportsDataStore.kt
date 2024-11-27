@@ -23,7 +23,6 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_PROMPTS_DISMISSED
 import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataStore.Keys.TOGGLE_REPORTS_SENT
 import com.squareup.anvil.annotations.ContributesBinding
@@ -34,7 +33,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 interface ToggleReportsDataStore {
@@ -74,7 +73,6 @@ data class ToggleReportsSetting(
     val maxPromptCount: Int,
 )
 
-@RemoteFeatureStoreNamed(ToggleReportsFeature::class)
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesToggleReportsDataStore @Inject constructor(
@@ -152,8 +150,8 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
 
     override suspend fun getPromptsDismissed(): List<String> =
         withContext(dispatcherProvider.io()) {
-            return@withContext store.data.firstOrNull().let { prefs ->
-                prefs?.get(TOGGLE_REPORTS_PROMPTS_DISMISSED)?.toList() ?: emptyList()
+            return@withContext store.data.first().let { prefs ->
+                prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
             }
         }
 
@@ -176,8 +174,8 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
 
     override suspend fun getReportsSent(): List<String> =
         withContext(dispatcherProvider.io()) {
-            return@withContext store.data.firstOrNull().let { prefs ->
-                prefs?.get(TOGGLE_REPORTS_SENT)?.toList() ?: emptyList()
+            return@withContext store.data.first().let { prefs ->
+                prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
             }
         }
 
