@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Prenumeratos nustatymai</string>
     <string name="subscriptionSettingSubscribe">Apsaugokite savo ryšį ir tapatybę su „Privacy Pro“.</string>
     <string name="subscriptionSettingSubscribeSubtitle">Apima mūsų VPN, Asmens duomenų pašalinimą ir Tapatybės vagystės atkūrimą.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Apima mūsų VPN ir Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Gaukite „Privacy Pro“</string>
     <string name="subscriptionSettingRestore">Turiu prenumeratą</string>
     <string name="subscriptionSettingWaiting">Jūsų prenumerata aktyvuojama</string>
@@ -79,7 +80,7 @@
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viskas paruošta.</string>
     <string name="purchaseCompletedText">Jūsų pirkinys buvo sėkmingas.</string>
-    <string name="purchaseRecoveredText">Jau turėjote prenumeratą ir mes ją jums atkūrėme.</string>
+    <string name="purchaseRecoveredText">Jau turėjai prenumeratą ir mes ją tau atkūrėme.</string>
     <string name="purchaseErrorTitle">Įvyko klaida</string>
     <string name="purchaseError">Mums kyla problemų prijungiant. Bandykite dar kartą vėliau.</string>
 
