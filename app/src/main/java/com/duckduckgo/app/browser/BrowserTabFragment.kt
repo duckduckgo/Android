@@ -1526,8 +1526,14 @@ class BrowserTabFragment :
 
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
-            is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
-            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
+            is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
+                refresh()
+                privacyProtectionEnabledConfirmation(it.domain)
+            }
+            is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
+                refresh()
+                privacyProtectionDisabledConfirmation(it.domain)
+            }
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)

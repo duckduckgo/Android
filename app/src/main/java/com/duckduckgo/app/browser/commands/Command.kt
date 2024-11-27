@@ -78,8 +78,8 @@ sealed class Command {
 
     class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
     class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
-    class ShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
-    class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
+    class RefreshAndShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
+    class RefreshAndShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
     object AskToDisableLoginDetection : Command()
     class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
     class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()

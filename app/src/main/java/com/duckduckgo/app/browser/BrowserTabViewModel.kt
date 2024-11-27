@@ -141,8 +141,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
@@ -1464,7 +1464,13 @@ class BrowserTabViewModel @Inject constructor(
         if (domain != null) {
             allowlistRefreshTriggerJob = isDomainInUserAllowlist(domain)
                 .drop(count = 1) // skip current state - we're only interested in change events
-                .onEach { command.postValue(NavigationCommand.Refresh) }
+                .onEach { isInAllowList ->
+                    if (isInAllowList) {
+                        command.postValue(RefreshAndShowPrivacyProtectionDisabledConfirmation(domain))
+                    } else {
+                        command.postValue(RefreshAndShowPrivacyProtectionEnabledConfirmation(domain))
+                    }
+                }
                 .launchIn(viewModelScope)
         }
 
@@ -2284,7 +2290,6 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }
@@ -2305,7 +2310,6 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOn(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = false)
         }
     }

@@ -82,8 +82,8 @@ import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
@@ -2010,7 +2010,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
+        assertCommandIssued<RefreshAndShowPrivacyProtectionDisabledConfirmation> {
             assertEquals("www.example.com", this.domain)
         }
     }
@@ -2030,7 +2030,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
+        assertCommandIssued<RefreshAndShowPrivacyProtectionEnabledConfirmation> {
             assertEquals("www.example.com", this.domain)
         }
     }
