@@ -864,6 +864,10 @@ class BrowserTabFragment :
             dialog.deleteBookmarkListener = viewModel
         }
 
+        disableSwipingOutsideTheOmnibar()
+    }
+
+    private fun disableSwipingOutsideTheOmnibar() {
         newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
             (v as FrameLayout).requestDisallowInterceptTouchEvent(true)
             return@setOnTouchListener true

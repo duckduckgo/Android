@@ -229,13 +229,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-
-        // lifecycleScope.launch {
-        //     repeat(100) {
-        //         viewModel.onOpenInNewTabRequested("cnn.com")
-        //         kotlinx.coroutines.delay(1000)
-        //     }
-        // }
     }
 
     override fun onStop() {
