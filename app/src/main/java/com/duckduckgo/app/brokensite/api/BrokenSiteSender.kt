@@ -32,9 +32,9 @@ import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
-import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_MENU
+import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
