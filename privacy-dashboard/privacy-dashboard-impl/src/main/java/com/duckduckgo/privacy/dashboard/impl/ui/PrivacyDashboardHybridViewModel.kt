@@ -63,6 +63,7 @@ import com.squareup.moshi.Types
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -368,11 +369,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     userAllowListRepository.addDomainToUserAllowList(domain)
                     if (event.eventOrigin.screen == PRIMARY_SCREEN) {
                         if (toggleReports.shouldPrompt()) {
-                            command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
+                            withContext(Dispatchers.Main) {
+                                command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
+                            }
                         }
-                    }
-                    if (dashboardOpenedFromCustomTab) {
-                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                        if (dashboardOpenedFromCustomTab) {
                             pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
                         }
                     } else {

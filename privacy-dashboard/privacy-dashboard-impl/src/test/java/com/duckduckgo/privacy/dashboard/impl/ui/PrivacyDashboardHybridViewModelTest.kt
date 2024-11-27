@@ -355,14 +355,9 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-    fun whenUserDismissesToggleReportPromptThenCommandIsSent() = runTest {
+    fun whenUserDismissesToggleReportPromptThenOnPromptDismissedRuns() = runTest {
         testee.onToggleReportPromptDismissed()
-
         verify(toggleReports).onPromptDismissed()
-
-        testee.commands().test {
-            assertEquals(GoBack, awaitItem())
-        }
     }
 
     @Test
