@@ -588,7 +588,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun initializeTabs() {
         if (isSwipingTabsFeatureEnabled()) {
             tabPager.adapter = tabManager.tabPagerAdapter
-            tabPager.offscreenPageLimit = 1
+            // tabPager.offscreenPageLimit = 1
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2).toPx().toInt()))
 
@@ -702,7 +702,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun onMoveToTabRequested(index: Int) {
         Timber.d("### onMoveToTabRequested: $index")
 
-        tabPager.currentItem = index
+        tabPager.post {
+            tabPager.setCurrentItem(index, false)
+        }
     }
 
     private data class CombinedInstanceState(
