@@ -58,8 +58,6 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
-import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -113,6 +111,8 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState

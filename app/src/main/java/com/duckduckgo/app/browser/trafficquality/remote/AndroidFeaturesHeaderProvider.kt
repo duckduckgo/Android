@@ -23,6 +23,9 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
@@ -42,24 +45,30 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     override fun provide(): String? {
         val versionConfig = featuresRequestHeaderStore.getConfig(appBuildConfig.versionCode)
         if (versionConfig != null) {
-            if (isTooSoonToLog(versionConfig)) {
-                return null
+            if (shouldLogValue(versionConfig)) {
+                return mapFeatures(versionConfig)
             }
-            if (isTooLateToLog(versionConfig)) {
-                return null
-            }
-            return mapFeatures(versionConfig)
         } else {
             return null
         }
+
+        return null
     }
 
-    private fun isTooSoonToLog(versionConfig: TrafficQualityAppVersion): Boolean {
-        return false
-    }
+    private fun shouldLogValue(versionConfig: TrafficQualityAppVersion): Boolean {
+        val appBuildDateMillis = appBuildConfig.buildDateTimeMillis
+        if (appBuildDateMillis == 0L) {
+            return false
+        }
 
-    private fun isTooLateToLog(versionConfig: TrafficQualityAppVersion): Boolean {
-        return false
+        val appBuildDate = LocalDateTime.ofEpochSecond(appBuildDateMillis / 1000, 0, ZoneOffset.UTC)
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
+
+        val daysUntilLoggingStarts = versionConfig.daysUntilLoggingStarts
+        val daysForAppVersionLogging = versionConfig.daysUntilLoggingStarts + versionConfig.daysLogging
+
+        return daysSinceBuild in daysUntilLoggingStarts..daysForAppVersionLogging
     }
 
     private fun mapFeatures(versionConfig: TrafficQualityAppVersion): String? {

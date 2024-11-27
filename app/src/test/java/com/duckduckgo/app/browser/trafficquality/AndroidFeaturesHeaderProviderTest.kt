@@ -21,11 +21,12 @@ import com.duckduckgo.app.browser.trafficquality.remote.RealAndroidFeaturesHeade
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -38,11 +39,8 @@ class AndroidFeaturesHeaderProviderTest {
 
     private val currentVersion = 5210000
     private val anotherVersion = 5220000
-    private val appBuildConfig = mock<AppBuildConfig>().apply {
-        whenever(this.flavor).thenReturn(BuildFlavor.PLAY)
-        whenever(this.versionCode).thenReturn(currentVersion)
-    }
 
+    private val appBuildConfig: AppBuildConfig = mock()
     private val featuresRequestHeaderStore: FeaturesRequestHeaderStore = mock()
     private val mockAutoconsent: Autoconsent = mock()
     private val mockGpc: Gpc = mock()
@@ -61,6 +59,9 @@ class AndroidFeaturesHeaderProviderTest {
             mockAppTrackingProtection,
             mockNetworkProtectionState,
         )
+
+        whenever(appBuildConfig.versionCode).thenReturn(currentVersion)
+        givenBuildDateDaysAgo(6)
     }
 
     @Test
@@ -73,7 +74,7 @@ class AndroidFeaturesHeaderProviderTest {
 
     @Test
     fun whenCurrentVersionPresentAndNoFeaturesEnabledThenNoValueProvided() {
-        val noFeaturesEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, noFeaturesEnabled())
+        val noFeaturesEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, noFeaturesEnabled())
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(noFeaturesEnabled)
 
         val result = testee.provide()
@@ -83,7 +84,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndGPCFeatureEnabledAndGPCDisabledThenValueProvided() {
         whenever(mockGpc.isEnabled()).thenReturn(false)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(gpc = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -93,7 +94,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndGPCFeatureEnabledAndGPCEnabledThenValueProvided() {
         whenever(mockGpc.isEnabled()).thenReturn(true)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(gpc = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -103,7 +104,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndCPMFeatureEnabledAndCPMDisabledThenValueProvided() {
         whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(false)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(cpm = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(cpm = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -113,7 +114,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndCPMFeatureEnabledAndCPMEnabledThenValueProvided() {
         whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(true)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(cpm = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(cpm = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -123,7 +124,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndAppTPFeatureEnabledAndAppTPDisabledThenValueProvided() = runTest {
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(appTP = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(appTP = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -133,7 +134,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndAppTPFeatureEnabledAndAppTPEnabledThenValueProvided() = runTest {
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(appTP = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(appTP = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -143,7 +144,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndVPNFeatureEnabledAndVPNDisabledThenValueProvided() = runTest {
         whenever(mockNetworkProtectionState.isEnabled()).thenReturn(false)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(netP = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(netP = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -153,7 +154,7 @@ class AndroidFeaturesHeaderProviderTest {
     @Test
     fun whenCurrentVersionPresentAndVPNFeatureEnabledAndVPNEnabledThenValueProvided() = runTest {
         whenever(mockNetworkProtectionState.isEnabled()).thenReturn(true)
-        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(netP = true))
+        val gpcEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(netP = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(gpcEnabled)
 
         val result = testee.provide()
@@ -166,11 +167,31 @@ class AndroidFeaturesHeaderProviderTest {
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
         whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
-        val features = TrafficQualityAppVersion(currentVersion, 1, 1, featuresEnabled(gpc = true, cpm = true, appTP = true, netP = true))
+        val features = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true, cpm = true, appTP = true, netP = true))
         whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(features)
 
         val result = testee.provide()
         assertTrue(result == "vpn_enabled=true" || result == "cpm_enabled=true" || result == "gpc_enabled=true" || result == "atp_enabled=true")
+    }
+
+    @Test
+    fun whenItsTooEarlyToLogThenNoValueProvided() = runTest {
+        givenBuildDateDaysAgo(1)
+        val features = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true, cpm = true, appTP = true, netP = true))
+        whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(features)
+
+        val result = testee.provide()
+        assertNull(result)
+    }
+
+    @Test
+    fun whenItsTooLateToLogThenNoValueProvided() = runTest {
+        givenBuildDateDaysAgo(20)
+        val features = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true, cpm = true, appTP = true, netP = true))
+        whenever(featuresRequestHeaderStore.getConfig(currentVersion)).thenReturn(features)
+
+        val result = testee.provide()
+        assertNull(result)
     }
 
     private fun noFeaturesEnabled(): TrafficQualityAppVersionFeatures {
@@ -184,5 +205,10 @@ class AndroidFeaturesHeaderProviderTest {
         netP: Boolean = false,
     ): TrafficQualityAppVersionFeatures {
         return TrafficQualityAppVersionFeatures(gpc = gpc, cpm = cpm, appTP = appTP, netP = netP)
+    }
+
+    private fun givenBuildDateDaysAgo(days: Long) {
+        val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        whenever(appBuildConfig.buildDateTimeMillis).thenReturn(daysAgo)
     }
 }
