@@ -53,7 +53,7 @@
         android:id="@+id/autofillLoginsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAutofillLoginsSetting" />
+        app:primaryText="@string/settingsPasswordsAndAutofillLoginsSetting" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
@@ -71,7 +71,7 @@
         android:id="@+id/fireButtonSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireButton" />
+        app:primaryText="@string/settingsDataClearing" />
 
     <LinearLayout
         android:id="@+id/settingsSectionDuckPlayer"
