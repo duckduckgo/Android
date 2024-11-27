@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.trafficquality
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
+import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderSettingStore
+import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderStore
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -26,6 +32,7 @@ import javax.inject.Inject
 class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val androidFeaturesHeaderProvider: AndroidFeaturesHeaderProvider,
 ) : CustomHeadersPlugin {
 
     override fun getHeaders(url: String): Map<String, String> {
@@ -33,15 +40,20 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
             androidBrowserConfigFeature.featuresRequestHeader().isEnabled() &&
             duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         ) {
-            return mapOf(
-                X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE,
-            )
+            val headerValue = androidFeaturesHeaderProvider.provide()
+            return if (headerValue != null){
+                mapOf(
+                    X_DUCKDUCKGO_ANDROID_HEADER to headerValue,
+                )
+            } else {
+                emptyMap()
+            }
+
         }
         return emptyMap()
     }
 
     companion object {
         internal const val X_DUCKDUCKGO_ANDROID_HEADER = "x-duckduckgo-android"
-        internal const val TEST_VALUE = "test"
     }
 }

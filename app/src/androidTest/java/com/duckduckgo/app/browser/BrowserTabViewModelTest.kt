@@ -58,8 +58,8 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
-import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab

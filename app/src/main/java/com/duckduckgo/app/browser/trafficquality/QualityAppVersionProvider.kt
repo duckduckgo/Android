@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.trafficquality
 
+import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderSettingStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,7 +30,9 @@ interface QualityAppVersionProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealQualityAppVersionProvider @Inject constructor(private val appBuildConfig: AppBuildConfig) : QualityAppVersionProvider {
+class RealQualityAppVersionProvider @Inject constructor(
+    private val appBuildConfig: AppBuildConfig
+) : QualityAppVersionProvider {
     override fun provide(): String {
         val appBuildDateMillis = appBuildConfig.buildDateTimeMillis
 
