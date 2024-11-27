@@ -36,6 +36,7 @@ dependencies {
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':experiments-api')
+    implementation project(path: ':statistics-api')
 
     implementation AndroidX.appCompat
     implementation Google.android.material
