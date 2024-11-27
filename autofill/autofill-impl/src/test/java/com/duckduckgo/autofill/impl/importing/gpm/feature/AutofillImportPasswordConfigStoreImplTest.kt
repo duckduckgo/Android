@@ -47,30 +47,63 @@ class AutofillImportPasswordConfigStoreImplTest {
 
     @Test
     fun whenLaunchUrlNotSpecifiedInConfigThenDefaultUsed() = runTest {
-        configureFeature(config = Config())
+        configureFeature(config = Config(urlMappings = listOf(UrlMapping("key", "https://example.com"))))
         assertEquals(LAUNCH_URL_DEFAULT, testee.getConfig().launchUrlGooglePasswords)
     }
 
     @Test
     fun whenLaunchUrlSpecifiedInConfigThenOverridesDefault() = runTest {
-        configureFeature(config = Config(launchUrl = "https://example.com"))
+        configureFeature(config = Config(launchUrl = "https://example.com", urlMappings = listOf(UrlMapping("key", "https://example.com"))))
         assertEquals("https://example.com", testee.getConfig().launchUrlGooglePasswords)
     }
 
     @Test
     fun whenJavascriptConfigNotSpecifiedInConfigThenDefaultUsed() = runTest {
-        configureFeature(config = Config())
+        configureFeature(config = Config(urlMappings = listOf(UrlMapping("key", "https://example.com"))))
         assertEquals(JAVASCRIPT_CONFIG_DEFAULT, testee.getConfig().javascriptConfigGooglePasswords)
     }
 
     @Test
     fun whenJavascriptConfigSpecifiedInConfigThenOverridesDefault() = runTest {
-        configureFeature(config = Config(javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar"))))
+        configureFeature(
+            config = Config(
+                javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar")),
+                urlMappings = listOf(UrlMapping("key", "https://example.com")),
+            ),
+        )
         assertEquals("""{"domains":["foo, bar"],"key":"value"}""", testee.getConfig().javascriptConfigGooglePasswords)
     }
 
+    @Test
+    fun whenUrlMappingsSpecifiedInConfigOverridesDefault() = runTest {
+        configureFeature(config = Config(urlMappings = listOf(UrlMapping("key", "https://example.com"))))
+        testee.getConfig().urlMappings.apply {
+            assertEquals(1, size)
+            assertEquals("key", get(0).key)
+            assertEquals("https://example.com", get(0).url)
+        }
+    }
+
+    @Test
+    fun whenUrlMappingsNotSpecifiedInConfigThenDefaultsUsed() = runTest {
+        configureFeature(config = Config(urlMappings = null))
+        assertEquals(5, testee.getConfig().urlMappings.size)
+    }
+
+    @Test
+    fun whenUrlMappingsNotSpecifiedInConfigThenCorrectOrderOfDefaultsReturned() = runTest {
+        configureFeature(config = Config(urlMappings = null))
+        testee.getConfig().urlMappings.apply {
+            assertEquals("webflow-passphrase-encryption", get(0).key)
+            assertEquals("webflow-pre-login", get(1).key)
+            assertEquals("webflow-export", get(2).key)
+            assertEquals("webflow-authenticate", get(3).key)
+            assertEquals("webflow-post-login-landing", get(4).key)
+        }
+    }
+
     @SuppressLint("DenyListedApi")
-    private fun configureFeature(enabled: Boolean = true, config: Config = Config()) {
+    private fun configureFeature(enabled: Boolean = true, config: Config = Config(urlMappings = listOf(UrlMapping("key", "https://example.com")))) {
         autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(
             State(
                 remoteEnableState = enabled,
@@ -78,11 +111,13 @@ class AutofillImportPasswordConfigStoreImplTest {
             ),
         )
     }
-
     private data class Config(
         val launchUrl: String? = null,
+        val canInjectJavascript: Boolean = true,
         val javascriptConfig: JavaScriptConfig? = null,
+        val urlMappings: List<UrlMapping>?,
     )
+
     private data class JavaScriptConfig(
         val key: String,
         val domains: List<String>,

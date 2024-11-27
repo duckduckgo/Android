@@ -16,21 +16,22 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ImportedCredentialValidator {
-    fun isValid(loginCredentials: LoginCredentials): Boolean
+    fun isValid(loginCredentials: GoogleCsvLoginCredential): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class DefaultImportedCredentialValidator @Inject constructor() : ImportedCredentialValidator {
 
-    override fun isValid(loginCredentials: LoginCredentials): Boolean {
+    override fun isValid(loginCredentials: GoogleCsvLoginCredential): Boolean {
         with(loginCredentials) {
-            if (domain?.startsWith(APP_PASSWORD_PREFIX) == true) return false
+            if (url?.startsWith(APP_PASSWORD_PREFIX) == true) {
+                return false
+            }
 
             if (allFieldsEmpty()) {
                 return false
@@ -40,11 +41,11 @@ class DefaultImportedCredentialValidator @Inject constructor() : ImportedCredent
         }
     }
 
-    private fun LoginCredentials.allFieldsEmpty(): Boolean {
-        return domain.isNullOrBlank() &&
+    private fun GoogleCsvLoginCredential.allFieldsEmpty(): Boolean {
+        return url.isNullOrBlank() &&
             username.isNullOrBlank() &&
             password.isNullOrBlank() &&
-            domainTitle.isNullOrBlank() &&
+            title.isNullOrBlank() &&
             notes.isNullOrBlank()
     }
 

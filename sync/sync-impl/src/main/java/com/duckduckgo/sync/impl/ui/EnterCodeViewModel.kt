@@ -30,8 +30,14 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -45,6 +51,8 @@ class EnterCodeViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
+    private val syncFeature: SyncFeature,
+    private val syncPixels: SyncPixels,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -66,8 +74,10 @@ class EnterCodeViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object LoginSucess : Command()
+        data object LoginSuccess : Command()
+        data class AskToSwitchAccount(val encodedStringCode: String) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        data object SwitchAccountSuccess : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -81,36 +91,79 @@ class EnterCodeViewModel @Inject constructor(
     private suspend fun authFlow(
         pastedCode: String,
     ) {
-        val result = syncAccountRepository.processCode(pastedCode)
-        when (result) {
-            is Result.Success -> command.send(Command.LoginSucess)
-            is Result.Error -> {
-                when (result.code) {
-                    ALREADY_SIGNED_IN.code -> {
-                        showError(R.string.sync_login_authenticated_device_error, result.reason)
-                    }
-                    LOGIN_FAILED.code -> {
-                        showError(R.string.sync_connect_login_error, result.reason)
-                    }
-                    CONNECT_FAILED.code -> {
-                        showError(R.string.sync_connect_generic_error, result.reason)
-                    }
-                    CREATE_ACCOUNT_FAILED.code -> {
-                        showError(R.string.sync_create_account_generic_error, result.reason)
-                    }
-                    INVALID_CODE.code -> {
-                        viewState.value = viewState.value.copy(authState = AuthState.Error)
-                    }
-                    else -> {}
+        val userSignedIn = syncAccountRepository.isSignedIn()
+        when (val result = syncAccountRepository.processCode(pastedCode)) {
+            is Result.Success -> {
+                val commandSuccess = if (userSignedIn) {
+                    syncPixels.fireUserSwitchedAccount()
+                    SwitchAccountSuccess
+                } else {
+                    LoginSuccess
                 }
+                command.send(commandSuccess)
+            }
+            is Result.Error -> {
+                processError(result, pastedCode)
             }
         }
     }
 
-    private suspend fun showError(
-        message: Int,
-        reason: String,
-    ) {
-        command.send(ShowError(message = message, reason = reason))
+    private suspend fun processError(result: Error, pastedCode: String) {
+        if (result.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
+            command.send(AskToSwitchAccount(pastedCode))
+        } else {
+            if (result.code == INVALID_CODE.code) {
+                viewState.value = viewState.value.copy(authState = AuthState.Error)
+                return
+            }
+
+            when (result.code) {
+                ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
+                LOGIN_FAILED.code -> R.string.sync_connect_login_error
+                CONNECT_FAILED.code -> R.string.sync_connect_generic_error
+                CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
+                INVALID_CODE.code -> R.string.sync_invalid_code_error
+                else -> null
+            }?.let { message ->
+                command.send(
+                    ShowError(
+                        message = message,
+                        reason = result.reason,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserAcceptedSwitchingAccount()
+            val result = syncAccountRepository.logoutAndJoinNewAccount(encodedStringCode)
+            if (result is Error) {
+                when (result.code) {
+                    ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
+                    LOGIN_FAILED.code -> R.string.sync_connect_login_error
+                    CONNECT_FAILED.code -> R.string.sync_connect_generic_error
+                    CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
+                    INVALID_CODE.code -> R.string.sync_invalid_code_error
+                    else -> null
+                }?.let { message ->
+                    command.send(
+                        ShowError(message = message, reason = result.reason),
+                    )
+                }
+            } else {
+                syncPixels.fireUserSwitchedAccount()
+                command.send(SwitchAccountSuccess)
+            }
+        }
+    }
+
+    fun onUserCancelledJoiningNewAccount() {
+        syncPixels.fireUserCancelledSwitchingAccount()
+    }
+
+    fun onUserAskedToSwitchAccount() {
+        syncPixels.fireAskUserToSwitchAccount()
     }
 }

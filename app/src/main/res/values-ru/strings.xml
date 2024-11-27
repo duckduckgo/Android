@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Позже</string>
     <string name="preciseLocationSystemDialogNeverAllow">Больше не спрашивать для этого сайта</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Дать %1$s доступ к геопозиции?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Анонимная геопозиция позволяет подобрать более точные результаты поблизости. Вы всегда можете изменить эту настройку позже.</string>
     <string name="preciseLocationSiteDialogSubtitle">Вы можете управлять разрешениями на доступ к геопозиции, которые вы предоставили отдельным сайтам, в настройках.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Анонимная геопозиция нужна только для поиска подходящих результатов поблизости. Доступ к геопозиции, предоставленный отдельным сайтам, можно проконтролировать в настройках.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Всегда</string>
     <string name="preciseLocationSiteDialogAllowOnce">Только для этой сессии</string>
     <string name="preciseLocationSiteDialogDenyAlways">Всегда отказывать</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешения удалены для всех сайтов</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения для «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Запрашивать</string>
+    <string name="permissionsPerWebsiteAskSetting">Спрашивать каждый раз</string>
     <string name="permissionsPerWebsiteDenySetting">Отказать</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">«Запросить» отключено для всех сайтов</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Отключено в отношении всех сайтов</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Notify Me View on Downloads -->

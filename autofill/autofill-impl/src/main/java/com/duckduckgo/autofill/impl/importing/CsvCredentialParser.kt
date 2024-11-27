@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult
 import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Error
 import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Success
@@ -33,7 +32,7 @@ interface CsvCredentialParser {
     suspend fun parseCsv(csv: String): ParseResult
 
     sealed interface ParseResult {
-        data class Success(val credentials: List<LoginCredentials>) : ParseResult
+        data class Success(val credentials: List<GoogleCsvLoginCredential>) : ParseResult
         data object Error : ParseResult
     }
 }
@@ -61,7 +60,7 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
      * Format of the Google Password Manager CSV is:
      * name | url | username | password | note
      */
-    private suspend fun convertToCredentials(csv: String): List<LoginCredentials> {
+    private suspend fun convertToCredentials(csv: String): List<GoogleCsvLoginCredential> {
         return withContext(dispatchers.io()) {
             val lines = mutableListOf<CsvRow>()
             val iter = CsvReader.builder().build(csv).spliterator()
@@ -81,8 +80,8 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
                     }
 
                     parseToCredential(
-                        domainTitle = it.getField(0).blanksToNull(),
-                        domain = it.getField(1).blanksToNull(),
+                        title = it.getField(0).blanksToNull(),
+                        url = it.getField(1).blanksToNull(),
                         username = it.getField(2).blanksToNull(),
                         password = it.getField(3).blanksToNull(),
                         notes = it.getField(4).blanksToNull(),
@@ -92,15 +91,15 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
     }
 
     private fun parseToCredential(
-        domainTitle: String?,
-        domain: String?,
+        title: String?,
+        url: String?,
         username: String?,
         password: String?,
         notes: String?,
-    ): LoginCredentials {
-        return LoginCredentials(
-            domainTitle = domainTitle,
-            domain = domain,
+    ): GoogleCsvLoginCredential {
+        return GoogleCsvLoginCredential(
+            title = title,
+            url = url,
             username = username,
             password = password,
             notes = notes,

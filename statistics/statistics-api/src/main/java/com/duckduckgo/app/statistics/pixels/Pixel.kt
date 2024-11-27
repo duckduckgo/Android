@@ -61,6 +61,11 @@ interface Pixel {
         const val FROM_ONBOARDING = "from_onboarding"
         const val ADDRESS_BAR = "address_bar"
         const val LAUNCH_SCREEN = "launch_screen"
+        const val TAB_COUNT = "tab_count"
+        const val TAB_ACTIVE_7D = "tab_active_7d"
+        const val TAB_INACTIVE_1W = "tab_inactive_1w"
+        const val TAB_INACTIVE_2W = "tab_inactive_2w"
+        const val TAB_INACTIVE_3W = "tab_inactive_3w"
     }
 
     object PixelValues {

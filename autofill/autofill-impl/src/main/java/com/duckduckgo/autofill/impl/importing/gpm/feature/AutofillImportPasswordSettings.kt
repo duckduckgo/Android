@@ -33,7 +33,14 @@ interface AutofillImportPasswordConfigStore {
 data class AutofillImportPasswordSettings(
     val canImportFromGooglePasswords: Boolean,
     val launchUrlGooglePasswords: String,
+    val canInjectJavascript: Boolean,
     val javascriptConfigGooglePasswords: String,
+    val urlMappings: List<UrlMapping>,
+)
+
+data class UrlMapping(
+    val key: String,
+    val url: String,
 )
 
 @ContributesBinding(AppScope::class)
@@ -43,8 +50,8 @@ class AutofillImportPasswordConfigStoreImpl @Inject constructor(
     private val moshi: Moshi,
 ) : AutofillImportPasswordConfigStore {
 
-    private val jsonAdapter: JsonAdapter<CanImportFromGooglePasswordManagerConfig> by lazy {
-        moshi.adapter(CanImportFromGooglePasswordManagerConfig::class.java)
+    private val jsonAdapter: JsonAdapter<ImportConfigJson> by lazy {
+        moshi.adapter(ImportConfigJson::class.java)
     }
 
     override suspend fun getConfig(): AutofillImportPasswordSettings {
@@ -54,24 +61,48 @@ class AutofillImportPasswordConfigStoreImpl @Inject constructor(
                     jsonAdapter.fromJson(it)
                 }.getOrNull()
             }
-            val launchUrl = config?.launchUrl ?: LAUNCH_URL_DEFAULT
-            val javascriptConfig = config?.javascriptConfig?.toString() ?: JAVASCRIPT_CONFIG_DEFAULT
 
             AutofillImportPasswordSettings(
                 canImportFromGooglePasswords = autofillFeature.canImportFromGooglePasswordManager().isEnabled(),
-                launchUrlGooglePasswords = launchUrl,
-                javascriptConfigGooglePasswords = javascriptConfig,
+                launchUrlGooglePasswords = config?.launchUrl ?: LAUNCH_URL_DEFAULT,
+                canInjectJavascript = config?.canInjectJavascript ?: CAN_INJECT_JAVASCRIPT_DEFAULT,
+                javascriptConfigGooglePasswords = config?.javascriptConfig?.toString() ?: JAVASCRIPT_CONFIG_DEFAULT,
+                urlMappings = config?.urlMappings.convertFromJsonModel(),
             )
         }
     }
 
     companion object {
         internal const val JAVASCRIPT_CONFIG_DEFAULT = "\"{}\""
+        internal const val CAN_INJECT_JAVASCRIPT_DEFAULT = true
+
         internal const val LAUNCH_URL_DEFAULT = "https://passwords.google.com/options?ep=1"
+
+        // order is important; first match wins so keep the most specific to start of the list
+        internal val URL_MAPPINGS_DEFAULT = listOf(
+            UrlMapping(key = "webflow-passphrase-encryption", url = "https://passwords.google.com/error/sync-passphrase"),
+            UrlMapping(key = "webflow-pre-login", url = "https://passwords.google.com/intro"),
+            UrlMapping(key = "webflow-export", url = "https://passwords.google.com/options?ep=1"),
+            UrlMapping(key = "webflow-authenticate", url = "https://accounts.google.com/"),
+            UrlMapping(key = "webflow-post-login-landing", url = "https://passwords.google.com"),
+        )
     }
 
-    private data class CanImportFromGooglePasswordManagerConfig(
+    private data class ImportConfigJson(
         val launchUrl: String? = null,
+        val canInjectJavascript: Boolean = CAN_INJECT_JAVASCRIPT_DEFAULT,
         val javascriptConfig: JSONObject? = null,
+        val urlMappings: List<UrlMappingJson>? = null,
     )
+
+    private data class UrlMappingJson(
+        val key: String,
+        val url: String,
+    )
+
+    private fun List<UrlMappingJson>?.convertFromJsonModel(): List<UrlMapping> {
+        return this?.let { jsonList ->
+            jsonList.map { UrlMapping(key = it.key, url = it.url) }
+        } ?: URL_MAPPINGS_DEFAULT
+    }
 }

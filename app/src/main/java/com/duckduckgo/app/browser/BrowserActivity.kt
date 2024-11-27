@@ -274,6 +274,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         lastActiveTabs.add(tab.tabId)
 
+        viewModel.onTabActivated(tab.tabId)
+
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(tab.tabId, tab.url, tab.skipHome, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)

@@ -366,9 +366,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
     RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
 
+    SITE_NOT_WORKING_WEBSITE_BROKEN("site_not_working_website_is_broken"),
+    SITE_NOT_WORKING_SHOWN("site_not_working_shown"),
+
     URI_LOADED("m_uri_loaded"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
-    FEATURES_ENABLED_AT_SEARCH_TIME("features"),
+    APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 }

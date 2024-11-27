@@ -1098,11 +1098,11 @@
         const opts2 = new WindowsMessagingConfig({
           methods: {
             // @ts-expect-error - not in @types/chrome
-            postMessage: window.chrome.webview.postMessage,
+            postMessage: globalThis.windowsInteropPostMessage,
             // @ts-expect-error - not in @types/chrome
-            addEventListener: window.chrome.webview.addEventListener,
+            addEventListener: globalThis.windowsInteropAddEventListener,
             // @ts-expect-error - not in @types/chrome
-            removeEventListener: window.chrome.webview.removeEventListener
+            removeEventListener: globalThis.windowsInteropRemoveEventListener
           }
         });
         return new Messaging(messageContext, opts2);

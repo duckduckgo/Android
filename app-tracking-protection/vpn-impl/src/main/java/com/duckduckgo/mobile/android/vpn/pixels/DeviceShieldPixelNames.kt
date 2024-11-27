@@ -39,6 +39,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DISABLE_DAILY("m_atp_ev_disabled_d"),
 
     ATP_ENABLE_UNIQUE("m_atp_ev_enabled_u"),
+    ATP_ENABLE_MONTHLY("m_atp_ev_enabled_monthly"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE("m_atp_ev_enabled_reminder_notification_u"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY("m_atp_ev_enabled_reminder_notification_d"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION("m_atp_ev_enabled_reminder_notification_c"),

@@ -38,6 +38,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
@@ -968,10 +970,12 @@ sealed class DaxBubbleCta(
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        val titleRes: Int,
+        val descriptionRes: Int,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
-        title = R.string.onboardingPrivacyProDaxDialogTitle,
-        description = R.string.onboardingPrivacyProDaxDialogDescription,
+        title = titleRes,
+        description = descriptionRes,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
         primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
         secondaryCta = R.string.onboardingPrivacyProDaxDialogCancelButton,
@@ -1026,6 +1030,26 @@ sealed class DaxBubbleCta(
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    )
+
+    data class DaxExperimentPrivacyProCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        val titleRes: Int,
+        val descriptionRes: Int,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
+        title = titleRes,
+        description = descriptionRes,
+        placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
+        primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
+        secondaryCta = R.string.onboardingPrivacyProDaxDialogCancelButton,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
     )
@@ -1093,6 +1117,38 @@ sealed class HomePanelCta(
         AppPixelName.WIDGET_LEGACY_CTA_LAUNCHED,
         AppPixelName.WIDGET_LEGACY_CTA_DISMISSED,
     )
+}
+
+class BrokenSitePromptDialogCta() : Cta {
+
+    override val ctaId: CtaId = CtaId.BROKEN_SITE_PROMPT
+    override val shownPixel: Pixel.PixelName = SITE_NOT_WORKING_SHOWN
+    override val okPixel: Pixel.PixelName = SITE_NOT_WORKING_WEBSITE_BROKEN
+    override val cancelPixel: Pixel.PixelName? = null
+
+    override fun pixelCancelParameters(): Map<String, String> = mapOf()
+
+    override fun pixelOkParameters(): Map<String, String> = mapOf()
+
+    override fun pixelShownParameters(): Map<String, String> = mapOf()
+
+    fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+        val view = binding.includeBrokenSitePromptDialog.root
+        view.gone()
+    }
+
+    fun showBrokenSitePromptCta(
+        binding: FragmentBrowserTabBinding,
+        onReportBrokenSiteClicked: () -> Unit,
+        onDismissCtaClicked: () -> Unit,
+        onCtaShown: () -> Unit,
+    ) {
+        val daxDialog = binding.includeBrokenSitePromptDialog
+        daxDialog.root.show()
+        binding.includeBrokenSitePromptDialog.reportButton.setOnClickListener { onReportBrokenSiteClicked.invoke() }
+        binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+        onCtaShown()
+    }
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {
