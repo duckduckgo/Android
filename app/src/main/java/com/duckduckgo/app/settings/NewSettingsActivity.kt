@@ -51,6 +51,7 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
@@ -90,6 +91,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+
+private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
 @InjectWith(ActivityScope::class)
 class NewSettingsActivity : DuckDuckGoActivity() {
@@ -198,6 +201,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         with(viewsOther) {
             aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
+            ddgOnOtherPlatformsSetting.setOnClickListener { viewModel.onDdgOnOtherPlatformsClicked() }
         }
     }
 
@@ -322,6 +326,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
+            is LaunchOtherPlatforms -> launchOtherPlatforms()
             null -> TODO()
         }
     }
@@ -435,6 +440,11 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             this,
             GeneralPrivacyProFeedbackScreenNoParams,
         )
+    }
+
+    private fun launchOtherPlatforms() {
+        startActivity(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+        finish()
     }
 
     companion object {

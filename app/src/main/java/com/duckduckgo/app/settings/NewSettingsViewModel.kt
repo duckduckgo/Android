@@ -48,6 +48,7 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
@@ -135,6 +136,7 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchGeneralSettingsScreen : Command()
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchOtherPlatforms : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -320,6 +322,10 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)
+    }
+
+    fun onDdgOnOtherPlatformsClicked() {
+        viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
 
     companion object {
