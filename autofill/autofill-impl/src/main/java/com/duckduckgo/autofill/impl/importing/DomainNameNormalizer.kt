@@ -16,25 +16,24 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface DomainNameNormalizer {
-    suspend fun normalizeDomains(unnormalized: List<LoginCredentials>): List<LoginCredentials>
+    suspend fun normalize(unnormalizedUrl: String?): String?
 }
 
 @ContributesBinding(AppScope::class)
 class DefaultDomainNameNormalizer @Inject constructor(
     private val urlMatcher: AutofillUrlMatcher,
 ) : DomainNameNormalizer {
-    override suspend fun normalizeDomains(unnormalized: List<LoginCredentials>): List<LoginCredentials> {
-        return unnormalized.map {
-            val currentDomain = it.domain ?: return@map it
-            val normalizedDomain = urlMatcher.cleanRawUrl(currentDomain)
-            it.copy(domain = normalizedDomain)
+    override suspend fun normalize(unnormalizedUrl: String?): String? {
+        return if (unnormalizedUrl == null) {
+            null
+        } else {
+            urlMatcher.cleanRawUrl(unnormalizedUrl)
         }
     }
 }

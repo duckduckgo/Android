@@ -40,6 +40,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
@@ -289,4 +290,5 @@ private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFl
     DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
     TOGGLE_MENU -> BrokenSiteModelReportFlow.TOGGLE_MENU
     TOGGLE_DASHBOARD -> BrokenSiteModelReportFlow.TOGGLE_DASHBOARD
+    PROMPT -> BrokenSiteModelReportFlow.PROMPT
 }

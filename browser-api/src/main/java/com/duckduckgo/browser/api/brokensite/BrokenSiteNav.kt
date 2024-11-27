@@ -44,7 +44,7 @@ data class BrokenSiteData(
     val openerContext: BrokenSiteOpenerContext?,
     val jsPerformance: DoubleArray?,
 ) {
-    enum class ReportFlow { MENU, DASHBOARD, TOGGLE_DASHBOARD, TOGGLE_MENU }
+    enum class ReportFlow { MENU, DASHBOARD, TOGGLE_DASHBOARD, TOGGLE_MENU, PROMPT }
 
     companion object {
         fun fromSite(site: Site?, reportFlow: ReportFlow): BrokenSiteData {

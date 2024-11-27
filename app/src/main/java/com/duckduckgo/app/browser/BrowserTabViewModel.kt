@@ -98,6 +98,7 @@ import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
@@ -199,6 +200,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -231,6 +233,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -245,6 +248,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -252,9 +256,11 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -343,6 +349,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -429,6 +436,8 @@ class BrowserTabViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
     private val toggleReports: ToggleReports,
+    private val brokenSitePrompt: BrokenSitePrompt,
+    private val tabStatsBucketing: TabStatsBucketing,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -824,6 +833,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewHidden() {
+        ctaViewState.value?.cta.let {
+            if (it is BrokenSitePromptDialogCta) {
+                command.value = HideBrokenSitePromptCta(it)
+            }
+        }
         skipHome = false
         viewModelScope.launch {
             downloadCallback
@@ -987,6 +1001,12 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
+                }
+            }
+
+            is BrokenSitePromptDialogCta -> {
+                viewModelScope.launch(dispatchers.main()) {
+                    command.value = HideBrokenSitePromptCta(currentCtaViewState().cta as BrokenSitePromptDialogCta)
                 }
             }
         }
@@ -1163,7 +1183,9 @@ class BrowserTabViewModel @Inject constructor(
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
-        viewModelScope.launch { removeCurrentTabFromRepository() }
+        viewModelScope.launch {
+            removeCurrentTabFromRepository()
+        }
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -1173,7 +1195,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun closeAndSelectSourceTab() {
-        viewModelScope.launch { removeAndSelectTabFromRepository() }
+        viewModelScope.launch {
+            removeAndSelectTabFromRepository()
+        }
     }
 
     private suspend fun removeAndSelectTabFromRepository() {
@@ -1204,6 +1228,9 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
+            site?.uri?.let {
+                brokenSitePrompt.pageRefreshed(it)
+            }
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
         }
     }
@@ -1357,6 +1384,13 @@ class BrowserTabViewModel @Inject constructor(
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
+                    ctaViewState.value?.cta?.let { cta ->
+                        if (cta is BrokenSitePromptDialogCta) {
+                            withContext(dispatchers.main()) {
+                                command.value = HideBrokenSitePromptCta(cta)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1374,6 +1408,11 @@ class BrowserTabViewModel @Inject constructor(
                         withContext(dispatchers.main()) {
                             urlUpdated(stateChange.url)
                         }
+                    }
+                }
+                ctaViewState.value?.cta?.let { cta ->
+                    if (cta is BrokenSitePromptDialogCta) {
+                        command.value = HideBrokenSitePromptCta(cta)
                     }
                 }
             }
@@ -2596,6 +2635,7 @@ class BrowserTabViewModel @Inject constructor(
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
+        onUserDismissedCta(ctaViewState.value?.cta)
     }
 
     fun onCtaShown() {
@@ -2632,7 +2672,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
@@ -2645,11 +2685,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        ctaViewModel.onUserClickCtaOkButton(cta)
+        viewModelScope.launch {
+            ctaViewModel.onUserClickCtaOkButton(cta)
+        }
         val onboardingCommand = when (cta) {
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
+            is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
             else -> null
         }
         onboardingCommand?.let {
@@ -2660,9 +2703,12 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
+            ctaViewModel.onUserClickCtaSkipButton(cta)
+            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
+            } else if (cta is BrokenSitePromptDialogCta) {
+                onBrokenSiteCtaDismissButtonClicked(cta)
             }
             if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
                 pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
@@ -2672,9 +2718,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedCta(cta: Cta) {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+    fun onUserDismissedCta(cta: Cta?) {
+        cta?.let {
+            viewModelScope.launch {
+                ctaViewModel.onUserDismissedCta(it)
+            }
         }
     }
 
@@ -2799,7 +2847,27 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher() {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
-        pixel.fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        fireDailyLaunchPixel()
+        onUserDismissedCta(ctaViewState.value?.cta)
+    }
+
+    private fun fireDailyLaunchPixel() {
+        val tabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getNumberOfOpenTabs() }
+        val activeTabCount = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveLastWeek() }
+        val inactive1w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveOneWeekAgo() }
+        val inactive2w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveTwoWeeksAgo() }
+        val inactive3w = viewModelScope.async(dispatchers.io()) { tabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo() }
+
+        viewModelScope.launch(dispatchers.io()) {
+            val params = mapOf(
+                PixelParameter.TAB_COUNT to tabCount.await(),
+                PixelParameter.TAB_ACTIVE_7D to activeTabCount.await(),
+                PixelParameter.TAB_INACTIVE_1W to inactive1w.await(),
+                PixelParameter.TAB_INACTIVE_2W to inactive2w.await(),
+                PixelParameter.TAB_INACTIVE_3W to inactive3w.await(),
+            )
+            pixel.fire(TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+        }
     }
 
     private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {
@@ -3403,6 +3471,21 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun onBrokenSiteCtaDismissButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        viewModelScope.launch {
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
+    }
+
+    private fun onBrokenSiteCtaOkButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
+        viewModelScope.launch {
+            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = PROMPT))
+            command.value = HideBrokenSitePromptCta(cta)
+        }
+        return null
+    }
+
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
@@ -3446,7 +3529,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
         onUserDismissedCta(cta)
         return when (cta) {
-            is DaxBubbleCta.DaxPrivacyProCta -> LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri())
+            is DaxBubbleCta.DaxPrivacyProCta, is DaxBubbleCta.DaxExperimentPrivacyProCta -> {
+                val cohortOrigin = ctaViewModel.getCohortOrigin()
+                LaunchPrivacyPro(
+                    "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding$cohortOrigin".toUri(),
+                )
+            }
             is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
@@ -3670,8 +3758,10 @@ class BrowserTabViewModel @Inject constructor(
         return when {
             lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
                 R.drawable.onboarding_experiment_background_bitmap_light
+
             !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
                 R.drawable.onboarding_experiment_background_bitmap_dark
+
             lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
             else -> R.drawable.onboarding_background_bitmap_dark
         }

@@ -97,7 +97,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
 
         val numberStoredPasswords = getNumberStoredPasswords()
         val togglePixel = if (autofillStore.autofillEnabled) AUTOFILL_TOGGLED_ON_SEARCH else AUTOFILL_TOGGLED_OFF_SEARCH
-        val bucket = engagementBucketing.bucketNumberOfSavedPasswords(numberStoredPasswords)
+        val bucket = engagementBucketing.bucketNumberOfCredentials(numberStoredPasswords)
         pixel.fire(togglePixel, mapOf("count_bucket" to bucket), type = Daily())
     }
 
@@ -113,7 +113,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
         if (autofilled && searched) {
             pixel.fire(AUTOFILL_ENGAGEMENT_ACTIVE_USER, type = Daily())
 
-            val bucket = engagementBucketing.bucketNumberOfSavedPasswords(numberStoredPasswords)
+            val bucket = engagementBucketing.bucketNumberOfCredentials(numberStoredPasswords)
             pixel.fire(AUTOFILL_ENGAGEMENT_STACKED_LOGINS, mapOf("count_bucket" to bucket), type = Daily())
         }
 

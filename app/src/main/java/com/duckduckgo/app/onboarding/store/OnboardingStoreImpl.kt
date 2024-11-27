@@ -25,7 +25,9 @@ import com.duckduckgo.mobile.android.R.drawable
 import java.util.Locale
 import javax.inject.Inject
 
-class OnboardingStoreImpl @Inject constructor(private val context: Context) : OnboardingStore {
+class OnboardingStoreImpl @Inject constructor(
+    private val context: Context,
+) : OnboardingStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 

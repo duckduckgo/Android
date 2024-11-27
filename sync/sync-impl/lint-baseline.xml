@@ -36,6 +36,17 @@
 
     <issue
         id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/AppSyncAccountRepositoryTest.kt"
+            line="100"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q &amp;&amp; appBuildConfig.sdkInt != Build.VERSION_CODES.P) {"
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
@@ -98,6 +109,28 @@
             file="src/main/java/com/duckduckgo/sync/impl/auth/DeviceAuthenticator.kt"
             line="129"
             column="38"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
+            line="63"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/EnterCodeViewModelTest.kt"
+            line="137"
+            column="9"/>
     </issue>
 
     <issue
@@ -373,6 +406,28 @@
             file="src/test/java/com/duckduckgo/sync/impl/SyncRemoteFeatureToggleTest.kt"
             line="194"
             column="16"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        this.seamlessAccountSwitching().setRawStoredState(State(true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
+            line="62"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/sync/impl/ui/SyncWithAnotherDeviceViewModelTest.kt"
+            line="135"
+            column="9"/>
     </issue>
 
     <issue

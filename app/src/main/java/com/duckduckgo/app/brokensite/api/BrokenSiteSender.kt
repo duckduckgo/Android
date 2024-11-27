@@ -34,6 +34,7 @@ import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_MENU
+import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
@@ -232,4 +233,5 @@ private fun ReportFlow.toStringValue(): String = when (this) {
     MENU -> "menu"
     TOGGLE_DASHBOARD -> "on_protections_off_dashboard_main"
     TOGGLE_MENU -> "on_protections_off_menu"
+    PROMPT -> "prompt"
 }

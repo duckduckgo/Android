@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -125,6 +126,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -148,6 +150,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -173,6 +176,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -185,6 +189,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -209,6 +214,8 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -464,7 +471,10 @@ class BrowserTabViewModelTest {
 
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
-    private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+    private val mockDisabledToggle: Toggle = mock {
+        on { it.isEnabled() } doReturn false
+        on { it.isEnabled(any()) } doReturn false
+    }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
@@ -492,6 +502,11 @@ class BrowserTabViewModelTest {
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockToggleReports: ToggleReports = mock()
+    private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockTabStatsBucketing: TabStatsBucketing = mock()
+    private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
+        .create(ExtendedOnboardingFeatureToggles::class.java)
+    private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
 
     @Before
     fun before() = runTest {
@@ -519,6 +534,7 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
+        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockDisabledToggle)
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
@@ -559,6 +575,8 @@ class BrowserTabViewModelTest {
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
+            brokenSitePrompt = mockBrokenSitePrompt,
+            extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -658,6 +676,8 @@ class BrowserTabViewModelTest {
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
             toggleReports = mockToggleReports,
+            brokenSitePrompt = mockBrokenSitePrompt,
+            tabStatsBucketing = mockTabStatsBucketing,
         )
 
         testee.loadData("abc", null, false, false)
@@ -2437,6 +2457,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCloseAndSelectSourceTabSelectedThenTabDeletedFromRepository() = runTest {
+        givenOneActiveTabSelected()
+        testee.closeAndSelectSourceTab()
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+    }
+
+    @Test
     fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
         testee.onUserPressedBack()
@@ -2575,10 +2602,15 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedLearnMoreExperimentBubbleCtaButtonThenLaunchPrivacyPro() {
-        val cta = DaxBubbleCta.DaxPrivacyProCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxPrivacyProCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            R.string.onboardingPrivacyProDaxDialogTitle,
+            R.string.onboardingPrivacyProDaxDialogDescription,
+        )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro>()
     }
 
     @Test
@@ -5011,6 +5043,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+        verify(mockBrokenSitePrompt, never()).pageRefreshed(any())
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
+    }
+
+    @Test
     fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithTopPosition() = runTest {
         testee.onRefreshRequested(triggeredByUser = false)
         verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = true)
@@ -5323,6 +5367,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun givenTrackersBlockedCtaShownWhenLaunchingTabSwitcherThenCtaIsDismissed() = runTest {
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.userLaunchingTabSwitcher()
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun givenTrackersBlockedCtaShownWhenUserRequestOpeningNewTabThenCtaIsDismissed() = runTest {
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
     fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
         val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
@@ -5428,12 +5492,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() {
+    fun whenUserLaunchingTabSwitcherThenLaunchTabSwitcherCommandSentAndPixelFired() = runTest {
+        val tabCount = "61-80"
+        val active7d = "21+"
+        val inactive1w = "11-20"
+        val inactive2w = "6-10"
+        val inactive3w = "0"
+
+        whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+
+        val params = mapOf(
+            PixelParameter.TAB_COUNT to tabCount,
+            PixelParameter.TAB_ACTIVE_7D to active7d,
+            PixelParameter.TAB_INACTIVE_1W to inactive1w,
+            PixelParameter.TAB_INACTIVE_2W to inactive2w,
+            PixelParameter.TAB_INACTIVE_3W to inactive3w,
+        )
+
         testee.userLaunchingTabSwitcher()
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, emptyMap(), emptyMap(), Daily())
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
     }
 
     @Test
@@ -5635,6 +5719,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertTrue(browserViewState().showDuckPlayerIcon)
+    }
+
+    @Test
+    fun whenNewPageAndBrokenSitePromptVisibleThenHideCta() = runTest {
+        setCta(BrokenSitePromptDialogCta())
+
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+        testee.navigationStateChanged(buildWebNavigation("https://example.com"))
+
+        assertCommandIssued<HideBrokenSitePromptCta>()
     }
 
     @Test
@@ -6013,6 +6107,7 @@ class BrowserTabViewModelTest {
         override suspend fun onToggleOff(origin: PrivacyToggleOrigin) {
             toggleOff++
         }
+
         override suspend fun onToggleOn(origin: PrivacyToggleOrigin) {
             toggleOn++
         }

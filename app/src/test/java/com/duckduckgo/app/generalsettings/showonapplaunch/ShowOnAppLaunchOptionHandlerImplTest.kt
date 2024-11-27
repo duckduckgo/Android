@@ -790,6 +790,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
+        override suspend fun updateTabLastAccess(tabId: String) {
+            TODO("Not yet implemented")
+        }
+
         override fun retrieveSiteData(tabId: String): MutableLiveData<Site> {
             TODO("Not yet implemented")
         }
@@ -849,6 +853,17 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         }
 
         override suspend fun setTabLayoutType(layoutType: LayoutType) {
+            TODO("Not yet implemented")
+        }
+
+        override fun getOpenTabCount(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun countTabsAccessedWithinRange(
+            accessOlderThan: Long,
+            accessNotMoreThan: Long?,
+        ): Int {
             TODO("Not yet implemented")
         }
     }

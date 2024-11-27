@@ -36,8 +36,10 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Loading
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -96,13 +98,21 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            LoginSucess -> {
+            LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
             }
 
             is ShowError -> {
                 showError(command)
+            }
+
+            is AskToSwitchAccount -> askUserToSwitchAccount(command)
+            SwitchAccountSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_USER_SWITCHED_ACCOUNT, true)
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
         }
     }
@@ -120,6 +130,26 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             ).show()
     }
 
+    private fun askUserToSwitchAccount(it: AskToSwitchAccount) {
+        viewModel.onUserAskedToSwitchAccount()
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_switch_account_header)
+            .setMessage(R.string.sync_dialog_switch_account_description)
+            .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
+            .setNegativeButton(R.string.sync_dialog_switch_account_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAcceptedJoiningNewAccount(it.encodedStringCode)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserCancelledJoiningNewAccount()
+                    }
+                },
+            ).show()
+    }
+
     companion object {
         enum class Code {
             RECOVERY_CODE,
@@ -127,6 +157,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         }
 
         private const val EXTRA_CODE_TYPE = "codeType"
+
+        const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
 
         internal fun intent(context: Context, codeType: Code): Intent {
             return Intent(context, EnterCodeActivity::class.java).apply {

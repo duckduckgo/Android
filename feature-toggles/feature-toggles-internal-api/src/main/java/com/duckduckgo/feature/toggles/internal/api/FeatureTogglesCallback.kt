@@ -26,4 +26,9 @@ interface FeatureTogglesCallback {
      * This method is called whenever a cohort is assigned to the FeatureToggle
      */
     fun onCohortAssigned(experimentName: String, cohortName: String, enrollmentDate: String)
+
+    /**
+     * @return `true` if the ANY of the remote feature targets match the device configuration, `false` otherwise
+     */
+    fun matchesToggleTargets(targets: List<Any>): Boolean
 }

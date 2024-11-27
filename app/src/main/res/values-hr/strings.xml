@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Možda kasnije</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne pitaj ponovno za ovo web-mjesto</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Dati %1$s dopuštenje za pristup lokaciji?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Vašu anonimnu lokaciju upotrebljavamo samo da bismo vam pružili bolje rezultate, bliže vašoj lokaciji. Uvijek se kasnije možete predomisliti.</string>
     <string name="preciseLocationSiteDialogSubtitle">U postavkama možete upravljati dozvolama za pristup lokaciji koje ste dodijelili pojedinim web-mjestima.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Tvoju anonimnu lokaciju koristimo samo za postizanje boljih rezultata, bliže tebi. U postavkama možeš upravljati dozvolama za pristup lokaciji koje si dodijelio pojedinim web-mjestima.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Uvijek</string>
     <string name="preciseLocationSiteDialogAllowOnce">Samo za ovu sesiju</string>
     <string name="preciseLocationSiteDialogDenyAlways">Uvijek odbij</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Uklonjena su dopuštenja za sve web lokacije</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dopuštenja za „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Zatraži</string>
+    <string name="permissionsPerWebsiteAskSetting">Pitaj svaki puta</string>
     <string name="permissionsPerWebsiteDenySetting">Odbij</string>
     <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Opcija \"Pitaj\" onemogućena je za sve web lokacije</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Onemogućeno za sva web-mjesta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
 
     <!-- Notify Me View on Downloads -->

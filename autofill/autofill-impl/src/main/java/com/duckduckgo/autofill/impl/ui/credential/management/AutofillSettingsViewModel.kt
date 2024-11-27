@@ -20,8 +20,12 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserSnackbar
@@ -40,6 +44,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_SAVE_CREDENTIAL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
@@ -84,7 +89,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
@@ -133,6 +138,8 @@ class AutofillSettingsViewModel @Inject constructor(
     private val autofillBreakageReportSender: AutofillBreakageReportSender,
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
+    private val autofillFeature: AutofillFeature,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -159,6 +166,9 @@ class AutofillSettingsViewModel @Inject constructor(
     private var credentialModeBeforeLocking: CredentialMode? = null
 
     private var combineJob: Job? = null
+
+    // we only want to send this once for this 'session' of being in the management screen
+    private var importGooglePasswordButtonShownPixelSent = false
 
     fun onCopyUsername(username: String?) {
         username?.let { clipboardInteractor.copyToClipboard(it, isSensitive = false) }
@@ -431,6 +441,14 @@ class AutofillSettingsViewModel @Inject constructor(
                 _neverSavedSitesViewState.value = NeverSavedSitesViewState(showOptionToReset = count > 0)
             }
         }
+
+        viewModelScope.launch(dispatchers.io()) {
+            val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
+            val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
+            val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
+            val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+            _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
+        }
     }
 
     private suspend fun isBreakageReportingAllowed(): Boolean {
@@ -689,8 +707,10 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onImportPasswords() {
-        addCommand(LaunchImportPasswords)
+    fun onImportPasswordsFromGooglePasswordManager() {
+        viewModelScope.launch(dispatchers.io()) {
+            addCommand(LaunchImportPasswordsFromGooglePasswordManager)
+        }
     }
 
     fun onReportBreakageClicked() {
@@ -702,7 +722,10 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentSite(currentUrl: String?, privacyProtectionEnabled: Boolean?) {
+    fun updateCurrentSite(
+        currentUrl: String?,
+        privacyProtectionEnabled: Boolean?,
+    ) {
         val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(
             currentUrl = currentUrl,
             privacyProtectionEnabled = privacyProtectionEnabled,
@@ -771,6 +794,13 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun recordImportGooglePasswordButtonShown() {
+        if (!importGooglePasswordButtonShownPixelSent) {
+            importGooglePasswordButtonShownPixelSent = true
+            pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN)
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -779,6 +809,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialSearchQuery: String = "",
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val canShowPromo: Boolean = false,
+        val canImportFromGooglePasswords: Boolean = false,
     )
 
     data class ReportBreakageState(
@@ -854,7 +885,7 @@ class AutofillSettingsViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
-        data object LaunchImportPasswords : ListModeCommand()
+        data object LaunchImportPasswordsFromGooglePasswordManager : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()
