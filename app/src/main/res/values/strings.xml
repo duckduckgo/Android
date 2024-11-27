@@ -165,6 +165,7 @@
     <string name="settingsAddWidget" tools:ignore="MissingTranslation">Add Widget to HomeScreen</string>
     <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Set Your Address Bar Position</string>
     <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Enable Voice Search</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo on Other Platforms</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
