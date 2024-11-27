@@ -159,6 +159,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         with(viewsNextSteps) {
             addWidgetToHomeScreenSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             addressBarPositionSetting.setOnClickListener { viewModel.onChangeAddressBarPositionClicked() }
+            enableVoiceSearchSetting.setOnClickListener { viewModel.onEnableVoiceSearchClicked() }
         }
     }
 
@@ -209,6 +210,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                 }
             }.launchIn(lifecycleScope)
 
@@ -233,6 +235,10 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
         }
+    }
+
+    private fun updateVoiceSearchVisibility(isVisible: Boolean) {
+        viewsNextSteps.enableVoiceSearchSetting.isVisible = isVisible
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {

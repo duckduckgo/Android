@@ -164,6 +164,7 @@
     <string name="settingsDataClearing" tools:ignore="MissingTranslation">Data Clearing</string>
     <string name="settingsAddWidget" tools:ignore="MissingTranslation">Add Widget to HomeScreen</string>
     <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Set Your Address Bar Position</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Enable Voice Search</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>

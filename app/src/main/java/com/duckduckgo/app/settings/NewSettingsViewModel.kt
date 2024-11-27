@@ -72,6 +72,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -96,6 +97,7 @@ class NewSettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -108,6 +110,7 @@ class NewSettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isVoiceSearchVisible: Boolean = false,
     )
 
     sealed class Command {
@@ -168,6 +171,7 @@ class NewSettingsViewModel @Inject constructor(
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                    isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),
             )
         }
@@ -205,6 +209,10 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onChangeAddressBarPositionClicked() {
         viewModelScope.launch { command.send(LaunchAppearanceScreen) }
+    }
+
+    fun onEnableVoiceSearchClicked() {
+        viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
     }
 
     fun onDefaultBrowserSettingClicked() {
