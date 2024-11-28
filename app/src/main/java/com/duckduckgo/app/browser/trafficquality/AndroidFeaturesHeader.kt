@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomH
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class)
 class AndroidFeaturesHeaderPlugin @Inject constructor(
@@ -38,6 +39,7 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
         ) {
             val headerValue = androidFeaturesHeaderProvider.provide()
             return if (headerValue != null) {
+                Timber.d("FeaturesHeader: custom header value is $headerValue")
                 mapOf(
                     X_DUCKDUCKGO_ANDROID_HEADER to headerValue,
                 )

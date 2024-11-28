@@ -44,10 +44,9 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
 ) : AndroidFeaturesHeaderProvider {
     override fun provide(): String? {
-        Timber.d("FeaturesHeader: provide()")
         val config = featuresRequestHeaderStore.getConfig()
         if (config.isNotEmpty()) {
-            Timber.d("FeaturesHeader: config received")
+            Timber.d("FeaturesHeader: config present $config")
             val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
             if (versionConfig != null) {
                 Timber.d("FeaturesHeader: config for current version $versionConfig")
@@ -56,7 +55,7 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
                     return mapFeatures(versionConfig)
                 }
             } else {
-                Timber.d("FeaturesHeader: no config received for current version")
+                Timber.d("FeaturesHeader: no config received for version ${appBuildConfig.versionCode}")
                 return null
             }
         } else {

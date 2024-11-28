@@ -28,7 +28,7 @@ interface FeaturesRequestHeaderStore {
     fun getConfig(): List<TrafficQualityAppVersion>
 }
 
-private data class TrafficQualitySettingsJson(
+data class TrafficQualitySettingsJson(
     val versions: List<TrafficQualityAppVersion>,
 )
 
@@ -57,14 +57,13 @@ class FeaturesRequestHeaderSettingStore @Inject constructor(
     }
 
     override fun getConfig(): List<TrafficQualityAppVersion> {
-        Timber.d("FeaturesHeader: looking for config")
         val config = androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
+            Timber.d("FeaturesHeader: config present $it")
             runCatching {
-                jsonAdapter.fromJson(it)?.versions
+                val configJson = jsonAdapter.fromJson(it)
+                configJson?.versions
             }.getOrDefault(emptyList())
         } ?: emptyList()
-
-        Timber.d("FeaturesHeader: config mapped $config")
         return config
     }
 }
