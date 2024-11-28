@@ -200,6 +200,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle" tools:ignore="MissingTranslation">Data Clearing</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
@@ -211,6 +212,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatically Clear…</string>
+    <string name="settingsAutomaticallyClearData" tools:ignore="MissingTranslation">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
