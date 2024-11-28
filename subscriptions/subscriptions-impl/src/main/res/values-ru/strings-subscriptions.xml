@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Срок действия вашей подписки Privacy Pro истек</string>
     <string name="subscriptionSettingExpiredSubtitle">Чтобы использовать Privacy Pro, подпишитесь заново</string>
     <string name="subscriptionSettingExpiredViewPlans">Просмотреть тарифы</string>
-
+    <string name="subscriptionSettingSectionSubscription">По подписке</string>
+    <string name="subscriptionSettingRemoveFromDevice">Удалить с этого устройства</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
+    <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Все готово!</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Какую функцию вы хотели бы увидеть?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Подписки</string>
+    <string name="activitySubscriptionSettings">Настройки подписки</string>
+    <string name="activityActivateSubscription">Активация подписки</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Отправить отзыв</string>
 </resources>
