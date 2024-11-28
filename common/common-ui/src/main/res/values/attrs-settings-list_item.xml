@@ -19,6 +19,6 @@
         <attr name="leadingIcon" />
         <attr name="primaryText" />
         <attr name="showBetaPill" />
-        <attr name="isOn" format="boolean" />
+        <attr name="indicatorStatus" />
     </declare-styleable>
 </resources>
