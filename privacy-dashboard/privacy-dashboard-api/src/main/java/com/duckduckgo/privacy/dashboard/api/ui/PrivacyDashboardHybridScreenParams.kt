@@ -44,9 +44,9 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
      * @param tabId The tab ID
      */
     data class BrokenSiteForm(
-      override val tabId: String,
-      override val opener: DashboardOpener = NONE,
-      val reportFlow: BrokenSiteFormReportFlow
+        override val tabId: String,
+        override val opener: DashboardOpener = NONE,
+        val reportFlow: BrokenSiteFormReportFlow,
     ) : PrivacyDashboardHybridScreenParams() {
         enum class BrokenSiteFormReportFlow {
             MENU,
