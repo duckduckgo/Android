@@ -17,10 +17,15 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import java.time.Instant
 
 class FakeSubscriptionsDataStore(private val supportEncryption: Boolean = true) : SubscriptionsDataStore {
 
     // Auth
+    override var accessTokenV2: String? = null
+    override var accessTokenV2ExpiresAt: Instant? = null
+    override var refreshTokenV2: String? = null
+    override var refreshTokenV2ExpiresAt: Instant? = null
     override var accessToken: String? = null
     override var authToken: String? = null
     override var email: String? = null

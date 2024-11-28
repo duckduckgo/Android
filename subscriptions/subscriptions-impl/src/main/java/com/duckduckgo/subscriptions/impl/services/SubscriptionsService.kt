@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.services
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

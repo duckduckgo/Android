@@ -20,10 +20,15 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import java.time.Instant
 
 interface SubscriptionsDataStore {
 
     // Auth
+    var accessTokenV2: String?
+    var accessTokenV2ExpiresAt: Instant?
+    var refreshTokenV2: String?
+    var refreshTokenV2ExpiresAt: Instant?
     var accessToken: String?
     var authToken: String?
     var email: String?
@@ -51,6 +56,46 @@ internal class SubscriptionsEncryptedDataStore constructor(
     private fun encryptedPreferences(): SharedPreferences? {
         return sharedPreferencesProvider.getEncryptedSharedPreferences(FILENAME, multiprocess = true)
     }
+
+    override var accessTokenV2: String?
+        get() = encryptedPreferences?.getString(KEY_ACCESS_TOKEN_V2, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) { putString(KEY_ACCESS_TOKEN_V2, value) }
+        }
+
+    override var accessTokenV2ExpiresAt: Instant?
+        get() = encryptedPreferences?.getLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, 0)
+            ?.takeIf { it != 0L }
+            ?.let { Instant.ofEpochMilli(it) }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_ACCESS_TOKEN_V2_EXPIRES_AT)
+                } else {
+                    putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, value.toEpochMilli())
+                }
+            }
+        }
+
+    override var refreshTokenV2: String?
+        get() = encryptedPreferences?.getString(KEY_REFRESH_TOKEN_V2, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) { putString(KEY_REFRESH_TOKEN_V2, value) }
+        }
+
+    override var refreshTokenV2ExpiresAt: Instant?
+        get() = encryptedPreferences?.getLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, 0)
+            ?.takeIf { it != 0L }
+            ?.let { Instant.ofEpochMilli(it) }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_REFRESH_TOKEN_V2_EXPIRES_AT)
+                } else {
+                    putLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, value.toEpochMilli())
+                }
+            }
+        }
 
     override var productId: String?
         get() = encryptedPreferences?.getString(KEY_PRODUCT_ID, null)
@@ -147,6 +192,10 @@ internal class SubscriptionsEncryptedDataStore constructor(
 
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.store"
+        const val KEY_ACCESS_TOKEN_V2 = "KEY_ACCESS_TOKEN_V2"
+        const val KEY_ACCESS_TOKEN_V2_EXPIRES_AT = "KEY_ACCESS_TOKEN_V2_EXPIRES_AT"
+        const val KEY_REFRESH_TOKEN_V2 = "KEY_REFRESH_TOKEN_V2"
+        const val KEY_REFRESH_TOKEN_V2_EXPIRES_AT = "KEY_REFRESH_TOKEN_V2_EXPIRES_AT"
         const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
         const val KEY_PLATFORM = "KEY_PLATFORM"

@@ -9,6 +9,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
+import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -80,12 +81,23 @@ class RealAuthRepositoryTest {
     fun whenTokensThenReturnTokens() = runTest {
         assertNull(authStore.authToken)
         assertNull(authStore.accessToken)
+        assertNull(authStore.accessTokenV2)
+        assertNull(authStore.accessTokenV2ExpiresAt)
+        assertNull(authStore.refreshTokenV2)
+        assertNull(authStore.refreshTokenV2ExpiresAt)
 
         authStore.accessToken = "accessToken"
         authStore.authToken = "authToken"
 
+        val accessTokenV2 = AccessToken(jwt = "jwt-access", expiresAt = Instant.parse("2024-10-21T10:15:30.00Z"))
+        val refreshTokenV2 = RefreshToken(jwt = "jwt-refresh", expiresAt = Instant.parse("2024-10-21T10:15:30.00Z"))
+        authRepository.setAccessTokenV2(accessTokenV2)
+        authRepository.setRefreshTokenV2(refreshTokenV2)
+
         assertEquals("authToken", authRepository.getAuthToken())
         assertEquals("accessToken", authRepository.getAccessToken())
+        assertEquals(accessTokenV2, authRepository.getAccessTokenV2())
+        assertEquals(refreshTokenV2, authRepository.getRefreshTokenV2())
     }
 
     @Test

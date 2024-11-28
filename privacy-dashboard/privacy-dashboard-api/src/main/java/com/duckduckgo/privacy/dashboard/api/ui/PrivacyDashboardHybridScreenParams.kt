@@ -44,9 +44,15 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
      * @param tabId The tab ID
      */
     data class BrokenSiteForm(
-        override val tabId: String,
-        override val opener: DashboardOpener = NONE,
-    ) : PrivacyDashboardHybridScreenParams()
+      override val tabId: String,
+      override val opener: DashboardOpener = NONE,
+      val reportFlow: BrokenSiteFormReportFlow
+    ) : PrivacyDashboardHybridScreenParams() {
+        enum class BrokenSiteFormReportFlow {
+            MENU,
+            PROMPT,
+        }
+    }
 
     /**
      * Use this parameter to launch the toggle report form.
