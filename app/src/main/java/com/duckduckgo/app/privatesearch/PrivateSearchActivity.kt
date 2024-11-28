@@ -18,6 +18,7 @@ package com.duckduckgo.app.privatesearch
 
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -32,9 +33,11 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.NewSettingsFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
@@ -42,6 +45,9 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var newSettingsFeature: NewSettingsFeature
 
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
@@ -59,6 +65,20 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (newSettingsFeature.self().isEnabled()) {
+            with(binding) {
+                privateSearchHeaderImage.isGone = true
+                privateSearchTitle.isGone = true
+                privateSearchDescription.isGone = true
+                privateSearchHeadingSearchSettings.isGone = true
+
+                privateSearchHeaderImageNew.isVisible = true
+                privateSearchTitleNew.isVisible = true
+                statusIndicator.isVisible = true
+                privateSearchDescriptionNew.isVisible = true
+            }
+        }
 
         configureUiEventHandlers()
         observeViewModel()

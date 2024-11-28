@@ -46,7 +46,19 @@
                 android:layout_marginTop="@dimen/keyline_3"
                 android:padding="@dimen/keyline_2"
                 app:srcCompat="@drawable/private_search_header_image"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/privateSearchHeaderImageNew"
+                android:layout_width="128dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:visibility="gone"
+                app:srcCompat="@drawable/search_ok_128"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/privateSearchTitle"
@@ -57,8 +69,30 @@
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:gravity="center"
                 android:text="@string/privateSearchTitle"
-                app:typography="h2" />
+                app:typography="h2"
+                tools:visibility="gone" />
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/privateSearchTitleNew"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:gravity="center"
+                android:text="@string/privateSearchActivityTitle"
+                android:visibility="gone"
+                app:typography="h2"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.StatusIndicator
+                android:id="@+id/statusIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                app:indicatorStatus="alwaysOn"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/privateSearchDescription"
@@ -71,7 +105,22 @@
                 android:paddingBottom="@dimen/keyline_4"
                 android:text="@string/privateSearchDescription"
                 app:textType="secondary"
-                app:typography="body2" />
+                app:typography="body2"
+                tools:visibility="gone" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/privateSearchDescriptionNew"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_6"
+                android:gravity="center"
+                android:text="@string/privateSearchDescription"
+                android:visibility="gone"
+                app:textType="secondary"
+                app:typography="body2"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
@@ -81,7 +130,8 @@
                 android:id="@+id/privateSearchHeadingSearchSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/privateSearchHeadingSearchSettings" />
+                app:primaryText="@string/privateSearchHeadingSearchSettings"
+                tools:visibility="gone" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/privateSearchAutocompleteToggle"
@@ -92,9 +142,9 @@
                 app:showSwitch="true" />
 
             <LinearLayout
+                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSites"
                 android:orientation="vertical">
 
                 <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
