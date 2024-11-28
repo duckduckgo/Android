@@ -288,7 +288,7 @@ private fun MutableLiveData<ViewState>.setProtectionsState(state: SiteProtection
 private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFlow = when (this) {
     MENU -> BrokenSiteModelReportFlow.MENU
     DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
+    PROMPT -> BrokenSiteModelReportFlow.PROMPT
     TOGGLE_MENU -> BrokenSiteModelReportFlow.TOGGLE_MENU
     TOGGLE_DASHBOARD -> BrokenSiteModelReportFlow.TOGGLE_DASHBOARD
-    PROMPT -> BrokenSiteModelReportFlow.PROMPT
 }

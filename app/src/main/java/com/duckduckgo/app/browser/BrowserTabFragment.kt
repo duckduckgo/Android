@@ -1924,7 +1924,7 @@ class BrowserTabFragment :
                 PROMPT -> BrokenSiteFormReportFlow.PROMPT
                 else -> BrokenSiteFormReportFlow.MENU
             }
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId, DashboardOpener.NONE, reportFlow))
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))
                 ?.let { startActivity(it) }
         } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()

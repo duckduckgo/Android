@@ -231,7 +231,7 @@ class BrokenSiteSubmitter @Inject constructor(
 private fun ReportFlow.toStringValue(): String = when (this) {
     DASHBOARD -> "dashboard"
     MENU -> "menu"
+    PROMPT -> "prompt"
     TOGGLE_DASHBOARD -> "on_protections_off_dashboard_main"
     TOGGLE_MENU -> "on_protections_off_menu"
-    PROMPT -> "prompt"
 }
