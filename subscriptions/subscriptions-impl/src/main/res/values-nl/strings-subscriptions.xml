@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Je Privacy Pro-abonnement is verlopen</string>
     <string name="subscriptionSettingExpiredSubtitle">Abonneer je opnieuw om Privacy Pro te blijven gebruiken</string>
     <string name="subscriptionSettingExpiredViewPlans">Abonnementen bekijken</string>
-
+    <string name="subscriptionSettingSectionSubscription">Abonnement</string>
+    <string name="subscriptionSettingRemoveFromDevice">Verwijderen van dit apparaat</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
+    <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Je bent klaar.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Deel je feedback met ons …</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Welke functie wil je zien?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonnementen</string>
+    <string name="activitySubscriptionSettings">Abonnementinstellingen</string>
+    <string name="activityActivateSubscription">Abonnement activeren</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Verstuur feedback</string>
 </resources>
