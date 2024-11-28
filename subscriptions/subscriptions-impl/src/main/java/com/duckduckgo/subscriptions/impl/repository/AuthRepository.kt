@@ -206,7 +206,7 @@ internal class RealAuthRepository constructor(
     override suspend fun setFeatures(
         basePlanId: String,
         features: Set<String>,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         val featuresMap = subscriptionsDataStore.subscriptionFeatures
             ?.let(featuresAdapter::fromJson)
             ?.toMutableMap() ?: mutableMapOf()
@@ -216,10 +216,11 @@ internal class RealAuthRepository constructor(
         subscriptionsDataStore.subscriptionFeatures = featuresAdapter.toJson(featuresMap)
     }
 
-    override suspend fun getFeatures(basePlanId: String): Set<String> =
+    override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.subscriptionFeatures
             ?.let(featuresAdapter::fromJson)
             ?.get(basePlanId) ?: emptySet()
+    }
 
     private suspend fun updateSerpPromoCookie() {
         val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }
