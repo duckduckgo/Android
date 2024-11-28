@@ -270,6 +270,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
@@ -556,6 +557,7 @@ class BrowserTabViewModelTest {
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
+        whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -2026,11 +2028,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenRefreshAndShowDisabledConfirmationMessage() = runTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<RefreshAndShowPrivacyProtectionDisabledConfirmation> {
+            assertEquals("www.example.com", this.domain)
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenRefreshAndShowEnabledConfirmationMessage() = runTest {
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        assertCommandIssued<RefreshAndShowPrivacyProtectionEnabledConfirmation> {
             assertEquals("www.example.com", this.domain)
         }
     }
@@ -2043,16 +2055,6 @@ class BrowserTabViewModelTest {
         verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
         assertEquals(1, protectionTogglePlugin.toggleOn)
-    }
-
-    @Test
-    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
-        loadUrl("http://www.example.com/home.html")
-        testee.onPrivacyProtectionMenuClicked()
-        assertCommandIssued<RefreshAndShowPrivacyProtectionEnabledConfirmation> {
-            assertEquals("www.example.com", this.domain)
-        }
     }
 
     @Test

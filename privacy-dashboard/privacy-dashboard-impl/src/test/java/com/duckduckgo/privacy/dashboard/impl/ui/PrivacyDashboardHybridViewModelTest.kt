@@ -103,7 +103,9 @@ class PrivacyDashboardHybridViewModelTest {
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val pluginPoint = FakePluginPoint(protectionTogglePlugin)
 
-    private val toggleReports: ToggleReports = mock()
+    private val toggleReports: ToggleReports = mock {
+        runBlocking { whenever(mock.shouldPrompt()).thenReturn(false) }
+    }
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
