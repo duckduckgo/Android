@@ -43,6 +43,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':remote-messaging-api')
     implementation project(path: ':autofill-api')
+    implementation project(path: ':settings-api') // temporary until we release new settings
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
