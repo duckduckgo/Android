@@ -245,7 +245,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun updateTabLastAccess(tabId: String) {
         databaseExecutor().scheduleDirect {
-            tabsDao.updateTabLastAccess(tabId)
+            tabsDao.updateTabLastAccess(tabId, timeProvider.localDateTimeNow())
         }
     }
 

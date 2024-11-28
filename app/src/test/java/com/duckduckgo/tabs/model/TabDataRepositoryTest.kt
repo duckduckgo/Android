@@ -517,7 +517,7 @@ class TabDataRepositoryTest {
         val now = now()
         val tab1 = TabEntity(tabId = "tab1", lastAccessTime = now.minusDays(8))
         val tab2 = TabEntity(tabId = "tab2", lastAccessTime = now.minusDays(10))
-        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9))
+        val tab3 = TabEntity(tabId = "tab3", lastAccessTime = now.minusDays(9).minusSeconds(1))
         val tab4 = TabEntity(tabId = "tab4")
         whenever(mockDao.tabs()).thenReturn(listOf(tab1, tab2, tab3, tab4))
         val testee = tabDataRepository()
