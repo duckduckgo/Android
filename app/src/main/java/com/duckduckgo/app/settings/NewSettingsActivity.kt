@@ -51,12 +51,12 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
