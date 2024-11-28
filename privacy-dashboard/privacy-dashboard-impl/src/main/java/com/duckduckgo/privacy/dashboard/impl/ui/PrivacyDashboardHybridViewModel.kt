@@ -372,9 +372,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                                 command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
                             }
                         }
-                        if (dashboardOpenedFromCustomTab) {
-                            pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
-                        }
+                    }
+                    if (dashboardOpenedFromCustomTab) {
+                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
                     } else {
                         val pixelName = when (event.eventOrigin.screen) {
                             PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_ADD
