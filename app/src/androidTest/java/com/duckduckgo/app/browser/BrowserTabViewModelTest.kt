@@ -270,7 +270,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
@@ -2028,22 +2027,36 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenRefreshAndShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
-        loadUrl("http://www.example.com/home.html")
+    fun whenPrivacyProtectionMenuClickedForNonAllowListedSiteThenRefreshAndShowDisabledConfirmationMessage() = runTest {
+        val domain = "www.example.com"
+        val url = "http://www.example.com/home.html"
+
+        val allowlistFlow = MutableStateFlow(listOf<String>())
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(allowlistFlow)
+
+        loadUrl(url)
         testee.onPrivacyProtectionMenuClicked()
+        allowlistFlow.value = listOf(domain)
+
         assertCommandIssued<RefreshAndShowPrivacyProtectionDisabledConfirmation> {
-            assertEquals("www.example.com", this.domain)
+            assertEquals(domain, this.domain)
         }
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenRefreshAndShowEnabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
-        loadUrl("http://www.example.com/home.html")
+        val domain = "www.example.com"
+        val url = "http://www.example.com/home.html"
+
+        val allowlistFlow = MutableStateFlow(listOf(domain))
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(allowlistFlow)
+
+        loadUrl(url)
         testee.onPrivacyProtectionMenuClicked()
+        allowlistFlow.value = emptyList()
+
         assertCommandIssued<RefreshAndShowPrivacyProtectionEnabledConfirmation> {
-            assertEquals("www.example.com", this.domain)
+            assertEquals(domain, this.domain)
         }
     }
 
