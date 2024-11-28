@@ -35,13 +35,19 @@ class RealNetpDataVolumeStore @Inject constructor(
     private val networkProtectionPrefs: NetworkProtectionPrefs,
 ) : NetpDataVolumeStore {
     override var dataVolume: DataVolume
-        get() = DataVolume(
-            receivedBytes = networkProtectionPrefs.getLong(KEY_RECEIVED_BYTES, 0L),
-            transmittedBytes = networkProtectionPrefs.getLong(KEY_TRANSMITTED_BYTES, 0L),
-        )
+        get() {
+            return kotlin.runCatching {
+                DataVolume(
+                    receivedBytes = networkProtectionPrefs.getLong(KEY_RECEIVED_BYTES, 0L),
+                    transmittedBytes = networkProtectionPrefs.getLong(KEY_TRANSMITTED_BYTES, 0L),
+                )
+            }.getOrDefault(DataVolume())
+        }
         set(value) {
-            networkProtectionPrefs.putLong(KEY_RECEIVED_BYTES, value.receivedBytes)
-            networkProtectionPrefs.putLong(KEY_TRANSMITTED_BYTES, value.transmittedBytes)
+            kotlin.runCatching {
+                networkProtectionPrefs.putLong(KEY_RECEIVED_BYTES, value.receivedBytes)
+                networkProtectionPrefs.putLong(KEY_TRANSMITTED_BYTES, value.transmittedBytes)
+            }
         }
 
     companion object {

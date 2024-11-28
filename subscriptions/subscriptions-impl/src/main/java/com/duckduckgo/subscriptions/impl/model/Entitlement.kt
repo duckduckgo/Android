@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.subscriptions.impl.model
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+data class Entitlement(
+    /**
+     * Name of the entitlement.
+     */
+    val name: String,
 
-dependencies {
-    /* Temporary while developing new settings screen */
-    implementation project(':feature-toggles-api')
-
-    implementation project(':navigation-api')
-    implementation Google.dagger
-    implementation AndroidX.core.ktx
-}
-
-android {
-    namespace 'com.duckduckgo.settings.api'
-}
-
+    /**
+     * Name of the product represented by this entitlement.
+     */
+    val product: String,
+)
