@@ -28,7 +28,6 @@ import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 interface AndroidFeaturesHeaderProvider {
     fun provide(): String?
@@ -46,24 +45,18 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     override fun provide(): String? {
         val config = featuresRequestHeaderStore.getConfig()
         if (config.isNotEmpty()) {
-            Timber.d("FeaturesHeader: config present $config")
             val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
             if (versionConfig != null) {
-                Timber.d("FeaturesHeader: config for current version $versionConfig")
                 if (shouldLogValue(versionConfig)) {
-                    Timber.d("FeaturesHeader: inside the logging period")
                     return mapFeatures(versionConfig)
                 }
             } else {
-                Timber.d("FeaturesHeader: no config received for version ${appBuildConfig.versionCode}")
                 return null
             }
         } else {
-            Timber.d("FeaturesHeader: no config received")
             return null
         }
 
-        Timber.d("FeaturesHeader: not in the logging period")
         return null
     }
 
@@ -79,9 +72,6 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
         val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
         val daysUntilLoggingStarts = versionConfig.daysUntilLoggingStarts
         val daysForAppVersionLogging = versionConfig.daysUntilLoggingStarts + versionConfig.daysLogging
-        Timber.d(
-            "FeaturesHeader: daysSinceBuild $daysSinceBuild  daysUntilLoggingStarts $daysUntilLoggingStarts daysForAppVersionLogging $daysForAppVersionLogging",
-        )
 
         return daysSinceBuild in daysUntilLoggingStarts..daysForAppVersionLogging
     }
@@ -103,11 +93,9 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
             }
 
             if (params.isEmpty()) {
-                Timber.d("FeaturesHeader: no params to log")
                 null
             } else {
-                Timber.d("FeaturesHeader: retrieving a random param to log")
-                val randomIndex = (0 until params.size).random()
+                val randomIndex = (0..<params.size).random()
                 params.keys.toList()[randomIndex].plus("=").plus(params.values.toList()[randomIndex])
             }
         }

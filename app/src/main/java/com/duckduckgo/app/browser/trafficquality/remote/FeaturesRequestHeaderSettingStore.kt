@@ -22,7 +22,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
 
 interface FeaturesRequestHeaderStore {
     fun getConfig(): List<TrafficQualityAppVersion>
@@ -58,7 +57,6 @@ class FeaturesRequestHeaderSettingStore @Inject constructor(
 
     override fun getConfig(): List<TrafficQualityAppVersion> {
         val config = androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
-            Timber.d("FeaturesHeader: config present $it")
             runCatching {
                 val configJson = jsonAdapter.fromJson(it)
                 configJson?.versions
