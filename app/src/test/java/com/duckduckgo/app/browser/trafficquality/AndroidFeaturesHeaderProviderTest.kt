@@ -65,8 +65,17 @@ class AndroidFeaturesHeaderProviderTest {
     }
 
     @Test
-    fun whenCurrentVersionNotPresentThenNoValueProvided() {
+    fun whenNoVersionsPresentThenNoValueProvided() {
         whenever(featuresRequestHeaderStore.getConfig()).thenReturn(emptyList())
+
+        val result = testee.provide()
+        assertNull(result)
+    }
+
+    @Test
+    fun whenCurrentVersionNotPresentThenNoValueProvided() {
+        val noFeaturesEnabled = TrafficQualityAppVersion(anotherVersion, 5, 5, noFeaturesEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(noFeaturesEnabled))
 
         val result = testee.provide()
         assertNull(result)
