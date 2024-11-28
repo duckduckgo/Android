@@ -13,7 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
     <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
@@ -21,7 +22,7 @@
     <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN is Off</string>
     <string name="netpManagementDescriptionOff">Connect to secure all of your device’s Internet traffic.</string>
     <string name="netpManagementDescriptionOn">All device Internet traffic is being secured through the VPN.</string>
-    <string name="netpManagementToggleTitle">VPN</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
     <string name="netpManagementToggleSubtitleConnecting">Connecting…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
@@ -213,16 +214,16 @@
     <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for DuckDuckGo VPN.</string>
 
     <!-- NetP Settings-->
-    <string name="netpSubscriptionSettingsTitle">VPN</string>
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
     <string name="netpSubscriptionSettingsConnected">Enabled</string>
     <string name="netpSubscriptionSettingsConnecting">Connecting…</string>
     <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
 
     <!-- Custom DNS -->
-    <string name="netpSetttingDnsHeader">DNS</string>
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
     <string name="netpCustomDnsSettingText">DNS Server</string>
     <string name="netpPrivateDns">Private DNS</string>
-    <string name="netpCustomDnsDefault">DuckDuckGo</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
     <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Block malware)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
