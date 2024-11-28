@@ -22,9 +22,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import timber.log.Timber
 
 interface FeaturesRequestHeaderStore {
-    fun getConfig(appVersion: Int): TrafficQualityAppVersion?
+    fun getConfig(): List<TrafficQualityAppVersion>
 }
 
 private data class TrafficQualitySettingsJson(
@@ -35,7 +36,7 @@ data class TrafficQualityAppVersion(
     val appVersion: Int,
     val daysUntilLoggingStarts: Int,
     val daysLogging: Int,
-    val features: TrafficQualityAppVersionFeatures,
+    val featuresLogged: TrafficQualityAppVersionFeatures,
 )
 
 data class TrafficQualityAppVersionFeatures(
@@ -55,12 +56,15 @@ class FeaturesRequestHeaderSettingStore @Inject constructor(
         moshi.adapter(TrafficQualitySettingsJson::class.java)
     }
 
-    override fun getConfig(appVersion: Int): TrafficQualityAppVersion? {
-        return androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
+    override fun getConfig(): List<TrafficQualityAppVersion> {
+        Timber.d("FeaturesHeader: looking for config")
+        val config = androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
             runCatching {
-                val config = jsonAdapter.fromJson(it)
-                config?.versions?.find { it.appVersion == appVersion }
-            }.getOrNull()
-        }
+                jsonAdapter.fromJson(it)?.versions
+            }.getOrDefault(emptyList())
+        } ?: emptyList()
+
+        Timber.d("FeaturesHeader: config mapped $config")
+        return config
     }
 }

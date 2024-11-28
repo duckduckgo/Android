@@ -28,6 +28,7 @@ import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 interface AndroidFeaturesHeaderProvider {
     fun provide(): String?
@@ -43,15 +44,27 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
 ) : AndroidFeaturesHeaderProvider {
     override fun provide(): String? {
-        val versionConfig = featuresRequestHeaderStore.getConfig(appBuildConfig.versionCode)
-        if (versionConfig != null) {
-            if (shouldLogValue(versionConfig)) {
-                return mapFeatures(versionConfig)
+        Timber.d("FeaturesHeader: provide()")
+        val config = featuresRequestHeaderStore.getConfig()
+        if (config.isNotEmpty()) {
+            Timber.d("FeaturesHeader: config received")
+            val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
+            if (versionConfig != null) {
+                Timber.d("FeaturesHeader: config for current version $versionConfig")
+                if (shouldLogValue(versionConfig)) {
+                    Timber.d("FeaturesHeader: inside the logging period")
+                    return mapFeatures(versionConfig)
+                }
+            } else {
+                Timber.d("FeaturesHeader: no config received for current version")
+                return null
             }
         } else {
+            Timber.d("FeaturesHeader: no config received")
             return null
         }
 
+        Timber.d("FeaturesHeader: not in the logging period")
         return null
     }
 
@@ -63,10 +76,13 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
 
         val appBuildDate = LocalDateTime.ofEpochSecond(appBuildDateMillis / 1000, 0, ZoneOffset.UTC)
         val now = LocalDateTime.now(ZoneOffset.UTC)
-        val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
 
+        val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
         val daysUntilLoggingStarts = versionConfig.daysUntilLoggingStarts
         val daysForAppVersionLogging = versionConfig.daysUntilLoggingStarts + versionConfig.daysLogging
+        Timber.d(
+            "FeaturesHeader: daysSinceBuild $daysSinceBuild  daysUntilLoggingStarts $daysUntilLoggingStarts daysForAppVersionLogging $daysForAppVersionLogging",
+        )
 
         return daysSinceBuild in daysUntilLoggingStarts..daysForAppVersionLogging
     }
@@ -74,23 +90,24 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     private fun mapFeatures(versionConfig: TrafficQualityAppVersion): String? {
         return runBlocking {
             val params = mutableMapOf<String, String>()
-            if (versionConfig.features.cpm) {
+            if (versionConfig.featuresLogged.cpm) {
                 params[CPM_HEADER] = autoconsent.isAutoconsentEnabled().toString()
             }
-            if (versionConfig.features.gpc) {
+            if (versionConfig.featuresLogged.gpc) {
                 params[GPC_HEADER] = gpc.isEnabled().toString()
             }
-            if (versionConfig.features.appTP) {
+            if (versionConfig.featuresLogged.appTP) {
                 params[APP_TP_HEADER] = appTrackingProtection.isEnabled().toString()
             }
-
-            if (versionConfig.features.netP) {
+            if (versionConfig.featuresLogged.netP) {
                 params[NET_P_HEADER] = networkProtectionState.isEnabled().toString()
             }
 
             if (params.isEmpty()) {
+                Timber.d("FeaturesHeader: no params to log")
                 null
             } else {
+                Timber.d("FeaturesHeader: retrieving a random param to log")
                 val randomIndex = (0 until params.size).random()
                 params.keys.toList()[randomIndex].plus("=").plus(params.values.toList()[randomIndex])
             }
