@@ -74,7 +74,10 @@
     <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
     <string name="subscriptionSettingExpiredSubtitle">Subscribe again to continue using Privacy\u00A0Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">View Plans</string>
-
+    <string name="subscriptionSettingSectionSubscription">Subscription</string>
+    <string name="subscriptionSettingRemoveFromDevice">Remove From This Device</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
+    <string name="subscriptionSettingSendFeedback">Send Feedback</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
@@ -153,4 +156,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Please give us your feedback…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">What feature would you like to see?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Subscriptions</string>
+    <string name="activitySubscriptionSettings">Subscription Settings</string>
+    <string name="activityActivateSubscription">Activate Subscription</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Send Feedback</string>
 </resources>
