@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app
+package com.duckduckgo.common.test
 
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.di.AppComponent
-import com.duckduckgo.app.global.DuckDuckGoApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
-fun getApp(): DuckDuckGoApplication {
-    return InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as DuckDuckGoApplication
-}
-
-fun getDaggerComponent(): AppComponent {
-    return getApp().daggerAppComponent as AppComponent
+// https://stackoverflow.com/a/44991770/73479
+fun <T> LiveData<T>.blockingObserve(): T? {
+    var value: T? = null
+    val latch = CountDownLatch(1)
+    val innerObserver = Observer<T> {
+        value = it
+        latch.countDown()
+    }
+    observeForever(innerObserver)
+    latch.await(2, TimeUnit.SECONDS)
+    return value
 }
