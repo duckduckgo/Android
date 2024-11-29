@@ -47,7 +47,7 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
         val config = featuresRequestHeaderStore.getConfig()
         val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
         return if (versionConfig != null && shouldLogValue(versionConfig)) {
-            mapFeatures(versionConfig)
+            logFeature(versionConfig)
         } else {
             null
         }
@@ -69,27 +69,51 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
         return daysSinceBuild in daysUntilLoggingStarts..daysForAppVersionLogging
     }
 
-    private fun mapFeatures(versionConfig: TrafficQualityAppVersion): String? {
-        return runBlocking {
-            val params = mutableMapOf<String, String>()
-            if (versionConfig.featuresLogged.cpm) {
-                params[CPM_HEADER] = autoconsent.isAutoconsentEnabled().toString()
-            }
-            if (versionConfig.featuresLogged.gpc) {
-                params[GPC_HEADER] = gpc.isEnabled().toString()
-            }
-            if (versionConfig.featuresLogged.appTP) {
-                params[APP_TP_HEADER] = appTrackingProtection.isEnabled().toString()
-            }
-            if (versionConfig.featuresLogged.netP) {
-                params[NET_P_HEADER] = networkProtectionState.isEnabled().toString()
-            }
+    private fun logFeature(versionConfig: TrafficQualityAppVersion): String? {
+        val listOfFeatures = mutableListOf<String>()
+        if (versionConfig.featuresLogged.cpm) {
+            listOfFeatures.add(CPM_HEADER)
+        }
+        if (versionConfig.featuresLogged.gpc) {
+            listOfFeatures.add(GPC_HEADER)
+        }
 
-            if (params.isEmpty()) {
-                null
-            } else {
-                val randomIndex = (0..<params.size).random()
-                params.keys.toList()[randomIndex].plus("=").plus(params.values.toList()[randomIndex])
+        if (versionConfig.featuresLogged.appTP) {
+            listOfFeatures.add(APP_TP_HEADER)
+        }
+
+        if (versionConfig.featuresLogged.netP) {
+            listOfFeatures.add(NET_P_HEADER)
+        }
+
+        return if (listOfFeatures.isEmpty()) {
+            null
+        } else {
+            val randomIndex = (0..<listOfFeatures.size).random()
+            listOfFeatures[randomIndex].plus("=").plus(mapFeature(listOfFeatures[randomIndex]))
+        }
+    }
+
+    private fun mapFeature(feature: String): String? {
+        return runBlocking {
+            when (feature) {
+                CPM_HEADER -> {
+                    autoconsent.isAutoconsentEnabled().toString()
+                }
+
+                GPC_HEADER -> {
+                    gpc.isEnabled().toString()
+                }
+
+                APP_TP_HEADER -> {
+                    appTrackingProtection.isEnabled().toString()
+                }
+
+                NET_P_HEADER -> {
+                    networkProtectionState.isEnabled().toString()
+                }
+
+                else -> null
             }
         }
     }

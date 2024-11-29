@@ -25,8 +25,6 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import java.lang.IllegalStateException
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
 
@@ -68,8 +66,5 @@ class RealAppBuildConfig @Inject constructor(
         get() = variantManager.get().getVariantKey()
 
     override val buildDateTimeMillis: Long
-        get() {
-            val days = 6L
-            return LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        }
+        get() = BuildConfig.BUILD_DATE_MILLIS
 }
