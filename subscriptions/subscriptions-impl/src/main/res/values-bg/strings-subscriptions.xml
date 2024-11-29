@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Абонамент ви за Privacy Pro е изтекъл</string>
     <string name="subscriptionSettingExpiredSubtitle">Абонирайте се отново, за да продължите да използвате Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Преглед на плановете</string>
-
+    <string name="subscriptionSettingSectionSubscription">Абонамент</string>
+    <string name="subscriptionSettingRemoveFromDevice">Премахване от това устройство</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
+    <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Всичко е готово.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Моля, споделете своето мнение…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Каква функция бихте искали да въведем?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Абонаменти</string>
+    <string name="activitySubscriptionSettings">Настройки на абонамент</string>
+    <string name="activityActivateSubscription">Активиране на абонамент</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Изпратете отзив</string>
 </resources>
