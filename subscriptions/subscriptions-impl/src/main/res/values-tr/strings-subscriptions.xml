@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
     <string name="subscriptionSettingExpiredSubtitle">Privacy Pro\'yu kullanmaya devam etmek için tekrar abone olun</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>
-
+    <string name="subscriptionSettingSectionSubscription">Abonelik</string>
+    <string name="subscriptionSettingRemoveFromDevice">Bu Cihazdan Kaldır</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
+    <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Her şey hazır.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lütfen bize geri bildirimlerinizi iletin…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hangi özelliği görmek istersiniz?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonelikler</string>
+    <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
+    <string name="activityActivateSubscription">Aboneliği Etkinleştir</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Geri Bildirim gönder</string>
 </resources>
