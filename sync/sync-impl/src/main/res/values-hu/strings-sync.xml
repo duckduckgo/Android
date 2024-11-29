@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Letöltési link megosztása</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Átváltasz egy másik szinkronizációs lehetőségre?</string>
+    <string name="sync_dialog_switch_account_primary_button">Váltás másik szinkronizálási lehetőségre</string>
+    <string name="sync_dialog_switch_account_secondary_button">Mégsem</string>
+    <string name="sync_dialog_switch_account_description">Ez az eszköz már szinkronizálva van. Biztosan szinkronizálni szeretnéd egy másik biztonsági mentéssel vagy eszközzel? A váltás nem távolítja el ezzel az eszközzel már szinkronizált adatokat.</string>
 </resources>

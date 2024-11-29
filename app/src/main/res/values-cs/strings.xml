@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Možná později</string>
     <string name="preciseLocationSystemDialogNeverAllow">Neptat se znovu u těchto stránek</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Udělit %1$s povolení k přístupu k poloze?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Vaši anonymní polohu využíváme pouze k dosažení lepších výsledků, blíže k vám. Vždycky si to můžete později rozmyslet.</string>
     <string name="preciseLocationSiteDialogSubtitle">Oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, můžete spravovat v Nastavení.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Tvou anonymní polohu používáme jen k tomu, abychom ti mohli poskytovat lepší výsledky v tvojí blízkosti. Oprávnění k přístupu k poloze udělené jednotlivým webovým stránkám můžeš spravovat v Nastaveních.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Pouze pro tuto relaci</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vždy odmítnout</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Oprávnění odebrána všem webům</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oprávnění „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Zeptat se</string>
+    <string name="permissionsPerWebsiteAskSetting">Vždycky se ptát</string>
     <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
     <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Možnost „Zeptat se“ je u všech webů vypnutá</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázáno pro všechny weby</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
 
     <!-- Notify Me View on Downloads -->
