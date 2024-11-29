@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Abonamentul tău Privacy Pro a expirat</string>
     <string name="subscriptionSettingExpiredSubtitle">Abonează-te din nou pentru a continua să utilizezi Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Vezi planurile</string>
-
+    <string name="subscriptionSettingSectionSubscription">Abonament</string>
+    <string name="subscriptionSettingRemoveFromDevice">Elimină de pe acest dispozitiv</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
+    <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Ești gata.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Te rugăm să ne comunici feedbackul tău...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ce caracteristică ai dori să vezi?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonamente</string>
+    <string name="activitySubscriptionSettings">Setări pentru abonament</string>
+    <string name="activityActivateSubscription">Activează abonamentul</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Trimite feedback</string>
 </resources>
