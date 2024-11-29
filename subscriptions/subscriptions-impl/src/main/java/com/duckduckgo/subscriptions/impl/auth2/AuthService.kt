@@ -26,7 +26,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface AuthService {
-    @GET("https://quack.duckduckgo.com/api/auth/v2/authorize")
+    @GET("https://quackdev.duckduckgo.com/api/auth/v2/authorize")
     suspend fun authorize(
         @Query("response_type") responseType: String,
         @Query("code_challenge") codeChallenge: String,
@@ -36,12 +36,12 @@ interface AuthService {
         @Query("scope") scope: String,
     ): Response<Unit>
 
-    @POST("https://quack.duckduckgo.com/api/auth/v2/account/create")
+    @POST("https://quackdev.duckduckgo.com/api/auth/v2/account/create")
     suspend fun createAccount(
         @Header("Cookie") cookie: String,
     ): Response<Unit>
 
-    @GET("https://quack.duckduckgo.com/api/auth/v2/token")
+    @GET("https://quackdev.duckduckgo.com/api/auth/v2/token")
     suspend fun token(
         @Query("grant_type") grantType: String,
         @Query("client_id") clientId: String,
@@ -51,22 +51,22 @@ interface AuthService {
         @Query("refresh_token") refreshToken: String?,
     ): TokensResponse
 
-    @GET("https://quack.duckduckgo.com/api/auth/v2/.well-known/jwks.json")
+    @GET("https://quackdev.duckduckgo.com/api/auth/v2/.well-known/jwks.json")
     suspend fun jwks(): ResponseBody
 
-    @POST("https://quack.duckduckgo.com/api/auth/v2/login")
+    @POST("https://quackdev.duckduckgo.com/api/auth/v2/login")
     suspend fun login(
         @Header("Cookie") cookie: String,
         @Body body: StoreLoginBody,
     ): Response<Unit>
 
-    @POST("https://quack.duckduckgo.com/api/auth/v2/exchange")
+    @POST("https://quackdev.duckduckgo.com/api/auth/v2/exchange")
     suspend fun exchange(
         @Header("Authorization") authorization: String,
         @Header("Cookie") cookie: String,
     ): Response<Unit>
 
-    @POST("https://quack.duckduckgo.com/api/auth/v2/logout")
+    @POST("https://quackdev.duckduckgo.com/api/auth/v2/logout")
     suspend fun logout(@Header("Authorization") authorization: String)
 }
 
