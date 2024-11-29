@@ -37,7 +37,6 @@ import com.duckduckgo.settings.api.NewSettingsFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)

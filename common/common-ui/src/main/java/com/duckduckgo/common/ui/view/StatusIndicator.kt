@@ -71,7 +71,8 @@ class StatusIndicator @JvmOverloads constructor(
 
         ALWAYS_ON,
         ON,
-        OFF;
+        OFF,
+        ;
 
         companion object {
 
