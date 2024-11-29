@@ -81,6 +81,7 @@ import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
@@ -305,29 +306,28 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         viewsPrivacy.cookiePopupProtectionSetting.setStatus(isOn = enabled)
     }
 
-    private fun processCommand(it: Command?) {
+    private fun processCommand(it: Command) {
         when (it) {
             is LaunchDefaultBrowser -> launchDefaultAppScreen()
-            is LaunchAutofillSettings -> launchAutofillSettings()
-            is LaunchAccessibilitySettings -> launchAccessibilitySettings()
-            is LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
-            is LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
-            is LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
+            is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
+            is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
+            is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
+            is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
+            is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
+            is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchSyncSettings -> launchSyncSettings()
-            is LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
-            is LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
-            is LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
-            is LaunchFireButtonScreen -> launchFireButtonScreen()
-            is LaunchPermissionsScreen -> launchPermissionsScreen()
-            is LaunchAppearanceScreen -> launchAppearanceScreen()
-            is LaunchAboutScreen -> launchAboutScreen()
-            is LaunchGeneralSettingsScreen -> launchGeneralSettingsScreen()
+            is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
+            is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
+            is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
+            is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
+            is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
+            is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
+            is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
+            is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
+            is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)
             is LaunchFeedback -> launchFeedback()
-            is LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
-            is LaunchOtherPlatforms -> launchOtherPlatforms()
-            null -> TODO()
+            is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
+            is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
         }
     }
 
@@ -350,40 +350,17 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         launchDefaultAppActivity()
     }
 
-    private fun launchAutofillSettings() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity), options)
+    private fun launchScreen(activityParams: ActivityParams) {
+        globalActivityStarter.start(this, activityParams)
     }
 
-    private fun launchAccessibilitySettings() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AccessibilityScreens.Default, options)
+    private fun launchActivity(intent: Intent) {
+        startActivity(intent)
     }
 
-    private fun launchEmailProtectionScreen(url: String) {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrowserActivity.intent(this, url, interstitialScreen = true), options)
-        this.finish()
-    }
-
-    private fun launchEmailProtectionNotSupported() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, EmailProtectionUnsupportedScreenNoParams, options)
-    }
-
-    private fun launchSyncSettings() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, SyncActivityWithEmptyParams, options)
-    }
-
-    private fun launchAppTPTrackersScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
-    }
-
-    private fun launchAppTPOnboardingScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams, options)
+    private fun launchActivityAndFinish(intent: Intent) {
+        launchActivity(intent)
+        finish()
     }
 
     private fun launchAddHomeScreenWidget() {
@@ -391,60 +368,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         addWidgetLauncher.launchAddWidget(this)
     }
 
-    private fun launchPrivateSearchScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, PrivateSearchScreenNoParams, options)
-    }
-
-    private fun launchWebTrackingProtectionScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, WebTrackingProtectionScreenNoParams, options)
-    }
-
-    private fun launchCookiePopupProtectionScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AutoconsentSettingsActivity.intent(this), options)
-    }
-
-    private fun launchFireButtonScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, FireButtonScreenNoParams, options)
-    }
-
-    private fun launchPermissionsScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, PermissionsScreenNoParams, options)
-    }
-
-    private fun launchAppearanceScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AppearanceScreen.Default, options)
-    }
-
-    private fun launchAboutScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AboutScreenNoParams, options)
-    }
-
-    private fun launchGeneralSettingsScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, GeneralSettingsScreenNoParams, options)
-    }
-
     private fun launchFeedback() {
         feedbackFlow.launch(null)
-    }
-
-    private fun launchPproUnifiedFeedback() {
-        globalActivityStarter.start(
-            this,
-            GeneralPrivacyProFeedbackScreenNoParams,
-        )
-    }
-
-    private fun launchOtherPlatforms() {
-        startActivity(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
-        finish()
     }
 
     companion object {
