@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
+@ContributesBinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
