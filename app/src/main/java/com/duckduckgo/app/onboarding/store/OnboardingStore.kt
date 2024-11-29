@@ -20,7 +20,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
-    var visitSiteCtaDisplayCount: Int?
+    var visitSiteCtaDisplayCount: Int
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
     fun getExperimentSearchOptions(): List<DaxDialogIntroOption>

@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
             cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
                 cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
         if (isVisitSiteSuggestionsCta) {
-            if (userBrowserProperties.daysSinceInstalled() <= 3) {
+            if (userBrowserProperties.daysSinceInstalled() <= MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN) {
                 val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
                 pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
                 onboardingStore.visitSiteCtaDisplayCount = count + 1
@@ -589,5 +589,6 @@ class CtaViewModel @Inject constructor(
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
+        private const val MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN = 3
     }
 }

@@ -35,9 +35,9 @@ class OnboardingStoreImpl @Inject constructor(
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
-    override var visitSiteCtaDisplayCount: Int?
+    override var visitSiteCtaDisplayCount: Int
         get() = preferences.getInt(VISIT_SITE_CTA_DISPLAY_COUNT, 0)
-        set(count) = preferences.edit { putInt(VISIT_SITE_CTA_DISPLAY_COUNT, count ?: 0) }
+        set(count) = preferences.edit { putInt(VISIT_SITE_CTA_DISPLAY_COUNT, count) }
 
     override fun getSearchOptions(): List<DaxDialogIntroOption> {
         val country = Locale.getDefault().country
