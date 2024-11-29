@@ -79,12 +79,12 @@
 
                 <ImageView
                     android:id="@+id/changeAppIcon"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/keyline_6"
                     android:layout_height="@dimen/keyline_6"
                     android:layout_gravity="center"
                     android:layout_marginEnd="@dimen/keyline_4"
                     android:importantForAccessibility="no"
-                    tools:srcCompat="@mipmap/ic_launcher_red_round" />
+                    tools:srcCompat="@drawable/ic_ddg_logo" />
 
             </LinearLayout>
 
