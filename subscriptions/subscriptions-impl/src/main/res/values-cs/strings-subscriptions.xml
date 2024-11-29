@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Tvoje předplatné Privacy Pro vypršelo</string>
     <string name="subscriptionSettingExpiredSubtitle">Pokud chceš dál používat službu Privacy Pro, znovu si založ předplatné</string>
     <string name="subscriptionSettingExpiredViewPlans">Zobrazit tarify</string>
-
+    <string name="subscriptionSettingSectionSubscription">Předplatné</string>
+    <string name="subscriptionSettingRemoveFromDevice">Odebrat z tohohle zařízení</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Nápověda a podpora</string>
+    <string name="subscriptionSettingSendFeedback">Odeslat zpětnou vazbu</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">A je to.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pošli nám svou zpětnou vazbu...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Jaká funkce by se ti líbila?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Předplatné</string>
+    <string name="activitySubscriptionSettings">Nastavení předplatného</string>
+    <string name="activityActivateSubscription">Aktivace předplatného</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 </resources>
