@@ -42,22 +42,15 @@ class RealAndroidFeaturesHeaderProvider @Inject constructor(
     private val appTrackingProtection: AppTrackingProtection,
     private val networkProtectionState: NetworkProtectionState,
 ) : AndroidFeaturesHeaderProvider {
+
     override fun provide(): String? {
         val config = featuresRequestHeaderStore.getConfig()
-        if (config.isNotEmpty()) {
-            val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
-            if (versionConfig != null) {
-                if (shouldLogValue(versionConfig)) {
-                    return mapFeatures(versionConfig)
-                }
-            } else {
-                return null
-            }
+        val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
+        return if (versionConfig != null && shouldLogValue(versionConfig)) {
+            mapFeatures(versionConfig)
         } else {
-            return null
+            null
         }
-
-        return null
     }
 
     private fun shouldLogValue(versionConfig: TrafficQualityAppVersion): Boolean {

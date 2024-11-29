@@ -36,13 +36,8 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
             androidBrowserConfigFeature.featuresRequestHeader().isEnabled() &&
             duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         ) {
-            val headerValue = androidFeaturesHeaderProvider.provide()
-            return if (headerValue != null) {
-                mapOf(
-                    X_DUCKDUCKGO_ANDROID_HEADER to headerValue,
-                )
-            } else {
-                emptyMap()
+            androidFeaturesHeaderProvider.provide()?.let { headerValue ->
+                return mapOf(X_DUCKDUCKGO_ANDROID_HEADER to headerValue)
             }
         }
         return emptyMap()
