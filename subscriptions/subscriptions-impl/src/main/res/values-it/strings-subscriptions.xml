@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Il tuo abbonamento Privacy Pro è scaduto</string>
     <string name="subscriptionSettingExpiredSubtitle">Abbonati di nuovo per continuare a usare Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Visualizza i piani</string>
-
+    <string name="subscriptionSettingSectionSubscription">Abbonamento</string>
+    <string name="subscriptionSettingRemoveFromDevice">Rimuovi da questo dispositivo</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Aiuto e assistenza</string>
+    <string name="subscriptionSettingSendFeedback">Invia feedback</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">È tutto pronto.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Comunicaci la tua opinione...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Quale funzionalità vorresti vedere?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abbonamenti</string>
+    <string name="activitySubscriptionSettings">Impostazioni dell\'abbonamento</string>
+    <string name="activityActivateSubscription">Attiva abbonamento</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Invia feedback</string>
 </resources>
