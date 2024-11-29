@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Vaša naročnina na Privacy Pro je potekla</string>
     <string name="subscriptionSettingExpiredSubtitle">Znova se naročite, če želite še naprej uporabljati Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Oglejte si načrte</string>
-
+    <string name="subscriptionSettingSectionSubscription">Naročnina</string>
+    <string name="subscriptionSettingRemoveFromDevice">Odstrani iz te naprave</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Pomoč in podpora</string>
+    <string name="subscriptionSettingSendFeedback">Pošljite povratne informacije</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Vse je pripravljeno.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pošljite nam povratne informacije ...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Katero funkcijo bi radi videli?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Naročnine</string>
+    <string name="activitySubscriptionSettings">Nastavitve naročnine</string>
+    <string name="activityActivateSubscription">Aktiviranje naročnine</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Pošljite povratne informacije</string>
 </resources>
