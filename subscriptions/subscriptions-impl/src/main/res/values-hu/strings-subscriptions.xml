@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Lejárt a Privacy Pro-előfizetésed</string>
     <string name="subscriptionSettingExpiredSubtitle">Fizess elő újra, hogy tovább használhasd a Privacy Pro szolgáltatást</string>
     <string name="subscriptionSettingExpiredViewPlans">Csomagok megtekintése</string>
-
+    <string name="subscriptionSettingSectionSubscription">Előfizetés</string>
+    <string name="subscriptionSettingRemoveFromDevice">Eltávolítás erről az eszközről</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Segítség és támogatás</string>
+    <string name="subscriptionSettingSendFeedback">Visszajelzés küldése</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Minden készen áll.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Küldj nekünk visszajelzést…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Milyen funkciót szeretnél látni?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Előfizetések</string>
+    <string name="activitySubscriptionSettings">Előfizetési beállítások</string>
+    <string name="activityActivateSubscription">Előfizetés aktiválása</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Visszajelzés küldése</string>
 </resources>
