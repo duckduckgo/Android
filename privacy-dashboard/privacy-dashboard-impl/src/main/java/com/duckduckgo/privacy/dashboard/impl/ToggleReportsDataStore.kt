@@ -28,7 +28,6 @@ import com.duckduckgo.privacy.dashboard.impl.SharedPreferencesToggleReportsDataS
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
@@ -59,7 +58,6 @@ interface ToggleReportsDataStore {
     suspend fun canPrompt(): Boolean
 }
 
-@JsonClass(generateAdapter = true)
 data class ToggleReportsSetting(
     @field:Json(name = "dismissLogicEnabled")
     val dismissLogicEnabled: Boolean,
@@ -96,40 +94,35 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         const val DEFAULT_MAX_PROMPT = 3
     }
 
-    override suspend fun getDismissLogicEnabled(): Boolean =
-        withContext(dispatcherProvider.io()) {
-            return@withContext toggleReportsFeature.self().getSettings()?.let {
-                jsonAdapter.fromJson(it)
-            }?.dismissLogicEnabled ?: false
-        }
+    override suspend fun getDismissLogicEnabled(): Boolean {
+        return toggleReportsFeature.self().getSettings()?.let {
+            jsonAdapter.fromJson(it)
+        }?.dismissLogicEnabled ?: false
+    }
 
-    override suspend fun getDismissInterval(): Int =
-        withContext(dispatcherProvider.io()) {
-            return@withContext toggleReportsFeature.self().getSettings()?.let {
-                jsonAdapter.fromJson(it)
-            }?.dismissInterval ?: DEFAULT_INTERVAL
-        }
+    override suspend fun getDismissInterval(): Int {
+        return toggleReportsFeature.self().getSettings()?.let {
+            jsonAdapter.fromJson(it)
+        }?.dismissInterval ?: DEFAULT_INTERVAL
+    }
 
-    override suspend fun getPromptLimitLogicEnabled(): Boolean =
-        withContext(dispatcherProvider.io()) {
-            return@withContext toggleReportsFeature.self().getSettings()?.let {
-                jsonAdapter.fromJson(it)
-            }?.promptLimitLogicEnabled ?: false
-        }
+    override suspend fun getPromptLimitLogicEnabled(): Boolean {
+        return toggleReportsFeature.self().getSettings()?.let {
+            jsonAdapter.fromJson(it)
+        }?.promptLimitLogicEnabled ?: false
+    }
 
-    override suspend fun getPromptInterval(): Int =
-        withContext(dispatcherProvider.io()) {
-            return@withContext toggleReportsFeature.self().getSettings()?.let {
-                jsonAdapter.fromJson(it)
-            }?.promptInterval ?: DEFAULT_INTERVAL
-        }
+    override suspend fun getPromptInterval(): Int {
+        return toggleReportsFeature.self().getSettings()?.let {
+            jsonAdapter.fromJson(it)
+        }?.promptInterval ?: DEFAULT_INTERVAL
+    }
 
-    override suspend fun getMaxPromptCount(): Int =
-        withContext(dispatcherProvider.io()) {
-            return@withContext toggleReportsFeature.self().getSettings()?.let {
-                jsonAdapter.fromJson(it)
-            }?.maxPromptCount ?: DEFAULT_MAX_PROMPT
-        }
+    override suspend fun getMaxPromptCount(): Int {
+        return toggleReportsFeature.self().getSettings()?.let {
+            jsonAdapter.fromJson(it)
+        }?.maxPromptCount ?: DEFAULT_MAX_PROMPT
+    }
 
     override suspend fun insertTogglePromptDismiss() {
         withContext(dispatcherProvider.io()) {
@@ -148,12 +141,11 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
-    override suspend fun getPromptsDismissed(): List<String> =
-        withContext(dispatcherProvider.io()) {
-            return@withContext store.data.first().let { prefs ->
-                prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
-            }
+    override suspend fun getPromptsDismissed(): List<String> {
+        return store.data.first().let { prefs ->
+            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
         }
+    }
 
     override suspend fun insertTogglePromptSend() {
         withContext(dispatcherProvider.io()) {
@@ -172,12 +164,11 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
         }
     }
 
-    override suspend fun getReportsSent(): List<String> =
-        withContext(dispatcherProvider.io()) {
-            return@withContext store.data.first().let { prefs ->
-                prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
-            }
+    override suspend fun getReportsSent(): List<String> {
+        return store.data.first().let { prefs ->
+            prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
         }
+    }
 
     override suspend fun canPrompt(): Boolean =
         withContext(dispatcherProvider.io()) {
