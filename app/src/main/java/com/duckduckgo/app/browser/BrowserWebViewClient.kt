@@ -24,6 +24,7 @@ import android.net.http.SslError.SSL_EXPIRED
 import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
 import android.webkit.HttpAuthHandler
+import android.webkit.JavascriptInterface
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceError
@@ -461,6 +462,8 @@ class BrowserWebViewClient @Inject constructor(
             flushCookies()
             printInjector.injectPrint(webView)
 
+            // injectJavaScript(webView)
+
             url?.let {
                 val uri = url.toUri()
                 if (url != ABOUT_BLANK) {
@@ -488,6 +491,38 @@ class BrowserWebViewClient @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun injectJavaScript(webView: WebView?) {
+        webView?.addJavascriptInterface(JavaScriptInterface(), "AndroidFunction")
+        webView?.loadUrl(
+            "javascript:(function() {" +
+                "var elements = document.getElementsByTagName('*');" +
+                "for (var i = 0; i < elements.length; i++) {" +
+                "    var element = elements[i];" +
+                "    if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {" +
+                "        var originalText = element.innerText;" +
+                "        AndroidFunction.translateText(originalText, function(translatedText) {" +
+                "            element.innerText = translatedText;" +
+                "        });" +
+                "    }" +
+                "}" +
+                "})()",
+        )
+    }
+
+    class JavaScriptInterface {
+
+        @JavascriptInterface
+        fun translateText(originalText: String, callback: (String) -> Unit) {
+            // Implement your translation logic here
+            val translatedText = translate(originalText)
+            callback(translatedText)
+        }
+
+        private fun translate(string: String): String {
+            return "AHOJ"
         }
     }
 
