@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Jaa latauslinkki</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Linkki kopioitu</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Vaihdetaanko toiseen synkronointiin?</string>
+    <string name="sync_dialog_switch_account_primary_button">Vaihda synkronointi</string>
+    <string name="sync_dialog_switch_account_secondary_button">Peruuta</string>
+    <string name="sync_dialog_switch_account_description">Tämä laite on jo synkronoitu. Haluatko varmasti synkronoida sen toisen varmuuskopion tai laitteen kanssa? Vaihtaminen ei poista tähän laitteeseen jo synkronoituja tietoja.</string>
 </resources>

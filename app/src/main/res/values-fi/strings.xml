@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Ehkä myöhemmin</string>
     <string name="preciseLocationSystemDialogNeverAllow">Älä kysy uudelleen tälle sivustolle</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Annetaanko palvelulle %1$s lupa nähdä sijaintisi?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Käytämme anonyymiä sijaintia pelkästään tarjotaksemme parempia tuloksia lähempää sijaintiasi. Voit aina muuttaa mieltäsi myöhemmin.</string>
     <string name="preciseLocationSiteDialogSubtitle">Voit hallita yksittäisille sivustoille antamiasi sijaintilupia asetuksista.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Käytämme anonyymiä sijaintia pelkästään tarjotaksemme parempia tuloksia lähempää sijaintiasi. Voit hallita yksittäisille sivustoille antamiasi sijaintilupia asetuksista.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Aina</string>
     <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>
     <string name="preciseLocationSiteDialogDenyAlways">Kiellä aina</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Ei vielä yhtään sivustoa</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Käyttöoikeudet poistettu kaikilta sivustoilta</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oikeudet: %1$s </string>
-    <string name="permissionsPerWebsiteAskSetting">Kysy</string>
+    <string name="permissionsPerWebsiteAskSetting">Kysy joka kerta</string>
     <string name="permissionsPerWebsiteDenySetting">Estä</string>
     <string name="permissionsPerWebsiteAllowSetting">Salli</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Kysy-toiminto poistettu käytöstä kaikilta sivustoilta</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Poistettu käytöstä kaikilla sivustoilla</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
 
     <!-- Notify Me View on Downloads -->

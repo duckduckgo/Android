@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -78,6 +79,7 @@ class OnboardingDaxDialogTests {
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockExtendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin = mock()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -99,6 +101,7 @@ class OnboardingDaxDialogTests {
             mockHighlightsOnboardingExperimentManager,
             mockBrokenSitePrompt,
             mockExtendedOnboardingPixelsPlugin,
+            mockUserBrowserProperties,
         )
     }
 

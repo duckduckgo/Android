@@ -215,6 +215,8 @@ fladle {
 }
 
 dependencies {
+	implementation project(":malicious-site-protection-impl")
+	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
 	implementation project(":custom-tabs-api")
 	implementation project(":duckplayer-impl")
