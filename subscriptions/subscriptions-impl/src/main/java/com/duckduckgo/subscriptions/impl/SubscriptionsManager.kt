@@ -90,6 +90,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import retrofit2.HttpException
@@ -266,8 +267,8 @@ class RealSubscriptionsManager @Inject constructor(
         return authRepository.getRefreshTokenV2() != null
     }
 
-    private suspend fun shouldUseAuthV2(): Boolean {
-        return privacyProFeature.get().authApiV2().isEnabled() || isSignedInV2()
+    private suspend fun shouldUseAuthV2(): Boolean = withContext(dispatcherProvider.io()) {
+        privacyProFeature.get().authApiV2().isEnabled() || isSignedInV2()
     }
 
     private fun emitEntitlementsValues() {
@@ -870,8 +871,9 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private fun isLaunchedRow(): Boolean =
+    private suspend fun isLaunchedRow(): Boolean = withContext(dispatcherProvider.io()) {
         privacyProFeature.get().isLaunchedROW().isEnabled()
+    }
 
     private fun parseError(e: HttpException): ResponseError? {
         return try {

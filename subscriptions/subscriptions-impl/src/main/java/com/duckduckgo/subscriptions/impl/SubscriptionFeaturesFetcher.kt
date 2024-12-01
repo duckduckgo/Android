@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -29,6 +30,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesMultibinding(
@@ -41,19 +43,24 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
     private val authRepository: AuthRepository,
     private val privacyProFeature: PrivacyProFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         appCoroutineScope.launch {
             try {
-                if (privacyProFeature.featuresApi().isEnabled()) {
+                if (isFeaturesApiEnabled()) {
                     fetchSubscriptionFeatures()
                 }
             } catch (e: Exception) {
                 logcat { "Failed to fetch subscription features" }
             }
         }
+    }
+
+    private suspend fun isFeaturesApiEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        privacyProFeature.featuresApi().isEnabled()
     }
 
     private suspend fun fetchSubscriptionFeatures() {
