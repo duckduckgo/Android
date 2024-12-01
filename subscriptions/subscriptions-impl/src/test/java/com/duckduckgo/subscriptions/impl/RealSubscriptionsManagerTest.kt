@@ -17,8 +17,10 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
@@ -1122,7 +1124,42 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertEquals("1$", monthlyFormattedPrice)
             assertEquals(YEARLY_PLAN_US, yearlyPlanId)
             assertEquals("1$", yearlyFormattedPrice)
+            assertEquals(setOf(NETP), features)
         }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferAndNoFeaturesThenReturnNull() = runTest {
+        authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+
+        assertNull(subscriptionsManager.getSubscriptionOffer())
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferAndRowPlansAvailableThenReturnValue() = runTest {
+        authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
+        givenIsLaunchedRow(true)
+
+        val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
+
+        with(subscriptionOffer) {
+            assertEquals(MONTHLY_PLAN_ROW, monthlyPlanId)
+            assertEquals("1$", monthlyFormattedPrice)
+            assertEquals(YEARLY_PLAN_ROW, yearlyPlanId)
+            assertEquals("1$", yearlyFormattedPrice)
+            assertEquals(setOf(NETP), features)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnNull() = runTest {
+        authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+        givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
+        givenIsLaunchedRow(false)
+
+        assertNull(subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
@@ -1486,6 +1523,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         }
 
         whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenIsLaunchedRow(value: Boolean) {
+        privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {
