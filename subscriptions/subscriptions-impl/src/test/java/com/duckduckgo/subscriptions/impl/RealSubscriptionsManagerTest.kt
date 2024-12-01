@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
+import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -1112,33 +1113,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenGetSubscriptionOfferThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
-        val productDetails: ProductDetails = mock { productDetails ->
-            whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
-
-            val pricingPhaseList: List<PricingPhase> = listOf(
-                mock { pricingPhase ->
-                    whenever(pricingPhase.formattedPrice).thenReturn("1$")
-                },
-            )
-
-            val pricingPhases: PricingPhases = mock { pricingPhases ->
-                whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
-            }
-
-            val monthlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN_US)
-                whenever(offer.pricingPhases).thenReturn(pricingPhases)
-            }
-
-            val yearlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN_US)
-                whenever(offer.pricingPhases).thenReturn(pricingPhases)
-            }
-
-            whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(monthlyOffer, yearlyOffer))
-        }
-
-        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+        givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
 
         val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
 
@@ -1486,6 +1461,31 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private suspend fun givenAccessTokenIsExpired() {
         val accessToken = authRepository.getAccessTokenV2() ?: return
         authRepository.setAccessTokenV2(accessToken.copy(expiresAt = timeProvider.currentTime - Duration.ofHours(1)))
+    }
+
+    private fun givenPlansAvailable(vararg basePlanIds: String) {
+        val productDetails: ProductDetails = mock { productDetails ->
+            whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
+
+            val pricingPhaseList: List<PricingPhase> = listOf(
+                mock { pricingPhase -> whenever(pricingPhase.formattedPrice).thenReturn("1$") },
+            )
+
+            val pricingPhases: PricingPhases = mock { pricingPhases ->
+                whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
+            }
+
+            val offers = basePlanIds.map { basePlanId ->
+                mock<SubscriptionOfferDetails> { offer ->
+                    whenever(offer.basePlanId).thenReturn(basePlanId)
+                    whenever(offer.pricingPhases).thenReturn(pricingPhases)
+                }
+            }
+
+            whenever(productDetails.subscriptionOfferDetails).thenReturn(offers)
+        }
+
+        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {
