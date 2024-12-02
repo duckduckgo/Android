@@ -75,7 +75,10 @@
     <string name="subscriptionSettingExpired">Dit Privacy Pro-abonnement er udløbet</string>
     <string name="subscriptionSettingExpiredSubtitle">Abonner igen for at fortsætte med at bruge Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Se abonnementer</string>
-
+    <string name="subscriptionSettingSectionSubscription">Abonnement</string>
+    <string name="subscriptionSettingRemoveFromDevice">Fjern fra denne enhed</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Hjælp og support</string>
+    <string name="subscriptionSettingSendFeedback">Send tilbagemelding</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du er klar.</string>
@@ -154,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Giv os feedback...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hvilken funktion kunne du tænke dig at se?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Abonnementer</string>
+    <string name="activitySubscriptionSettings">Abonnementsindstillinger</string>
+    <string name="activityActivateSubscription">Aktivér abonnement</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Send tilbagemelding</string>
 </resources>
