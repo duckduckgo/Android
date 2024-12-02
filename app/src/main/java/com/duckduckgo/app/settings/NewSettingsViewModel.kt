@@ -24,7 +24,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_MAC_APP_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WINDOWS_APP_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -86,7 +101,6 @@ class NewSettingsViewModel @Inject constructor(
     data class ViewState(
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
@@ -147,7 +161,6 @@ class NewSettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                    appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = appTrackingProtection.isRunning(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
@@ -170,7 +183,6 @@ class NewSettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
-                    appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
                     isPrivacyProEnabled = subscriptions.isEligible(),
                 )

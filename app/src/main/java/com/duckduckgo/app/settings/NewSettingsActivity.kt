@@ -50,7 +50,6 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -204,7 +203,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateDefaultBrowserViewVisibility(it)
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
-                        it.appTrackingProtectionOnboardingShown,
                     )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
@@ -247,13 +245,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {
-        if (emailAddress.isNullOrEmpty()) {
-            viewsPrivacy.emailSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.settingsEmailProtectionSubtitle))
-            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-        } else {
-            viewsPrivacy.emailSetting.setSecondaryText(emailAddress)
-            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-        }
+        viewsPrivacy.emailSetting.setStatus(isOn = !emailAddress.isNullOrEmpty())
     }
 
     private fun updateSyncSetting(visible: Boolean) {
@@ -263,15 +255,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateAutoconsent(enabled: Boolean) {
-        if (enabled) {
-            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.cookiePopupProtectionEnabled))
-            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-        } else {
-            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(
-                getString(com.duckduckgo.app.browser.R.string.cookiePopupProtectionDescription),
-            )
-            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-        }
+        viewsPrivacy.cookiePopupProtectionSetting.setStatus(isOn = enabled)
     }
 
     private fun processCommand(it: Command?) {
@@ -302,13 +286,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun updateDefaultBrowserViewVisibility(it: NewSettingsViewModel.ViewState) {
         with(viewsPrivacy.setAsDefaultBrowserSetting) {
             visibility = if (it.showDefaultBrowserSetting) {
-                if (it.isAppDefaultBrowser) {
-                    setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-                    setSecondaryText(getString(com.duckduckgo.app.browser.R.string.settingsDefaultBrowserSetDescription))
-                } else {
-                    setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                    setSecondaryText(getString(com.duckduckgo.app.browser.R.string.settingsDefaultBrowserNotSetDescription))
-                }
+                setStatus(isOn = it.isAppDefaultBrowser)
                 View.VISIBLE
             } else {
                 View.GONE
@@ -316,24 +294,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDeviceShieldSettings(
-        appTPEnabled: Boolean,
-        appTrackingProtectionOnboardingShown: Boolean,
-    ) {
-        with(viewsPrivacy) {
-            if (appTPEnabled) {
-                vpnSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.atp_SettingsDeviceShieldEnabled))
-                vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
-            } else {
-                if (appTrackingProtectionOnboardingShown) {
-                    vpnSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.atp_SettingsDeviceShieldDisabled))
-                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.WARNING)
-                } else {
-                    vpnSetting.setSecondaryText(getString(com.duckduckgo.app.browser.R.string.atp_SettingsDeviceShieldNeverEnabled))
-                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                }
-            }
-        }
+    private fun updateDeviceShieldSettings(appTPEnabled: Boolean) {
+        viewsPrivacy.vpnSetting.setStatus(isOn = appTPEnabled)
     }
 
     private fun launchDefaultAppScreen() {

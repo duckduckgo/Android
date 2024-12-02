@@ -14,18 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.settings.SettingsActivity">
-
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
-
-    <include
-        android:id="@+id/includeSettings"
-        layout="@layout/content_settings_new" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <item android:color="@color/gray50"  android:state_enabled="false" tools:ignore="InvalidColorAttribute" />
+    <item android:color="@color/alertGreen"  android:state_enabled="true" tools:ignore="InvalidColorAttribute" />
+</selector>

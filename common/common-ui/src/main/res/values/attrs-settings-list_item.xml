@@ -14,18 +14,11 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.settings.SettingsActivity">
-
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
-
-    <include
-        android:id="@+id/includeSettings"
-        layout="@layout/content_settings_new" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+<resources>
+    <declare-styleable name="SettingsListItem">
+        <attr name="leadingIcon" />
+        <attr name="primaryText" />
+        <attr name="showBetaPill" />
+        <attr name="isOn" format="boolean" />
+    </declare-styleable>
+</resources>
