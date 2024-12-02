@@ -19,7 +19,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     private lateinit var matcher: RMFPProBillingPeriodMatchingAttribute
     private val testSubscription = Subscription(
-        productId = SubscriptionsConstants.YEARLY_PLAN,
+        productId = SubscriptionsConstants.YEARLY_PLAN_US,
         startedAt = 10000L,
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,
@@ -85,7 +85,7 @@ class RMFPProBillingPeriodMatchingAttributeTest {
 
     @Test
     fun whenMatchingAttributeHasMonthlyValueAndSubscriptionIsMonthlyThenEvaluateToTrue() = runTest {
-        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(productId = SubscriptionsConstants.MONTHLY_PLAN))
+        whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription.copy(productId = SubscriptionsConstants.MONTHLY_PLAN_US))
         val result = matcher.evaluate(PProBillingPeriodMatchingAttribute("monthly"))
 
         assertNotNull(result)

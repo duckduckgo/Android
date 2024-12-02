@@ -34,8 +34,15 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
@@ -83,6 +90,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import retrofit2.HttpException
@@ -259,8 +267,8 @@ class RealSubscriptionsManager @Inject constructor(
         return authRepository.getRefreshTokenV2() != null
     }
 
-    private suspend fun shouldUseAuthV2(): Boolean {
-        return privacyProFeature.get().authApiV2().isEnabled() || isSignedInV2()
+    private suspend fun shouldUseAuthV2(): Boolean = withContext(dispatcherProvider.io()) {
+        privacyProFeature.get().authApiV2().isEnabled() || isSignedInV2()
     }
 
     private fun emitEntitlementsValues() {
@@ -648,15 +656,39 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionOffer(): SubscriptionOffer? =
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
-            ?.run {
-                val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN } ?: return@run null
-                val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN } ?: return@run null
+            ?.subscriptionOfferDetails
+            .orEmpty()
+            .associateBy { it.basePlanId }
+            .let { availablePlans ->
+                when {
+                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        availablePlans.getValue(MONTHLY_PLAN_US) to availablePlans.getValue(YEARLY_PLAN_US)
+                    }
+                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) && isLaunchedRow() -> {
+                        availablePlans.getValue(MONTHLY_PLAN_ROW) to availablePlans.getValue(YEARLY_PLAN_ROW)
+                    }
+                    else -> null
+                }
+            }
+            ?.let { (monthlyOffer, yearlyOffer) ->
+                val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
+                    authRepository.getFeatures(monthlyOffer.basePlanId)
+                } else {
+                    when (monthlyOffer.basePlanId) {
+                        MONTHLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
+                        MONTHLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
+                        else -> throw IllegalStateException()
+                    }
+                }
+
+                if (features.isEmpty()) return@let null
 
                 SubscriptionOffer(
                     monthlyPlanId = monthlyOffer.basePlanId,
                     monthlyFormattedPrice = monthlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
                     yearlyPlanId = yearlyOffer.basePlanId,
                     yearlyFormattedPrice = yearlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
+                    features = features,
                 )
             }
 
@@ -839,6 +871,10 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    private suspend fun isLaunchedRow(): Boolean = withContext(dispatcherProvider.io()) {
+        privacyProFeature.get().isLaunchedROW().isEnabled()
+    }
+
     private fun parseError(e: HttpException): ResponseError? {
         return try {
             val error = adapter.fromJson(e.response()?.errorBody()?.string().orEmpty())
@@ -904,6 +940,7 @@ data class SubscriptionOffer(
     val monthlyFormattedPrice: String,
     val yearlyPlanId: String,
     val yearlyFormattedPrice: String,
+    val features: Set<String>,
 )
 
 data class ValidatedTokenPair(

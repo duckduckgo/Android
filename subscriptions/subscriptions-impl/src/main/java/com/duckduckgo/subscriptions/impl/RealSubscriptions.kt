@@ -145,6 +145,13 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun authApiV2(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun isLaunchedROW(): Toggle
+
+    // Kill switch
+    @Toggle.DefaultValue(true)
+    fun featuresApi(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

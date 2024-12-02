@@ -61,6 +61,8 @@ interface AuthRepository {
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
+    suspend fun setFeatures(basePlanId: String, features: Set<String>)
+    suspend fun getFeatures(basePlanId: String): Set<String>
 }
 
 @Module
@@ -85,6 +87,15 @@ internal class RealAuthRepository constructor(
 
     private val moshi = Builder().build()
 
+    private val featuresAdapter by lazy {
+        val type = Types.newParameterizedType(
+            Map::class.java,
+            String::class.java,
+            Set::class.java,
+        )
+        moshi.adapter<Map<String, Set<String>>>(type)
+    }
+
     private inline fun <reified T> Moshi.listToJson(list: List<T>): String {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).toJson(list)
     }
@@ -98,29 +109,29 @@ internal class RealAuthRepository constructor(
         updateSerpPromoCookie()
     }
 
-    override suspend fun getAccessTokenV2(): AccessToken? {
-        val jwt = subscriptionsDataStore.accessTokenV2 ?: return null
-        val expiresAt = subscriptionsDataStore.accessTokenV2ExpiresAt ?: return null
-        return AccessToken(jwt, expiresAt)
+    override suspend fun getAccessTokenV2(): AccessToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.accessTokenV2 ?: return@withContext null
+        val expiresAt = subscriptionsDataStore.accessTokenV2ExpiresAt ?: return@withContext null
+        AccessToken(jwt, expiresAt)
     }
 
-    override suspend fun setRefreshTokenV2(refreshToken: RefreshToken?) {
+    override suspend fun setRefreshTokenV2(refreshToken: RefreshToken?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.refreshTokenV2 = refreshToken?.jwt
         subscriptionsDataStore.refreshTokenV2ExpiresAt = refreshToken?.expiresAt
     }
 
-    override suspend fun getRefreshTokenV2(): RefreshToken? {
-        val jwt = subscriptionsDataStore.refreshTokenV2 ?: return null
-        val expiresAt = subscriptionsDataStore.refreshTokenV2ExpiresAt ?: return null
-        return RefreshToken(jwt, expiresAt)
+    override suspend fun getRefreshTokenV2(): RefreshToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.refreshTokenV2 ?: return@withContext null
+        val expiresAt = subscriptionsDataStore.refreshTokenV2ExpiresAt ?: return@withContext null
+        RefreshToken(jwt, expiresAt)
     }
 
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
     }
 
-    override suspend fun getEntitlements(): List<Entitlement> {
-        return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
+    override suspend fun getEntitlements(): List<Entitlement> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
     }
 
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
@@ -192,7 +203,26 @@ internal class RealAuthRepository constructor(
         subscriptionsDataStore.canUseEncryption()
     }
 
-    private suspend fun updateSerpPromoCookie() {
+    override suspend fun setFeatures(
+        basePlanId: String,
+        features: Set<String>,
+    ) = withContext(dispatcherProvider.io()) {
+        val featuresMap = subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.toMutableMap() ?: mutableMapOf()
+
+        featuresMap[basePlanId] = features
+
+        subscriptionsDataStore.subscriptionFeatures = featuresAdapter.toJson(featuresMap)
+    }
+
+    override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.get(basePlanId) ?: emptySet()
+    }
+
+    private suspend fun updateSerpPromoCookie() = withContext(dispatcherProvider.io()) {
         val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }
         serpPromo.injectCookie(accessToken)
     }

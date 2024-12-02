@@ -39,4 +39,5 @@ class FakeSubscriptionsDataStore(private val supportEncryption: Boolean = true) 
     override var entitlements: String? = null
     override var productId: String? = null
     override fun canUseEncryption(): Boolean = supportEncryption
+    override var subscriptionFeatures: String? = null
 }

@@ -105,7 +105,13 @@ class RealSubscriptionsTest {
     fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+            SubscriptionOffer(
+                monthlyPlanId = "test",
+                yearlyFormattedPrice = "test",
+                yearlyPlanId = "test",
+                monthlyFormattedPrice = "test",
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
         )
         assertTrue(subscriptions.isEligible())
     }
@@ -136,7 +142,13 @@ class RealSubscriptionsTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+            SubscriptionOffer(
+                monthlyPlanId = "test",
+                yearlyFormattedPrice = "test",
+                yearlyPlanId = "test",
+                monthlyFormattedPrice = "test",
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
         )
         assertTrue(subscriptions.isEligible())
     }
@@ -146,7 +158,13 @@ class RealSubscriptionsTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+            SubscriptionOffer(
+                monthlyPlanId = "test",
+                yearlyFormattedPrice = "test",
+                yearlyPlanId = "test",
+                monthlyFormattedPrice = "test",
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
         )
         assertFalse(subscriptions.isEligible())
     }
@@ -154,7 +172,13 @@ class RealSubscriptionsTest {
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+            SubscriptionOffer(
+                monthlyPlanId = "test",
+                yearlyFormattedPrice = "test",
+                yearlyPlanId = "test",
+                monthlyFormattedPrice = "test",
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
         )
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
@@ -171,7 +195,13 @@ class RealSubscriptionsTest {
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnTrue() = runTest {
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+            SubscriptionOffer(
+                monthlyPlanId = "test",
+                yearlyFormattedPrice = "test",
+                yearlyPlanId = "test",
+                monthlyFormattedPrice = "test",
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
         )
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 

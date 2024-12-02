@@ -51,7 +51,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -60,6 +62,7 @@ import logcat.logcat
 
 interface PlayBillingManager {
     val products: List<ProductDetails>
+    val productsFlow: Flow<List<ProductDetails>>
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
 
@@ -94,7 +97,13 @@ class RealPlayBillingManager @Inject constructor(
     override val purchaseState = _purchaseState.asSharedFlow()
 
     // New Subscription ProductDetails
-    override var products = emptyList<ProductDetails>()
+    private var _products = MutableStateFlow(emptyList<ProductDetails>())
+
+    override val products: List<ProductDetails>
+        get() = _products.value
+
+    override val productsFlow: Flow<List<ProductDetails>>
+        get() = _products.asStateFlow()
 
     // Purchase History
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
@@ -240,7 +249,7 @@ class RealPlayBillingManager @Inject constructor(
                 if (result.products.isEmpty()) {
                     logcat { "No products found" }
                 }
-                this.products = result.products
+                _products.value = result.products
             }
 
             is SubscriptionsResult.Failure -> {
