@@ -62,7 +62,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -118,7 +117,6 @@ class BrowserViewModel @Inject constructor(
 
     val tabs: Flow<List<String>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> tab.tabId } }
-        .filterNot { it.isEmpty() }
         .distinctUntilChanged()
 
     val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
