@@ -64,6 +64,7 @@ import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.io.InputStream
 import javax.inject.Inject
@@ -98,6 +99,7 @@ interface DuckPlayerInternal : DuckPlayer {
 
 @ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
 @ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
