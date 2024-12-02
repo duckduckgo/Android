@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN este pornit</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN este oprit</string>
+    <string name="netpManagementDescriptionOff">Conectează-te pentru a securiza traficul pe internet\n pentru toate dispozitivele tale.</string>
+    <string name="netpManagementDescriptionOn">Tot traficul de internet al dispozitivelor este securizat\nprin VPN.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Se conectează…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Conectat · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Nu este conectat</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN este în prezent în versiune beta. <annotation type="report_issues_link">Trimite-ne feedback</annotation> pentru a ne ajuta să ne îmbunătățim serviciile!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">VPN-ul îți cauzează probleme cu o aplicație?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">Poți exclude aplicații din VPN fără a dezactiva VPN-ul.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Exclude o aplicație</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Dezactivează VPN-ul</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Nu mai întreba niciodată</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Locație selectată</string>
+    <string name="netpManagementLocationHeaderVpnOn">Locație conectată</string>
+    <string name="netpManagementLocationNearest">(Cea mai apropiată)</string>
+    <string name="netpManagementLocationPlaceholder">Cea mai apropiată locație</string>
+    <string name="netpManagementLocationCustom">(Personalizat)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Detalii conexiune</string>
+    <string name="netpManagementConnectionDetailsIp">Adresa IP</string>
+    <string name="netpManagementConnectionDetailsDns">Server DNS</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Volum de date</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN-ul este conectat.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN-ul este conectat și dirijează traficul dispozitivului prin &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Aplicația VPN poate fi deconectată</string>
+    <string name="netpVpnConflictMessage">Android permite doar o singură conexiune VPN activă în același timp. Activarea DuckDuckGo VPN poate deconecta orice VPN activ pe dispozitivul tău.</string>
+    <string name="netpActionGotIt">Am înțeles</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Aplicația ta VPN blochează DuckDuckGo VPN</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android permite doar o singură conexiune VPN activă în același timp. Deschide Setări de rețea &gt; VPN. Găsește aplicația VPN care este „Mereu pornită” și dezactiveaz-o pentru a continua.</string>
+    <string name="netpActionOpenSettings">Deschide Setări</string>
+    <string name="netpActionCancel">Anulare</string>
+    <string name="netpActionNotNow">Nu acum</string>
+    <string name="netpActionGoToSettings">Mergi la Setări</string>
+    <string name="netpAlwaysOnPromotionHeading">Setează ca Mereu pornit</string>
+    <string name="netpAlwaysOnPromotionBody">Accesează Setările VPN ale dispozitivului tău pentru DuckDuckGo și activează <b>VPN mereu pornit</b> pentru a preveni dezactivarea protecției de către Android.\n\nAsigură-te că ai lăsat dezactivată cealaltă setare.</string>
+    <string name="netpAlwaysOnLockdownBody">Pentru a evita probleme în aplicație, accesează <b>Setările VPN pentru DuckDuckGo</b> ale dispozitivului și dezactivează <b>Blochează conexiunile fără VPN.</b></string>
+    <string name="netpAlwaysOnLockdownHeading">Modifică setările VPN</string>
+    <string name="netpBannerVpnRevoked"><b>VPN-ul este dezactivat.</b>\nEste posibil ca o aplicație VPN de pe dispozitivul tău să îl fi dezactivat. Folosește comutatorul pentru a-l reactiva.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Acțiune necesară!</b> Pentru a evita problemele legate de aplicații, trebuie să modifici setările Android. <annotation type="open_settings_link">Schimbă setările</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Aplicația se blochează sau se închide</string>
+    <string name="netpReportBreakageCategoryMessages">Nu reușesc să livrez mesaje</string>
+    <string name="netpReportBreakageCategoryCalls">Apelurile vocale nu funcționează</string>
+    <string name="netpReportBreakageCategoryContent">Conținutul se încarcă lent</string>
+    <string name="netpReportBreakageCategoryConnection">Aplicația nu are conexiune</string>
+    <string name="netpReportBreakageCategoryIot">Nu pot conecta dispozitivul local</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Solicitare de funcționalitate</string>
+    <string name="netpReportBreakageCategoryOther">Altceva</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN se poate utiliza gratuit în timpul versiunii beta.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Gestionează</string>
+    <string name="netpManagementManageItemExclusion">Aplicații excluse</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Niciuna</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d aplicație</item>
+        <item quantity="few">%1$d aplicații</item>
+        <item quantity="other">%1$d de aplicații</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">Setări VPN</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Generalități</string>
+    <string name="netpVpnSettingsSystemHeader">Sistem</string>
+    <string name="netpVpnNotificationSettingsTitle">Notificări VPN</string>
+    <string name="netpVpnSettingsTitle">Setări VPN</string>
+    <string name="netpVpnSettingKillSwitch">Întotdeauna activat</string>
+    <string name="netpVpnSettingAlwaysOn">Întotdeauna activat</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Permite utilizarea nerestricționată a bateriei de către aplicație</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">În setările bateriei aplicației, permite utilizarea nerestricționată pentru a împiedica Android să dezactiveze VPN-ul în fundal</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Utilizarea bateriei de către aplicație nu este restricționată</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">În setările bateriei aplicației, acest lucru împiedică Android să dezactiveze VPN-ul în fundal</string>
+    <string name="netpVpnSettingAlwaysOnByline">Restaurează automat o conexiune VPN după întrerupere</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Exclude rețelele locale</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Ocolește VPN-ul pentru conexiunile la rețeaua locală, cum ar fi la o imprimantă.</string>
+    <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN previne scurgerile DNS către furnizorul tău de servicii de internet prin direcționarea interogărilor DNS prin tunelul VPN către propriul nostru resolver.</string>
+    <string name="netpVpnSettingGeoswitching">Locație preferată</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Cea mai apropiată disponibilă</string>
+
+    <string name="netpVpnNotificationSettings">Notificări VPN</string>
+    <string name="netpVpnNotificationSettingsByLine">Primește o notificare dacă ți se întrerupe conexiunea sau dacă se schimbă starea VPN-ului</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Utilizare nerestricționată a bateriei</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Împiedică Android să oprească VPN-ul.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Oprește VPN-ul în timpul apelurilor Wi-Fi</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Oprește temporar VPN-ul în timpul apelurilor Wi-Fi și reconectează-l automat la sfârșitul acestora</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Este necesară permisiunea pentru telefon</string>
+    <string name="netpGrantPhonePermissionByline">Pentru a activa această setare, trebuie să permiți DuckDuckGo să efectueze și să gestioneze apeluri telefonice prin setările sistemului.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Setări</string>
+    <string name="netpGrantPhonePermissionActionNegative">Anulare</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Notificările sunt dezactivate</string>
+    <string name="netpVpnNotifyMeByLine">Primește notificări despre evenimentele VPN</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Gestionează aplicațiile</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN funcționează în mod implicit în toate aplicațiile. Dacă întâmpini probleme cu aplicația având VPN-ul activat, încearcă să dezactivezi protecția pentru aplicația respectivă.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN este dezactivat.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Dezactivat manual</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Activat manual</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Dacă se activează, pot apărea probleme cu aplicația</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Protecție activată</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Protecție dezactivată</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Toate</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Vrei să raportezi o problemă?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Anunță-ne dacă ai dezactivat VPN-ul pentru %1$s deoarece ai întâmpinat probleme cu aplicația.\n\nDe asemenea, vom dezactiva App Tracking Protection pentru %1$s.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Raportează problema</string>
+    <string name="netpExclusionListManuallyCTANotNow">Nu acum</string>
+    <string name="netpExclusionListManuallyCTACancel">Anulare</string>
+    <string name="netpExclusionListManuallyCTARestore">Restaurează</string>
+    <string name="netpExclusionListManuallyMenuRestore">Restabilește protecția pentru toate aplicațiile</string>
+    <string name="netpExclusionListManuallyMenuReport">Raportează o problemă cu o aplicație</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Restabilești protecția pentru toate aplicațiile?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Acest lucru va actualiza setările de protecție personalizate și va activa VPN-ul pentru toate aplicațiile. Poți să modifici oricând setările de protecție mai târziu.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Protecția a fost restabilită la setările implicite</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Aplicații de sistem Android</string>
+    <string name="netpExclusionListWarningTitle">Despre excluderile aplicațiilor de sistem</string>
+    <string name="netpExclusionListWarningMessage">Traficul de internet, inclusiv conexiunile de fundal, folosite de acest grup de aplicații nu va fi protejat de VPN. Ia în considerare reactivarea dacă asta nu rezolvă problema, pentru a preveni scurgerile de date neașteptate.</string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Despre</string>
+    <string name="netpManagementAboutItemFaqs">Întrebări frecvente și suport</string>
+    <string name="netpManagementAboutItemShareFeedback">Trimite feedback</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Întrebări frecvente și asistență</string>
+    <string name="netpFaqQuestionOne">Cum funcționează DuckDuckGo VPN?</string>
+    <string name="netpFaqAnswerOne">VPN-ul folosește protocolul open source WireGuard pentru a configura o rețea privată virtuală (VPN) pe dispozitivul tău. Când este activată, tot traficul dispozitivului tău este mai întâi criptat și apoi direcționat prin cel mai apropiat server VPN pentru a-ți proteja activitatea de navigare de furnizorii de servicii de internet și pentru a-ți ascunde locația de aplicațiile și site-urile pe care le vizitezi.</string>
+    <string name="netpFaqQuestionTwo">Este protejată doar navigarea mea pe web?</string>
+    <string name="netpFaqAnswerTwo">Toată activitatea de rețea de pe dispozitivul tău este protejată.</string>
+    <string name="netpFaqQuestionThree">DuckDuckGo păstrează jurnalele datelor mele?</string>
+    <string name="netpFaqAnswerThree">Nu, nu păstrăm loguri.</string>
+    <string name="netpFaqQuestionFour">Unde sunt situate serverele VPN?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo oferă un număr limitat de servere în timp ce DuckDuckGo VPN este în versiune beta, localizat în Statele Unite, Canada și Europa.</string>
+    <string name="netpFaqQuestionSix">De ce unele aplicații nu funcționează când VPN-ul este pornit?</string>
+    <string name="netpFaqAnswerSix">Unele site-uri web și aplicații limitează intenționat accesul persoanelor care folosesc un VPN. De exemplu, îți pot cere să rezolvi un CAPTCHA pentru a se asigura că ești o persoană reală, și nu un robot. Dacă ai probleme repetate cu o aplicație, o poți exclude complet din VPN în setările DuckDuckGo VPN.</string>
+    <string name="netpFaqQuestionSeven">De ce nu pot închide notificările VPN-ului?</string>
+    <string name="netpFaqAnswerSeven">Android cere ca VPN-urile să afișeze o notificare persistentă cât timp VPN-ul este activ.</string>
+    <string name="netpFaqQuestionEight">Este VPN-ul compatibil cu App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Da, atât VPN-ul, cât și App Tracking Protection pot fi activate în același timp. Niciun alt VPN nu este compatibil cu DuckDuckGo App Tracking Protection.</string>
+    <string name="netpFaqQuestionNine">VPN-ul se poate utiliza în mod gratuit?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN se poate utiliza gratuit în perioada de testare beta. În cele din urmă, va fi oferit ca serviciu plătit.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Conectează-te</string>
+    <string name="netpNotificationCTAReportIssue">Ai probleme cu o aplicație?</string>
+    <string name="netpNotificationDisabled">VPN-ul este deconectat. Atinge pentru a continua securizarea traficului dispozitivului tău.</string>
+    <string name="netpNotificationDisabledByVpn">O aplicație VPN de pe dispozitivul tău a deconectat DuckDuckGo VPN. Atinge pentru a te reconecta.</string>
+    <string name="netpUnsafeWifi">Conectat la o rețea Wi-Fi nesigură.</string>
+    <string name="netpNotificationCTAReconnectNow">Reconectează-te acum</string>
+    <string name="netpNotificationSnoozeTitle">VPN-ul este în repaus</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN-ul se va reconecta la %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN deconectat din cauza expirării abonamentului. Abonează-te la Privacy Pro pentru a reconecta DuckDuckGo VPN.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">Locația VPN</string>
+    <string name="netpGeoswitchingHeaderRecommended">Recomandat</string>
+    <string name="netpGeoswitchingDefaultTitle">Cel mai apropiat disponibil</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Conectează-te automat la cel mai apropiat server pe care îl putem găsi</string>
+    <string name="netpGeoswitchingHeaderCustom">Personalizat</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d orașe</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">VPN-ul s-a deconectat din cauza unui abonament expirat</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonează-te la Privacy Pro pentru a reconecta DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Înscrie-te</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Renunță</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Verifică abonamentul</string>
+    <string name="netpVerifySubscriptionInProgress">Te rugăm să aștepți până verificăm abonamentul tău...</string>
+    <string name="netpVerifySubscriptionNoSubscription">Ups! Nu ai niciun abonament valabil.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Ups! Abonamentul tău nu este valabil pentru DuckDuckGo VPN.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Activat</string>
+    <string name="netpSubscriptionSettingsConnecting">Se conectează…</string>
+    <string name="netpSubscriptionSettingsDisconnected">Dezactivat</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">Server DNS</string>
+    <string name="netpPrivateDns">DNS privat</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blochează programele malware)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recomandat)</string>
+    <string name="netpCustomDnsCustom">Personalizat</string>
+    <string name="netpCustomDnsInputAddressHint">Adresa IPv4</string>
+    <string name="netpCustomDnsApply">Aplică</string>
+    <string name="netpCustomDnsCustomHeader">Server DNS</string>
+    <string name="netpCustomDnsPrivateDnsWarning">DNS-ul privat este deja specificat în setările DNS ale sistemului. Oprește DNS-ul privat pentru a seta un DNS personalizat pentru DuckDuckGo VPN. <annotation type="open_settings_link">Deschide setările sistemului</annotation></string>
+    <string name="netpCustomDnsWarning">Folosirea unui server DNS personalizat poate afecta viteza de navigare și îți poate expune activitatea unor terțe părți, dacă serverul nu este sigur sau de încredere.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo direcționează interogările DNS prin serverele noastre DNS, astfel încât furnizorul tău de internet să nu poată vedea ce site-uri web vizitezi.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Blochează programele malware</string>
+    <string name="netpDnsBlockMalwareByline">Blochează programele malware cu o listă de blocare la nivel de DNS. Dacă un site web nu se încarcă, încearcă să dezactivezi blocarea.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Vrei să excluzi aplicațiile care nu sunt compatibile cu VPN-urile?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Am găsit %1$s în timp ce VPN-ul este conectat.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d aplicație nouă care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
+        <item quantity="few">%1$d aplicații noi care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+        <item quantity="other">%1$d de aplicații noi care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Vrei să excluzi toate aplicațiile care nu sunt compatibile cu VPN-urile?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d altă aplicație care nu este compatibilă cu VPN-urile. Exclude această aplicație pentru a o folosi</item>
+        <item quantity="few">%1$d alte aplicații care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+        <item quantity="other">%1$d de alte aplicații care nu sunt compatibile cu VPN-urile. Exclude aceste aplicații pentru a le folosi</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Exclude automat aplicațiile incompatibile</string>
+    <string name="netpAutoExcludePromptActionAdd">Exclude aplicațiile</string>
+    <string name="netpAutoExcludePromptActionCancel">Ignorare</string>
+    <string name="netpAutoExcludeToggleName">Exclude automat aplicațiile care nu sunt compatibile cu VPN-urile</string>
+    <string name="netpExclusionListLabelAutoExclude">Incompatibilă cu VPN-urile</string>
+    <string name="netpExclusionListAutoExcludeDescription">Unele aplicații, cum ar fi cele bancare sau de streaming, nu funcționează bine cu VPN-urile. Când această setare este activată, vom exclude automat acele aplicații.</string>
+</resources>
