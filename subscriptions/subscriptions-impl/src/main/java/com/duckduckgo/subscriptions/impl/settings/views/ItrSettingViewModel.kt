@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.ITR
+import com.duckduckgo.subscriptions.api.Product.ROW_ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
@@ -64,7 +65,7 @@ class ItrSettingViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         subscriptions.getEntitlementStatus().onEach {
-            _viewState.emit(viewState.value.copy(hasSubscription = it.contains(ITR)))
+            _viewState.emit(viewState.value.copy(hasSubscription = ITR in it || ROW_ITR in it))
         }.launchIn(viewModelScope)
     }
 

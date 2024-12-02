@@ -34,7 +34,10 @@ interface CsvCredentialConverter {
     sealed interface CsvCredentialImportResult : Parcelable {
 
         @Parcelize
-        data class Success(val numberCredentialsInSource: Int, val loginCredentialsToImport: List<LoginCredentials>) : CsvCredentialImportResult
+        data class Success(
+            val numberCredentialsInSource: Int,
+            val loginCredentialsToImport: List<LoginCredentials>,
+        ) : CsvCredentialImportResult
 
         @Parcelize
         data object Error : CsvCredentialImportResult
@@ -80,15 +83,27 @@ class GooglePasswordManagerCsvCredentialConverter @Inject constructor(
         }
     }
 
-    private suspend fun deduplicateAndCleanup(allCredentials: List<LoginCredentials>): List<LoginCredentials> {
-        val dedupedCredentials = allCredentials.distinct()
-        val validCredentials = dedupedCredentials.filter { credentialValidator.isValid(it) }
-        val normalizedDomains = domainNameNormalizer.normalizeDomains(validCredentials)
-        val entriesNotAlreadySaved = filterNewCredentials(normalizedDomains)
-        return entriesNotAlreadySaved
+    private suspend fun deduplicateAndCleanup(allCredentials: List<GoogleCsvLoginCredential>): List<LoginCredentials> {
+        return allCredentials
+            .distinct()
+            .filter { credentialValidator.isValid(it) }
+            .toLoginCredentials()
+            .filterNewCredentials()
     }
 
-    private suspend fun filterNewCredentials(credentials: List<LoginCredentials>): List<LoginCredentials> {
-        return existingCredentialMatchDetector.filterExistingCredentials(credentials)
+    private suspend fun List<GoogleCsvLoginCredential>.toLoginCredentials(): List<LoginCredentials> {
+        return this.map {
+            LoginCredentials(
+                domainTitle = it.title,
+                username = it.username,
+                password = it.password,
+                domain = domainNameNormalizer.normalize(it.url),
+                notes = it.notes,
+            )
+        }
+    }
+
+    private suspend fun List<LoginCredentials>.filterNewCredentials(): List<LoginCredentials> {
+        return existingCredentialMatchDetector.filterExistingCredentials(this)
     }
 }

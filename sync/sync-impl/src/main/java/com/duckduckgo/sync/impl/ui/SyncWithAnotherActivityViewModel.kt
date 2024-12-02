@@ -36,16 +36,21 @@ import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowMessage
-import javax.inject.*
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +67,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val syncFeature: SyncFeature,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -111,9 +117,15 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     sealed class Command {
         object ReadTextCode : Command()
         object LoginSuccess : Command()
+        object SwitchAccountSuccess : Command()
         data class ShowMessage(val messageId: Int) : Command()
         object FinishWithError : Command()
-        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        data class ShowError(
+            @StringRes val message: Int,
+            val reason: String = "",
+        ) : Command()
+
+        data class AskToSwitchAccount(val encodedStringCode: String) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -124,24 +136,39 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
+            val userSignedIn = syncAccountRepository.isSignedIn()
             when (val result = syncAccountRepository.processCode(qrCode)) {
                 is Error -> {
-                    when (result.code) {
-                        ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
-                        LOGIN_FAILED.code -> R.string.sync_connect_login_error
-                        CONNECT_FAILED.code -> R.string.sync_connect_generic_error
-                        CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
-                        INVALID_CODE.code -> R.string.sync_invalid_code_error
-                        else -> null
-                    }?.let { message ->
-                        command.send(ShowError(message = message, reason = result.reason))
-                    }
+                    emitError(result, qrCode)
                 }
 
                 is Success -> {
                     syncPixels.fireLoginPixel()
-                    command.send(LoginSuccess)
+                    val commandSuccess = if (userSignedIn) {
+                        syncPixels.fireUserSwitchedAccount()
+                        SwitchAccountSuccess
+                    } else {
+                        LoginSuccess
+                    }
+                    command.send(commandSuccess)
                 }
+            }
+        }
+    }
+
+    private suspend fun emitError(result: Error, qrCode: String) {
+        if (result.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
+            command.send(AskToSwitchAccount(qrCode))
+        } else {
+            when (result.code) {
+                ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
+                LOGIN_FAILED.code -> R.string.sync_connect_login_error
+                CONNECT_FAILED.code -> R.string.sync_connect_generic_error
+                CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
+                INVALID_CODE.code -> R.string.sync_invalid_code_error
+                else -> null
+            }?.let { message ->
+                command.send(ShowError(message = message, reason = result.reason))
             }
         }
     }
@@ -151,5 +178,54 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             syncPixels.fireLoginPixel()
             command.send(LoginSuccess)
         }
+    }
+
+    fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserAcceptedSwitchingAccount()
+            val result = syncAccountRepository.logoutAndJoinNewAccount(encodedStringCode)
+            if (result is Error) {
+                when (result.code) {
+                    ALREADY_SIGNED_IN.code -> R.string.sync_login_authenticated_device_error
+                    LOGIN_FAILED.code -> R.string.sync_connect_login_error
+                    CONNECT_FAILED.code -> R.string.sync_connect_generic_error
+                    CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
+                    INVALID_CODE.code -> R.string.sync_invalid_code_error
+                    else -> null
+                }?.let { message ->
+                    command.send(
+                        ShowError(message = message, reason = result.reason),
+                    )
+                }
+            } else {
+                syncPixels.fireLoginPixel()
+                syncPixels.fireUserSwitchedAccount()
+                command.send(SwitchAccountSuccess)
+            }
+        }
+    }
+
+    fun onEnterCodeResult(result: EnterCodeContractOutput) {
+        viewModelScope.launch {
+            when (result) {
+                EnterCodeContractOutput.Error -> {}
+                EnterCodeContractOutput.LoginSuccess -> {
+                    syncPixels.fireLoginPixel()
+                    command.send(LoginSuccess)
+                }
+                EnterCodeContractOutput.SwitchAccountSuccess -> {
+                    syncPixels.fireLoginPixel()
+                    command.send(SwitchAccountSuccess)
+                }
+            }
+        }
+    }
+
+    fun onUserCancelledJoiningNewAccount() {
+        syncPixels.fireUserCancelledSwitchingAccount()
+    }
+
+    fun onUserAskedToSwitchAccount() {
+        syncPixels.fireAskUserToSwitchAccount()
     }
 }

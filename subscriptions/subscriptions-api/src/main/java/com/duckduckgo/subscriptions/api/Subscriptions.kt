@@ -23,6 +23,15 @@ import kotlinx.coroutines.flow.Flow
 interface Subscriptions {
 
     /**
+     * Checks if the user is currently signed in.
+     *
+     * Note: A signed-in user does not necessarily have an active subscription.
+     *
+     * @return `true` if the user is signed in; `false` otherwise
+     */
+    suspend fun isSignedIn(): Boolean
+
+    /**
      * This method returns a [String] with the access token for the authenticated user or [null] if it doesn't exist
      * or any errors arise.
      * @return [String]
@@ -64,6 +73,7 @@ interface Subscriptions {
 enum class Product(val value: String) {
     NetP("Network Protection"),
     ITR("Identity Theft Restoration"),
+    ROW_ITR("Global Identity Theft Restoration"),
     PIR("Data Broker Protection"),
 }
 

@@ -2,6 +2,8 @@ package com.duckduckgo.feature.toggles.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.Toggle.TargetMatcherPlugin
 import okio.ByteString.Companion.encode
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -9,7 +11,12 @@ import org.mockito.kotlin.verify
 
 class RealFeatureTogglesCallbackTest {
     private val pixel: Pixel = mock()
-    private val callback = RealFeatureTogglesCallback(pixel)
+    private val plugins: PluginPoint<TargetMatcherPlugin> = object : PluginPoint<TargetMatcherPlugin> {
+        override fun getPlugins(): Collection<TargetMatcherPlugin> {
+            TODO("Not yet implemented")
+        }
+    }
+    private val callback = RealFeatureTogglesCallback(pixel, plugins)
 
     @Test
     fun `test pixel is sent with correct parameters`() {

@@ -23,6 +23,7 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -164,6 +165,12 @@ abstract class TabsDao {
     fun lastTab(): TabEntity? {
         return tabs().lastOrNull()
     }
+
+    @Query("update tabs set lastAccessTime=:lastAccessTime where tabId=:tabId")
+    abstract fun updateTabLastAccess(
+        tabId: String,
+        lastAccessTime: LocalDateTime,
+    )
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
     abstract fun updateUrlAndTitle(

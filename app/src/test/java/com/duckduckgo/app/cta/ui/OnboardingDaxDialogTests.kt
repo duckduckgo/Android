@@ -28,12 +28,15 @@ import com.duckduckgo.app.onboarding.store.AppStage.DAX_ONBOARDING
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -74,6 +77,9 @@ class OnboardingDaxDialogTests {
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
+    private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
+    private val mockExtendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin = mock()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -93,6 +99,9 @@ class OnboardingDaxDialogTests {
             subscriptions = mock(),
             mockDuckPlayer,
             mockHighlightsOnboardingExperimentManager,
+            mockBrokenSitePrompt,
+            mockExtendedOnboardingPixelsPlugin,
+            mockUserBrowserProperties,
         )
     }
 

@@ -32,7 +32,20 @@ Utilities to automatically generate TypeScript types from JSON Schema files.
 
 ## NPM commands
 
+Consider using [nvm](https://github.com/nvm-sh/nvm) to manage node versions, after installing in the project directory run:
+
+```
+nvm use
+```
+
 From the top-level root folder of this npm workspace, you can run the following npm commands:
+
+**Install dependencies**:
+
+Will install all the dependencies we need to build and run the project:
+```
+npm install
+```
 
 **Build all workspaces**:
 

@@ -310,8 +310,12 @@ class RealPrivacyConfigPersisterTest {
         }
     }
 
-    class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
-        override fun onPrivacyConfigDownloaded() {}
+    internal class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
+        internal var downloadCallCount = 0
+
+        override fun onPrivacyConfigDownloaded() {
+            downloadCallCount++
+        }
     }
 
     companion object {

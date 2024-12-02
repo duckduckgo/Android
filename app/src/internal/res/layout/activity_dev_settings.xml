@@ -88,6 +88,13 @@
                 app:secondaryText="@string/devSettingsScreenCustomTabsSubtitle"
                 />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/notifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenNotificationsTitle"
+                app:secondaryText="@string/devSettingsScreenNotificationsSubtitle" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"

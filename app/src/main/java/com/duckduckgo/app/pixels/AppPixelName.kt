@@ -49,6 +49,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
     ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE("m_onboarding_skip_major_network_unique"),
+    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -363,11 +364,14 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
     RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
-    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload-three-times-within-20-seconds"),
+
+    SITE_NOT_WORKING_WEBSITE_BROKEN("m_site-not-working_website-is-broken"),
+    SITE_NOT_WORKING_SHOWN("m_site-not-working_shown"),
 
     URI_LOADED("m_uri_loaded"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
-    FEATURES_ENABLED_AT_SEARCH_TIME("features"),
+    APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 }

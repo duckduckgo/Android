@@ -30,6 +30,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
@@ -55,6 +56,7 @@ class TabDataRepository @Inject constructor(
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : TabRepository {
@@ -192,6 +194,19 @@ class TabDataRepository @Inject constructor(
         tabSwitcherDataStore.setTabLayoutType(layoutType)
     }
 
+    override fun getOpenTabCount(): Int {
+        return tabsDao.tabs().size
+    }
+
+    override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
+        val now = timeProvider.localDateTimeNow()
+        val start = now.minusDays(accessOlderThan)
+        val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive
+        return tabsDao.tabs().filter {
+            it.lastAccessTime?.isBefore(start) == true && (end == null || it.lastAccessTime?.isAfter(end) == true)
+        }.size
+    }
+
     override suspend fun addNewTabAfterExistingTab(
         url: String?,
         tabId: String,
@@ -225,6 +240,12 @@ class TabDataRepository @Inject constructor(
     override suspend fun updateTabPosition(from: Int, to: Int) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateTabsOrder(from, to)
+        }
+    }
+
+    override suspend fun updateTabLastAccess(tabId: String) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.updateTabLastAccess(tabId, timeProvider.localDateTimeNow())
         }
     }
 
@@ -335,8 +356,7 @@ class TabDataRepository @Inject constructor(
                 Timber.w("Cannot find tab for tab ID")
                 return@scheduleDirect
             }
-            tab.tabPreviewFile = fileName
-            tabsDao.updateTab(tab)
+            tabsDao.updateTab(tab.copy(tabPreviewFile = fileName))
 
             Timber.i("Updated tab preview image. $tabId now uses $fileName")
             deleteOldPreviewImages(tabId, fileName)

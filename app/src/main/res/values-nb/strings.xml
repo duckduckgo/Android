@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Kanskje senere</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ikke spør igjen for dette nettstedet</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Vil du gi %1$s tillatelse til å se posisjonen din?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Vi bruker den anonyme posisjonen kun til å levere bedre resultater, i nærheten av deg. Du kan ombestemme deg senere.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan administrere posisjonstillatelser du har gitt til enkeltsider under Innstillinger.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi bruker den anonyme posisjonen kun til å levere bedre resultater, i nærheten av deg. I innstillingene kan du administrere posisjonstillatelser du har gitt til enkeltsider.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
     <string name="preciseLocationSiteDialogAllowOnce">Kun for denne økten</string>
     <string name="preciseLocationSiteDialogDenyAlways">Aldri tillat</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Ingen nettsteder ennå</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tillatelser fjernet for alle nettsteder</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tillatelser for «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Spør</string>
+    <string name="permissionsPerWebsiteAskSetting">Spør hver gang</string>
     <string name="permissionsPerWebsiteDenySetting">Avvis</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillat</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">«Spør» er deaktivert for alle nettsteder</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Deaktivert for alle nettsteder</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$stillatelse for %2$s</string>
 
     <!-- Notify Me View on Downloads -->

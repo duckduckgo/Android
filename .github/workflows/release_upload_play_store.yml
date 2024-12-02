@@ -63,7 +63,7 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Assemble the bundle
-        run: ./gradleW bundleRelease -PuseUploadSigning
+        run: ./gradlew bundleRelease -PuseUploadSigning -Pbuild-date-time
 
       - name: Capture App Bundle Path
         id: capture_output
@@ -72,20 +72,14 @@ jobs:
           echo "bundle_path=$output" >> $GITHUB_OUTPUT
 
       - name: Upload bundle to Play Store
-        id: create_app_bundle
+        id: upload_bundle_play
         run: |
           bundle exec fastlane deploy_playstore
 
       - name: Upload Universal APK to Github
-        id: create_app_bundle
+        id: upload_bundle_github
         run: |
           bundle exec fastlane deploy_github
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
-          path: duckduckgo.apk
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
