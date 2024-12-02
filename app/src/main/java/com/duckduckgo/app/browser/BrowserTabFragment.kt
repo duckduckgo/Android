@@ -2529,7 +2529,7 @@ class BrowserTabFragment :
             configureWebViewForBlobDownload(it)
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            translator.addJsInterface(it) { original -> "AHOJ" }
+            translator.addJsInterface(it)
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,

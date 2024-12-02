@@ -17,14 +17,50 @@
 package com.duckduckgo.app.browser.translate
 
 import android.webkit.JavascriptInterface
+import com.google.android.gms.tasks.Tasks
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
+import timber.log.Timber
 
-class TranslatorJavascriptInterface(private val translateText: (String) -> String) {
+class TranslatorJavascriptInterface {
+    val options = TranslatorOptions.Builder()
+        .setSourceLanguage(TranslateLanguage.SLOVAK)
+        .setTargetLanguage(TranslateLanguage.ENGLISH)
+        .build()
+    val translator = Translation.getClient(options)
+
     @JavascriptInterface
     fun translate(originalText: String): String {
-        return translateText(originalText)
+        return mlKitTranslate(originalText)
     }
 
     companion object {
         const val JAVASCRIPT_INTERFACE_NAME = "WebTranslator"
+    }
+
+    private fun mlKitTranslate(original: String): String {
+        return Tasks.await(
+            translator.downloadModelIfNeeded()
+                .addOnSuccessListener {
+                    Timber.d("$$$ Translation model downloaded")
+                }
+                .addOnFailureListener { exception ->
+                    Timber.d("$$$ Failed to download model: $exception")
+                }
+                .continueWithTask { task ->
+                    if (task.isSuccessful) {
+                        translator.translate(original)
+                            .addOnSuccessListener { translation ->
+                                translation
+                            }
+                            .addOnFailureListener { p0 -> Timber.d("$$$ Failed to translate: $p0") }
+                    } else {
+                        Tasks.forException<String>(
+                            task.exception ?: Exception("Unknown error"),
+                        )
+                    }
+                },
+        )
     }
 }

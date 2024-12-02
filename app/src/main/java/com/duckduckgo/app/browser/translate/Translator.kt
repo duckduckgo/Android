@@ -24,7 +24,6 @@ import javax.inject.Inject
 interface Translator {
     fun addJsInterface(
         webView: WebView,
-        translate: (String) -> String,
     )
 
     fun translate(
@@ -36,9 +35,8 @@ interface Translator {
 class TranslatorJS @Inject constructor() : Translator {
     override fun addJsInterface(
         webView: WebView,
-        translate: (String) -> String,
     ) {
-        webView.addJavascriptInterface(TranslatorJavascriptInterface(translate), TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME)
+        webView.addJavascriptInterface(TranslatorJavascriptInterface(), TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME)
     }
 
     override fun translate(webView: WebView) {
@@ -46,18 +44,32 @@ class TranslatorJS @Inject constructor() : Translator {
             """
             javascript:(function() {
                 function translateTextNodes(node) {
-                    if (node.nodeType === Node.TEXT_NODE && node.parentNode.tagName.toLowerCase() !== 'script') {
-                        var originalText = node.textContent;
-                        if (originalText.trim().length > 0) {
-                            var leadingWhitespace = originalText.match(/^\s*/)[0];
-                            var trailingWhitespace = originalText.match(/\s*${'$'}/)[0];
-                            var translatedText = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(originalText.trim());
-                            node.textContent = leadingWhitespace + translatedText + trailingWhitespace;
-                        }
-                    } else {
+                    const nodeName = node.nodeName;
+                    if (node.nodeType === Node.TEXT_NODE && nodeName !== 'script' && nodeName !== 'style' && nodeName !== 'meta' && nodeName !== 'link') {
+                        asyncTranslateBlock(node);
+                    } else if (isTranslatableNode(node)) {
                         for (var i = 0; i < node.childNodes.length; i++) {
                             translateTextNodes(node.childNodes[i]);
                         }
+                    }
+                }
+                
+                function isTranslatableNode(node) {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const tagName = node.tagName.toLowerCase();
+                        return tagName !== 'script' && tagName !== 'style' && tagName !== 'meta' && tagName !== 'link';
+                    }
+                    return true;
+                }
+                
+                async function asyncTranslateBlock(node) {
+                    var originalText = node.textContent;
+                    if (originalText.trim().length > 0) {
+                        console.log("$$$ Translating " + originalText);
+                        var leadingWhitespace = originalText.match(/^\s*/)[0];
+                        var trailingWhitespace = originalText.match(/\s*${'$'}/)[0];
+                        var translation = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(originalText.trim());
+                        node.textContent = leadingWhitespace + translation + trailingWhitespace;
                     }
                 }
                 
@@ -69,13 +81,13 @@ class TranslatorJS @Inject constructor() : Translator {
                             });
                         });
                     });
-                    
+        
                     observer.observe(document.body, {
                         childList: true,
                         subtree: true,
                     });
                 }
-                
+        
                 translateTextNodes(document.body);
                 observeDOMChanges();
             })();
