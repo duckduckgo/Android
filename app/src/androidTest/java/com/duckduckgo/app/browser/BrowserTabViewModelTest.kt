@@ -58,8 +58,6 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.TEST_VALUE
-import com.duckduckgo.app.browser.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -113,6 +111,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -3335,7 +3334,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
-        assertEquals(TEST_VALUE, command.headers[X_DUCKDUCKGO_ANDROID_HEADER])
+        assertEquals("TEST_VALUE", command.headers[X_DUCKDUCKGO_ANDROID_HEADER])
     }
 
     @Test
@@ -5867,7 +5866,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun givenCustomHeadersProviderReturnsAndroidFeaturesHeader() {
-        fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to TEST_VALUE)
+        fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to "TEST_VALUE")
     }
 
     private suspend fun givenFireButtonPulsing() {
