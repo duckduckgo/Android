@@ -405,29 +405,28 @@ class OmnibarLayoutViewModel @Inject constructor(
         query: String,
         hasFocus: Boolean,
         clearQuery: Boolean,
+        deleteLastCharacter: Boolean,
     ) {
-        Timber.d("Omnibar: onInputStateChanged to $query clearQuery $clearQuery")
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
+        Timber.d("Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter")
+
         _viewState.update {
-            val deletion = it.query.length == 1 && clearQuery
-            val shouldUpdateQuery = query.isNotBlank() && !clearQuery || deletion
-            val updatedQuery = if (shouldUpdateQuery) {
-                Timber.d("Omnibar: onInputStateChanged updating query to $query")
-                query
-            } else {
-                Timber.d("Omnibar: onInputStateChanged not updating query, stays as ${it.query}")
-                it.query
-            }
-            val omnibarText = if (deletion) {
+            val updatedQuery = if (deleteLastCharacter) {
+                Timber.d("Omnibar: deleting last character, old query ${it.query} also deleted")
                 it.url
+            } else if (clearQuery) {
+                Timber.d("Omnibar: clearing old query ${it.query}, we keep it as reference")
+                it.query
             } else {
+                Timber.d("Omnibar: not clearing or deleting old query ${it.query}, updating query to $query")
                 query
             }
+
             it.copy(
                 query = updatedQuery,
-                omnibarText = omnibarText,
+                omnibarText = query,
                 updateOmnibarText = false,
                 hasFocus = hasFocus,
                 showBrowserMenu = showControls,

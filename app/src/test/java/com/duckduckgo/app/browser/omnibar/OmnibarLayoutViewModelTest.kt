@@ -628,7 +628,8 @@ class OmnibarLayoutViewModelTest {
         val query = ""
         val hasFocus = true
         val clearQuery = true
-        testee.onInputStateChanged(query, hasFocus, clearQuery)
+        val deleteLastCharacter = false
+        testee.onInputStateChanged(query, hasFocus, clearQuery, deleteLastCharacter)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -647,7 +648,8 @@ class OmnibarLayoutViewModelTest {
         val query = "query"
         val hasFocus = true
         val clearQuery = true
-        testee.onInputStateChanged(query, hasFocus, clearQuery)
+        val deleteLastCharacter = false
+        testee.onInputStateChanged(query, hasFocus, clearQuery, deleteLastCharacter)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -830,12 +832,15 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenClearingInputWhileInSiteThenURLisShown() = runTest {
+    fun whenHidingKeyboardAfterClearingInputWhileInSiteThenURLisShown() = runTest {
         givenSiteLoaded(RANDOM_URL)
         testee.onClearTextButtonPressed()
         val hasFocus = true
         val clearQuery = true
-        testee.onInputStateChanged("", hasFocus, clearQuery)
+        val deleteLastCharacter = false
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(RANDOM_URL, false, false, false)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -844,18 +849,59 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenClearingInputWhileInSERPThenURLisShown() = runTest {
+    fun whenHidingKeyboardAfterClearingInputWhileInSERPThenURLisShown() = runTest {
         givenSiteLoaded(SERP_URL)
-
-        testee.onClearTextButtonPressed()
 
         val hasFocus = true
         val clearQuery = true
-        testee.onInputStateChanged("", hasFocus, clearQuery)
+        val deleteLastCharacter = false
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(SERP_URL, false, false, false)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.omnibarText == SERP_URL)
+        }
+    }
+
+    @Test
+    fun whenClosingKeyboardAfterDeletingLastCharacterFromOmnibaWhileInSERPThenURLisShown() = runTest {
+        givenSiteLoaded(SERP_URL)
+
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = true
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(SERP_URL, false, false, deleteLastCharacter)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == SERP_URL)
+        }
+    }
+
+    @Test
+    fun whenClosingKeyboardAfterDeletingLastCharacterFromOmnibaWhileInSitehenURLisShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = true
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(RANDOM_URL, false, false, deleteLastCharacter)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
         }
     }
 
