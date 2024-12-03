@@ -643,7 +643,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun `when process and edit email success an is signed in using auth v2 aThen access token is refreshed`() = runTest {
+    fun `when process and edit email success and is signed in using auth v2 then access token is refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
 
