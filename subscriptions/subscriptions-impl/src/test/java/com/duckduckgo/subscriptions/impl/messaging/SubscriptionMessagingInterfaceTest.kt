@@ -58,7 +58,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessUnknownMessageDoNothing() = runTest {
+    fun `when process unknown message do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         messagingInterface.process("", "secret")
@@ -68,7 +68,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessUnknownSecretDoNothing() = runTest {
+    fun `when process unknown secret do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -82,7 +82,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessNoUrlDoNothing() = runTest {
+    fun `when process no url do nothing`() = runTest {
         messagingInterface.register(webView, callback)
 
         val message = """
@@ -96,7 +96,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessInterfaceNotRegisteredDoNothing() = runTest {
+    fun `when process interface not registered do nothing`() = runTest {
         whenever(webView.url).thenReturn("https://duckduckgo.com/test")
 
         val message = """
@@ -110,7 +110,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessIfMethodDoesNotMatchDoNothing() = runTest {
+    fun `when process if method does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -124,7 +124,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsMessageIfActiveThenReturnResponse() = runTest {
+    fun `when process and get subscriptions message if active then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
         givenSubscriptionIsActive()
@@ -152,7 +152,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsMessageIfNotActiveThenReturnResponse() = runTest {
+    fun `when process and get subscriptions message if not active then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -179,7 +179,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsMessageErrorThenReturnResponse() = runTest {
+    fun `when process and get subscriptions message error then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsFailure()
 
@@ -206,7 +206,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsMessageIfTokenExpiredThenReturnResponse() = runTest {
+    fun `when process and get subscriptions message if token expired then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsExpired()
 
@@ -233,7 +233,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and get subscriptions if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -247,7 +247,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionIfNoIdDoNothing() = runTest {
+    fun `when process and get subscription if no id do nothing`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -261,7 +261,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetAccessTokenThenReturnResponse() = runTest {
+    fun `when process and get access token then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAccessTokenIsSuccess()
 
@@ -288,7 +288,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetAccessTokenMessageErrorThenReturnResponse() = runTest {
+    fun `when process and get access token message error then return response`() = runTest {
         givenInterfaceIsRegistered()
         givenAccessTokenIsFailure()
 
@@ -315,7 +315,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetAccessTokenIfNoIdDoNothing() = runTest {
+    fun `when process and get access token if no id do nothing`() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -329,7 +329,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndBackToSettingsIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and back to settings if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -342,7 +342,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndBackToSettingsThenCallbackExecuted() = runTest {
+    fun `when process and back to settings then callback executed`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -355,7 +355,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndSetSubscriptionMessageIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and set subscription message if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -369,7 +369,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndSetSubscriptionMessageThenAuthenticate() = runTest {
+    fun `when process and set subscription message then authenticate`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -385,7 +385,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndSetSubscriptionMessageAndNoTokenThenDoNothing() = runTest {
+    fun `when process and set subscription message and no token then do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -399,7 +399,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionOptionsMessageIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and get subscription options message if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -412,7 +412,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionOptionsMessageThenCallbackCalled() = runTest {
+    fun `when process and get subscription options message then callback called`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -425,7 +425,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionOptionsMessageAndNoIdThenDoNothing() = runTest {
+    fun `when process and get subscription options message and no id then do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -439,7 +439,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndSubscriptionSelectedMessageIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and subscription selected message if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -452,7 +452,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndSubscriptionSelectedMessageThenCallbackCalled() = runTest {
+    fun `when process and subscription selected message then callback called`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -465,7 +465,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndActivateSubscriptionIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and activate subscription if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -478,7 +478,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndActivateSubscriptionThenCallbackExecuted() = runTest {
+    fun `when process and activate subscription then callback executed`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -491,7 +491,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndFeatureSelectedIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and feature selected if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -504,7 +504,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndFeatureSelectedThenCallbackExecuted() = runTest {
+    fun `when process and feature selected then callback executed`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -517,7 +517,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndFeatureSelectedMessageIfUrlNotInAllowListedDomainsThenDoNothing() = runTest {
+    fun `when process and feature selected message if url not in allow listed domains then do nothing`() = runTest {
         messagingInterface.register(webView, callback)
         whenever(webView.url).thenReturn("https://duckduckgo.example.com")
 
@@ -531,7 +531,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndBackToSettingsActivateSuccessIfFeatureNameDoesNotMatchDoNothing() = runTest {
+    fun `when process and back to settings activate success if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -544,7 +544,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndBackToSettingsActiveSuccessThenCallbackExecuted() = runTest {
+    fun `when process and back to settings active success then callback executed`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -557,7 +557,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndMonthlyPriceClickedThenPixelSent() = runTest {
+    fun `when process and monthly price clicked then pixel sent`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -571,7 +571,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndYearlyPriceClickedThenPixelSent() = runTest {
+    fun `when process and yearly price clicked then pixel sent`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -585,7 +585,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndAddEmailSuccessThenPixelSent() = runTest {
+    fun `when process and add email success then pixel sent`() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -599,7 +599,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndFaqClickedThenCallbackExecuted() = runTest {
+    fun `when process and faq clicked then callback executed`() = runTest {
         val jsMessageCallback: JsMessageCallback = mock()
         messagingInterface.register(webView, jsMessageCallback)
         whenever(webView.url).thenReturn("https://duckduckgo.com/test")
@@ -614,7 +614,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndAddEmailClickedThenCallbackExecuted() = runTest {
+    fun `when process and add email clicked then callback executed`() = runTest {
         val jsMessageCallback: JsMessageCallback = mock()
         messagingInterface.register(webView, jsMessageCallback)
         whenever(webView.url).thenReturn("https://duckduckgo.com/test")
@@ -629,7 +629,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndAddEmailSuccessAnIsSignedInUsingAuthV2AThenAccessTokenIsRefreshed() = runTest {
+    fun `when process and add email success an is signed in using auth v2 aThen access token is refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
 
@@ -643,7 +643,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndEditEmailSuccessAnIsSignedInUsingAuthV2AThenAccessTokenIsRefreshed() = runTest {
+    fun `when process and edit email success an is signed in using auth v2 aThen access token is refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
 
@@ -657,7 +657,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndRemoveEmailSuccessAnIsSignedInUsingAuthV2AThenAccessTokenIsRefreshed() = runTest {
+    fun `when process and remove email success an is signed in using auth v2 aThen access token is refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
 
@@ -671,7 +671,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndAddEmailSuccessAnIsNotSignedInUsingAuthV2AThenAccessTokenIsNotRefreshed() = runTest {
+    fun `when process and add email success an is not signed in using auth v2 aThen access token is not refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
 
@@ -685,7 +685,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndEditEmailSuccessAnIsNotSignedInUsingAuthV2AThenAccessTokenIsNotRefreshed() = runTest {
+    fun `when process and edit email success an is not signed in using auth v2 aThen access token is not refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
 
@@ -699,7 +699,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndRemoveEmailSuccessAnIsNotSignedInUsingAuthV2AThenAccessTokenIsNotRefreshed() = runTest {
+    fun `when process and remove email success an is not signed in using auth v2 aThen access token is not refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
 
