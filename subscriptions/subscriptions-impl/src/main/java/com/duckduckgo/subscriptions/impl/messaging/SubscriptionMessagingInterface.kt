@@ -237,6 +237,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                         pixelSender.reportAddEmailSuccess()
                         subscriptionsManager.tryRefreshAccessToken()
                     }
+
                     "subscriptionsEditEmailSuccess" -> subscriptionsManager.tryRefreshAccessToken()
                     "subscriptionsWelcomeAddEmailClicked",
                     "subscriptionsWelcomeFaqClicked",
@@ -251,7 +252,7 @@ class SubscriptionMessagingInterface @Inject constructor(
 
         private suspend fun SubscriptionsManager.tryRefreshAccessToken() {
             try {
-                if (subscriptionsManager.isSignedInV2()) {
+                if (isSignedInV2()) {
                     refreshAccessToken()
                 }
             } catch (e: Exception) {
