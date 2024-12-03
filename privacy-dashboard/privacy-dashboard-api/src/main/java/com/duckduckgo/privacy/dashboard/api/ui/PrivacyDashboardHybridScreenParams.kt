@@ -35,7 +35,7 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
     data class BrokenSiteForm(override val tabId: String, val reportFlow: BrokenSiteFormReportFlow) : PrivacyDashboardHybridScreenParams() {
         enum class BrokenSiteFormReportFlow {
             MENU,
-            PROMPT,
+            RELOAD_THREE_TIMES_WITHIN_20_SECONDS,
         }
     }
 }
