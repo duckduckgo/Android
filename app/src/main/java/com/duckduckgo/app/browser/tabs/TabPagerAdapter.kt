@@ -62,7 +62,6 @@ class TabPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         Timber.d("### TabPagerAdapter.createFragment: $position")
-        increaseOffscreenTabLimitIfNeeded()
 
         val tab = getTabById(tabIds[position]) ?: requestNewTab()
         val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
@@ -84,6 +83,8 @@ class TabPagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<String>) {
+        increaseOffscreenTabLimitIfNeeded()
+
         val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabIds, newTabs))
         diff.dispatchUpdatesTo(this)
         tabIds.clear()

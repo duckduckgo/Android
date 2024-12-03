@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.IsSwipingTabsFeatureEnabled
@@ -65,7 +66,13 @@ class DefaultTabManager @Inject constructor(
             requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
-            getOffScreenPageLimit = { browserActivity.tabPager.offscreenPageLimit },
+            getOffScreenPageLimit = {
+                if (browserActivity.tabPager.offscreenPageLimit == OFFSCREEN_PAGE_LIMIT_DEFAULT) {
+                    3
+                } else {
+                    browserActivity.tabPager.offscreenPageLimit
+                }
+            },
         )
     }
 
