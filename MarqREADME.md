@@ -1,4 +1,4 @@
-# DuckDuckGo Android
+# Marq DuckDuckGo Android
 
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -28,3 +28,4 @@ Contact us at https://duckduckgo.com/feedback if you have feedback, questions or
 
 ## License
 DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
+Update
