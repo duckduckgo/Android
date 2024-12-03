@@ -657,6 +657,20 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun whenProcessAndRemoveEmailSuccessAnIsSignedInUsingAuthV2AThenAccessTokenIsRefreshed() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(subscriptionsManager.isSignedInV2()).thenReturn(true)
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsRemoveEmailSuccess","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(subscriptionsManager).refreshAccessToken()
+    }
+
+    @Test
     fun whenProcessAndAddEmailSuccessAnIsNotSignedInUsingAuthV2AThenAccessTokenIsNotRefreshed() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
@@ -677,6 +691,20 @@ class SubscriptionMessagingInterfaceTest {
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsEditEmailSuccess","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(subscriptionsManager, never()).refreshAccessToken()
+    }
+
+    @Test
+    fun whenProcessAndRemoveEmailSuccessAnIsNotSignedInUsingAuthV2AThenAccessTokenIsNotRefreshed() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsRemoveEmailSuccess","id":"myId","params":{}}
         """.trimIndent()
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")

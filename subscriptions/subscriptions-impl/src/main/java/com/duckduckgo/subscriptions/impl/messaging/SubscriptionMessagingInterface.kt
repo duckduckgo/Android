@@ -238,7 +238,10 @@ class SubscriptionMessagingInterface @Inject constructor(
                         subscriptionsManager.tryRefreshAccessToken()
                     }
 
-                    "subscriptionsEditEmailSuccess" -> subscriptionsManager.tryRefreshAccessToken()
+                    "subscriptionsEditEmailSuccess",
+                    "subscriptionsRemoveEmailSuccess",
+                    -> subscriptionsManager.tryRefreshAccessToken()
+
                     "subscriptionsWelcomeAddEmailClicked",
                     "subscriptionsWelcomeFaqClicked",
                     -> {
@@ -268,6 +271,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             "subscriptionsUnknownPriceClicked",
             "subscriptionsAddEmailSuccess",
             "subscriptionsEditEmailSuccess",
+            "subscriptionsRemoveEmailSuccess",
             "subscriptionsWelcomeAddEmailClicked",
             "subscriptionsWelcomeFaqClicked",
         )
