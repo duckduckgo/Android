@@ -260,7 +260,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -3484,7 +3484,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onBrokenSiteCtaOkButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
         viewModelScope.launch {
-            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = PROMPT))
+            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = RELOAD_THREE_TIMES_WITHIN_20_SECONDS))
             command.value = HideBrokenSitePromptCta(cta)
         }
         return null

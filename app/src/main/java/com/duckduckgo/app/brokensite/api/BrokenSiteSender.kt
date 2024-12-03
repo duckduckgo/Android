@@ -32,7 +32,7 @@ import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
-import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
+import com.duckduckgo.brokensite.api.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_MENU
 import com.duckduckgo.browser.api.WebViewVersionProvider
@@ -231,7 +231,7 @@ class BrokenSiteSubmitter @Inject constructor(
 private fun ReportFlow.toStringValue(): String = when (this) {
     DASHBOARD -> "dashboard"
     MENU -> "menu"
-    PROMPT -> "prompt"
     TOGGLE_DASHBOARD -> "on_protections_off_dashboard_main"
     TOGGLE_MENU -> "on_protections_off_menu"
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> "reload-three-times-within-20-seconds"
 }

@@ -225,7 +225,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -1921,7 +1921,7 @@ class BrowserTabFragment :
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
             val reportFlow = when (data.reportFlow) {
-                PROMPT -> BrokenSiteFormReportFlow.PROMPT
+                RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.PROMPT
                 else -> BrokenSiteFormReportFlow.MENU
             }
             globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))

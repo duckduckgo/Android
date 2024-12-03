@@ -109,7 +109,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                         is BrokenSiteForm -> {
                             when (params.reportFlow) {
                                 BrokenSiteForm.BrokenSiteFormReportFlow.MENU -> ReportFlow.MENU
-                                BrokenSiteForm.BrokenSiteFormReportFlow.PROMPT -> ReportFlow.PROMPT
+                                BrokenSiteForm.BrokenSiteFormReportFlow.PROMPT -> ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                             }
                         }
                         else -> ReportFlow.DASHBOARD
