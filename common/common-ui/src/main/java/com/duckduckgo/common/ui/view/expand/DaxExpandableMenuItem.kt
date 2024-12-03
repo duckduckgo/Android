@@ -30,7 +30,7 @@ import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground
-import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.updateLayoutParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -100,7 +100,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.DaxExpandableMenuItem_leadingIconSize)) {
-                val imageSize = LeadingIconSize.from(getInt(R.styleable.DaxExpandableMenuItem_leadingIconSize, 1))
+                val imageSize = IconSize.from(getInt(R.styleable.DaxExpandableMenuItem_leadingIconSize, 1))
                 setLeadingIconSize(imageSize)
             }
 
@@ -163,8 +163,8 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
     }
 
     /** Sets the leading icon background image type */
-    fun setLeadingIconSize(imageSize: LeadingIconSize) {
-        val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+    fun setLeadingIconSize(imageSize: IconSize) {
+        val size = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         binding.daxExpandableMenuItemIcon.layoutParams.width = size
         binding.daxExpandableMenuItemIcon.layoutParams.height = size
     }
@@ -270,7 +270,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             this.expandableMenuItem.setLeadingIconBackgroundType(value)
         }
 
-        fun setLeadingIconSize(value: LeadingIconSize) = apply {
+        fun setLeadingIconSize(value: IconSize) = apply {
             this.expandableMenuItem.setLeadingIconSize(value)
         }
         fun setPrimaryButtonText(value: String?) = apply {
