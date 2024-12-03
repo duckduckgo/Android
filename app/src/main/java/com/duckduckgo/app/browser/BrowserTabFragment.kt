@@ -1921,7 +1921,7 @@ class BrowserTabFragment :
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
             val reportFlow = when (data.reportFlow) {
-                RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.PROMPT
+                RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                 else -> BrokenSiteFormReportFlow.MENU
             }
             globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))

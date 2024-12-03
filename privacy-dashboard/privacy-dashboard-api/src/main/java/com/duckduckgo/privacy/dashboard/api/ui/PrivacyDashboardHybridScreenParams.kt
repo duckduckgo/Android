@@ -50,7 +50,7 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
     ) : PrivacyDashboardHybridScreenParams() {
         enum class BrokenSiteFormReportFlow {
             MENU,
-            PROMPT,
+            RELOAD_THREE_TIMES_WITHIN_20_SECONDS,
         }
     }
 
