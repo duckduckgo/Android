@@ -699,7 +699,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun `when process and remove email success an is not signed in using auth v2 aThen access token is not refreshed`() = runTest {
+    fun `when process and remove email success and is not signed in using auth v2 then access token is not refreshed`() = runTest {
         givenInterfaceIsRegistered()
         whenever(subscriptionsManager.isSignedInV2()).thenReturn(false)
 
