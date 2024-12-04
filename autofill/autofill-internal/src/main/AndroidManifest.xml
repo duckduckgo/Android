@@ -21,7 +21,18 @@
             android:name="com.duckduckgo.autofill.internal.AutofillInternalSettingsActivity"
             android:exported="true"
             android:label="@string/autofillDevSettingsTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            />
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <service
+            android:name="com.duckduckgo.autofill.impl.service.RealAutofillService"
+            android:exported="true"
+            android:label="@string/appName"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/service_configuration" />
+        </service>
     </application>
 </manifest>

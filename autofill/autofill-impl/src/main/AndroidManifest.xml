@@ -24,19 +24,6 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
-        <service
-            android:name=".service.DDGAutofillService"
-            android:exported="true"
-            android:label="My Autofill Service"
-            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.autofill.AutofillService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.autofill"
-                android:resource="@xml/service_configuration" />
-        </service>
     </application>
 
 </manifest>

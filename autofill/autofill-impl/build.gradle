@@ -54,6 +54,7 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
+    implementation("androidx.autofill:autofill:1.1.0")
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
