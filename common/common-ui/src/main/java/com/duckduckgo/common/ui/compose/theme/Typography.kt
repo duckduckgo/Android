@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 @Immutable
@@ -27,67 +28,57 @@ data class DuckDuckGoTypography(
 
     val title: TextStyle = TextStyle(
         fontSize = 32.sp,
-        letterSpacing = 4.sp,
         lineHeight = 36.sp,
         fontWeight = FontWeight.Bold,
     ),
 
     val h1: TextStyle = TextStyle(
         fontSize = 24.sp,
-        letterSpacing = 6.sp,
         lineHeight = 30.sp,
         fontWeight = FontWeight.Bold,
     ),
 
     val h2: TextStyle = TextStyle(
         fontSize = 20.sp,
-        letterSpacing = 4.sp,
         lineHeight = 24.sp,
         fontWeight = FontWeight.Medium,
     ),
 
     val h3: TextStyle= TextStyle(
         fontSize = 16.sp,
-        letterSpacing = 5.sp,
         lineHeight = 21.sp,
         fontWeight = FontWeight.Medium,
     ),
 
     val h4: TextStyle = TextStyle(
         fontSize = 14.sp,
-        letterSpacing = 6.sp,
         lineHeight = 20.sp,
         fontWeight = FontWeight.Medium,
     ),
 
     val h5: TextStyle = TextStyle(
         fontSize = 13.sp,
-        letterSpacing = 3.sp,
         lineHeight = 16.sp,
         fontWeight = FontWeight.Medium,
     ),
 
     val body1: TextStyle = TextStyle(
         fontSize = 16.sp,
-        letterSpacing = 4.sp,
         lineHeight = 20.sp,
     ),
     val body2: TextStyle = TextStyle(
         fontSize = 14.sp,
-        letterSpacing = 4.sp,
         lineHeight = 18.sp,
     ),
 
     val button: TextStyle = TextStyle(
         fontSize = 15.sp,
-        letterSpacing = 5.sp,
         lineHeight = 20.sp,
         fontWeight = FontWeight.Bold,
     ),
 
     val caption: TextStyle = TextStyle(
         fontSize = 12.sp,
-        letterSpacing = 4.sp,
         lineHeight = 16.sp,
     ),
 )
