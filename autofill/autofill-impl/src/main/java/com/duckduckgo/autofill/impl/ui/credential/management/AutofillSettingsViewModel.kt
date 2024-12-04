@@ -58,6 +58,7 @@ import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -198,12 +199,13 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onViewCredentials(
         credentials: LoginCredentials,
     ) {
-        _viewState.value = viewState.value.copy(
+        addCommand(AutofillLogin(credentials))
+        /*_viewState.value = viewState.value.copy(
             credentialMode = Viewing(credentialsViewed = credentials, showLinkButton = credentials.shouldShowLinkButton()),
         )
         addCommand(ShowCredentialMode)
 
-        updateDuckAddressStatus(credentials.username)
+        updateDuckAddressStatus(credentials.username)*/
     }
 
     fun onCreateNewCredentials() {
@@ -863,6 +865,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
+        class AutofillLogin(val credentials: LoginCredentials) : Command()
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()

@@ -26,7 +26,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <service
-            android:name=".service.DDGAutofillService"
+            android:name=".service.RealAutofillService"
             android:exported="true"
             android:label="My Autofill Service"
             android:permission="android.permission.BIND_AUTOFILL_SERVICE">
