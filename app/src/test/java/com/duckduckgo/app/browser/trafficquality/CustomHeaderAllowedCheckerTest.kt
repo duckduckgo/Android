@@ -1,0 +1,142 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.browser.trafficquality
+
+import com.duckduckgo.app.browser.trafficquality.Result.Allowed
+import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
+import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderStore
+import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
+import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.time.ZoneId
+
+class CustomHeaderAllowedCheckerTest {
+
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val featuresRequestHeaderStore: FeaturesRequestHeaderStore = mock()
+
+    private lateinit var testee: CustomHeaderAllowedChecker
+
+    private val currentVersion = 5210000
+    private val anotherVersion = 5220000
+
+    @Before
+    fun setup() {
+        testee = RealCustomHeaderGracePeriodChecker(appBuildConfig, featuresRequestHeaderStore)
+        whenever(appBuildConfig.versionCode).thenReturn(currentVersion)
+    }
+
+    @Test
+    fun whenNoConfigAvailableThenNotAllowed() = runTest {
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(null)
+
+        val result = testee.isAllowed()
+
+        assert(result is NotAllowed)
+    }
+
+    @Test
+    fun whenNoConfigForCurrentVersionAvailableThenNotAllowed() = runTest {
+        val config = TrafficQualityAppVersion(anotherVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+        val result = testee.isAllowed()
+
+        assert(result is NotAllowed)
+    }
+
+    @Test
+    fun whenAskingAtStartOfGracePeriodThenIsAllowed() = runTest {
+        givenBuildDateDaysAgo(5)
+        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+        val result = testee.isAllowed()
+
+        assert(result is Allowed)
+    }
+
+    @Test
+    fun whenAskingDuringGracePeriodThenReturnIsAllowed() = runTest {
+        givenBuildDateDaysAgo(8)
+        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+        val result = testee.isAllowed()
+
+        assert(result is Allowed)
+    }
+
+    @Test
+    fun whenAskingAtTheEndOfGracePeriodThenIsAllowed() = runTest {
+        givenBuildDateDaysAgo(10)
+        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+
+        val result = testee.isAllowed()
+
+        assert(result is Allowed)
+    }
+
+    @Test
+    fun whenItsTooEarlyToLogThenIsNotAllowed() = runTest {
+        givenBuildDateDaysAgo(1)
+
+        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+
+        val result = testee.isAllowed()
+
+        assert(result is NotAllowed)
+    }
+
+    @Test
+    fun whenItsTooLateToLogThenIsNotAllowed() = runTest {
+        givenBuildDateDaysAgo(20)
+
+        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+
+        val result = testee.isAllowed()
+
+        assert(result is NotAllowed)
+    }
+
+    private fun givenBuildDateDaysAgo(days: Long) {
+        val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        whenever(appBuildConfig.buildDateTimeMillis).thenReturn(daysAgo)
+    }
+
+    private fun featuresEnabled(
+        gpc: Boolean = false,
+        cpm: Boolean = false,
+        appTP: Boolean = false,
+        netP: Boolean = false,
+    ): TrafficQualityAppVersionFeatures {
+        return TrafficQualityAppVersionFeatures(gpc = gpc, cpm = cpm, appTP = appTP, netP = netP)
+    }
+}

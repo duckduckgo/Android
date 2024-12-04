@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.trafficquality.remote
 
+import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.AppScope
@@ -23,50 +24,23 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 interface AndroidFeaturesHeaderProvider {
-    fun provide(): String?
+    fun provide(config: TrafficQualityAppVersion): String?
 }
 
 @ContributesBinding(AppScope::class)
 class RealAndroidFeaturesHeaderProvider @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-    private val featuresRequestHeaderStore: FeaturesRequestHeaderStore,
     private val autoconsent: Autoconsent,
     private val gpc: Gpc,
     private val appTrackingProtection: AppTrackingProtection,
     private val networkProtectionState: NetworkProtectionState,
 ) : AndroidFeaturesHeaderProvider {
 
-    override fun provide(): String? {
-        val config = featuresRequestHeaderStore.getConfig()
-        val versionConfig = config.find { it.appVersion == appBuildConfig.versionCode }
-        return if (versionConfig != null && shouldLogValue(versionConfig)) {
-            logFeature(versionConfig)
-        } else {
-            null
-        }
-    }
-
-    private fun shouldLogValue(versionConfig: TrafficQualityAppVersion): Boolean {
-        val appBuildDateMillis = appBuildConfig.buildDateTimeMillis
-        if (appBuildDateMillis == 0L) {
-            return false
-        }
-
-        val appBuildDate = LocalDateTime.ofEpochSecond(appBuildDateMillis / 1000, 0, ZoneOffset.UTC)
-        val now = LocalDateTime.now(ZoneOffset.UTC)
-
-        val daysSinceBuild = ChronoUnit.DAYS.between(appBuildDate, now)
-        val daysUntilLoggingStarts = versionConfig.daysUntilLoggingStarts
-        val daysForAppVersionLogging = versionConfig.daysUntilLoggingStarts + versionConfig.daysLogging
-
-        return daysSinceBuild in daysUntilLoggingStarts..daysForAppVersionLogging
+    override fun provide(config: TrafficQualityAppVersion): String? {
+        return logFeature(config)
     }
 
     private fun logFeature(versionConfig: TrafficQualityAppVersion): String? {
