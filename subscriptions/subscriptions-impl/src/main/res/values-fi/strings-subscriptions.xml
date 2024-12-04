@@ -67,6 +67,7 @@
     <string name="subscriptionSetting">Tilauksen asetukset</string>
     <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja identiteettisi Privacy Prolla</string>
     <string name="subscriptionSettingSubscribeSubtitle">Seuraavat sisältyvät: VPN, Personal Information Removal ja Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Sisältää: VPN ja Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Hanki Privacy Pro</string>
     <string name="subscriptionSettingRestore">Minulla on tilaus</string>
     <string name="subscriptionSettingWaiting">Tilauksesi aktivoidaan</string>
@@ -74,12 +75,15 @@
     <string name="subscriptionSettingExpired">Privacy Pro -tilauksesi on päättynyt</string>
     <string name="subscriptionSettingExpiredSubtitle">Tilaa uudelleen jatkaaksesi Privacy Pron käyttöä</string>
     <string name="subscriptionSettingExpiredViewPlans">Näytä tilaukset</string>
-
+    <string name="subscriptionSettingSectionSubscription">Tilaus</string>
+    <string name="subscriptionSettingRemoveFromDevice">Poista tältä laitteelta</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Apu ja tuki</string>
+    <string name="subscriptionSettingSendFeedback">Lähetä palautetta</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kaikki on valmista.</string>
     <string name="purchaseCompletedText">Ostosi onnistui.</string>
-    <string name="purchaseRecoveredText">Sinulla oli jo tilaus, ja olemme palauttaneet sen.</string>
+    <string name="purchaseRecoveredText">Sinulla oli jo tilaus, ja olemme palauttaneet sen puolestasi.</string>
     <string name="purchaseErrorTitle">Jokin meni pieleen</string>
     <string name="purchaseError">Yhteyden muodostamisessa on ongelmia. Yritä myöhemmin uudelleen.</string>
 
@@ -153,4 +157,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Anna meille palautetta...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Minkä ominaisuuden haluaisit nähdä?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Tilaukset</string>
+    <string name="activitySubscriptionSettings">Tilauksen asetukset</string>
+    <string name="activityActivateSubscription">Aktivoi tilaus</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Lähetä palautetta</string>
 </resources>
