@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.service
 
+import android.os.Build.VERSION_CODES
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -78,6 +79,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -103,6 +105,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -133,6 +136,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -163,6 +167,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -266,6 +271,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -289,6 +295,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -315,6 +322,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -343,6 +351,7 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
+                "com.example.app",
                 null,
                 "example.com",
                 listOf(

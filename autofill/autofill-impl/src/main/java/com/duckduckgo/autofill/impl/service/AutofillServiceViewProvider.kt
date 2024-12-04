@@ -21,6 +21,7 @@ import android.app.PendingIntent
 import android.app.slice.Slice
 import android.content.Context
 import android.graphics.drawable.Icon
+import android.os.Build.VERSION_CODES
 import android.service.autofill.InlinePresentation
 import android.widget.RemoteViews
 import android.widget.inline.InlinePresentationSpec

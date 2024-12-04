@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.service
 import android.annotation.SuppressLint
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
+import android.os.Build
 import android.view.autofill.AutofillId
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
@@ -68,6 +69,7 @@ class RealAutofillParser @Inject constructor(
     override fun parseStructure(structure: AssistStructure): MutableList<AutofillRootNode> {
         val autofillRootNodes = mutableListOf<AutofillRootNode>()
         val windowNodeCount = structure.windowNodeCount
+        Timber.i("DDGAutofillService windowNodeCount: $windowNodeCount")
         for (i in 0 until windowNodeCount) {
             val windowNode = structure.getWindowNodeAt(i)
             windowNode.rootViewNode?.let { viewNode ->
@@ -75,6 +77,10 @@ class RealAutofillParser @Inject constructor(
                     traverseViewNode(viewNode).convertIntoAutofillNode(),
                 )
             }
+        }
+        Timber.i("DDGAutofillService convertedNodes: $autofillRootNodes")
+        autofillRootNodes.forEach { node ->
+            Timber.i("DDGAutofillService Detected Fields: ${node.parsedAutofillFields.filter { it.type != UNKNOWN }}")
         }
         return autofillRootNodes
     }
