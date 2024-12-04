@@ -33,7 +33,7 @@ class RealInstallSourceExtractor @Inject constructor(
 
     @SuppressLint("NewApi")
     override fun extract(): String? {
-        return if (appBuildConfig.sdkInt >= VERSION_CODES.R) {
+        return if (appBuildConfig.sdkInt >= 30) {
             installationSourceModern(context.packageName)
         } else {
             installationSourceLegacy(context.packageName)

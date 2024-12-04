@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.aura.AuraExperimentManager
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
@@ -117,8 +118,9 @@ class StubStatisticsModule {
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
         dispatcherProvider: DispatcherProvider,
+        auraExperimentManager: AuraExperimentManager,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider, auraExperimentManager)
     }
 
     @Provides
