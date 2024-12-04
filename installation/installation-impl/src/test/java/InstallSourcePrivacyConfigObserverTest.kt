@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.installation.api.installer.InstallSourceExtractor
 import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_FULL_PACKAGE_NAME
 import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_PACKAGE_NAME
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore
