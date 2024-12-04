@@ -16,8 +16,18 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management
 
+import android.app.Activity
+import android.app.assist.AssistStructure
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.service.autofill.Dataset
 import android.view.WindowManager
+import android.view.autofill.AutofillManager
+import android.view.autofill.AutofillValue
+import android.widget.RemoteViews
+import androidx.annotation.DrawableRes
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
@@ -39,6 +49,12 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.autofill.impl.service.AutofillFieldType
+import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
+import com.duckduckgo.autofill.impl.service.AutofillParser
+import com.duckduckgo.autofill.impl.service.AutofillRootNode
+import com.duckduckgo.autofill.impl.service.ParsedAutofillField
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -98,12 +114,19 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     @Inject
     lateinit var settingsPageFeature: SettingsPageFeature
 
+    @Inject
+    lateinit var autofillParser: AutofillParser
+
+    private var assistStructure: AssistStructure? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (deviceAuthenticator.isAuthenticationRequiredForAutofill()) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
+
+        assistStructure = IntentCompat.getParcelableExtra(intent, AutofillManager.EXTRA_ASSIST_STRUCTURE, AssistStructure::class.java)
 
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
@@ -209,6 +232,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             is ExitLockedMode -> exitLockedMode()
             is ExitDisabledMode -> exitDisabledMode()
             is ExitListMode -> exitListMode()
+            is AutofillLogin -> autofillLogin(command)
             else -> processed = false
         }
         if (processed) {
@@ -216,6 +240,147 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             viewModel.commandProcessed(command)
         }
     }
+
+    private fun autofillLogin(command: AutofillLogin) {
+        val structure = assistStructure ?: return
+        val parsedNodes = autofillParser.parseStructure(structure)
+        val detectedNode: Pair<AutofillRootNode, ParsedAutofillField>? = parsedNodes.firstNotNullOfOrNull { node ->
+            val focusedDetectedField = node.parsedAutofillFields
+                .firstOrNull { field ->
+                    field.originalNode.isFocused && field.type != UNKNOWN
+                }
+            if (focusedDetectedField != null) {
+                return@firstNotNullOfOrNull Pair(node, focusedDetectedField)
+            }
+            val firstDetectedField = node.parsedAutofillFields.firstOrNull { field -> field.type != UNKNOWN }
+            if (firstDetectedField != null) {
+                return@firstNotNullOfOrNull Pair(node, firstDetectedField)
+            }
+            return@firstNotNullOfOrNull null
+        }
+
+        if (detectedNode == null) {
+            return
+        }
+
+        val fields = detectedNode.first.parsedAutofillFields.filter { it.type != UNKNOWN }
+
+        val dataset = buildDataset(fields, command)
+
+        val resultIntent = Intent().apply {
+            putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, dataset)
+        }
+        this.setResult(Activity.RESULT_OK, resultIntent)
+        this.finish()
+    }
+
+    private fun buildDataset(
+        fields: List<ParsedAutofillField>,
+        command: AutofillLogin,
+    ): Dataset {
+        val datasetBuilder = Dataset.Builder()
+        fields.forEach { fieldsToAutofill ->
+            val suggestionTitle = "name ${fieldsToAutofill.autofillId}"
+            val suggestionSubtitle = "subtitle"
+            val icon = R.drawable.ic_autofill_color_24
+            // >= android 11
+            /*val isInlineSupported = if (inlinePresentationSpec != null ) {
+                UiVersions.getVersions(inlinePresentationSpec.style).contains(UiVersions.INLINE_UI_VERSION_1)
+            } else {
+                false
+            }
+            if (isInlineSupported) {
+                val slice = InlineSuggestionUi.newContentBuilder(
+                    PendingIntent.getService(
+                        this,
+                        0,
+                        Intent(),
+                        PendingIntent.FLAG_ONE_SHOT or
+                            PendingIntent.FLAG_UPDATE_CURRENT or
+                            PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ).setTitle(suggestionTitle)
+                    .setSubtitle(suggestionSubtitle)
+                    .setStartIcon(Icon.createWithResource(this, icon))
+                    .build().slice
+                val inlinePresentation = InlinePresentation(slice, inlinePresentationSpec!!, false)
+                datasetBuilder.setInlinePresentation(inlinePresentation)
+            }*/
+
+            // Supported in all android apis
+            val remoteView = buildAutofillRemoteViews(
+                name = suggestionTitle,
+                subtitle = suggestionSubtitle,
+                iconRes = icon,
+                shouldTintIcon = false,
+            )
+            datasetBuilder.setValue(
+                fieldsToAutofill.autofillId,
+                if (fieldsToAutofill.type == AutofillFieldType.USERNAME) {
+                    AutofillValue.forText(command.credentials.username)
+                } else {
+                    AutofillValue.forText(command.credentials.password)
+                },
+                remoteView,
+            )
+
+            fieldsToAutofill.autofillId
+        }
+        return datasetBuilder.build()
+    }
+
+    private fun buildAutofillRemoteViews(
+        // autofillContentDescription: String?,
+        name: String,
+        subtitle: String,
+        @DrawableRes iconRes: Int,
+        shouldTintIcon: Boolean,
+    ): RemoteViews =
+        RemoteViews(
+            packageName,
+            R.layout.autofill_remote_view,
+        ).apply {
+            /*autofillContentDescription?.let {
+                setContentDescription(
+                    R.id.container,
+                    it,
+                )
+            }*/
+            setTextViewText(
+                R.id.title,
+                name,
+            )
+            setTextViewText(
+                R.id.subtitle,
+                subtitle,
+            )
+            setImageViewResource(
+                R.id.icon,
+                iconRes,
+            )
+            /*setInt(
+                R.id.container,
+                "setBackgroundColor",
+                Color.CYAN,
+            )*/
+            setInt(
+                R.id.title,
+                "setTextColor",
+                Color.BLACK,
+            )
+            setInt(
+                R.id.subtitle,
+                "setTextColor",
+                Color.BLACK,
+            )
+            if (shouldTintIcon) {
+                setInt(
+                    R.id.icon,
+                    "setColorFilter",
+                    Color.BLACK,
+                )
+            }
+        }
 
     private fun showCopiedToClipboardSnackbar(dataType: CopiedToClipboardDataType) {
         val stringResourceId = when (dataType) {
