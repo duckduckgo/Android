@@ -22,15 +22,13 @@ import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderSto
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 class CustomHeaderAllowedCheckerTest {
 
@@ -95,7 +93,6 @@ class CustomHeaderAllowedCheckerTest {
         val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
         whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
 
-
         val result = testee.isAllowed()
 
         assert(result is Allowed)
@@ -107,7 +104,6 @@ class CustomHeaderAllowedCheckerTest {
 
         val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
         whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
-
 
         val result = testee.isAllowed()
 

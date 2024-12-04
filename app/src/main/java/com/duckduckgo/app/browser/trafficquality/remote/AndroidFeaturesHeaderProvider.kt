@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.trafficquality.remote
 
-import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection

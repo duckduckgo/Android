@@ -3,8 +3,8 @@ package com.duckduckgo.app.browser
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
-import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.AppVersionHeaderProvider
+import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle

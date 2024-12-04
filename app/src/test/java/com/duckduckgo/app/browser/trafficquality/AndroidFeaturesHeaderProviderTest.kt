@@ -50,7 +50,6 @@ class AndroidFeaturesHeaderProviderTest {
             mockAppTrackingProtection,
             mockNetworkProtectionState,
         )
-
     }
 
     @Test
@@ -166,5 +165,4 @@ class AndroidFeaturesHeaderProviderTest {
     ): TrafficQualityAppVersionFeatures {
         return TrafficQualityAppVersionFeatures(gpc = gpc, cpm = cpm, appTP = appTP, netP = netP)
     }
-
 }
