@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.tabs
 import android.os.Message
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
@@ -73,6 +74,9 @@ class RealTabManager @Inject constructor(
             return
         } else {
             clearStaleTabs(updatedTabs)
+        }
+        browserActivity.lifecycleScope.launch {
+            browserActivity.viewModel.onTabsUpdated(updatedTabs)
         }
     }
 
@@ -138,15 +142,7 @@ class RealTabManager @Inject constructor(
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(
-                tabId = tab.tabId,
-                url = tab.url,
-                skipHome = tab.skipHome,
-                isExternal = browserActivity.intent?.getBooleanExtra(
-                    BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
-                    false,
-                ) ?: false,
-            )
+            openNewTab(tab.tabId, tab.url, tab.skipHome, browserActivity.intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) == true)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
