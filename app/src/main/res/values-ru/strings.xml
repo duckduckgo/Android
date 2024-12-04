@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Защита конфиденциальности</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
     <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
@@ -135,7 +134,6 @@
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
     <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Дальнейшие шаги</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>
@@ -158,15 +156,9 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Основные настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Очистка данных</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Добавьте виджет на домашний экран</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Настроить положение адресной строки</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Включить голосовой поиск</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo для других платформ</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
@@ -722,7 +714,6 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Пароли</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Пароли и автозаполнение</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
 
