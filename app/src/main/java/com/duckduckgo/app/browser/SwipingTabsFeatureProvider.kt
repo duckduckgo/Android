@@ -21,12 +21,10 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class IsSwipingTabsFeatureEnabled @Inject constructor(
+class SwipingTabsFeatureProvider @Inject constructor(
     swipingTabsFeature: SwipingTabsFeature,
 ) {
-    private val isEnabled: Boolean = swipingTabsFeature.self().isEnabled()
-
-    operator fun invoke(): Boolean {
-        return isEnabled
+    val isEnabled: Boolean by lazy {
+        swipingTabsFeature.self().isEnabled()
     }
 }
