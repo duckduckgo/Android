@@ -75,6 +75,9 @@ class RealTabManager @Inject constructor(
         } else {
             clearStaleTabs(updatedTabs)
         }
+        browserActivity.lifecycleScope.launch {
+            browserActivity.viewModel.onTabsUpdated(updatedTabs)
+        }
     }
 
     override fun openMessageInNewTab(
