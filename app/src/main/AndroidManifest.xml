@@ -44,7 +44,7 @@
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <activity
-            android:name="com.duckduckgo.app.tabs.ui.TabRulesActivity"
+            android:name="com.duckduckgo.app.tabs.rules.TabRulesActivity"
             android:exported="false" />
 
         <meta-data
