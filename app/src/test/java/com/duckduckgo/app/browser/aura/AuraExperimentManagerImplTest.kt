@@ -80,8 +80,8 @@ class AuraExperimentManagerImplTest {
     fun whenReturningUserThenSetsReturningUserFlag() = runTest {
         whenever(toggle.isEnabled()).thenReturn(true)
         whenever(installSourceExtractor.extract()).thenReturn("a.b.c")
-        whenever(toggle.getSettings()).thenReturn("valid_json")
-        whenever(auraExperimentListJsonParser.parseJson("valid_json")).thenReturn(Packages(list = listOf("a.b.c")))
+        whenever(toggle.getSettings()).thenReturn("json")
+        whenever(auraExperimentListJsonParser.parseJson("json")).thenReturn(Packages(list = listOf("a.b.c")))
         whenever(statisticsDataStore.variant).thenReturn(AuraExperimentManagerImpl.RETURNING_USER)
 
         testee.initialize()
