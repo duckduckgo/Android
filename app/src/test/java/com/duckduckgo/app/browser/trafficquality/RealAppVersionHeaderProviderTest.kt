@@ -1,8 +1,6 @@
 package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.trafficquality.RealAppVersionHeaderProvider.Companion.APP_VERSION_QUALITY_DEFAULT_VALUE
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import org.junit.Assert.*

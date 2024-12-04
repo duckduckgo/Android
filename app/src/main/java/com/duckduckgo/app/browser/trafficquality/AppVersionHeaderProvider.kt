@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.trafficquality
 
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -32,7 +31,7 @@ class RealAppVersionHeaderProvider @Inject constructor(
 
 ) : AppVersionHeaderProvider {
     override fun provide(isStub: Boolean): String {
-        return if (isStub){
+        return if (isStub) {
             APP_VERSION_QUALITY_DEFAULT_VALUE
         } else {
             appBuildConfig.versionName
