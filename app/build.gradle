@@ -425,6 +425,8 @@ dependencies {
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 
+    implementation "com.google.mlkit:translate:17.0.3"
+
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
