@@ -28,6 +28,7 @@ import javax.inject.Inject
 class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val qualityAppVersionProvider: QualityAppVersionProvider,
     private val androidFeaturesHeaderProvider: AndroidFeaturesHeaderProvider,
 ) : CustomHeadersPlugin {
 
