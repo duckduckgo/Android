@@ -15,4 +15,5 @@
   -->
 
 <autofill-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity" />
+    android:settingsActivity="com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity"
+    android:supportsInlineSuggestions="true"/>

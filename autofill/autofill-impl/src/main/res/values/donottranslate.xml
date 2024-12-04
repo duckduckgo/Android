@@ -15,5 +15,5 @@
   -->
 
 <resources>
-
+    <string name="autofill_service_suggestion_search_passwords">Search Passwords</string>
 </resources>
