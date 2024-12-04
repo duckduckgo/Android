@@ -18,7 +18,10 @@ package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,9 +32,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.databinding.ItemTabRulesBinding
@@ -130,6 +136,14 @@ class TabSwitcherAdapter(
         holder.rootView.setOnClickListener {
             itemClickListener.onTabRuleSelected()
         }
+        val avd = AnimatedVectorDrawableCompat.create(holder.rootView.context, R.drawable.ic_dax_eyebrow_waggle)
+        holder.binding.logo.setImageDrawable(avd)
+        avd?.registerAnimationCallback(object : Animatable2Compat.AnimationCallback() {
+            override fun onAnimationEnd(drawable: Drawable?) {
+                Handler(Looper.getMainLooper()).postDelayed({ avd.start() }, 1000)
+            }
+        })
+        avd?.start()
         holder.close.setOnClickListener { itemClickListener.onTabDeleted(holder.bindingAdapterPosition, true) }
     }
 
