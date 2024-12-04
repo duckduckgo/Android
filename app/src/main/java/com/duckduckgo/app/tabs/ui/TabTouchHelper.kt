@@ -30,6 +30,9 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.RULES
 import kotlin.math.abs
 
 class TabTouchHelper(
@@ -120,8 +123,9 @@ class TabTouchHelper(
 
     fun onLayoutTypeChanged(layoutType: LayoutType) {
         when (layoutType) {
-            LayoutType.GRID -> setDefaultDragDirs(ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or ItemTouchHelper.DOWN)
-            LayoutType.LIST -> setDefaultDragDirs(ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+            GRID -> setDefaultDragDirs(ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+            LIST -> setDefaultDragDirs(ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+            RULES -> Unit
         }
     }
 

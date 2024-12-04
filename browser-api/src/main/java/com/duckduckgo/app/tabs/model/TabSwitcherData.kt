@@ -27,6 +27,6 @@ data class TabSwitcherData(
     }
 
     enum class LayoutType {
-        GRID, LIST
+        RULES, GRID, LIST
     }
 }

@@ -48,6 +48,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.RULES
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
@@ -220,7 +223,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         this.layoutType = layoutType
         when (layoutType) {
-            LayoutType.GRID -> {
+            GRID -> {
                 val gridLayoutManager = GridLayoutManager(
                     this@TabSwitcherActivity,
                     gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT),
@@ -228,10 +231,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 tabsRecycler.layoutManager = gridLayoutManager
                 showListLayoutButton()
             }
-            LayoutType.LIST -> {
+            LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
                 showGridLayoutButton()
             }
+
+            RULES -> Unit
         }
 
         tabsAdapter.onLayoutTypeChanged(layoutType)
@@ -312,8 +317,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         layoutTypeMenuItem = menu.findItem(R.id.layoutType)
 
         when (layoutType) {
-            LayoutType.GRID -> showListLayoutButton()
-            LayoutType.LIST -> showGridLayoutButton()
+            GRID -> showListLayoutButton()
+            LIST -> showGridLayoutButton()
+            RULES -> Unit
             null -> layoutTypeMenuItem?.isVisible = false
         }
 
@@ -400,6 +406,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             tabsAdapter.onTabMoved(from, to)
             viewModel.onTabMoved(from, to)
         }
+    }
+
+    override fun onTabRuleSelected() {
+        startActivity(Intent(this, TabRulesActivity::class.java))
     }
 
     private fun onTabDraggingStarted() {

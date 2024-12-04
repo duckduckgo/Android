@@ -23,4 +23,5 @@ interface TabSwitcherListener {
     fun onTabSelected(tab: TabEntity)
     fun onTabDeleted(position: Int, deletedBySwipe: Boolean)
     fun onTabMoved(from: Int, to: Int)
+    fun onTabRuleSelected()
 }
