@@ -33,6 +33,14 @@ android {
     lintOptions {
         baseline file("lint-baseline.xml")
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
 dependencies {
@@ -54,6 +62,14 @@ dependencies {
 
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+
+    // Compose
+    api(platform(AndroidX.compose.bom))
+    api(AndroidX.compose.runtime)
+    api(AndroidX.compose.foundation)
+    api(AndroidX.compose.foundation.layout)
+    api(AndroidX.compose.material3)
+    api(AndroidX.compose.ui)
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
