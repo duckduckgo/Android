@@ -18,7 +18,6 @@ package com.duckduckgo.installation.impl.installer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
