@@ -16,6 +16,12 @@
 
 package com.duckduckgo.app.aura
 
+/** Public interface for AuraExperimentManagerImpl */
 interface AuraExperimentManager {
+
+    /**
+     * Initializes the AuraExperimentManager.
+     * This checks if the install source is an Aura package, setting the ATB variant and origin accordingly.
+     */
     suspend fun initialize()
 }

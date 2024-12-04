@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.installation.impl.installer
+package com.duckduckgo.installation.api.installer
 
+/** Public interface for RealInstallSourceExtractor */
 interface InstallSourceExtractor {
+
+    /**
+     * Extracts the installer package name from the PackageManager.
+     */
     fun extract(): String?
 }

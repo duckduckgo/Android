@@ -3,7 +3,7 @@ package com.duckduckgo.app.browser.aura
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
+import com.duckduckgo.installation.api.installer.InstallSourceExtractor
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test

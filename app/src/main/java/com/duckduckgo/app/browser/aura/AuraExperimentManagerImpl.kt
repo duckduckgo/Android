@@ -20,7 +20,7 @@ import com.duckduckgo.app.aura.AuraExperimentManager
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
+import com.duckduckgo.installation.api.installer.InstallSourceExtractor
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
