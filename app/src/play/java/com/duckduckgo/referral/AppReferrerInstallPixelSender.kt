@@ -58,7 +58,7 @@ class AppReferrerInstallPixelSender @Inject constructor(
     }
 
     private fun sendOriginAttribute(originAttribute: String?) {
-        val returningUser = statisticsDataStore.variant == RETURNING_USER_VARIANT
+        val returningUser = statisticsDataStore.variant == RETURNING_USER_VARIANT || appReferrerDataStore.returningUser
 
         val params = mutableMapOf(
             PIXEL_PARAM_LOCALE to appBuildConfig.deviceLocale.toLanguageTag(),

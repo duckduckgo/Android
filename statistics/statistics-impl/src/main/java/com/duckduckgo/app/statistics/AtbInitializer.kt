@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.aura.AuraExperimentManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -49,6 +50,7 @@ class AtbInitializer @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: DaggerSet<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
+    private val auraExperimentManager: AuraExperimentManager,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -73,8 +75,11 @@ class AtbInitializer @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         if (!statisticsDataStore.hasInstallationStatistics) {
-            // First time we initializeAtb
-            statisticsUpdater.initializeAtb()
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                auraExperimentManager.initialize()
+                // First time we initializeAtb
+                statisticsUpdater.initializeAtb()
+            }
         }
     }
 }

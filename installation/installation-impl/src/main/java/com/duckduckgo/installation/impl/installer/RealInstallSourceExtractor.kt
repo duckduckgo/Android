@@ -25,10 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface InstallSourceExtractor {
-    fun extract(): String?
-}
-
 @ContributesBinding(AppScope::class)
 class RealInstallSourceExtractor @Inject constructor(
     private val context: Context,

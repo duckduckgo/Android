@@ -29,6 +29,7 @@ interface AppReferrerDataStore {
     var campaignSuffix: String?
     var installedFromEuAuction: Boolean
     var utmOriginAttributeCampaign: String?
+    var returningUser: Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,6 +51,10 @@ class AppReferenceSharePreferences @Inject constructor(private val context: Cont
         get() = preferences.getBoolean(KEY_INSTALLED_FROM_EU_AUCTION, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_INSTALLED_FROM_EU_AUCTION, value) }
 
+    override var returningUser: Boolean
+        get() = preferences.getBoolean(KEY_RETURNING_USER, false)
+        set(value) = preferences.edit(true) { putBoolean(KEY_RETURNING_USER, value) }
+
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     companion object {
@@ -58,5 +63,6 @@ class AppReferenceSharePreferences @Inject constructor(private val context: Cont
         private const val KEY_ORIGIN_ATTRIBUTE_CAMPAIGN = "KEY_ORIGIN_ATTRIBUTE_CAMPAIGN"
         private const val KEY_CHECKED_PREVIOUSLY = "KEY_CHECKED_PREVIOUSLY"
         private const val KEY_INSTALLED_FROM_EU_AUCTION = "KEY_INSTALLED_FROM_EU_AUCTION"
+        private const val KEY_RETURNING_USER = "KEY_RETURNING_USER"
     }
 }

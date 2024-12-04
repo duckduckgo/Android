@@ -68,6 +68,14 @@ class AppReferrerInstallPixelSenderTest {
     }
 
     @Test
+    fun whenBothUserCheckAndReferrerExtractionFinishedForAuraReturningUserThenPixelSent() = runTest {
+        configureAsAuraReturningUser()
+        configureReferrerCampaign("foo")
+        testee.onAppAtbInitialized()
+        verifyCorrectPixelSent("foo", returningUser = true)
+    }
+
+    @Test
     fun whenBothUserCheckAndReferrerExtractionFinishedForNewUserThenPixelSent() = runTest {
         configureAsNewUser()
         configureReferrerCampaign("foo")
@@ -87,6 +95,10 @@ class AppReferrerInstallPixelSenderTest {
 
     private fun configureAsReturningUser() {
         whenever(statisticsDataStore.variant).thenReturn("ru")
+    }
+
+    private fun configureAsAuraReturningUser() {
+        whenever(appReferrerDataStore.returningUser).thenReturn(true)
     }
 
     private fun configureAsNewUser() {

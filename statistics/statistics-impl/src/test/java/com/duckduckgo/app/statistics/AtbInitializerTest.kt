@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics
 
+import com.duckduckgo.app.aura.AuraExperimentManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -25,6 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -38,6 +40,7 @@ class AtbInitializerTest {
 
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val statisticsUpdater: StatisticsUpdater = mock()
+    private val auraExperimentManager: AuraExperimentManager = mock()
     private var atbInitializerListener = FakeAtbInitializerListener()
 
     @Test
@@ -59,6 +62,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             setOf(atbInitializerListener),
             coroutineRule.testDispatcherProvider,
+            auraExperimentManager,
         )
 
         testee.onPrivacyConfigDownloaded()
@@ -76,6 +80,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             setOf(atbInitializerListener),
             coroutineRule.testDispatcherProvider,
+            auraExperimentManager,
         )
 
         testee.initialize()
@@ -102,12 +107,15 @@ class AtbInitializerTest {
     }
 
     @Test
-    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
+    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAuraExperimentAndAtbInitialized() = runTest {
         configureNeverInitialized()
 
         testee.onPrivacyConfigDownloaded()
 
-        verify(statisticsUpdater).initializeAtb()
+        inOrder(auraExperimentManager, statisticsUpdater) {
+            verify(auraExperimentManager).initialize()
+            verify(statisticsUpdater).initializeAtb()
+        }
     }
 
     private fun configureNeverInitialized() {
@@ -118,6 +126,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             setOf(atbInitializerListener),
             coroutineRule.testDispatcherProvider,
+            auraExperimentManager,
         )
     }
 
@@ -129,6 +138,7 @@ class AtbInitializerTest {
             statisticsUpdater,
             setOf(atbInitializerListener),
             coroutineRule.testDispatcherProvider,
+            auraExperimentManager,
         )
     }
 }
