@@ -45,7 +45,7 @@ class RealInstallSourceExtractor @Inject constructor(
         return context.packageManager.getInstallerPackageName(packageName)
     }
 
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     private fun installationSourceModern(packageName: String): String? {
         return context.packageManager.getInstallSourceInfo(packageName).installingPackageName
     }
