@@ -163,11 +163,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onNewIntent(newIntent: Intent?) {
+    override fun onNewIntent(newIntent: Intent) {
         super.onNewIntent(newIntent)
         dataClearerForegroundAppRestartPixel.registerIntent(newIntent)
         viewModel.resetViewState()
-        newIntent?.let {
+        newIntent.let {
             sendLaunchPixels(it)
             handleVoiceSearchLaunch(it)
         }
