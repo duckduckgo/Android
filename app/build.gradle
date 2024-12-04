@@ -471,6 +471,15 @@ dependencies {
     testImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.archCore.testing
 
+    // Compose
+    implementation(platform(AndroidX.compose.bom))
+    implementation AndroidX.activity.compose
+    implementation AndroidX.compose.runtime
+    implementation AndroidX.compose.foundation
+    implementation AndroidX.compose.material3
+    implementation AndroidX.compose.ui.tooling
+    lintChecks("com.slack.lint.compose:compose-lint-checks:_")
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
