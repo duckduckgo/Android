@@ -184,6 +184,14 @@ android {
             jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
         }
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "_"
+    }
 }
 
 static def isValidSigningConfig(signingConfig) {
