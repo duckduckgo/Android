@@ -26,7 +26,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
@@ -84,7 +85,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
         val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
         val date = formatter.format(Date(subscription.expiresOrRenewsAt))
-        val type = if (subscription.productId == MONTHLY_PLAN) Monthly else Yearly
+        val type = when (subscription.productId) {
+            MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> Monthly
+            else -> Yearly
+        }
 
         _viewState.emit(
             Ready(

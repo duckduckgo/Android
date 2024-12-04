@@ -23,6 +23,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -35,7 +37,9 @@ import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -62,8 +66,14 @@ class CopySubscriptionDataView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.root.setPrimaryText("Copy subscriptions data")
-        binding.root.setSecondaryText("Copies your data to the clipboard")
+        binding.root.setPrimaryText("Subscriptions data")
+
+        findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch(dispatcherProvider.main()) {
+            while (true) {
+                binding.root.setSecondaryText(getData())
+                delay(1.seconds)
+            }
+        }
 
         binding.root.setClickListener {
             copyDataToClipboard()
@@ -74,34 +84,26 @@ class CopySubscriptionDataView @JvmOverloads constructor(
         val clipboardManager = context.getSystemService(ClipboardManager::class.java)
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val auth = authRepository.getAuthToken()
-            val authToken = if (auth.isNullOrBlank()) {
-                "No auth token found"
-            } else {
-                auth
-            }
-
-            val access = authRepository.getAccessToken()
-            val accessToken = if (access.isNullOrBlank()) {
-                "No access token found"
-            } else {
-                access
-            }
-
-            val external = authRepository.getExternalID()
-            val externalId = if (external.isNullOrBlank()) {
-                "No external id found"
-            } else {
-                external
-            }
-            val text = "Auth token is $authToken || Access token is $accessToken || External id is $externalId"
-
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("", text))
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", getData()))
 
             withContext(dispatcherProvider.main()) {
                 Toast.makeText(context, "Data copied to clipboard", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private suspend fun getData(): String {
+        val textParts = listOf(
+            "Account: ${authRepository.getAccount()}",
+            "Subscription: ${authRepository.getSubscription()}",
+            "Entitlements: ${authRepository.getEntitlements()}",
+            "Access token (V2): ${authRepository.getAccessTokenV2()}",
+            "Refresh token (V2): ${authRepository.getRefreshTokenV2()}",
+            "Auth token (V1): ${authRepository.getAuthToken()}",
+            "Access token (V1): ${authRepository.getAccessToken()}",
+        )
+
+        return textParts.joinToString(separator = "\n---\n")
     }
 }
 

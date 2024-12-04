@@ -67,7 +67,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
         SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
-        InformationalEventsMessage(appCoroutineScope, pixelSender),
+        InformationalEventsMessage(subscriptionsManager, appCoroutineScope, pixelSender),
         GetAccessTokenMessage(subscriptionsManager),
     )
 
@@ -220,6 +220,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     }
 
     private class InformationalEventsMessage(
+        private val subscriptionsManager: SubscriptionsManager,
         @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
         private val pixelSender: SubscriptionPixelSender,
     ) : JsMessageHandler {
@@ -232,7 +233,15 @@ class SubscriptionMessagingInterface @Inject constructor(
                 when (jsMessage.method) {
                     "subscriptionsMonthlyPriceClicked" -> pixelSender.reportMonthlyPriceClick()
                     "subscriptionsYearlyPriceClicked" -> pixelSender.reportYearlyPriceClick()
-                    "subscriptionsAddEmailSuccess" -> pixelSender.reportAddEmailSuccess()
+                    "subscriptionsAddEmailSuccess" -> {
+                        pixelSender.reportAddEmailSuccess()
+                        subscriptionsManager.tryRefreshAccessToken()
+                    }
+
+                    "subscriptionsEditEmailSuccess",
+                    "subscriptionsRemoveEmailSuccess",
+                    -> subscriptionsManager.tryRefreshAccessToken()
+
                     "subscriptionsWelcomeAddEmailClicked",
                     "subscriptionsWelcomeFaqClicked",
                     -> {
@@ -244,6 +253,16 @@ class SubscriptionMessagingInterface @Inject constructor(
             }
         }
 
+        private suspend fun SubscriptionsManager.tryRefreshAccessToken() {
+            try {
+                if (isSignedInV2()) {
+                    refreshAccessToken()
+                }
+            } catch (e: Exception) {
+                logcat { e.stackTraceToString() }
+            }
+        }
+
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf(
@@ -251,6 +270,8 @@ class SubscriptionMessagingInterface @Inject constructor(
             "subscriptionsYearlyPriceClicked",
             "subscriptionsUnknownPriceClicked",
             "subscriptionsAddEmailSuccess",
+            "subscriptionsEditEmailSuccess",
+            "subscriptionsRemoveEmailSuccess",
             "subscriptionsWelcomeAddEmailClicked",
             "subscriptionsWelcomeFaqClicked",
         )

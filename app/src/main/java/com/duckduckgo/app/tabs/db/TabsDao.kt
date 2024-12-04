@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.swap
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -173,7 +172,7 @@ abstract class TabsDao {
     @Query("update tabs set lastAccessTime=:lastAccessTime where tabId=:tabId")
     abstract fun updateTabLastAccess(
         tabId: String,
-        lastAccessTime: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC),
+        lastAccessTime: LocalDateTime,
     )
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")

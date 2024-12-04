@@ -20,9 +20,10 @@ import android.os.Message
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.browser.IsSwipingTabsFeatureEnabled
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -31,19 +32,19 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import dagger.android.DaggerActivity
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
-    private val isSwipingTabsFeatureEnabled: IsSwipingTabsFeatureEnabled,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
 ) : TabManager {
@@ -79,7 +80,7 @@ class DefaultTabManager @Inject constructor(
     private var _currentTab: BrowserTabFragment? = null
     override var currentTab: BrowserTabFragment?
         get() {
-            return if (isSwipingTabsFeatureEnabled()) {
+            return if (swipingTabsFeature.isEnabled) {
                 tabPagerAdapter.currentFragment
             } else {
                 _currentTab
@@ -90,7 +91,7 @@ class DefaultTabManager @Inject constructor(
         }
 
     override fun onSelectedTabChanged(tabId: String) {
-        if (isSwipingTabsFeatureEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             Timber.d("### TabManager.onSelectedTabChanged: $tabId")
             tabPagerAdapter.onSelectedTabChanged(tabId)
             if (keepSingleTab) {
@@ -103,7 +104,7 @@ class DefaultTabManager @Inject constructor(
 
     override fun onTabsUpdated(updatedTabIds: List<String>) {
         Timber.d("### TabManager.onTabsUpdated: $updatedTabIds")
-        if (isSwipingTabsFeatureEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             if (keepSingleTab) {
                 updatedTabIds.firstOrNull { it == getSelectedTabId() }?.let {
                     tabPagerAdapter.onTabsUpdated(listOf(it))
@@ -120,7 +121,7 @@ class DefaultTabManager @Inject constructor(
         message: Message,
         sourceTabId: String?,
     ) {
-        if (isSwipingTabsFeatureEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
                 tabPagerAdapter.setMessageForNewFragment(message)
                 browserActivity.viewModel.onNewTabRequested(sourceTabId)
@@ -200,10 +201,7 @@ class DefaultTabManager @Inject constructor(
                         tabId = tab.tabId,
                         url = tab.url,
                         skipHome = tab.skipHome,
-                        isExternal = browserActivity.intent?.getBooleanExtra(
-                            BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
-                            false,
-                        ) == true,
+                        isExternal = browserActivity.intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false,) == true,
                     )
                 }
                 return@launch
@@ -250,7 +248,7 @@ class DefaultTabManager @Inject constructor(
     }
 
     private fun clearStaleTabs(updatedTabs: List<String>?) {
-        if (isSwipingTabsFeatureEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             return
         }
 

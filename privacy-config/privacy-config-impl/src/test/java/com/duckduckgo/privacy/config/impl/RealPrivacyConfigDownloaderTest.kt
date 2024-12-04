@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Error
@@ -27,6 +28,7 @@ import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -35,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import retrofit2.Response
 
 @RunWith(AndroidJUnit4::class)
@@ -45,40 +48,81 @@ class RealPrivacyConfigDownloaderTest {
     lateinit var testee: RealPrivacyConfigDownloader
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
-    private val pluginPoint = FakeFakePrivacyConfigCallbackPluginPoint(listOf(FakePrivacyConfigCallbackPlugin()))
+    private val pixel: Pixel = mock()
+    private val oneCallback = FakePrivacyConfigCallbackPlugin()
+    private val anotherCallback = FakePrivacyConfigCallbackPlugin()
+    private val callbacks = listOf(oneCallback, anotherCallback)
+    private val pluginPoint = FakeFakePrivacyConfigCallbackPluginPoint(callbacks)
 
     @Before
     fun before() {
-        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint)
+        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel)
     }
 
     @Test
-    fun whenDownloadIsNotSuccessfulThenReturnFalse() =
-        runTest {
-            testee =
-                RealPrivacyConfigDownloader(
-                    TestFailingPrivacyConfigService(),
-                    mockPrivacyConfigPersister,
-                    pluginPoint,
-                )
-            assertTrue(testee.download() is Error)
-        }
+    fun whenDownloadIsNotSuccessfulThenReturnAndPixelError() = runTest {
+        testee =
+            RealPrivacyConfigDownloader(
+                TestFailingPrivacyConfigService(),
+                mockPrivacyConfigPersister,
+                pluginPoint,
+                pixel,
+            )
+        assertTrue(testee.download() is Error)
+        verify(pixel).fire("m_privacy_config_download_error")
+    }
 
     @Test
-    fun whenDownloadIsSuccessfulThenReturnTrue() =
-        runTest { assertTrue(testee.download() is Success) }
+    fun whenDownloadIsEmptyThenReturnAndPixelError() = runTest {
+        testee =
+            RealPrivacyConfigDownloader(
+                TestEmptyPrivacyConfigService(),
+                mockPrivacyConfigPersister,
+                pluginPoint,
+                pixel,
+            )
+        assertTrue(testee.download() is Error)
+        verify(pixel).fire("m_privacy_config_empty_error")
+    }
 
     @Test
-    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() =
-        runTest {
-            testee.download()
+    fun whenDownloadIsSuccessfulThenReturnTrue() = runTest {
+        assertTrue(testee.download() is Success)
+    }
 
-            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), any())
+    @Test
+    fun whenDownloadIsSuccessfulThenCallCallback() = runTest {
+        testee.download()
+
+        callbacks.forEach {
+            assertEquals(1, it.downloadCallCount)
         }
+    }
+
+    @Test
+    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() = runTest {
+        testee.download()
+
+        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any(), any())
+    }
+
+    @Test
+    fun whenDownloadStoreErrorThenFireStoreErrorPixel() = runTest {
+        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow()
+
+        testee.download()
+        verify(pixel).fire("m_privacy_config_store_error")
+    }
 
     class TestFailingPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): Response<JsonPrivacyConfig> {
             throw Exception()
+        }
+    }
+
+    class TestEmptyPrivacyConfigService : PrivacyConfigService {
+        override suspend fun privacyConfig(): Response<JsonPrivacyConfig> {
+            return Response.success(null)
         }
     }
 

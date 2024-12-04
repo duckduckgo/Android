@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Хранение паролей можно отключить в любой момент.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Открыть Настройки</string>
+
+    <string name="newTabPageShortcutPasswords">Пароли</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импорт паролей из Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из Google: %1$d</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из CSV: %1$d</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Импортировать пароли из Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Импортировать пароли из Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизировать пароли с DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизировать пароли с DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Открыть пароли Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортировать из настольного браузера</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Импорт в DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Импортирование завершено</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Понятно</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Не удалось импортировать пароли</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Пропущено (дубликаты и недействительные): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Импортировано паролей: <b>%1$d</b>]]></string>
+
 </resources>

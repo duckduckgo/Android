@@ -240,4 +240,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Jebkurā brīdī varat izslēgt paroļu saglabāšanu.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Atvērt iestatījumus</string>
+
+    <string name="newTabPageShortcutPasswords">Paroles</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importēt Google paroles</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importēt paroles no Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importēt paroles no Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhronizēt DuckDuckGo paroles</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhronizēt DuckDuckGo paroles</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importē savas Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Atvērt Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Izvēlies CSV failu</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importēt no galddatora pārlūka</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importēt uz DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importēšana pabeigta</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Sapratu</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Paroļu importēšana neizdevās</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Izlaists (dublikāts vai nederīgs): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importētās paroles: <b>%1$d</b>]]></string>
+
 </resources>

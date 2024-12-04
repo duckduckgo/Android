@@ -226,6 +226,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -273,6 +274,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
 import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
@@ -1941,7 +1943,11 @@ class BrowserTabFragment :
         val context = context ?: return
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId))
+            val reportFlow = when (data.reportFlow) {
+                PROMPT -> BrokenSiteFormReportFlow.PROMPT
+                else -> BrokenSiteFormReportFlow.MENU
+            }
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId, reportFlow))
                 ?.let { startActivity(it) }
         } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
