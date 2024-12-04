@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Voit poistaa salasanojen tallennuksen käytöstä milloin tahansa.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Avaa asetukset</string>
+
+    <string name="newTabPageShortcutPasswords">Salasanat</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Tuo Google-salasanat</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d Googlesta tuotua salasanaa</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d salasanaa tuotu CSV-tiedostosta</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Tuo salasanat Googlesta</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Tuo salasanat Googlesta</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronoi DuckDuckGo-salasanat</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronoi DuckDuckGo-salasanat</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Tuo Google-salasanasi</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Avaa Google Salasanat</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Valitse CSV-tiedosto</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Tuo tietokoneen selaimesta</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Tuo DuckDuckGo:hon</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Tuonti on valmis</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Selvä</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Salasanojen tuonti epäonnistui</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ohitettu (kaksoiskappale tai virheellinen): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Tuodut salasanat: <b>%1$d</b>]]></string>
+
 </resources>

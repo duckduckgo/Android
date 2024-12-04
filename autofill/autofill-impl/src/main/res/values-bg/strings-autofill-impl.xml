@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Можете да изключите запазването на пароли по всяко време.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Отвори Настройки</string>
+
+    <string name="newTabPageShortcutPasswords">Пароли</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импортиране на пароли от Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Импортиране на пароли от Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Импортиране на пароли от Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизиране на паролите от DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизиране на паролите от DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Импортиране на вашите пароли от Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Отваряне на паролите от Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Избор на CSV файл</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортиране от браузър на работния плот</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Импортиране в DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Импортирането е завършено</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Разбрах</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Импортирането на паролата е неуспешно</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Пропуснати (дублирани или невалидни): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Импортирани пароли: <b>%1$d</b>]]></string>
+
 </resources>

@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Puoi disattivare il salvataggio della password in qualsiasi momento.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Apri Impostazioni</string>
+
+    <string name="newTabPageShortcutPasswords">Password</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importa le password di Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da file CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importa le password da Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importa le password da Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizza le password di DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizza le password di DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importa le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Apri le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Scegli un file CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importa dal browser desktop</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importa in DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importazione completata</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Fatto</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Importazione password non riuscita</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorato (duplicato o non valido): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Password importate: <b>%1$d</b>]]></string>
+
 </resources>
