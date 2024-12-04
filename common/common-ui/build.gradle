@@ -34,6 +34,14 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
 dependencies {
@@ -56,6 +64,16 @@ dependencies {
 
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+
+    // Compose
+    api(platform(AndroidX.compose.bom))
+    api(AndroidX.compose.runtime)
+    api(AndroidX.compose.foundation)
+    api(AndroidX.compose.foundation.layout)
+    api(AndroidX.compose.material3)
+    api(AndroidX.compose.ui)
+
+    api lintChecks("com.slack.lint.compose:compose-lint-checks:_")
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
