@@ -58,7 +58,7 @@
     <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
     <string name="privacyProFaq">Need help with Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages.</string>
+    <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
     <string name="subscriptionStatusSubscribed">Subscribed</string>
     <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
 
@@ -66,6 +66,7 @@
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Protect your connection and identity with Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">Includes our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Includes our VPN and Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
     <string name="subscriptionSettingWaiting">Your subscription is being activated</string>
@@ -73,12 +74,15 @@
     <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
     <string name="subscriptionSettingExpiredSubtitle">Subscribe again to continue using Privacy\u00A0Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">View Plans</string>
-
+    <string name="subscriptionSettingSectionSubscription">Subscription</string>
+    <string name="subscriptionSettingRemoveFromDevice">Remove From This Device</string>
+    <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
+    <string name="subscriptionSettingSendFeedback">Send Feedback</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
     <string name="purchaseCompletedText">Your purchase was successful.</string>
-    <string name="purchaseRecoveredText">Your already had a subscription and we\'ve recovered that for you.</string>
+    <string name="purchaseRecoveredText">You already had a subscription and we\'ve recovered that for you.</string>
     <string name="purchaseErrorTitle">Something went wrong</string>
     <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
 
@@ -152,4 +156,11 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Please give us your feedback…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">What feature would you like to see?</string>
+
+    <!-- Activity titles -->
+    <string name="activitySubscriptions">Subscriptions</string>
+    <string name="activitySubscriptionSettings">Subscription Settings</string>
+    <string name="activityActivateSubscription">Activate Subscription</string>
+    <string name="activityPir" translatable="false">Privacy Pro</string>
+    <string name="activitySendFeedback">Send Feedback</string>
 </resources>

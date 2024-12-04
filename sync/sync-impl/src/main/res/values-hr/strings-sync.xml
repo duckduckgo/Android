@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Podijeli poveznicu za preuzimanje</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Poveznica je kopirana</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Prijeđi na drugu sinkronizaciju?</string>
+    <string name="sync_dialog_switch_account_primary_button">Prebaci sinkronizaciju</string>
+    <string name="sync_dialog_switch_account_secondary_button">Odustani</string>
+    <string name="sync_dialog_switch_account_description">Ovaj je uređaj već sinkroniziran. Jesi li siguran da ga želiš sinkronizirati s drugom sigurnosnom kopijom ili uređajem? Prebacivanjem se neće ukloniti nijedan podatak koji je već sinkroniziran s ovim uređajem.</string>
 </resources>

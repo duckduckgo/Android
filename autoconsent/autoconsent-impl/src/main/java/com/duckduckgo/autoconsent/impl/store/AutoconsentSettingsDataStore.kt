@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 interface AutoconsentSettingsDataStore {
     var userSetting: Boolean
     var firstPopupHandled: Boolean
+    fun invalidateCache()
 }
 
 class RealAutoconsentSettingsDataStore constructor(
@@ -38,7 +39,15 @@ class RealAutoconsentSettingsDataStore constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
     private var cachedInternalUserSetting: Boolean? = null
-    private val defaultValue: Boolean by lazy { autoconsentFeature.onByDefault().isEnabled() }
+
+    private var _defaultValue: Boolean? = null
+    private val defaultValue: Boolean
+        get() {
+            if (_defaultValue == null) {
+                _defaultValue = autoconsentFeature.onByDefault().isEnabled()
+            }
+            return _defaultValue!!
+        }
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -67,6 +76,13 @@ class RealAutoconsentSettingsDataStore constructor(
                 putBoolean(AUTOCONSENT_FIRST_POPUP_HANDLED, value)
             }
         }
+
+    override fun invalidateCache() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            _defaultValue = autoconsentFeature.onByDefault().isEnabled()
+            cachedInternalUserSetting = null // invalidate cache
+        }
+    }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.autoconsent.store.settings"

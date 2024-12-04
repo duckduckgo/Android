@@ -32,5 +32,10 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
      * Use this parameter to launch the site breakage reporting form.
      * @param tabId The tab ID
      */
-    data class BrokenSiteForm(override val tabId: String) : PrivacyDashboardHybridScreenParams()
+    data class BrokenSiteForm(override val tabId: String, val reportFlow: BrokenSiteFormReportFlow) : PrivacyDashboardHybridScreenParams() {
+        enum class BrokenSiteFormReportFlow {
+            MENU,
+            PROMPT,
+        }
+    }
 }

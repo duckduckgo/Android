@@ -240,4 +240,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Poți dezactiva oricând salvarea parolelor.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Deschide Setări</string>
+
+    <string name="newTabPageShortcutPasswords">Parole</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importă parolele de la Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parole importate de la Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parole importate din CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importă parole de la Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importă parole de la Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizează parolele DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizează parolele DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importă parolele tale Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Deschide parolele Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Alege un fișier CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importă din browserul pentru desktop</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importă în DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import finalizat</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Am înțeles</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Importarea parolelor nu a reușit</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Omise (duplicate sau nevalide): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Parole importate: <b>%1$d</b>]]></string>
+
 </resources>

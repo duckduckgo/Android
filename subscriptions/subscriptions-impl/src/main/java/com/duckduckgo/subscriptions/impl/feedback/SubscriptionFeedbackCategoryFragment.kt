@@ -18,19 +18,30 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackCategoryBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layout.content_feedback_category) {
     private val binding: ContentFeedbackCategoryBinding by viewBinding()
+
+    @Inject
+    lateinit var authRepository: AuthRepository
 
     override fun onViewCreated(
         view: View,
@@ -51,6 +62,18 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
         binding.categoryPir.setOnClickListener {
             listener.onUserClickedCategory(PIR)
         }
+
+        lifecycleScope.launch {
+            val pirAvailable = isPirCategoryAvailable()
+            withStarted {
+                binding.categoryPir.isVisible = pirAvailable
+            }
+        }
+    }
+
+    private suspend fun isPirCategoryAvailable(): Boolean {
+        val subscription = authRepository.getSubscription() ?: return false
+        return subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
     }
 
     interface Listener {

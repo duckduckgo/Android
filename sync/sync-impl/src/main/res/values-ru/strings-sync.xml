@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Поделиться ссылкой для загрузки</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Переключиться на другую синхронизацию?</string>
+    <string name="sync_dialog_switch_account_primary_button">Переключить синхронизацию</string>
+    <string name="sync_dialog_switch_account_secondary_button">Отменить</string>
+    <string name="sync_dialog_switch_account_description">Это устройство уже синхронизировано. Действительно синхронизировать его с другой резервной копией или устройством? Переключение не приведет к удалению данных, синхронизированных с этим устройством ранее.</string>
 </resources>

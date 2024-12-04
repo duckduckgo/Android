@@ -34,8 +34,15 @@ import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.SendTdsIntent
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ShowSavedSitesClearedConfirmation
 import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
+import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -98,6 +105,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
+        binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
     }
 
     private fun observeViewModel() {
@@ -119,14 +127,14 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun processCommand(it: Command?) {
+    private fun processCommand(it: Command) {
         when (it) {
-            is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.OpenUASelector -> showUASelector()
-            is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
-            is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
-            is Command.CustomTabs -> showCustomTabs()
-            else -> TODO()
+            is SendTdsIntent -> sendTdsIntent()
+            is OpenUASelector -> showUASelector()
+            is ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
+            is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is CustomTabs -> showCustomTabs()
+            Notifications -> showNotifications()
         }
     }
 
@@ -165,6 +173,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showCustomTabs() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(CustomTabsInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showNotifications() {
+        startActivity(NotificationsActivity.intent(this))
     }
 
     companion object {

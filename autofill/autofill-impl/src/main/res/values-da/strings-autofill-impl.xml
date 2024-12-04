@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Du kan slå lagring af adgangskoder fra når som helst.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Åbn indstillinger</string>
+
+    <string name="newTabPageShortcutPasswords">Adgangskoder</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importer Google-adgangskoder</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d adgangskoder importeret fra Google.</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d adgangskoder importeret fra CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importer adgangskoder fra Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importer adgangskoder fra Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkroniser DuckDuckGo-adgangskoder</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkroniser DuckDuckGo-adgangskoder</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importer dine Google-adgangskoder</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Åbn Google-adgangskoder</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Vælg en CSV-fil</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer fra browseren på computeren</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importer til DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import fuldført</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Forstået</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Import af adgangskode mislykkedes</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Sprunget over (duplikerede eller ugyldige): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Adgangskoder importeret: <b>%1$d</b>]]></string>
+
 </resources>

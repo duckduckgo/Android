@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Del downloadlink</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopieret</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Skift til en anden synkronisering?</string>
+    <string name="sync_dialog_switch_account_primary_button">Skift synkronisering</string>
+    <string name="sync_dialog_switch_account_secondary_button">Annuller</string>
+    <string name="sync_dialog_switch_account_description">Denne enhed er allerede synkroniseret. Er du sikker på, at du vil synkronisere den med en anden sikkerhedskopi eller enhed? Et skifte fjerner ikke data, der allerede er synkroniseret til denne enhed.</string>
 </resources>

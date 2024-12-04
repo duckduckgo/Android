@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">A jelszó mentése bármikor kikapcsolható.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Beállítások megnyitása</string>
+
+    <string name="newTabPageShortcutPasswords">Jelszavak</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Google-jelszavak importálása</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d jelszó importálva a Google-ból</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d jelszó importálva CSV-fájlból</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Jelszavak importálása a Google-ból</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Jelszavak importálása a Google-ból</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-jelszavak szinkronizálása</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-jelszavak szinkronizálása</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Google-jelszavaid importálása</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Nyisd meg a Google Jelszókezelőt</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Válassz egy CSV-fájlt</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importálás asztali böngészőből</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importálás a DuckDuckGóba</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importálás kész</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Megvan</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">A jelszó importálása nem sikerült</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Kihagyott (ismétlődő vagy érvénytelen): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importált jelszó: <b>%1$d</b>]]></string>
+
 </resources>

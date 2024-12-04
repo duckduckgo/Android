@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Zdieľať odkaz na stiahnutie</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz bol skopírovaný</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Prepnúť na inú synchronizáciu?</string>
+    <string name="sync_dialog_switch_account_primary_button">Prepnutie synchronizácie</string>
+    <string name="sync_dialog_switch_account_secondary_button">Zrušiť</string>
+    <string name="sync_dialog_switch_account_description">Toto zariadenie je už synchronizované. Naozaj ho že chceš synchronizovať s inou zálohou alebo zariadením? Prepínanie neodstráni žiadne údaje, ktoré už boli synchronizované s týmto zariadením.</string>
 </resources>

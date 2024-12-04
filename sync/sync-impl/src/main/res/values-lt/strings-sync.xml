@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Bendrinti atsisiuntimo nuorodą</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Perjungti į kitą sinchronizaciją?</string>
+    <string name="sync_dialog_switch_account_primary_button">Perjungti sinchronizavimą</string>
+    <string name="sync_dialog_switch_account_secondary_button">Atšaukti</string>
+    <string name="sync_dialog_switch_account_description">Šis įrenginys jau sinchronizuotas, ar tikrai norite jį sinchronizuoti su kita atsargine kopija ar įrenginiu? Perjungiant nebus pašalinti jokie duomenys, jau sinchronizuoti su šiuo įrenginiu.</string>
 </resources>

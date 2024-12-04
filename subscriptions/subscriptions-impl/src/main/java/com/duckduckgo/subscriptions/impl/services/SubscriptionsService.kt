@@ -19,10 +19,11 @@ package com.duckduckgo.subscriptions.impl.services
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface SubscriptionsService {
@@ -45,6 +46,9 @@ interface SubscriptionsService {
     suspend fun feedback(
         @Body feedbackBody: FeedbackBody,
     ): FeedbackResponse
+
+    @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
+    suspend fun features(@Path("sku") sku: String): FeaturesResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -91,4 +95,8 @@ data class FeedbackBody(
 
 data class FeedbackResponse(
     val message: String,
+)
+
+data class FeaturesResponse(
+    val features: List<String>,
 )

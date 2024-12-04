@@ -30,13 +30,12 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +56,7 @@ class TabDataRepository @Inject constructor(
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : TabRepository {
@@ -199,7 +199,7 @@ class TabDataRepository @Inject constructor(
     }
 
     override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
-        val now = LocalDateTime.now(ZoneOffset.UTC)
+        val now = timeProvider.localDateTimeNow()
         val start = now.minusDays(accessOlderThan)
         val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive
         return tabsDao.tabs().filter {
@@ -245,7 +245,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun updateTabLastAccess(tabId: String) {
         databaseExecutor().scheduleDirect {
-            tabsDao.updateTabLastAccess(tabId)
+            tabsDao.updateTabLastAccess(tabId, timeProvider.localDateTimeNow())
         }
     }
 

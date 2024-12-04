@@ -28,6 +28,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
@@ -39,10 +40,14 @@ import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.time.Instant
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
-    suspend fun getExternalID(): String?
+    suspend fun setAccessTokenV2(accessToken: AccessToken?)
+    suspend fun getAccessTokenV2(): AccessToken?
+    suspend fun setRefreshTokenV2(refreshToken: RefreshToken?)
+    suspend fun getRefreshTokenV2(): RefreshToken?
     suspend fun setAccessToken(accessToken: String?)
     suspend fun getAccessToken(): String?
     suspend fun setAuthToken(authToken: String?)
@@ -56,6 +61,8 @@ interface AuthRepository {
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
     suspend fun canSupportEncryption(): Boolean
+    suspend fun setFeatures(basePlanId: String, features: Set<String>)
+    suspend fun getFeatures(basePlanId: String): Set<String>
 }
 
 @Module
@@ -80,6 +87,15 @@ internal class RealAuthRepository constructor(
 
     private val moshi = Builder().build()
 
+    private val featuresAdapter by lazy {
+        val type = Types.newParameterizedType(
+            Map::class.java,
+            String::class.java,
+            Set::class.java,
+        )
+        moshi.adapter<Map<String, Set<String>>>(type)
+    }
+
     private inline fun <reified T> Moshi.listToJson(list: List<T>): String {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).toJson(list)
     }
@@ -87,21 +103,40 @@ internal class RealAuthRepository constructor(
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).fromJson(jsonString)
     }
 
+    override suspend fun setAccessTokenV2(accessToken: AccessToken?) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.accessTokenV2 = accessToken?.jwt
+        subscriptionsDataStore.accessTokenV2ExpiresAt = accessToken?.expiresAt
+        updateSerpPromoCookie()
+    }
+
+    override suspend fun getAccessTokenV2(): AccessToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.accessTokenV2 ?: return@withContext null
+        val expiresAt = subscriptionsDataStore.accessTokenV2ExpiresAt ?: return@withContext null
+        AccessToken(jwt, expiresAt)
+    }
+
+    override suspend fun setRefreshTokenV2(refreshToken: RefreshToken?) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.refreshTokenV2 = refreshToken?.jwt
+        subscriptionsDataStore.refreshTokenV2ExpiresAt = refreshToken?.expiresAt
+    }
+
+    override suspend fun getRefreshTokenV2(): RefreshToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.refreshTokenV2 ?: return@withContext null
+        val expiresAt = subscriptionsDataStore.refreshTokenV2ExpiresAt ?: return@withContext null
+        RefreshToken(jwt, expiresAt)
+    }
+
     override suspend fun setEntitlements(entitlements: List<Entitlement>) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.entitlements = moshi.listToJson(entitlements)
     }
 
-    override suspend fun getEntitlements(): List<Entitlement> {
-        return subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
-    }
-
-    override suspend fun getExternalID(): String? = withContext(dispatcherProvider.io()) {
-        return@withContext subscriptionsDataStore.externalId
+    override suspend fun getEntitlements(): List<Entitlement> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.entitlements?.let { moshi.parseList(it) } ?: emptyList()
     }
 
     override suspend fun setAccessToken(accessToken: String?) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.accessToken = accessToken
-        serpPromo.injectCookie(accessToken)
+        updateSerpPromoCookie()
     }
 
     override suspend fun setAuthToken(authToken: String?) = withContext(dispatcherProvider.io()) {
@@ -167,7 +202,41 @@ internal class RealAuthRepository constructor(
     override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.canUseEncryption()
     }
+
+    override suspend fun setFeatures(
+        basePlanId: String,
+        features: Set<String>,
+    ) = withContext(dispatcherProvider.io()) {
+        val featuresMap = subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.toMutableMap() ?: mutableMapOf()
+
+        featuresMap[basePlanId] = features
+
+        subscriptionsDataStore.subscriptionFeatures = featuresAdapter.toJson(featuresMap)
+    }
+
+    override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.subscriptionFeatures
+            ?.let(featuresAdapter::fromJson)
+            ?.get(basePlanId) ?: emptySet()
+    }
+
+    private suspend fun updateSerpPromoCookie() = withContext(dispatcherProvider.io()) {
+        val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }
+        serpPromo.injectCookie(accessToken)
+    }
 }
+
+data class AccessToken(
+    val jwt: String,
+    val expiresAt: Instant,
+)
+
+data class RefreshToken(
+    val jwt: String,
+    val expiresAt: Instant,
+)
 
 data class Account(
     val email: String?,
@@ -207,8 +276,3 @@ fun List<Entitlement>.toProductList(): List<Product> {
         emptyList()
     }
 }
-
-data class Entitlement(
-    val name: String,
-    val product: String,
-)

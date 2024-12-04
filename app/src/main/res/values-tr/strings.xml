@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Belki Sonra</string>
     <string name="preciseLocationSystemDialogNeverAllow">Bu Site için Bir Daha Sorma</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">%1$s için konuma erişim izni verilsin mi?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Anonim konumunuzu sadece size daha yakın, daha alakalı sonuçlar sunmak için kullanırız. Bu tercihi daha sonra dilediğiniz zaman değiştirebilirsiniz.</string>
     <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonim konumunuzu yalnızca size daha yakın, daha iyi sonuçlar sunmak için kullanıyoruz. Ayrı ayrı sitelere verdiğiniz konum erişimi izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Her zaman</string>
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
     <string name="preciseLocationSiteDialogDenyAlways">Her Zaman Reddet</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
-    <string name="permissionsPerWebsiteAskSetting">Sor</string>
+    <string name="permissionsPerWebsiteAskSetting">Her seferinde sor</string>
     <string name="permissionsPerWebsiteDenySetting">Reddet</string>
     <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için \"Sor\" devre dışı bırakıldı</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için devre dışı</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
 
     <!-- Notify Me View on Downloads -->
