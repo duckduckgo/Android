@@ -135,7 +135,7 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                app:primaryText="Subscription" />
+                app:primaryText="@string/subscriptionSettingSectionSubscription" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/changePlan"
@@ -157,7 +157,7 @@
                     android:id="@+id/removeDevice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="Remove From This Device" />
+                    app:primaryText="@string/subscriptionSettingRemoveFromDevice" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
@@ -166,7 +166,7 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    app:primaryText="Help and Support" />
+                    app:primaryText="@string/subscriptionSettingSectionHelpAndSupport" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/faq"
@@ -185,7 +185,7 @@
                 android:id="@+id/sendFeedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Send Feedback" />
+                app:primaryText="@string/subscriptionSettingSendFeedback" />
 
         </LinearLayout>
     </ScrollView>

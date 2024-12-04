@@ -24,8 +24,10 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -34,9 +36,14 @@ import javax.inject.Inject
 class DuckPlayerSettingsTitle @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: Pixel,
+    private val settingsFeature: NewSettingsFeature,
 ) : DuckPlayerSettingsPlugin {
     override fun getView(context: Context): View {
         return OneLineListItem(context).apply {
+            if (settingsFeature.self().isEnabled()) {
+                setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
+            }
+
             setPrimaryText(context.getString(R.string.duck_player_setting_title))
             setOnClickListener {
                 pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED)

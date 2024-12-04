@@ -32,6 +32,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
@@ -142,6 +143,17 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(false)
     fun serpPromoCookie(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun authApiV2(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun isLaunchedROW(): Toggle
+
+    // Kill switch
+    @Toggle.DefaultValue(true)
+    fun featuresApi(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

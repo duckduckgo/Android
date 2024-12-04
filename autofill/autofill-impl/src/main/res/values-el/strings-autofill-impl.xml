@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Μπορείτε να απενεργοποιήσετε την αποθήκευση κωδικού πρόσβασης οποιαδήποτε στιγμή.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Άνοιγμα ρυθμίσεων</string>
+
+    <string name="newTabPageShortcutPasswords">Κωδικοί πρόσβασης</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Εισαγωγή κωδικών πρόσβασης Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από το Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Άνοιγμα κωδικών πρόσβασης Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Εισαγωγή στο DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Η εισαγωγή ολοκληρώθηκε</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Το έπιασα</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Η εισαγωγή κωδικού πρόσβασης απέτυχε</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Παραλείφθηκε (διπλότυπο ή μη έγκυρο): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Κωδικοί πρόσβασης που εισήχθησαν: <b>%1$d</b>]]></string>
+
 </resources>

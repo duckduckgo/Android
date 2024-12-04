@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.squareup.moshi.Json
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -44,15 +44,7 @@ interface AuthService {
      */
     @GET("https://quack.duckduckgo.com/api/auth/access-token")
     suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
-
-    /**
-     * Deletes an account
-     */
-    @POST("https://quack.duckduckgo.com/api/auth/account/delete")
-    suspend fun delete(@Header("Authorization") authorization: String): DeleteAccountResponse
 }
-
-data class DeleteAccountResponse(val status: String)
 
 data class StoreLoginBody(
     val signature: String,

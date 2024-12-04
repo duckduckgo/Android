@@ -255,7 +255,7 @@
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Conferma</string>
     <string name="dialogSave">Salva</string>
-    <string name="delete">Cancella</string>
+    <string name="delete">Elimina</string>
     <string name="edit">Modifica</string>
     <string name="remove">Rimuovi</string>
     <string name="removeAll">Elimina tutto</string>
@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Forse più tardi</string>
     <string name="preciseLocationSystemDialogNeverAllow">Non chiedere più per questo sito</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Consenti a %1$s di accedere alla tua posizione?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Usiamo la tua posizione anonima solo per offrirti risultati migliori, più vicini a te. Puoi sempre cambiare idea in seguito.</string>
     <string name="preciseLocationSiteDialogSubtitle">Puoi gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti in Impostazioni.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Usiamo la tua posizione anonima solo per offrirti risultati migliori, più vicini a te. Puoi gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti in Impostazioni.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Sempre</string>
     <string name="preciseLocationSiteDialogAllowOnce">Solo per questa sessione</string>
     <string name="preciseLocationSiteDialogDenyAlways">Nega sempre</string>
@@ -633,7 +633,7 @@
     <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
     <string name="downloadsFileNotFoundErrorMessage">Il file non esiste più</string>
     <string name="downloadsItemMenuShare">Condividi</string>
-    <string name="downloadsItemMenuDelete">Cancella</string>
+    <string name="downloadsItemMenuDelete">Elimina</string>
     <string name="downloadsItemMenuCancel">Annulla</string>
     <string name="downloadsActivityMenuDeleteAll">Elimina tutto</string>
     <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s eliminato</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Non esistono ancora siti</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorizzazioni rimosse per tutti i siti</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorizzazioni per \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Chiedi</string>
+    <string name="permissionsPerWebsiteAskSetting">Chiedi ogni volta</string>
     <string name="permissionsPerWebsiteDenySetting">Rifiuta</string>
     <string name="permissionsPerWebsiteAllowSetting">Consenti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">\"Chiedi\" disattivato per tutti i siti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Disattivato per tutti i siti</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorizzazione %1$s per %2$s</string>
 
     <!-- Notify Me View on Downloads -->

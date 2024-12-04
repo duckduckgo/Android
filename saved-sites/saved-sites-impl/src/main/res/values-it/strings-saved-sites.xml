@@ -106,5 +106,5 @@
     <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Eliminare questa cartella dei segnalibri?</string>
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Questa operazione eliminerà la tua cartella dei segnalibri &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annulla</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Cancella</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Elimina</string>
 </resources>

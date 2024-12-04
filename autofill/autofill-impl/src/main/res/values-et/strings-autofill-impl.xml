@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Paroolide salvestamise saad igal ajal välja lülitada.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Ava sätted</string>
+
+    <string name="newTabPageShortcutPasswords">Paroolid</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Impordi Google\'i paroolid</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi Google\'ist</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi CSV-st</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Impordi paroolid Google\'ist</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Impordi paroolid Google\'ist</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo paroolide sünkroonimine</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sünkrooni DuckDuckGo paroolid</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Impordi oma Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Ava Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Impordi töölaua brauserist</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Impordi DuckDuckGo-sse</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import on lõpetatud</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Sain aru</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Parooli import ebaõnnestus</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Vahele jäetud (duplikaat või kehtetu): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Imporditud paroolid: <b>%1$d</b>]]></string>
+
 </resources>

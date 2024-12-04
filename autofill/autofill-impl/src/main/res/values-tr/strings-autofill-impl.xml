@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Parola kaydetmeyi istediğiniz zaman kapatabilirsiniz.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Ayarları Aç</string>
+
+    <string name="newTabPageShortcutPasswords">Şifreler</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Google Şifrelerini İçe Aktar</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d şifre Google\'dan içe aktarıldı</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d şifre CSV\'den içe aktarıldı</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Google\'dan Şifreleri İçe Aktar</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Google\'dan Şifreleri İçe Aktar</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo Şifrelerini Senkronize Et</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo Şifrelerini Senkronize Et</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Google Şifrelerinizi İçe Aktarın</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Google Şifrelerini Aç</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Bir CSV dosyası seç</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Masaüstü Tarayıcısından İçe Aktar</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">DuckDuckGo\'ya Aktar</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">İçe Aktarma Tamamlandı</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Anladım</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Şifre içe aktarma başarısız</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Atlandı (yinelenen veya geçersiz): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[İçe aktarılan şifreler: <b>%1$d</b>]]></string>
+
 </resources>

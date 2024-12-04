@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Shranjevanje gesel lahko kadar koli izklopite.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Odpri nastavitve</string>
+
+    <string name="newTabPageShortcutPasswords">Gesla</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Uvozi gesla iz Googla</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Št. gesel, uvoženih iz Googla: %1$d</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Št. gesel, uvoženih iz CSV: %1$d</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Uvozi gesla iz Googla</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Uvozi gesla iz Googla</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhroniziraj gesla DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhroniziraj gesla DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Uvozite svoja gesla iz Googla</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Odprite gesla v Googlu</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Izberite datoteko CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Uvoz iz namiznega brskalnika</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Uvoz v DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Uvoz je dokončan</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Razumem</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Uvoz gesel ni uspel</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Preskočeno (podvojeno ali neveljavno): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Uvožena gesla: <b>%1$d</b>]]></string>
+
 </resources>

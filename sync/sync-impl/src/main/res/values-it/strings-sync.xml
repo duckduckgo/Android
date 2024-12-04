@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Condividi link per il download</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiato</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Vuoi passare a una sincronizzazione diversa?</string>
+    <string name="sync_dialog_switch_account_primary_button">Cambia sincronizzazione</string>
+    <string name="sync_dialog_switch_account_secondary_button">Annulla</string>
+    <string name="sync_dialog_switch_account_description">Questo dispositivo è già sincronizzato. Vuoi davvero sincronizzarlo con un backup o un dispositivo diverso? L\'operazione non rimuoverà alcun dato già sincronizzato su questo dispositivo.</string>
 </resources>

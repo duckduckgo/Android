@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Może później</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nie pytaj ponownie dla tej witryny</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Przyznać %1$s uprawnienia dostępu do lokalizacji?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Używamy Twojej anonimowej lokalizacji tylko po to, aby zapewnić lepsze wyniki, bliżej Ciebie. Zawsze możesz później zmienić zdanie.</string>
     <string name="preciseLocationSiteDialogSubtitle">Uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom możesz zarządzać w Ustawieniach.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Używamy Twojej anonimowej lokalizacji tylko po to, aby zapewnić lepsze wyniki bliżej Ciebie. Uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom możesz zarządzać w Ustawieniach.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Zawsze</string>
     <string name="preciseLocationSiteDialogAllowOnce">Tylko dla tej sesji</string>
     <string name="preciseLocationSiteDialogDenyAlways">Zawsze odmawiaj</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Poproś</string>
+    <string name="permissionsPerWebsiteAskSetting">Pytaj za każdym razem</string>
     <string name="permissionsPerWebsiteDenySetting">Odmów</string>
     <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono opcję „Pytaj” dla wszystkich witryn</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono dla wszystkich witryn</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
     <!-- Notify Me View on Downloads -->

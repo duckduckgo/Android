@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl.survey
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.productIdToBillingPeriod
 import com.duckduckgo.survey.api.SurveyParameterPlugin
@@ -45,8 +44,6 @@ class PproBillingParameterPlugin @Inject constructor(
         val productId = subscriptionsManager.getSubscription()?.productId
         return productId?.productIdToBillingPeriod() ?: ""
     }
-
-    private fun String.isMonthly(): Boolean = this == MONTHLY_PLAN
 }
 
 @ContributesMultibinding(AppScope::class)
