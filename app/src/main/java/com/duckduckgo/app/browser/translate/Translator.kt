@@ -42,73 +42,67 @@ class TranslatorJS @Inject constructor() : Translator {
     override fun translate(webView: WebView) {
         webView.loadUrl(
             """
-            javascript:(function() {
-                function translateTextNodes(node) {
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        console.log("$$$ Node text: " + node.textContent);
-                        asyncTranslateBlock(node);
-                    } else if (isTranslatableNode(node)) {
-                        node.childNodes.forEach(translateTextNodes);
-                    }
-                }
-            
-                function isTranslatableNode(node) {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const tagName = node.tagName.toLowerCase();
-                        return !['script', 'style', 'meta', 'link', 'noscript', 'iframe', 'canvas', 'object', 'embed', 'applet', 'svg', 'audio', 'video', 'map', 'area', 'track', 'base', 'param', 'source', 'input', 'textarea', 'select', 'option'].includes(tagName);
-                    }
-                    console.log("$$$ Node tag: " + node.tagName.toLowerCase());
-                    return false;
-                }
-                
-                const translationCache = new Map();
-                
-                async function asyncTranslateBlock(node) {
-                    const originalText = node.textContent;
-                    const trimmedText = originalText.trim();
-                
-                    if (trimmedText.length > 0) {
-                        // Check cache first
-                        if (translationCache.has(trimmedText)) {
-                            node.textContent = applyWhitespace(originalText, translationCache.get(trimmedText));
-                            return;
+                javascript:(function() {
+                    const translationCache = new Map();
+                    
+                    function translateTextNodes(node) {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            asyncTranslateBlock(node);
+                        } else if (isTranslatableNode(node)) {
+                            node.childNodes.forEach(translateTextNodes);
                         }
-                
-                        try {
-                            console.log("$$$ Translating " + trimmedText);
+                    }
+                    
+                    function isTranslatableNode(node) {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.tagName) {
+                            const tagName = node.tagName.toLowerCase();
+                            return !['script', 'style', 'meta', 'link', 'noscript', 'iframe', 'canvas', 'object', 'embed', 'applet', 'svg', 'audio', 'video', 'map', 'area', 'track', 'base', 'param', 'source', 'input', 'textarea', 'select', 'option'].includes(tagName);
+                        }
+                        return false;
+                    }
+                    
+                    async function asyncTranslateBlock(node) {
+                        const originalText = node.textContent;
+                        const trimmedText = originalText.trim();
+                        
+                        if (trimmedText.length > 0) {
+                            if (translationCache.has(trimmedText)) {
+                                node.textContent = applyWhitespace(originalText, translationCache.get(trimmedText));
+                                return;
+                            }                    
+                            console.log("$$$ Translating " + originalText);
+                            
                             const translation = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(trimmedText);
                             translationCache.set(trimmedText, translation);
+                            
                             node.textContent = applyWhitespace(originalText, translation);
-                        } catch (error) {
-                            console.error("Translation error:", error);
                         }
                     }
-                }
-                
-                function applyWhitespace(originalText, translatedText) {
-                    const leadingWhitespace = originalText.match(/^\s*/)[0];
-                    const trailingWhitespace = originalText.match(/\s*$/)[0];
-                    return leadingWhitespace + translatedText + trailingWhitespace;
-                }
-                
-                function observeDOMChanges() {
-                    const observer = new MutationObserver((mutations) => {
-                        mutations.forEach((mutation) => {
-                            mutation.addedNodes.forEach((node) => {
-                                translateTextNodes(node);
+                    
+                    function applyWhitespace(originalText, translatedText) {
+                        const leadingWhitespace = originalText.match(/^\s*/)[0];
+                        const trailingWhitespace = originalText.match(/\s*$/)[0];
+                        return leadingWhitespace + translatedText + trailingWhitespace;
+                    }
+                    
+                    function observeDOMChanges() {
+                        const observer = new MutationObserver((mutations) => {
+                            mutations.forEach((mutation) => {
+                                mutation.addedNodes.forEach((node) => {
+                                    translateTextNodes(node);
+                                });
                             });
                         });
-                    });
-        
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true,
-                    });
-                }
-        
-                translateTextNodes(document.body);
-                observeDOMChanges();
-            })();
+            
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true,
+                        });
+                    }
+            
+                    translateTextNodes(document.body);
+                    observeDOMChanges();
+                })();
             """,
         )
     }
