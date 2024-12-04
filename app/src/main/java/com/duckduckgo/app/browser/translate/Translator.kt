@@ -44,33 +44,51 @@ class TranslatorJS @Inject constructor() : Translator {
             """
             javascript:(function() {
                 function translateTextNodes(node) {
-                    const nodeName = node.nodeName;
-                    if (node.nodeType === Node.TEXT_NODE && nodeName !== 'script' && nodeName !== 'style' && nodeName !== 'meta' && nodeName !== 'link') {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        console.log("$$$ Node text: " + node.textContent);
                         asyncTranslateBlock(node);
                     } else if (isTranslatableNode(node)) {
-                        for (var i = 0; i < node.childNodes.length; i++) {
-                            translateTextNodes(node.childNodes[i]);
+                        node.childNodes.forEach(translateTextNodes);
+                    }
+                }
+            
+                function isTranslatableNode(node) {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const tagName = node.tagName.toLowerCase();
+                        return !['script', 'style', 'meta', 'link', 'noscript', 'iframe', 'canvas', 'object', 'embed', 'applet', 'svg', 'audio', 'video', 'map', 'area', 'track', 'base', 'param', 'source', 'input', 'textarea', 'select', 'option'].includes(tagName);
+                    }
+                    console.log("$$$ Node tag: " + node.tagName.toLowerCase());
+                    return false;
+                }
+                
+                const translationCache = new Map();
+                
+                async function asyncTranslateBlock(node) {
+                    const originalText = node.textContent;
+                    const trimmedText = originalText.trim();
+                
+                    if (trimmedText.length > 0) {
+                        // Check cache first
+                        if (translationCache.has(trimmedText)) {
+                            node.textContent = applyWhitespace(originalText, translationCache.get(trimmedText));
+                            return;
+                        }
+                
+                        try {
+                            console.log("$$$ Translating " + trimmedText);
+                            const translation = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(trimmedText);
+                            translationCache.set(trimmedText, translation);
+                            node.textContent = applyWhitespace(originalText, translation);
+                        } catch (error) {
+                            console.error("Translation error:", error);
                         }
                     }
                 }
                 
-                function isTranslatableNode(node) {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const tagName = node.tagName.toLowerCase();
-                        return tagName !== 'script' && tagName !== 'style' && tagName !== 'meta' && tagName !== 'link';
-                    }
-                    return true;
-                }
-                
-                async function asyncTranslateBlock(node) {
-                    var originalText = node.textContent;
-                    if (originalText.trim().length > 0) {
-                        console.log("$$$ Translating " + originalText);
-                        var leadingWhitespace = originalText.match(/^\s*/)[0];
-                        var trailingWhitespace = originalText.match(/\s*${'$'}/)[0];
-                        var translation = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(originalText.trim());
-                        node.textContent = leadingWhitespace + translation + trailingWhitespace;
-                    }
+                function applyWhitespace(originalText, translatedText) {
+                    const leadingWhitespace = originalText.match(/^\s*/)[0];
+                    const trailingWhitespace = originalText.match(/\s*$/)[0];
+                    return leadingWhitespace + translatedText + trailingWhitespace;
                 }
                 
                 function observeDOMChanges() {
@@ -91,7 +109,7 @@ class TranslatorJS @Inject constructor() : Translator {
                 translateTextNodes(document.body);
                 observeDOMChanges();
             })();
-        """,
+            """,
         )
     }
 }

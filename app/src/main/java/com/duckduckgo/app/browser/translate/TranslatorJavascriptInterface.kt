@@ -40,6 +40,7 @@ class TranslatorJavascriptInterface {
     }
 
     private fun mlKitTranslate(original: String): String {
+        Timber.d("$$$ About to translate: $original")
         return Tasks.await(
             translator.downloadModelIfNeeded()
                 .addOnSuccessListener {
@@ -50,8 +51,10 @@ class TranslatorJavascriptInterface {
                 }
                 .continueWithTask { task ->
                     if (task.isSuccessful) {
+                        Timber.d("$$$ Starting translation of: $original")
                         translator.translate(original)
                             .addOnSuccessListener { translation ->
+                                Timber.d("$$$ Translated: $original")
                                 translation
                             }
                             .addOnFailureListener { p0 -> Timber.d("$$$ Failed to translate: $p0") }
