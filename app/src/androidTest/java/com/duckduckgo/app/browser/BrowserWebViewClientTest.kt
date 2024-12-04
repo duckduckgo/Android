@@ -57,10 +57,11 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
+import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOADING_BAR_EXPERIMENT
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -72,11 +73,11 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.experiments.api.loadingbarexperiment.LoadingBarExperimentManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -146,9 +147,11 @@ class BrowserWebViewClientTest {
     private val subscriptions: Subscriptions = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val navigationHistory: NavigationHistory = mock()
-    private val loadingBarExperimentManager: LoadingBarExperimentManager = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
+    private val mockUriLoadedManager: UriLoadedManager = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidBrowserConfigFeature, mock())
 
     @UiThreadTest
     @Before
@@ -183,8 +186,9 @@ class BrowserWebViewClientTest {
             mediaPlayback,
             subscriptions,
             mockDuckPlayer,
-            loadingBarExperimentManager,
             mockDuckDuckGoUrlDetector,
+            mockUriLoadedManager,
+            mockAndroidFeaturesHeaderPlugin,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -409,7 +413,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpThenAddQueryParam() = runTest {
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerSetOriginToSerpAuto() = runTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -424,8 +428,8 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
         openInNewTabFlow.emit(Off)
 
-        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
     }
 
     @Test
@@ -534,7 +538,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpAndOpenInNewTabThenAddQueryParam() = runTest {
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerFromSerpAndOpenInNewTabThenSetOriginToSerpAuto() = runTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -550,8 +554,8 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
         openInNewTabFlow.emit(Off)
 
-        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
-        verify(mockWebView).loadUrl("www.youtube.com/watch?v=1234&origin=serp_auto")
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
     }
 
     @UiThreadTest
@@ -926,7 +930,7 @@ class BrowserWebViewClientTest {
             whenever(mockWebView.progress).thenReturn(100)
             whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
             whenever(mockWebView.settings).thenReturn(mock())
-            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(anyString())).thenReturn(false)
+            whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isYoutubeWatchUrl(any())).thenReturn(false)
             testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
@@ -1050,12 +1054,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenLoadingBarExperimentEnabledThenPixelFiredWithExperimentData() {
+    fun whenPageLoadsThenFireUriLoadedPixel() {
         val mockWebView = getImmediatelyInvokedMockWebView()
 
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
-        whenever(loadingBarExperimentManager.variant).thenReturn(true)
         whenever(mockWebView.settings).thenReturn(mock())
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.progress).thenReturn(100)
@@ -1063,63 +1064,7 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
-        verify(pixel).fire(
-            AppPixelName.URI_LOADED.pixelName,
-            mapOf(LOADING_BAR_EXPERIMENT to "1"),
-        )
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenLoadingBarExperimentDisabledThenPixelFiredWithoutExperimentData() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(false)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        whenever(mockWebView.progress).thenReturn(100)
-
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        testee.onPageFinished(mockWebView, EXAMPLE_URL)
-
-        verify(pixel).fire(AppPixelName.URI_LOADED)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenLoadingBarExperimentEnabledButProgressIsNot100ThenNoPixelFired() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(true)
-        whenever(loadingBarExperimentManager.variant).thenReturn(true)
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        whenever(mockWebView.progress).thenReturn(50)
-
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        testee.onPageFinished(mockWebView, EXAMPLE_URL)
-
-        verify(pixel, never()).fire(anyString(), any(), any(), any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenShouldNotSendUriLoadedPixelThenNoPixelFired() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-
-        whenever(loadingBarExperimentManager.isExperimentEnabled()).thenReturn(true)
-        whenever(loadingBarExperimentManager.shouldSendUriLoadedPixel).thenReturn(false)
-        whenever(loadingBarExperimentManager.variant).thenReturn(true)
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        whenever(mockWebView.progress).thenReturn(100)
-
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        testee.onPageFinished(mockWebView, EXAMPLE_URL)
-
-        verify(pixel, never()).fire(anyString(), any(), any(), any())
+        mockUriLoadedManager.sendUriLoadedPixel()
     }
 
     private class TestWebView(context: Context) : WebView(context) {

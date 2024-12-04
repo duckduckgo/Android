@@ -27,7 +27,6 @@ import android.webkit.ValueCallback
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
-import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SslErrorResponse
@@ -36,6 +35,7 @@ import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -160,13 +160,6 @@ sealed class Command {
         val url: String?,
         val showDuckPlayerIcon: Boolean = false,
     ) : Command()
-    class CheckSystemLocationPermission(
-        val domain: String,
-        val deniedForever: Boolean,
-    ) : Command()
-
-    class AskDomainPermission(val locationPermission: LocationPermission) : Command()
-    object RequestSystemLocationPermission : Command()
     class RefreshUserAgent(
         val url: String?,
         val isDesktop: Boolean,
@@ -237,6 +230,7 @@ sealed class Command {
         val payload: String,
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
+    data class HideBrokenSitePromptCta(val brokenSitePromptDialogCta: BrokenSitePromptDialogCta) : Command()
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     data object AutocompleteItemRemoved : Command()
     object OpenDuckPlayerSettings : Command()

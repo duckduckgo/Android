@@ -49,6 +49,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
     ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE("m_onboarding_skip_major_network_unique"),
+    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -278,16 +279,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),
 
-    PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE("m_pc_syd_e"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_LATER("m_pc_syd_l"),
-    PRECISE_LOCATION_SYSTEM_DIALOG_NEVER("m_pc_syd_n"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE("m_pc_s_l_e"),
-    PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE("m_pc_s_l_d"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS("m_pc_sd_aa"),
-    PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
-    PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
-
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
@@ -373,9 +364,14 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     REFRESH_ACTION_DAILY_PIXEL("m_refresh_action_daily"),
     RELOAD_TWICE_WITHIN_12_SECONDS("m_reload_twice_within_12_seconds"),
-    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload_three_times_within_20_seconds"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("m_reload-three-times-within-20-seconds"),
+
+    SITE_NOT_WORKING_WEBSITE_BROKEN("m_site-not-working_website-is-broken"),
+    SITE_NOT_WORKING_SHOWN("m_site-not-working_shown"),
 
     URI_LOADED("m_uri_loaded"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
+
+    APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 }

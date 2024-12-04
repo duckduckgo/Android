@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Peut-être plus tard</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne plus demander pour ce site</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Autoriser %1$s à accéder à la localisation ?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Nous n\'utilisons votre localisation anonyme que pour vous fournir de meilleurs résultats, plus proches de vous. Vous pouvez modifier ce réglage plus tard.</string>
     <string name="preciseLocationSiteDialogSubtitle">Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Nous n\'utilisons votre localisation anonyme que pour vous fournir de meilleurs résultats, plus proches de vous. Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Toujours</string>
     <string name="preciseLocationSiteDialogAllowOnce">Seulement pour cette session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Toujours refuser</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorisations supprimées pour tous les sites</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorisations pour « %1$s » </string>
-    <string name="permissionsPerWebsiteAskSetting">Demander</string>
+    <string name="permissionsPerWebsiteAskSetting">Toujours demander</string>
     <string name="permissionsPerWebsiteDenySetting">Refuser</string>
     <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">« Demander » désactivé pour tous les sites</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Désactivé pour tous les sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
 
     <!-- Notify Me View on Downloads -->

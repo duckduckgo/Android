@@ -29,7 +29,6 @@ import java.lang.reflect.Proxy
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 import kotlin.random.Random
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
@@ -39,7 +38,6 @@ class FeatureToggles private constructor(
     private val flavorNameProvider: () -> String,
     private val featureName: String,
     private val appVariantProvider: () -> String?,
-    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
 ) {
@@ -52,7 +50,6 @@ class FeatureToggles private constructor(
         private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
         private var appVariantProvider: () -> String? = { "" },
-        private var localeProvider: () -> Locale? = { Locale.getDefault() },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
         private var callback: FeatureTogglesCallback? = null,
     ) {
@@ -62,7 +59,6 @@ class FeatureToggles private constructor(
         fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
-        fun localeProvider(locale: () -> Locale?) = apply { this.localeProvider = locale }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun callback(callback: FeatureTogglesCallback) = apply { this.callback = callback }
         fun build(): FeatureToggles {
@@ -82,7 +78,6 @@ class FeatureToggles private constructor(
                 flavorNameProvider = flavorNameProvider,
                 featureName = featureName!!,
                 appVariantProvider = appVariantProvider,
-                localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = this.callback,
             )
@@ -130,7 +125,6 @@ class FeatureToggles private constructor(
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
                 appVariantProvider = appVariantProvider,
-                localeProvider = localeProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = callback,
             ).also { featureToggleCache[method] = it }
@@ -194,9 +188,9 @@ interface Toggle {
     fun getRawStoredState(): State?
 
     /**
-     * @return a Map of <String, String> containing the config of the feature or an empty map
+     * @return a JSON string containing the `settings`` of the feature or null if not present in the remote config
      */
-    fun getConfig(): Map<String, String>
+    fun getSettings(): String?
 
     /**
      * @return a [Cohort] if one has been assigned or `null` otherwise.
@@ -224,12 +218,14 @@ interface Toggle {
         val metadataInfo: String? = null,
         val cohorts: List<Cohort> = emptyList(),
         val assignedCohort: Cohort? = null,
-        val config: Map<String, String> = emptyMap(),
+        val settings: String? = null,
     ) {
         data class Target(
             val variantKey: String?,
             val localeCountry: String?,
             val localeLanguage: String?,
+            val isReturningUser: Boolean?,
+            val isPrivacyProEligible: Boolean?,
         )
         data class Cohort(
             val name: String,
@@ -262,6 +258,18 @@ interface Toggle {
         fun set(key: String, state: State)
 
         fun get(key: String): State?
+    }
+
+    /**
+     * It is possible to add feature [Target]s.
+     * To do that, just add the property inside the [Target] and implement the [TargetMatcherPlugin] to do the matching
+     */
+    interface TargetMatcherPlugin {
+        /**
+         * Implement this method when adding a new target property.
+         * @return `true` if the target matches else false
+         */
+        fun matchesTargetProperty(target: State.Target): Boolean
     }
 
     /**
@@ -301,7 +309,6 @@ internal class ToggleImpl constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
     private val appVariantProvider: () -> String?,
-    private val localeProvider: () -> Locale?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
 ) : Toggle {
@@ -315,31 +322,6 @@ internal class ToggleImpl constructor(
 
     override fun hashCode(): Int {
         return this.featureName().hashCode()
-    }
-
-    private fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
-        val variant = appVariantProvider.invoke()
-        // no targets then consider always treated
-        if (this.targets.isEmpty()) {
-            return true
-        }
-        // if it's an experiment we only check target variants and ignore all the rest
-        val variantTargets = this.targets.mapNotNull { it.variantKey }
-        if (isExperiment && variantTargets.isNotEmpty()) {
-            return variantTargets.contains(variant)
-        }
-        // finally, check all other targets
-        val countryTarget = this.targets.mapNotNull { it.localeCountry?.lowercase() }
-        val languageTarget = this.targets.mapNotNull { it.localeLanguage?.lowercase() }
-
-        if (countryTarget.isNotEmpty() && !countryTarget.contains(localeProvider.invoke()?.country?.lowercase())) {
-            return false
-        }
-        if (languageTarget.isNotEmpty() && !languageTarget.contains(localeProvider.invoke()?.language?.lowercase())) {
-            return false
-        }
-
-        return true
     }
 
     override fun featureName(): FeatureName {
@@ -381,6 +363,27 @@ internal class ToggleImpl constructor(
     }
 
     private fun isRolloutEnabled(): Boolean {
+        // This fun is in there because it should never be called outside this method
+        fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
+            val variant = appVariantProvider.invoke()
+            // no targets then consider always treated
+            if (this.targets.isEmpty()) {
+                return true
+            }
+            // if it's an experiment we only check target variants and ignore all the rest
+            // this is because the (retention) experiments define their targets some place else
+            val variantTargets = this.targets.mapNotNull { it.variantKey }
+            if (isExperiment && variantTargets.isNotEmpty()) {
+                return variantTargets.contains(variant)
+            }
+            // finally, check all other targets
+            val nonVariantTargets = this.targets.filter { it.variantKey == null }
+
+            // callback should never be null, but if it is, consider targets a match
+            return callback?.matchesToggleTargets(nonVariantTargets) ?: true
+        }
+
+        // This fun is in there because it should never be called outside this method
         fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
             val doTargetsMatch = state.evaluateTargetMatching(isExperiment)
@@ -484,26 +487,12 @@ internal class ToggleImpl constructor(
                 cohorts[randomIndex.sample()]
             }.getOrNull()
         }
-        fun containsAndMatchCohortTargets(targets: State.Target?): Boolean {
-            return targets?.let {
-                targets.localeLanguage?.let { targetLanguage ->
-                    val deviceLocale = localeProvider.invoke()
-                    if (deviceLocale?.language != targetLanguage) {
-                        return false
-                    }
-                }
-                targets.localeCountry?.let { targetCountry ->
-                    val deviceLocale = localeProvider.invoke()
-                    if (deviceLocale?.country != targetCountry) {
-                        return false
-                    }
-                }
-                return true
-            } ?: return true // no targets mean any target
+        fun containsAndMatchCohortTargets(targets: List<State.Target>): Boolean {
+            return callback?.matchesToggleTargets(targets) ?: true
         }
 
         // In the remote config, targets is a list, but it should not be. So we pick the first one (?)
-        if (!containsAndMatchCohortTargets(targets.firstOrNull())) {
+        if (!containsAndMatchCohortTargets(targets)) {
             return null
         }
 
@@ -521,7 +510,7 @@ internal class ToggleImpl constructor(
         )
     }
 
-    override fun getConfig(): Map<String, String> = store.get(key)?.config ?: emptyMap()
+    override fun getSettings(): String? = store.get(key)?.settings
 
     override fun getCohort(): Cohort? {
         return store.get(key)?.assignedCohort

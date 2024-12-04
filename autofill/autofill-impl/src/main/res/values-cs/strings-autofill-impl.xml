@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Ukládání hesel můžeš kdykoli vypnout.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Otevřít nastavení</string>
+
+    <string name="newTabPageShortcutPasswords">Hesla</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Import hesel z Googlu</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z Googlu: %1$d</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z CSV: %1$d</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importovat hesla z Googlu</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Import hesel z Googlu</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovat hesla na DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovat hesla na DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importuj si hesla z Googlu</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Otevřít hesla na Googlu</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Vybrat soubor CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovat z prohlížeče na počítači</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Import do DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import je hotový</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Mám to</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Import hesel se nezdařil</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Přeskočeno (duplicitní nebo neplatné): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importovaných hesel: <b>%1$d</b>]]></string>
+
 </resources>

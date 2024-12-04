@@ -53,13 +53,7 @@ enum class WebsitePermissionSettingOption(
             }
 
         fun Int.getPermissionSettingOptionFromPosition(): WebsitePermissionSettingOption {
-            var option = ASK
-            values().forEach {
-                if (it.order == this) {
-                    option = it
-                }
-            }
-            return option
+            return entries.first { it.order == this }
         }
     }
 }

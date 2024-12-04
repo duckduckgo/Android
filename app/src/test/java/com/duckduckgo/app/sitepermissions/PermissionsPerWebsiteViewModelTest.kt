@@ -18,10 +18,6 @@ package com.duckduckgo.app.sitepermissions
 
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
@@ -47,13 +43,9 @@ class PermissionsPerWebsiteViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
-    private val mockLocationPermissionsRepository: LocationPermissionsRepository = mock()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val viewModel = PermissionsPerWebsiteViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
-        locationPermissionsRepository = mockLocationPermissionsRepository,
-        settingsDataStore = mockSettingsDataStore,
     )
 
     private val domain = "domain.com"
@@ -211,20 +203,21 @@ class PermissionsPerWebsiteViewModelTest {
         micEnabled: Boolean = true,
         cameraEnabled: Boolean = true,
         locationEnabled: Boolean = true,
+        drmEnabled: Boolean = true,
     ) {
-        whenever(mockSettingsDataStore.appLocationPermission).thenReturn(locationEnabled)
         whenever(mockSitePermissionsRepository.askMicEnabled).thenReturn(micEnabled)
         whenever(mockSitePermissionsRepository.askCameraEnabled).thenReturn(cameraEnabled)
+        whenever(mockSitePermissionsRepository.askDrmEnabled).thenReturn(drmEnabled)
+        whenever(mockSitePermissionsRepository.askLocationEnabled).thenReturn(locationEnabled)
     }
 
     private fun loadWebsitePermissionsSettings(
         cameraSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
         micSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
-        locationSetting: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS,
+        locationSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
+        drmSetting: String = SitePermissionAskSettingType.ASK_EVERY_TIME.name,
     ) {
-        val testLocationEntity = LocationPermissionEntity(domain, locationSetting)
-        val testSitePermissionEntity = SitePermissionsEntity(domain, cameraSetting, micSetting)
+        val testSitePermissionEntity = SitePermissionsEntity(domain, cameraSetting, micSetting, drmSetting, locationSetting)
         mockSitePermissionsRepository.stub { onBlocking { getSitePermissionsForWebsite(domain) }.thenReturn(testSitePermissionEntity) }
-        mockLocationPermissionsRepository.stub { onBlocking { getDomainPermission(domain) }.thenReturn(testLocationEntity) }
     }
 }

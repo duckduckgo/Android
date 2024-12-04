@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Ίσως αργότερα</string>
     <string name="preciseLocationSystemDialogNeverAllow">Να μην γίνει ξανά ερώτηση γι\' αυτόν τον ιστότοπο</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Εκχώρηση άδειας στην εφαρμογή %1$s για πρόσβαση στην τοποθεσία;</string>
-    <string name="preciseLocationDDGDialogSubtitle">Χρησιμοποιούμε την ανώνυμη τοποθεσία σας αποκλειστικά και μόνο για να προσφέρουμε καλύτερα αποτελέσματα, πιο κοντά σε σας. Μπορείτε πάντα να αλλάξετε γνώμη αργότερα.</string>
     <string name="preciseLocationSiteDialogSubtitle">Μπορείτε να διαχειριστείτε τα δικαιώματα πρόσβασης τοποθεσίας που έχετε εκχωρήσει σε μεμονωμένους ιστότοπους από τις Ρυθμίσεις.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Χρησιμοποιούμε την ανώνυμη τοποθεσία σας αποκλειστικά και μόνο για να προσφέρουμε καλύτερα αποτελέσματα, πιο κοντά σε εσάς. Μπορείτε να διαχειριστείτε τα δικαιώματα πρόσβασης τοποθεσίας που έχετε εκχωρήσει σε μεμονωμένους ιστότοπους από τις Ρυθμίσεις.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Πάντα</string>
     <string name="preciseLocationSiteDialogAllowOnce">Μόνο γι\' αυτή τη σύνδεση</string>
     <string name="preciseLocationSiteDialogDenyAlways">Άρνηση για πάντα</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Δεν υπάρχουν ακόμη ιστότοποι</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Τα δικαιώματα καταργήθηκαν για όλους τους ιστότοπους</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Δικαιώματα για «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Αιτηθείτε</string>
+    <string name="permissionsPerWebsiteAskSetting">Να γίνεται ερώτηση κάθε φορά</string>
     <string name="permissionsPerWebsiteDenySetting">Απόρριψη</string>
     <string name="permissionsPerWebsiteAllowSetting">Αποδοχή</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Η επιλογή «Να γίνεται ερώτηση» είναι απενεργοποιημένη για όλους τους ιστότοπους</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Απενεργοποιήθηκε για όλους τους ιστότοπους</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s άδεια για %2$s</string>
 
     <!-- Notify Me View on Downloads -->

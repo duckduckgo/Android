@@ -32,6 +32,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
@@ -59,6 +60,9 @@ class RealSubscriptions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
 ) : Subscriptions {
+    override suspend fun isSignedIn(): Boolean =
+        subscriptionsManager.isSignedIn()
+
     override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
             is AccessTokenResult.Success -> result.accessToken
@@ -137,8 +141,19 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(true)
     fun allowEmailFeedback(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun serpPromoCookie(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun authApiV2(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun isLaunchedROW(): Toggle
+
+    // Kill switch
+    @Toggle.DefaultValue(true)
+    fun featuresApi(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

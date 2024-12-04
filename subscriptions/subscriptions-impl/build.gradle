@@ -78,6 +78,12 @@ dependencies {
     implementation Square.okHttp3.okHttp
     implementation AndroidX.security.crypto
 
+    implementation "io.jsonwebtoken:jjwt-api:_"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
+        exclude(group: 'org.json', module: 'json') // provided by Android natively
+    }
+
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
     testImplementation project(path: ':common-test')

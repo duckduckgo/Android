@@ -46,13 +46,13 @@
     <string name="credentialManagementEditPasswordHint">Password</string>
     <string name="credentialManagementEditWebsiteHint">URL del sito Web</string>
     <string name="credentialManagementEditNotesHint">Note</string>
-    <string name="credentialManagementEditButtonDelete">Cancella</string>
+    <string name="credentialManagementEditButtonDelete">Elimina</string>
     <string name="credentialManagementEditButtonSaveChanges">Salva modifiche</string>
     <string name="credentialManagementEditButtonCopyUsername">Copia nome utente</string>
     <string name="credentialManagementEditButtonCopyPassword">Copia password</string>
 
     <string name="credentialManagementViewMenuEdit">Modifica</string>
-    <string name="credentialManagementViewMenuDelete">Cancella</string>
+    <string name="credentialManagementViewMenuDelete">Elimina</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
 
@@ -62,7 +62,7 @@
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
-    <string name="autofillDeleteLoginDialogDelete">Cancella</string>
+    <string name="autofillDeleteLoginDialogDelete">Elimina</string>
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Puoi disattivare il salvataggio della password in qualsiasi momento.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Apri Impostazioni</string>
+
+    <string name="newTabPageShortcutPasswords">Password</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importa le password di Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da file CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importa le password da Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importa le password da Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizza le password di DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizza le password di DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importa le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Apri le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Scegli un file CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importa dal browser desktop</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importa in DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importazione completata</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Fatto</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Importazione password non riuscita</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorato (duplicato o non valido): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Password importate: <b>%1$d</b>]]></string>
+
 </resources>

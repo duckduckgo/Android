@@ -57,6 +57,12 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        if (project.hasProperty('build-date-time')) {
+            buildConfigField "long", "BUILD_DATE_MILLIS", "${System.currentTimeMillis()}"
+        } else {
+            buildConfigField "long", "BUILD_DATE_MILLIS", "0"
+        }
+
         namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
@@ -209,6 +215,8 @@ fladle {
 }
 
 dependencies {
+	implementation project(":malicious-site-protection-impl")
+	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
 	implementation project(":custom-tabs-api")
 	implementation project(":duckplayer-impl")
@@ -383,9 +391,6 @@ dependencies {
     implementation project(':survey-impl')
 
     implementation project(':breakage-reporting-impl')
-
-    implementation project(":auth-jwt-api")
-    implementation project(":auth-jwt-impl")
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

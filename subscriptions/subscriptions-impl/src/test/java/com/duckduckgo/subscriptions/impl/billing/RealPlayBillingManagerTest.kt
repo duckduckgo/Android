@@ -11,8 +11,8 @@ import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
@@ -105,7 +105,7 @@ class RealPlayBillingManagerTest {
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId)
 
             assertEquals(InProgress, awaitItem())
         }
@@ -126,7 +126,7 @@ class RealPlayBillingManagerTest {
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId)
 
             assertEquals(Canceled, awaitItem())
         }
@@ -194,12 +194,12 @@ class FakeBillingClientAdapter : BillingClientAdapter {
             whenever(it.productId).thenReturn(BASIC_SUBSCRIPTION)
 
             val monthlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN)
+                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN_US)
                 whenever(offer.offerToken).thenReturn("monthly_offer_token")
             }
 
             val yearlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
-                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN)
+                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN_US)
                 whenever(offer.offerToken).thenReturn("yearly_offer_token")
             }
 

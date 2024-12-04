@@ -24,7 +24,7 @@ class PproSurveyParameterPluginTest {
     private lateinit var currentTimeProvider: CurrentTimeProvider
 
     private val testSubscription = Subscription(
-        productId = SubscriptionsConstants.MONTHLY_PLAN,
+        productId = SubscriptionsConstants.MONTHLY_PLAN_US,
         startedAt = 1717797600000, // June 07 UTC
         expiresOrRenewsAt = 1719525600000, // June 27 UTC
         status = AUTO_RENEWABLE,
@@ -67,7 +67,7 @@ class PproSurveyParameterPluginTest {
     fun whenSubscriptionIsYearlyThenBillingParamEvaluatesToSubscriptionBilling() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             testSubscription.copy(
-                productId = SubscriptionsConstants.YEARLY_PLAN,
+                productId = SubscriptionsConstants.YEARLY_PLAN_US,
             ),
         )
 

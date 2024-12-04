@@ -106,6 +106,12 @@ interface InternalAutofillStore : AutofillStore {
     suspend fun reinsertCredentials(credentials: LoginCredentials)
 
     /**
+     * Used to bulk insert credentials
+     * @return The list of IDs of the inserted credentials
+     */
+    suspend fun bulkInsert(credentials: List<LoginCredentials>): List<Long>
+
+    /**
      * Used to reinsert a list of credentials that were previously deleted
      * This supports the ability to give user a brief opportunity to 'undo' a mass deletion
      *

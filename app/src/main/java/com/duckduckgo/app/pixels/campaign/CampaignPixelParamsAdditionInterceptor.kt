@@ -50,6 +50,10 @@ class CampaignPixelParamsAdditionInterceptor @Inject constructor(
                         val queryParams = queryParamsString.toParamsMap()
                         if (plugin.isEligible(queryParams)) {
                             runBlocking {
+                                /**
+                                 * The additional parameters being collected only apply to a single promotion about a DuckDuckGo product.
+                                 * The parameters are temporary, collected in aggregate, and anonymous.
+                                 */
                                 additionalPixelParamsGenerator.generateAdditionalParams().forEach { (key, value) ->
                                     url.addQueryParameter(key, value)
                                 }

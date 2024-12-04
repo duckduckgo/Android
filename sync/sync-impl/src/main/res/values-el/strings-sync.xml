@@ -190,4 +190,10 @@
     <string name="syncGetAppsOnOtherPlatformInstructionUrl" translatable="false">duckduckgo.com/app</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlDownloadButton">Κοινή χρήση συνδέσμου λήψης</string>
     <string name="syncGetAppsOnOtherPlatformInstructionUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ο σύνδεσμος αντιγράφηκε</string>
+
+    <!-- Sync Switching account prompt -->
+    <string name="sync_dialog_switch_account_header">Αλλαγή σε διαφορετικό συγχρονισμό;</string>
+    <string name="sync_dialog_switch_account_primary_button">Αλλαγή συγχρονισμού</string>
+    <string name="sync_dialog_switch_account_secondary_button">Ακύρωση</string>
+    <string name="sync_dialog_switch_account_description">Η συσκευή αυτή είναι ήδη συγχρονισμένη. Θέλετε σίγουρα να τη συγχρονίσετε με ένα διαφορετικό αντίγραφο ασφαλείας ή συσκευή; Η αλλαγή δεν θα αφαιρέσει δεδομένα που έχουν ήδη συγχρονιστεί σε αυτήν τη συσκευή.</string>
 </resources>

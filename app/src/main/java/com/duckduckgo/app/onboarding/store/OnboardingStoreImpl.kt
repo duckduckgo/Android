@@ -25,13 +25,19 @@ import com.duckduckgo.mobile.android.R.drawable
 import java.util.Locale
 import javax.inject.Inject
 
-class OnboardingStoreImpl @Inject constructor(private val context: Context) : OnboardingStore {
+class OnboardingStoreImpl @Inject constructor(
+    private val context: Context,
+) : OnboardingStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var onboardingDialogJourney: String?
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
+
+    override var visitSiteCtaDisplayCount: Int
+        get() = preferences.getInt(VISIT_SITE_CTA_DISPLAY_COUNT, 0)
+        set(count) = preferences.edit { putInt(VISIT_SITE_CTA_DISPLAY_COUNT, count) }
 
     override fun getSearchOptions(): List<DaxDialogIntroOption> {
         val country = Locale.getDefault().country
@@ -205,8 +211,13 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
         )
     }
 
+    override fun clearVisitSiteCtaDisplayCount() {
+        preferences.edit { remove(VISIT_SITE_CTA_DISPLAY_COUNT) }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
+        const val VISIT_SITE_CTA_DISPLAY_COUNT = "visitSiteCtaDisplayCount"
     }
 }

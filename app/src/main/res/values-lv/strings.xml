@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Varbūt vēlāk</string>
     <string name="preciseLocationSystemDialogNeverAllow">Vairs nejautāt par šo vietni</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Vai piešķirt %1$s atļauju piekļūt atrašanās vietai?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Mēs izmantojam tavu anonīmo atrašanās vietu tikai tāpēc, lai sniegtu labākus rezultātus tev tuvāk. Vēlāk vienmēr varēsi pārdomāt.</string>
     <string name="preciseLocationSiteDialogSubtitle">Iestatījumu sadaļā vari pārvaldīt atrašanās vietas piekļuves atļaujas, ko piešķīri atsevišķām vietnēm.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Mēs izmantojam tavu anonīmo atrašanās vietu tikai tam, lai sniegtu labākus rezultātus tuvāk tev. Iestatījumu sadaļā vari pārvaldīt atrašanās vietas piekļuves atļaujas, kas piešķirtas atsevišķām vietnēm.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vienmēr</string>
     <string name="preciseLocationSiteDialogAllowOnce">Tikai šai sesijai</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vienmēr aizliegt</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Atļaujas ir noņemtas visām vietnēm</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Jautāt</string>
+    <string name="permissionsPerWebsiteAskSetting">Jautāt katru reizi</string>
     <string name="permissionsPerWebsiteDenySetting">Liegt</string>
     <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">“Jautāt” ir atspējots visām vietnēm</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Atspējots visām vietnēm</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
 
     <!-- Notify Me View on Downloads -->

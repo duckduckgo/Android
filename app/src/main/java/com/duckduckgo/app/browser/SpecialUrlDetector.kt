@@ -34,7 +34,6 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class SpecialUrlDetectorImpl(
@@ -91,9 +90,7 @@ class SpecialUrlDetectorImpl(
 
         val uri = uriString.toUri()
 
-        val willNavigateToDuckPlayer = runBlocking(dispatcherProvider.io()) { duckPlayer.willNavigateToDuckPlayer(uri) }
-
-        if (willNavigateToDuckPlayer) {
+        if (duckPlayer.willNavigateToDuckPlayer(uri)) {
             return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
         } else {
             try {

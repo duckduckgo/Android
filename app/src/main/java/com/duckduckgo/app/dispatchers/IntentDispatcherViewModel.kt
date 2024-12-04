@@ -21,6 +21,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -37,6 +38,7 @@ class IntentDispatcherViewModel @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val dispatcherProvider: DispatcherProvider,
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -56,7 +58,8 @@ class IntentDispatcherViewModel @Inject constructor(
                 val intentText = intent?.intentText
                 val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
-                val customTabRequested = hasSession && !isEmailProtectionLink
+                val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
+                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl
 
                 Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
 

@@ -24,6 +24,8 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -31,20 +33,18 @@ import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
+import com.duckduckgo.duckplayer.api.DuckPlayer.*
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_AUTO
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_OVERLAY
 import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP
-import com.duckduckgo.duckplayer.api.ORIGIN_QUERY_PARAM_SERP_AUTO
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -62,12 +62,16 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_VIEW_FROM_
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.io.InputStream
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
@@ -95,6 +99,7 @@ interface DuckPlayerInternal : DuckPlayer {
 
 @ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
 @ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
@@ -102,20 +107,27 @@ class RealDuckPlayer @Inject constructor(
     private val duckPlayerLocalFilesPath: DuckPlayerLocalFilesPath,
     private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider,
-) : DuckPlayerInternal {
+    @IsMainProcess private val isMainProcess: Boolean,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
-    private val isFeatureEnabled: Boolean by lazy {
-        duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled()
+    private var duckPlayerOrigin: DuckPlayerOrigin? = null
+    private var isFeatureEnabled = false
+    private var duckPlayerDisabledHelpLink = ""
+
+    init {
+        if (isMainProcess) {
+            loadToMemory()
+        }
     }
 
-    private lateinit var duckPlayerDisabledHelpLink: String
+    override fun onPrivacyConfigDownloaded() {
+        loadToMemory()
+    }
 
     override fun getDuckPlayerState(): DuckPlayerState {
-        if (!::duckPlayerDisabledHelpLink.isInitialized) {
-            duckPlayerDisabledHelpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink() ?: ""
-        }
         return if (isFeatureEnabled) {
             ENABLED
         } else {
@@ -242,7 +254,7 @@ class RealDuckPlayer @Inject constructor(
         return isDuckPlayerUri(uri.toUri())
     }
 
-    override suspend fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
+    override fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
         val validPaths = duckPlayerLocalFilesPath.assetsPath()
         val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
         return (
@@ -253,10 +265,6 @@ class RealDuckPlayer @Inject constructor(
                     (uri.pathSegments.firstOrNull() != "embed" && uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) != null)
                 )
             )
-    }
-
-    override suspend fun isSimulatedYoutubeNoCookie(uri: String): Boolean {
-        return isSimulatedYoutubeNoCookie(uri.toUri())
     }
 
     private fun getDuckPlayerAssetsPath(url: Uri): String? {
@@ -282,8 +290,10 @@ class RealDuckPlayer @Inject constructor(
 
     private fun createDuckPlayerUriFromYoutube(uri: Uri): String {
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
-        val origin = uri.getQueryParameter(ORIGIN_QUERY_PARAM)?.let { it } ?: ORIGIN_QUERY_PARAM_AUTO
-        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}?$ORIGIN_QUERY_PARAM=$origin"
+        if (duckPlayerOrigin == null) {
+            duckPlayerOrigin = AUTO
+        }
+        return "$DUCK_PLAYER_URL_BASE${uri.getQueryParameter(videoIdQueryParam)}"
     }
 
     override suspend fun intercept(
@@ -381,10 +391,10 @@ class RealDuckPlayer @Inject constructor(
         return null
     }
 
-    private suspend fun doesYoutubeUrlComeFromDuckPlayer(url: Uri, request: WebResourceRequest? = null): Boolean {
+    private fun doesYoutubeUrlComeFromDuckPlayer(url: Uri, request: WebResourceRequest? = null): Boolean {
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()
         val requestedVideoId = url.getQueryParameter(videoIdQueryParam)
-        val isSimulated: suspend (String?) -> Boolean = { uri ->
+        val isSimulated: (String?) -> Boolean = { uri ->
             uri?.let { isSimulatedYoutubeNoCookie(it.toUri()) } == true
         }
 
@@ -423,14 +433,14 @@ class RealDuckPlayer @Inject constructor(
                 withContext(dispatchers.main()) {
                     webView.loadUrl(youtubeUrl)
                 }
-                val origin = url.getQueryParameter(ORIGIN_QUERY_PARAM)
-                if (origin == ORIGIN_QUERY_PARAM_SERP || origin == ORIGIN_QUERY_PARAM_SERP_AUTO) {
+                if (url.getQueryParameter(ORIGIN_QUERY_PARAM) == ORIGIN_QUERY_PARAM_SERP || duckPlayerOrigin == SERP_AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_SERP)
-                } else if (origin == ORIGIN_QUERY_PARAM_AUTO) {
+                } else if (duckPlayerOrigin == AUTO) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_YOUTUBE_AUTOMATIC)
-                } else if (origin != ORIGIN_QUERY_PARAM_OVERLAY) {
+                } else if (duckPlayerOrigin != OVERLAY) {
                     pixel.fire(DUCK_PLAYER_VIEW_FROM_OTHER)
                 }
+                duckPlayerOrigin = null
             }
         }
         return WebResourceResponse(null, null, null)
@@ -449,7 +459,7 @@ class RealDuckPlayer @Inject constructor(
         return duckPlayerFeatureRepository.getYouTubeEmbedUrl()
     }
 
-    override suspend fun willNavigateToDuckPlayer(
+    override fun willNavigateToDuckPlayer(
         destinationUrl: Uri,
     ): Boolean {
         return (
@@ -469,5 +479,16 @@ class RealDuckPlayer @Inject constructor(
         return duckPlayerFeatureRepository.observeOpenInNewTab().map {
             (if (!duckPlayerFeature.openInNewTab().isEnabled()) Unavailable else if (it) On else Off)
         }
+    }
+
+    private fun loadToMemory() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            isFeatureEnabled = duckPlayerFeature.self().isEnabled() && duckPlayerFeature.enableDuckPlayer().isEnabled()
+            duckPlayerDisabledHelpLink = duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink() ?: ""
+        }
+    }
+
+    override fun setDuckPlayerOrigin(origin: DuckPlayerOrigin) {
+        duckPlayerOrigin = origin
     }
 }

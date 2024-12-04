@@ -58,6 +58,10 @@ class FakeSettingsDataStore : SettingsDataStore {
         get() = store["appLocationPermissionDeniedForever"] as Boolean? ?: false
         set(value) { store["appLocationPermissionDeniedForever"] = value }
 
+    override var appLocationPermissionMigrated: Boolean
+        get() = store["appLocationPermissionMigrated"] as Boolean? ?: false
+        set(value) { store["appLocationPermissionMigrated"] = value }
+
     override var appIcon: AppIcon
         get() = store["appIcon"] as AppIcon? ?: defaultIcon()
         set(value) { store["appIcon"] = value }

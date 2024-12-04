@@ -89,7 +89,7 @@ class AutofillSurveyImpl @Inject constructor(
                 .appendQueryParameter(SurveyParams.MODEL, appBuildConfig.model)
                 .appendQueryParameter(SurveyParams.SOURCE, IN_APP)
                 .appendQueryParameter(SurveyParams.LAST_ACTIVE_DATE, appDaysUsedRepository.getLastActiveDay())
-                .appendQueryParameter(SurveyParams.NUMBER_PASSWORDS, passwordBucketing.bucketNumberOfSavedPasswords(passwordsSaved))
+                .appendQueryParameter(SurveyParams.NUMBER_PASSWORDS, passwordBucketing.bucketNumberOfCredentials(passwordsSaved))
 
             urlBuilder.build().toString()
         }

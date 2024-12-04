@@ -124,6 +124,7 @@ platform :android do
 
          options_release_number = options[:release_number]
          options_release_notes = options[:release_notes]
+         options_release_notes = options[:release_notes]
          options_notes_type = options[:notes_type]
 
          newVersion = determine_version_number(
@@ -208,7 +209,7 @@ platform :android do
     version = props["VERSION"]
     releaseNotes = release_notes_github()
     apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
-    token = ENV["GITHUB_UPLOAD_TOKEN"]
+    token = ENV["GH_TOKEN"]
 
     UI.message ("Upload new app version to GitHub\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
 

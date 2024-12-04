@@ -547,8 +547,8 @@
     <string name="preciseLocationSystemDialogDeny">Mogoče kasneje</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne vprašaj znova za to spletno mesto</string>
     <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Dovoli %1$s dostop do lokacije?</string>
-    <string name="preciseLocationDDGDialogSubtitle">Vašo anonimno lokacijo uporabljamo samo, da vam zagotovimo boljše rezultate v vaši bližini. Pozneje si lahko vedno premislite.</string>
     <string name="preciseLocationSiteDialogSubtitle">Dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, lahko upravljate v nastavitvah.</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vašo anonimno lokacijo uporabljamo le za zagotavljanje boljših rezultatov, bližje vam. Dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, lahko upravljate v nastavitvah.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vedno</string>
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
@@ -673,10 +673,10 @@
     <string name="sitePermissionsSettingsEmptyText">Spletnih mest še ni</string>
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Dovoljenja so odstranjena za vsa spletna mesta</string>
     <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dovoljenja za »%1$s« </string>
-    <string name="permissionsPerWebsiteAskSetting">Vprašaj</string>
+    <string name="permissionsPerWebsiteAskSetting">Vprašaj vsakič</string>
     <string name="permissionsPerWebsiteDenySetting">Zavrni</string>
     <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Poziv »Vprašaj« je onemogočen za vsa spletna mesta</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Onemogočeno za vsa spletna mesta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dovoljenje za %2$s</string>
 
     <!-- Notify Me View on Downloads -->
