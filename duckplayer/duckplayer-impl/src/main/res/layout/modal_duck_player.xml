@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/dismissButton"
         app:layout_constraintTop_toBottomOf="@id/body"
-        app:buttonSize="large"
+        app:daxButtonSize="large"
         android:layout_marginHorizontal="55dp"
         android:layout_marginVertical="@dimen/keyline_5"
         android:text="@string/duck_player_info_modal_button"/>

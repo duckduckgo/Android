@@ -138,7 +138,7 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:alpha="0"
                     android:text="@string/onboardingLetsDoItButton"
-                    app:buttonSize="large"
+                    app:daxButtonSize="large"
                     tools:alpha="1" />
 
             </LinearLayout>

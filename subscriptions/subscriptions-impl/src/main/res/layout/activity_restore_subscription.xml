@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/keyline_2"
                 android:text="@string/restoreSubscriptionGooglePlayButton"
-                app:buttonSize="small" />
+                app:daxButtonSize="small" />
 
         </LinearLayout>
     </ScrollView>

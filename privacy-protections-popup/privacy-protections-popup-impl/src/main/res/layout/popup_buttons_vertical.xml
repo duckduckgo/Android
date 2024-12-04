@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/privacy_protections_popup_button_disable"
-        app:buttonSize="small" />
+        app:daxButtonSize="small" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dismissButton"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="@string/privacy_protections_popup_button_dismiss"
         android:visibility="gone"
-        app:buttonSize="small" />
+        app:daxButtonSize="small" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dontShowAgainButton"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:text="@string/privacy_protections_popup_button_dont_show_again"
         android:visibility="gone"
-        app:buttonSize="small"
+        app:daxButtonSize="small"
         tools:visibility="visible" />
 
 </LinearLayout>

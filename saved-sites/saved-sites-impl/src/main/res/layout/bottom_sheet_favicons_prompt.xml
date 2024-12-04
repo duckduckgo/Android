@@ -89,7 +89,7 @@
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/faviconsPromptPrimaryCta"
                 android:layout_width="0dp"
-                app:buttonSize="large"
+                app:daxButtonSize="large"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/faviconsPromptPrimaryCta"
@@ -101,7 +101,7 @@
                 android:id="@+id/faviconsPromptSecondaryCta"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:buttonSize="large"
+                app:daxButtonSize="large"
                 android:text="@string/faviconsPromptSecondaryCta"
                 app:layout_constraintEnd_toEndOf="@id/faviconsPromptPrimaryCta"
                 app:layout_constraintStart_toStartOf="@id/faviconsPromptPrimaryCta"
