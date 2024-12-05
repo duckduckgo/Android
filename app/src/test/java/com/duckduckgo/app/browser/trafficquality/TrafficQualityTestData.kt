@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.trafficquality
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 
-private val currentVersion = 5210000
+val currentVersion = 5210000
 private val anotherVersion = 5220000
 
 val configEnabledForAnotherVersion = TrafficQualityAppVersion(anotherVersion, 5, 5, featuresEnabled())
