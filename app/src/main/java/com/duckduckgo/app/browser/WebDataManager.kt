@@ -23,11 +23,16 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import timber.log.Timber
 
 interface WebDataManager {
     suspend fun clearData(
@@ -38,12 +43,15 @@ interface WebDataManager {
     fun clearWebViewSessions()
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class WebViewDataManager @Inject constructor(
     private val context: Context,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -77,6 +85,7 @@ class WebViewDataManager @Inject constructor(
                         // Check if this is the domain to exclude
                         if (!originString.endsWith(".duckduckgo.com")) {
                             // Delete all other origins
+                            Timber.d("aitor delete $originString / $origin")
                             webStorage.deleteOrigin(originString)
                         }
                     }
@@ -107,7 +116,11 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
-        fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
+        if (androidBrowserConfigFeature.deleteLocalStorageKillSwitch().isEnabled()) {
+            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))
+        } else {
+            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
+        }
     }
 
     private suspend fun clearAuthentication(webView: WebView) {

@@ -74,7 +74,6 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -158,17 +157,6 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun webDataManager(
-        context: Context,
-        webViewSessionStorage: WebViewSessionStorage,
-        cookieManager: DuckDuckGoCookieManager,
-        fileDeleter: FileDeleter,
-        webViewHttpAuthStore: WebViewHttpAuthStore,
-    ): WebDataManager =
-        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
