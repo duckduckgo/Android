@@ -83,4 +83,11 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun featuresRequestHeader(): Toggle
+
+    /**
+     * When enabled we should delete the app_webview/Default/Local Storage folder. If all goes well, we should not need to set this to `true`
+     * in remote config
+     */
+    @Toggle.DefaultValue(false)
+    fun deleteLocalStorageKillSwitch(): Toggle
 }
