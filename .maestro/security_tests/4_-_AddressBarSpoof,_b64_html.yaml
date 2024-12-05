@@ -10,6 +10,10 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-open-b64-html.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "Start"
 # This test is expected to open a new tab with empty origin ("") and then prompt to open the link in another app

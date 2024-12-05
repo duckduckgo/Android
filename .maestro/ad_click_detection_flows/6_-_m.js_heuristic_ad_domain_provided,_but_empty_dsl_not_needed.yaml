@@ -7,22 +7,22 @@ tags:
 
 - runFlow: ../shared/onboarding.yaml
 
-- inputText: "https://www.search-company.site/#ad-id-6" # scroll until the ad-id-6 instead of ad-id-7 (context: https://app.asana.com/0/0/1204397066248823/1204415854211764/f)
+- inputText: "https://www.search-company.site/#ad-id-5"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Got It.*"
+    timeout: 60000
+- scrollUntilVisible:
+    element:
+      id: "ad-id-6"
+    direction: DOWN
 - tapOn:
-    text: "Got It"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/fireIconMenu"
-- tapOn:
-    text: "Cancel"
-- assertVisible:
-    id: "ad-id-7"
-- tapOn:
-    id: "ad-id-7"
-- assertVisible:
-    text: "Publisher site"
+    id: "ad-id-6"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:

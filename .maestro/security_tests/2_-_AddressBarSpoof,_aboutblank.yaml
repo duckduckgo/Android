@@ -9,6 +9,10 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-rewrite.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "Start"
 # This test is expected to load "about:blank" then duckduckgo.com, not remain on the current page with spoofed content.

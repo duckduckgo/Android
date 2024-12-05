@@ -7,14 +7,16 @@ tags:
 - runFlow: ../shared/onboarding.yaml
 - inputText: "https://www.search-company.site/#ad-id-5"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
-- assertVisible:
-    id: "ad-id-5"
+- extendedWaitUntil:
+      visible:
+          id: "ad-id-5"
+      timeout: 60000
 - tapOn:
     id: "ad-id-5"
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
@@ -48,10 +50,14 @@ tags:
     text: "convert.ad-company.site"
 - action: back
 - action: back
-- assertVisible:
-    text: "Publisher site"
-- assertVisible:
-    text: "Buy now"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
+- extendedWaitUntil:
+    visible:
+      text: "Buy now"
+    timeout: 60000
 - assertVisible:
     id: "buy-now"
 - tapOn:
@@ -91,11 +97,7 @@ tags:
     text: "convert.ad-company.site"
 - action: back
 - action: back
-- tapOn:
-    id: "com.android.systemui:id/recent_apps"
-- swipe:
-    start: 100,500
-    end: 100,200
+- killApp
 - launchApp:
     clearState: false
 - assertVisible:

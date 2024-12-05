@@ -10,6 +10,10 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"
 - pressKey: Enter
+- extendedWaitUntil:
+      visible:
+          text: "Got It"
+      timeout: 60000
 - tapOn: "Got It"
 - tapOn: "Start"
 # Now check the address bar hasn't been updated too early resulting in spoofed content

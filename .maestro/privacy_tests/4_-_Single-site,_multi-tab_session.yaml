@@ -7,14 +7,16 @@ tags:
 - runFlow: ../shared/onboarding.yaml
 - inputText: "https://www.search-company.site/#ad-id-5"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
-- assertVisible:
-    id: "ad-id-5"
+- extendedWaitUntil:
+      visible:
+          id: "ad-id-5"
+      timeout: 60000
 - tapOn:
     id: "ad-id-5"
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
@@ -48,18 +50,24 @@ tags:
     text: "convert.ad-company.site"
 - action: back
 - action: back
-- assertVisible:
-    text: "Publisher site"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     text: "Publisher site"
-- assertVisible:
-    text: "Green T-shirt"
+- extendedWaitUntil:
+    visible:
+      text: "Green T-shirt"
+    timeout: 60000
 - assertVisible:
     id: "product-link-1"
 - tapOn:
     id: "product-link-1"
-- assertVisible:
-    text: "Buy now"
+- extendedWaitUntil:
+    visible:
+      text: "Buy now"
+    timeout: 60000
 - assertVisible:
     id: "buy-now"
 - tapOn:

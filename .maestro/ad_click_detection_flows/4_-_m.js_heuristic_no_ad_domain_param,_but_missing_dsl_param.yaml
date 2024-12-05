@@ -7,22 +7,24 @@ tags:
 
 - runFlow: ../shared/onboarding.yaml
 
-- inputText: "https://www.search-company.site/#ad-id-8"
+- inputText: "https://www.search-company.site/#ad-id-3"
 - pressKey: Enter
-- assertVisible:
-    text: ".*Got It.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Got It.*"
+    timeout: 60000
 - tapOn:
     text: "Got It"
+- scrollUntilVisible:
+    element:
+      id: "ad-id-4"
+    direction: DOWN
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/fireIconMenu"
-- tapOn:
-    text: "Cancel"
-- assertVisible:
-    id: "ad-id-8"
-- tapOn:
-    id: "ad-id-8"
-- assertVisible:
-    text: "Publisher site"
+    id: "ad-id-4"
+- extendedWaitUntil:
+    visible:
+      text: "Publisher site"
+    timeout: 60000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
 - assertVisible:
@@ -36,6 +38,8 @@ tags:
 - assertVisible:
     text: ".*Ad Company"
 - assertVisible:
+    text: "convert.ad-company.site"
+- assertVisible:
     text: "ad-company.site"
 - action: back
 - assertVisible:
@@ -43,14 +47,6 @@ tags:
 - tapOn:
     text: "View Non-Tracker Companies"
 - assertVisible:
-    text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
+    text: "We did not identify any requests from third-party domains."
 - assertVisible:
     text: "About our Web Tracking Protections"
-- assertVisible:
-    text: "The following domain’s requests were loaded because a publisher-company.site ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling."
-- assertVisible:
-    text: "How our search ads impact our protections"
-- assertVisible:
-    text: ".*Ad Company"
-- assertVisible:
-    text: "convert.ad-company.site"

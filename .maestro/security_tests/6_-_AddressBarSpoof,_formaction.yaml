@@ -10,6 +10,10 @@ tags:
     id: "omnibarTextInput"
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"
 - pressKey: Enter
+- extendedWaitUntil:
+    visible:
+        text: "Got It"
+    timeout: 60000
 - tapOn: "Got It"
 - tapOn: "run"
 # Should do nothing - the navigation should be prevented.

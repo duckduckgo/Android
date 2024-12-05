@@ -55,65 +55,64 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          name: API_34_adClickTest_${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 34
           workspace: .maestro
+          timeout: 120
           include-tags: adClickTest
 
       - name: Privacy Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          name: API_34_privacyTest_${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 34
           workspace: .maestro
+          timeout: 120
           include-tags: privacyTest
 
       - name: Security Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          name: API_34_securityTest_${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 34
           workspace: .maestro
+          timeout: 120
           include-tags: securityTest
 
       - name: Release Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          name: API_34_releaseTest_${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 34
           workspace: .maestro
+          timeout: 120
           include-tags: releaseTest
 
       - name: Notifications permissions Android 13+
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ secrets.ROBIN_PROJECT_ID }}
+          name: API_33_notificationPermissionTest_${{ github.sha }}
           app-file: apk/release.apk
           android-api-level: 33
+          timeout: 120
           workspace: .maestro/notifications_permissions_android13_plus
-
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        uses: honeycombio/gha-create-asana-task@main
-        with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - End to end tests
-          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
