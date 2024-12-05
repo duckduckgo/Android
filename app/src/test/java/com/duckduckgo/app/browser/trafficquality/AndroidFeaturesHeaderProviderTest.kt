@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.trafficquality.remote.RealAndroidFeaturesHeaderProvider
 import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -151,18 +150,5 @@ class AndroidFeaturesHeaderProviderTest {
 
         val result = testee.provide(config)
         assertTrue(result == "vpn_enabled=true" || result == "cpm_enabled=true" || result == "gpc_enabled=true" || result == "atp_enabled=true")
-    }
-
-    private fun noFeaturesEnabled(): TrafficQualityAppVersionFeatures {
-        return TrafficQualityAppVersionFeatures(gpc = false, cpm = false, appTP = false, netP = false)
-    }
-
-    private fun featuresEnabled(
-        gpc: Boolean = false,
-        cpm: Boolean = false,
-        appTP: Boolean = false,
-        netP: Boolean = false,
-    ): TrafficQualityAppVersionFeatures {
-        return TrafficQualityAppVersionFeatures(gpc = gpc, cpm = cpm, appTP = appTP, netP = netP)
     }
 }
