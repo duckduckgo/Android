@@ -9,6 +9,13 @@ name: "Autofill: Search credentials"
     commands:
       - tapOn: "No thanks"
 
+- runFlow:
+    when:
+      visible: "Help us improve!"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/close"
+
 - tapOn:
     id: searchLogins
 
