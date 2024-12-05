@@ -3859,4 +3859,8 @@ internal class FakeVariantManager : VariantManager {
         saveVariantsCallCounter++
         variant = ""
     }
+
+    override fun isReturningUser(): Boolean {
+        TODO("Not yet implemented")
+    }
 }
