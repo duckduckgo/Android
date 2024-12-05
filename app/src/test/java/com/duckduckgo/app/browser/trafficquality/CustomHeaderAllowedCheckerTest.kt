@@ -19,8 +19,6 @@ package com.duckduckgo.app.browser.trafficquality
 import com.duckduckgo.app.browser.trafficquality.Result.Allowed
 import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderStore
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersionFeatures
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -57,8 +55,7 @@ class CustomHeaderAllowedCheckerTest {
 
     @Test
     fun whenNoConfigForCurrentVersionAvailableThenNotAllowed() = runTest {
-        val config = TrafficQualityAppVersion(anotherVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForAnotherVersion))
 
         val result = testee.isAllowed()
 
@@ -68,8 +65,7 @@ class CustomHeaderAllowedCheckerTest {
     @Test
     fun whenAskingAtStartOfGracePeriodThenIsAllowed() = runTest {
         givenBuildDateDaysAgo(5)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForCurrentVersion))
 
         val result = testee.isAllowed()
 
@@ -79,8 +75,7 @@ class CustomHeaderAllowedCheckerTest {
     @Test
     fun whenAskingDuringGracePeriodThenReturnIsAllowed() = runTest {
         givenBuildDateDaysAgo(8)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForCurrentVersion))
 
         val result = testee.isAllowed()
 
@@ -90,8 +85,7 @@ class CustomHeaderAllowedCheckerTest {
     @Test
     fun whenAskingAtTheEndOfGracePeriodThenIsAllowed() = runTest {
         givenBuildDateDaysAgo(10)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForCurrentVersion))
 
         val result = testee.isAllowed()
 
@@ -102,8 +96,7 @@ class CustomHeaderAllowedCheckerTest {
     fun whenItsTooEarlyToLogThenIsNotAllowed() = runTest {
         givenBuildDateDaysAgo(1)
 
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForCurrentVersion))
 
         val result = testee.isAllowed()
 
@@ -114,8 +107,7 @@ class CustomHeaderAllowedCheckerTest {
     fun whenItsTooLateToLogThenIsNotAllowed() = runTest {
         givenBuildDateDaysAgo(20)
 
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled())
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(config))
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(listOf(configEnabledForCurrentVersion))
 
         val result = testee.isAllowed()
 
@@ -125,14 +117,5 @@ class CustomHeaderAllowedCheckerTest {
     private fun givenBuildDateDaysAgo(days: Long) {
         val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         whenever(appBuildConfig.buildDateTimeMillis).thenReturn(daysAgo)
-    }
-
-    private fun featuresEnabled(
-        gpc: Boolean = false,
-        cpm: Boolean = false,
-        appTP: Boolean = false,
-        netP: Boolean = false,
-    ): TrafficQualityAppVersionFeatures {
-        return TrafficQualityAppVersionFeatures(gpc = gpc, cpm = cpm, appTP = appTP, netP = netP)
     }
 }
