@@ -52,6 +52,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.RULES
 import com.duckduckgo.app.tabs.rules.TabRulesActivity
+import com.duckduckgo.app.tabs.rules.TabRulesScreen
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
@@ -65,6 +66,7 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -116,6 +118,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -410,7 +415,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabRuleSelected() {
-        startActivity(Intent(this, TabRulesActivity::class.java))
+        globalActivityStarter.start(this, TabRulesScreen)
     }
 
     private fun onTabDraggingStarted() {
