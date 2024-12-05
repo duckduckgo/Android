@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Setări</string>
     <string name="settingsMenuItemTitle">Setări</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
+    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Măsuri de protecție a confidențialității</string>
     <string name="settingsHeadingAppearance">Aspect</string>
     <string name="settingsHeadingCustomize">Personalizare</string>
     <string name="settingsHeadingAbout">Despre</string>
@@ -134,6 +135,7 @@
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Blochează tehnologiile de urmărire prin e-mail și ascunde-ți adresa</string>
     <string name="settingsHeadingMore">Mai multe de la DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Pașii următori</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>
@@ -156,9 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
+    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Setări principale</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>
+    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Ștergerea datelor</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Adaugă un widget la ecranul de întâmpinare</string>
+    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Setează poziția barei de adrese</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Activează căutarea vocală</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo pe alte platforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Căutare Confidențială</string>
@@ -714,6 +722,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Parole</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Parole și completare automată</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
 

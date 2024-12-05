@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
+    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Integritetsskydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
@@ -134,6 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
     <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Nästa steg</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
@@ -156,9 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
+    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Huvudinställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
+    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datarensning</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Lägg till widget på startsidan</string>
+    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Ange din adressfältsposition</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Aktivera röstsökning</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo på andra plattformar</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
@@ -714,6 +722,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Lösenord</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Lösenord och automatisk ifyllning</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
 
