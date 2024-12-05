@@ -35,9 +35,6 @@ class CustomHeaderAllowedCheckerTest {
 
     private lateinit var testee: CustomHeaderAllowedChecker
 
-    private val currentVersion = 5210000
-    private val anotherVersion = 5220000
-
     @Before
     fun setup() {
         testee = RealCustomHeaderGracePeriodChecker(appBuildConfig, featuresRequestHeaderStore)
@@ -46,7 +43,7 @@ class CustomHeaderAllowedCheckerTest {
 
     @Test
     fun whenNoConfigAvailableThenNotAllowed() = runTest {
-        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(null)
+        whenever(featuresRequestHeaderStore.getConfig()).thenReturn(emptyList())
 
         val result = testee.isAllowed()
 
