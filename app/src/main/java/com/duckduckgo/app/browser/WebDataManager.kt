@@ -71,7 +71,7 @@ class WebViewDataManager @Inject constructor(
         suspendCoroutine { continuation ->
             webStorage.getOrigins { origins ->
                 kotlin.runCatching {
-                    for (origin in origins) {
+                    for (origin in origins.values) {
                         val originString = (origin as Origin).origin
 
                         // Check if this is the domain to exclude
@@ -82,6 +82,8 @@ class WebViewDataManager @Inject constructor(
                     }
                     continuation.resume(Unit)
                 }.onFailure {
+                    // fallback, if we crash we delete everything
+                    webStorage.deleteAllData()
                     continuation.resume(Unit)
                 }
             }
