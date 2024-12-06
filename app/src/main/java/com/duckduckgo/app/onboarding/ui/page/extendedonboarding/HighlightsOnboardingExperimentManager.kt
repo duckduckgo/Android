@@ -36,8 +36,8 @@ class HighlightsOnboardingExperimentManagerImpl @Inject constructor(
 
     override fun setExperimentVariants() {
         val variants = listOf(
-            VariantConfig("mw", 1.0, null), // Control variant
-            VariantConfig("mx", 1.0, null), // Experimental variant
+            VariantConfig("mw", 0.0, null), // Control variant
+            VariantConfig("mx", 0.0, null), // Experimental variant
         )
         variantManager.updateVariants(variants)
     }
