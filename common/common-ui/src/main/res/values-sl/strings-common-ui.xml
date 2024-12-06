@@ -30,4 +30,6 @@
     <string name="edit">Uredi</string>
     <string name="remove">Odstrani</string>
     <string name="removeAll">Odstrani vse</string>
+    <string name="undo">Razveljavi</string>
+    <string name="cancel">Preklic</string>
 </resources>

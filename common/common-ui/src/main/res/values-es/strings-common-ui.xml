@@ -30,4 +30,6 @@
     <string name="edit">Editar</string>
     <string name="remove">Eliminar</string>
     <string name="removeAll">Eliminar todo</string>
+    <string name="undo">Deshacer</string>
+    <string name="cancel">Cancelar</string>
 </resources>

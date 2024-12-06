@@ -30,4 +30,6 @@
     <string name="edit">Uredi</string>
     <string name="remove">Ukloni</string>
     <string name="removeAll">Odstrani sve</string>
+    <string name="undo">Poništi</string>
+    <string name="cancel">Odustani</string>
 </resources>

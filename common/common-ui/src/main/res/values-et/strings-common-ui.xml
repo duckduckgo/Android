@@ -30,4 +30,6 @@
     <string name="edit">Redigeeri</string>
     <string name="remove">Eemaldage</string>
     <string name="removeAll">Eemalda kõik</string>
+    <string name="undo">Võta tagasi</string>
+    <string name="cancel">Tühista</string>
 </resources>

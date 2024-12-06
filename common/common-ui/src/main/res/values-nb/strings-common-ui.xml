@@ -30,4 +30,6 @@
     <string name="edit">Rediger</string>
     <string name="remove">Fjern</string>
     <string name="removeAll">Fjern alle</string>
+    <string name="undo">Angre</string>
+    <string name="cancel">Avbryt</string>
 </resources>

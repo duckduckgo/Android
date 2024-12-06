@@ -30,5 +30,6 @@
     <string name="edit">Редактировать</string>
     <string name="remove">Удалить</string>
     <string name="removeAll">Удалить все</string>
-
+    <string name="undo">Отменить</string>
+    <string name="cancel">Отменить</string>
 </resources>

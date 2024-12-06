@@ -30,4 +30,6 @@
     <string name="edit">Editare</string>
     <string name="remove">Elimină</string>
     <string name="removeAll">Elimină tot</string>
+    <string name="undo">Anulează</string>
+    <string name="cancel">Anulează</string>
 </resources>

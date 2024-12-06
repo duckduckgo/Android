@@ -30,4 +30,6 @@
     <string name="edit">Bewerken</string>
     <string name="remove">Verwijderen</string>
     <string name="removeAll">Alles verwijderen</string>
+    <string name="undo">Ongedaan maken</string>
+    <string name="cancel">Annuleren</string>
 </resources>
