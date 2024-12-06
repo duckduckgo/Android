@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Stránky, které navštívíš, můžou žádat o přístup k fotoaparátu, mikrofonu, softwaru DRM (Digital Rights Management) nebo k poloze tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Povolit všem webům, aby žádaly o:</string>
+    <string name="sitePermissionsSettingsLocation">Poloha</string>
+    <string name="sitePermissionsSettingsCamera">Fotoaparát</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa webů</string>
+    <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Oprávnění odebrána všem webům</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oprávnění „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Vždycky se ptát</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
+    <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázáno pro všechny weby</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">%1$s žádá o přístup ke kameře a mikrofonu</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">%1$s žádá o přístup k mikrofonu</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">%1$s žádá o přístup ke kameře</string>

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -38,7 +37,6 @@ class FaviconModule {
         faviconPersister: FaviconPersister,
         bookmarksDao: SavedSitesEntitiesDao,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
-        locationPermissionsRepository: LocationPermissionsRepository,
         savedSitesRepository: SavedSitesRepository,
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider,
@@ -50,7 +48,6 @@ class FaviconModule {
             faviconPersister,
             bookmarksDao,
             fireproofWebsiteRepository,
-            locationPermissionsRepository,
             savedSitesRepository,
             faviconDownloader,
             dispatcherProvider,

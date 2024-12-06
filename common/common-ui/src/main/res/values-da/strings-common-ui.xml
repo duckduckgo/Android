@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Underret mig</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Tilføj</string>
+    <string name="dialogEditTitle">Rediger</string>
+    <string name="dialogSaveAction">Gem</string>
+    <string name="dialogConfirmTitle">Bekræft</string>
+    <string name="dialogSave">Gem</string>
+    <string name="delete">Slet</string>
+    <string name="edit">Rediger</string>
+    <string name="remove">Fjern</string>
+    <string name="removeAll">Fjern alt</string>
 </resources>

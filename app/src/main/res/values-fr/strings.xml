@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
+    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Protections de la confidentialité</string>
     <string name="settingsHeadingAppearance">Apparence</string>
     <string name="settingsHeadingCustomize">Personnaliser</string>
     <string name="settingsHeadingAbout">À propos</string>
@@ -134,6 +135,7 @@
     <string name="settingsEmailProtectionTitle">Protection des e-mails</string>
     <string name="settingsEmailProtectionSubtitle">Bloquez les traqueurs d\'e-mails et masquez votre adresse</string>
     <string name="settingsHeadingMore">Plus de la part de DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Étapes suivantes</string>
     <string name="settingsLightTheme">Clair</string>
     <string name="settingsTheme">Thème</string>
     <string name="settingsDarkTheme">Sombre</string>
@@ -156,9 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
+    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Réglages principaux</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
+    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Effacement des données</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Ajouter le widget à l\'écran d\'accueil</string>
+    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Définissez la position de votre barre d\'adresse</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Activez la recherche vocale</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo sur d\'autres plateformes</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Recherche privée</string>
@@ -251,14 +259,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Voir ce qui est envoyé</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Les informations envoyées dans les rapports ne peuvent pas être utilisées pour vous identifier :</b><br/><br/>• URL de la page (sans informations d'identification)<br/>• Marque, modèle et fabricant de l'appareil<br/>• Numéro de version du système d'exploitation<br/>• Numéro de version de l'application<br/>• Groupe d'expérimentation anonyme pour les tests de fonctionnalités<br/>• Informations sur les versions de nos protections qui étaient actives<br/>• Numéro de version du moteur du navigateur Web<br/>• Liste des protections et des fonctionnalités du navigateur qui étaient actives<br/>• Noms d'hôte des traqueurs bloqués, demandes de substitution, demandes ignorées et demandes ne figurant pas dans la liste des blocages de traqueurs<br/>• Erreurs signalées par le navigateur<br/>• Codes HTTP (Website Response Status)<br/>• Le formulaire de signalement que vous avez utilisé (menu, tableau de bord, etc.)<br/>• Date du dernier rapport envoyé pour ce site<br/>• Si vous avez choisi ou non d'afficher ces informations de signalement<br/>• Nombre de fois où les protections ont été désactivées<br/>• Vitesse de chargement de différentes parties de la page<br/>• Comment vous avez accédé à cette page, soit : SERP (recherche DuckDuckGo), Navigation (lien/URL) ou Externe (autres moyens)<br/>• Nombre d'actualisations depuis le chargement de la page<br/>• Langue principale et pays de votre appareil<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Confirmer</string>
-    <string name="dialogSave">Enregistrer</string>
-    <string name="delete">Supprimer</string>
-    <string name="edit">Modifier</string>
-    <string name="remove">Supprimer</string>
-    <string name="removeAll">Tout supprimer</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Rechercher avec DuckDuckGo</string>
@@ -477,11 +477,6 @@
     <string name="manageAllowlist">Sites non protégés</string>
     <string name="reportBrokenSite">Signaler un problème de site</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Ajouter</string>
-    <string name="dialogEditTitle">Modifier</string>
-    <string name="dialogSaveAction">Enregistrer</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
@@ -664,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Autorisations du site</string>
-    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez sont susceptibles de demander l\'accès à la localisation, à l\'appareil photo, au micro ou au logiciel DRM (gestion des droits numériques) de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
-    <string name="sitePermissionsSettingsLocation">Localisation</string>
-    <string name="sitePermissionsSettingsCamera">Appareil photo</string>
-    <string name="sitePermissionsSettingsMicrophone">Micro</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
-    <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorisations supprimées pour tous les sites</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorisations pour « %1$s » </string>
-    <string name="permissionsPerWebsiteAskSetting">Toujours demander</string>
-    <string name="permissionsPerWebsiteDenySetting">Refuser</string>
-    <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Désactivé pour tous les sites</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Sachez quand les téléchargements sont prêts</string>
@@ -714,6 +695,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Mots de passe</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Mots de passe et saisie automatique</string>
     <string name="autofillLoginSavedSnackbarMessage">Le mot de passe a été enregistré</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Le mot de passe a été modifié</string>
 

@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji urządzenia, kamery, mikrofonu lub oprogramowania DRM (Digital Rights Management). Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
+    <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
+    <string name="sitePermissionsSettingsCamera">Aparat</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
+    <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Pytaj za każdym razem</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmów</string>
+    <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono dla wszystkich witryn</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do aparatu i mikrofonu</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do mikrofonu</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do aparatu</string>

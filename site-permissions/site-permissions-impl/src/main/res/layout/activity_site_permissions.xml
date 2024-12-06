@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.app.sitepermissions.SitePermissionsActivity">
+    tools:context="com.duckduckgo.site.permissions.impl.ui.SitePermissionsActivity">
 
     <include
         android:id="@+id/includeToolbar"

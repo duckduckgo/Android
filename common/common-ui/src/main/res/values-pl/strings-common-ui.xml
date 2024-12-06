@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Powiadom mnie</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodaj</string>
+    <string name="dialogEditTitle">Edytuj</string>
+    <string name="dialogSaveAction">Zapisz</string>
+    <string name="dialogConfirmTitle">Potwierdź</string>
+    <string name="dialogSave">Zapisz</string>
+    <string name="delete">Usuń</string>
+    <string name="edit">Edytuj</string>
+    <string name="remove">Usuń</string>
+    <string name="removeAll">Usuń wszystko</string>
 </resources>

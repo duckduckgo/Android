@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Chci dostat upozornění</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Přidat</string>
+    <string name="dialogEditTitle">Upravit</string>
+    <string name="dialogSaveAction">Uložit</string>
+    <string name="dialogConfirmTitle">Potvrdit</string>
+    <string name="dialogSave">Uložit</string>
+    <string name="delete">Smazat</string>
+    <string name="edit">Upravit</string>
+    <string name="remove">Odstranit</string>
+    <string name="removeAll">Odstranit vše</string>
 </resources>

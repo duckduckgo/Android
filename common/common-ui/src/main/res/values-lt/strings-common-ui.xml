@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Informuoti</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Papildyti</string>
+    <string name="dialogEditTitle">Redaguoti</string>
+    <string name="dialogSaveAction">Išsaugoti</string>
+    <string name="dialogConfirmTitle">Patvirtinti</string>
+    <string name="dialogSave">Išsaugoti</string>
+    <string name="delete">Trinti</string>
+    <string name="edit">Redaguoti</string>
+    <string name="remove">Pašalinti</string>
+    <string name="removeAll">Pašalinti visus</string>
 </resources>
