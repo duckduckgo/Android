@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Sites non protégés</string>
     <string name="reportBrokenSite">Signaler un problème de site</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Ajouter</string>
+    <string name="dialogEditTitle">Modifier</string>
+    <string name="dialogSaveAction">Enregistrer</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>

@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Pievienot</string>
+    <string name="dialogEditTitle">Rediģēt</string>
+    <string name="dialogSaveAction">Saglabāt</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>

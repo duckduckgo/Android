@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Kaitseta saidid</string>
     <string name="reportBrokenSite">Teata mittetoimivast saidist</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lisa</string>
+    <string name="dialogEditTitle">Redigeeri</string>
+    <string name="dialogSaveAction">Salvesta</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>

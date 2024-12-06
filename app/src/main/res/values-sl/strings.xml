@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Nezaščitene strani</string>
     <string name="reportBrokenSite">Prijavite poškodovano spletno mesto</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodaj</string>
+    <string name="dialogEditTitle">Uredi</string>
+    <string name="dialogSaveAction">Shrani</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezaščitene strani</string>
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>

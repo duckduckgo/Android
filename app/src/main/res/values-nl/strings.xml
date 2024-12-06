@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Onbeschermde sites</string>
     <string name="reportBrokenSite">Defecte website melden</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Toevoegen</string>
+    <string name="dialogEditTitle">Bewerken</string>
+    <string name="dialogSaveAction">Opslaan</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>

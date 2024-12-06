@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Sites desprotegidos</string>
     <string name="reportBrokenSite">Denunciar site danificado</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Adicionar</string>
+    <string name="dialogEditTitle">Editar</string>
+    <string name="dialogSaveAction">Guardar</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>

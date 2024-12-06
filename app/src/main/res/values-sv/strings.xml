@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Oskyddade webbplatser</string>
     <string name="reportBrokenSite">Rapportera skadad webbplats</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lägg till</string>
+    <string name="dialogEditTitle">Redigera</string>
+    <string name="dialogSaveAction">Spara</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
