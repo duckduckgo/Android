@@ -16,15 +16,20 @@
 
 package com.duckduckgo.installation.impl.installer.com.duckduckgo.installation.impl.installer.aura
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.installation.impl.installer.aura.AuraExperimentListJsonParserImpl
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 
 class AuraExperimentListJsonParserImplTest {
 
-    private val testee = AuraExperimentListJsonParserImpl()
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    private val testee = AuraExperimentListJsonParserImpl(coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenGibberishInputThenReturnsReturnsEmptyPackages() = runTest {
