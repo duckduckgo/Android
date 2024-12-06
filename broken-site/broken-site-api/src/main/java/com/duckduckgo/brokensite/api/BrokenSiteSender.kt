@@ -41,4 +41,4 @@ data class BrokenSite(
     val jsPerformance: List<Double>?,
 )
 
-enum class ReportFlow { DASHBOARD, MENU, PROMPT }
+enum class ReportFlow { DASHBOARD, MENU, RELOAD_THREE_TIMES_WITHIN_20_SECONDS }
