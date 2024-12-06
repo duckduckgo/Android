@@ -3860,7 +3860,7 @@ internal class FakeVariantManager : VariantManager {
         variant = ""
     }
 
-    override fun isReturningUser(): Boolean {
+    override fun isReinstallVariant(): Boolean {
         TODO("Not yet implemented")
     }
 }

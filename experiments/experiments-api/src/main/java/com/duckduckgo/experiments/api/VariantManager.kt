@@ -41,9 +41,9 @@ interface VariantManager {
     fun updateVariants(variants: List<VariantConfig>)
 
     /**
-     * Determines if the user is a returning user.
+     * Checks if the user has been assigned the reinstall variant.
      *
-     * @return True if the user is assigned the reinstall variant, false otherwise.
+     * @return True if the user is assigned the reinstall variant; false otherwise.
      */
-    fun isReturningUser(): Boolean
+    fun isReinstallVariant(): Boolean
 }
