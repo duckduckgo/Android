@@ -80,7 +80,7 @@ class RealAppBuildConfig @Inject constructor(
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {
-            if (sdkInt < Build.VERSION_CODES.R) {
+            if (sdkInt < 30) {
                 return@withContext false
             }
 
