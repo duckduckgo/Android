@@ -17,7 +17,7 @@
 package com.duckduckgo.brokensite.api
 
 interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
+    fun submitBrokenSiteFeedback(brokenSite: BrokenSite, toggle: Boolean)
 }
 
 data class BrokenSite(
@@ -41,4 +41,4 @@ data class BrokenSite(
     val jsPerformance: List<Double>?,
 )
 
-enum class ReportFlow { DASHBOARD, MENU, PROMPT }
+enum class ReportFlow { DASHBOARD, MENU, PROMPT, TOGGLE_DASHBOARD, TOGGLE_MENU }

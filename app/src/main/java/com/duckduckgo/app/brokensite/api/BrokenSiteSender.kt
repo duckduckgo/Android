@@ -33,6 +33,8 @@ import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.brokensite.api.ReportFlow.DASHBOARD
 import com.duckduckgo.brokensite.api.ReportFlow.MENU
 import com.duckduckgo.brokensite.api.ReportFlow.PROMPT
+import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_DASHBOARD
+import com.duckduckgo.brokensite.api.ReportFlow.TOGGLE_MENU
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
@@ -82,7 +84,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val inventory: FeatureTogglesInventory,
 ) : BrokenSiteSender {
 
-    override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
+    override fun submitBrokenSiteFeedback(brokenSite: BrokenSite, toggle: Boolean) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
 
@@ -149,7 +151,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 params[LAST_SENT_DAY] = lastSentDay
             }
 
-            if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language) {
+            if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language && !toggle) {
                 params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
             }
 
@@ -160,7 +162,15 @@ class BrokenSiteSubmitter @Inject constructor(
                 SURROGATES_KEY to brokenSite.surrogates,
             )
             runCatching {
-                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params.toMap(), encodedParams)
+                if (toggle) {
+                    val unnecessaryKeys = listOf(CATEGORY_KEY, DESCRIPTION_KEY, PROTECTIONS_STATE)
+                    for (key in unnecessaryKeys) {
+                        params.remove(key)
+                    }
+                    pixel.fire(AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName, params.toMap(), encodedParams)
+                } else {
+                    pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params.toMap(), encodedParams)
+                }
             }
                 .onSuccess {
                     Timber.v("Feedback submission succeeded")
@@ -222,4 +232,6 @@ private fun ReportFlow.toStringValue(): String = when (this) {
     DASHBOARD -> "dashboard"
     MENU -> "menu"
     PROMPT -> "prompt"
+    TOGGLE_DASHBOARD -> "on_protections_off_dashboard_main"
+    TOGGLE_MENU -> "on_protections_off_menu"
 }

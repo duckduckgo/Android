@@ -25,6 +25,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onOpenSettings: (String) -> Unit,
     val onClose: () -> Unit,
     val onSubmitBrokenSiteReport: (String) -> Unit,
+    val onGetToggleReportOptions: () -> Unit,
+    val onSendToggleReport: () -> Unit,
+    val onRejectToggleReport: () -> Unit,
+    val onSeeWhatIsSent: () -> Unit,
+    val onShowNativeFeedback: () -> Unit,
 ) {
     @JavascriptInterface
     fun toggleAllowlist(payload: String) {
@@ -54,6 +59,31 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun submitBrokenSiteReport(payload: String) {
         onSubmitBrokenSiteReport(payload)
+    }
+
+    @JavascriptInterface
+    fun getToggleReportOptions() {
+        onGetToggleReportOptions()
+    }
+
+    @JavascriptInterface
+    fun sendToggleReport() {
+        onSendToggleReport()
+    }
+
+    @JavascriptInterface
+    fun rejectToggleReport() {
+        onRejectToggleReport()
+    }
+
+    @JavascriptInterface
+    fun seeWhatIsSent() {
+        onSeeWhatIsSent()
+    }
+
+    @JavascriptInterface
+    fun showNativeFeedback() {
+        onShowNativeFeedback()
     }
 
     companion object {

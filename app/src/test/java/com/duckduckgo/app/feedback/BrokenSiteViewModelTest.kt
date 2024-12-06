@@ -193,7 +193,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -241,7 +241,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -419,7 +419,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -468,7 +468,7 @@ class BrokenSiteViewModelTest {
             jsPerformance = null,
         )
 
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected, toggle = false)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 

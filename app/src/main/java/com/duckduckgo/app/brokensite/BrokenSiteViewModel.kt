@@ -39,6 +39,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_DASHBOARD
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.TOGGLE_MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extractDomain
@@ -212,7 +214,7 @@ class BrokenSiteViewModel @Inject constructor(
 
             val brokenSite = getBrokenSite(url, description, loginSiteFinal)
 
-            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
         }
         command.value = Command.ConfirmAndFinish
     }
@@ -287,4 +289,6 @@ private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFl
     MENU -> BrokenSiteModelReportFlow.MENU
     DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
     PROMPT -> BrokenSiteModelReportFlow.PROMPT
+    TOGGLE_MENU -> BrokenSiteModelReportFlow.TOGGLE_MENU
+    TOGGLE_DASHBOARD -> BrokenSiteModelReportFlow.TOGGLE_DASHBOARD
 }
