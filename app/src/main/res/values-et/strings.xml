@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Saidi load</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>
     <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>

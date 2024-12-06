@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Kontextové okno je skryté</string>
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
     <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>

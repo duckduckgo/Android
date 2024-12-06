@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallitut evästeet</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>

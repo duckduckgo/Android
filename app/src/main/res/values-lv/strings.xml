@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Uznirstošais logs paslēpts</string>
     <string name="autoconsentManagedNoticeAnimationText">Pārvaldītie sīkfaili</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Vietnes atļaujas</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>
     <string name="downloadsNotifyMeSubtitle">Saņem paziņojumu, kad lejupielāde ir pabeigta.</string>

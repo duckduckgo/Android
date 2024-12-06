@@ -18,6 +18,7 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
     <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
     <string name="sitePermissionsSettingsLocation">Sijainti</string>

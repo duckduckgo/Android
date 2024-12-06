@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>
     <string name="autoconsentManagedNoticeAnimationText">O cookies je postaráno!</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Oprávnění webu</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zjisti, až budou soubory ke stažení připraveny</string>
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>

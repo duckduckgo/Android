@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Felugró ablak elrejtve</string>
     <string name="autoconsentManagedNoticeAnimationText">Kezelt sütik</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Webhelyengedélyek</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>

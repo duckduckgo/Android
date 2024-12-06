@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Изскачащият прозорец е скрит</string>
     <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Разрешения за сайтове</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>

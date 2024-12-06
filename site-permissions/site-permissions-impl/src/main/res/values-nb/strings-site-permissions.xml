@@ -18,6 +18,7 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Nettstedstillatelser</string>
     <string name="sitePermissionsSettingsDescription">Nettsteder du besøker, kan be om tilgang til enhetens posisjon, kamera, mikrofon eller DRA-programvare (digital rettighetsadministrasjon). De får ikke tilgang til disse med mindre du uttrykkelig gir dem tillatelse.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillat alle nettsteder å be om:</string>
     <string name="sitePermissionsSettingsLocation">Posisjon</string>

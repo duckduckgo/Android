@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
     <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Permisiuni pentru site</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>

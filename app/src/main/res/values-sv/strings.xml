@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
