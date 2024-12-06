@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Незащитени сайтове</string>
     <string name="reportBrokenSite">Подаване на сигнал за повреден сайт</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Добавяне</string>
+    <string name="dialogEditTitle">Редактиране</string>
+    <string name="dialogSaveAction">Запази</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>

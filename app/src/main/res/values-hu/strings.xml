@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Védelem nélküli weboldalak</string>
     <string name="reportBrokenSite">Hibás weboldal jelentése</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Hozzáadás</string>
+    <string name="dialogEditTitle">Szerkesztés</string>
+    <string name="dialogSaveAction">Mentés</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>

@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Korumasız Siteler</string>
     <string name="reportBrokenSite">Hatalı Siteyi Bildirin</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Ekle</string>
+    <string name="dialogEditTitle">Düzenle</string>
+    <string name="dialogSaveAction">Kaydet</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>

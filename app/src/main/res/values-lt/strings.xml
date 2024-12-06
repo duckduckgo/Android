@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Neapsaugotos svetainės</string>
     <string name="reportBrokenSite">Pranešti apie sugadintą svetainę</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Papildyti</string>
+    <string name="dialogEditTitle">Redaguoti</string>
+    <string name="dialogSaveAction">Išsaugoti</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>

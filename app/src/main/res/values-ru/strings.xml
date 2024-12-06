@@ -471,11 +471,16 @@
     <string name="changeIconCtaAccept">Применить</string>
     <string name="changeIconCtaCancel">Отменить</string>
     <string name="changeIconDialogTitle">Применить новый значок?</string>
-    <string name="changeIconDialogMessage">Приложение может закрыться, чтоfбы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
+    <string name="changeIconDialogMessage">Приложение может закрыться, чтобы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageAllowlist">Незащищенные сайты</string>
     <string name="reportBrokenSite">Сообщить о неработающем сайте</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Добавить</string>
+    <string name="dialogEditTitle">Редактировать</string>
+    <string name="dialogSaveAction">Сохранить</string>
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащищенные сайты</string>

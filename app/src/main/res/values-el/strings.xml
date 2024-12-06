@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Μη προστατευόμενοι ιστότοποι</string>
     <string name="reportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Προσθήκη</string>
+    <string name="dialogEditTitle">Επεξεργασία</string>
+    <string name="dialogSaveAction">Αποθήκευση</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
