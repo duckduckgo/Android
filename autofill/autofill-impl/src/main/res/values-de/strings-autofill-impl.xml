@@ -258,6 +258,6 @@
     <string name="importPasswordsProcessingResultDialogDoneButtonText">Verstanden</string>
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Passwortimport fehlgeschlagen</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Übersprungen (doppelt oder ungültig): <b>%1$d</b>]]></string>
-    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passwörter importiert: ** **<b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passwörter importiert: <b>%1$d</b>]]></string>
 
 </resources>
