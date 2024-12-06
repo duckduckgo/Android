@@ -153,6 +153,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpda
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.StartTranslation
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -184,6 +185,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.translate.TranslationEngine
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
@@ -198,6 +200,8 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.viewstate.TranslationViewState
+import com.duckduckgo.app.browser.viewstate.TranslationViewState.TranslationState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -310,38 +314,6 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
-import java.net.URI
-import java.net.URISyntaxException
-import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.any
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.contains
-import kotlin.collections.drop
-import kotlin.collections.emptyList
-import kotlin.collections.emptyMap
-import kotlin.collections.filter
-import kotlin.collections.filterNot
-import kotlin.collections.firstOrNull
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
-import kotlin.collections.iterator
-import kotlin.collections.map
-import kotlin.collections.mapOf
-import kotlin.collections.minus
-import kotlin.collections.mutableMapOf
-import kotlin.collections.mutableSetOf
-import kotlin.collections.plus
-import kotlin.collections.set
-import kotlin.collections.setOf
-import kotlin.collections.take
-import kotlin.collections.toList
-import kotlin.collections.toMutableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -367,6 +339,11 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
+import java.net.URI
+import java.net.URISyntaxException
+import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -434,6 +411,7 @@ class BrowserTabViewModel @Inject constructor(
     private val customHeadersProvider: CustomHeadersProvider,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    val translationEngine: TranslationEngine,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -670,6 +648,17 @@ class BrowserTabViewModel @Inject constructor(
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
+
+        translationEngine.setOnTranslationFinishedListener {
+            viewModelScope.launch(dispatchers.main()) {
+                translated = true
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    translation = currentOmnibarViewState().translation.copy(
+                        isProgressBarVisible = false
+                    )
+                )
+            }
+        }
     }
 
     fun loadData(
@@ -785,6 +774,7 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
+        translationEngine.onClose()
         super.onCleared()
     }
 
@@ -1714,6 +1704,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private var translated = false
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
@@ -1730,9 +1721,35 @@ class BrowserTabViewModel @Inject constructor(
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
+            translated = false
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+
+            if (currentOmnibarViewState().translation.isTranslationVisible) {
+                identifyLanguageAndTranslate()
+            }
         }
+    }
+
+    fun identifyLanguageAndTranslate() = viewModelScope.launch {
+        val identifiedLanguage = withContext(dispatchers.io()) {
+            translationEngine.identifyLanguage(title ?: "").let {
+                if (it == "und") "en" else it
+            }
+        }
+
+        val targetLanguage = (currentOmnibarViewState().translation.state as? TranslationState.LanguagePickers)?.targetLanguage
+            ?: Locale.getDefault().language
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            translation = currentOmnibarViewState().translation.copy(
+                isProgressBarVisible = true,
+                state = TranslationState.LanguagePickers(
+                    sourceLanguage = identifiedLanguage,
+                    targetLanguage = targetLanguage
+                )
+            )
+        )
+        command.value = StartTranslation
     }
 
     override fun onSitePermissionRequested(
@@ -2616,6 +2633,18 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onOmnibarTranslationClosePressed() {
+        viewModelScope.launch {
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                translation = currentOmnibarViewState().translation.copy(
+                    isTranslationVisible = false
+                )
+            )
+
+            onRefreshRequested(false)
+        }
+    }
+
     fun userRequestedOpeningNewTab(longPress: Boolean = false) {
         command.value = GenerateWebViewPreviewImage
         command.value = LaunchNewTab
@@ -2780,6 +2809,30 @@ class BrowserTabViewModel @Inject constructor(
         url?.let {
             pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
             command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
+        }
+    }
+
+    fun onTranslateSelected() {
+        viewModelScope.launch {
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                translation = TranslationViewState(
+                    isTranslationVisible = true,
+                    isProgressBarVisible = true,
+                    state = TranslationState.StatusMessage("Identifying the language...")
+                )
+            )
+
+            val identifiedLanguage = withContext(dispatchers.io()) {
+                translationEngine.identifyLanguage(title ?: "").let {
+                    if (it == "und") "en" else it
+                }
+            }
+
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                translation = currentOmnibarViewState().translation.copy(
+                    state = TranslationState.LanguagePickers(identifiedLanguage, Locale.getDefault().language)
+                )
+            )
         }
     }
 
@@ -3595,6 +3648,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
@@ -3756,6 +3811,42 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
+    }
+
+    fun onOmnibarLanguageSelectionChanged(isSource: Boolean, language: String) = viewModelScope.launch {
+        val translationState = currentOmnibarViewState().translation.state as? TranslationState.LanguagePickers ?: return@launch
+        var source: String
+        var target: String
+        if (isSource) {
+            source = language
+            target = translationState.targetLanguage
+        } else {
+            source = translationState.sourceLanguage
+            target = language
+        }
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            translation = currentOmnibarViewState().translation.copy(
+                state = TranslationState.StatusMessage("Downloading language model..."),
+                isProgressBarVisible = true,
+            )
+        )
+
+        translationEngine.setLanguagePair(source, target)
+
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            translation = currentOmnibarViewState().translation.copy(
+                state = TranslationState.LanguagePickers(
+                    sourceLanguage = source,
+                    targetLanguage = target,
+                )
+            )
+        )
+
+        if (translated) {
+            onRefreshRequested(false)
+        } else {
+            command.value = StartTranslation
+        }
     }
 
     companion object {

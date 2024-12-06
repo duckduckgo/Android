@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar
+package com.duckduckgo.app.browser.viewstate
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "changeOmnibarPosition",
-)
-interface ChangeOmnibarPositionFeature {
-    @Toggle.DefaultValue(false)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    @Toggle.InternalAlwaysEnabled
-    fun refactor(): Toggle
+data class TranslationViewState(
+    val isTranslationVisible: Boolean = false,
+    val isProgressBarVisible: Boolean = false,
+    val state: TranslationState = TranslationState.Initial
+) {
+    sealed class TranslationState {
+        data object Initial : TranslationState()
+        data class StatusMessage(val message: String) : TranslationState()
+        data class LanguagePickers(
+            val sourceLanguage: String,
+            val targetLanguage: String,
+        ) : TranslationState()
+    }
 }

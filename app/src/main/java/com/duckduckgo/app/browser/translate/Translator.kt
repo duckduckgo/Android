@@ -24,6 +24,7 @@ import javax.inject.Inject
 interface Translator {
     fun addJsInterface(
         webView: WebView,
+        translationEngine: TranslationEngine,
     )
 
     fun translate(
@@ -33,23 +34,26 @@ interface Translator {
 
 @ContributesBinding(AppScope::class)
 class TranslatorJS @Inject constructor() : Translator {
-    override fun addJsInterface(
-        webView: WebView,
-    ) {
-        webView.addJavascriptInterface(TranslatorJavascriptInterface(), TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME)
+    override fun addJsInterface(webView: WebView, translationEngine: TranslationEngine) {
+        webView.addJavascriptInterface(TranslationJavascriptInterface(translationEngine), TranslationJavascriptInterface.JAVASCRIPT_INTERFACE_NAME)
     }
 
     override fun translate(webView: WebView) {
         webView.loadUrl(
             """
                 javascript:(function() {
+                    var cache = 0;
+                    var translations = 0;
                     const translationCache = new Map();
+                    var translationCanceled = false;
                     
                     function translateTextNodes(node) {
                         if (node.nodeType === Node.TEXT_NODE) {
-                            asyncTranslateBlock(node);
+                            asyncTranslateBlock(node)
                         } else if (isTranslatableNode(node)) {
-                            node.childNodes.forEach(translateTextNodes);
+                            for (var i = 0; i < node.childNodes.length && translationCanceled === false; ++i) {
+                                translateTextNodes(node.childNodes[i]);
+                            }
                         }
                     }
                     
@@ -68,11 +72,17 @@ class TranslatorJS @Inject constructor() : Translator {
                         if (trimmedText.length > 0) {
                             if (translationCache.has(trimmedText)) {
                                 node.textContent = applyWhitespace(originalText, translationCache.get(trimmedText));
+                                cache++;
                                 return;
                             }                    
-                            console.log("$$$ Translating " + originalText);
                             
-                            const translation = ${TranslatorJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(trimmedText);
+                            const translation = ${TranslationJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.translate(trimmedText);
+                            if (translation.length === 0) {
+                                console.log("$$$ Translation error, cancelling...");
+                                translationCanceled = true;
+                            }
+                            
+                            translations++;
                             translationCache.set(trimmedText, translation);
                             
                             node.textContent = applyWhitespace(originalText, translation);
@@ -89,7 +99,9 @@ class TranslatorJS @Inject constructor() : Translator {
                         const observer = new MutationObserver((mutations) => {
                             mutations.forEach((mutation) => {
                                 mutation.addedNodes.forEach((node) => {
+                                    console.log("$$$ Mutation started");
                                     translateTextNodes(node);
+                                    console.log("$$$ Mutation finished, cache hits: " + cache + ", translations: " + translations);
                                 });
                             });
                         });
@@ -99,8 +111,13 @@ class TranslatorJS @Inject constructor() : Translator {
                             subtree: true,
                         });
                     }
-            
+                    
+                    console.log("$$$ Translation started");
                     translateTextNodes(document.body);
+                    console.log("$$$ Translation finished, cache hits: " + cache + ", translations: " + translations);
+                    cache = 0;
+                    translations = 0;
+                    ${TranslationJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.onTranslationFinished();
                     observeDOMChanges();
                 })();
             """,

@@ -58,6 +58,7 @@
     <string name="requestMobileSiteMenuTitle">Mobile Site</string>
     <string name="downloadsMenuTitle">Downloads</string>
     <string name="printMenuTitle">Print Page</string>
+    <string name="translateMenuTitle">Translate…</string>
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection enabled for %1$s</string>

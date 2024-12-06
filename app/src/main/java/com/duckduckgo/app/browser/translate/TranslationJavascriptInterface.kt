@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar
+package com.duckduckgo.app.browser.translate
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import android.webkit.JavascriptInterface
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "changeOmnibarPosition",
-)
-interface ChangeOmnibarPositionFeature {
-    @Toggle.DefaultValue(false)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
+class TranslationJavascriptInterface(private val translationEngine: TranslationEngine) {
+    @JavascriptInterface
+    fun translate(original: String): String {
+        return translationEngine.translate(original)
+    }
 
-    @Toggle.DefaultValue(false)
-    @Toggle.InternalAlwaysEnabled
-    fun refactor(): Toggle
+    @JavascriptInterface
+    fun onTranslationFinished() {
+        translationEngine.onTranslationFinished()
+    }
+
+    companion object {
+        const val JAVASCRIPT_INTERFACE_NAME = "WebTranslator"
+    }
 }

@@ -160,6 +160,13 @@
                 app:primaryText="@string/printMenuTitle" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/translateMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_translate_16"
+                app:primaryText="@string/translateMenuTitle" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

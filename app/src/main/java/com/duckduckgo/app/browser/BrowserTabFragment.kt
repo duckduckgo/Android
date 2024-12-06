@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.R.attr.text
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
@@ -924,6 +925,14 @@ class BrowserTabFragment :
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
 
+    private fun onOmnibarTranslationClosePressed() {
+        viewModel.onOmnibarTranslationClosePressed()
+    }
+
+    private fun onOmnibarLanguageSelectionChanged(isSource: Boolean, language: String) {
+        viewModel.onOmnibarLanguageSelectionChanged(isSource, language)
+    }
+
     private fun onOmnibarFireButtonPressed(isPulseAnimationPlaying: Boolean) {
         browserActivity?.launchFire()
         viewModel.onFireMenuSelected()
@@ -1062,6 +1071,9 @@ class BrowserTabFragment :
             onMenuItemClicked(autofillMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                 viewModel.onAutofillMenuSelected()
+            }
+            onMenuItemClicked(translateMenuItem) {
+                viewModel.onTranslateSelected()
             }
 
             onMenuItemClicked(openInDdgBrowserMenuItem) {
@@ -1747,8 +1759,17 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
+            is Command.StartTranslation -> startTranslation()
             else -> {
                 // NO OP
+            }
+        }
+    }
+
+    private fun startTranslation() {
+        lifecycleScope.launch {
+            webView?.let {
+                translator.translate(it)
             }
         }
     }
@@ -2375,6 +2396,14 @@ class BrowserTabFragment :
                 override fun onCustomTabPrivacyDashboardPressed() {
                     onOmnibarCustomTabPrivacyDashboardPressed()
                 }
+
+                override fun onCloseTranslationPressed() {
+                    onOmnibarTranslationClosePressed()
+                }
+
+                override fun onLanguageSelectionChanged(isSource: Boolean, language: String) {
+                    onOmnibarLanguageSelectionChanged(isSource, language)
+                }
             },
         )
     }
@@ -2529,7 +2558,7 @@ class BrowserTabFragment :
             configureWebViewForBlobDownload(it)
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            translator.addJsInterface(it)
+            translator.addJsInterface(it, viewModel.translationEngine)
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,

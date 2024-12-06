@@ -240,4 +240,5 @@ sealed class Command {
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
+    data object StartTranslation : Command()
 }

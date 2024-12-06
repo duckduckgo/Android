@@ -23,4 +23,5 @@ data class OmnibarViewState(
     val shouldMoveCaretToStart: Boolean = false,
     val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
+    val translation: TranslationViewState = TranslationViewState(),
 )

@@ -426,6 +426,7 @@ dependencies {
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     implementation "com.google.mlkit:translate:17.0.3"
+    implementation 'com.google.mlkit:language-id:17.0.6'
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"

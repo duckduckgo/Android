@@ -27,9 +27,12 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -72,14 +75,17 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.button.IconButton
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
+import com.google.mlkit.nl.translate.TranslateLanguage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -88,6 +94,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(
@@ -176,6 +183,14 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
 
+    internal val translationPanel: View by lazy { findViewById(R.id.translationPanel) }
+    internal val sourceLanguage: Spinner by lazy { findViewById(R.id.sourceLanguageDropdown) }
+    internal val targetLanguage: Spinner by lazy { findViewById(R.id.targetLanguageDropdown) }
+    internal val languagesPanel: View by lazy { findViewById(R.id.languagesPanel) }
+    internal val status: TextView by lazy { findViewById(R.id.translationStatus) }
+    internal val translationProgressBar: ProgressBar by lazy { findViewById(R.id.translationProgressBar) }
+    internal val translationCloseButton: IconButton by lazy { findViewById(R.id.translationCloseButton) }
+
     init {
         val attr =
             context.theme.obtainStyledAttributes(attrs, R.styleable.LegacyOmnibarView, defStyle, 0)
@@ -251,6 +266,52 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             stateBuffer.clear()
         }
+
+        initializeTranslationPanel()
+    }
+
+    private fun initializeTranslationPanel() {
+        val languageNames = TranslateLanguage.getAllLanguages().map { Locale(it).displayLanguage.capitalizeFirstLetter() }
+        val sourceAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, languageNames)
+        sourceLanguage.adapter = sourceAdapter
+        sourceLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                omnibarItemPressedListener?.onLanguageSelectionChanged(isSource = true, TranslateLanguage.getAllLanguages()[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+
+        val targetAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, languageNames)
+        targetLanguage.adapter = targetAdapter
+        targetLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                omnibarItemPressedListener?.onLanguageSelectionChanged(isSource = false, TranslateLanguage.getAllLanguages()[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+
+        translationCloseButton.setOnClickListener {
+            omnibarItemPressedListener?.onCloseTranslationPressed()
+        }
+    }
+
+    fun showTranslationStatus(text: String) {
+        status.show()
+        status.text = text
+        languagesPanel.gone()
+    }
+
+    fun showLanguagesPanel(source: String, target: String) {
+        sourceLanguage.setSelection(TranslateLanguage.getAllLanguages().indexOf(source))
+        targetLanguage.setSelection(TranslateLanguage.getAllLanguages().indexOf(target))
+        languagesPanel.show()
+        status.gone()
     }
 
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {

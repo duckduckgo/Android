@@ -101,7 +101,6 @@ class BrowserWebViewClient @Inject constructor(
     private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
-    private val translator: Translator,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
@@ -491,8 +490,6 @@ class BrowserWebViewClient @Inject constructor(
                 }
             }
         }
-
-        translator.translate(webView)
     }
 
     private fun flushCookies() {

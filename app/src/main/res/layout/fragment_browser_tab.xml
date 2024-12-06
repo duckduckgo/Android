@@ -29,7 +29,7 @@
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -147,7 +147,7 @@
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibarBottom"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

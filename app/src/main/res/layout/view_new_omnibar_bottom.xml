@@ -31,6 +31,15 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorSurface">
 
+        <include android:id="@+id/translationPanel"
+            layout="@layout/include_translation_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
@@ -42,7 +51,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/translationPanel"
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
             <include
@@ -253,7 +262,7 @@
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/translationPanel"
             tools:progress="50"
             tools:visibility="visible" />
 
@@ -266,7 +275,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tabsMenu"
             app:layout_constraintStart_toEndOf="@id/toolbar"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/translationPanel"
             tools:visibility="visible">
 
             <ImageView
@@ -289,7 +298,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/browserMenu"
             app:layout_constraintStart_toEndOf="@id/fireIconMenu"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/translationPanel" />
 
         <FrameLayout
             android:id="@+id/browserMenu"
@@ -299,7 +308,7 @@
             android:layout_marginEnd="@dimen/keyline_0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/translationPanel"
             tools:visibility="visible">
 
             <ImageView
@@ -321,7 +330,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/translationPanel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

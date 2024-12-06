@@ -80,6 +80,13 @@ class BrowserPopupMenu(
         }
     }
 
+    internal val translateMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.translateMenuItem
+            BOTTOM -> bottomBinding.translateMenuItem
+        }
+    }
+
     internal val newTabMenuItem: View by lazy {
         when (omnibarPosition) {
             TOP -> topBinding.newTabMenuItem
@@ -302,6 +309,7 @@ class BrowserPopupMenu(
         settingsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
         printPageMenuItem.isVisible = viewState.canPrintPage && !displayedInCustomTabScreen
         autofillMenuItem.isVisible = viewState.showAutofill && !displayedInCustomTabScreen
+        translateMenuItem.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
 
         openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
         customTabsMenuDivider.isVisible = displayedInCustomTabScreen

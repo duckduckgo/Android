@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.TranslationViewState
+import com.duckduckgo.app.browser.viewstate.TranslationViewState.TranslationState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -135,6 +137,8 @@ class Omnibar(
         fun onClearTextPressed()
         fun onCustomTabClosePressed()
         fun onCustomTabPrivacyDashboardPressed()
+        fun onCloseTranslationPressed()
+        fun onLanguageSelectionChanged(isSource: Boolean, language: String)
     }
 
     interface FindInPageListener {
@@ -554,6 +558,7 @@ class Omnibar(
         Timber.d("Omnibar: renderOmnibarViewState $viewState")
         if (refactorFlagEnabled) {
             newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
+            handleTranslationState(viewState.translation)
         } else {
             if (viewState.navigationChange) {
                 setExpanded(true, true)
@@ -570,6 +575,27 @@ class Omnibar(
                 setTextSelection(0)
             }
         }
+    }
+
+    private fun handleTranslationState(state: TranslationViewState) {
+        newOmnibar.translationPanel.isVisible = state.isTranslationVisible
+        setTranslationProgress(state.isProgressBarVisible)
+        when (state.state) {
+            is TranslationState.StatusMessage -> {
+                newOmnibar.showTranslationStatus(state.state.message)
+                setTranslationProgress(true)
+            }
+            is TranslationState.LanguagePickers -> {
+                newOmnibar.showLanguagesPanel(state.state.sourceLanguage, state.state.targetLanguage)
+                newOmnibar.languagesPanel.show()
+            }
+            else -> {}
+        }
+    }
+
+    private fun setTranslationProgress(isWorking: Boolean) {
+        newOmnibar.translationProgressBar.isVisible = isWorking
+        newOmnibar.translationCloseButton.isVisible = !isWorking
     }
 
     private fun shouldUpdateOmnibarTextInput(
