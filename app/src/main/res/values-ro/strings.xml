@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Site-uri neprotejate</string>
     <string name="reportBrokenSite">Raportează Site-ul Defect</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Adaugă</string>
+    <string name="dialogEditTitle">Editează</string>
+    <string name="dialogSaveAction">Salvează</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>

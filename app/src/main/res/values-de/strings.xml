@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Ungeschützte Websites</string>
     <string name="reportBrokenSite">Fehlerhafte Seite melden</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Hinzufügen</string>
+    <string name="dialogEditTitle">Bearbeiten</string>
+    <string name="dialogSaveAction">Speichern</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>

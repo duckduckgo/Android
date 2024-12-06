@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Nechráněné stránky</string>
     <string name="reportBrokenSite">Nahlásit nefunkční webové stránky</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Přidat</string>
+    <string name="dialogEditTitle">Upravit</string>
+    <string name="dialogSaveAction">Uložit</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>

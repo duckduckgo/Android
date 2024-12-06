@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Suojaamattomat sivustot</string>
     <string name="reportBrokenSite">Ilmoita viallisesta sivustosta</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lisää</string>
+    <string name="dialogEditTitle">Muokkaa</string>
+    <string name="dialogSaveAction">Tallenna</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>

@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Niezabezpieczone witryny</string>
     <string name="reportBrokenSite">Zgłoś uszkodzoną witrynę</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodaj</string>
+    <string name="dialogEditTitle">Edytuj</string>
+    <string name="dialogSaveAction">Zapisz</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>

@@ -477,6 +477,11 @@
     <string name="manageAllowlist">Ubeskyttede nettsteder</string>
     <string name="reportBrokenSite">Rapporter nettstedfeil</string>
 
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Legg til</string>
+    <string name="dialogEditTitle">Rediger</string>
+    <string name="dialogSaveAction">Lagre</string>
+
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
