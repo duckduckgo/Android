@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se hva som er sendt</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informasjon som sendes i rapporter, kan ikke brukes til å identifisere deg:</b><br/><br/>• Side-URL (uten identifiserbar informasjon)<br/>• Enhetens merke, modell og produsent<br/>• Operativsystemets versjonsnummer<br/>• Appens versjonsnummer<br/>• Anonym eksperimentgruppe for funksjonstesting<br/>• Informasjon om hvilke versjoner av beskyttelsene våre som var aktive<br/>• Nettlesermotorens versjonsnummer<br/>• Liste over hvilke beskyttelser og nettleserfunksjoner som var aktive<br/>• Vertsnavn på blokkerte sporere, surrogatforespørsler, ignorerte forespørsler og forespørsler som ikke er på listen over sporingsblokkering<br/>• Feil rapportert av nettleseren<br/>• Nettstedets responsstatuskoder (HTTP) <br/>• Hvilket rapportskjema du brukte (meny, dashbord osv.)<br/>• Dato for siste rapport sendt for dette nettstedet<br/>• Hvorvidt du valgte å vise denne rapportinformasjonen<br/>• Antall ganger beskyttelse ble slått av<br/>• Hvor raskt deler av siden ble lastet<br/>• Hvordan du kom til denne siden, enten: SERP (DuckDuckGo-søk), navigasjon (lenke/URL) eller eksternt (på annen måte)<br/>• Antall oppfriskninger siden siden ble lastet<br/>• Enhetens hovedspråk og land<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bekreft</string>
-    <string name="dialogSave">Lagre</string>
-    <string name="delete">Slett</string>
-    <string name="edit">Rediger</string>
-    <string name="remove">Fjern</string>
-    <string name="removeAll">Fjern alle</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søk med DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Ubeskyttede nettsteder</string>
     <string name="reportBrokenSite">Rapporter nettstedfeil</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Legg til</string>
-    <string name="dialogEditTitle">Rediger</string>
-    <string name="dialogSaveAction">Lagre</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Nettstedstillatelser</string>
-    <string name="sitePermissionsSettingsDescription">Nettsteder du besøker, kan be om tilgang til enhetens posisjon, kamera, mikrofon eller DRA-programvare (digital rettighetsadministrasjon). De får ikke tilgang til disse med mindre du uttrykkelig gir dem tillatelse.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillat alle nettsteder å be om:</string>
-    <string name="sitePermissionsSettingsLocation">Posisjon</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer nettsteder</string>
-    <string name="sitePermissionsSettingsEmptyText">Ingen nettsteder ennå</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tillatelser fjernet for alle nettsteder</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tillatelser for «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Spør hver gang</string>
-    <string name="permissionsPerWebsiteDenySetting">Avvis</string>
-    <string name="permissionsPerWebsiteAllowSetting">Tillat</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Deaktivert for alle nettsteder</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$stillatelse for %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Finn ut når nedlastinger er klare</string>

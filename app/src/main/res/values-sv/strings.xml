@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se vad som skickats</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Information som skickas i rapporter kan inte användas för att identifiera dig:</b><br/><br/>• Sidans URL (utan identifierbar information)<br/>• Enhetens märke, modell och tillverkare<br/>• Operativsystemets versionsnummer<br/>• Appversionsnummer<br/>• Anonym experimentgrupp för funktionstestning<br/>• Information om vilka versioner av våra skydd som var aktiva<br/>• Versionsnummer för webbläsarens motor<br/>• Lista över vilka skydd och webbläsarfunktioner som var aktiva<br/>• Värdnamn på blockerade spårare, surrogatförfrågningar, ignorerade förfrågningar och förfrågningar som inte finns i listan för spårningsblockering<br/>• Webbläsarrapporterade fel<br/>• HTTP-koder (webbplatsens svarsstatus) <br/>• Vilken rapporteringsform du använde (meny, instrumentpanel osv.)<br/>• Datum för den senaste rapport som skickades för webbplatsen<br/>• Huruvida du valde att visa den här rapportinformationen<br/>• Antal gånger som skydden har kopplats bort<br/>• Hur snabbt delar av sidan lästes in<br/>• Hur du kom till den här sidan, antingen: SERP (DuckDuckGo-sökning), Navigering (länk/URL) eller Externt (på annat sätt)<br/>• Antal uppdateringar sedan sidan lästes in<br/>• Primärt språk och land för din enhet<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bekräfta</string>
-    <string name="dialogSave">Spara</string>
-    <string name="delete">Ta bort</string>
-    <string name="edit">Redigera</string>
-    <string name="remove">Ta bort</string>
-    <string name="removeAll">Ta bort alla</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Oskyddade webbplatser</string>
     <string name="reportBrokenSite">Rapportera skadad webbplats</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Lägg till</string>
-    <string name="dialogEditTitle">Redigera</string>
-    <string name="dialogSaveAction">Spara</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
-    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
-    <string name="sitePermissionsSettingsLocation">Plats</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
-    <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
-    <string name="permissionsPerWebsiteAskSetting">Fråga varje gång</string>
-    <string name="permissionsPerWebsiteDenySetting">Neka</string>
-    <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Inaktiverat för alla webbplatser</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Få reda på när nerladdningar är klara</string>

@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Podívej se, co se odesílá</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informace odeslané v přehledech se nedají použít k tvé identifikaci:</b><br/><br/>• Adresa URL stránky (bez údajů umožňujících zjištění totožnosti)<br/>• Značka, model a výrobce zařízení<br/>• Číslo verze operačního systému<br/>• Číslo verze aplikace<br/>• Anonymní experimentální skupina pro testování funkcí<br/>• Informace o tom, které verze našich ochranných funkcí byly aktivní<br/>• Číslo verze webového prohlížeče<br/>• Seznam aktivních ochranných funkcí a funkcí prohlížeče<br/>• Názvy hostitelů blokovaných trackerů, náhradních požadavků, ignorovaných požadavků a požadavků, které v seznamu blokovaných trackerů nejsou<br/>• Chyby hlášené prohlížečem<br/>• Kódy stavu odezvy webových stránek (HTTP)<br/>• Jaký formulář pro hlášení byl použitý (nabídka, hlavní panel atd.)<br/>• Datum posledního hlášení poslaného pro tento web<br/>• Jestli jsi vyjádřil(a) souhlas se zobrazováním těchto informací o hlášeních<br/>• Kolikrát byly ochranné funkce vypnuté<br/>• Jak rychle se jednotlivé části stránky načetly<br/>• Jak ses na tuhle stránku dostal(a), a to buď: přes SERP (vyhledávání DuckDuckGo), navigací (z odkazu/URL), nebo externě (jiným způsobem)<br/>• Počet obnovení od načtení stránky<br/>• Primární jazyk a země tvého zařízení<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potvrdit</string>
-    <string name="dialogSave">Uložit</string>
-    <string name="delete">Smazat</string>
-    <string name="edit">Upravit</string>
-    <string name="remove">Odstranit</string>
-    <string name="removeAll">Odstranit vše</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hledat DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Nechráněné stránky</string>
     <string name="reportBrokenSite">Nahlásit nefunkční webové stránky</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Přidat</string>
-    <string name="dialogEditTitle">Upravit</string>
-    <string name="dialogSaveAction">Uložit</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnění webu</string>
-    <string name="sitePermissionsSettingsDescription">Stránky, které navštívíš, můžou žádat o přístup k fotoaparátu, mikrofonu, softwaru DRM (Digital Rights Management) nebo k poloze tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Povolit všem webům, aby žádaly o:</string>
-    <string name="sitePermissionsSettingsLocation">Poloha</string>
-    <string name="sitePermissionsSettingsCamera">Fotoaparát</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa webů</string>
-    <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Oprávnění odebrána všem webům</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oprávnění „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Vždycky se ptát</string>
-    <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
-    <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázáno pro všechny weby</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zjisti, až budou soubory ke stažení připraveny</string>

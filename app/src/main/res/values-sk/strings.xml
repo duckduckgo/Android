@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pozrite sa, čo bolo odoslané</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informácie odoslané v zostavách nie je možné použiť na vašu identifikáciu:</b><br/><br/>• Adresa URL stránky (bez identifikovateľných informácií)<br/>• Značka, model a výrobca zariadenia<br/>• Číslo verzie operačného systému<br/>• Číslo verzie aplikácie<br/>• Anonymná experimentálna skupina na testovanie funkcií<br/>• Informácie o tom, ktoré verzie našich ochrán boli aktívne<br/>• Číslo verzie webového prehliadača<br/>• Zoznam aktívnych ochrán a funkcií prehliadača<br/>• Názvy hostiteľov blokovaných sledovaní, žiadosti iných používateľovi, ignorované žiadosti a žiadosti, ktoré nie sú v zozname blokovania sledovačov<br/>• Chyby nahlásené prehliadačom<br/>• Kódy stavu odozvy webovej lokality (HTTP) <br/>• Ktorý formulár zostáv ste použili (ponuka, informačný panel atď.)<br/>• Dátum poslednej zostavy odoslanej pre túto lokalitu<br/>• Či ste sa rozhodli zobraziť informácie o tejto zostave<br/>• Koľkokrát boli ochrany vypnuté<br/>• Ako rýchlo sa časti stránky načítali<br/>• Ako ste sa dostali na túto stránku, buď: SERP (vyhľadávanie DuckDuckGo), Navigácia (odkaz/URL) alebo Externé (iné prostriedky)<br/>• Počet obnovení od načítania stránky<br/>• Primárny jazyk a krajina vášho zariadenia<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potvrdiť</string>
-    <string name="dialogSave">Uložiť</string>
-    <string name="delete">Vymazať</string>
-    <string name="edit">Upraviť</string>
-    <string name="remove">Odstrániť</string>
-    <string name="removeAll">Odstrániť všetky</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Nezabezpečené webové stránky</string>
     <string name="reportBrokenSite">Nahlásiť nefunkčný web</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Pridať</string>
-    <string name="dialogEditTitle">Upraviť</string>
-    <string name="dialogSaveAction">Uložiť</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
-    <string name="sitePermissionsSettingsDescription">Stránky, ktoré navštívite, môžu požiadať o prístup k polohe vášho zariadenia, fotoaparátu, mikrofónu alebo softvéru DRM (Digital Rights Management). Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>
-    <string name="sitePermissionsSettingsLocation">Poloha</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofón</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa lokalít</string>
-    <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Povolenia boli odstránené pre všetky lokality</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Povolenia pre „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Vždy sa opýtať</string>
-    <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
-    <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázané pre všetky lokality</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s povolenie pre %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>

@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Site-urile pe care le accesezi îți pot solicita accesul la locația dispozitivului, la camera foto, la microfon sau la software-ul DRM (Digital Rights Management). Acestea nu vor putea accesa aceste date decât dacă le oferi în mod explicit permisiunea.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Permite tuturor site-urilor să solicite:</string>
+    <string name="sitePermissionsSettingsLocation">Locație</string>
+    <string name="sitePermissionsSettingsCamera">Aparat foto</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gestionează site-urile</string>
+    <string name="sitePermissionsSettingsEmptyText">Niciun site încă</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisiuni eliminate pentru toate site-urile</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisiuni pentru „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Întreabă de fiecare dată</string>
+    <string name="permissionsPerWebsiteDenySetting">Refuză</string>
+    <string name="permissionsPerWebsiteAllowSetting">Permite</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Dezactivat pentru toate site-urile</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permisiune %1$s pentru %2$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s” dorește să acceseze camera și microfonul</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s” dorește să acceseze microfonul</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s” dorește să acceseze camera</string>

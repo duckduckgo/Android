@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
+    <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
+    <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Atļaujas ir noņemtas visām vietnēm</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Jautāt katru reizi</string>
+    <string name="permissionsPerWebsiteDenySetting">Liegt</string>
+    <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Atspējots visām vietnēm</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt kamerai un mikrofonam</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt mikrofonam</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt kamerai</string>

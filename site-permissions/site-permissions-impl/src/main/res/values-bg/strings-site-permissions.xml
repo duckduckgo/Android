@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата, микрофона или софтуера за управление на цифровите права (DRM) на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
+    <string name="sitePermissionsSettingsLocation">Местоположение</string>
+    <string name="sitePermissionsSettingsCamera">Камера</string>
+    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
+    <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Питай всеки път</string>
+    <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
+    <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Деактивирано за всички сайтове</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата и микрофона</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до микрофона</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата</string>

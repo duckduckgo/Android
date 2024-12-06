@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions
+package com.duckduckgo.site.permissions.impl.ui
 
 import android.view.LayoutInflater
 import android.view.View
@@ -26,30 +26,29 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.layout
-import com.duckduckgo.app.browser.databinding.ViewSitePermissionsDescriptionBinding
-import com.duckduckgo.app.browser.databinding.ViewSitePermissionsEmptyListBinding
-import com.duckduckgo.app.browser.databinding.ViewSitePermissionsSiteBinding
-import com.duckduckgo.app.browser.databinding.ViewSitePermissionsTitleBinding
-import com.duckduckgo.app.browser.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.Divider
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.EmptySites
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.SiteAllowedItem
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.SitePermissionToggle
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.SitePermissionsDescription
-import com.duckduckgo.app.sitepermissions.SitePermissionListItem.SitePermissionsHeader
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.DESCRIPTION
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.DIVIDER
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.HEADER
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITES_EMPTY
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOWED_ITEM
-import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.site.permissions.impl.R
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsDescriptionBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsEmptyListBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsSiteBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsTitleBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsToggleBinding
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.Divider
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.EmptySites
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SiteAllowedItem
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionToggle
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsDescription
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsHeader
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DESCRIPTION
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DIVIDER
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.HEADER
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITES_EMPTY
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITE_ALLOWED_ITEM
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.TOGGLE
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(
@@ -172,7 +171,7 @@ class SitePermissionsAdapter(
         }
 
         private fun showOverflowMenu(removeDisabled: Boolean) {
-            val popupMenu = PopupMenu(layoutInflater, layout.popup_window_remove_all_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_remove_all_menu)
             val menuItem = popupMenu.contentView.findViewById<PopupMenuItemView>(R.id.removeAll)
             if (removeDisabled) {
                 menuItem.isEnabled = false

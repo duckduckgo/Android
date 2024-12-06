@@ -19,4 +19,16 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Ilmoita minulle</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lisää</string>
+    <string name="dialogEditTitle">Muokkaa</string>
+    <string name="dialogSaveAction">Tallenna</string>
+    <string name="dialogConfirmTitle">Vahvista</string>
+    <string name="dialogSave">Tallenna</string>
+    <string name="delete">Poista</string>
+    <string name="edit">Muokkaa</string>
+    <string name="remove">Poista</string>
+    <string name="removeAll">Poista kaikki</string>
+
 </resources>

@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına, mikrofonuna veya DRM (Dijital Haklar Yönetimi) yazılımına erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>
+    <string name="sitePermissionsSettingsLocation">Konum</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
+    <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
+    <string name="permissionsPerWebsiteAskSetting">Her seferinde sor</string>
+    <string name="permissionsPerWebsiteDenySetting">Reddet</string>
+    <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için devre dışı</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" kameraya ve mikrofona erişmek istiyor</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" mikrofona erişmek istiyor</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" kameraya erişmek istiyor</string>

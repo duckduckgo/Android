@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Bekijk wat er is verzonden</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>De in de rapporten verzonden informatie kan niet worden gebruikt om je te identificeren:</b><br/><br/>• URL van de pagina (zonder identificeerbare info)<br/>• Merk, model en fabrikant van het apparaat<br/>• Versienummer van het besturingssysteem<br/>• Versienummer van de app<br/>• Anonieme experimentgroep voor het testen van functies<br/>• Informatie over welke versies van onze beveiligingen actief waren<br/>• Versienummer van de webbrowser-engine<br/>• Lijst met welke beveiligingen en browserfuncties actief waren<br/>• Hostnamen van geblokkeerde trackers, surrogaatverzoeken, genegeerde verzoeken en verzoeken die niet in de lijst met geblokkeerde trackers staan<br/>• Door de browser gerapporteerde fouten<br/>• Responsstatuscodes van websites (HTTP)<br/>• Welk rapportageformulier je hebt gebruikt (menu, dashboard, enz.)<br/>• Datum van het laatst verzonden rapport voor deze site<br/>• Of je er wel of niet voor hebt gekozen om deze rapportgegevens te tonen<br/>• Aantal keren dat beveiligingen zijn uitgeschakeld<br/>• Hoe snel delen van de pagina zijn geladen<br/>• Hoe je op deze pagina bent gekomen, ofwel: SERP (DuckDuckGo-zoekopdracht), Navigatie (link/URL), of Extern (andere middelen)<br/>• Aantal vernieuwingen sinds het laden van de pagina<br/>• Primaire taal en land van je apparaat<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bevestigen</string>
-    <string name="dialogSave">Opslaan</string>
-    <string name="delete">Verwijderen</string>
-    <string name="edit">Bewerken</string>
-    <string name="remove">Verwijderen</string>
-    <string name="removeAll">Alles verwijderen</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Zoek in DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Onbeschermde sites</string>
     <string name="reportBrokenSite">Defecte website melden</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Toevoegen</string>
-    <string name="dialogEditTitle">Bewerken</string>
-    <string name="dialogSaveAction">Opslaan</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sitetoestemmingen</string>
-    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen toegang vragen tot de software, je camera, je microfoon of DRM (Digital Rights Management) op je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>
-    <string name="sitePermissionsSettingsLocation">Locatie</string>
-    <string name="sitePermissionsSettingsCamera">Camera</string>
-    <string name="sitePermissionsSettingsMicrophone">Microfoon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Sites beheren</string>
-    <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Toestemmingen verwijderd voor alle sites</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Toestemmingen voor \'%1$s\' </string>
-    <string name="permissionsPerWebsiteAskSetting">Elke keer vragen</string>
-    <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
-    <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Uitgeschakeld voor alle sites</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Toestemming voor %1$s voor %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>

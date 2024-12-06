@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
+    <string name="sitePermissionsSettingsLocation">Plats</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
+    <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
+    <string name="permissionsPerWebsiteAskSetting">Fråga varje gång</string>
+    <string name="permissionsPerWebsiteDenySetting">Neka</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Inaktiverat för alla webbplatser</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt kameran och mikrofonen</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt mikrofonen</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt kameran</string>

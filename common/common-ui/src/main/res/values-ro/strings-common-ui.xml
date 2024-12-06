@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">DORESC SĂ PRIMESC NOTIFICĂRI</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Adaugă</string>
+    <string name="dialogEditTitle">Editează</string>
+    <string name="dialogSaveAction">Salvează</string>
+    <string name="dialogConfirmTitle">Confirmare</string>
+    <string name="dialogSave">Salvare</string>
+    <string name="delete">Ștergere</string>
+    <string name="edit">Editare</string>
+    <string name="remove">Elimină</string>
+    <string name="removeAll">Elimină tot</string>
 </resources>

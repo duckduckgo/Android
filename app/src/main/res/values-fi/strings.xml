@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Katso, mitä on lähetetty</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporteissa lähetetyistä tiedoista ei voi tunnistaa sinua:</b><br/><br/>• Sivun URL-osoite (ilman tunnistettavia tietoja)<br/>• Laitteen merkki, malli ja valmistaja<br/>• Käyttöjärjestelmän versionumero<br/>• Sovelluksen versionumero<br/>• Nimetön kokeiluryhmä ominaisuuksien testaamista varten<br/>• Tietoa suojauksiemme aktiivisista versioista<br/>• Verkkoselainhakukoneen versionumero<br/>• Luettelo aktiivisista suojauksista ja selaimen ominaisuuksista<br/>• Estettyjen seurantatoimintojen isäntänimet, korvaavat pyynnöt, huomiotta jätetyt pyynnöt ja pyynnöt, jotka eivät ole seurannan estoluettelossa<br/>• Selaimen ilmoittamat virheet<br/>• Web-sivuston vastaustilan (HTTP) koodit<br/>• Mitä ilmoituslomaketta käytit (valikko, hallintapaneeli jne.)<br/>• Tämän sivuston viimeisen raportin lähetyspäivämäärä<br/>• Oletko valinnut tämän raportin tietojen näyttämisen vai et<br/>• Suojausten poiskytkeytymiskerrat<br/>• Kuinka nopeasti osat sivusta latautuivat<br/>• Miten pääsit tälle sivulle, joko: SERP (DuckDuckGo-haku), navigointi (linkki/URL) tai ulkoinen (muu keino)<br/>• Päivitysten määrä sivun latauksen jälkeen<br/>• Laitteesi ensisijainen kieli ja maa<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Vahvista</string>
-    <string name="dialogSave">Tallenna</string>
-    <string name="delete">Poista</string>
-    <string name="edit">Muokkaa</string>
-    <string name="remove">Poista</string>
-    <string name="removeAll">Poista kaikki</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Suojaamattomat sivustot</string>
     <string name="reportBrokenSite">Ilmoita viallisesta sivustosta</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Lisää</string>
-    <string name="dialogEditTitle">Muokkaa</string>
-    <string name="dialogSaveAction">Tallenna</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
-    <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
-    <string name="sitePermissionsSettingsLocation">Sijainti</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofoni</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Hallitse sivustoja</string>
-    <string name="sitePermissionsSettingsEmptyText">Ei vielä yhtään sivustoa</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Käyttöoikeudet poistettu kaikilta sivustoilta</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oikeudet: %1$s </string>
-    <string name="permissionsPerWebsiteAskSetting">Kysy joka kerta</string>
-    <string name="permissionsPerWebsiteDenySetting">Estä</string>
-    <string name="permissionsPerWebsiteAllowSetting">Salli</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Poistettu käytöstä kaikilla sivustoilla</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>

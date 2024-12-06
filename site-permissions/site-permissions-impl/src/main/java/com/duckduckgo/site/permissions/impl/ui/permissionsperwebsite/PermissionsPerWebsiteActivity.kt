@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions.permissionsperwebsite
+package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 
 import android.content.Context
 import android.content.Intent
@@ -25,20 +25,20 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityPermissionPerWebsiteBinding
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ALLOW
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.Companion.getPermissionSettingOptionFromPosition
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.site.permissions.impl.R
+import com.duckduckgo.site.permissions.impl.databinding.ActivityPermissionPerWebsiteBinding
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ALLOW
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.Companion.getPermissionSettingOptionFromPosition
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -129,8 +129,8 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
                 ),
                 currentOption.setting.order,
             )
-            .setPositiveButton(R.string.dialogSave)
-            .setNegativeButton(R.string.cancel)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
+            .setNegativeButton(com.duckduckgo.mobile.android.R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {

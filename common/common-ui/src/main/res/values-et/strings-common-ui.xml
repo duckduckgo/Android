@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Teavita mind</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lisa</string>
+    <string name="dialogEditTitle">Redigeeri</string>
+    <string name="dialogSaveAction">Salvesta</string>
+    <string name="dialogConfirmTitle">Kinnita</string>
+    <string name="dialogSave">Salvesta</string>
+    <string name="delete">Kustuta</string>
+    <string name="edit">Redigeeri</string>
+    <string name="remove">Eemaldage</string>
+    <string name="removeAll">Eemalda kõik</string>
 </resources>

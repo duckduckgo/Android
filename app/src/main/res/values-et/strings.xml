@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vaata, mida saadetakse</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Aruannetes saadetud teavet ei saa kasutada sinu tuvastamiseks:</b><br/><br/>• lehekülje URL (ilma tuvastatava teabeta)<br/>• seadme mark, mudel ja tootja<br/>• operatsioonisüsteemi versiooni number<br/>• rakenduse versiooni number<br/>• anonüümne katserühm funktsioonide testimiseks<br/>• teave selle kohta, millised meie kaitsete versioonid olid aktiivsed<br/>• veebibrauseri versiooni number<br/>• aktiivsete kaitsete ja brauseri funktsioonide loend<br/>• blokeeritud jälgurite hostinimed, asendustaotlused, ignoreeritud taotlused ja päringud, mis pole jälguri blokeerimisloendis<br/>• brauseri poolt teatatud tõrked<br/>• veebilehe vastuse oleku (HTTP) koodid<br/>• millist aruandlusvormi sa kasutasid (menüü, juhtpaneel jne)<br/>• selle saidi kohta saadetud viimase aruande kuupäev<br/>• kas valisid selle aruande teabe kuvamise või mitte<br/>• kaitsete väljalülitamise kordade arv<br/>• kui kiiresti lehe osad laadisid<br/>• mille abil sellele lehele jõudsid, kas: SERP (DuckDuckGo otsing), navigeerimine (link/URL) või väline (muud vahendid)<br/>• värskenduste arv alates lehe laadimisest<br/>• sinu seadme peamine keel ja riik<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Kinnita</string>
-    <string name="dialogSave">Salvesta</string>
-    <string name="delete">Kustuta</string>
-    <string name="edit">Redigeeri</string>
-    <string name="remove">Eemaldage</string>
-    <string name="removeAll">Eemalda kõik</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Kaitseta saidid</string>
     <string name="reportBrokenSite">Teata mittetoimivast saidist</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Lisa</string>
-    <string name="dialogEditTitle">Redigeeri</string>
-    <string name="dialogSaveAction">Salvesta</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Saidi load</string>
-    <string name="sitePermissionsSettingsDescription">Külastatavad veebisaidid võivad küsida juurdepääsu sinu seadme asukohale, kaamerale, mikrofonile või DRM-i (Digital Rights Management) tarkvarale. Need ei saa juurdepääsu enne, kui oled selleks andnud selgesõnalise loa.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Luba kõigil saitidel küsida järgmist.</string>
-    <string name="sitePermissionsSettingsLocation">Asukoht</string>
-    <string name="sitePermissionsSettingsCamera">Kaamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Saitide haldamine</string>
-    <string name="sitePermissionsSettingsEmptyText">Saite pole veel</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Kõikide saitide load on eemaldatud</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Saidi „%1$s“ load </string>
-    <string name="permissionsPerWebsiteAskSetting">Küsi iga kord</string>
-    <string name="permissionsPerWebsiteDenySetting">Keela</string>
-    <string name="permissionsPerWebsiteAllowSetting">Luba</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Kõigi saitide jaoks keelatud</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Luba %1$s saidile %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Teata, kui allalaadimised valmis saavad</string>

@@ -32,13 +32,14 @@ import com.duckduckgo.app.browser.databinding.ActivityPermissionsBinding
 import com.duckduckgo.app.permissions.PermissionsViewModel.Command
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
-import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -52,6 +53,9 @@ class PermissionsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: PermissionsViewModel by bindViewModel()
     private val binding: ActivityPermissionsBinding by viewBinding()
@@ -116,7 +120,7 @@ class PermissionsActivity : DuckDuckGoActivity() {
 
     private fun launchLocation() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(SitePermissionsActivity.intent(this), options)
+        globalActivityStarter.start(this, SitePermissionScreenNoParams, options)
     }
 
     private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
@@ -131,7 +135,7 @@ class PermissionsActivity : DuckDuckGoActivity() {
                 ),
                 currentAppLinkSetting,
             )
-            .setPositiveButton(R.string.dialogSave)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {

@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vê o que foi enviado</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>As informações enviadas nos relatórios não podem ser utilizadas para te identificar:</b><br/><br/>• URL da página (sem informações identificáveis)<br/>• Marca, modelo e fabricante do dispositivo<br/>• Número da versão do sistema operativo<br/>• Número da versão da aplicação<br/>• Grupo de experiência anónimo para testagem de funcionalidades<br/>• Informações sobre que versões das nossas proteções estavam ativas<br/>• Número da versão do motor do navegador web<br/>• Lista das proteções e funcionalidades do navegador que estavam ativas<br/>• Nomes de anfitriões de rastreadores bloqueados, pedidos de substituição, pedidos ignorados e pedidos que não estão na lista de bloqueio de rastreadores<br/>• Erros comunicados pelo navegador<br/>• Códigos de estado de resposta do site (HTTP)<br/>• Que forma de relatório utilizaste (menu, painel, etc.)<br/>• Data do último relatório enviado para este site<br/>• Se optaste ou não por mostrar esta informação do relatório<br/>• Número de vezes que as proteções foram desativadas<br/>• A rapidez com que partes da página foram carregadas<br/>• Como chegaste a esta página: SERP (pesquisa DuckDuckGo), Navegação (link/URL), ou Externa (outros meios)<br/>• Número de atualizações desde o carregamento da página<br/>• Idioma principal e país do teu dispositivo<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Confirmar</string>
-    <string name="dialogSave">Guardar</string>
-    <string name="delete">Eliminar</string>
-    <string name="edit">Editar</string>
-    <string name="remove">Remover</string>
-    <string name="removeAll">Remover tudo</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Sites desprotegidos</string>
     <string name="reportBrokenSite">Denunciar site danificado</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Adicionar</string>
-    <string name="dialogEditTitle">Editar</string>
-    <string name="dialogSaveAction">Guardar</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permissões dos sites</string>
-    <string name="sitePermissionsSettingsDescription">Os sites que visitas podem pedir acesso à localização, câmara, microfone ou DRM (Digital Rights Management) do teu dispositivo. Não poderão aceder a estas funcionalidades sem que concedas permissão explicitamente.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos os sites peçam:</string>
-    <string name="sitePermissionsSettingsLocation">Localização</string>
-    <string name="sitePermissionsSettingsCamera">Câmara</string>
-    <string name="sitePermissionsSettingsMicrophone">Microfone</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Gerir sites</string>
-    <string name="sitePermissionsSettingsEmptyText">Ainda não há sites</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">As permissões foram removidas para todos os sites</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissões para \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Pergunte todas as vezes</string>
-    <string name="permissionsPerWebsiteDenySetting">Recusar</string>
-    <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Desativado para todos os sites</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permissão para %2$s utilizar %1$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>

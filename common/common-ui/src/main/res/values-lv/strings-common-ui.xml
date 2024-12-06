@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">INFORMĒT MANI</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Pievienot</string>
+    <string name="dialogEditTitle">Rediģēt</string>
+    <string name="dialogSaveAction">Saglabāt</string>
+    <string name="dialogConfirmTitle">Apstiprināt</string>
+    <string name="dialogSave">Saglabāt</string>
+    <string name="delete">Dzēst</string>
+    <string name="edit">Rediģēt</string>
+    <string name="remove">Noņemt</string>
+    <string name="removeAll">Noņemt visu</string>
 </resources>

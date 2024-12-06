@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Δείτε τι έχει αποσταλεί</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Οι πληροφορίες που αποστέλλονται σε αναφορές δεν μπορούν να χρησιμοποιηθούν για την ταυτοποίησή σας:</b><br/><br/>• Διεύθυνση URL σελίδας (χωρίς ταυτοποιήσιμες πληροφορίες)<br/>• Μάρκα, μοντέλο και κατασκευαστής της συσκευής<br/>• Αριθμός έκδοσης λειτουργικού συστήματος<br/>• Αριθμός έκδοσης εφαρμογής<br/>• Ανώνυμη πειραματική ομάδα για δοκιμή λειτουργιών<br/>• Πληροφορίες σχετικά με το ποιες εκδόσεις των λειτουργιών προστασίας μας ήταν ενεργές<br/>• Αριθμός έκδοσης μηχανής προγράμματος περιήγησης ιστού<br/>• Κατάλογος των λειτουργιών προστασίας και των λειτουργιών του προγράμματος περιήγησης που ήταν ενεργά<br/>• Ονόματα κεντρικών υπολογιστών εφαρμογών παρακολούθησης που έχουν αποκλειστεί, υποκατάστατα αιτήματα, αγνοημένα αιτήματα και αιτήματα που δεν περιλαμβάνονται στη λίστα αποκλεισμού εφαρμογών παρακολούθησης<br />• Σφάλματα που αναφέρθηκαν από το πρόγραμμα περιήγησης<br/>• Κωδικοί κατάστασης απόκρισης ιστότοπου (HTTP)<br/>• Ποια φόρμα αναφοράς χρησιμοποιήσατε (μενού, πίνακας εργαλείων, κ.λπ.)<br/>• Ημερομηνία της τελευταίας αναφοράς που στάλθηκε γι' αυτόν τον ιστότοπο<br/>• Εάν επιλέξατε να εμφανίσετε αυτές τις πληροφορίες αναφοράς ή όχι<br />• Αριθμός φορών που απενεργοποιήθηκαν οι λειτουργίες προστασίας<br />• Πόσο γρήγορα φορτώθηκαν τμήματα της σελίδας<br/>• Πώς μεταβήκατε σε αυτήν τη σελίδα, είτε: SERP (αναζήτηση DuckDuckGo), Πλοήγηση (σύνδεσμος/διεύθυνση URL), είτε Εξωτερικά (άλλα μέσα)<br/>• Αριθμός ανανεώσεων από τη φόρτωση της σελίδας<br/>• Κύρια γλώσσα και χώρα της συσκευής σας<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Επιβεβαίωση</string>
-    <string name="dialogSave">Αποθήκευση</string>
-    <string name="delete">Διαγραφή</string>
-    <string name="edit">Επεξεργασία</string>
-    <string name="remove">Αφαίρεση</string>
-    <string name="removeAll">Αφαίρεση όλων</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Αναζήτηση DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Μη προστατευόμενοι ιστότοποι</string>
     <string name="reportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Προσθήκη</string>
-    <string name="dialogEditTitle">Επεξεργασία</string>
-    <string name="dialogSaveAction">Αποθήκευση</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Δικαιώματα ιστότοπου</string>
-    <string name="sitePermissionsSettingsDescription">Οι ιστότοποι που επισκέπτεστε ενδέχεται να ζητήσουν πρόσβαση στην τοποθεσία, την κάμερα, το μικρόφωνο ή το λογισμικό DRM (Διαχείριση ψηφιακών δικαιωμάτων) της συσκευής σας. Δεν θα μπορούν να έχουν πρόσβαση σε αυτά εάν δεν τους παρέχετε ρητά την άδειά σας.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Να επιτρέπεται σε όλους τους ιστότοπους να αιτούνται:</string>
-    <string name="sitePermissionsSettingsLocation">Τοποθεσία</string>
-    <string name="sitePermissionsSettingsCamera">Κάμερα</string>
-    <string name="sitePermissionsSettingsMicrophone">Μικρόφωνο</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Διαχείριση ιστότοπων</string>
-    <string name="sitePermissionsSettingsEmptyText">Δεν υπάρχουν ακόμη ιστότοποι</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Τα δικαιώματα καταργήθηκαν για όλους τους ιστότοπους</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Δικαιώματα για «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Να γίνεται ερώτηση κάθε φορά</string>
-    <string name="permissionsPerWebsiteDenySetting">Απόρριψη</string>
-    <string name="permissionsPerWebsiteAllowSetting">Αποδοχή</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Απενεργοποιήθηκε για όλους τους ιστότοπους</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s άδεια για %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>

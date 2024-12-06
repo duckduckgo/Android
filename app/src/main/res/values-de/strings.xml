@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Sehen, was gesendet wurde</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Die in den Berichten gesendeten Informationen können nicht dazu verwendet werden, dich zu identifizieren:</b><br/><br/>• Seiten-URL (ohne identifizierbare Informationen)<br/>• Gerätemarke, -modell und -hersteller<br/>• Versionsnummer des Betriebssystems<br/>• Versionsnummer der App<br/>• Anonyme Experimentiergruppe für Funktionstests<br/>• Informationen darüber, welche Versionen unserer Schutzmaßnahmen aktiv waren<br/>• Versionsnummer der Webbrowser-Engine<br/>• Liste der Schutzmaßnahmen und Browserfunktionen, die aktiv waren<br/>• Hostnamen der blockierten Tracker, Ersatzanfragen, ignorierte Anfragen und Anfragen, die nicht in der Tracker-Blockierliste enthalten sind<br/>• Vom Browser gemeldete Fehler<br/>• Codes für den Website-Antwortstatus (HTTP)<br/>• Verwendete Berichtsform (Menü, Dashboard usw.)<br/>• Datum des letzten Berichts für diese Website<br/>• Ob du dich für die Anzeige dieser Berichtsinformationen entschieden hast oder nicht<br/>• Wie oft der Schutz ausgeschaltet wurde<br/>• Wie schnell Teile der Seite geladen wurden<br/>• Wie du auf diese Seite gekommen bist: SERP (DuckDuckGo-Suche), Navigation (Link/URL) oder extern (andere Mittel)<br/>• Anzahl der Aktualisierungen seit dem Laden der Seite<br/>• Hauptsprache und Land deines Geräts<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bestätigen</string>
-    <string name="dialogSave">Speichern</string>
-    <string name="delete">Löschen</string>
-    <string name="edit">Bearbeiten</string>
-    <string name="remove">Entfernen</string>
-    <string name="removeAll">Alle entfernen</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Ungeschützte Websites</string>
     <string name="reportBrokenSite">Fehlerhafte Seite melden</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Hinzufügen</string>
-    <string name="dialogEditTitle">Bearbeiten</string>
-    <string name="dialogSaveAction">Speichern</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Website-Berechtigungen</string>
-    <string name="sitePermissionsSettingsDescription">Von dir besuchte Websites bitten möglicherweise um Zugriff auf den Standort, die Kamera, das Mikrofon oder die DRM-Software (Digital Rights Management) deines Geräts. Sie können darauf nicht zugreifen, es sei denn, du erteilst ihnen ausdrücklich die Erlaubnis.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Allen Websites erlauben, um Folgendes zu bitten:</string>
-    <string name="sitePermissionsSettingsLocation">Standort</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Websites verwalten</string>
-    <string name="sitePermissionsSettingsEmptyText">Noch keine Websites</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Berechtigungen für alle Websites entfernt</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Berechtigungen für „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Jedes Mal fragen</string>
-    <string name="permissionsPerWebsiteDenySetting">Ablehnen</string>
-    <string name="permissionsPerWebsiteAllowSetting">Zulassen</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Für alle Websites deaktiviert</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-Berechtigung für %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Erfahre, wann Downloads bereit sind</string>

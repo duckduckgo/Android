@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Obavijesti me</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodaj</string>
+    <string name="dialogEditTitle">Uredi</string>
+    <string name="dialogSaveAction">Spremi</string>
+    <string name="dialogConfirmTitle">Potvrdi</string>
+    <string name="dialogSave">Spremi</string>
+    <string name="delete">Izbriši</string>
+    <string name="edit">Uredi</string>
+    <string name="remove">Ukloni</string>
+    <string name="removeAll">Odstrani sve</string>
 </resources>

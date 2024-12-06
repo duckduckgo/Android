@@ -17,6 +17,22 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Site Permissions -->
+    <string name="sitePermissionsSettingsDescription">Os sites que visitas podem pedir acesso à localização, câmara, microfone ou DRM (Digital Rights Management) do teu dispositivo. Não poderão aceder a estas funcionalidades sem que concedas permissão explicitamente.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos os sites peçam:</string>
+    <string name="sitePermissionsSettingsLocation">Localização</string>
+    <string name="sitePermissionsSettingsCamera">Câmara</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfone</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gerir sites</string>
+    <string name="sitePermissionsSettingsEmptyText">Ainda não há sites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">As permissões foram removidas para todos os sites</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissões para \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Pergunte todas as vezes</string>
+    <string name="permissionsPerWebsiteDenySetting">Recusar</string>
+    <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Desativado para todos os sites</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permissão para %2$s utilizar %1$s</string>
+
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" pretende aceder à câmara e ao microfone</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" pretende aceder ao microfone</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" pretende aceder à câmara</string>
