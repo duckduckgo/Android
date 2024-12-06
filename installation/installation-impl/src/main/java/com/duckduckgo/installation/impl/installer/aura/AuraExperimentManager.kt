@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(AtbInitializerListener.AURA_EXPERIMENT_MANAGER)
 @SingleInstanceIn(AppScope::class)
-class AuraExperimentManagerImpl @Inject constructor(
+class AuraExperimentManager @Inject constructor(
     private val auraExperimentFeature: AuraExperimentFeature,
     private val auraExperimentListJsonParser: AuraExperimentListJsonParser,
     private val installSourceExtractor: InstallSourceExtractor,

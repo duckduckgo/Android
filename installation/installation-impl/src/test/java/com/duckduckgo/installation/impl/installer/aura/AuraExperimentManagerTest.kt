@@ -23,7 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
 import com.duckduckgo.installation.impl.installer.aura.AuraExperimentFeature
 import com.duckduckgo.installation.impl.installer.aura.AuraExperimentListJsonParser
-import com.duckduckgo.installation.impl.installer.aura.AuraExperimentManagerImpl
+import com.duckduckgo.installation.impl.installer.aura.AuraExperimentManager
 import com.duckduckgo.installation.impl.installer.aura.Packages
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -31,7 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
-class AuraExperimentManagerImplTest {
+class AuraExperimentManagerTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -43,11 +43,11 @@ class AuraExperimentManagerImplTest {
     private val appReferrer: AppReferrer = mock()
     private val toggle: Toggle = mock()
 
-    private lateinit var testee: AuraExperimentManagerImpl
+    private lateinit var testee: AuraExperimentManager
 
     @Before
     fun setup() {
-        testee = AuraExperimentManagerImpl(
+        testee = AuraExperimentManager(
             auraExperimentFeature,
             auraExperimentListJsonParser,
             installSourceExtractor,
@@ -98,7 +98,7 @@ class AuraExperimentManagerImplTest {
 
         testee.beforeAtbInit()
 
-        verify(statisticsDataStore).variant = AuraExperimentManagerImpl.VARIANT
-        verify(appReferrer).setOriginAttributeCampaign(AuraExperimentManagerImpl.ORIGIN)
+        verify(statisticsDataStore).variant = AuraExperimentManager.VARIANT
+        verify(appReferrer).setOriginAttributeCampaign(AuraExperimentManager.ORIGIN)
     }
 }
