@@ -18,6 +18,7 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Permisiuni pentru site</string>
     <string name="sitePermissionsSettingsDescription">Site-urile pe care le accesezi îți pot solicita accesul la locația dispozitivului, la camera foto, la microfon sau la software-ul DRM (Digital Rights Management). Acestea nu vor putea accesa aceste date decât dacă le oferi în mod explicit permisiunea.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Permite tuturor site-urilor să solicite:</string>
     <string name="sitePermissionsSettingsLocation">Locație</string>

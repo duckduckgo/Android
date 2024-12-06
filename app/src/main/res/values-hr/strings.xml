@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Skočni prozor je sakriven</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Dozvole web lokacija</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>

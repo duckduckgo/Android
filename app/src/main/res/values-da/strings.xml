@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop op-vindue skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Tilladelser til webstedet</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
     <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>

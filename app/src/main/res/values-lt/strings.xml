@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>
     <string name="autoconsentManagedNoticeAnimationText">Slapukai valdomi</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Svetainės leidimai</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Sužinokite, kada atsisiuntimai bus paruošti</string>
     <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>

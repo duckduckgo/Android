@@ -18,6 +18,7 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Vietnes atļaujas</string>
     <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
     <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>

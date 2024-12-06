@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ukryte wyskakujące okienka</string>
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Uprawnienia witryny</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
     <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>

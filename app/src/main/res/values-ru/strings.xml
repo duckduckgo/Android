@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Разрешения для сайтов</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
     <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>

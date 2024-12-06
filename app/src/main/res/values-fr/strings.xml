@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Fenêtre contextuelle masquée</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies gérés</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Autorisations du site</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Sachez quand les téléchargements sont prêts</string>
     <string name="downloadsNotifyMeSubtitle">Recevez une notification lorsque les téléchargements sont terminés.</string>
