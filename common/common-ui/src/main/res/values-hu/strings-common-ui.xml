@@ -30,4 +30,6 @@
     <string name="edit">Szerkesztés</string>
     <string name="remove">Eltávolítás</string>
     <string name="removeAll">Összes eltávolítása</string>
+    <string name="undo">Visszavonás</string>
+    <string name="cancel">Mégsem</string>
 </resources>

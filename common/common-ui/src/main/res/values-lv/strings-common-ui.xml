@@ -30,4 +30,6 @@
     <string name="edit">Rediģēt</string>
     <string name="remove">Noņemt</string>
     <string name="removeAll">Noņemt visu</string>
+    <string name="undo">Atsaukt</string>
+    <string name="cancel">Atcelt</string>
 </resources>

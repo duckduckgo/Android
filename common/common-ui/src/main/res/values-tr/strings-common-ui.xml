@@ -30,4 +30,6 @@
     <string name="edit">Düzenle</string>
     <string name="remove">Kaldır</string>
     <string name="removeAll">Tümünü Kaldır</string>
+    <string name="undo">Geri al</string>
+    <string name="cancel">Vazgeç</string>
 </resources>

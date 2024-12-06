@@ -30,4 +30,6 @@
     <string name="edit">Redigera</string>
     <string name="remove">Ta bort</string>
     <string name="removeAll">Ta bort alla</string>
+    <string name="undo">Återställ</string>
+    <string name="cancel">Avbryt</string>
 </resources>
