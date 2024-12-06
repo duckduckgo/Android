@@ -1,21 +1,46 @@
-package com.duckduckgo.app.browser.aura
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.duckduckgo.app.referral.AppReferrerDataStore
+package com.duckduckgo.installation.impl.installer.com.duckduckgo.installation.impl.installer.aura
+
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.browser.api.referrer.AppReferrer
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.installation.api.installer.InstallSourceExtractor
+import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
+import com.duckduckgo.installation.impl.installer.aura.AuraExperimentFeature
+import com.duckduckgo.installation.impl.installer.aura.AuraExperimentListJsonParser
+import com.duckduckgo.installation.impl.installer.aura.AuraExperimentManagerImpl
+import com.duckduckgo.installation.impl.installer.aura.Packages
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
 class AuraExperimentManagerImplTest {
 
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private val auraExperimentFeature: AuraExperimentFeature = mock()
     private val auraExperimentListJsonParser: AuraExperimentListJsonParser = mock()
     private val installSourceExtractor: InstallSourceExtractor = mock()
     private val statisticsDataStore: StatisticsDataStore = mock()
-    private val appReferrerDataStore: AppReferrerDataStore = mock()
+    private val appReferrer: AppReferrer = mock()
     private val toggle: Toggle = mock()
 
     private lateinit var testee: AuraExperimentManagerImpl
@@ -27,7 +52,8 @@ class AuraExperimentManagerImplTest {
             auraExperimentListJsonParser,
             installSourceExtractor,
             statisticsDataStore,
-            appReferrerDataStore,
+            appReferrer,
+            coroutinesTestRule.testDispatcherProvider,
         )
         whenever(auraExperimentFeature.self()).thenReturn(toggle)
     }
@@ -36,9 +62,9 @@ class AuraExperimentManagerImplTest {
     fun whenFeatureIsDisabledThenInitializeDoesNothing() = runTest {
         whenever(toggle.isEnabled()).thenReturn(false)
 
-        testee.initialize()
+        testee.beforeAtbInit()
 
-        verifyNoInteractions(auraExperimentListJsonParser, installSourceExtractor, statisticsDataStore, appReferrerDataStore)
+        verifyNoInteractions(auraExperimentListJsonParser, installSourceExtractor, statisticsDataStore, appReferrer)
     }
 
     @Test
@@ -46,9 +72,9 @@ class AuraExperimentManagerImplTest {
         whenever(toggle.isEnabled()).thenReturn(true)
         whenever(installSourceExtractor.extract()).thenReturn(null)
 
-        testee.initialize()
+        testee.beforeAtbInit()
 
-        verifyNoInteractions(auraExperimentListJsonParser, statisticsDataStore, appReferrerDataStore)
+        verifyNoInteractions(auraExperimentListJsonParser, statisticsDataStore, appReferrer)
     }
 
     @Test
@@ -58,9 +84,9 @@ class AuraExperimentManagerImplTest {
         whenever(toggle.getSettings()).thenReturn("json")
         whenever(auraExperimentListJsonParser.parseJson("json")).thenReturn(Packages(list = listOf("a.b.c")))
 
-        testee.initialize()
+        testee.beforeAtbInit()
 
-        verifyNoInteractions(statisticsDataStore, appReferrerDataStore)
+        verifyNoInteractions(statisticsDataStore, appReferrer)
     }
 
     @Test
@@ -70,22 +96,9 @@ class AuraExperimentManagerImplTest {
         whenever(toggle.getSettings()).thenReturn("json")
         whenever(auraExperimentListJsonParser.parseJson("json")).thenReturn(Packages(list = listOf("a.b.c")))
 
-        testee.initialize()
+        testee.beforeAtbInit()
 
         verify(statisticsDataStore).variant = AuraExperimentManagerImpl.VARIANT
-        verify(appReferrerDataStore).utmOriginAttributeCampaign = AuraExperimentManagerImpl.ORIGIN
-    }
-
-    @Test
-    fun whenReturningUserThenSetsReturningUserFlag() = runTest {
-        whenever(toggle.isEnabled()).thenReturn(true)
-        whenever(installSourceExtractor.extract()).thenReturn("a.b.c")
-        whenever(toggle.getSettings()).thenReturn("json")
-        whenever(auraExperimentListJsonParser.parseJson("json")).thenReturn(Packages(list = listOf("a.b.c")))
-        whenever(statisticsDataStore.variant).thenReturn(AuraExperimentManagerImpl.RETURNING_USER)
-
-        testee.initialize()
-
-        verify(appReferrerDataStore).returningUser = true
+        verify(appReferrer).setOriginAttributeCampaign(AuraExperimentManagerImpl.ORIGIN)
     }
 }

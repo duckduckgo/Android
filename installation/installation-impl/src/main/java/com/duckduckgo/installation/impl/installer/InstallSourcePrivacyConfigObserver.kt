@@ -27,7 +27,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.installation.api.installer.InstallSourceExtractor
 import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_FULL_PACKAGE_NAME
 import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_PACKAGE_NAME
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore

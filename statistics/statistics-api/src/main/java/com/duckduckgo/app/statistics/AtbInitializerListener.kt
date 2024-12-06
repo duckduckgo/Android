@@ -23,4 +23,9 @@ interface AtbInitializerListener {
 
     /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
     fun beforeAtbInitTimeoutMillis(): Long
+
+    companion object {
+        const val REINSTALL_LISTENER = 10
+        const val AURA_EXPERIMENT_MANAGER = 20
+    }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.aura
+package com.duckduckgo.installation.impl.installer.aura
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope

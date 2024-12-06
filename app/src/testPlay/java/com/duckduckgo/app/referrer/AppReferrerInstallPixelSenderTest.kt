@@ -4,7 +4,6 @@ import com.duckduckgo.app.pixels.AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.referral.AppReferrerInstallPixelSender
@@ -13,6 +12,7 @@ import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PAR
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_RETURNING_USER
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -35,7 +35,6 @@ class AppReferrerInstallPixelSenderTest {
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val appReferrerDataStore: AppReferrerDataStore = mock()
-    private val statisticsDataStore: StatisticsDataStore = mock()
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall = mock()
     private val captor = argumentCaptor<Map<String, String>>()
 
@@ -43,6 +42,9 @@ class AppReferrerInstallPixelSenderTest {
     fun setup() {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
         whenever(playStoreInstallChecker.installedFromPlayStore()).thenReturn(true)
+        runBlocking {
+            configureAsNewUser()
+        }
     }
 
     private val testee = AppReferrerInstallPixelSender(
@@ -51,7 +53,6 @@ class AppReferrerInstallPixelSenderTest {
         appCoroutineScope = coroutineTestRule.testScope,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appBuildConfig = appBuildConfig,
-        statisticsDataStore = statisticsDataStore,
     )
 
     @Test
@@ -62,14 +63,6 @@ class AppReferrerInstallPixelSenderTest {
     @Test
     fun whenBothUserCheckAndReferrerExtractionFinishedForReturningUserThenPixelSent() = runTest {
         configureAsReturningUser()
-        configureReferrerCampaign("foo")
-        testee.onAppAtbInitialized()
-        verifyCorrectPixelSent("foo", returningUser = true)
-    }
-
-    @Test
-    fun whenBothUserCheckAndReferrerExtractionFinishedForAuraReturningUserThenPixelSent() = runTest {
-        configureAsAuraReturningUser()
         configureReferrerCampaign("foo")
         testee.onAppAtbInitialized()
         verifyCorrectPixelSent("foo", returningUser = true)
@@ -93,16 +86,12 @@ class AppReferrerInstallPixelSenderTest {
         verifyNoMoreInteractions(pixel)
     }
 
-    private fun configureAsReturningUser() {
-        whenever(statisticsDataStore.variant).thenReturn("ru")
+    private suspend fun configureAsReturningUser() {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
     }
 
-    private fun configureAsAuraReturningUser() {
-        whenever(appReferrerDataStore.returningUser).thenReturn(true)
-    }
-
-    private fun configureAsNewUser() {
-        whenever(statisticsDataStore.variant).thenReturn("")
+    private suspend fun configureAsNewUser() {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
     }
 
     private fun configureReferrerCampaign(campaign: String?) {

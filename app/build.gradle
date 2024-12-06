@@ -358,7 +358,6 @@ dependencies {
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
 
-    implementation project(':installation-api')
     implementation project(':installation-impl')
 
     implementation project(':internal-features-api')

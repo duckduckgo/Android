@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
+import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -38,6 +39,7 @@ import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
+@PriorityKey(AtbInitializerListener.REINSTALL_LISTENER)
 class ReinstallAtbListener @Inject constructor(
     private val backupDataStore: BackupServiceDataStore,
     private val statisticsDataStore: StatisticsDataStore,

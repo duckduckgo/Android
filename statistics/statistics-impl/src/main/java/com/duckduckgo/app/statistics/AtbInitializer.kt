@@ -16,15 +16,14 @@
 
 package com.duckduckgo.app.statistics
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.aura.AuraExperimentManager
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -48,26 +47,15 @@ class AtbInitializer @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
-    private val listeners: DaggerSet<AtbInitializerListener>,
+    private val listeners: PluginPoint<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
-    private val auraExperimentManager: AuraExperimentManager,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
-        appCoroutineScope.launch(dispatcherProvider.io()) { initialize() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { refreshAppRetentionAtb() }
     }
 
-    @VisibleForTesting
-    suspend fun initialize() {
-        Timber.v("Initialize ATB")
-        listeners.forEach {
-            withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
-        }
-
-        initializeAtb()
-    }
-
-    private fun initializeAtb() {
+    private fun refreshAppRetentionAtb() {
         if (statisticsDataStore.hasInstallationStatistics) {
             statisticsUpdater.refreshAppRetentionAtb()
         }
@@ -76,10 +64,19 @@ class AtbInitializer @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         if (!statisticsDataStore.hasInstallationStatistics) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                auraExperimentManager.initialize()
+                Timber.v("Initialize ATB")
+                listeners.getPlugins().forEach {
+                    withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
+                }
                 // First time we initializeAtb
                 statisticsUpdater.initializeAtb()
             }
         }
     }
 }
+
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = AtbInitializerListener::class,
+)
+private interface AtbInitializerListenerTrigger

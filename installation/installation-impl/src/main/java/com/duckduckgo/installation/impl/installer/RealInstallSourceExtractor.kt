@@ -21,9 +21,16 @@ import android.content.Context
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.installation.api.installer.InstallSourceExtractor
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+
+interface InstallSourceExtractor {
+
+    /**
+     * Extracts the installer package name from the PackageManager.
+     */
+    fun extract(): String?
+}
 
 @ContributesBinding(AppScope::class)
 class RealInstallSourceExtractor @Inject constructor(

@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
+package com.duckduckgo.browser.api.referrer
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
+/** Public interface for app referral parameters */
+interface AppReferrer {
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
+    /**
+     * Sets the attribute campaign origin.
+     */
+    fun setOriginAttributeCampaign(origin: String?)
 }

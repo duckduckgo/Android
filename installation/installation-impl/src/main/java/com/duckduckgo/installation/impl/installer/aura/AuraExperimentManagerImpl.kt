@@ -14,46 +14,53 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.aura
+package com.duckduckgo.installation.impl.installer.aura
 
-import com.duckduckgo.app.aura.AuraExperimentManager
-import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.browser.api.referrer.AppReferrer
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.installation.api.installer.InstallSourceExtractor
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
-@ContributesBinding(AppScope::class)
+@ContributesMultibinding(AppScope::class)
+@PriorityKey(AtbInitializerListener.AURA_EXPERIMENT_MANAGER)
 @SingleInstanceIn(AppScope::class)
 class AuraExperimentManagerImpl @Inject constructor(
     private val auraExperimentFeature: AuraExperimentFeature,
     private val auraExperimentListJsonParser: AuraExperimentListJsonParser,
     private val installSourceExtractor: InstallSourceExtractor,
     private val statisticsDataStore: StatisticsDataStore,
-    private val appReferrerDataStore: AppReferrerDataStore,
-) : AuraExperimentManager {
+    private val appReferrer: AppReferrer,
+    private val dispatcherProvider: DispatcherProvider,
+) : AtbInitializerListener {
 
-    override suspend fun initialize() {
+    override suspend fun beforeAtbInit() {
+        initialize()
+    }
+
+    override fun beforeAtbInitTimeoutMillis(): Long = MAX_WAIT_TIME_MS
+
+    private suspend fun initialize() = withContext(dispatcherProvider.io()) {
         if (auraExperimentFeature.self().isEnabled()) {
             installSourceExtractor.extract()?.let { source ->
                 val settings = auraExperimentFeature.self().getSettings()
                 val packages = auraExperimentListJsonParser.parseJson(settings).list
                 if (packages.contains(source)) {
-                    if (statisticsDataStore.variant == RETURNING_USER) {
-                        appReferrerDataStore.returningUser = true
-                    }
                     statisticsDataStore.variant = VARIANT
-                    appReferrerDataStore.utmOriginAttributeCampaign = ORIGIN
+                    appReferrer.setOriginAttributeCampaign(ORIGIN)
                 }
             }
         }
     }
-
     companion object {
         const val VARIANT = "mq"
-        const val RETURNING_USER = "ru"
         const val ORIGIN = "funnel_app_aurapaid_android"
+        const val MAX_WAIT_TIME_MS = 1_500L
     }
 }

@@ -17,9 +17,11 @@
 package com.duckduckgo.app.buildconfig
 
 import android.os.Build
+import android.os.Environment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
@@ -27,10 +29,12 @@ import dagger.Lazy
 import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class RealAppBuildConfig @Inject constructor(
     private val variantManager: Lazy<VariantManager>, // break any possible DI dependency cycle
+    private val dispatcherProvider: DispatcherProvider,
 ) : AppBuildConfig {
     override val isDebug: Boolean = BuildConfig.DEBUG
     override val applicationId: String = BuildConfig.APPLICATION_ID
@@ -64,6 +68,13 @@ class RealAppBuildConfig @Inject constructor(
 
     override val variantName: String?
         get() = variantManager.get().getVariantKey()
+
+    override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext kotlin.runCatching {
+            val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            downloadDirectory.exists()
+        }.getOrDefault(false)
+    }
 
     override val buildDateTimeMillis: Long
         get() = BuildConfig.BUILD_DATE_MILLIS

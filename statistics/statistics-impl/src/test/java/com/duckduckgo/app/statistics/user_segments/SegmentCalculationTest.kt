@@ -6,13 +6,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.APP_USE
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.SEARCH
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities.loadText
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
-import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
@@ -53,7 +54,7 @@ class SegmentCalculationTest(private val input: TestInput) {
 
     private lateinit var usageHistory: UsageHistory
     private lateinit var atbStore: StatisticsDataStore
-    private val mockVariantManager = mock<VariantManager>()
+    private val appBuildConfig = mock<AppBuildConfig>()
     private val mockPixel: Pixel = mock()
     private val crashLogger: CrashLogger = org.mockito.kotlin.mock()
 
@@ -66,7 +67,7 @@ class SegmentCalculationTest(private val input: TestInput) {
     @Before
     fun setup() {
         atbStore = FakeStatisticsDataStore()
-        whenever(mockVariantManager.getVariantKey()).thenReturn(null)
+        runBlocking { whenever(appBuildConfig.isAppReinstall()).thenReturn(false) }
 
         usageHistory = SegmentStoreModule().provideSegmentStore(
             FakeSharedPreferencesProvider(),
@@ -76,7 +77,7 @@ class SegmentCalculationTest(private val input: TestInput) {
         segmentCalculation = RealSegmentCalculation(
             coroutineTestRule.testDispatcherProvider,
             atbStore,
-            mockVariantManager,
+            appBuildConfig,
         )
         userSegmentsPixelSender = UserSegmentsPixelSender(
             usageHistory,
@@ -93,7 +94,7 @@ class SegmentCalculationTest(private val input: TestInput) {
         // prepping test
         atbStore.atb = Atb(input.client.atb.removeSuffix("ru"))
         if (input.client.atb.contains("ru")) {
-            whenever(mockVariantManager.getVariantKey()).thenReturn("ru")
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         }
 
         input.client.usage.forEachIndexed { index, usage ->
@@ -115,7 +116,7 @@ class SegmentCalculationTest(private val input: TestInput) {
         // prepping test
         atbStore.atb = Atb(input.client.atb.removeSuffix("ru"))
         if (input.client.atb.contains("ru")) {
-            whenever(mockVariantManager.getVariantKey()).thenReturn("ru")
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         }
         var oldAtb: String = atbStore.atb!!.version
         input.client.usage.forEachIndexed { index, usage ->
