@@ -30,5 +30,6 @@
     <string name="edit">Muokkaa</string>
     <string name="remove">Poista</string>
     <string name="removeAll">Poista kaikki</string>
-
+    <string name="undo">Kumoa</string>
+    <string name="cancel">Peruuta</string>
 </resources>

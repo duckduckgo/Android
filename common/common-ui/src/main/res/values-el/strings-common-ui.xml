@@ -30,5 +30,6 @@
     <string name="edit">Επεξεργασία</string>
     <string name="remove">Αφαίρεση</string>
     <string name="removeAll">Αφαίρεση όλων</string>
-
+    <string name="undo">Αναίρεση</string>
+    <string name="cancel">Ακύρωση</string>
 </resources>

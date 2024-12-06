@@ -30,4 +30,6 @@
     <string name="edit">Upravit</string>
     <string name="remove">Odstranit</string>
     <string name="removeAll">Odstranit vše</string>
+    <string name="undo">Vrátit</string>
+    <string name="cancel">Zrušit</string>
 </resources>

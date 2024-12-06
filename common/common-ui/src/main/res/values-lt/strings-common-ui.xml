@@ -30,4 +30,6 @@
     <string name="edit">Redaguoti</string>
     <string name="remove">Pašalinti</string>
     <string name="removeAll">Pašalinti visus</string>
+    <string name="undo">Anuliuoti</string>
+    <string name="cancel">Atšaukti</string>
 </resources>

@@ -30,4 +30,6 @@
     <string name="edit">Редактиране</string>
     <string name="remove">Премахване</string>
     <string name="removeAll">Премахване на всички</string>
+    <string name="undo">Отмяна</string>
+    <string name="cancel">Отмени</string>
 </resources>
