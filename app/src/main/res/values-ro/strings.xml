@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vezi ce se trimite</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informațiile trimise în rapoarte nu pot fi folosite pentru a te identifica:</b><br/><br/>• Adresa URL a paginii (fără informații identificabile)<br/>• Marca, modelul și producătorul dispozitivului<br/>• Numărul versiunii sistemului de operare<br/>• Numărul versiunii aplicației<br/>• Grup de experimente anonim pentru testarea funcționalităților<br/>• Informații despre ce versiuni ale instrumentelor noastre de protecție au fost active<br/>• Numărul versiunii motorului browserului<br/>• Lista cu protecțiile și funcțiile browserului care erau active<br/>• Numele de gazdă ale tehnologiilor de urmărire blocate, solicitările surogat, solicitările ignorate și solicitările care nu se află în lista de blocare a tehnologiilor de urmărire<br/>• Erori raportate de browser<br/>• Codurile pentru starea răspunsului site-ului (HTTP) <br/>• Ce formular de raportare ai folosit (meniu, tablou de bord etc.)<br/>• Data ultimului raport trimis pentru acest site<br/>• Dacă ai ales sau nu să afișezi informațiile despre acest raport<br/>• Numărul de dezactivări ale instrumentelor de protecție<br/>• Cât de repede au fost încărcate anumite părți ale paginii<br/>• Cum ai ajuns la această pagină, fie: SERP (căutare DuckDuckGo), navigare (link/URL) sau extern (alte mijloace)<br/>• Numărul de reîmprospătări de la încărcarea paginii<br/>• Limba principală și țara dispozitivului tău <br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Confirmare</string>
-    <string name="dialogSave">Salvare</string>
-    <string name="delete">Ștergere</string>
-    <string name="edit">Editare</string>
-    <string name="remove">Elimină</string>
-    <string name="removeAll">Elimină tot</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Site-uri neprotejate</string>
     <string name="reportBrokenSite">Raportează Site-ul Defect</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Adaugă</string>
-    <string name="dialogEditTitle">Editează</string>
-    <string name="dialogSaveAction">Salvează</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Permisiuni pentru site</string>
-    <string name="sitePermissionsSettingsDescription">Site-urile pe care le accesezi îți pot solicita accesul la locația dispozitivului, la camera foto, la microfon sau la software-ul DRM (Digital Rights Management). Acestea nu vor putea accesa aceste date decât dacă le oferi în mod explicit permisiunea.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Permite tuturor site-urilor să solicite:</string>
-    <string name="sitePermissionsSettingsLocation">Locație</string>
-    <string name="sitePermissionsSettingsCamera">Aparat foto</string>
-    <string name="sitePermissionsSettingsMicrophone">Microfon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Gestionează site-urile</string>
-    <string name="sitePermissionsSettingsEmptyText">Niciun site încă</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisiuni eliminate pentru toate site-urile</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisiuni pentru „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Întreabă de fiecare dată</string>
-    <string name="permissionsPerWebsiteDenySetting">Refuză</string>
-    <string name="permissionsPerWebsiteAllowSetting">Permite</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Dezactivat pentru toate site-urile</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Permisiune %1$s pentru %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>

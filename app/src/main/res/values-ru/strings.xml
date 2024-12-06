@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Что было отправлено</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>В отчет включаются следующие сведения (по которым невозможно установить вашу личность):</b><br/><br/>• адрес веб-страницы (без идентифицирующих данных);<br/>• марка, модель и изготовитель устройства;<br/>• номер операционной системы;<br/>• номер версии приложения;<br/>• анонимная экспериментальная группа для тестирования функций;<br/>• версии задействованных функций защиты;<br/>• номер версии движка браузера;<br/>• список активных средств защиты и функций браузера;<br/>• имена хостов заблокированных трекеров, суррогатные и проигнорированные запросы, а также запросы, не входящие в список блокировки трекеров;<br/>• ошибки, зафиксированные браузером;<br/>• коды состояния ответа сайта (HTTP);<br/>• способ отправки отчета (через меню, панель управления и так далее);<br/>• дата отправки последнего отчета по этому сайту;<br/>• отметка о том, готовы ли вы раскрыть содержимое отчета;<br/>• количество отключений функций защиты;<br/>• скорость загрузки разных частей страницы;<br/>• информация о том, как вы попали на данную страницу — через результаты поиска (в DuckDuckGo), путем навигации (по ссылке/URL-адресу) или иным (внешним) способом;<br/>• количество обновлений страницы с момента ее загрузки;<br/>• основной язык и регион вашего устройства.<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Подтвердить</string>
-    <string name="dialogSave">Сохранить</string>
-    <string name="delete">Удалить</string>
-    <string name="edit">Редактировать</string>
-    <string name="remove">Удалить</string>
-    <string name="removeAll">Удалить все</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Поиск в DuckDuckGo</string>
 
@@ -479,16 +471,11 @@
     <string name="changeIconCtaAccept">Применить</string>
     <string name="changeIconCtaCancel">Отменить</string>
     <string name="changeIconDialogTitle">Применить новый значок?</string>
-    <string name="changeIconDialogMessage">Приложение может закрыться, чтобы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
+    <string name="changeIconDialogMessage">Приложение может закрыться, чтоfбы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageAllowlist">Незащищенные сайты</string>
     <string name="reportBrokenSite">Сообщить о неработающем сайте</string>
-
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Добавить</string>
-    <string name="dialogEditTitle">Редактировать</string>
-    <string name="dialogSaveAction">Сохранить</string>
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащищенные сайты</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения для сайтов</string>
-    <string name="sitePermissionsSettingsDescription">Посещаемые вами сайты могут запрашивать доступ к геопозиции, камере, микрофону или программам DRM (защиты авторских прав) вашего устройства. Доступ предоставляется только с вашего разрешения.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешить всем сайтам запрашивать:</string>
-    <string name="sitePermissionsSettingsLocation">Геопозиция</string>
-    <string name="sitePermissionsSettingsCamera">Камера</string>
-    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление сайтами</string>
-    <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешения удалены для всех сайтов</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения для «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Спрашивать каждый раз</string>
-    <string name="permissionsPerWebsiteDenySetting">Отказать</string>
-    <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Отключено в отношении всех сайтов</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>

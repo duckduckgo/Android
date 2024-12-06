@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Meddela mig</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lägg till</string>
+    <string name="dialogEditTitle">Redigera</string>
+    <string name="dialogSaveAction">Spara</string>
+    <string name="dialogConfirmTitle">Bekräfta</string>
+    <string name="dialogSave">Spara</string>
+    <string name="delete">Ta bort</string>
+    <string name="edit">Redigera</string>
+    <string name="remove">Ta bort</string>
+    <string name="removeAll">Ta bort alla</string>
 </resources>

@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Вижте какво е изпратено</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Информацията, изпратена в отчетите, не може да се използва, за да бъдете идентифицирани:</b><br/><br/>• URL адрес на страница (без информация за идентифициране)<br/>• Марка, модел и производител на устройството<br/>• Номер на версията на операционната система<br/>• Номер на версията на приложението<br/>• Анонимна експериментална група за тестване на функции<br/>• Информация за версиите на нашите защити, които са били активни<br/>• Номер на версията на уеб браузъра<br/>• Списък със защитите и функциите на браузъра, които са били активни<br/>• Имена на хостове на блокирани тракери, сурогатни заявки, игнорирани заявки и заявки, които не са в списъка за блокиране на тракери<br/>• Грешки, докладвани от браузъра<br/>• Кодове за статус на отговор на уебсайта (HTTP) <br/>• Форма за докладване, която сте използвали (меню, табло за управление и т.н.)<br/>• Дата на последния изпратен доклад за този сайт<br/>• Дали сте избрали да покажете информация за този доклад<br/>• Брой пъти, когато защитите са били изключени<br/>• Колко бързо са се заредили частите на страницата<br/>• Как сте стигнали до тази страница: SERP (търсене с DuckDuckGo), навигация (връзка/URL) или чрез външни средства (други средства)<br/>• Брой опреснявания откакто страницата е била заредена<br/>• Основен език и държава на устройството<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Потвърдете</string>
-    <string name="dialogSave">Запази</string>
-    <string name="delete">Изтриване</string>
-    <string name="edit">Редактиране</string>
-    <string name="remove">Премахване</string>
-    <string name="removeAll">Премахване на всички</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Търсене с DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Незащитени сайтове</string>
     <string name="reportBrokenSite">Подаване на сигнал за повреден сайт</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Добавяне</string>
-    <string name="dialogEditTitle">Редактиране</string>
-    <string name="dialogSaveAction">Запази</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения за сайтове</string>
-    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата, микрофона или софтуера за управление на цифровите права (DRM) на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
-    <string name="sitePermissionsSettingsLocation">Местоположение</string>
-    <string name="sitePermissionsSettingsCamera">Камера</string>
-    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
-    <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Питай всеки път</string>
-    <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
-    <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Деактивирано за всички сайтове</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Разберете кога изтеглянето е завършено</string>

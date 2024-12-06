@@ -19,4 +19,15 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Bana bildir</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Ekle</string>
+    <string name="dialogEditTitle">Düzenle</string>
+    <string name="dialogSaveAction">Kaydet</string>
+    <string name="dialogConfirmTitle">Onayla</string>
+    <string name="dialogSave">Kaydet</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+    <string name="remove">Kaldır</string>
+    <string name="removeAll">Tümünü Kaldır</string>
 </resources>

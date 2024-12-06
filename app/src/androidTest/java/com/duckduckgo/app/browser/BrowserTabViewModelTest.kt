@@ -142,7 +142,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
@@ -369,8 +368,6 @@ class BrowserTabViewModelTest {
     private val mockUserEventsStore: UserEventsStore = mock()
 
     private val mockFileDownloader: FileDownloader = mock()
-
-    private val geoLocationPermissions: GeoLocationPermissions = mock()
 
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler = mock()
 

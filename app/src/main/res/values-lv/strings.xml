@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Skatīt, kas tiek nosūtīts</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ziņojumos nosūtīto informāciju nevar izmantot, lai tevi identificētu:</b><br/><br/>• Lapas URL (bez identificējamas informācijas)<br/>• Ierīces marka, modelis un ražotājs<br/>• Operētājsistēmas versijas numurs<br/>• Lietotnes versijas numurs<br/>• Anonīma eksperimentālā grupa funkciju testēšanai<br/>• Informācija par to, kuras mūsu aizsardzības versijas bija aktīvas<br/>• Tīmekļa pārlūkprogrammas meklētājsistēmas versijas numurs<br/>• Saraksts ar aizsardzības un pārlūkprogrammas funkcijām, kas bija aktīvas<br/>• Bloķēto izsekotāju resursdatoru nosaukumi, surogātu pieprasījumi, ignorētie pieprasījumi un pieprasījumi, kas nav iekļauti izsekotāju bloķēšanas sarakstā<br/>• Pārlūkprogrammas ziņotās kļūdas<br/>• Tīmekļa vietnes atbildes statusa (HTTP) kodi<br/>• Kuru ziņojuma veidlapu izmantoji (“izvēlne”, “informācijas panelis” utt.)<br/>• Datums, kurā tika nosūtīts pēdējais ziņojums par šo vietni<br/>• Vai izvēlējies rādīt šo ziņojuma informāciju<br/>• Aizsardzības izslēgšanas reižu skaits<br/>• Cik ātri tika ielādētas lapas daļas<br/>• Kā tu nonāci šajā lapā: SERP (DuckDuckGo meklēšana), Navigācija (saite/URL) vai Ārēji (citos veidos)<br/>• Atsvaidzināšanas reižu skaits kopš lapas ielādes<br/>• Tavas ierīces galvenā valoda un valsts<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Apstiprināt</string>
-    <string name="dialogSave">Saglabāt</string>
-    <string name="delete">Dzēst</string>
-    <string name="edit">Rediģēt</string>
-    <string name="remove">Noņemt</string>
-    <string name="removeAll">Noņemt visu</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Pievienot</string>
-    <string name="dialogEditTitle">Rediģēt</string>
-    <string name="dialogSaveAction">Saglabāt</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Vietnes atļaujas</string>
-    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
-    <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
-    <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Atļaujas ir noņemtas visām vietnēm</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Jautāt katru reizi</string>
-    <string name="permissionsPerWebsiteDenySetting">Liegt</string>
-    <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Atspējots visām vietnēm</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Uzzini, kad lejupielādes ir gatavas</string>

@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pogledaj što je poslano</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podaci poslani u izvješćima ne mogu se koristiti za tvoju identifikaciju:</b><br/><br/>• URL stranice (bez podataka pomoću kojih se možeš identificirati)<br/>• Marka, model i proizvođač uređaja<br/>• Broj verzije operativnog sustava<br/>• Broj verzije aplikacije<br/>• Anonimna eksperimentalna grupa za testiranje značajki<br/>• Informacije o tome koje su verzije naših zaštita bile aktivne<br/>• Broj verzije motora internetskog preglednika<br/>• Popis aktivnih zaštita i značajki preglednika<br/>• Blokirana imena domaćina alata za praćenje, zamjenski zahtjevi, zanemareni zahtjevi i zahtjevi koji nisu na popisu blokiranih alata za praćenje<br/>• Pogreške koje je prijavio preglednik<br/>• Kodovi statusa odgovora web-mjesta (HTTP)<br/>• Koji je obrazac za izvješćivanje korišten (izbornik, nadzorna ploča itd.)<br/>• Datum posljednjeg izvješća poslanog za ovo web-mjesto<br/>• Je li odabrano prikazivanje ovih podataka o izvješću ili ne<br/>• Koliko je puta zaštita isključena<br/>• Koliko se brzo učitavaju dijelovi stranice<br/>• Kako si došao do ove stranice, ili: SERP (DuckDuckGo pretraživanje), Navigacija (veza/URL) ili Vanjska (drugi način)<br/>• Broj osvježavanja od učitavanja stranice<br/>• Primarni jezik i zemlja tvog uređaja<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potvrdi</string>
-    <string name="dialogSave">Spremi</string>
-    <string name="delete">Izbriši</string>
-    <string name="edit">Uredi</string>
-    <string name="remove">Ukloni</string>
-    <string name="removeAll">Odstrani sve</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Nezaštićena web-mjesta</string>
     <string name="reportBrokenSite">Prijavi neispravno web-mjesto</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Dodaj</string>
-    <string name="dialogEditTitle">Uredi</string>
-    <string name="dialogSaveAction">Spremi</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezaštićena web-mjesta</string>
     <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dozvole web lokacija</string>
-    <string name="sitePermissionsSettingsDescription">Stranice koje posjećuješ mogu tražiti pristup lokaciji tvog uređaja, fotoaparatu, mikrofonu ili DRM (Digital Rights Management) softveru. Neće im moći pristupiti osim ako im za to izričito ne daš dopuštenje.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Dopusti svim web-lokacijama da zatraže:</string>
-    <string name="sitePermissionsSettingsLocation">Lokacija</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje web-lokacijama</string>
-    <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Uklonjena su dopuštenja za sve web lokacije</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dopuštenja za „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Pitaj svaki puta</string>
-    <string name="permissionsPerWebsiteDenySetting">Odbij</string>
-    <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Onemogućeno za sva web-mjesta</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>

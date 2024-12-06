@@ -260,14 +260,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Žiūrėti, kas išsiųsta</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ataskaitose siunčiama informacija negali būti naudojama jūsų tapatybei nustatyti:</b><br/><br/>• puslapio URL (be identifikuojamos informacijos);<br/>• įrenginio markė, modelis ir gamintojas;<br/>• operacinės sistemos versijos numeris;<br/>• programos versijos numeris;<br/>• anoniminė eksperimentų grupė funkcijų testavimui;<br/>• informacija apie tai, kurios apsaugos versijos buvo aktyvios;<br/>• žiniatinklio naršyklės variklio versijos numeris;<br/>• sąrašas, kurios apsaugos ir naršyklės funkcijos buvo aktyvios;<br/>• užblokuotų stebėjimo priemonių, pakaitinių užklausų, ignoruojamų užklausų ir užklausų, kurios nėra stebėjimo priemonių blokavimo sąraše, prieglobos pavadinimai;<br/>• naršyklės praneštos klaidos;<br/>• svetainės atsako būsenos (HTTP) kodai;<br/>• naudota ataskaitų teikimo forma (meniu, prietaisų skydelis ir kt.);<br/>• paskutinio šios svetainės pranešimo siuntimo data;<br/>• ar pasirinkote rodyti šio pranešimo informaciją, ar ne;<br/>• apsaugos išjungimo kartų skaičius;<br/>• kaip greitai įkeltos puslapio dalys;<br/>• kaip patekote į šį puslapį: naudodami SERP („DuckDuckGo“ paieška), navigaciją (nuoroda / URL) ar išorinę priemonę (kitos priemonės);<br/>• atnaujinimų skaičius nuo puslapio įkėlimo;<br/>• pagrindinė jūsų įrenginio kalba ir šalis.<br/>]]>"</string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Patvirtinti</string>
-    <string name="dialogSave">Išsaugoti</string>
-    <string name="delete">Trinti</string>
-    <string name="edit">Redaguoti</string>
-    <string name="remove">Pašalinti</string>
-    <string name="removeAll">Pašalinti visus</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
 
@@ -485,11 +477,6 @@
     <string name="manageAllowlist">Neapsaugotos svetainės</string>
     <string name="reportBrokenSite">Pranešti apie sugadintą svetainę</string>
 
-    <!-- Dialogs -->
-    <string name="dialogAddTitle">Papildyti</string>
-    <string name="dialogEditTitle">Redaguoti</string>
-    <string name="dialogSaveAction">Išsaugoti</string>
-
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
@@ -672,20 +659,6 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Svetainės leidimai</string>
-    <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio buvimo vietos, kameros, mikrofono arba DRM (skaitmeninių teisių valdymo) programinės įrangos. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>
-    <string name="sitePermissionsSettingsLocation">Vieta</string>
-    <string name="sitePermissionsSettingsCamera">Fotoaparatas</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofonas</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Tvarkyti svetaines</string>
-    <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Pašalinti visų svetainių leidimai</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Leidimai „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Klausti kiekvieną kartą</string>
-    <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
-    <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Išjungta visose svetainėse</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Sužinokite, kada atsisiuntimai bus paruošti</string>
