@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.statistics
 
+import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -39,6 +41,17 @@ class AtbInitializerTest {
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val statisticsUpdater: StatisticsUpdater = mock()
     private var atbInitializerListener = FakeAtbInitializerListener()
+    private val lifecycleOwner = TestLifecycleOwner()
+    private val listeners = object : PluginPoint<AtbInitializerListener> {
+        override fun getPlugins(): Collection<AtbInitializerListener> {
+            return setOf(atbInitializerListener)
+        }
+    }
+    private val emptyListeners = object : PluginPoint<AtbInitializerListener> {
+        override fun getPlugins(): Collection<AtbInitializerListener> {
+            return emptyList()
+        }
+    }
 
     @Test
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runTest {
@@ -57,7 +70,7 @@ class AtbInitializerTest {
             coroutineRule.testScope,
             statisticsDataStore,
             statisticsUpdater,
-            setOf(atbInitializerListener),
+            emptyListeners,
             coroutineRule.testDispatcherProvider,
         )
 
@@ -74,11 +87,11 @@ class AtbInitializerTest {
             coroutineRule.testScope,
             statisticsDataStore,
             statisticsUpdater,
-            setOf(atbInitializerListener),
+            listeners,
             coroutineRule.testDispatcherProvider,
         )
 
-        testee.initialize()
+        testee.onResume(lifecycleOwner)
 
         verify(statisticsUpdater, never()).initializeAtb()
     }
@@ -87,7 +100,7 @@ class AtbInitializerTest {
     fun whenAlreadyInitializedThenRefreshCalled() = runTest {
         configureAlreadyInitialized()
 
-        testee.initialize()
+        testee.onResume(lifecycleOwner)
 
         verify(statisticsUpdater).refreshAppRetentionAtb()
     }
@@ -102,7 +115,7 @@ class AtbInitializerTest {
     }
 
     @Test
-    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
+    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAuraExperimentAndAtbInitialized() = runTest {
         configureNeverInitialized()
 
         testee.onPrivacyConfigDownloaded()
@@ -116,7 +129,7 @@ class AtbInitializerTest {
             coroutineRule.testScope,
             statisticsDataStore,
             statisticsUpdater,
-            setOf(atbInitializerListener),
+            listeners,
             coroutineRule.testDispatcherProvider,
         )
     }
@@ -127,7 +140,7 @@ class AtbInitializerTest {
             coroutineRule.testScope,
             statisticsDataStore,
             statisticsUpdater,
-            setOf(atbInitializerListener),
+            listeners,
             coroutineRule.testDispatcherProvider,
         )
     }

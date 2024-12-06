@@ -19,10 +19,15 @@ package com.duckduckgo.app.referral
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.referrer.AppReferrer
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface AppReferrerDataStore {
     var referrerCheckedPreviously: Boolean
@@ -31,9 +36,27 @@ interface AppReferrerDataStore {
     var utmOriginAttributeCampaign: String?
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AppReferrerDataStore::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AppReferrer::class,
+)
 @SingleInstanceIn(AppScope::class)
-class AppReferenceSharePreferences @Inject constructor(private val context: Context) : AppReferrerDataStore {
+class AppReferenceSharePreferences @Inject constructor(
+    private val context: Context,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : AppReferrerDataStore, AppReferrer {
+
+    override fun setOriginAttributeCampaign(origin: String?) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            utmOriginAttributeCampaign = origin
+        }
+    }
+
     override var campaignSuffix: String?
         get() = preferences.getString(KEY_CAMPAIGN_SUFFIX, null)
         set(value) = preferences.edit(true) { putString(KEY_CAMPAIGN_SUFFIX, value) }

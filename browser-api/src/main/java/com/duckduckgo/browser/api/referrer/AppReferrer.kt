@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics
+package com.duckduckgo.browser.api.referrer
 
-interface AtbInitializerListener {
+/** Public interface for app referral parameters */
+interface AppReferrer {
 
-    /** This method will be called before initializing the ATB */
-    suspend fun beforeAtbInit()
-
-    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
-    fun beforeAtbInitTimeoutMillis(): Long
-
-    companion object {
-        const val REINSTALL_LISTENER = 10
-        const val AURA_EXPERIMENT_MANAGER = 20
-    }
+    /**
+     * Sets the attribute campaign origin.
+     */
+    fun setOriginAttributeCampaign(origin: String?)
 }

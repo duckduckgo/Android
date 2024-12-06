@@ -30,6 +30,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':statistics-api')
+    implementation project(path: ':browser-api')
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation Google.dagger

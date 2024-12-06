@@ -31,7 +31,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -115,7 +115,7 @@ class StubStatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: DaggerSet<AtbInitializerListener>,
+        listeners: PluginPoint<AtbInitializerListener>,
         dispatcherProvider: DispatcherProvider,
     ): MainProcessLifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider)
