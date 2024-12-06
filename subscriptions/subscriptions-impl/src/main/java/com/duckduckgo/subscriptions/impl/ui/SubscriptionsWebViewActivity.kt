@@ -70,7 +70,8 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL_V1
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL_V2
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
@@ -549,7 +550,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun backToSettings() {
-        if (params.url == ACTIVATE_URL) {
+        if (params.url == ACTIVATE_URL_V1 || params.url == ACTIVATE_URL_V2) {
             setResult(RESULT_OK)
         }
         finish()

@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.R.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL_V2
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
@@ -51,6 +52,7 @@ import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangeP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
@@ -118,6 +120,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         binding.manageEmail.setOnClickListener {
             viewModel.onEmailButtonClicked()
+        }
+
+        binding.addToDevice.setOnClickListener {
+            viewModel.onAddToDeviceButtonClicked()
         }
 
         binding.faq.setClickListener {
@@ -209,12 +215,26 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (viewState.email == null) {
-            binding.manageEmail.setPrimaryText(resources.getString(string.addEmailPrimaryText))
-            binding.manageEmail.setSecondaryText(resources.getString(string.addEmailSecondaryText))
+        if (viewState.isActivationFlowV2) {
+            binding.addToDevice.show()
+            if (viewState.email == null) {
+                binding.manageEmail.gone()
+                binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmailV2))
+            } else {
+                binding.manageEmail.show()
+                binding.manageEmail.setSecondaryText(viewState.email)
+                binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithEmailV2))
+            }
         } else {
-            binding.manageEmail.setPrimaryText(resources.getString(string.editEmailPrimaryText))
-            binding.manageEmail.setSecondaryText(viewState.email + "\n\n" + resources.getString(string.editEmailSecondaryText))
+            binding.addToDevice.gone()
+            binding.manageEmail.show()
+            if (viewState.email == null) {
+                binding.manageEmail.setPrimaryText(resources.getString(string.addEmailPrimaryText))
+                binding.manageEmail.setSecondaryText(resources.getString(string.addEmailSecondaryText))
+            } else {
+                binding.manageEmail.setPrimaryText(resources.getString(string.editEmailPrimaryText))
+                binding.manageEmail.setSecondaryText(viewState.email + "\n\n" + resources.getString(string.editEmailSecondaryText))
+            }
         }
 
         if (viewState.showFeedback) {
@@ -233,6 +253,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
             GoToAddEmailScreen -> goToAddEmail()
             GoToEditEmailScreen -> goToEditEmail()
+            GoToActivationScreen -> goToActivation()
 
             is GoToPortal -> {
                 globalActivityStarter.start(
@@ -291,6 +312,15 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             SubscriptionsWebViewActivityWithParams(
                 url = ADD_EMAIL_URL,
                 toolbarConfig = CustomTitle(getString(string.addEmailText)),
+            ),
+        )
+    }
+
+    private fun goToActivation() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = ACTIVATE_URL_V2,
             ),
         )
     }

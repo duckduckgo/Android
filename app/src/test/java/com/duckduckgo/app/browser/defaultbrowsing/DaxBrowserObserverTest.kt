@@ -27,7 +27,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
-class DefaultBrowserObserverTest {
+class DaxBrowserObserverTest {
 
     private lateinit var testee: DefaultBrowserObserver
 

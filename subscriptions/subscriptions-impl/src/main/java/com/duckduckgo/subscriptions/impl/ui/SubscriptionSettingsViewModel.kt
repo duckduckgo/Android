@@ -22,21 +22,25 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import dagger.Lazy
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -50,6 +54,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -57,6 +62,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val dispatcherProvider: DispatcherProvider,
+    private val privacyProFeature: Lazy<PrivacyProFeature>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -98,6 +105,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 platform = subscription.platform,
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
+                isActivationFlowV2 = withContext(dispatcherProvider.io()) {
+                    privacyProFeature.get().isActivationFlowV2().isEnabled()
+                },
             ),
         )
     }
@@ -107,6 +117,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         pixelSender.reportAddDeviceEnterEmailClick()
         viewModelScope.launch {
             command.send(if (state.email == null) GoToAddEmailScreen else GoToEditEmailScreen)
+        }
+    }
+
+    fun onAddToDeviceButtonClicked() {
+        viewModelScope.launch {
+            command.send(GoToActivationScreen)
         }
     }
 
@@ -135,6 +151,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object FinishSignOut : Command()
         data object GoToEditEmailScreen : Command()
         data object GoToAddEmailScreen : Command()
+        data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
     }
 
@@ -148,6 +165,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val platform: String,
             val email: String?,
             val showFeedback: Boolean = false,
+            val isActivationFlowV2: Boolean,
         ) : ViewState()
     }
 }

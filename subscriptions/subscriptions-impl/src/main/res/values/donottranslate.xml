@@ -39,6 +39,15 @@
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>
 
+    <!--Restore Subscriptions Activity v2-->
+    <string name="restoreSubscriptionTitleV2">Add your Privacy Pro subscription to this device</string>
+    <string name="restoreSubscriptionGooglePlayTitleV2">Add via Google Play Account</string>
+    <string name="restoreSubscriptionGooglePlayDescriptionV2">Restore your subscription on Android devices using your Google Play account.</string>
+    <string name="restoreSubscriptionGooglePlayGetStartedV2">Restore Purchase</string>
+    <string name="restoreSubscriptionEmailTitleV2">Add via Email</string>
+    <string name="restoreSubscriptionEmailDescriptionV2">Link an email address to your subscription to add Privacy Pro to this device.</string>
+    <string name="restoreSubscriptionEmailGetStartedV2">Get Started</string>
+
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
@@ -61,6 +70,12 @@
     <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
     <string name="subscriptionStatusSubscribed">Subscribed</string>
     <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
+
+    <!--Settings Subscriptions Activity Activation Flow v2-->
+    <string name="activateOnOtherDevicesV2">Add Privacy Pro to Other Devices</string>
+    <string name="addToDevicePrimaryTextV2">Add to Device</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailV2">Add Privacy Pro to your other devices via Google Play or by linking an email address.</string>
+    <string name="addToDeviceSecondaryTextWithEmailV2">Use the email above to add your subscription on your other devices in the DuckDuckGo app. Go to Settings > Privacy Pro > I Have a Subscription.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>

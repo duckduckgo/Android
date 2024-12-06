@@ -26,15 +26,21 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowUIState.LoadedV1
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowUIState.LoadedV2
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowUIState.Loading
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowWebViewTitle
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowWebViewTitle.AddEmail
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ActivationFlowWebViewTitle.Dax
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
@@ -43,10 +49,12 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(RestoreSubscriptionScreenWithParams::class)
@@ -78,15 +86,45 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.googlePlay.setOnClickListener {
-            viewModel.restoreFromStore()
-        }
+        lifecycleScope.launch {
+            viewModel.viewState.collect {
+                when (it.uiState) {
+                    LoadedV1 -> {
+                        binding.restoreSubscriptionContentV1Container.root.show()
 
-        with(binding.manageEmailCard) {
-            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
-            emailButton.setText(string.restoreSubscriptionEmailButton)
-            emailButton.setOnClickListener {
-                viewModel.restoreFromEmail()
+                        binding.restoreSubscriptionContentV1Container.googlePlay.setOnClickListener {
+                            viewModel.restoreFromStore()
+                        }
+
+                        with(binding.restoreSubscriptionContentV1Container.manageEmailCard) {
+                            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
+                            emailButton.setText(string.restoreSubscriptionEmailButton)
+                            emailButton.setOnClickListener {
+                                viewModel.restoreFromEmail()
+                            }
+                        }
+                    }
+
+                    LoadedV2 -> {
+                        binding.restoreSubscriptionContentV2Container.root.show()
+
+                        // removing the click listeners from the LineListItems
+                        // so that they don't trigger the selectable background animation when interacted with
+                        binding.restoreSubscriptionContentV2Container.restoreSubscriptionEmailTitle.setOnClickListener(null)
+                        binding.restoreSubscriptionContentV2Container.restoreSubscriptionGooglePlayTitle.setOnClickListener(null)
+
+                        binding.restoreSubscriptionContentV2Container.restoreSubscriptionEmailLayout.setOnClickListener {
+                            viewModel.restoreFromEmail()
+                        }
+                        binding.restoreSubscriptionContentV2Container.restoreSubscriptionGooglePlayLayout.setOnClickListener {
+                            viewModel.restoreFromStore()
+                        }
+                    }
+
+                    Loading -> {
+                        // no-op
+                    }
+                }
             }
         }
     }
@@ -97,12 +135,18 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun goToRestore() {
+    private fun goToRestore(activationUrl: String, webViewTitle: ActivationFlowWebViewTitle) {
+        val toolbarConfig = when (webViewTitle) {
+            AddEmail -> {
+                CustomTitle(getString(string.addEmailText))
+            }
+            Dax -> ToolbarConfig.DaxPrivacyPro
+        }
         val intent = globalActivityStarter.startIntent(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = ACTIVATE_URL,
-                toolbarConfig = CustomTitle(getString(string.addEmailText)),
+                url = activationUrl,
+                toolbarConfig = toolbarConfig,
             ),
         )
         startForResultRestore.launch(intent)
@@ -180,7 +224,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is RestoreFromEmail -> goToRestore()
+            is RestoreFromEmail -> goToRestore(command.activationUrl, command.webViewTitle)
             is Success -> onPurchaseRestored()
             is SubscriptionNotFound -> subscriptionNotFound()
             is Error -> showError()

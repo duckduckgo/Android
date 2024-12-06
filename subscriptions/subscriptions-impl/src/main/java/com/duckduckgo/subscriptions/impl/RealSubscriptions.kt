@@ -149,6 +149,9 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(false)
     fun isLaunchedROW(): Toggle
 
+    @Toggle.DefaultValue(false)
+    fun isActivationFlowV2(): Toggle
+
     // Kill switch
     @Toggle.DefaultValue(true)
     fun featuresApi(): Toggle

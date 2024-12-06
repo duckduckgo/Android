@@ -20,7 +20,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity">
+              tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity">
 
     <include
             android:id="@+id/includeToolbar"
@@ -121,6 +121,13 @@
                 android:layout_height="wrap_content"
                 tools:primaryText="@string/addEmailPrimaryText"
                 tools:secondaryText="@string/addEmailSecondaryText"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/addToDevice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/addToDevicePrimaryTextV2"
+                tools:secondaryText="@string/addToDeviceSecondaryTextV2" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/learnMore"
