@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN Açık</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN Kapalı</string>
+    <string name="netpManagementDescriptionOff">Tüm cihazlarınızın internet trafiğinde güvenliği sağlamak\niçin bağlanın.</string>
+    <string name="netpManagementDescriptionOn">Tüm cihaz internet trafiği VPN ile güvence altında.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Bağlantı kuruluyor...</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Bağlı · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Bağlı değil</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN şu anda beta sürümünde. <annotation type="report_issues_link">Geri bildirim paylaşarak</annotation> gelişmemize yardımcı olun!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">VPN bir uygulamada sorunlara mı neden oluyor?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">VPN\'i kapatmadan uygulamaları VPN\'den hariç tutabilirsiniz.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Bir uygulamayı hariç tut</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">VPN\'i kapat</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Bir daha sorma</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Konum Seçildi</string>
+    <string name="netpManagementLocationHeaderVpnOn">Bağlı Konum</string>
+    <string name="netpManagementLocationNearest">(En Yakın)</string>
+    <string name="netpManagementLocationPlaceholder">En yakın konum</string>
+    <string name="netpManagementLocationCustom">(Özel)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Bağlantı Ayrıntıları</string>
+    <string name="netpManagementConnectionDetailsIp">IP Adresi</string>
+    <string name="netpManagementConnectionDetailsDns">DNS Sunucusu</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Veri Hacmi</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN bağlandı.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN bağlandı ve cihaz trafiği &lt;b&gt;%1$s&lt;/b&gt; üzerinden yönlendiriliyor.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">VPN uygulamanızın bağlantısı kesilmiş olabilir</string>
+    <string name="netpVpnConflictMessage">Android aynı anda yalnızca bir etkin VPN bağlantısına izin verir. DuckDuckGo VPN\'i etkinleştirmek, cihazdaki diğer aktif VPN bağlantılarını kesebilir.</string>
+    <string name="netpActionGotIt">Anladım</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">VPN uygulamanız DuckDuckGo VPN\'i engelliyor</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android aynı anda yalnızca bir etkin VPN bağlantısına izin verir. Ağ ayarları &gt; VPN seçeneğini açın. \"Her zaman açık\" olan VPN uygulamasını bulun ve devam etmek için devre dışı bırakın.</string>
+    <string name="netpActionOpenSettings">Ayarları Aç</string>
+    <string name="netpActionCancel">Vazgeç</string>
+    <string name="netpActionNotNow">Şimdi Değil</string>
+    <string name="netpActionGoToSettings">Ayarlar\'a gidin</string>
+    <string name="netpAlwaysOnPromotionHeading">Her zaman açık olarak ayarla</string>
+    <string name="netpAlwaysOnPromotionBody">DuckDuckGo için cihazınızın VPN Ayarlarına gidin ve Android\'in korumayı devre dışı bırakmasını önlemek için <b>Her zaman açık</b> VPN\'i etkinleştirin.\n\nDiğer ayarı KAPALI bıraktığınızdan emin olun.</string>
+    <string name="netpAlwaysOnLockdownBody">Uygulama sorunlarını önlemek için cihazınızın <b>DuckDuckGo için VPN Ayarları</b> bölümüne gidin ve <b>VPN\'siz bağlantıları engelle</b> seçeneğini devre dışı bırakın.</string>
+    <string name="netpAlwaysOnLockdownHeading">VPN ayarlarınızı değiştirin</string>
+    <string name="netpBannerVpnRevoked"><b>VPN devre dışı.</b>\nCihazındaki bir VPN uygulaması bunu devre dışı bırakmış olabilir. Yeniden etkinleştirmek için düğmeyi kullanın.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>İşlem gerekli!</b> Uygulama sorunlarını önlemek için Android ayarlarınızı değiştirmeniz gerekiyor. <annotation type="open_settings_link">Ayarları değiştir</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Uygulama donuyor veya çöküyor</string>
+    <string name="netpReportBreakageCategoryMessages">Mesaj teslimatı başarısız</string>
+    <string name="netpReportBreakageCategoryCalls">Sesli aramalar çalışmıyor</string>
+    <string name="netpReportBreakageCategoryContent">İçerik yavaş yükleniyor</string>
+    <string name="netpReportBreakageCategoryConnection">Uygulamanın bağlantısı yok</string>
+    <string name="netpReportBreakageCategoryIot">Yerel cihaza bağlanılamıyor</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Özellik isteği</string>
+    <string name="netpReportBreakageCategoryOther">Başka bir şey</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN, beta sürümünde ücretsizdir.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Yönet</string>
+    <string name="netpManagementManageItemExclusion">Hariç Tutulan Uygulamalar</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Yok</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d uygulama</item>
+        <item quantity="other">%1$d uygulama</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">VPN Ayarları</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Genel</string>
+    <string name="netpVpnSettingsSystemHeader">Sistem</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN Bildirimleri</string>
+    <string name="netpVpnSettingsTitle">VPN Ayarları</string>
+    <string name="netpVpnSettingKillSwitch">Her Zaman Açık</string>
+    <string name="netpVpnSettingAlwaysOn">Her Zaman Açık</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Sınırsız Uygulama Pil Kullanımına İzin Ver</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">Uygulama Pil Ayarlarında, Android\'in arka planda VPN\'i devre dışı bırakmasını önlemek için Sınırsız kullanıma izin verin</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Uygulama Pil Kullanımı Sınırsızdır</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">Uygulama Pil Ayarları\'nda bunun yapmak, Android\'in arka planda VPN\'i devre dışı bırakmasını engeller</string>
+    <string name="netpVpnSettingAlwaysOnByline">Kesintiden sonra VPN bağlantısını otomatik olarak geri yükle</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Yerel Ağları Hariç Tut</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Bir yazıcı gibi yerel ağ bağlantıları için VPN\'i atlayın.</string>
+    <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN, DNS sorgularını VPN tüneli üzerinden kendi çözümleyicimize yönlendirerek İnternet Servis Sağlayıcınıza DNS sızıntılarını önler.</string>
+    <string name="netpVpnSettingGeoswitching">Tercih Edilen Konum</string>
+    <string name="netpVpnSettingGeoswitchingDefault">En Yakın Kullanılabilir</string>
+
+    <string name="netpVpnNotificationSettings">VPN Bildirimleri</string>
+    <string name="netpVpnNotificationSettingsByLine">Bağlantınız kesilir veya VPN durumunuz değişirse bildirim alın</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Sınırsız Pil Kullanımı</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Android\'in VPN\'i durdurmasını engeller.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Wi-Fi aramaları sırasında VPN\'i duraklat</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Wi-Fi aramaları devam ederken VPN\'i geçici olarak duraklat ve sonrasında otomatik olarak yeniden bağlan</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Telefon İzni Gereklidir</string>
+    <string name="netpGrantPhonePermissionByline">Bu ayarı etkinleştirmek için sistem ayarları üzerinden DuckDuckGo\'nun telefon görüşmeleri yapmasına ve yönetmesine izin vermeniz gerekir.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Ayarlar</string>
+    <string name="netpGrantPhonePermissionActionNegative">Vazgeç</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Bildirimler devre dışı bırakıldı</string>
+    <string name="netpVpnNotifyMeByLine">VPN etkinliklerinden haberdar olun</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Uygulamaları Yönet</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN varsayılan olarak tüm uygulamalarda çalışır. VPN etkin olduğunda uygulama sorunları yaşıyorsanız, o uygulama için korumayı devre dışı bırakmayı deneyin.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN devre dışı.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Manuel olarak etkinleştirildi</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Etkinleştirilirse uygulama sorunları oluşabilir</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Koruma Etkin</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Koruma Devre Dışı</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Tümü</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Sorun mu bildireceksiniz?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Uygulama sorunları yaşadığınızdan %1$s için VPN\'i devre dışı bıraktıysanız lütfen bize bildirin.\n\n%1$s için App Tracking Protecion\'ı da devre dışı bırakacağız.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Sorun Bildir</string>
+    <string name="netpExclusionListManuallyCTANotNow">Şimdi Değil</string>
+    <string name="netpExclusionListManuallyCTACancel">Vazgeç</string>
+    <string name="netpExclusionListManuallyCTARestore">Geri Yükle</string>
+    <string name="netpExclusionListManuallyMenuRestore">Tüm Uygulamalar için Korumayı Geri Yükle</string>
+    <string name="netpExclusionListManuallyMenuReport">Bir Uygulamayla İlgili Sorun Bildir</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Tüm uygulamalar için koruma geri yüklensin mi?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Bu, özel koruma ayarlarını güncelleyip tüm uygulamalar için VPN\'i etkinleştirecek. Koruma ayarlarını daha sonra her zaman tekrar değiştirebilirsiniz.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Koruma varsayılan ayarları geri yüklendi</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Android Sistem Uygulamaları</string>
+    <string name="netpExclusionListWarningTitle">Sistem Uygulaması Hariç Tutmaları Hakkında</string>
+    <string name="netpExclusionListWarningMessage">Bu uygulama grubu tarafından kullanılan arka plan bağlantıları da dahil olmak üzere internet trafiği VPN tarafından korunmayacaktır. Bu sorunu çözmezse, beklenmeyen veri sızıntılarını önlemek için yeniden etkinleştirmeyi düşün.</string>
+    <string name="netpExclusionListWarningActionPositive">Tamam</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Hakkında</string>
+    <string name="netpManagementAboutItemFaqs">SSS ve Destek</string>
+    <string name="netpManagementAboutItemShareFeedback">Geri Bildirim gönder</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">SSS ve Destek</string>
+    <string name="netpFaqQuestionOne">DuckDuckGo VPN nasıl çalışır?</string>
+    <string name="netpFaqAnswerOne">VPN, cihazda bir sanal özel ağ (VPN) yapılandırmak için açık kaynaklı WireGuard protokolünü kullanır. Etkinleştirildiğinde, tüm cihaz trafiğiniz önce şifrelenir ve ardından tarama etkinliğinizi internet servis sağlayıcılarından korumak ve konumunuzu ziyaret ettiğiniz uygulamalardan ve sitelerden gizlemek için en yakın VPN sunucusuna yönlendirilir.</string>
+    <string name="netpFaqQuestionTwo">Yalnızca web\'de gezinmem mi korunuyor?</string>
+    <string name="netpFaqAnswerTwo">Cihazınızdaki tüm ağ etkinlikleriniz korunur.</string>
+    <string name="netpFaqQuestionThree">DuckDuckGo verilerimin günlüklerini tutuyor mu?</string>
+    <string name="netpFaqAnswerThree">Hayır, günlük tutmuyoruz.</string>
+    <string name="netpFaqQuestionFour">VPN sunucuları nerede bulunuyor?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo, VPN beta sürümündeyken Amerika Birleşik Devletleri, Kanada ve Avrupa\'da bulunan sınırlı sayıda sunucu sunar.</string>
+    <string name="netpFaqQuestionSix">VPN açıkken bazı uygulamalar neden çalışmıyor?</string>
+    <string name="netpFaqAnswerSix">Bazı web siteleri ve uygulamalar, VPN kullanan kişilerin erişimini bilerek sınırlar. Örneğin, bir bot yerine gerçek bir kişi olduğunuzdan emin olmak için sizden bir CAPTCHA çözmenizi isteyebilirler. Bir uygulamayla ilgili tekrarlanan sorunlar yaşarsanız, DuckDuckGo VPN ayarları altında uygulamayı VPN\'den tamamen hariç tutabilirsiniz.</string>
+    <string name="netpFaqQuestionSeven">VPN bildirimlerini neden kapatamıyorum?</string>
+    <string name="netpFaqAnswerSeven">Android, VPN etkin olduğunda VPN\'lerin kalıcı bir bildirim göstermesini zorunlu kılar.</string>
+    <string name="netpFaqQuestionEight">VPN, App Tracking Protection ile uyumlu mu?</string>
+    <string name="netpFaqAnswerEight">Evet, hem VPN hem de App Tracking Protection aynı anda açık olabilir. Başka hiçbir VPN DuckDuckGo App Tracking Protection ile uyumlu değil.</string>
+    <string name="netpFaqQuestionNine">VPN ücretsiz mi kullanılabilir?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN, beta aşamasındayken ücretsiz olarak kullanılabilir. Sonunda ücretli bir hizmet olarak sunulacak.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Bağlan</string>
+    <string name="netpNotificationCTAReportIssue">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
+    <string name="netpNotificationDisabled">VPN bağlantısı kesildi. Cihaz trafiğinizi güvence altına almaya devam etmek için dokunun.</string>
+    <string name="netpNotificationDisabledByVpn">Cihazınızdaki bir VPN uygulaması DuckDuckGo VPN\'in bağlantısını kesti. Yeniden bağlanmak için dokun.</string>
+    <string name="netpUnsafeWifi">Güvenli olmayan WIFI\'ye bağlandın.</string>
+    <string name="netpNotificationCTAReconnectNow">Şimdi Yeniden Bağlan</string>
+    <string name="netpNotificationSnoozeTitle">VPN uyku modunda</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN %1$s itibarıyla yeniden bağlanacak</string>
+    <string name="netpNotificationVpnAccessRevoked">Abonelik süresi dolduğu için VPN bağlantısı kesildi. DuckDuckGo VPN\'e yeniden bağlanmak için Privacy Pro\'ya abone olun.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN Konumu</string>
+    <string name="netpGeoswitchingHeaderRecommended">Önerilen</string>
+    <string name="netpGeoswitchingDefaultTitle">En Yakın Kullanılabilir</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Bulabildiğimiz en yakın sunucuya otomatik olarak bağlanın</string>
+    <string name="netpGeoswitchingHeaderCustom">Özelleştirme</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d şehir</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">Abonelik süresi dolduğu için VPN bağlantısı kesildi</string>
+    <string name="netpDialogVpnAccessRevokedBody">DuckDuckGo VPN\'e yeniden bağlanmak için Privacy Pro\'ya abone olun.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Abone ol</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Reddet</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Aboneliği Doğrula</string>
+    <string name="netpVerifySubscriptionInProgress">Aboneliğiniz doğrulanırken lütfen bekleyin…</string>
+    <string name="netpVerifySubscriptionNoSubscription">Hata! Geçerli bir aboneliğiniz yok.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Hata! Aboneliğiniz DuckDuckGo VPN için geçerli değil.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Etkin</string>
+    <string name="netpSubscriptionSettingsConnecting">Bağlantı kuruluyor...</string>
+    <string name="netpSubscriptionSettingsDisconnected">Devre Dışı</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS Sunucusu</string>
+    <string name="netpPrivateDns">Özel DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Kötü amaçlı yazılımları engelle)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (Önerilen)</string>
+    <string name="netpCustomDnsCustom">Özelleştirme</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 Adresi</string>
+    <string name="netpCustomDnsApply">Uygula</string>
+    <string name="netpCustomDnsCustomHeader">DNS Sunucusu</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Özel DNS, Sistem DNS Ayarlarında zaten belirtilmiş. DuckDuckGo VPN için özel bir DNS ayarlamak üzere Özel DNS\'i kapatın. <annotation type="open_settings_link">Sistem Ayarlarını Aç</annotation></string>
+    <string name="netpCustomDnsWarning">Özel bir DNS sunucusu kullanmak, tarama hızlarını etkileyebilir ve sunucu güvenli veya güvenilir değilse etkinliğini üçüncü taraflara ifşa edebilir.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo, DNS sorgularını DNS sunucularımız üzerinden yönlendirir. Böylece internet sağlayıcınız hangi web sitelerini ziyaret ettiğinizi göremez.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Kötü Amaçlı Yazılımları Engelle</string>
+    <string name="netpDnsBlockMalwareByline">DNS düzeyindeki engelleme listesiyle kötü amaçlı yazılımları engelleyin. Bir web sitesi yüklenmiyorsa, engellemeyi kapatmayı deneyin.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">VPN\'lerle uyumlu olmayan uygulamaları hariç tutmak ister misiniz?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">VPN bağlıyken %1$s bulduk.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
+        <item quantity="other">VPN\'lerle uyumlu olmayan %1$d yeni uygulama. Bunları kullanmak için bu uygulamaları hariç tutun</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">VPN\'lerle uyumlu olmayan tüm uygulamaları hariç tutmak ister misiniz?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için uygulamayı hariç tutun</item>
+        <item quantity="other">VPN\'lerle uyumlu olmayan %1$d diğer uygulama. Kullanmak için bu uygulamaları hariç tutun</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Uyumlu olmayan uygulamaları otomatik olarak hariç tutun</string>
+    <string name="netpAutoExcludePromptActionAdd">Uygulamaları Hariç Tut</string>
+    <string name="netpAutoExcludePromptActionCancel">Atla</string>
+    <string name="netpAutoExcludeToggleName">VPN\'lerle uyumlu olmayan uygulamaları otomatik olarak hariç tutun</string>
+    <string name="netpExclusionListLabelAutoExclude">VPN\'lerle uyumlu değil</string>
+    <string name="netpExclusionListAutoExcludeDescription">Bankacılık veya yayın uygulamaları gibi bazı uygulamalar VPN\'lerle iyi çalışmaz. Bu ayar etkinleştirildiğinde, bu uygulamalar otomatik olarak hariç tutulur.</string>
+</resources>

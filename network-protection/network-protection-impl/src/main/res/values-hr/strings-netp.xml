@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN je uključen</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN je isključen</string>
+    <string name="netpManagementDescriptionOff">Poveži se i osiguraj internetski promet\nna svim svojim uređajima.</string>
+    <string name="netpManagementDescriptionOn">Sav internetski promet uređaja osiguran je\nputem VPN-a.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Povezivanje u tijeku...</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Povezano %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Nije povezano</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN trenutačno je u beta fazi. <annotation type="report_issues_link">Podijeli povratne informacije</annotation> kako bi nam pomogao da se poboljšamo!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">Uzrokuje li VPN probleme s tvojom aplikacijom?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">Možeš isključiti aplikacije iz VPN-a bez isključivanja VPN-a.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Isključi aplikaciju</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Isključi VPN</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Nikad više ne pitaj</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Odabrana lokacija</string>
+    <string name="netpManagementLocationHeaderVpnOn">Povezana lokacija</string>
+    <string name="netpManagementLocationNearest">(Najbliža)</string>
+    <string name="netpManagementLocationPlaceholder">Najbliža lokacija</string>
+    <string name="netpManagementLocationCustom">(Prilagođeno)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Detalji o vezi</string>
+    <string name="netpManagementConnectionDetailsIp">IP adresa</string>
+    <string name="netpManagementConnectionDetailsDns">DNS poslužitelj</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Količina podataka</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN je povezan.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN je povezan i usmjerava promet uređaja kroz &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Tvoja VPN aplikacija možda ne radi zbog prekida veze</string>
+    <string name="netpVpnConflictMessage">Android dopušta samo jednu aktivnu VPN vezu odjednom. Omogućavanje DuckDuckGo VPN-a može prekinuti vezu s bilo kojim aktivnim VPN-om na tvom uređaju.</string>
+    <string name="netpActionGotIt">Shvatio/la sam</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Tvoja VPN aplikacija blokira DuckDuckGo VPN</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android dopušta samo jednu aktivnu VPN vezu odjednom. Otvori Mrežne postavke &gt; VPN. Pronađi VPN aplikaciju koja je \"uvijek uključena\" i onemogući je za nastavak.</string>
+    <string name="netpActionOpenSettings">Otvori postavke</string>
+    <string name="netpActionCancel">Odustani</string>
+    <string name="netpActionNotNow">Ne sad</string>
+    <string name="netpActionGoToSettings">Idi na Postavke</string>
+    <string name="netpAlwaysOnPromotionHeading">Postavi na \"Uvijek uključeno\" (Always-on)</string>
+    <string name="netpAlwaysOnPromotionBody">Idi na VPN postavke svog uređaja za DuckDuckGo i omogući <b>Uvijek uključen VPN</b> kako bi spriječio da Android onemogući zaštitu.\n\nObavezno ostavi drugu postavku isključenu (OFF).</string>
+    <string name="netpAlwaysOnLockdownBody">Kako bi izbjegao probleme s aplikacijom, idi na <b>VPN postavke svog uređaja za DuckDuckGo</b> i onemogući <b>Blokiraj veze bez VPN-a.</b></string>
+    <string name="netpAlwaysOnLockdownHeading">Promijeni svoje VPN postavke</string>
+    <string name="netpBannerVpnRevoked"><b>VPN je onemogućen.</b>\nMožda ga je onemogućila VPN aplikacija na tvom uređaju. Koristi opciju za ponovno omogućavanje.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Potrebno je izvršiti radnju!</b> Za izbjegavanje problema s aplikacijom, moraš promijeniti postavke za Android. <annotation type="open_settings_link">Promjena postavki</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Aplikacija se smrzava ili ruši</string>
+    <string name="netpReportBreakageCategoryMessages">Isporuka poruke nije uspjela</string>
+    <string name="netpReportBreakageCategoryCalls">Glasovni pozivi ne funkcioniraju</string>
+    <string name="netpReportBreakageCategoryContent">Sadržaj se sporo učitava</string>
+    <string name="netpReportBreakageCategoryConnection">Aplikacija nije na mreži</string>
+    <string name="netpReportBreakageCategoryIot">Nije moguće povezati lokalni uređaj s mrežom</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Zahtjev za značajkom</string>
+    <string name="netpReportBreakageCategoryOther">Nešto drugo</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN je besplatan za korištenje tijekom beta testiranja.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Upravljanje</string>
+    <string name="netpManagementManageItemExclusion">Isključene aplikacije</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Nijedno</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d aplikacija</item>
+        <item quantity="few">%1$d aplikacije</item>
+        <item quantity="many">%1$d aplikacija</item>
+        <item quantity="other">%1$d aplikacija</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">VPN postavke</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Općenito</string>
+    <string name="netpVpnSettingsSystemHeader">Zadana</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN obavijesti</string>
+    <string name="netpVpnSettingsTitle">VPN postavke</string>
+    <string name="netpVpnSettingKillSwitch">Uvijek uključeno</string>
+    <string name="netpVpnSettingAlwaysOn">Uvijek uključeno</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Dopusti neograničenu upotrebu baterije za aplikacije</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">U postavkama aplikacije za bateriju dopusti neograničenu uporabu baterije kako bi spriječio Android da onemogući rad VPN-a u pozadini</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Upotreba baterije za aplikacije je neograničena</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">U postavkama aplikacije za bateriju, ovo sprječava Android da onemogući VPN u pozadini</string>
+    <string name="netpVpnSettingAlwaysOnByline">Automatski obnovi VPN vezu nakon prekida</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Izostavi lokalne mreže</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Zaobiđi VPN za lokalne mrežne veze, poput pisača.</string>
+    <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN sprječava otkrivanje DNS-a tvom davatelju internetskih usluga usmjeravanjem DNS upita kroz VPN tunel na naš vlastiti rješavač.</string>
+    <string name="netpVpnSettingGeoswitching">Preferirana lokacija</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Najbliže dostupno</string>
+
+    <string name="netpVpnNotificationSettings">VPN obavijesti</string>
+    <string name="netpVpnNotificationSettingsByLine">Primaj obavijesti ako se veza prekine ili se status VPN-a promijeni</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Neograničena uporaba baterije</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Sprječava Android da zaustavi VPN.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Pauziraj VPN tijekom Wi-Fi poziva</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Privremeno pauziraj VPN kada su Wi-Fi pozivi u tijeku i automatski se ponovno poveži nakon toga</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Potrebna je dozvola za telefon</string>
+    <string name="netpGrantPhonePermissionByline">Za omogućavanje ove postavke, moraš dopustiti DuckDuckGou da upućuje i upravlja telefonskim pozivima putem postavki sustava.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Postavke</string>
+    <string name="netpGrantPhonePermissionActionNegative">Odustani</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Obavijesti su onemogućene</string>
+    <string name="netpVpnNotifyMeByLine">Primaj obavijesti o VPN događajima</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Upravljaj aplikacijama</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN funkcionira u svim aplikacijama prema zadanim postavkama. Ako imaš problema s aplikacijom s omogućenim VPN-om, pokušaj onemogućiti zaštitu za tu aplikaciju.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN je onemogućen.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Ručno onemogućeno</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Ručno omogućeno</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Ako je App Tracking Protection omogućen, mogu se pojaviti problemi s aplikacijom</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Zaštita je omogućena</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Zaštita je onemogućena</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Sve</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Prijaviti problem?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Obavijesti nas ako si onemogućio VPN za %1$s zbog problema s aplikacijom.\n\nTakođer ćemo onemogućiti App Tracking Protection za %1$s.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Prijavi problem</string>
+    <string name="netpExclusionListManuallyCTANotNow">Ne sad</string>
+    <string name="netpExclusionListManuallyCTACancel">Odustani</string>
+    <string name="netpExclusionListManuallyCTARestore">Vrati</string>
+    <string name="netpExclusionListManuallyMenuRestore">Vrati zaštitu za sve aplikacije</string>
+    <string name="netpExclusionListManuallyMenuReport">Prijavi problem s aplikacijom</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Želiš li vratiti zaštitu za sve aplikacije?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Ovo će ažurirati tvoje prilagođene postavke zaštite i omogućiti VPN za sve aplikacije. Postavke zaštite uvijek možeš promijeniti kasnije.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Zaštita je vraćena na zadane postavke</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Omogućavanje zaštite šalje naziv aplikacije DuckDuckGou.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Aplikacije sustava Android</string>
+    <string name="netpExclusionListWarningTitle">O izuzecima aplikacija sustava</string>
+    <string name="netpExclusionListWarningMessage">Internetski promet, uključujući pozadinske veze koje koristi ova skupina aplikacija, neće biti zaštićen VPN-om. Ako to ne riješi problem, razmisli o ponovnom omogućavanju kako bi spriječio neočekivano \"curenje\" podataka.</string>
+    <string name="netpExclusionListWarningActionPositive">U redu</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">O</string>
+    <string name="netpManagementAboutItemFaqs">Često postavljana pitanja i podrška</string>
+    <string name="netpManagementAboutItemShareFeedback">Pošalji povratnu informaciju</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Često postavljana pitanja i podrška</string>
+    <string name="netpFaqQuestionOne">Kako funkcionira DuckDuckGo VPN?</string>
+    <string name="netpFaqAnswerOne">VPN koristi open source WireGuard protokol za konfiguriranje virtualne privatne mreže (VPN) na tvom uređaju. Kada je omogućen, sav promet tvog uređaja najprije se šifrira, a zatim usmjerava preko najbližeg VPN poslužitelja kako bi zaštitio tvoju aktivnost pregledavanja od pružatelja internetskih usluga i sakrio tvoju lokaciju od aplikacija i web stranica koje posjećuješ.</string>
+    <string name="netpFaqQuestionTwo">Je li samo moje pregledavanje weba zaštićeno?</string>
+    <string name="netpFaqAnswerTwo">Sve mrežne aktivnosti na tvom uređaju su zaštićene.</string>
+    <string name="netpFaqQuestionThree">Čuva li DuckDuckGo zapise mojih podataka?</string>
+    <string name="netpFaqAnswerThree">Ne, ne pohranjujemo zapise.</string>
+    <string name="netpFaqQuestionFour">Gdje se nalaze VPN poslužitelji?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo nudi ograničen broj poslužitelja dok je DuckDuckGo VPN u beta fazi, smještenih u Sjedinjenim Državama, Kanadi i Europi.</string>
+    <string name="netpFaqQuestionSix">Zašto neke aplikacije ne rade kada je VPN uključen?</string>
+    <string name="netpFaqAnswerSix">Neka web-mjesta i aplikacije namjerno ograničavaju pristup osobama koje koriste VPN. Primjerice, mogu te zamoliti da riješiš CAPTCHA kako bi bili sigurni da si stvarna osoba, a ne bot. Ako imaš opetovane probleme s aplikacijom, možeš je u potpunosti isključiti iz VPN-a u postavkama DuckDuckGo VPN-a.</string>
+    <string name="netpFaqQuestionSeven">Zašto ne mogu isključiti VPN obavijesti?</string>
+    <string name="netpFaqAnswerSeven">Android zahtijeva da VPN-ovi trajno prikazuju obavijesti dok je VPN uključen.</string>
+    <string name="netpFaqQuestionEight">Je li VPN kompatibilan sa zaštitom App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Da, i VPN i App Tracking Protection mogu biti uključeni istovremeno. Nijedan drugi VPN nije kompatibilan s DuckDuckGo App Tracking Protection.</string>
+    <string name="netpFaqQuestionNine">Je li VPN besplatan za korištenje?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN je besplatan za korištenje dok je u beta fazi. S vremenom će biti ponuđen kao plaćena usluga.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Poveži se</string>
+    <string name="netpNotificationCTAReportIssue">Imate problema s aplikacijom?</string>
+    <string name="netpNotificationDisabled">Veza s VPN-om je prekinuta. Dodirni za nastavak osiguravanja prometa na svom uređaju.</string>
+    <string name="netpNotificationDisabledByVpn">VPN aplikacija na tvom uređaju prekinula je vezu s DuckDuckGo VPN-om. Dodirni za ponovno povezivanje.</string>
+    <string name="netpUnsafeWifi">Povezano na nesigurnu WIFI mrežu.</string>
+    <string name="netpNotificationCTAReconnectNow">Ponovno se poveži</string>
+    <string name="netpNotificationSnoozeTitle">VPN je u stanju mirovanja</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN će se ponovno povezati u %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN je prekinut zbog istekle pretplate. Pretplati se na Privacy Pro kako bi ponovno povezao DuckDuckGo VPN.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN lokacija</string>
+    <string name="netpGeoswitchingHeaderRecommended">Preporučeno</string>
+    <string name="netpGeoswitchingDefaultTitle">Najbliže dostupno</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Automatski se poveži s najbližim poslužiteljem koji možemo pronaći</string>
+    <string name="netpGeoswitchingHeaderCustom">Prilagođeno</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d gradova</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">VPN je isključen zbog isteka pretplate</string>
+    <string name="netpDialogVpnAccessRevokedBody">Pretplati se na Privacy Pro kako bi ponovno povezao DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Pretplati se</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Odbaci</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Potvrdi pretplatu</string>
+    <string name="netpVerifySubscriptionInProgress">Pričekaj dok provjeravamo tvoju pretplatu...</string>
+    <string name="netpVerifySubscriptionNoSubscription">Ups! Nemaš valjanu pretplatu.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Ups! Tvoja pretplata ne vrijedi za DuckDuckGo VPN.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Omogućeno</string>
+    <string name="netpSubscriptionSettingsConnecting">Povezivanje u tijeku...</string>
+    <string name="netpSubscriptionSettingsDisconnected">Onemogućeno</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS poslužitelj</string>
+    <string name="netpPrivateDns">Privatni DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokiraj zloćudni softver)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (preporučeno)</string>
+    <string name="netpCustomDnsCustom">Prilagođeno</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 adresa</string>
+    <string name="netpCustomDnsApply">Primijeni</string>
+    <string name="netpCustomDnsCustomHeader">DNS poslužitelj</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Privatni DNS već je specificiran u postavkama DNS-a sustava. Isključi privatni DNS kako bi postavio prilagođeni DNS za DuckDuckGo VPN. <annotation type="open_settings_link">Otvori postavke sustava</annotation></string>
+    <string name="netpCustomDnsWarning">Korištenje prilagođenog DNS poslužitelja može utjecati na brzinu pregledavanja i izložiti tvoju aktivnost trećim stranama ako poslužitelj nije zaštićen ili pouzdan.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo usmjerava DNS upite putem naših DNS poslužitelja tako da tvoj davatelj internetskih usluga ne može vidjeti koje web stranice posjećuješ.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Blokiraj zlonamjerni softver</string>
+    <string name="netpDnsBlockMalwareByline">Blokiraj zlonamjerni softver pomoću popisa za blokiranje na razini DNS-a. Ako se web-mjesto ne učita, probaj isključiti blokiranje.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Želiš li isključiti aplikacije koje nisu kompatibilne s VPN-ovima?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Pronašli smo %1$s dok je VPN spojen.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d nova aplikacija koja nije kompatibilna s VPN-ovima. Izuzmi ovu aplikaciju u svrhu njenog korištenja.</item>
+        <item quantity="few">%1$d nove aplikacije koje nisu kompatibilne s VPN-ovima. Izuzmi ove aplikacije u svrhu njihovog korištenja.</item>
+        <item quantity="many">%1$d novih aplikacija koje nisu kompatibilne s VPN-ovima. Izuzmi ove aplikacije u svrhu njihovog korištenja.</item>
+        <item quantity="other">%1$d novih aplikacija koje nisu kompatibilne s VPN-ovima. Izuzmi ove aplikacije u svrhu njihovog korištenja.</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Želiš li izuzeti (isključiti) sve aplikacije koje nisu kompatibilne s VPN-ovima?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d druga aplikacija koja nije kompatibilna s VPN-ovima. Izuzmi tu aplikaciju u svrhu njezinog korištenje</item>
+        <item quantity="few">%1$d druge aplikacije koje nisu kompatibilne s VPN-ovima. Izuzmi te aplikacije u svrhu njihovog korištenja.</item>
+        <item quantity="many">%1$d drugih aplikacija koje nisu kompatibilne s VPN-ovima. Izuzmi te aplikacije u svrhu njihovog korištenja.</item>
+        <item quantity="other">%1$d drugih aplikacija koje nisu kompatibilne s VPN-ovima. Izuzmi te aplikacije u svrhu njihovog korištenja.</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Automatski izuzmi (isključi) nekompatibilne aplikacije</string>
+    <string name="netpAutoExcludePromptActionAdd">Izuzmi aplikacije</string>
+    <string name="netpAutoExcludePromptActionCancel">Preskoči</string>
+    <string name="netpAutoExcludeToggleName">Automatski izuzmi aplikacije koje nisu kompatibilne s VPN-ovima</string>
+    <string name="netpExclusionListLabelAutoExclude">Nekompatibilno s VPN-ovima</string>
+    <string name="netpExclusionListAutoExcludeDescription">Neke aplikacije, poput bankarskih ili streaming aplikacija, ne funkcioniraju dobro s VPN-ovima. Kad je ova postavka omogućena, automatski ćemo izuzeti (isključiti) te aplikacije.</string>
+</resources>

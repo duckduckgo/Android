@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">A DuckDuckGo VPN be van kapcsolva</string>
+    <string name="netpManagementHeadlineStatusOff">A DuckDuckGo VPN ki van kapcsolva</string>
+    <string name="netpManagementDescriptionOff">Csatlakozz az összes eszköz internetes\nforgalmának védelméhez.</string>
+    <string name="netpManagementDescriptionOn">A VPN védi az összes eszköz\ninternetes forgalmát.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Csatlakozás…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Csatlakoztatva · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Nincs csatlakoztatva</string>
+    <string name="netpManagementBetaDescription">A DuckDuckGo VPN jelenleg béta verzióban érhető el. <annotation type="report_issues_link">Adj visszajelzést</annotation>, hogy segíts nekünk fejlődni!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">Problémákat okoz a VPN egy alkalmazásnál?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">A VPN kikapcsolása nélkül is kizárhatsz alkalmazásokat a VPN-ből.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Egy alkalmazás kizárása</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">VPN kikapcsolása</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Ne kérdezd meg ezt többé</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Kiválasztott hely</string>
+    <string name="netpManagementLocationHeaderVpnOn">Csatlakoztatott hely</string>
+    <string name="netpManagementLocationNearest">(Legközelebbi)</string>
+    <string name="netpManagementLocationPlaceholder">Legközelebbi hely</string>
+    <string name="netpManagementLocationCustom">(Egyéni)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Kapcsolat adatai</string>
+    <string name="netpManagementConnectionDetailsIp">IP-cím</string>
+    <string name="netpManagementConnectionDetailsDns">DNS-kiszolgáló</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Adatmennyiség</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN csatlakoztatva.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">A VPN csatlakoztatva van, és az eszköz forgalma ezen keresztül kerül átirányításra: &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Előfordulhat, hogy VPN alkalmazás kapcsolata megszakad</string>
+    <string name="netpVpnConflictMessage">Az Android egyszerre csak egy aktív VPN-kapcsolatot engedélyez. A DuckDuckGo VPN engedélyezése megszakíthatja a készüléked bármely aktív VPN-kapcsolatát.</string>
+    <string name="netpActionGotIt">Értem</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">A VPN-alkalmazásod blokkolja a DuckDuckGo VPN-t</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Az Android egyszerre csak egy aktív VPN-kapcsolatot engedélyez. Nyisd meg a Hálózati beállítások &gt; VPN menüpontot. Keresd meg a „mindig bekapcsolva“ értékre állított VPN alkalmazást, és a folytatáshoz tiltsd le.</string>
+    <string name="netpActionOpenSettings">Beállítások megnyitása</string>
+    <string name="netpActionCancel">Mégsem</string>
+    <string name="netpActionNotNow">Most nem</string>
+    <string name="netpActionGoToSettings">Lépj a Beállítások menübe</string>
+    <string name="netpAlwaysOnPromotionHeading">Mindig bekapcsolva</string>
+    <string name="netpAlwaysOnPromotionBody">Nyisd meg a készüléked DuckDuckGo VPN-beállításait, és engedélyezd a <b>Mindig aktív VPN</b> funkciót, hogy az Android ne kapcsolja ki a védelmet.\n\nA másik beállítást hagyd kikapcsolva.</string>
+    <string name="netpAlwaysOnLockdownBody">Az alkalmazásproblémák elkerülése érdekében nyisd meg az eszközöd <b>DuckDuckGo VPN-beállításait</b>, és tiltsd le a <b>VPN nélküli kapcsolatok blokkolása</b>lehetőséget.</string>
+    <string name="netpAlwaysOnLockdownHeading">A VPN beállítások módosítása</string>
+    <string name="netpBannerVpnRevoked"><b>A VPN le van tiltva.</b>\nElőfordulhat, hogy egy, az eszközödön lévő VPN-alkalmazás tiltotta le. Használd a váltógombot az újbóli engedélyezéshez.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Beavatkozás szükséges!</b> Az alkalmazással kapcsolatos problémák elkerülése érdekében módosítanod kell az Android beállításait. <annotation type="open_settings_link">Beállítások módosítása</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Az alkalmazás lefagy vagy összeomlik</string>
+    <string name="netpReportBreakageCategoryMessages">Az üzenet kézbesítése sikertelen</string>
+    <string name="netpReportBreakageCategoryCalls">A hanghívások nem működnek</string>
+    <string name="netpReportBreakageCategoryContent">A tartalom lassan töltődik be</string>
+    <string name="netpReportBreakageCategoryConnection">Az alkalmazásnak nincs kapcsolata</string>
+    <string name="netpReportBreakageCategoryIot">Nem lehet csatlakoztatni a helyi eszközt</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Funkciókérés</string>
+    <string name="netpReportBreakageCategoryOther">Valami más</string>
+
+    <string name="netpBetaDisclaimerFooter">A DuckDuckGo VPN béta verziója ingyenesen használható.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Kezelés</string>
+    <string name="netpManagementManageItemExclusion">Kizárt alkalmazások</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Nincs</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d alkalmazás</item>
+        <item quantity="other">%1$d alkalmazás</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">VPN-beállítások</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Általános</string>
+    <string name="netpVpnSettingsSystemHeader">Rendszer</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN-értesítések</string>
+    <string name="netpVpnSettingsTitle">VPN-beállítások</string>
+    <string name="netpVpnSettingKillSwitch">Mindig be van kapcsolva</string>
+    <string name="netpVpnSettingAlwaysOn">Mindig be van kapcsolva</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Alkalmazás korlátlan akkumulátorhasználatának engedélyezése</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">Az Alkalmazás akkumulátorbeállításainál engedélyezd a Korlátlan használatot, hogy az Android ne tiltsa le a háttérben a VPN-t</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Alkalmazás akkumulátorhasználata korlátlan</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">Az Alkalmazás akkumulátorbeállításaiban ez megakadályozza, hogy az Android letiltsa a VPN-t a háttérben</string>
+    <string name="netpVpnSettingAlwaysOnByline">VPN-kapcsolat automatikus helyreállítása megszakítás után</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Helyi hálózatok kizárása</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Kerülje meg a VPN-t helyi hálózati eszközökkel való kapcsolódáshoz, például egy nyomtató használatához.</string>
+    <string name="netpVpnSettingDnsLeak">A DuckDuckGo VPN megakadályozza a DNS-szivárgást az internetszolgáltatód felé azáltal, hogy a DNS-lekérdezéseket a VPN-alagúton keresztül a saját feloldónkhoz irányítja.</string>
+    <string name="netpVpnSettingGeoswitching">Preferált helyszín</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Legközelebbi elérhető</string>
+
+    <string name="netpVpnNotificationSettings">VPN-értesítések</string>
+    <string name="netpVpnNotificationSettingsByLine">Kapj értesítést, ha megszakad a kapcsolatod, vagy megváltozik a VPN állapota</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Korlátlan akkumulátorhasználat</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Megakadályozza, hogy az Android leállítsa a VPN-t.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">VPN szüneteltetése wifi-hívások közben</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">VPN ideiglenes szüneteltetése wifi-hívások közben, majd automatikus újracsatlakozás a hívás után</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Telefonengedély szükséges</string>
+    <string name="netpGrantPhonePermissionByline">Ennek a beállításnak az engedélyezéséhez a rendszerbeállításokban engedélyezned kell, hogy a DuckDuckGo kezdeményezhessen és kezelhessen telefonhívásokat.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Beállítások</string>
+    <string name="netpGrantPhonePermissionActionNegative">Mégsem</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Az értesítések le vannak tiltva</string>
+    <string name="netpVpnNotifyMeByLine">Kapj értesítést a VPN-eseményekről</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Alkalmazások kezelése</string>
+    <string name="netpExclusionListHeaderDefault">A DuckDuckGo VPN alapértelmezés szerint minden alkalmazásban működik. Ha problémákat tapasztalsz egy alkalmazás használata során a VPN bekapcsolt állapotában, próbálkozz azzal, hogy letiltod a védelmet az adott alkalmazásra vonatkozóan.</string>
+    <string name="netpExclusionListHeaderDisabled">A DuckDuckGo VPN ki van kapcsolva.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Manuálisan bekapcsolva</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Ha engedélyezve van, alkalmazásproblémák léphetnek fel</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Védelem engedélyezve</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Védelem letiltva</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Összes</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Jelentesz egy problémát?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Kérjük, jelezd nekünk, ha azért kapcsoltad ki a VPN-t a(z) %1$s alkalmazásnál, mert problémát tapasztaltál az alkalmazás működésében.\n\nEzenkívül letiltjuk a(z) %1$s App Tracking Protectiont.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Probléma jelentése</string>
+    <string name="netpExclusionListManuallyCTANotNow">Most nem</string>
+    <string name="netpExclusionListManuallyCTACancel">Mégsem</string>
+    <string name="netpExclusionListManuallyCTARestore">Visszaállítás</string>
+    <string name="netpExclusionListManuallyMenuRestore">Az összes alkalmazás védelmének visszaállítása</string>
+    <string name="netpExclusionListManuallyMenuReport">Alkalmazással kapcsolatos probléma bejelentése</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Visszaállítod az összes alkalmazás védelmét?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Ezzel frissíted az egyéni védelmi beállításaidat, és engedélyezed a VPN-t az összes alkalmazáshoz. A védelmi beállításokat később bármikor módosíthatod.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">A védelem visszaállt az alapértelmezett beállításokra</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Android-rendszeralkalmazások</string>
+    <string name="netpExclusionListWarningTitle">A rendszeralkalmazások kizárásáról</string>
+    <string name="netpExclusionListWarningMessage">A VPN nem fogja védeni az ezen alkalmazáscsoport által használt internetforgalmat, a háttérkapcsolatokat is beleértve. Ha ez nem oldja meg a problémát, fontold meg a védelem újbóli engedélyezését, hogy elkerüld a váratlan adatvesztéseket.</string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">További információ</string>
+    <string name="netpManagementAboutItemFaqs">GYIK és segítségnyújtás</string>
+    <string name="netpManagementAboutItemShareFeedback">Visszajelzés küldése</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">GYIK és segítségnyújtás</string>
+    <string name="netpFaqQuestionOne">Hogyan működik a DuckDuckGo VPN?</string>
+    <string name="netpFaqAnswerOne">A VPN a nyílt forráskódú WireGuard protokollt használja, hogy virtuális magánhálózatot (VPN) állítson be az eszközödön. Ha engedélyezve van, az eszközöd teljes internetes forgalma először titkosításra kerül, majd átirányításra kerül a legközelebbi VPN-szerveren keresztül. Az internetszolgáltatók így nem tudják nyomon követni a böngészési tevékenységedet, az alkalmazások és az általad meglátogatott webhelyek pedig nem nem láthatják a tartózkodási helyedet.</string>
+    <string name="netpFaqQuestionTwo">Csak a webes böngészésem van védve?</string>
+    <string name="netpFaqAnswerTwo">Az eszközödön végzett összes hálózati tevékenység védett.</string>
+    <string name="netpFaqQuestionThree">A DuckDuckGo naplózza az adataimat?</string>
+    <string name="netpFaqAnswerThree">Nem, nem tárolunk naplókat.</string>
+    <string name="netpFaqQuestionFour">Hol találhatók a VPN-szerverek?</string>
+    <string name="netpFaqAnswerFour">A DuckDuckGo VPN béta verziója korlátozott számú szervert kínál az Egyesült Államokban, Kanadában és Európában.</string>
+    <string name="netpFaqQuestionSix">Miért nem működnek egyes alkalmazások, amikor a VPN be van kapcsolva?</string>
+    <string name="netpFaqAnswerSix">Néhány webhely és alkalmazás szándékosan korlátozza a hozzáférést azok számára, akik VPN-t használnak. Például előfordulhat, hogy megkérnek egy CAPTCHA teszt megoldására, hogy megbizonyosodjanak róla, hogy valódi személy vagy, nem pedig egy robot. Ha egy alkalmazással kapcsolatban ismétlődő problémák lépnek fel, teljesen kizárhatod azt a VPN-védelem alól a DuckDuckGo VPN-beállításaiban.</string>
+    <string name="netpFaqQuestionSeven">Miért nem tudom eltávolítani a VPN-értesítéseket?</string>
+    <string name="netpFaqAnswerSeven">Az Android megköveteli, hogy a VPN-ek egy állandó értesítést jelenítsenek meg, amíg be vannak kapcsolva.</string>
+    <string name="netpFaqQuestionEight">Kompatibilis a VPN az App Tracking Protection funkcióval?</string>
+    <string name="netpFaqAnswerEight">Igen, a VPN és az App Tracking Protection be lehet kapcsolva egyidejűleg. Egyetlen más VPN sem kompatibilis a DuckDuckGo App Tracking Protection funkciójával.</string>
+    <string name="netpFaqQuestionNine">Ingyenesen használható a VPN?</string>
+    <string name="netpFaqAnswerNine">A DuckDuckGo VPN béta verziója ingyenesen használható. Végül fizetős szolgáltatásként lesz elérhető.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Csatlakozás</string>
+    <string name="netpNotificationCTAReportIssue">Problémáid vannak egy alkalmazással?</string>
+    <string name="netpNotificationDisabled">A VPN kapcsolat megszakadt. Koppints, hogy folytatódjon az eszközöd forgalmának védelme.</string>
+    <string name="netpNotificationDisabledByVpn">Az eszközödön lévő egyik VPN-alkalmazás megszakította a DuckDuckGo VPN kapcsolatát. Koppints az újrakapcsolódáshoz.</string>
+    <string name="netpUnsafeWifi">Nem biztonságos wifihálózathoz csatlakozva.</string>
+    <string name="netpNotificationCTAReconnectNow">Újrakapcsolódás most</string>
+    <string name="netpNotificationSnoozeTitle">A VPN szüneteltetve van</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">A VPN újrakapcsolódik ekkor: %1$s.</string>
+    <string name="netpNotificationVpnAccessRevoked">A VPN-kapcsolat megszakadt, mert lejárt az előfizetésed. Fizess elő a Privacy Pro szolgáltatásra a DuckDuckGo VPN újracsatlakoztatásához.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN-helyszín</string>
+    <string name="netpGeoswitchingHeaderRecommended">Ajánlott</string>
+    <string name="netpGeoswitchingDefaultTitle">Legközelebbi elérhető</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Automatikus csatlakozás az általunk talált legközelebbi szerverhez</string>
+    <string name="netpGeoswitchingHeaderCustom">Egyéni</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d város</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">A VPN megszakadt, mert lejárt az előfizetésed</string>
+    <string name="netpDialogVpnAccessRevokedBody">Fizess elő a Privacy Pro szolgáltatásra a DuckDuckGo VPN újracsatlakoztatásához.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Feliratkozás</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Elutasítás</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Előfizetés megerősítése</string>
+    <string name="netpVerifySubscriptionInProgress">Kérlek, várj, amíg ellenőrizzük az előfizetésed…</string>
+    <string name="netpVerifySubscriptionNoSubscription">Hoppá! Nincs érvényes előfizetésed.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Hoppá! Az előfizetésed nem érvényes a DuckDuckGo VPN-re.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Engedélyezve</string>
+    <string name="netpSubscriptionSettingsConnecting">Csatlakozás…</string>
+    <string name="netpSubscriptionSettingsDisconnected">Letiltva</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS-kiszolgáló</string>
+    <string name="netpPrivateDns">Privát DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (rosszindulatú programok blokkolása)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (ajánlott)</string>
+    <string name="netpCustomDnsCustom">Egyéni</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4-cím</string>
+    <string name="netpCustomDnsApply">Alkalmaz</string>
+    <string name="netpCustomDnsCustomHeader">DNS-kiszolgáló</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Már meg van adva egy privát DNS a rendszer DNS-beállításaiban. Kapcsold ki a Privát DNS-t, hogy egyéni DNS-t állíthass be a DuckDuckGo VPN-hez. <annotation type="open_settings_link">Rendszerbeállítások megnyitása</annotation></string>
+    <string name="netpCustomDnsWarning">Egy egyedi DNS-kiszolgáló használata befolyásolhatja a böngészési sebességet, és harmadik felek számára is láthatóvá teheti a tevékenységedet, ha a kiszolgáló nem biztonságos vagy nem megbízható.</string>
+    <string name="netpDdgDnsByLine">A DuckDuckGo a saját DNS-kiszolgálóin keresztül irányítja át a DNS-lekérdezéseket, így az internetszolgáltatód nem láthatja, hogy milyen webhelyeket látogatsz meg.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Rosszindulatú programok blokkolása</string>
+    <string name="netpDnsBlockMalwareByline">Rosszindulatú programok blokkolása DNS-szintű tiltólistával. Ha egy weboldal nem töltődik be, próbálkozz azzal, hogy kikapcsolod a blokkolást.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Szeretnéd kizárni a VPN-ekkel nem kompatibilis alkalmazásokat?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">%1$s került azonosításra, miközben a VPN csatlakoztatva volt.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
+        <item quantity="other">%1$d új alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Szeretnéd kizárni az összes olyan alkalmazást, amely nem kompatibilis a VPN-ekkel?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazást, hogy használni tudd</item>
+        <item quantity="other">%1$d másik alkalmazás nem kompatibilis a VPN-ekkel. Zárd ki az alkalmazásokat, hogy használni tudd őket</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Inkompatibilis alkalmazások automatikus kizárása</string>
+    <string name="netpAutoExcludePromptActionAdd">Alkalmazások kizárása</string>
+    <string name="netpAutoExcludePromptActionCancel">Kihagyás</string>
+    <string name="netpAutoExcludeToggleName">A VPN-ekkel nem kompatibilis alkalmazások automatikus kizárása</string>
+    <string name="netpExclusionListLabelAutoExclude">Nem kompatibilis a VPN-ekkel</string>
+    <string name="netpExclusionListAutoExcludeDescription">Egyes alkalmazások, mint például a banki vagy streaming-alkalmazások, nem működnek jól a VPN-ekkel. Ha ez a beállítás engedélyezve van, automatikusan kizárjuk ezeket az alkalmazásokat.</string>
+</resources>

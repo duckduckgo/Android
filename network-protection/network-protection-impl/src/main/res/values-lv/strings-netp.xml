@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN ir ieslēgts</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN ir izslēgts</string>
+    <string name="netpManagementDescriptionOff">Izveido savienojumu, lai aizsargātu visu savu ierīču\nInterneta trafiku.</string>
+    <string name="netpManagementDescriptionOn">Visu ierīču Interneta trafiks tiek aizsargāts,\n izmantojot VPN.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Notiek savienojuma izveide…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Pieslēgts · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Nav savienots</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN pašlaik ir beta versijā. <annotation type="report_issues_link">Dalies ar atsauksmēm</annotation> lai palīdzētu mums uzlaboties!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">Vai VPN rada problēmas ar kādu lietotni?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">Tu vari izslēgt lietotnes no VPN, neizslēdzot VPN.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Neietvert programmu</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Izslēgt VPN</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Nekad vairs nejautāt</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Izvēlētā atrašanās vieta</string>
+    <string name="netpManagementLocationHeaderVpnOn">Savienojuma atrašanās vieta</string>
+    <string name="netpManagementLocationNearest">(Tuvākais)</string>
+    <string name="netpManagementLocationPlaceholder">Tuvākā atrašanās vieta</string>
+    <string name="netpManagementLocationCustom">(Pielāgots)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Savienojuma informācija</string>
+    <string name="netpManagementConnectionDetailsIp">IP adrese</string>
+    <string name="netpManagementConnectionDetailsDns">DNS serveris</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Datu apjoms</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN ir savienots.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN ir pievienots un maršrutē ierīces datplūsmu caur &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Iespējams, tava VPN lietotne tikt atvienota</string>
+    <string name="netpVpnConflictMessage">Android vienlaicīgi atļauj tikai vienu aktīvu VPN savienojumu. Ieslēdzot DuckDuckGo VPN, var tikt atvienots jebkurš aktīvs VPN tavā ierīcē.</string>
+    <string name="netpActionGotIt">Sapratu</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Tava VPN lietotne bloķē DuckDuckGo VPN</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android vienlaicīgi atļauj tikai vienu aktīvu VPN savienojumu. Atver tīkla iestatījumus &gt; VPN. Atrodi VPN lietojumprogrammu, kura ir iestatīta kā “Vienmēr ieslēgta”, un atspējo to, lai turpinātu.</string>
+    <string name="netpActionOpenSettings">Atvērt iestatījumus</string>
+    <string name="netpActionCancel">Atcelt</string>
+    <string name="netpActionNotNow">Ne tagad</string>
+    <string name="netpActionGoToSettings">Doties uz Iestatījumiem</string>
+    <string name="netpAlwaysOnPromotionHeading">Iestatīt \"Vienmēr ieslēgts\"</string>
+    <string name="netpAlwaysOnPromotionBody">Dodies uz savas ierīces DuckDuckGo VPN iestatījumiem un iespējo <b>Vienmēr ieslēgts VPN</b>, lai nepieļautu, ka Android atspējo aizsardzību.\n\nAtceries, ka otrs iestatījums jāatstāj IZSLĒGTS.</string>
+    <string name="netpAlwaysOnLockdownBody">Lai izvairītos no lietotņu problēmām, dodies uz savas ierīces <b>DuckDuckGo</b> VPN iestatījumiem un atspējo <b>Bloķēt savienojumus bez VPN.</b></string>
+    <string name="netpAlwaysOnLockdownHeading">VPN iestatījumu maiņa</string>
+    <string name="netpBannerVpnRevoked"><b>VPN ir atspējots.</b>\nIespējams, to ir atspējojusi kāda VPN lietotne tavā ierīcē. Izmanto slēdzi, lai to no jauna iespējotu.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Nepieciešama rīcība!</b> Lai izvairītos no problēmām ar lietotnēm, ir jāmaina Android iestatījumi. <annotation type="open_settings_link">Mainīt iestatījumus</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Lietotne sastingst vai avarē</string>
+    <string name="netpReportBreakageCategoryMessages">Neizdodas ziņojuma piegāde</string>
+    <string name="netpReportBreakageCategoryCalls">Nedarbojas balss zvani</string>
+    <string name="netpReportBreakageCategoryContent">Saturs ielādējas lēni</string>
+    <string name="netpReportBreakageCategoryConnection">Lietotnei nav savienojuma</string>
+    <string name="netpReportBreakageCategoryIot">Nevar izveidot savienojumu ar vietēju ierīci</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Funkcionalitātes pieprasījums</string>
+    <string name="netpReportBreakageCategoryOther">Kaut kas cits</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN beta versijas laikā var izmantot bez maksas.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Pārvaldīt</string>
+    <string name="netpManagementManageItemExclusion">Izslēgtās lietotnes</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Nav</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="zero">Lietotnes %1$d</item>
+        <item quantity="one">Lietotne %1$d</item>
+        <item quantity="other">Lietotnes %1$d</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">VPN iestatījumi</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Vispārīgi</string>
+    <string name="netpVpnSettingsSystemHeader">Sistēma</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN paziņojumi</string>
+    <string name="netpVpnSettingsTitle">VPN iestatījumi</string>
+    <string name="netpVpnSettingKillSwitch">Vienmēr ieslēgts</string>
+    <string name="netpVpnSettingAlwaysOn">Vienmēr ieslēgts</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Atļaut neierobežotu lietotņu akumulatora lietošanu</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">Akumulatora iestatījumu lietotnes atļauj neierobežotu lietošanu, lai novērstu, ka Android atspējo VPN fona režīmā</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Lietotnes akumulatora lietojums ir neierobežots</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">Lietotņu akumulatora iestatījumos tas neļauj operētājsistēmai Android atspējot VPN fonā</string>
+    <string name="netpVpnSettingAlwaysOnByline">Automātiski atjaunot VPN savienojumu pēc pārtraukuma.</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Neietvert vietējos tīklus</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Ļauj apiet VPN vietējā tīkla savienojumiem, piemēram, ar printeri.</string>
+    <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN novērš DNS noplūdes uz tavu interneta pakalpojumu sniedzēju, novirzot DNS vaicājumus caur VPN tuneli uz mūsu pašu atrisinātāju.</string>
+    <string name="netpVpnSettingGeoswitching">Vēlamā atrašanās vieta</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Tuvākais pieejamais</string>
+
+    <string name="netpVpnNotificationSettings">VPN paziņojumi</string>
+    <string name="netpVpnNotificationSettingsByLine">Saņem paziņojumu, ja savienojums pārtrūkst vai mainās VPN statuss.</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Neierobežota akumulatora lietošana</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Neļauj operētājsistēmai Android apturēt VPN.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Pauzēt VPN Wi-Fi zvanu laikā</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Īslaicīgi atspējo VPN, kad notiek Wi-Fi zvani, un automātiski atjauno savienojumu pēc tam.</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Nepieciešama tālruņa atļauja</string>
+    <string name="netpGrantPhonePermissionByline">Lai iespējotu šo iestatījumu, tev ir jāļauj DuckDuckGo veikt un pārvaldīt tālruņa zvanus, izmantojot sistēmas iestatījumus.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Iestatījumi</string>
+    <string name="netpGrantPhonePermissionActionNegative">Atcelt</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Paziņojumi ir atspējoti</string>
+    <string name="netpVpnNotifyMeByLine">Saņem paziņojumus par VPN notikumiem</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Pārvaldīt lietojumprogrammas</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN pēc noklusējuma darbojas visās lietotnēs. Ja, ieslēdzot VPN, rodas problēmas ar lietotnēm, mēģiniet atspējot šīs lietotnes aizsardzību.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN ir atspējots.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Manuāli atspējota</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Manuāli iespējota</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Iespējošana var traucēt citām lietotnēm</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Aizsardzība iespējota</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Viss</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Ziņot par problēmu?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Lūdzu, informē mūs, ja atspējoji VPN pakalpojumam %1$s, jo tev radās problēmas ar lietotni.\n\nMēs arī atspējosim pakalpojuma %1$s App Tracking Protection.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Ziņot par problēmu</string>
+    <string name="netpExclusionListManuallyCTANotNow">Ne tagad</string>
+    <string name="netpExclusionListManuallyCTACancel">Atcelt</string>
+    <string name="netpExclusionListManuallyCTARestore">Atjaunot</string>
+    <string name="netpExclusionListManuallyMenuRestore">Visu lietotņu aizsardzības atjaunošana</string>
+    <string name="netpExclusionListManuallyMenuReport">Ziņot par problēmu ar lietotni</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Vai atjaunot aizsardzību visām lietotnēm?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Tas atjauninās tavus pielāgotos aizsardzības iestatījumus un iespējos VPN visām lietotnēm. Mainīt savus aizsardzības iestatījumus varēsi jebkurā laikā.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Atjaunoti aizsardzības noklusējuma iestatījumi</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Aizsardzības iespējošana nosūta lietotnes nosaukumu DuckDuckGo.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Android sistēmas lietotnes</string>
+    <string name="netpExclusionListWarningTitle">Par sistēmas lietotņu izslēgumiem</string>
+    <string name="netpExclusionListWarningMessage">Interneta trafiks, tostarp fona savienojumi, ko izmanto šī lietotņu grupa, netiks aizsargāts ar VPN. Apsver iespēju atkārtoti iespējot, ja tas neatrisina problēmu, lai novērstu neparedzētu datu noplūdi.</string>
+    <string name="netpExclusionListWarningActionPositive">Labi</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Par</string>
+    <string name="netpManagementAboutItemFaqs">Bieži uzdotie jautājumi un atbalsts</string>
+    <string name="netpManagementAboutItemShareFeedback">Sūtīt atsauksmi</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Bieži uzdotie jautājumi un atbalsts</string>
+    <string name="netpFaqQuestionOne">Kā darbojas DuckDuckGo VPN?</string>
+    <string name="netpFaqAnswerOne">VPN izmanto atvērtā koda protokolu WireGuard, lai tavā ierīcē konfigurētu virtuālo privāto tīklu (VPN). Kad šī funkcija ir ieslēgta, visa tava ierīces datplūsma vispirms tiek šifrēta un pēc tam novirzīta caur tuvāko VPN serveri, lai aizsargātu tavu pārlūkošanas darbību no interneta pakalpojumu sniedzējiem un paslēptu tavu atrašanās vietu no lietotnēm un vietnēm, kuras apmeklē.</string>
+    <string name="netpFaqQuestionTwo">Vai ir aizsargāta tikai mana tīmekļa pārlūkošana?</string>
+    <string name="netpFaqAnswerTwo">Visa tīkla darbība tavā ierīcē ir aizsargāta.</string>
+    <string name="netpFaqQuestionThree">Vai DuckDuckGo saglabā manus datu žurnālus?</string>
+    <string name="netpFaqAnswerThree">Nē, mēs neuzglabājam tavu žurnālus.</string>
+    <string name="netpFaqQuestionFour">Kur atrodas VPN serveri?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo piedāvā ierobežotu serveru skaitu, kamēr DuckDuckGo VPN ir beta versijā un atrodas Amerikas Savienotajās Valstīs, Kanādā un Eiropā.</string>
+    <string name="netpFaqQuestionSix">Kāpēc dažas lietotnes nedarbojas, kad ir ieslēgts VPN?</string>
+    <string name="netpFaqAnswerSix">Dažas vietnes un lietotnes apzināti ierobežo piekļuvi cilvēkiem, kas izmanto VPN. Piemēram, viņi var lūgt tevi atrisināt CAPTCHA, lai pārliecinātos, ka esi īsts cilvēks, nevis robots. Ja tev rodas atkārtotas problēmas ar lietotni, tu vari to pilnībā izslēgt no VPN sadaļā DuckDuckGo VPN iestatījumos.</string>
+    <string name="netpFaqQuestionSeven">Kāpēc es nevaru noraidīt VPN paziņojumus?</string>
+    <string name="netpFaqAnswerSeven">Android pieprasa, lai VPN rādītu pastāvīgu paziņojumu, kamēr VPN ir ieslēgts.</string>
+    <string name="netpFaqQuestionEight">Vai VPN ir saderīgs ar App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Jā, vienlaicīgi var būt ieslēgts gan VPN, gan App Tracking Protection. Neviens cits VPN nav saderīgs ar DuckDuckGo App Tracking Protection.</string>
+    <string name="netpFaqQuestionNine">Vai VPN lietošana ir bez maksas?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN var izmantot bez maksas, kamēr tas ir beta versijā. Vēlāk to piedāvās kā maksas pakalpojumu.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Savienot</string>
+    <string name="netpNotificationCTAReportIssue">Problēmas ar lietotni?</string>
+    <string name="netpNotificationDisabled">VPN ir atvienots. Pieskaries, lai turpinātu aizsargāt ierīces trafiku.</string>
+    <string name="netpNotificationDisabledByVpn">Kāda VPN lietotne tavā ierīcē atvienoja DuckDuckGo VPN. Pieskaries, lai atkārtoti izveidotu savienojumu.</string>
+    <string name="netpUnsafeWifi">Savienots ar nedrošu WIFI.</string>
+    <string name="netpNotificationCTAReconnectNow">Atkārtoti izveidot savienojumu tūlīt</string>
+    <string name="netpNotificationSnoozeTitle">VPN ir atslēgts</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN atkārtoti pieslēgsies plkst. %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN atvienots, jo ir beidzies abonements. Abonē Privacy Pro, lai atkārtoti izveidotu savienojumu ar DuckDuckGo VPN.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN atrašanās vieta</string>
+    <string name="netpGeoswitchingHeaderRecommended">Ieteicams</string>
+    <string name="netpGeoswitchingDefaultTitle">Tuvākais pieejamais</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Automātiski izveido savienojumu ar tuvāko serveri, ko varam atrast.</string>
+    <string name="netpGeoswitchingHeaderCustom">Paraža</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d pilsētas</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">VPN atvienots, jo ir beidzies abonements</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonē Privacy Pro, lai atkārtoti izveidotu savienojumu ar DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Abonēt</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Nerādīt</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Pārbaudi abonementu</string>
+    <string name="netpVerifySubscriptionInProgress">Lūdzu, uzgaidi, kamēr mēs verificējam tavu abonementu…</string>
+    <string name="netpVerifySubscriptionNoSubscription">Ups! Tev nav neviena derīga abonementa.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Ups! Tavs abonements nav derīgs DuckDuckGo VPN.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Iespējots</string>
+    <string name="netpSubscriptionSettingsConnecting">Notiek savienojuma izveide…</string>
+    <string name="netpSubscriptionSettingsDisconnected">Atspējots</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS serveris</string>
+    <string name="netpPrivateDns">Privātais DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (bloķēt ļaunprātīgu programmatūru)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (ieteicams)</string>
+    <string name="netpCustomDnsCustom">Paraža</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 adrese</string>
+    <string name="netpCustomDnsApply">Lietot</string>
+    <string name="netpCustomDnsCustomHeader">DNS serveris</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Privātais DNS jau ir norādīts sistēmas DNS iestatījumos. Izslēdz privāto DNS, lai DuckDuckGo VPN iestatītu pielāgotu DNS. <annotation type="open_settings_link">Atver sistēmas iestatījumus</annotation></string>
+    <string name="netpCustomDnsWarning">Ja serveris nav drošs vai uzticams, pielāgota DNS servera izmantošana var ietekmēt pārlūkošanas ātrumu un atklāt tavas darbības trešajām pusēm.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo maršrutē DNS vaicājumus caur mūsu DNS serveriem, lai tavs interneta pakalpojumu sniedzējs neredzētu, kādas vietnes tu apmeklē.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Bloķēt ļaunprogrammatūru</string>
+    <string name="netpDnsBlockMalwareByline">Bloķē ļaunprātīgu programmatūru ar DNS līmeņa bloķēšanas sarakstu. Ja vietne netiek ielādēta, pamēģini izslēgt bloķēšanu.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Vai tu vēlies izslēgt lietotnes, kas nav saderīgas ar VPN?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Mēs atradām %1$s, kamēr VPN savienojums ir izveidots.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="zero">%1$d jaunas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="one">%1$d jauna lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="other">%1$d jaunas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Vai tu vēlies izslēgt visas lietotnes, kas nav saderīgas ar VPN?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="zero">%1$d citas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="one">%1$d cita lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="other">%1$d citas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Automātiski izslēgt nesaderīgas lietotnes</string>
+    <string name="netpAutoExcludePromptActionAdd">Izslēgt lietotnes</string>
+    <string name="netpAutoExcludePromptActionCancel">Izlaist</string>
+    <string name="netpAutoExcludeToggleName">Automātiski izslēdz lietotnes, kas nav saderīgas ar VPN.</string>
+    <string name="netpExclusionListLabelAutoExclude">Nesaderīgs ar VPN</string>
+    <string name="netpExclusionListAutoExcludeDescription">Dažas lietotnes, piemēram, banku vai straumēšanas lietotnes, nedarbojas labi ar VPN. Kad šis iestatījums ir ieslēgts, mēs automātiski izslēgsim šādas lietotnes.</string>
+</resources>
