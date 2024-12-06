@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.duckduckgo.sync.impl"
+<manifest package="com.duckduckgo.site.permissions.impl"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
