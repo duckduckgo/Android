@@ -51,6 +51,8 @@ class ReinstallAtbListenerTest {
 
     @Test
     fun whenBeforeAtbInitIsCalledThenClearBackupServiceSharedPreferences() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
         testee.beforeAtbInit()
 
         verify(mockBackupDataStore).clearBackupPreferences()
