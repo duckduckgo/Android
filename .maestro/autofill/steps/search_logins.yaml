@@ -5,16 +5,16 @@ name: "Autofill: Search credentials"
 
 - runFlow:
     when:
-      visible: "Sync & Back Up Your Passwords"
-    commands:
-      - tapOn: "No thanks"
-
-- runFlow:
-    when:
       visible: "Help us improve!"
     commands:
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/close"
+
+- runFlow:
+    when:
+      visible: "Sync & Back Up Your Passwords"
+    commands:
+      - tapOn: "No thanks"
 
 - tapOn:
     id: searchLogins
