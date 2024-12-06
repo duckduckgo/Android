@@ -18,6 +18,7 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Permisos del sitio</string>
     <string name="sitePermissionsSettingsDescription">Los sitios que visites pueden pedirte acceso a la ubicación de tu dispositivo, a la cámara, al micrófono o al software DRM (Gestión de Derechos Digitales). No podrán acceder a ellos a menos que les des permiso explícitamente.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos los sitios soliciten:</string>
     <string name="sitePermissionsSettingsLocation">Ubicación</string>

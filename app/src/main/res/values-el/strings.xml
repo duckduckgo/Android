@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Δικαιώματα ιστότοπου</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Ανακαλύψτε πότε είναι έτοιμες οι λήψεις</string>
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>

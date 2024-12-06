@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-vindu skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Informasjonskapsler administrert</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Nettstedstillatelser</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Finn ut når nedlastinger er klare</string>
     <string name="downloadsNotifyMeSubtitle">Få et varsel når nedlastinger er fullført.</string>

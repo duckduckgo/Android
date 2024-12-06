@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ventana emergente oculta</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies gestionadas</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Permisos del sitio</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Entérate de cuándo están listas las descargas</string>
     <string name="downloadsNotifyMeSubtitle">Recibe una notificación cuando se completen las descargas.</string>

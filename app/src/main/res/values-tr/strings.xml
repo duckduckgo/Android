@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Site İzinleri</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>

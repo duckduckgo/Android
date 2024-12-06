@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ocultado</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies geridos</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Permissões dos sites</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saber quando as transferências estão prontas</string>
     <string name="downloadsNotifyMeSubtitle">Receba uma notificação quando as transferências estiverem concluídas.</string>

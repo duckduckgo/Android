@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Ugotovite, kdaj so prenosi pripravljeni</string>
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>

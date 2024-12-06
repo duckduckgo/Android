@@ -17,7 +17,8 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Site Permissions Settings -->
+    <!-- Site Permissions -->
+    <string name="settingsSitePermissions">Autorizzazioni del sito</string>
     <string name="sitePermissionsSettingsDescription">I siti che visiti potrebbero richiedere l\'accesso al software di localizzazione, videocamera, microfono o DRM (Digital Rights Management) del tuo dispositivo. Non potranno accedervi finché non darai il consenso esplicito.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Consenti a tutti i siti di richiedere:</string>
     <string name="sitePermissionsSettingsLocation">Posizione</string>

@@ -657,9 +657,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
     <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Sitetoestemmingen</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>
     <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
