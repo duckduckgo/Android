@@ -50,9 +50,11 @@
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
+        android:layout_marginVertical="@dimen/keyline_2"
         android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/otherOptionsHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/sync_setup_single_device_title"/>
@@ -71,6 +73,7 @@
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
+        android:layout_marginVertical="@dimen/keyline_2"
         android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem

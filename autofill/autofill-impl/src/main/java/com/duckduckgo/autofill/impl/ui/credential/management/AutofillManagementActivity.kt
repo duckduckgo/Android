@@ -74,6 +74,7 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -93,6 +94,9 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var newSettingsFeature: NewSettingsFeature
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -324,7 +328,11 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun resetToolbar() {
-        setTitle(R.string.autofillManagementScreenTitle)
+        if (newSettingsFeature.self().isEnabled()) {
+            setTitle(R.string.autofillManagementScreenTitleNew)
+        } else {
+            setTitle(R.string.autofillManagementScreenTitle)
+        }
         binding.toolbar.menu.clear()
         hideSearchBar()
         supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
