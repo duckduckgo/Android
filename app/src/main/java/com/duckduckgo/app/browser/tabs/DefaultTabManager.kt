@@ -18,41 +18,69 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import dagger.android.DaggerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
-class RealTabManager @Inject constructor(
+class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val tabRepository: TabRepository,
+    private val dispatchers: DispatcherProvider,
 ) : TabManager {
-    companion object {
-        private const val MAX_ACTIVE_TABS = 40
-    }
-
     private val browserActivity = activity as BrowserActivity
     private val lastActiveTabs = TabList()
     private val supportFragmentManager = activity.supportFragmentManager
     private var openMessageInNewTabJob: Job? = null
 
+    private val keepSingleTab: Boolean
+        get() = !browserActivity.tabPager.isUserInputEnabled
+
+    override val tabPagerAdapter by lazy {
+        TabPagerAdapter(
+            fragmentManager = supportFragmentManager,
+            lifecycleOwner = browserActivity,
+            activityIntent = browserActivity.intent,
+            getSelectedTabId = ::getSelectedTabId,
+            getTabById = ::getTabById,
+            requestNewTab = ::requestNewTab,
+            onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
+            setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
+            getOffScreenPageLimit = {
+                if (browserActivity.tabPager.offscreenPageLimit == OFFSCREEN_PAGE_LIMIT_DEFAULT) {
+                    1
+                } else {
+                    browserActivity.tabPager.offscreenPageLimit
+                }
+            },
+        )
+    }
+
     private var _currentTab: BrowserTabFragment? = null
     override var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
-                null
+                tabPagerAdapter.currentFragment
             } else {
                 _currentTab
             }
@@ -61,22 +89,29 @@ class RealTabManager @Inject constructor(
             _currentTab = value
         }
 
-    override fun onSelectedTabChanged(tab: TabEntity?) {
+    override fun onSelectedTabChanged(tabId: String) {
         if (swipingTabsFeature.isEnabled) {
-            return
-        } else if (tab != null) {
-            selectTab(tab)
+            Timber.d("### TabManager.onSelectedTabChanged: $tabId")
+            if (keepSingleTab) {
+                tabPagerAdapter.onTabsUpdated(listOf(tabId))
+            }
+        } else {
+            selectTab(tabId)
         }
     }
 
-    override fun onTabsUpdated(updatedTabs: List<TabEntity>) {
+    override fun onTabsUpdated(updatedTabIds: List<String>) {
+        Timber.d("### TabManager.onTabsUpdated: $updatedTabIds")
         if (swipingTabsFeature.isEnabled) {
-            return
+            if (keepSingleTab) {
+                updatedTabIds.firstOrNull { it == getSelectedTabId() }?.let {
+                    tabPagerAdapter.onTabsUpdated(listOf(it))
+                }
+            } else {
+                tabPagerAdapter.onTabsUpdated(updatedTabIds)
+            }
         } else {
-            clearStaleTabs(updatedTabs)
-        }
-        browserActivity.lifecycleScope.launch {
-            browserActivity.viewModel.onTabsUpdated(updatedTabs)
+            clearStaleTabs(updatedTabIds)
         }
     }
 
@@ -84,18 +119,25 @@ class RealTabManager @Inject constructor(
         message: Message,
         sourceTabId: String?,
     ) {
-        openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
-            val tabId = browserActivity.viewModel.onNewTabRequested(sourceTabId)
-            val fragment = openNewTab(
-                tabId = tabId,
-                url = null,
-                skipHome = false,
-                isExternal = browserActivity.intent?.getBooleanExtra(
-                    BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
-                    false,
-                ) ?: false,
-            )
-            fragment.messageFromPreviousTab = message
+        if (swipingTabsFeature.isEnabled) {
+            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+                tabPagerAdapter.setMessageForNewFragment(message)
+                browserActivity.viewModel.onNewTabRequested(sourceTabId)
+            }
+        } else {
+            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+                val tabId = browserActivity.viewModel.onNewTabRequested(sourceTabId)
+                val fragment = openNewTab(
+                    tabId = tabId,
+                    url = null,
+                    skipHome = false,
+                    isExternal = browserActivity.intent?.getBooleanExtra(
+                        BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
+                        false,
+                    ) == true,
+                )
+                fragment.messageFromPreviousTab = message
+            }
         }
     }
 
@@ -125,33 +167,51 @@ class RealTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
-    private fun selectTab(tab: TabEntity?) {
-        if (swipingTabsFeature.isEnabled) {
-            return
+    private fun requestNewTab(): TabEntity = runBlocking(dispatchers.io()) {
+        val tabId = browserActivity.viewModel.onNewTabRequested()
+        return@runBlocking tabRepository.flowTabs.transformWhile { result ->
+            result.firstOrNull { it.tabId == tabId }?.let { entity ->
+                emit(entity)
+                return@transformWhile true
+            }
+            return@transformWhile false
+        }.first()
+    }
+
+    private fun getSelectedTabId(): String? = runBlocking {
+        tabRepository.getSelectedTab()?.tabId
+    }
+
+    private fun getTabById(tabId: String): TabEntity? = runBlocking {
+        tabRepository.getTab(tabId)
+    }
+
+    private fun selectTab(tabId: String) = browserActivity.lifecycleScope.launch {
+        if (tabId != currentTab?.tabId) {
+            lastActiveTabs.add(tabId)
+
+            browserActivity.viewModel.onTabActivated(tabId)
+
+            val fragment = supportFragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
+            if (fragment == null) {
+                tabRepository.getTab(tabId)?.let { tab ->
+                    openNewTab(
+                        tabId = tab.tabId,
+                        url = tab.url,
+                        skipHome = tab.skipHome,
+                        isExternal = browserActivity.intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) == true,
+                    )
+                }
+                return@launch
+            }
+            val transaction = supportFragmentManager.beginTransaction()
+            currentTab?.let {
+                transaction.hide(it)
+            }
+            transaction.show(fragment)
+            transaction.commit()
+            currentTab = fragment
         }
-
-        Timber.v("Select tab: $tab")
-
-        if (tab == null) return
-
-        if (tab.tabId == currentTab?.tabId) return
-
-        lastActiveTabs.add(tab.tabId)
-
-        browserActivity.viewModel.onTabActivated(tab.tabId)
-
-        val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
-        if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, browserActivity.intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) == true)
-            return
-        }
-        val transaction = supportFragmentManager.beginTransaction()
-        currentTab?.let {
-            transaction.hide(it)
-        }
-        transaction.show(fragment)
-        transaction.commit()
-        currentTab = fragment
     }
 
     private fun openNewTab(
@@ -185,7 +245,7 @@ class RealTabManager @Inject constructor(
         transaction.commit()
     }
 
-    private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
+    private fun clearStaleTabs(updatedTabs: List<String>?) {
         if (swipingTabsFeature.isEnabled) {
             return
         }
@@ -196,7 +256,7 @@ class RealTabManager @Inject constructor(
 
         val stale = supportFragmentManager
             .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
+            .filter { fragment -> updatedTabs.none { it == fragment.tabId } }
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)

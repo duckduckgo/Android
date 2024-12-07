@@ -129,6 +129,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
+    private var swipeListener: ItemTouchHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -174,8 +175,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             onTabDraggingFinished = this::onTabDraggingFinished,
         )
 
-        val swipeListener = ItemTouchHelper(tabTouchHelper)
-        swipeListener.attachToRecyclerView(tabsRecycler)
+        swipeListener = ItemTouchHelper(tabTouchHelper)
+        swipeListener?.attachToRecyclerView(tabsRecycler)
 
         tabItemDecorator = TabItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabItemDecorator)
@@ -205,6 +206,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
                 updateLayoutType(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.isDeletingEnabled.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { isEnabled ->
+                tabsAdapter.onIsDeletingEnabledChanged(isEnabled)
+                swipeListener?.attachToRecyclerView(if (isEnabled) tabsRecycler else null)
             }
         }
 

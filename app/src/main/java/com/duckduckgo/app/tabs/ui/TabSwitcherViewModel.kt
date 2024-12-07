@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -54,6 +55,10 @@ class TabSwitcherViewModel @Inject constructor(
         context = viewModelScope.coroutineContext,
     )
 
+    val isDeletingEnabled = tabRepository.flowTabs.map { it.size > 1 }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
@@ -66,7 +71,12 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        tabRepository.add()
+        val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+        if (emptyTab != null) {
+            tabRepository.select(tabId = emptyTab)
+        } else {
+            tabRepository.add()
+        }
         command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)

@@ -2423,11 +2423,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserRequestedToOpenNewTabThenNewTabCommandIssued() {
+    fun whenUserRequestedToOpenNewTabAndNoEmptyTabExistsThenNewTabCommandIssued() {
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
         testee.userRequestedOpeningNewTab()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabAndEmptyTabExistsThenSelectTheEmptyTab() = runTest {
+        val emptyTabId = "EMPTY_TAB"
+        tabsLiveData.value = listOf(TabEntity(emptyTabId))
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertFalse(command is Command.LaunchNewTab)
+
+        verify(mockTabRepository).select(emptyTabId)
         verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 

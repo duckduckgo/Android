@@ -18,24 +18,22 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.tabs.model.TabEntity
 
 interface TabManager {
+    companion object {
+        const val MAX_ACTIVE_TABS = 40
+    }
+
     var currentTab: BrowserTabFragment?
+    val tabPagerAdapter: TabPagerAdapter
 
-    fun onSelectedTabChanged(tab: TabEntity?)
-    fun onTabsUpdated(updatedTabs: List<TabEntity>)
-    fun openMessageInNewTab(
-        message: Message,
-        sourceTabId: String?,
-    )
+    fun onSelectedTabChanged(tabId: String)
+    fun onTabsUpdated(updatedTabIds: List<String>)
 
+    fun openMessageInNewTab(message: Message, sourceTabId: String?)
     fun openExistingTab(tabId: String)
     fun launchNewTab()
-    fun openQueryInNewTab(
-        query: String,
-        sourceTabId: String?,
-    )
+    fun openQueryInNewTab(query: String, sourceTabId: String?)
 
     fun onCleanup()
 }

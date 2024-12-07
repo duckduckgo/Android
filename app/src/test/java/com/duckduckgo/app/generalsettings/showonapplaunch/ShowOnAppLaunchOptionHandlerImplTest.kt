@@ -754,8 +754,14 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             get() = TODO("Not yet implemented")
         override val liveSelectedTab: LiveData<TabEntity>
             get() = TODO("Not yet implemented")
+        override val flowSelectedTab: Flow<TabEntity?>
+            get() = TODO("Not yet implemented")
         override val tabSwitcherData: Flow<TabSwitcherData>
             get() = TODO("Not yet implemented")
+
+        override suspend fun getTab(tabId: String): TabEntity? {
+            TODO("Not yet implemented")
+        }
 
         override suspend fun addDefaultTab(): String {
             TODO("Not yet implemented")
