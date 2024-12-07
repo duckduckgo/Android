@@ -43,7 +43,6 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -78,16 +77,16 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.googlePlay.setOnClickListener {
-            viewModel.restoreFromStore()
-        }
+        // removing the click listeners from the LineListItems
+        // so that they don't trigger the selectable background animation when interacted with
+        binding.restoreSubscriptionEmailTitle.setOnClickListener(null)
+        binding.restoreSubscriptionGooglePlayTitle.setOnClickListener(null)
 
-        with(binding.manageEmailCard) {
-            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
-            emailButton.setText(string.restoreSubscriptionEmailButton)
-            emailButton.setOnClickListener {
-                viewModel.restoreFromEmail()
-            }
+        binding.restoreSubscriptionEmailLayout.setOnClickListener {
+            viewModel.restoreFromEmail()
+        }
+        binding.restoreSubscriptionGooglePlayLayout.setOnClickListener {
+            viewModel.restoreFromStore()
         }
     }
 
@@ -102,7 +101,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = ACTIVATE_URL,
-                toolbarConfig = CustomTitle(getString(string.addEmailText)),
             ),
         )
         startForResultRestore.launch(intent)

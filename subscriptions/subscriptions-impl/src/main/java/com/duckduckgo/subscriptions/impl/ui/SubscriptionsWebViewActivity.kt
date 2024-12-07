@@ -33,7 +33,6 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -201,8 +200,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             itrJsMessaging.register(it, null)
             it.webChromeClient = object : WebChromeClient() {
 
-                private var url: String? = null
-
                 override fun onCreateWindow(
                     view: WebView?,
                     isDialog: Boolean,
@@ -219,12 +216,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     view: WebView?,
                     newProgress: Int,
                 ) {
-                    view?.url.let { currentUrl ->
-                        if (currentUrl != url) {
-                            url = currentUrl
-                            onUrlChanged(url)
-                        }
-                    }
                     if (newProgress == 100) {
                         if (binding.webview.canGoBack()) {
                             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
@@ -419,20 +410,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 toolbar.setNavigationOnClickListener { onBackPressed() }
             }
         }
-    }
-
-    private fun onUrlChanged(url: String?) {
-        val addEmailPath = SubscriptionSettingsActivity.ADD_EMAIL_URL.toUri().path ?: return
-
-        val shouldOverrideTitleForAddEmailFlow = url?.toUri()?.path?.startsWith(addEmailPath) ?: false
-
-        updateToolbarTitle(
-            if (shouldOverrideTitleForAddEmailFlow) {
-                CustomTitle(getString(string.addEmailText))
-            } else {
-                params.toolbarConfig
-            },
-        )
     }
 
     private fun processCommand(command: Command) {

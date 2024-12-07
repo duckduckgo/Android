@@ -19,8 +19,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="privacyPro">Privacy Pro</string>
-    <string name="email">Email</string>
-    <string name="addEmailText">Add Email</string>
     <string name="manageEmail">Manage Email</string>
 
     <!--Restore Subscriptions Activity-->
@@ -32,12 +30,13 @@
     <string name="subscriptionNotFound">Subscription Not Found</string>
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
     <string name="purchaseRestored">Your purchases have been restored.</string>
-    <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
-    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Your subscription is automatically available in DuckDuckGo on any device signed in to your Google Play account.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
-    <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
-    <string name="restoreSubscriptionEmailButton">Enter Email</string>
+    <string name="restoreSubscriptionTitle">Add your Privacy Pro subscription to this device</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Add via Google Play Account</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restore your subscription on Android devices using your Google Play account.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Restore Purchase</string>
+    <string name="restoreSubscriptionEmailTitle">Add via Email</string>
+    <string name="restoreSubscriptionEmailDescription">Link an email address to your subscription to add Privacy Pro to this device.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Get Started</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
@@ -51,11 +50,11 @@
     <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
     <string name="expires">expires</string>
-    <string name="activateOnOtherDevices">Activate on Other Devices</string>
-    <string name="addEmailPrimaryText">Add Email</string>
-    <string name="addEmailSecondaryText">Add an optional email to your subscription to access Privacy\u00A0Pro on other devices.</string>
+    <string name="activateOnOtherDevices">Add Privacy Pro to Other Devices</string>
+    <string name="addToDevicePrimaryText">Add to Device</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Add Privacy Pro to your other devices via Google Play or by linking an email address.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Use the email above to add your subscription on your other devices in the DuckDuckGo app. Go to Settings > Privacy Pro > I Have a Subscription.</string>
     <string name="editEmailPrimaryText">Edit Email</string>
-    <string name="editEmailSecondaryText">Use this email to activate your subscription in Settings &gt; Privacy Pro in the DuckDuckGo app on your other devices.</string>
     <string name="learnMore">Learn More</string>
     <string name="privacyProFaq">Need help with Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
@@ -160,7 +159,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Subscriptions</string>
     <string name="activitySubscriptionSettings">Subscription Settings</string>
-    <string name="activityActivateSubscription">Activate Subscription</string>
+    <string name="activityActivateSubscription">I Have a Subscription</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send Feedback</string>
 </resources>

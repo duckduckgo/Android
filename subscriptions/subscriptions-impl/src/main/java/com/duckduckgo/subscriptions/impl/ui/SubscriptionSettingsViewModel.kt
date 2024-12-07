@@ -31,7 +31,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
@@ -102,11 +102,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
         )
     }
 
-    fun onEmailButtonClicked() {
-        val state = (viewState.value as? Ready) ?: return
-        pixelSender.reportAddDeviceEnterEmailClick()
+    fun onEditEmailButtonClicked() {
         viewModelScope.launch {
-            command.send(if (state.email == null) GoToAddEmailScreen else GoToEditEmailScreen)
+            command.send(GoToEditEmailScreen)
+        }
+    }
+
+    fun onAddToDeviceButtonClicked() {
+        viewModelScope.launch {
+            command.send(GoToActivationScreen)
         }
     }
 
@@ -134,7 +138,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     sealed class Command {
         data object FinishSignOut : Command()
         data object GoToEditEmailScreen : Command()
-        data object GoToAddEmailScreen : Command()
+        data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
     }
 

@@ -4,23 +4,23 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -185,85 +185,19 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToAddEmailScreenCommand() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "android",
-            ),
-        )
-
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = null, externalId = "external_id"),
-        )
-
-        viewModel.onCreate(mock())
-
+    fun `when OnEditEmail button clicked then send GoToEditEmailScreen command`() = runTest {
         viewModel.commands().test {
-            viewModel.onEmailButtonClicked()
-            assertEquals(GoToAddEmailScreen, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToEditEmailScreenCommand() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "android",
-            ),
-        )
-
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = "test@example.com", externalId = "external_id"),
-        )
-
-        viewModel.onCreate(mock())
-
-        viewModel.commands().test {
-            viewModel.onEmailButtonClicked()
+            viewModel.onEditEmailButtonClicked()
             assertEquals(GoToEditEmailScreen, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnEmailButtonClickedThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "android",
-            ),
-        )
-
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = "test@example.com", externalId = "external_id"),
-        )
-
-        viewModel.onCreate(mock())
-
+    fun `when AddToDevice button clicked then send GoToActivationScreen command`() = runTest {
         viewModel.commands().test {
-            viewModel.onEmailButtonClicked()
-            verify(pixelSender).reportAddDeviceEnterEmailClick()
+            viewModel.onAddToDeviceButtonClicked()
+            assertEquals(GoToActivationScreen, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
