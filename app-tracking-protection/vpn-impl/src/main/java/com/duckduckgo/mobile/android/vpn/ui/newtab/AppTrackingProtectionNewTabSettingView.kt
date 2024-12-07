@@ -28,12 +28,14 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.databinding.ViewApptpSettingsItemBinding
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionNewTabSettingsViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
@@ -47,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 
 @InjectWith(ViewScope::class)
 class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
@@ -91,6 +94,8 @@ class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
 class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
+    private val appTpRemoteFeatures: AppTpRemoteFeatures,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
@@ -98,7 +103,15 @@ class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor(
         return AppTrackingProtectionNewTabSettingView(context)
     }
 
-    override suspend fun isActive(): Boolean {
+    override suspend fun isActive(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext if (appTpRemoteFeatures.promoteAppTpInNewTabPage().isEnabled()) {
+            !vpnFeatureRemover.isFeatureRemoved()
+        } else {
+            isActiveInternal()
+        }
+    }
+
+    private suspend fun isActiveInternal(): Boolean {
         if (vpnFeatureRemover.isFeatureRemoved()) {
             return false
         }
