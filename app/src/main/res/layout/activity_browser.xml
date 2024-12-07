@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <androidx.viewpager2.widget.ViewPager2
+    <com.duckduckgo.app.browser.tabs.pager.TabPager
         android:id="@+id/tabPager"
         android:saveEnabled="false"
         android:layout_width="match_parent"

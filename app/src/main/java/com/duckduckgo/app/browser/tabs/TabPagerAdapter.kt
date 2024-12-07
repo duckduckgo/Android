@@ -23,9 +23,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.tabs.adapter.FragmentStateAdapter
 import com.duckduckgo.app.tabs.model.TabEntity
 import timber.log.Timber
 

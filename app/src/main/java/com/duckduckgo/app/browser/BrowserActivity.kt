@@ -32,7 +32,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -46,6 +45,8 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.pager.MarginPageTransformer
+import com.duckduckgo.app.browser.tabs.pager.TabPager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -82,11 +83,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -156,7 +157,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrowserBinding by viewBinding()
 
-    val tabPager: ViewPager2 by lazy {
+    val tabPager: TabPager by lazy {
         binding.tabPager
     }
 
