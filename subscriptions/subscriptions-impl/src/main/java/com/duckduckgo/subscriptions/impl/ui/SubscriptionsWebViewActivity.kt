@@ -246,7 +246,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(false)
-                databaseEnabled = false
                 setSupportZoom(true)
             }
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
