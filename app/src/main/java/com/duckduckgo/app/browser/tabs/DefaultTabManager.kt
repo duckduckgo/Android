@@ -68,7 +68,7 @@ class DefaultTabManager @Inject constructor(
             setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
             getOffScreenPageLimit = {
                 if (browserActivity.tabPager.offscreenPageLimit == OFFSCREEN_PAGE_LIMIT_DEFAULT) {
-                    3
+                    1
                 } else {
                     browserActivity.tabPager.offscreenPageLimit
                 }
