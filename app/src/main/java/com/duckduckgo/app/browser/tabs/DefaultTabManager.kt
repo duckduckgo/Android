@@ -61,7 +61,6 @@ class DefaultTabManager @Inject constructor(
             fragmentManager = supportFragmentManager,
             lifecycleOwner = browserActivity,
             activityIntent = browserActivity.intent,
-            moveToTabIndex = { index -> browserActivity.onMoveToTabRequested(index) },
             getSelectedTabId = ::getSelectedTabId,
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
@@ -93,7 +92,6 @@ class DefaultTabManager @Inject constructor(
     override fun onSelectedTabChanged(tabId: String) {
         if (swipingTabsFeature.isEnabled) {
             Timber.d("### TabManager.onSelectedTabChanged: $tabId")
-            tabPagerAdapter.onSelectedTabChanged(tabId)
             if (keepSingleTab) {
                 tabPagerAdapter.onTabsUpdated(listOf(tabId))
             }

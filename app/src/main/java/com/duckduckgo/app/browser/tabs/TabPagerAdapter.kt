@@ -33,7 +33,6 @@ class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
     private val fragmentManager: FragmentManager,
     private val activityIntent: Intent?,
-    private val moveToTabIndex: (Int) -> Unit,
     private val getTabById: (String) -> TabEntity?,
     private val requestNewTab: () -> TabEntity,
     private val getSelectedTabId: () -> String?,
@@ -83,21 +82,12 @@ class TabPagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<String>) {
-        increaseOffscreenTabLimitIfNeeded()
+        // increaseOffscreenTabLimitIfNeeded()
 
         val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabIds, newTabs))
         diff.dispatchUpdatesTo(this)
         tabIds.clear()
         tabIds.addAll(newTabs)
-
-        onSelectedTabChanged(getSelectedTabId() ?: tabIds.first())
-    }
-
-    fun onSelectedTabChanged(tabId: String) {
-        val selectedTabIndex = tabIds.indexOfFirst { it == tabId }
-        if (selectedTabIndex != -1) {
-            moveToTabIndex(selectedTabIndex)
-        }
     }
 
     fun onPageChanged(position: Int) {
