@@ -492,6 +492,16 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         }
     }
 
+    @Test
+    fun whenPurchaseIfSignedInAndSubscriptionRefreshFailsThenLaunchesPurchaseFlow() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionFails()
+
+        subscriptionsManager.purchase(mock(), planId = "")
+
+        verify(playBillingManager).launchBillingFlow(any(), any(), any())
+    }
+
     @Test(expected = Exception::class)
     fun whenExchangeTokenFailsTokenThenReturnThrow() = runTest {
         givenAccessTokenFails()
@@ -828,8 +838,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenGetAuthTokenIfUserSignedInWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
         assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
 
-        authDataStore.externalId = "test"
         givenUserIsSignedIn()
+        authDataStore.externalId = "test"
         givenSubscriptionSucceedsWithEntitlements()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
         givenPurchaseStored()
@@ -1272,11 +1282,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
             authDataStore.refreshTokenV2 = FAKE_REFRESH_TOKEN_V2
             authDataStore.refreshTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofDays(30)
-            authDataStore.externalId = "1234"
         } else {
             authDataStore.accessToken = "accessToken"
             authDataStore.authToken = "authToken"
         }
+        authDataStore.externalId = "1234"
     }
 
     private suspend fun givenCreateAccountFails() {
