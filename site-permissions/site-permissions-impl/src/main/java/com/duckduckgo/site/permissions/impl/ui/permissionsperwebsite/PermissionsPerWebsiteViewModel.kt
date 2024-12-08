@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions.permissionsperwebsite
+package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption.ASK_DISABLED
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK_DISABLED
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel

@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">A(z) „%1$s” meg akarja nyitni a DRM-szoftveredet</string>
+    <string name="drmSiteDialogSubtitle">A digitális jogosultságokat kezelő szoftver a védett médiatartalmak lejátszásához szükséges, de az eszközazonosítókhoz is hozzáférést biztosít. Csak olyan webhelyeknek adj engedélyt ezekhez az adatokhoz, amelyekben megbízol. Az engedélyek bármikor kezelhetők a Beállításokban. <annotation type="drm_learn_more_link">További tudnivalók</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Mindig</string>
+    <string name="drmSiteDialogAllowOnce">Csak erre a munkamenetre</string>
+    <string name="drmSiteDialogDenyAlways">Mindig megtagad</string>
+    <string name="drmSiteDialogDenyOnce">Megtagad erre a munkamenetre</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” hozzá akar férni a tartózkodási helyedhez</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Választott beállítás megjegyzése</string>
+    <string name="preciseLocationDDGDialogSubtitle">Az anonim tartózkodási helyedet csak arra használjuk, hogy jobb, hozzád közelebbi találatokat tudjunk adni. A Beállításokban kezelheted az egyes webhelyeknek megadott helyhozzáférési engedélyeket.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Az egyes webhelyeknek megadott helyhozzáférési engedélyeket a Beállításokban kezelheted.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a tartózkodási helyhez ezen az eszközön</string>
+    <string name="systemPermissionDialogLocationDeniedContent">A webhelyek csak akkor használhatják a tartózkodási helyet, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a tartózkodási helyhez</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Webhelyengedélyek</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">A Beállításokban kezelheted az egyes webhelyeknek megadott mikrofon- és kamera-hozzáférési engedélyeket.</string>
+    <string name="sitePermissionsMicDialogSubtitle">A Beállításokban kezelheted az egyes webhelyeknek megadott mikrofon-hozzáférési engedélyeket.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">A Beállításokban kezelheted az egyes webhelyeknek megadott kamera-hozzáférési engedélyeket.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” hozzá akar férni a kamerához és a mikrofonhoz</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” hozzá akar férni a mikrofonhoz</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” hozzá akar férni a kamerához</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">A webhelyek csak akkor használhatják a kamerát és a mikrofont, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Beállítások megnyitása</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Mégsem</string>
+
+    <string name="sitePermissionsSettingsDescription">A meglátogatott webhelyek hozzáférést kérhetnek az eszköz helyéhez, kamerájához, mikrofonjához vagy a digitális jogosultságokat kezelő (DRM) szoftveréhez. Ezekhez nem férhetnek hozzá, hacsak nem adsz rá kifejezett engedélyt.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Minden webhely kérheti a következőket:</string>
+    <string name="sitePermissionsSettingsLocation">Hely</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Webhelyek kezelése</string>
+    <string name="sitePermissionsSettingsEmptyText">Még nincsenek oldalak</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Minden webhely engedélye eltávolítva</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Engedélyek a következőhöz: „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Kérdezzen rá minden alkalommal</string>
+    <string name="permissionsPerWebsiteDenySetting">Megtagadás</string>
+    <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Letiltva minden webhely számára</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
+
 </resources>

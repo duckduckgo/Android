@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Indstillinger</string>
     <string name="settingsMenuItemTitle">Indstillinger</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
+    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Beskyttelse af privatlivet</string>
     <string name="settingsHeadingAppearance">udseende</string>
     <string name="settingsHeadingCustomize">Tilpas</string>
     <string name="settingsHeadingAbout">Omkring</string>
@@ -134,6 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
     <string name="settingsEmailProtectionSubtitle">Bloker e-mailtrackere, og skjul din adresse</string>
     <string name="settingsHeadingMore">Mere fra DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Næste trin</string>
     <string name="settingsLightTheme">Let</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mørk</string>
@@ -156,9 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
+    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Generelle indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
+    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datarydning</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Tilføj widget til startskærmen</string>
+    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Angiv placeringen af adresselinjen</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Aktivér stemmesøgning</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo på andre platforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søgning</string>
@@ -251,14 +259,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se, hvad der bliver sendt</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Oplysninger sendt i rapporter kan ikke bruges til at identificere dig:</b><br/><br/>• Side-URL (uden identificerbare oplysninger)<br/>• Enhedsmærke, model og producent<br/>• Operativsystem-versionsnummer<br/>• App-versionsnummer<br/>• Anonym eksperimentgruppe til funktionstest<br/>• Oplysninger om, hvilke versioner af vores beskyttelser der var aktive<br/>• Webbrowser-motorversionsnummer<br/>• Liste over hvilke beskyttelser og browserfunktioner, der var aktive<br/>• Værtsnavne på blokerede trackere, surrogatanmodninger, ignorerede anmodninger og anmodninger, der ikke er på listen over trackerblokeringer<br/>• Browserrapporterede fejl<br/>• Websiteresponsstatuskoder (HTTP) <br/>• Hvilken rapporteringsformular du brugte (menu , dashboard osv.)<br/>• Dato for sidste rapport sendt for dette websted<br/>• Hvorvidt du valgte at vise disse rapportoplysninger<br/>• Antal gange, beskyttelse blev slået fra<br/>• Hvor hurtigt dele af siden blev indlæst<br/>• Hvordan du kom til denne side, enten: SERP (DuckDuckGo-søgning), Navigation (link/URL) eller Ekstern (på anden måde)<br/>• Antal opdateringer siden sideindlæsning<br/>• Din enheds primære sprog og land<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bekræft</string>
-    <string name="dialogSave">Gem</string>
-    <string name="delete">Slet</string>
-    <string name="edit">Rediger</string>
-    <string name="remove">Fjern</string>
-    <string name="removeAll">Fjern alt</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>
@@ -662,23 +662,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop op-vindue skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Tilladelser til webstedet</string>
-    <string name="sitePermissionsSettingsDescription">Websteder, du besøger, kan bede om adgang til din enheds placering, kamera, mikrofon eller DRM-software (Digital Rights Management). De vil ikke kunne få adgang til disse, medmindre du udtrykkeligt giver dem tilladelse.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillad, at alle websteder beder om:</string>
-    <string name="sitePermissionsSettingsLocation">Placering</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer websteder</string>
-    <string name="sitePermissionsSettingsEmptyText">Ingen websteder endnu</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tilladelser fjernet for alle websteder</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tilladelser til \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Spørg hver gang</string>
-    <string name="permissionsPerWebsiteDenySetting">Afvis</string>
-    <string name="permissionsPerWebsiteAllowSetting">Tillad</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Deaktiveret for alle websteder</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s tilladelse til %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
     <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
@@ -714,6 +697,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Adgangskoder og automatisk udfyldning</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
 

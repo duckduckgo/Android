@@ -259,14 +259,6 @@
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">See what\'s sent</string>
     <string name="brokenSiteReportDataDisclosure"><![CDATA[<b>Info sent in reports can\'t be used to identify you:</b><br/><br/>&#8226; Page URL (without identifiable info)<br/>&#8226; Device make, model, and manufacturer<br/>&#8226; Operating system version number<br/>&#8226; App version number<br/>&#8226; Anonymous experiment group for feature testing<br/>&#8226; Information about which versions of our protections were active<br/>&#8226; Web browser engine version number<br/>&#8226; List of which protections and browser features were active<br/>&#8226; Hostnames of trackers blocked, surrogate requests, ignored requests, and requests not in tracker blocking list<br/>&#8226; Browser-reported errors<br/>&#8226; Website response status (HTTP) codes<br/>&#8226; Which reporting form you used ("menu", "dashboard", etc.)<br/>&#8226; Date of last report sent for this site<br/>&#8226; Whether or not you opted to show this report info<br/>&#8226; Number of times protections were toggled off<br/>&#8226; How quickly parts of the page loaded<br/>&#8226; How you got to this page, either: "SERP" (DuckDuckGo search), "Navigation" (link/URL), or "External" (other means)<br/>&#8226; Number of refreshes since page load<br/>&#8226; Primary language and country of your device<br/>]]></string>
 
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Confirm</string>
-    <string name="dialogSave">Save</string>
-    <string name="delete">Delete</string>
-    <string name="edit">Edit</string>
-    <string name="remove">Remove</string>
-    <string name="removeAll">Remove All</string>
-
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
 
@@ -668,23 +660,6 @@
     <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up Hidden</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies Managed</string>
-
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Site Permissions</string>
-    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, microphone, or DRM (Digital Rights Management) software. They won’t be able to access these unless you explicitly give them permission.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
-    <string name="sitePermissionsSettingsLocation">Location</string>
-    <string name="sitePermissionsSettingsCamera">Camera</string>
-    <string name="sitePermissionsSettingsMicrophone">Microphone</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
-    <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissions for \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Ask every time</string>
-    <string name="permissionsPerWebsiteDenySetting">Deny</string>
-    <string name="permissionsPerWebsiteAllowSetting">Allow</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Disabled for all sites</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permission for %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>

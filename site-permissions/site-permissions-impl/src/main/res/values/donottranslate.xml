@@ -15,26 +15,6 @@
   -->
 
 <resources>
-    <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" wants to open your DRM software</string>
-    <string name="drmSiteDialogSubtitle">Digital Rights Management software is required to play protected media content, but also provides access to device identifiers. Only grant permission to sites you trust with this data. You can manage permissions at any time in Settings. <annotation type="drm_learn_more_link">Learn More</annotation></string>
-    <string name="drmSiteDialogAllowAlways">Always</string>
-    <string name="drmSiteDialogAllowOnce">Only for This Session</string>
-    <string name="drmSiteDialogDenyAlways">Deny Always</string>
-    <string name="drmSiteDialogDenyOnce">Deny for This Session</string>
-
-    <!-- Location Permission -->
-    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access your location</string>
-    <string name="sitePermissionsDialogRememberMeCheckBox">Remember my choice</string>
-    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
-    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
-    <string name="systemPermissionDialogLocationDeniedTitle">Allow DuckDuckGo to ask for location access on this device</string>
-    <string name="systemPermissionDialogLocationDeniedContent">Sites can only use your location if you allow DuckDuckGo to ask for access.</string>
-    <string name="sitePermissionsLocationDeniedSnackBarMessage">Allow DuckDuckGo to ask for location access</string>
-
-    <!-- Site Permission -->
-    <string name="sitePermissionsMicAndCameraDialogSubtitle">You can manage the microphone and camera access permissions you’ve granted to individual sites in Settings.</string>
-    <string name="sitePermissionsMicDialogSubtitle">You can manage the microphone access permissions you’ve granted to individual sites in Settings.</string>
-    <string name="sitePermissionsCameraDialogSubtitle">You can manage the camera access permissions you’ve granted to individual sites in Settings.</string>
-
+    <!-- DRM -->
+    <string name="sitePermissionsSettingsDRM">DRM</string>
 </resources>
