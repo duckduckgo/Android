@@ -39,7 +39,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -134,7 +133,6 @@ class AutoCompleteApi @Inject constructor(
     private val autoCompleteRepository: AutoCompleteRepository,
     private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
-    private val dispatcherProvider: DispatcherProvider,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
