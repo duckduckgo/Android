@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.domain
 
 import android.net.Uri
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber

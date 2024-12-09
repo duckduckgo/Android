@@ -19,7 +19,9 @@ package com.duckduckgo.malicioussiteprotection.impl
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitesDatabase.Companion.ALL_MIGRATIONS
+import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
+import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase
+import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase.Companion.ALL_MIGRATIONS
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
