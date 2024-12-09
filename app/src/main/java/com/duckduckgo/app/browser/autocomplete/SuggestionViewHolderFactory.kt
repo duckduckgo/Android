@@ -271,7 +271,11 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 editQueryImage.setImageResource(R.drawable.ic_autocomplete_down_20dp)
             }
 
-            root.tag = SEARCH_ITEM
+            if (item.isUrl) {
+                root.tag = OTHER_ITEM
+            } else {
+                root.tag = SEARCH_ITEM
+            }
         }
     }
 

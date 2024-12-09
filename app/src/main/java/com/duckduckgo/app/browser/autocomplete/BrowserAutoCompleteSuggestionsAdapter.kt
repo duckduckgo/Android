@@ -24,6 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
@@ -81,6 +82,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             suggestions[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
             suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             suggestions[position] is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
+            suggestions[position] is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
             else -> SUGGESTION_TYPE
         }
     }
