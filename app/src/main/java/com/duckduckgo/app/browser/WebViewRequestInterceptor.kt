@@ -102,7 +102,8 @@ class WebViewRequestInterceptor(
         val onSiteBlockedAsync: () -> Unit = {
             // TODO (cbarreiro): Handle site blocked asynchronously
         }
-        maliciousSiteProtection.shouldIntercept(request, webView, documentUri, onSiteBlockedAsync)?.let {
+
+        maliciousSiteProtection.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
             // TODO (cbarreiro): Handle site blocked synchronously
             return it
         }
