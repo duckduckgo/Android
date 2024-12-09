@@ -12,7 +12,6 @@ import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PAR
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_RETURNING_USER
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import java.util.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -39,12 +38,10 @@ class AppReferrerInstallPixelSenderTest {
     private val captor = argumentCaptor<Map<String, String>>()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
         whenever(playStoreInstallChecker.installedFromPlayStore()).thenReturn(true)
-        runBlocking {
-            configureAsNewUser()
-        }
+        configureAsNewUser()
     }
 
     private val testee = AppReferrerInstallPixelSender(

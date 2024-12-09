@@ -13,7 +13,6 @@ import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
@@ -65,9 +64,9 @@ class SegmentCalculationTest(private val input: TestInput) {
     private lateinit var userSegmentsPixelSender: UserSegmentsPixelSender
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         atbStore = FakeStatisticsDataStore()
-        runBlocking { whenever(appBuildConfig.isAppReinstall()).thenReturn(false) }
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
 
         usageHistory = SegmentStoreModule().provideSegmentStore(
             FakeSharedPreferencesProvider(),

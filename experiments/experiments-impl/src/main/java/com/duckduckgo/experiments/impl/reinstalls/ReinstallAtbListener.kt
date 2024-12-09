@@ -30,7 +30,7 @@ import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(AtbInitializerListener.REINSTALL_LISTENER)
+@PriorityKey(AtbInitializerListener.PRIORITY_REINSTALL_LISTENER)
 class ReinstallAtbListener @Inject constructor(
     private val backupDataStore: BackupServiceDataStore,
     private val statisticsDataStore: StatisticsDataStore,

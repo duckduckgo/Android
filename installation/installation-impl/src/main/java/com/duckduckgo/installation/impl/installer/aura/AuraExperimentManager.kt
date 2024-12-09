@@ -29,7 +29,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(AtbInitializerListener.AURA_EXPERIMENT_MANAGER)
+@PriorityKey(AtbInitializerListener.PRIORITY_AURA_EXPERIMENT_MANAGER)
 @SingleInstanceIn(AppScope::class)
 class AuraExperimentManager @Inject constructor(
     private val auraExperimentFeature: AuraExperimentFeature,
