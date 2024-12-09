@@ -19,7 +19,6 @@ package com.duckduckgo.malicioussiteprotection.impl
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
@@ -33,7 +32,6 @@ import java.net.URLDecoder
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -75,13 +73,13 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val processedUrls = mutableListOf<String>()
 
     private fun shouldIntercept(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean {
+        Timber.tag("PhishingAndMalwareDetector").d("shouldIntercept $url")
         // TODO (cbarreiro): Implement the logic to check if the URL is malicious
         return false
     }
 
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
-        webView: WebView,
         documentUri: Uri?,
         onSiteBlockedAsync: () -> Unit,
     ): WebResourceResponse? {
@@ -104,20 +102,13 @@ class RealMaliciousSiteProtection @Inject constructor(
             return null
         }
 
-        Timber.tag("PhishingAndMalwareDetector").d("shouldIntercept $decodedUrl, referer ${request.requestHeaders["Referer"]}")
-
-        if (request.isForMainFrame) {
+        if (request.isForMainFrame && decodedUrl.toUri() == documentUri) {
             if (shouldIntercept(decodedUrl.toUri(), onSiteBlockedAsync)) {
                 return WebResourceResponse(null, null, null)
             }
             processedUrls.add(decodedUrl)
-        } else if (
-            isForIframe(request)
-        ) {
+        } else if (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host) {
             if (shouldIntercept(decodedUrl.toUri(), onSiteBlockedAsync)) {
-                withContext(dispatchers.main()) {
-                    webView.stopLoading()
-                }
                 return WebResourceResponse(null, null, null)
             }
             processedUrls.add(decodedUrl)
@@ -127,7 +118,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     override fun shouldOverrideUrlLoading(
         url: Uri,
-        webView: WebView,
+        webViewUrl: Uri?,
         isForMainFrame: Boolean,
         isRedirect: Boolean,
         onSiteBlockedAsync: () -> Unit,
@@ -143,9 +134,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             return false
         }
 
-        Timber.tag("PhishingAndMalwareDetector").d("shouldOverrideUrlLoading $decodedUrl")
-
-        if (isForMainFrame) {
+        if (isForMainFrame && decodedUrl.toUri() == webViewUrl) {
             if (shouldIntercept(decodedUrl.toUri(), onSiteBlockedAsync)) {
                 return true
             }
