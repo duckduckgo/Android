@@ -84,6 +84,7 @@ import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -121,6 +122,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
+        maliciousSiteProtection: MaliciousSiteProtection,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -131,6 +133,7 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
+            maliciousSiteProtection,
         )
     }
 
