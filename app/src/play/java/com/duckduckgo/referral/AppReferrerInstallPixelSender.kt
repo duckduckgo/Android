@@ -21,7 +21,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -39,7 +38,6 @@ class AppReferrerInstallPixelSender @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
-    private val statisticsDataStore: StatisticsDataStore,
 ) : AtbLifecyclePlugin {
 
     private val pixelSent = AtomicBoolean(false)
@@ -57,8 +55,8 @@ class AppReferrerInstallPixelSender @Inject constructor(
         }
     }
 
-    private fun sendOriginAttribute(originAttribute: String?) {
-        val returningUser = statisticsDataStore.variant == RETURNING_USER_VARIANT
+    private suspend fun sendOriginAttribute(originAttribute: String?) {
+        val returningUser = appBuildConfig.isAppReinstall()
 
         val params = mutableMapOf(
             PIXEL_PARAM_LOCALE to appBuildConfig.deviceLocale.toLanguageTag(),
@@ -74,8 +72,6 @@ class AppReferrerInstallPixelSender @Inject constructor(
     }
 
     companion object {
-        private const val RETURNING_USER_VARIANT = "ru"
-
         const val PIXEL_PARAM_ORIGIN = "origin"
         const val PIXEL_PARAM_LOCALE = "locale"
         const val PIXEL_PARAM_RETURNING_USER = "reinstall"

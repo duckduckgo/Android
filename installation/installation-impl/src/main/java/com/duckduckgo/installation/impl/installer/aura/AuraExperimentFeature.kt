@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics
+package com.duckduckgo.installation.impl.installer.aura
 
-interface AtbInitializerListener {
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 
-    /** This method will be called before initializing the ATB */
-    suspend fun beforeAtbInit()
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "auraExperiment",
+)
+interface AuraExperimentFeature {
 
-    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
-    fun beforeAtbInitTimeoutMillis(): Long
-
-    companion object {
-        const val PRIORITY_REINSTALL_LISTENER = 10
-        const val PRIORITY_AURA_EXPERIMENT_MANAGER = 20
-    }
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }
