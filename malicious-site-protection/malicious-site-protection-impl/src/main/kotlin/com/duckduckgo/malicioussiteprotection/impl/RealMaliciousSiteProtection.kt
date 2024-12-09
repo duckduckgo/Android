@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
@@ -70,7 +71,8 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
     }
 
-    private val processedUrls = mutableListOf<String>()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val processedUrls = mutableListOf<String>()
 
     private fun shouldIntercept(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean {
         Timber.tag("PhishingAndMalwareDetector").d("shouldIntercept $url")
