@@ -57,19 +57,20 @@ class NetPStateCollector @Inject constructor(
             put("enabled", isNetpRunning)
             put("CGNATed", isCGNATed())
             put("subscriptionActive", netpSubscriptionManager.getVpnStatus().isActive())
+            appPackageId?.let {
+                put("reportedAppProtected", !netPExclusionListRepository.getExcludedAppPackages().contains(it))
+            }
+            put("excludeLocalNetworks", netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled())
+            put("excludedSystemAppCategories", systemAppsExclusionRepository.getExcludedCategories().map { it.name })
+            put("pauseDuringWifiCallsEnabled", netPSettingsLocalConfig.vpnPauseDuringCalls().isEnabled())
+            put("customDNS", !netpVpnSettingsDataStore.customDns.isNullOrEmpty())
+            put("autoExcludeBrokenApps", netPSettingsLocalConfig.autoExcludeBrokenApps().isEnabled())
             if (isNetpRunning) {
-                appPackageId?.let {
-                    put("reportedAppProtected", !netPExclusionListRepository.getExcludedAppPackages().contains(it))
-                }
                 val serverDetails = wgTunnelConfig.getWgConfig()?.asServerDetails()
                 put("connectedServer", serverDetails?.location ?: "Unknown")
                 put("connectedServerIP", serverDetails?.ipAddress ?: "Unknown")
                 put("connectionQuality", connectionQualityStore.getConnectionLatency().asConnectionQuality())
                 put("customServerSelection", netPGeoswitchingRepository.getUserPreferredLocation().countryCode != null)
-                put("excludeLocalNetworks", netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled())
-                put("excludedSystemAppCategories", systemAppsExclusionRepository.getExcludedCategories().map { it.name })
-                put("pauseDuringWifiCallsEnabled", netPSettingsLocalConfig.vpnPauseDuringCalls().isEnabled())
-                put("customDNS", !netpVpnSettingsDataStore.customDns.isNullOrEmpty())
             }
         }
     }
