@@ -955,8 +955,10 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarClearTextButtonPressed() {
-        viewModel.onClearOmnibarTextInput()
-        omnibar.setText("")
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onClearOmnibarTextInput()
+            omnibar.setText("")
+        }
     }
 
     private fun configureCustomTab() {
