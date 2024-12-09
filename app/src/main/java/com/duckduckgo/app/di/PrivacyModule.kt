@@ -32,8 +32,6 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
@@ -77,7 +75,6 @@ object PrivacyModule {
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
-        geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
@@ -96,7 +93,6 @@ object PrivacyModule {
             settingsDataStore,
             cookieManager,
             appCacheClearer,
-            geoLocationPermissions,
             thirdPartyCookieManager,
             adClickManager,
             fireproofWebsiteRepository,
@@ -128,17 +124,6 @@ object PrivacyModule {
         fileDeleter: FileDeleter,
     ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun geoLocationPermissions(
-        context: Context,
-        locationPermissionsRepository: LocationPermissionsRepository,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider,
-    ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 
     @Provides

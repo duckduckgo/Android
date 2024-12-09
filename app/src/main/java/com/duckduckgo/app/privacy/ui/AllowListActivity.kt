@@ -109,7 +109,7 @@ class AllowListActivity : DuckDuckGoActivity() {
         val inputBinding = DialogEditAllowlistBinding.inflate(layoutInflater)
         CustomAlertDialogBuilder(this)
             .setTitle(R.string.dialogAddTitle)
-            .setPositiveButton(R.string.dialogSave)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .setView(inputBinding)
             .addEventListener(
@@ -128,7 +128,7 @@ class AllowListActivity : DuckDuckGoActivity() {
         inputBinding.customDialogTextInput.text = entry.domain
         CustomAlertDialogBuilder(this)
             .setTitle(R.string.dialogEditTitle)
-            .setPositiveButton(R.string.dialogSave)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .setView(inputBinding)
             .addEventListener(
@@ -144,7 +144,7 @@ class AllowListActivity : DuckDuckGoActivity() {
 
     private fun showDeleteDialog(entry: UserAllowListedDomain) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.dialogConfirmTitle)
+            .setTitle(com.duckduckgo.mobile.android.R.string.dialogConfirmTitle)
             .setMessage(getString(R.string.allowlistEntryDeleteConfirmMessage, entry.domain).html(this))
             .setPositiveButton(android.R.string.yes)
             .setNegativeButton(android.R.string.no)

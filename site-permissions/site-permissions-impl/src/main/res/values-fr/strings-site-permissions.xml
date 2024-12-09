@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">« %1$s » souhaite ouvrir votre logiciel DRM</string>
+    <string name="drmSiteDialogSubtitle">Le logiciel de gestion des droits numériques est nécessaire pour lire du contenu multimédia protégé, mais il permet également d\'accéder aux identifiants des appareils. N\'accordez l\'autorisation d\'accès à ces données qu\'aux sites auxquels vous faites confiance. Vous pouvez gérer les autorisations à tout moment dans Paramètres. <annotation type="drm_learn_more_link">En savoir plus</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Toujours</string>
+    <string name="drmSiteDialogAllowOnce">Seulement pour cette session</string>
+    <string name="drmSiteDialogDenyAlways">Toujours refuser</string>
+    <string name="drmSiteDialogDenyOnce">Refuser pour cette session</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">« %1$s » souhaite accéder à votre position</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Mémoriser mon choix</string>
+    <string name="preciseLocationDDGDialogSubtitle">Nous n\'utilisons votre localisation anonyme que pour vous fournir de meilleurs résultats, plus proches de vous. Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Autoriser DuckDuckGo à demander l\'accès à la localisation sur cet appareil</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Les sites ne peuvent utiliser votre position que si vous autorisez DuckDuckGo à demander l\'accès.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Autoriser DuckDuckGo à demander l\'accès à la localisation</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Autorisations du site</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Vous pouvez gérer les autorisations d\'accès au micro et à l\'appareil photo accordées aux différents sites depuis les paramètres.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Vous pouvez gérer les autorisations d\'accès au micro accordées aux différents sites depuis les paramètres.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Vous pouvez gérer les autorisations d\'accès à l\'appareil photo accordées aux différents sites depuis les paramètres.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">« %1$s » souhaite accéder à l\'appareil photo et au micro</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">« %1$s » souhaite accéder au micro</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">« %1$s » souhaite accéder à l\'appareil photo</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Les sites ne peuvent utiliser votre appareil photo et votre micro que si vous autorisez DuckDuckGo à demander l\'accès.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Ouvrir les paramètres</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Annuler</string>
+
+    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez sont susceptibles de demander l\'accès à la localisation, à l\'appareil photo, au micro ou au logiciel DRM (gestion des droits numériques) de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
+    <string name="sitePermissionsSettingsLocation">Localisation</string>
+    <string name="sitePermissionsSettingsCamera">Appareil photo</string>
+    <string name="sitePermissionsSettingsMicrophone">Micro</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
+    <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Autorisations supprimées pour tous les sites</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorisations pour « %1$s » </string>
+    <string name="permissionsPerWebsiteAskSetting">Toujours demander</string>
+    <string name="permissionsPerWebsiteDenySetting">Refuser</string>
+    <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Désactivé pour tous les sites</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
+
 </resources>

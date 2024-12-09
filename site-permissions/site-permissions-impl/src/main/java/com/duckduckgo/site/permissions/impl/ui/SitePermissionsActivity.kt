@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions
+package com.duckduckgo.site.permissions.impl.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.site.permissions.impl.R
+import com.duckduckgo.site.permissions.impl.databinding.ActivitySitePermissionsBinding
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteActivity
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SitePermissionScreenNoParams::class)
 class SitePermissionsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -93,7 +93,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             binding.root,
             message,
             Snackbar.LENGTH_LONG,
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+        ).setAction(com.duckduckgo.mobile.android.R.string.undo) {
             viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions)
         }.show()
     }
@@ -115,11 +115,5 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun launchWebsiteAllowed(domain: String) {
         startActivity(PermissionsPerWebsiteActivity.intent(this, domain))
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, SitePermissionsActivity::class.java)
-        }
     }
 }

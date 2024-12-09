@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" želi otvoriti tvoj DRM softver</string>
+    <string name="drmSiteDialogSubtitle">Softver za upravljanje digitalnim pravima potreban je za reprodukciju zaštićenog medijskog sadržaja, ali i za pristup identifikatorima uređaja. Pruži dopuštenje samo web lokacijama kojima vjeruješ u vezi s rukovanjem ovim podacima. Dopuštenjima možeš upravljati u svakom trenutku u Postavkama. <annotation type="drm_learn_more_link">Saznaj više</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Uvijek</string>
+    <string name="drmSiteDialogAllowOnce">Samo za ovu sesiju</string>
+    <string name="drmSiteDialogDenyAlways">Uvijek odbij</string>
+    <string name="drmSiteDialogDenyOnce">Odbij za ovu sesiju</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" želi pristupiti tvojoj lokaciji</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Zapamti moj izbor</string>
+    <string name="preciseLocationDDGDialogSubtitle">Tvoju anonimnu lokaciju koristimo samo za postizanje boljih rezultata, bliže tebi. U postavkama možeš upravljati dozvolama za pristup lokaciji koje si dodijelio pojedinim web-mjestima.</string>
+    <string name="preciseLocationSiteDialogSubtitle">U postavkama možete upravljati dozvolama za pristup lokaciji koje ste dodijelili pojedinim web-mjestima.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Dopusti DuckDuckGou da zatraži pristup lokaciji na ovom uređaju</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Web-mjesta mogu koristiti tvoju lokaciju samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Dopusti DuckDuckGou da zatraži pristup lokaciji</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Dozvole web lokacija</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">U postavkama možeš upravljati dozvolama za pristup mikrofonu i kameri koje si dodijelio pojedinim web-mjestima.</string>
+    <string name="sitePermissionsMicDialogSubtitle">U postavkama možeš upravljati dozvolama za pristup mikrofonu koje si dodijelio pojedinim web-mjestima.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">U postavkama možeš upravljati dozvolama za pristup kameri koje si dodijelio pojedinim web-mjestima.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" želi pristupiti kameri i mikrofonu</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" želi pristupiti mikrofonu</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" želi pristupiti kameri</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Stranice mogu koristiti tvoju kameru i mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otvori postavke</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Otkaži</string>
+
+    <string name="sitePermissionsSettingsDescription">Stranice koje posjećuješ mogu tražiti pristup lokaciji tvog uređaja, fotoaparatu, mikrofonu ili DRM (Digital Rights Management) softveru. Neće im moći pristupiti osim ako im za to izričito ne daš dopuštenje.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Dopusti svim web-lokacijama da zatraže:</string>
+    <string name="sitePermissionsSettingsLocation">Lokacija</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje web-lokacijama</string>
+    <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Uklonjena su dopuštenja za sve web lokacije</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dopuštenja za „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Pitaj svaki puta</string>
+    <string name="permissionsPerWebsiteDenySetting">Odbij</string>
+    <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Onemogućeno za sva web-mjesta</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
+
 </resources>
