@@ -4,24 +4,50 @@ on:
   workflow_dispatch:
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
+  MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
+  APP_VERSION: "5.220.0"
+  emoji_start: ":flight_departure:" # 🛫 or ':soon:' 🔜
+  emoji_info: ":information_source:" # ℹ️
 
 jobs:
   report-release-error:
-    name: Create Asana Task
-    runs-on: ubuntu-20.04
+    name: Notify Mattermost
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./.github/actions/scripts
 
     steps:
-      - name: Create Asana task when workflow failed
-        uses: honeycombio/gha-create-asana-task@main
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Production Release
-          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
+          ref: feature/david/11-14-gha_notify_mattermost
+
+      - name: Make sure script can be executed
+        run: |
+          chmod +x send_chat_message.sh          
+
+      - name: Send Release started message
+        run: |        
+          ./send_chat_message.sh '${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release task created message
+        run: |
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release tag created
+        run: |
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+
+      - name: Send Release task created message
+        run: |
+          echo -n '::notice title=Inputs::' && echo '${{ toJson(inputs) }}' | sed -z 's_\n_%0A_g'; echo
+          message="Release ${{ env.APP_VERSION }} task created"
+          message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"          
+          ./send_chat_message.sh '${{env.emoji_info}}'" ${message}"
+          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
