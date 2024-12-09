@@ -20,8 +20,6 @@
     <string name="cancel">Atšaukti</string>
     <string name="ok">Gerai</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">El.paštas</string>
-    <string name="addEmailText">Pridėti el. paštą</string>
     <string name="manageEmail">Tvarkyti el. paštą</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Prenumeratos nerasta</string>
     <string name="subscriptionNotFoundDescription">Su šia „Google Play“ paskyra susijusi prenumerata nebėra aktyvi.</string>
     <string name="purchaseRestored">Jūsų pirkiniai atkurti.</string>
-    <string name="restoreSubscriptionTitle">Aktyvuokite prenumeratą šiame įrenginyje</string>
-    <string name="restoreSubscriptionDescription">Pasiekite „Privacy Pro“ prenumeratą šiame įrenginyje per „Google Play“ arba el. pašto adresą.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Jūsų prenumerata automatiškai pasiekiama „DuckDuckGo“ bet kuriame įrenginyje, prisijungusiame prie jūsų „Google Play“ paskyros.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Atkurti pirkimą</string>
-    <string name="restoreSubscriptionEmailDescription">Naudokite savo el. pašto adresą, kad aktyvintumėte prenumeratą šiame įrenginyje.</string>
-    <string name="restoreSubscriptionEmailButton">Įveskite el. paštą</string>
+    <string name="restoreSubscriptionTitle">Pridėkite savo „Privacy Pro“ prenumeratą prie šio įrenginio</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Pridėti per „Google Play“ paskyrą</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Atkurkite savo prenumeratą „Android“ įrenginiuose naudodami „Google Play“ paskyrą.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Atkurti pirkimą</string>
+    <string name="restoreSubscriptionEmailTitle">Pridėti per el. paštą</string>
+    <string name="restoreSubscriptionEmailDescription">Susiekite el. pašto adresą su prenumerata, kad prie šio įrenginio pridėtumėte \"Privacy Pro\".</string>
+    <string name="restoreSubscriptionEmailGetStarted">Pradėti</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Pašalinti prenumeratą</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Metinė prenumerata</string>
     <string name="renews">atsinaujina</string>
     <string name="expires">baigiasi</string>
-    <string name="activateOnOtherDevices">Aktyvuoti kituose įrenginiuose</string>
-    <string name="addEmailPrimaryText">Pridėti el. paštą</string>
-    <string name="addEmailSecondaryText">Pridėkite alternatyvų el. pašto adresą prie savo prenumeratos, kad galėtumėte pasiekti „Privacy Pro“ kituose įrenginiuose.</string>
+    <string name="activateOnOtherDevices">Pridėti „Privacy Pro“ prie kitų įrenginių</string>
+    <string name="addToDevicePrimaryText">Pridėti prie įrenginio</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pridėkite „Privacy Pro“ į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į „Settings“ (Nustatymai) &gt; „Privacy Pro“ &gt; „I have a Subscription“ (Turiu prenumeratą).</string>
     <string name="editEmailPrimaryText">Redaguoti el. pašto adresą</string>
-    <string name="editEmailSecondaryText">Naudokite šį el. laišką, kad aktyvintumėte prenumeratą nustatymuose &gt; „Privacy Pro“ „DuckDuckGo“ programėlėje kituose įrenginiuose.</string>
     <string name="learnMore">Sužinoti daugiau</string>
     <string name="privacyProFaq">Reikia pagalbos su „Privacy Pro“?</string>
     <string name="privacyProFaqSecondary">Gaukite atsakymus į dažniausiai užduodamus klausimus arba susisiekite su „Privacy Pro“ palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Prenumeratos</string>
     <string name="activitySubscriptionSettings">Prenumeratos nustatymai</string>
-    <string name="activityActivateSubscription">Aktyvuoti prenumeratą</string>
+    <string name="activityActivateSubscription">Turiu prenumeratą</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
 </resources>
