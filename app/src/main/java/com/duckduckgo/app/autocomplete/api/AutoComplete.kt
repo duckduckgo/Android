@@ -60,6 +60,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
@@ -152,6 +153,7 @@ class AutoCompleteApi @Inject constructor(
         ) { bookmarks, favorites, tabs, historyResults, searchResults ->
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
+            Timber.d("Navigational: topHits ${topHits.toList()}")
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
             val distinctSearchResults = getDistinctSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
@@ -191,11 +193,12 @@ class AutoCompleteApi @Inject constructor(
         bookmarksAndFavoritesAndTabsAndHistory: List<AutoCompleteSuggestion>,
         searchResults: List<AutoCompleteSearchSuggestion>,
     ): List<AutoCompleteSuggestion> {
-        return (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
+        return (bookmarksAndFavoritesAndTabsAndHistory + searchResults).filter {
             when (it) {
                 is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                 is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                 is AutoCompleteUrlSuggestion -> true
+                is AutoCompleteSearchSuggestion -> it.isUrl
                 else -> false
             }
         }.take(maximumNumberOfTopHits)
