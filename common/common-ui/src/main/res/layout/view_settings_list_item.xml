@@ -65,7 +65,7 @@
         app:layout_constraintTop_toTopOf="@id/primaryText"
         tools:visibility="visible" />
 
-    <com.duckduckgo.common.ui.view.StatusIndicator
+    <com.duckduckgo.common.ui.view.StatusIndicatorView
         android:id="@+id/statusIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

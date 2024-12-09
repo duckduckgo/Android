@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':statistics-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':settings-api') // temporary until we release new settings
 
     implementation AndroidX.appCompat
     implementation JakeWharton.timber
