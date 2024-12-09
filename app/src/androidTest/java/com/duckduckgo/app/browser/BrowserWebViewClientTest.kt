@@ -79,6 +79,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -152,6 +153,7 @@ class BrowserWebViewClientTest {
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidBrowserConfigFeature, mock())
+    private val mockMaliciousSiteProtection: MaliciousSiteProtection = mock()
 
     @UiThreadTest
     @Before
@@ -189,6 +191,7 @@ class BrowserWebViewClientTest {
             mockDuckDuckGoUrlDetector,
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
+            mockMaliciousSiteProtection,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -334,7 +337,7 @@ class BrowserWebViewClientTest {
         TestScope().launch {
             val webResourceRequest = mock<WebResourceRequest>()
             testee.shouldInterceptRequest(webView, webResourceRequest)
-            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any())
+            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any(), any())
         }
     }
 

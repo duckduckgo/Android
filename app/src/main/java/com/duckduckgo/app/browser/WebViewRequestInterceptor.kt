@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -48,6 +49,7 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
+        maliciousSiteProtection: MaliciousSiteProtection,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
@@ -92,9 +94,18 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
+        maliciousSiteProtection: MaliciousSiteProtection,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri? = request.url
+
+        val onSiteBlockedAsync: () -> Unit = {
+            // TODO (cbarreiro): Handle site blocked asynchronously
+        }
+        maliciousSiteProtection.shouldIntercept(request, webView, documentUri, onSiteBlockedAsync)?.let {
+            // TODO (cbarreiro): Handle site blocked synchronously
+            return it
+        }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
