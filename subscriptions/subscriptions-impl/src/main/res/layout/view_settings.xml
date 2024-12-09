@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
         android:id="@+id/subscriptionBuyContainer"
         android:background="?attr/selectableItemBackground"
         android:orientation="vertical"
@@ -49,9 +49,9 @@
             app:typography="body1"
             android:text="@string/subscriptionSettingGet" />
 
-    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 
-    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
         android:id="@+id/subscriptionSettingContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,9 +68,9 @@
             app:primaryText="@string/subscriptionSetting"
             tools:ignore="RtlSymmetry" />
 
-    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 
-    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
             android:id="@+id/subscriptionWaitingContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,9 +87,9 @@
             app:leadingIcon="@drawable/ic_info_16"
             app:leadingIconSize="small"
             tools:ignore="RtlSymmetry" />
-    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 
-    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
         android:id="@+id/subscriptionRestoreContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,6 +105,6 @@
             app:primaryText="@string/subscriptionSettingRestore"
             tools:ignore="RtlSymmetry" />
 
-    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 
 </LinearLayout>
