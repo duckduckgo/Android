@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.data
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
+import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
+import com.duckduckgo.malicioussiteprotection.impl.data.embedded.MaliciousSiteProtectionEmbeddedDataProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -69,9 +72,9 @@ class RealMaliciousSiteRepository @Inject constructor(
             phishingHashPrefixesRevision = embeddedPhishingHashPrefixes?.revision,
             malwareHashPrefixesRevision = embeddedMalwareHashPrefixes?.revision,
             phishingHashPrefixes = embeddedPhishingHashPrefixes?.insert?.toSet() ?: setOf(),
-            phishingFilterSet = embeddedPhishingFilterSet?.insert?.map { FilterEntity(it.hash, it.regex, type = "phishing") }?.toSet() ?: setOf(),
+            phishingFilterSet = embeddedPhishingFilterSet?.insert ?: setOf(),
             malwareHashPrefixes = embeddedMalwareHashPrefixes?.insert?.toSet() ?: setOf(),
-            malwareFilterSet = embeddedMalwareFilterSet?.insert?.map { FilterEntity(it.hash, it.regex, type = "malware") }?.toSet() ?: setOf(),
+            malwareFilterSet = embeddedMalwareFilterSet?.insert ?: setOf(),
         )
     }
 
@@ -85,3 +88,29 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 }
+
+data class Match(
+    val hostname: String,
+    val url: String,
+    val regex: String,
+    val hash: String,
+)
+
+data class HashPrefixResponse(
+    val insert: Set<String>,
+    val delete: Set<String>,
+    val revision: Int,
+    val replace: Boolean,
+)
+
+data class FilterSetResponse(
+    val insert: Set<Filter>,
+    val delete: Set<Filter>,
+    val revision: Int,
+    val replace: Boolean,
+)
+
+data class Filter(
+    val hash: String,
+    val regex: String,
+)
