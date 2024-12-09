@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.domain
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding

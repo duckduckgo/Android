@@ -7,7 +7,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
-import com.duckduckgo.malicioussiteprotection.impl.RealMaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.impl.domain.RealMaliciousSiteProtection
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
