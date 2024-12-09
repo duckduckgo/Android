@@ -76,6 +76,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -117,6 +118,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
+    private val phishingAndMalwareDetector: MaliciousSiteProtection,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -125,6 +127,10 @@ class BrowserWebViewClient @Inject constructor(
     private var start: Long? = null
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
+
+    private val onSiteBlockedAsync: () -> Unit = {
+        // TODO (cbarreiro): Handle site blocked asynchronously
+    }
 
     init {
         appCoroutineScope.launch {
@@ -158,6 +164,12 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
+
+            if (phishingAndMalwareDetector.shouldOverrideUrlLoading(url, webView, isForMainFrame, isRedirect, onSiteBlockedAsync)) {
+                // TODO (cbarreiro): Handle site blocked synchronously
+                return true
+            }
+
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
@@ -407,6 +419,7 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                phishingAndMalwareDetector.onPageLoadStarted()
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -509,7 +522,7 @@ class BrowserWebViewClient @Inject constructor(
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
+            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), phishingAndMalwareDetector, webViewClientListener)
         }
     }
 
