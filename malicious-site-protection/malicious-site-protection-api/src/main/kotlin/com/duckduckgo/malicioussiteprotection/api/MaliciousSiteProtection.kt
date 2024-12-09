@@ -16,4 +16,24 @@
 
 package com.duckduckgo.malicioussiteprotection.api
 
-interface MaliciousSiteProtection
+import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+
+interface MaliciousSiteProtection {
+    suspend fun shouldIntercept(
+        request: WebResourceRequest,
+        documentUri: Uri?,
+        onSiteBlockedAsync: () -> Unit,
+    ): WebResourceResponse?
+
+    fun onPageLoadStarted()
+
+    fun shouldOverrideUrlLoading(
+        url: Uri,
+        webViewUrl: Uri?,
+        isForMainFrame: Boolean,
+        isRedirect: Boolean,
+        onSiteBlockedAsync: () -> Unit,
+    ): Boolean
+}

@@ -57,6 +57,7 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
@@ -119,6 +120,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteProtection = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -198,6 +200,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUri = testCase.siteURL.toUri(),
             webView = webView,
+            maliciousSiteProtection = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
