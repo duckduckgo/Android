@@ -17,12 +17,15 @@
 package com.duckduckgo.duckplayer.impl
 
 import android.content.res.AssetManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface DuckPlayerLocalFilesPath {
     fun assetsPath(): List<String>
@@ -33,9 +36,19 @@ interface DuckPlayerLocalFilesPath {
 class RealDuckPlayerLocalFilesPath @Inject constructor(
     private val assetManager: AssetManager,
     dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    @IsMainProcess private val isMainProcess: Boolean,
 ) : DuckPlayerLocalFilesPath {
 
-    private val assetsPaths: List<String> = runBlocking(dispatcherProvider.io()) { getAllAssetFilePaths("duckplayer") }
+    private var assetsPaths: List<String> = listOf()
+
+    init {
+        if (isMainProcess) {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                assetsPaths = getAllAssetFilePaths("duckplayer")
+            }
+        }
+    }
 
     override fun assetsPath(): List<String> = assetsPaths
 
