@@ -21,8 +21,8 @@ import android.util.AttributeSet
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import com.duckduckgo.common.ui.view.StatusIndicator
-import com.duckduckgo.common.ui.view.StatusIndicator.Status
+import com.duckduckgo.common.ui.view.StatusIndicatorView
+import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -44,7 +44,7 @@ class SettingsListItem @JvmOverloads constructor(
         get() = binding.leadingIcon
     val betaPill: ImageView
         get() = binding.betaPill
-    val statusIndicator: StatusIndicator
+    val statusIndicator: StatusIndicatorView
         get() = binding.statusIndicator
 
     init {

@@ -23,7 +23,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewStatusIndicatorBinding
 
-class StatusIndicator @JvmOverloads constructor(
+class StatusIndicatorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

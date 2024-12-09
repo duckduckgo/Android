@@ -60,7 +60,7 @@
                 app:typography="h2"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.StatusIndicator
+            <com.duckduckgo.common.ui.view.StatusIndicatorView
                 android:id="@+id/autoconsentStatusIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
