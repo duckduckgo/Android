@@ -70,6 +70,8 @@ dependencies {
     api(AndroidX.compose.foundation.layout)
     api(AndroidX.compose.material3)
     api(AndroidX.compose.ui)
+    api(AndroidX.lifecycle.runtime.compose)
+    api(AndroidX.lifecycle.viewModelCompose)
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"

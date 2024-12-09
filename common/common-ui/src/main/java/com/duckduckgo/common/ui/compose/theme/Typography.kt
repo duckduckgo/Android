@@ -66,6 +66,7 @@ data class DuckDuckGoTypography(
         fontSize = 16.sp,
         lineHeight = 20.sp,
     ),
+
     val body2: TextStyle = TextStyle(
         fontSize = 14.sp,
         lineHeight = 18.sp,

@@ -34,7 +34,7 @@ interface FaviconManager {
 
     suspend fun tryFetchFaviconForUrl(
         url: String,
-    ): File?
+    ): Bitmap?
 
     suspend fun persistCachedFavicon(
         tabId: String,
@@ -84,6 +84,11 @@ interface FaviconManager {
         placeholder: String?,
         domain: String,
     ): Drawable
+
+    suspend fun persistFavicon(
+        favicon: Bitmap,
+        url: String
+    )
 }
 
 sealed class FaviconSource {

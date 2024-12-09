@@ -16,14 +16,7 @@
 
 package com.duckduckgo.app.tabs.rules
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-/**
- * Use this model to launch the Tab Rules screen
- */
-data object TabRulesScreen : ActivityParams
-
-/**
- * Use this model to launch the Tab Rules visited sites screen
- */
-data object TabRulesVisitedSitesScreen : ActivityParams
+data class TabRulesViewState(
+    val tabRules: List<TabRule> = emptyList(),
+    val manualUrl: String? = null,
+)

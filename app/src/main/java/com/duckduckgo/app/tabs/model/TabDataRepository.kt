@@ -110,6 +110,15 @@ class TabDataRepository @Inject constructor(
         return@withContext tabId
     }
 
+    override suspend fun selectAndUpdateTab(
+        tabId: String,
+        url: String
+    ): String {
+        select(tabId)
+        update(tabId, siteFactory.buildSite(url, tabId))
+        return tabId
+    }
+
     override suspend fun addDefaultTab(): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
 
@@ -180,6 +189,8 @@ class TabDataRepository @Inject constructor(
             add(url, skipHome = true)
         }
     }
+
+    override suspend fun getTabIdByPartialUrl(url: String): String? = tabsDao.findTabIdByPartialUrl(url)
 
     override suspend fun getTabId(url: String): String? = tabsDao.selectTabByUrl(url)
 

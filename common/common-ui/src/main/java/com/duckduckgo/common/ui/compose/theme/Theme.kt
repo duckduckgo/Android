@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.compose.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 
 object DuckDuckGoTheme {
 

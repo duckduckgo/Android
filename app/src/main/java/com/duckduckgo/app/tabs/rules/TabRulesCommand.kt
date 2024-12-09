@@ -16,14 +16,9 @@
 
 package com.duckduckgo.app.tabs.rules
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+sealed class TabRulesCommand {
 
-/**
- * Use this model to launch the Tab Rules screen
- */
-data object TabRulesScreen : ActivityParams
-
-/**
- * Use this model to launch the Tab Rules visited sites screen
- */
-data object TabRulesVisitedSitesScreen : ActivityParams
+    sealed class Navigate : TabRulesCommand() {
+        data object TabRulesVisitedSitesScreen : Navigate()
+    }
+}

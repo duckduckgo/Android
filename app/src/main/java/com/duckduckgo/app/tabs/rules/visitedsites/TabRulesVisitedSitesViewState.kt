@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.rules
+package com.duckduckgo.app.tabs.rules.visitedsites
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.app.tabs.rules.Async
+import com.duckduckgo.app.tabs.rules.Uninitialized
 
-/**
- * Use this model to launch the Tab Rules screen
- */
-data object TabRulesScreen : ActivityParams
-
-/**
- * Use this model to launch the Tab Rules visited sites screen
- */
-data object TabRulesVisitedSitesScreen : ActivityParams
+data class TabRulesVisitedSitesViewState(
+    val visitedSites: Async<List<VisitedSite>> = Uninitialized,
+)

@@ -65,6 +65,7 @@ class DuckDuckGoFaviconManager constructor(
                 invalidateCacheIfNewDomain(tabId, domain)
                 Pair(domain, faviconSource.icon)
             }
+
             is FaviconSource.UrlFavicon -> {
                 val domain = faviconSource.url.extractDomain() ?: return null
                 invalidateCacheIfNewDomain(tabId, domain)
@@ -95,7 +96,7 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun tryFetchFaviconForUrl(url: String): File? {
+    override suspend fun tryFetchFaviconForUrl(url: String): Bitmap? {
         return withContext(dispatcherProvider.io()) {
             val domain = url.extractDomain() ?: return@withContext null
 
@@ -103,6 +104,7 @@ class DuckDuckGoFaviconManager constructor(
 
             return@withContext if (favicon != null) {
                 saveFavicon(null, favicon, domain)
+                favicon
             } else {
                 null
             }
@@ -171,7 +173,12 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
+    override suspend fun loadToViewFromLocalWithPlaceholder(
+        tabId: String?,
+        url: String,
+        view: ImageView,
+        placeholder: String?
+    ) {
         val bitmap = loadFromDisk(tabId, url)
         view.loadFavicon(bitmap, url, placeholder)
     }
@@ -185,6 +192,17 @@ class DuckDuckGoFaviconManager constructor(
             val cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
             if (cachedFavicon != null) {
                 faviconPersister.copyToDirectory(cachedFavicon, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            }
+        }
+    }
+
+    override suspend fun persistFavicon(
+        favicon: Bitmap,
+        url: String
+    ) {
+        withContext(dispatcherProvider.io()) {
+            url.extractDomain()?.let {
+                faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, favicon, it)
             }
         }
     }

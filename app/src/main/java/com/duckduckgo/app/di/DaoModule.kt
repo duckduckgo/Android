@@ -97,4 +97,7 @@ object DaoModule {
 
     @Provides
     fun syncRelationsDao(database: AppDatabase) = database.syncRelationsDao()
+
+    @Provides
+    fun tabRulesDao(database: AppDatabase) = database.tabRulesDao()
 }

@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.rules
+package com.duckduckgo.app.tabs.rules.visitedsites
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+sealed class TabRulesVisitedSitesCommand {
 
-/**
- * Use this model to launch the Tab Rules screen
- */
-data object TabRulesScreen : ActivityParams
-
-/**
- * Use this model to launch the Tab Rules visited sites screen
- */
-data object TabRulesVisitedSitesScreen : ActivityParams
+    sealed class Navigate : TabRulesVisitedSitesCommand() {
+        data object Back : Navigate()
+    }
+}

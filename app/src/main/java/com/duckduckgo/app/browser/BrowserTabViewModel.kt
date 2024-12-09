@@ -42,6 +42,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
@@ -690,6 +691,15 @@ class BrowserTabViewModel @Inject constructor(
         url?.let {
             onUserSubmittedQuery(it)
         }
+
+        tabRepository.liveSelectedTab.asFlow().onEach { tabEntity ->
+            if (this@BrowserTabViewModel::tabId.isInitialized &&
+                tabEntity.tabId == tabId &&
+                tabEntity.url != url
+            ) {
+                tabEntity.url?.let { onUserSubmittedQuery(it) }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onViewRecreated() {
@@ -984,7 +994,7 @@ class BrowserTabViewModel @Inject constructor(
         when (currentCtaViewState().cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
             is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
@@ -994,7 +1004,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -3493,7 +3503,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxExperimentNoTrackersCta,
             is OnboardingDaxDialogCta.DaxExperimentMainNetworkCta,
-            -> {
+                -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 }
@@ -3522,6 +3532,7 @@ class BrowserTabViewModel @Inject constructor(
                     "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding$cohortOrigin".toUri(),
                 )
             }
+
             is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()

@@ -29,6 +29,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -48,6 +49,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.tabs.TabRulesDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -74,6 +76,8 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val tabRulesDao: TabRulesDao,
+    private val siteFactory: SiteFactory,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -112,6 +116,7 @@ class BrowserViewModel @Inject constructor(
                     Timber.i("App clear state initializing")
                     viewState.value = currentViewState.copy(hideWebContent = true)
                 }
+
                 ApplicationClearDataState.FINISHED -> {
                     Timber.i("App clear state finished")
                     viewState.value = currentViewState.copy(hideWebContent = false)
@@ -126,12 +131,15 @@ class BrowserViewModel @Inject constructor(
                 is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
                     command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
                 }
+
                 is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
                     command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
                 }
+
                 is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
                     command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
                 }
+
                 else -> {}
             }
         }
@@ -277,9 +285,19 @@ class BrowserViewModel @Inject constructor(
 
     fun onOpenShortcut(url: String) {
         launch(dispatchers.io()) {
-            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            pixel.fire(AppPixelName.SHORTCUT_OPENED)
+            val tabRule = tabRulesDao.getTabRuleByUrl(url)
+            if (tabRule != null && tabRule.isEnabled) {
+                val tabId = tabRepository.getTabIdByPartialUrl(tabRule.url)
+                if (tabId != null) {
+                    tabRepository.selectAndUpdateTab(url = tabRule.url, tabId = tabId)
+                } else {
+                    tabRepository.selectByUrlOrNewTab(tabRule.url)
+                }
+            } else {
+                tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
+            }
         }
+        pixel.fire(AppPixelName.SHORTCUT_OPENED)
     }
 
     fun onLaunchedFromNotification(pixelName: String) {

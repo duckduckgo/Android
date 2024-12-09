@@ -59,6 +59,8 @@ interface TabRepository {
         sourceTabId: String,
     ): String
 
+    suspend fun selectAndUpdateTab(tabId: String, url: String): String
+
     suspend fun addNewTabAfterExistingTab(
         url: String? = null,
         tabId: String,
@@ -110,6 +112,8 @@ interface TabRepository {
     )
 
     suspend fun selectByUrlOrNewTab(url: String)
+
+    suspend fun getTabIdByPartialUrl(url: String): String?
 
     suspend fun getTabId(url: String): String?
 

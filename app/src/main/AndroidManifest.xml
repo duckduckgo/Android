@@ -45,7 +45,12 @@
 
         <activity
             android:name="com.duckduckgo.app.tabs.rules.TabRulesActivity"
-            android:exported="false" />
+            android:exported="true" />
+
+        <activity
+            android:name="com.duckduckgo.app.tabs.rules.visitedsites.TabRulesVisitedSitesActivity"
+            android:parentActivityName="com.duckduckgo.app.tabs.rules.TabRulesActivity"
+            android:exported="true" />
 
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
