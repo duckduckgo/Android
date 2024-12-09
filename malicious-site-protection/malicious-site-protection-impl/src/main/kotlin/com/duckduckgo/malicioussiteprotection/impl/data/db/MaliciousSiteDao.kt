@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.malicioussiteprotection.impl.data.Filter
 import kotlin.math.max
 
 @Dao
@@ -76,9 +77,9 @@ interface MaliciousSiteDao {
         phishingHashPrefixesRevision: Int?,
         malwareHashPrefixesRevision: Int?,
         phishingHashPrefixes: Set<String>,
-        phishingFilterSet: Set<FilterEntity>,
+        phishingFilterSet: Set<Filter>,
         malwareHashPrefixes: Set<String>,
-        malwareFilterSet: Set<FilterEntity>,
+        malwareFilterSet: Set<Filter>,
     ) {
         val lastRevision = getLatestRevision()
         deleteRevisions()
@@ -92,8 +93,8 @@ interface MaliciousSiteDao {
             ),
         )
         insertHashPrefixes(phishingHashPrefixes.map { HashPrefixEntity(hashPrefix = it, type = "phishing") })
-        insertFilters(phishingFilterSet)
+        insertFilters(phishingFilterSet.map { FilterEntity(it.hash, it.regex, type = "phishing") }.toSet())
         insertHashPrefixes(malwareHashPrefixes.map { HashPrefixEntity(hashPrefix = it, type = "malware") })
-        insertFilters(malwareFilterSet)
+        insertFilters(malwareFilterSet.map { FilterEntity(it.hash, it.regex, type = "malware") }.toSet())
     }
 }
