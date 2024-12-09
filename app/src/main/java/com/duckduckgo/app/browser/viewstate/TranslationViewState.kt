@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.viewstate
 data class TranslationViewState(
     val isTranslationVisible: Boolean = false,
     val isProgressBarVisible: Boolean = false,
-    val state: TranslationState = TranslationState.Initial
+    val state: TranslationState = TranslationState.Initial,
 ) {
     sealed class TranslationState {
         data object Initial : TranslationState()

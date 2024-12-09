@@ -21,10 +21,10 @@ import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 class TranslationEngine @Inject constructor() {
     private var translator: Translator? = null
@@ -33,7 +33,7 @@ class TranslationEngine @Inject constructor() {
     private val languageIdentifier = LanguageIdentification.getClient()
     private var languagePair: String? = null
 
-    suspend fun setLanguagePair(sourceLanguage: String, targetLanguage: String) {
+    suspend fun setLanguagePair(sourceLanguage: String, targetLanguage: String, onLanguageModelDownloading: () -> Unit) {
         val options = TranslatorOptions.Builder()
             .setSourceLanguage(sourceLanguage)
             .setTargetLanguage(targetLanguage)
@@ -44,12 +44,13 @@ class TranslationEngine @Inject constructor() {
         translator = Translation.getClient(options).apply {
             languagePair?.let {
                 if (!downloadedModels.contains(it)) {
+                    onLanguageModelDownloading()
                     withContext(Dispatchers.IO) {
                         Tasks.await(
                             downloadModelIfNeeded()
                                 .addOnSuccessListener { _ ->
                                     downloadedModels.add(it)
-                                }
+                                },
                         )
                     }
                 }
@@ -70,28 +71,29 @@ class TranslationEngine @Inject constructor() {
     }
 
     fun identifyLanguage(text: String): String {
-        return Tasks.await(languageIdentifier.identifyLanguage(text)
-            .addOnSuccessListener { languageCode ->
-                languageCode
-            }
-            .addOnFailureListener {
-                // Model couldn’t be loaded or other internal error.
-                // ...
-            })
+        return Tasks.await(
+            languageIdentifier.identifyLanguage(text)
+                .addOnSuccessListener { languageCode ->
+                    languageCode
+                }
+                .addOnFailureListener {
+                    // Model couldn’t be loaded or other internal error.
+                    // ...
+                },
+        )
     }
 
     fun translate(original: String): String {
         try {
             return return translator?.let {
                 Tasks.await(
-                    it.translate(original).addOnFailureListener { e -> Timber.d(e, "$$$ Error translating") }
+                    it.translate(original).addOnFailureListener { e -> Timber.d(e, "$$$ Error translating") },
                 )
             } ?: ""
         } catch (e: Exception) {
             Timber.e(e, "$$$ Failed to translate text")
             return original
         }
-
     }
 
     fun onClose() {

@@ -579,17 +579,24 @@ class Omnibar(
 
     private fun handleTranslationState(state: TranslationViewState) {
         newOmnibar.translationPanel.isVisible = state.isTranslationVisible
-        setTranslationProgress(state.isProgressBarVisible)
-        when (state.state) {
-            is TranslationState.StatusMessage -> {
-                newOmnibar.showTranslationStatus(state.state.message)
-                setTranslationProgress(true)
+        if (state.isTranslationVisible) {
+            setTranslationProgress(state.isProgressBarVisible)
+            when (state.state) {
+                is TranslationState.StatusMessage -> {
+                    newOmnibar.showTranslationStatus(state.state.message)
+                    setTranslationProgress(true)
+                }
+
+                is TranslationState.LanguagePickers -> {
+                    newOmnibar.showLanguagesPanel(state.state.sourceLanguage, state.state.targetLanguage)
+                    newOmnibar.languagesPanel.show()
+                }
+
+                else -> {}
             }
-            is TranslationState.LanguagePickers -> {
-                newOmnibar.showLanguagesPanel(state.state.sourceLanguage, state.state.targetLanguage)
-                newOmnibar.languagesPanel.show()
-            }
-            else -> {}
+        } else {
+            // reset the selection
+            newOmnibar.showLanguagesPanel("en", "en")
         }
     }
 

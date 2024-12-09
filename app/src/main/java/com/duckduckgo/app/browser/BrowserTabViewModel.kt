@@ -314,6 +314,11 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
+import java.net.URI
+import java.net.URISyntaxException
+import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -339,11 +344,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
-import java.net.URI
-import java.net.URISyntaxException
-import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -654,8 +654,8 @@ class BrowserTabViewModel @Inject constructor(
                 translated = true
                 omnibarViewState.value = currentOmnibarViewState().copy(
                     translation = currentOmnibarViewState().translation.copy(
-                        isProgressBarVisible = false
-                    )
+                        isProgressBarVisible = false,
+                    ),
                 )
             }
         }
@@ -1732,23 +1732,32 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun identifyLanguageAndTranslate() = viewModelScope.launch {
+        val targetLanguage = (currentOmnibarViewState().translation.state as? TranslationState.LanguagePickers)?.targetLanguage
+            ?: Locale.getDefault().language
+
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            translation = TranslationViewState(
+                isTranslationVisible = true,
+                isProgressBarVisible = true,
+                state = TranslationState.StatusMessage("Identifying the language..."),
+            ),
+        )
+
         val identifiedLanguage = withContext(dispatchers.io()) {
             translationEngine.identifyLanguage(title ?: "").let {
                 if (it == "und") "en" else it
             }
         }
-
-        val targetLanguage = (currentOmnibarViewState().translation.state as? TranslationState.LanguagePickers)?.targetLanguage
-            ?: Locale.getDefault().language
         omnibarViewState.value = currentOmnibarViewState().copy(
             translation = currentOmnibarViewState().translation.copy(
                 isProgressBarVisible = true,
                 state = TranslationState.LanguagePickers(
                     sourceLanguage = identifiedLanguage,
-                    targetLanguage = targetLanguage
-                )
-            )
+                    targetLanguage = targetLanguage,
+                ),
+            ),
         )
+
         command.value = StartTranslation
     }
 
@@ -2637,8 +2646,8 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 translation = currentOmnibarViewState().translation.copy(
-                    isTranslationVisible = false
-                )
+                    isTranslationVisible = false,
+                ),
             )
 
             onRefreshRequested(false)
@@ -2818,8 +2827,8 @@ class BrowserTabViewModel @Inject constructor(
                 translation = TranslationViewState(
                     isTranslationVisible = true,
                     isProgressBarVisible = true,
-                    state = TranslationState.StatusMessage("Identifying the language...")
-                )
+                    state = TranslationState.StatusMessage("Identifying the language..."),
+                ),
             )
 
             val identifiedLanguage = withContext(dispatchers.io()) {
@@ -2830,8 +2839,8 @@ class BrowserTabViewModel @Inject constructor(
 
             omnibarViewState.value = currentOmnibarViewState().copy(
                 translation = currentOmnibarViewState().translation.copy(
-                    state = TranslationState.LanguagePickers(identifiedLanguage, Locale.getDefault().language)
-                )
+                    state = TranslationState.LanguagePickers(identifiedLanguage, Locale.getDefault().language),
+                ),
             )
         }
     }
@@ -3648,8 +3657,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-
-
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
@@ -3824,22 +3831,17 @@ class BrowserTabViewModel @Inject constructor(
             source = translationState.sourceLanguage
             target = language
         }
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            translation = currentOmnibarViewState().translation.copy(
-                state = TranslationState.StatusMessage("Downloading language model..."),
-                isProgressBarVisible = true,
-            )
-        )
 
-        translationEngine.setLanguagePair(source, target)
+        translationEngine.setLanguagePair(source, target, ::onLanguageModelDownloading)
 
         omnibarViewState.value = currentOmnibarViewState().copy(
             translation = currentOmnibarViewState().translation.copy(
                 state = TranslationState.LanguagePickers(
                     sourceLanguage = source,
                     targetLanguage = target,
-                )
-            )
+                ),
+                isProgressBarVisible = true,
+            ),
         )
 
         if (translated) {
@@ -3847,6 +3849,15 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = StartTranslation
         }
+    }
+
+    private fun onLanguageModelDownloading() {
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            translation = currentOmnibarViewState().translation.copy(
+                state = TranslationState.StatusMessage("Downloading language model..."),
+                isProgressBarVisible = true,
+            ),
+        )
     }
 
     companion object {

@@ -87,6 +87,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.mlkit.nl.translate.TranslateLanguage
 import dagger.android.support.AndroidSupportInjection
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +95,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(

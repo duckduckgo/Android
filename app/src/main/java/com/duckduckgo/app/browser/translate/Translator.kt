@@ -49,7 +49,7 @@ class TranslatorJS @Inject constructor() : Translator {
                     
                     function translateTextNodes(node) {
                         if (node.nodeType === Node.TEXT_NODE) {
-                            asyncTranslateBlock(node)
+                            translateBlock(node)
                         } else if (isTranslatableNode(node)) {
                             for (var i = 0; i < node.childNodes.length && translationCanceled === false; ++i) {
                                 translateTextNodes(node.childNodes[i]);
@@ -65,7 +65,7 @@ class TranslatorJS @Inject constructor() : Translator {
                         return false;
                     }
                     
-                    async function asyncTranslateBlock(node) {
+                    function translateBlock(node) {
                         const originalText = node.textContent;
                         const trimmedText = originalText.trim();
                         
@@ -80,6 +80,7 @@ class TranslatorJS @Inject constructor() : Translator {
                             if (translation.length === 0) {
                                 console.log("$$$ Translation error, cancelling...");
                                 translationCanceled = true;
+                                return;
                             }
                             
                             translations++;
