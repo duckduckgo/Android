@@ -21,7 +21,7 @@
     <string name="notifyme_button_label">Notify me</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" tools:ignore="MissingTranslation">Always On</string>
-    <string name="on" tools:ignore="MissingTranslation">On</string>
-    <string name="off" tools:ignore="MissingTranslation">Off</string>
+    <string name="alwaysOn" translatable="false">Always On</string>
+    <string name="on" translatable="false">On</string>
+    <string name="off" translatable="false">Off</string>
 </resources>

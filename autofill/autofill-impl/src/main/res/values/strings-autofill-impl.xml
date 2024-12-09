@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Exit Setup</string>
 
     <string name="autofillManagementScreenTitle">Passwords</string>
-    <string name="autofillManagementScreenTitleNew" tools:ignore="MissingTranslation">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Passwords</string>
     <string name="credentialManagementAutofillSubtitle">Passwords are encrypted. Nobody but you can see them, not even us. <annotation type="learn_more_link">Learn More</annotation></string>
