@@ -108,7 +108,6 @@ class AutoCompleteApiTest {
             mockAutoCompleteRepository,
             mockTabRepository,
             mockUserStageStore,
-            coroutineTestRule.testDispatcherProvider,
             mockAutocompleteTabsFeature,
         )
     }

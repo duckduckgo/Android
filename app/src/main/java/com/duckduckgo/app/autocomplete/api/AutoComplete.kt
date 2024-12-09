@@ -39,7 +39,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -61,6 +60,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
@@ -134,7 +134,6 @@ class AutoCompleteApi @Inject constructor(
     private val autoCompleteRepository: AutoCompleteRepository,
     private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
-    private val dispatcherProvider: DispatcherProvider,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
@@ -154,6 +153,7 @@ class AutoCompleteApi @Inject constructor(
         ) { bookmarks, favorites, tabs, historyResults, searchResults ->
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
+            Timber.d("Navigational: topHits ${topHits.toList()}")
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
             val distinctSearchResults = getDistinctSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
@@ -193,11 +193,12 @@ class AutoCompleteApi @Inject constructor(
         bookmarksAndFavoritesAndTabsAndHistory: List<AutoCompleteSuggestion>,
         searchResults: List<AutoCompleteSearchSuggestion>,
     ): List<AutoCompleteSuggestion> {
-        return (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
+        return (bookmarksAndFavoritesAndTabsAndHistory + searchResults).filter {
             when (it) {
                 is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                 is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                 is AutoCompleteUrlSuggestion -> true
+                is AutoCompleteSearchSuggestion -> it.isUrl
                 else -> false
             }
         }.take(maximumNumberOfTopHits)
