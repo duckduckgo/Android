@@ -29,10 +29,10 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -80,6 +80,8 @@ class BrowserViewModelTest {
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
     @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
+
+    @Mock private lateinit var userStageStore: UserStageStore
 
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
@@ -146,13 +148,13 @@ class BrowserViewModelTest {
 
     @Test
     fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runTest {
-        testee.onTabsUpdated(ArrayList())
+        testee.onTabsUpdated(areTabsEmpty = true)
         verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
-        testee.onTabsUpdated(listOf(TabEntity(TAB_ID, "", "", skipHome = false, viewed = true, position = 0)))
+        testee.onTabsUpdated(areTabsEmpty = false)
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -299,6 +301,7 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            userStageStore = userStageStore,
         )
     }
 

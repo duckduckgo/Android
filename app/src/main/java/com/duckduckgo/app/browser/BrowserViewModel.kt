@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -33,6 +34,8 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_CANCELLED
@@ -48,7 +51,6 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -58,6 +60,12 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -74,6 +82,7 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    userStageStore: UserStageStore,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -101,39 +110,51 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
-    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
-    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private var dataClearingObserver = Observer<ApplicationClearDataState> {
-        it?.let { state ->
-            when (state) {
-                ApplicationClearDataState.INITIALIZING -> {
-                    Timber.i("App clear state initializing")
-                    viewState.value = currentViewState.copy(hideWebContent = true)
-                }
-                ApplicationClearDataState.FINISHED -> {
-                    Timber.i("App clear state finished")
-                    viewState.value = currentViewState.copy(hideWebContent = false)
-                }
+    val selectedTab: Flow<String> = tabRepository.flowSelectedTab
+        .map { tab -> tab?.tabId }
+        .filterNotNull()
+        .distinctUntilChanged()
+
+    val tabs: Flow<List<String>> = tabRepository.flowTabs
+        .map { tabs -> tabs.map { tab -> tab.tabId } }
+        .distinctUntilChanged()
+
+    val selectedTabIndex: Flow<Int> = combine(tabs, selectedTab) { tabs, selectedTab ->
+        tabs.indexOf(selectedTab)
+    }.filterNot { it == -1 }
+
+    val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
+        .distinctUntilChanged()
+        .map { it != AppStage.DAX_ONBOARDING }
+        .asLiveData()
+
+    private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
+        when (state) {
+            ApplicationClearDataState.INITIALIZING -> {
+                Timber.i("App clear state initializing")
+                viewState.value = currentViewState.copy(hideWebContent = true)
+            }
+            ApplicationClearDataState.FINISHED -> {
+                Timber.i("App clear state finished")
+                viewState.value = currentViewState.copy(hideWebContent = false)
             }
         }
     }
 
-    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
-        it?.let { promptType ->
-            when (promptType) {
-                is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
-                    command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
-                    command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
-                    command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
-                }
-                else -> {}
+    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> { promptType ->
+        when (promptType) {
+            is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
+                command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
             }
+            is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
+                command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+            }
+            is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
+                command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+            }
+            else -> {}
         }
     }
 
@@ -186,8 +207,8 @@ class BrowserViewModel @Inject constructor(
         )
     }
 
-    suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
-        if (tabs.isNullOrEmpty()) {
+    suspend fun onTabsUpdated(areTabsEmpty: Boolean) {
+        if (areTabsEmpty) {
             Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.addDefaultTab()
             return
@@ -292,7 +313,9 @@ class BrowserViewModel @Inject constructor(
 
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
-            tabRepository.select(tabId)
+            if (tabId != tabRepository.getSelectedTab()?.tabId) {
+                tabRepository.select(tabId)
+            }
         }
     }
 
