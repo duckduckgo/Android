@@ -62,6 +62,7 @@ object DatabaseModule {
             .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
             .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+            .fallbackToDestructiveMigration()
             .build()
     }
 

@@ -55,6 +55,8 @@ import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.tabs.TabRuleEntity
+import com.duckduckgo.app.tabs.TabRulesDao
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -73,7 +75,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 56,
+    version = 59,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -107,6 +109,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         Entity::class,
         Relation::class,
         RefreshEntity::class,
+        TabRuleEntity::class,
     ],
 )
 
@@ -161,6 +164,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 
     abstract fun refreshDao(): RefreshDao
+
+    abstract fun tabRulesDao(): TabRulesDao
 }
 
 @Suppress("PropertyName")
