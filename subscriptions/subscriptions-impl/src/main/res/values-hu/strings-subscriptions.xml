@@ -20,8 +20,6 @@
     <string name="cancel">Mégsem</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-mail-cím</string>
-    <string name="addEmailText">E-mail-cím hozzáadása</string>
     <string name="manageEmail">E-mail-cím kezelése</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Előfizetés nem található</string>
     <string name="subscriptionNotFoundDescription">Az ehhez a Google Play-fiókhoz tartozó előfizetés már nem aktív.</string>
     <string name="purchaseRestored">A vásárlások vissza lettek állítva.</string>
-    <string name="restoreSubscriptionTitle">Előfizetés aktiválása ezen az eszközön</string>
-    <string name="restoreSubscriptionDescription">A Google Play vagy egy e-mail-cím használatával férhetsz hozzá Privacy Pro-előfizetésedhez ezen az eszközön.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Az előfizetésed automatikusan elérhető a DuckDuckGo-ban minden olyan eszközön, amelyen be vagy jelentkezve a Google Play-fiókodba.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Vásárlás visszaállítása</string>
-    <string name="restoreSubscriptionEmailDescription">Előfizetésedet az e-mail-címed használatával aktiválhatod ezen az eszközön.</string>
-    <string name="restoreSubscriptionEmailButton">E-mail-cím megadása</string>
+    <string name="restoreSubscriptionTitle">Add hozzá a Privacy Pro-előfizetésedet ehhez az eszközhöz</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Add hozzá a Google Play-fiókodon keresztül</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Állítsd vissza az előfizetésedet Android-eszközökön a Google Play-fiókoddal.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Vásárlás visszaállítása</string>
+    <string name="restoreSubscriptionEmailTitle">Hozzáadás e-mail-cím használatával</string>
+    <string name="restoreSubscriptionEmailDescription">Kapcsolj egy e-mail-címet az előfizetésedhez, hogy hozzáadhasd a Privacy Prót ehhez az eszközhöz.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Első lépések</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Előfizetés eltávolítása</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Éves előfizetés</string>
     <string name="renews">megújul</string>
     <string name="expires">lejár</string>
-    <string name="activateOnOtherDevices">Aktiválás más eszközökön</string>
-    <string name="addEmailPrimaryText">E-mail-cím hozzáadása</string>
-    <string name="addEmailSecondaryText">Egy opcionális e-mail-címnek az előfizetéshez való hozzáadásával más eszközökön is hozzáférhetsz a Privacy Pro-előfizetésedhez.</string>
+    <string name="activateOnOtherDevices">Privacy Pro hozzáadása más eszközökhöz</string>
+    <string name="addToDevicePrimaryText">Hozzáadás az eszközhöz</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Add hozzá a Privacy Prót a többi eszközödhöz a Google Play-en keresztül vagy egy e-mail-cím hozzákapcsolásával.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">A DuckDuckGo-alkalmazásban hozzáadhatod az előfizetésedet a többi eszközödön a fenti e-mail-cím használatával. Ezt a Beállítások &gt; Privacy Pro &gt; Van előfizetésem menüpontban tudod megtenni.</string>
     <string name="editEmailPrimaryText">E-mail-cím szerkesztése</string>
-    <string name="editEmailSecondaryText">Ezzel az e-mail-címmel aktiválhatod az előfizetésedet a többi eszközödön a DuckDuckGo alkalmazás Beállítások &gt; Privacy Pro menüpontjában.</string>
     <string name="learnMore">További részletek</string>
     <string name="privacyProFaq">Segítségre van szükséged a Privacy Pro-előfizetéssel kapcsolatban?</string>
     <string name="privacyProFaqSecondary">A súgóoldalainkon választ kaphatsz a gyakran ismételt kérdésekre, vagy felveheted a kapcsolatot a Privacy Pro-támogatást nyújtó ügyfélszolgálattal. A funkciók elérhetősége országonként változik.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Előfizetések</string>
     <string name="activitySubscriptionSettings">Előfizetési beállítások</string>
-    <string name="activityActivateSubscription">Előfizetés aktiválása</string>
+    <string name="activityActivateSubscription">Van előfizetésem</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
 </resources>
