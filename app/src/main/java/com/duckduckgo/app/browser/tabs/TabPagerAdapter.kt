@@ -37,8 +37,6 @@ class TabPagerAdapter(
     private val requestNewTab: () -> TabEntity,
     private val getSelectedTabId: () -> String?,
     private val onTabSelected: (String) -> Unit,
-    private val getOffScreenPageLimit: () -> Int,
-    private val setOffScreenPageLimit: (Int) -> Unit,
 ) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle) {
     private val tabIds = mutableListOf<String>()
     private var messageForNewFragment: Message? = null
@@ -53,11 +51,6 @@ class TabPagerAdapter(
         get() = fragmentManager.fragments
             .filterIsInstance<BrowserTabFragment>()
             .firstOrNull { it.tabId == getSelectedTabId() }
-
-    private val activeTabCount
-        get() = fragmentManager.fragments
-            .filterIsInstance<BrowserTabFragment>()
-            .filter { it.isInitialized }.size
 
     override fun createFragment(position: Int): Fragment {
         Timber.d("### TabPagerAdapter.createFragment: $position")
@@ -82,8 +75,6 @@ class TabPagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<String>) {
-        // increaseOffscreenTabLimitIfNeeded()
-
         val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabIds, newTabs))
         diff.dispatchUpdatesTo(this)
         tabIds.clear()
@@ -93,13 +84,6 @@ class TabPagerAdapter(
     fun onPageChanged(position: Int) {
         if (position < tabIds.size) {
             onTabSelected(tabIds[position])
-        }
-    }
-
-    private fun increaseOffscreenTabLimitIfNeeded() {
-        val offscreenPageLimit = getOffScreenPageLimit()
-        if (activeTabCount >= offscreenPageLimit * 2 - 1 && activeTabCount < TabManager.MAX_ACTIVE_TABS) {
-            setOffScreenPageLimit(offscreenPageLimit + 1)
         }
     }
 

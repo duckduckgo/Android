@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
@@ -65,14 +64,6 @@ class DefaultTabManager @Inject constructor(
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
-            setOffScreenPageLimit = { limit -> browserActivity.tabPager.offscreenPageLimit = limit },
-            getOffScreenPageLimit = {
-                if (browserActivity.tabPager.offscreenPageLimit == OFFSCREEN_PAGE_LIMIT_DEFAULT) {
-                    1
-                } else {
-                    browserActivity.tabPager.offscreenPageLimit
-                }
-            },
         )
     }
 
