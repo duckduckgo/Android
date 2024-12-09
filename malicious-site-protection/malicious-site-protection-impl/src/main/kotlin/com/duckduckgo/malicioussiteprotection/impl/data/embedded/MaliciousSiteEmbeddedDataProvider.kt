@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.data.embedded
 
 import android.content.Context
 import androidx.annotation.RawRes
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.malicioussiteprotection.impl.R
+import com.duckduckgo.malicioussiteprotection.impl.data.FilterSetResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.HashPrefixResponse
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -84,29 +87,3 @@ class RealMaliciousSiteProtectionEmbeddedDataProvider @Inject constructor(
         }
     }
 }
-
-data class Match(
-    val hostname: String,
-    val url: String,
-    val regex: String,
-    val hash: String,
-)
-
-data class HashPrefixResponse(
-    val insert: Set<String>,
-    val delete: Set<String>,
-    val revision: Int,
-    val replace: Boolean,
-)
-
-data class FilterSetResponse(
-    val insert: Set<Filter>,
-    val delete: Set<Filter>,
-    val revision: Int,
-    val replace: Boolean,
-)
-
-data class Filter(
-    val hash: String,
-    val regex: String,
-)

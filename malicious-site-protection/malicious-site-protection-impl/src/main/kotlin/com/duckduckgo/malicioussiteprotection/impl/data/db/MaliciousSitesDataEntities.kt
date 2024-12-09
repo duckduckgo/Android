@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.impl
+package com.duckduckgo.malicioussiteprotection.impl.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
