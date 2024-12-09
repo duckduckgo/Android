@@ -364,11 +364,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 Timber.d("Shortcut opened with url $sharedText")
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
-                return
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 Timber.d("Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
-                return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 Timber.w("open in current tab requested")
                 if (currentTab != null) {
@@ -377,7 +375,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
-                return
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
@@ -390,15 +387,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
-
-                return
             }
         } else {
-            Timber.i("shared text empty, opening last tab")
-        }
-
-        if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
-            viewModel.handleShowOnAppLaunchOption()
+            Timber.i("shared text empty, defaulting to show on app launch option")
+            if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
+                viewModel.handleShowOnAppLaunchOption()
+            }
         }
     }
 
