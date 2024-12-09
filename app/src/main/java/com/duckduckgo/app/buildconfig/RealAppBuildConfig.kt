@@ -88,23 +88,17 @@ class RealAppBuildConfig @Inject constructor(
                 return@withContext preferences.getBoolean(APP_REINSTALLED_KEY, false)
             }
 
-            val isAppReinstalled = preferences.getBoolean(APP_REINSTALLED_KEY, false)
-
-            if (isAppReinstalled) {
-                return@withContext true
+            val downloadDirectory = getDownloadsDirectory()
+            val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
+            val appReinstallValue = if (!ddgDirectoryExists) {
+                createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+                // this is a new install
+                false
             } else {
-                val downloadDirectory = getDownloadsDirectory()
-                val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
-                val appReinstallValue = if (!ddgDirectoryExists) {
-                    createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
-                    // this is a new install
-                    false
-                } else {
-                    true
-                }
-                preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
-                return@withContext appReinstallValue
+                true
             }
+            preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
+            return@withContext appReinstallValue
         }.getOrDefault(false)
     }
 
