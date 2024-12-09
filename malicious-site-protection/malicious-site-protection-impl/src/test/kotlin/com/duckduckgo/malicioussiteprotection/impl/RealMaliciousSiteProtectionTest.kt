@@ -1,3 +1,4 @@
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
@@ -18,6 +19,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealMaliciousSiteProtectionTest {
 
