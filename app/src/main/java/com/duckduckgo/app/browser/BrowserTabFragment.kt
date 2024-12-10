@@ -608,6 +608,8 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
+    var isInitialized = false
+
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -816,13 +818,16 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
+        Timber.d("Resuming webview: $tabId")
         webView?.let {
             if (it.isShown) it.onResume()
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
@@ -838,9 +843,8 @@ class BrowserTabFragment :
         configureOmnibar()
 
         if (savedInstanceState == null) {
-            viewModel.onViewReady()
-            messageFromPreviousTab?.let {
-                processMessage(it)
+            if (isActiveTab) {
+                initFragmentIfNecessary()
             }
         } else {
             viewModel.onViewRecreated()
@@ -849,7 +853,7 @@ class BrowserTabFragment :
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
-                override fun onStop(owner: LifecycleOwner) {
+                override fun onPause(owner: LifecycleOwner) {
                     if (isVisible) {
                         updateOrDeleteWebViewPreview()
                     }
@@ -861,6 +865,16 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
+
+        disableSwipingOutsideTheOmnibar()
+    }
+
+    private fun disableSwipingOutsideTheOmnibar() {
+        newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
+            (v as FrameLayout).requestDisallowInterceptTouchEvent(true)
+            return@setOnTouchListener true
+        }
+        binding.legacyOmnibar.setOnTouchListener { v, event -> false }
     }
 
     private fun configureOmnibar() {
@@ -1138,8 +1152,21 @@ class BrowserTabFragment :
         startActivity(TabSwitcherActivity.intent(activity, tabId))
     }
 
+    private fun initFragmentIfNecessary() {
+        if (!isInitialized) {
+            isInitialized = true
+
+            viewModel.onViewReady()
+            messageFromPreviousTab?.let {
+                processMessage(it)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+
+        initFragmentIfNecessary()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
@@ -1310,6 +1337,10 @@ class BrowserTabFragment :
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
                     }
+
+                    if (isActiveTab) {
+                        initFragmentIfNecessary()
+                    }
                 }
             },
         )
@@ -1333,7 +1364,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.NewTab)
+        omnibar.setViewMode(ViewMode.NewTab)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1349,7 +1380,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Browser(viewModel.url))
+        omnibar.setViewMode(ViewMode.Browser(viewModel.url))
     }
 
     private fun showError(
@@ -1360,7 +1391,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Error)
+        omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1381,7 +1412,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.setViewMode(Omnibar.ViewMode.SSLWarning)
+        omnibar.setViewMode(ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
@@ -2430,7 +2461,11 @@ class BrowserTabFragment :
             cancelPendingAutofillRequestsToChooseCredentials()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
+
+            // prevent a crash when the view is not initiliazed yet
+            if (view != null) {
+                binding.focusDummy.requestFocus()
+            }
         }
     }
 
@@ -2464,6 +2499,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(

@@ -77,6 +77,8 @@ class TabDataRepository @Inject constructor(
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
+    override val flowSelectedTab: Flow<TabEntity?> = tabsDao.flowSelectedTab()
+
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
@@ -329,6 +331,10 @@ class TabDataRepository @Inject constructor(
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
         }
+    }
+
+    override suspend fun getTab(tabId: String): TabEntity? {
+        return withContext(dispatchers.io()) { tabsDao.tab(tabId) }
     }
 
     override fun updateTabFavicon(

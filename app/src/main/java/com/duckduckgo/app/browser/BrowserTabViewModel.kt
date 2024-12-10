@@ -2618,7 +2618,15 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userRequestedOpeningNewTab(longPress: Boolean = false) {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+        if (emptyTab != null) {
+            viewModelScope.launch {
+                tabRepository.select(tabId = emptyTab)
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
