@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.BrowserTabFragment
 
 interface TabManager {
     companion object {
-        const val MAX_ACTIVE_TABS = 40
+        const val MAX_ACTIVE_TABS = 20
     }
 
     var currentTab: BrowserTabFragment?
