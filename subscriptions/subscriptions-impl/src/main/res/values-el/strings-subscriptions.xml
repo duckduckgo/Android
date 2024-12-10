@@ -20,8 +20,6 @@
     <string name="cancel">Ακύρωση</string>
     <string name="ok">Εντάξει</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">Email</string>
-    <string name="addEmailText">Προσθήκη email</string>
     <string name="manageEmail">Διαχείριση Email</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Η συνδρομή δεν βρέθηκε</string>
     <string name="subscriptionNotFoundDescription">Η συνδρομή που συνδέεται με αυτόν τον λογαριασμό Google Play δεν είναι πλέον ενεργή.</string>
     <string name="purchaseRestored">Οι αγορές σας έχουν αποκατασταθεί.</string>
-    <string name="restoreSubscriptionTitle">Ενεργοποιήστε τη συνδρομή σας σε αυτήν τη συσκευή</string>
-    <string name="restoreSubscriptionDescription">Αποκτήστε πρόσβαση στη συνδρομή σας Privacy Pro σε αυτήν τη συσκευή μέσω Google Play ή διεύθυνσης email.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Η συνδρομή σας είναι αυτόματα διαθέσιμη στο DuckDuckGo σε οποιαδήποτε συσκευή είναι συνδεδεμένη στον λογαριασμό σας στο Google Play.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Επαναφορά αγοράς</string>
-    <string name="restoreSubscriptionEmailDescription">Χρησιμοποιήστε το email σας για να ενεργοποιήσετε τη συνδρομή σας στη συσκευή αυτή.</string>
-    <string name="restoreSubscriptionEmailButton">Εισαγωγή email</string>
+    <string name="restoreSubscriptionTitle">Προσθέστε τη συνδρομή σας Privacy Pro σε αυτήν τη συσκευή</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Προσθήκη μέσω λογαριασμού Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Κάντε επαναφορά της συνδρομή σας σε συσκευές Android χρησιμοποιώντας τον λογαριασμό σας στο Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Επαναφορά αγοράς</string>
+    <string name="restoreSubscriptionEmailTitle">Προσθήκη μέσω email</string>
+    <string name="restoreSubscriptionEmailDescription">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να προσθέσετε το Privacy Pro σε αυτήν τη συσκευή.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Ξεκινήστε</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Αφαίρεση συνδρομής</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Ετήσια συνδρομή</string>
     <string name="renews">ανανεώνεται</string>
     <string name="expires">λήγει</string>
-    <string name="activateOnOtherDevices">Ενεργοποίηση σε άλλες συσκευές</string>
-    <string name="addEmailPrimaryText">Προσθήκη email</string>
-    <string name="addEmailSecondaryText">Προσθέστε ένα προαιρετικό email στη συνδρομή σας για να αποκτήσετε πρόσβαση στο Privacy Pro από άλλες συσκευές.</string>
+    <string name="activateOnOtherDevices">Προσθήκη Privacy Pro σε άλλες συσκευές</string>
+    <string name="addToDevicePrimaryText">Προσθήκη σε συσκευή</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Προσθέστε το Privacy Pro στις άλλες συσκευές σας μέσω του Google Play ή συνδέοντας μια διεύθυνση email.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Privacy Pro &gt; Έχω συνδρομή.</string>
     <string name="editEmailPrimaryText">Επεξεργασία email</string>
-    <string name="editEmailSecondaryText">Χρησιμοποιήστε αυτό το email για να ενεργοποιήσετε τη συνδρομή σας στις Ρυθμίσεις &gt; Privacy Pro στην εφαρμογή DuckDuckGo στις άλλες συσκευές σας.</string>
     <string name="learnMore">Μάθετε περισσότερα</string>
     <string name="privacyProFaq">Χρειάζεστε βοήθεια με το Privacy Pro;</string>
     <string name="privacyProFaqSecondary">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη του Privacy Pro από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Συνδρομές</string>
     <string name="activitySubscriptionSettings">Ρυθμίσεις συνδρομής</string>
-    <string name="activityActivateSubscription">Ενεργοποίηση συνδρομής</string>
+    <string name="activityActivateSubscription">Έχω συνδρομή</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 </resources>

@@ -20,8 +20,6 @@
     <string name="cancel">Odustani</string>
     <string name="ok">U redu</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-pošta</string>
-    <string name="addEmailText">Dodaj e-poštu</string>
     <string name="manageEmail">Upravljaj e-poštom</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Pretplata nije pronađena</string>
     <string name="subscriptionNotFoundDescription">Tvoja pretplata povezana s ovim Google Play računom više nije aktivna.</string>
     <string name="purchaseRestored">Tvoje kupnje su vraćene.</string>
-    <string name="restoreSubscriptionTitle">Aktiviraj svoju pretplatu na ovom uređaju</string>
-    <string name="restoreSubscriptionDescription">Pristupi svojoj pretplati na Privacy Pro na ovom uređaju putem Google Playa ili adrese e-pošte.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Tvoja pretplata automatski je dostupna u DuckDuckGo na bilo kojem uređaju prijavljenom na tvoj Google Play račun.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Vrati kupnju</string>
-    <string name="restoreSubscriptionEmailDescription">Koristi svoju e-poštu za aktivaciju pretplate na ovom uređaju.</string>
-    <string name="restoreSubscriptionEmailButton">Unesi adresu e-pošte</string>
+    <string name="restoreSubscriptionTitle">Dodaj svoju pretplatu na Privacy Pro na ovaj uređaj</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Dodaj putem Google Play računa</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Obnovi svoju pretplatu na Android uređajima koristeći svoj Google Play račun.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Vrati kupnju</string>
+    <string name="restoreSubscriptionEmailTitle">Dodaj putem e-pošte</string>
+    <string name="restoreSubscriptionEmailDescription">Poveži adresu e-pošte s pretplatom kako bi dodao Privacy Pro na ovaj uređaj.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Započnite</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Ukloni pretplatu</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Godišnja pretplata</string>
     <string name="renews">obnavlja se</string>
     <string name="expires">istječe</string>
-    <string name="activateOnOtherDevices">Aktiviraj na drugim uređajima</string>
-    <string name="addEmailPrimaryText">Dodaj e-poštu</string>
-    <string name="addEmailSecondaryText">Dodaj neobaveznu e-poštu svojoj pretplati kako bi pristupio Privacy Prou na drugim uređajima.</string>
+    <string name="activateOnOtherDevices">Dodaj Privacy Pro na druge uređaje</string>
+    <string name="addToDevicePrimaryText">Dodaj na uređaj</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Dodaj Privacy Pro na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Privacy Pro &gt; Imam pretplatu.</string>
     <string name="editEmailPrimaryText">Uredi e-poštu</string>
-    <string name="editEmailSecondaryText">Koristi ovu adresu e-pošte za aktiviranje pretplate u Postavke &gt; Privacy Pro u aplikaciji DuckDuckGo na drugim uređajima.</string>
     <string name="learnMore">Saznajte više</string>
     <string name="privacyProFaq">Trebaš pomoć s Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku Privacy Pro putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Pretplate</string>
     <string name="activitySubscriptionSettings">Postavke pretplate</string>
-    <string name="activityActivateSubscription">Aktiviraj pretplatu</string>
+    <string name="activityActivateSubscription">Imam pretplatu</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
 </resources>
