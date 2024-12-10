@@ -24,7 +24,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -36,6 +35,24 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+interface MaliciousSiteBlockerWebViewIntegration {
+
+    suspend fun shouldIntercept(
+        request: WebResourceRequest,
+        documentUri: Uri?,
+        onSiteBlockedAsync: () -> Unit,
+    ): WebResourceResponse?
+
+    suspend fun shouldOverrideUrlLoading(
+        url: Uri,
+        webViewUrl: Uri?,
+        isForMainFrame: Boolean,
+        onSiteBlockedAsync: () -> Unit,
+    ): Boolean
+
+    fun onPageLoadStarted()
+}
 
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
 @ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
