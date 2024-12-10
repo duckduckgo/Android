@@ -1358,6 +1358,190 @@ class AutoCompleteApiTest {
         assertEquals("example.com/path?query1=1&query2=1", "https://www.example.com/path?query1=1&query2=1".formatIfUrl())
     }
 
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsNotTabOrFavouriteOrBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(5, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndNotFavouriteOrBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(6, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "espn", url = "https://espn.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(6, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = false),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndFavoriteThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "espn", url = "https://espn.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(
+                    favorite(title = "espn", url = "https://espn.com"),
+                ),
+            ),
+        )
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(6, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = true),
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+            ),
+            value.suggestions,
+        )
+    }
+
     private fun favorite(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
