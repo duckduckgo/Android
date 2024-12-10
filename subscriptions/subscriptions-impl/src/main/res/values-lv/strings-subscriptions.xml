@@ -20,8 +20,6 @@
     <string name="cancel">Atcelt</string>
     <string name="ok">Labi</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-pasts</string>
-    <string name="addEmailText">Pievienot e-pasta adresi</string>
     <string name="manageEmail">Pārvaldīt e-pastu</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Abonements nav atrasts</string>
     <string name="subscriptionNotFoundDescription">Ar šo Google Play kontu saistītais abonements vairs nav aktīvs.</string>
     <string name="purchaseRestored">Tavi pirkumi ir atjaunoti.</string>
-    <string name="restoreSubscriptionTitle">Aktivizē savu abonementu šajā ierīcē</string>
-    <string name="restoreSubscriptionDescription">Piekļūsti savam Privacy Pro abonementam šajā ierīcē, izmantojot Google Play vai e-pasta adresi.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Tavs abonements ir automātiski pieejams DuckDuckGo jebkurā ierīcē, kurā esi pierakstījies savā Google Play kontā.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Atjaunot pirkumu</string>
-    <string name="restoreSubscriptionEmailDescription">Izmanto savu e-pasta adresi, lai aktivizētu abonementu šajā ierīcē.</string>
-    <string name="restoreSubscriptionEmailButton">Ievadi e-pasta adresi</string>
+    <string name="restoreSubscriptionTitle">Pievieno šai ierīcei savu Privacy Pro abonementu</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Pievieno ar Google Play kontu</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Atjauno abonementu Android ierīcēs, izmantojot savu Google Play kontu.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Atjaunot pirkumu</string>
+    <string name="restoreSubscriptionEmailTitle">Pievieno, izmantojot e-pastu</string>
+    <string name="restoreSubscriptionEmailDescription">Piesaisti e-pasta adresi savam abonementam, lai pievienotu Privacy Pro šai ierīcei.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Sākt darbu</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Noņemt abonementu</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Gada abonements</string>
     <string name="renews">atjaunojas</string>
     <string name="expires">beidzas</string>
-    <string name="activateOnOtherDevices">Aktivizēt citās ierīcēs</string>
-    <string name="addEmailPrimaryText">Pievienot e-pasta adresi</string>
-    <string name="addEmailSecondaryText">Pēc izvēles pievieno abonementam e-pasta adresi, lai piekļūtu Privacy Pro citās ierīcēs.</string>
+    <string name="activateOnOtherDevices">Pievieno Privacy Pro citām ierīcēm</string>
+    <string name="addToDevicePrimaryText">Pievienot ierīcei</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pievieno Privacy Pro citām ierīcēm ar Google Play vai piesaistot e-pasta adresi.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Dodies uz sadaļu \"Iestatījumi\" &gt; Privacy Pro &gt; \"Man ir abonements\".</string>
     <string name="editEmailPrimaryText">Rediģēt e-pasta adresi</string>
-    <string name="editEmailSecondaryText">Izmanto šo e-pasta adresi, lai aktivizētu savu abonementu sadaļā Iestatījumi &gt; Privacy Pro lietotnē DuckDuckGo citās ierīcēs.</string>
     <string name="learnMore">Uzzināt vairāk</string>
     <string name="privacyProFaq">Vai nepieciešama palīdzība saistībā ar Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar Privacy Pro atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonementi</string>
     <string name="activitySubscriptionSettings">Abonementa iestatījumi</string>
-    <string name="activityActivateSubscription">Aktivizēt abonementu</string>
+    <string name="activityActivateSubscription">Man ir abonements</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
 </resources>
