@@ -29,13 +29,13 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
-import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -49,7 +49,7 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
-        maliciousSiteProtection: MaliciousSiteProtection,
+        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
@@ -94,7 +94,7 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
-        maliciousSiteProtection: MaliciousSiteProtection,
+        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri? = request.url
@@ -103,7 +103,7 @@ class WebViewRequestInterceptor(
             // TODO (cbarreiro): Handle site blocked asynchronously
         }
 
-        maliciousSiteProtection.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
+        maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
             // TODO (cbarreiro): Handle site blocked synchronously
             return it
         }

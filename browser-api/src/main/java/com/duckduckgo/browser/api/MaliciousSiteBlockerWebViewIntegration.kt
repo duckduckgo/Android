@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.malicioussiteprotection.api
+package com.duckduckgo.browser.api
 
 import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 
-interface MaliciousSiteProtection {
+interface MaliciousSiteBlockerWebViewIntegration {
 
-    suspend fun isMalicious(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean
+    suspend fun shouldIntercept(
+        request: WebResourceRequest,
+        documentUri: Uri?,
+        onSiteBlockedAsync: () -> Unit,
+    ): WebResourceResponse?
 
-    val isFeatureEnabled: Boolean
+    suspend fun shouldOverrideUrlLoading(
+        url: Uri,
+        webViewUrl: Uri?,
+        isForMainFrame: Boolean,
+        onSiteBlockedAsync: () -> Unit,
+    ): Boolean
+
+    fun onPageLoadStarted()
 }
