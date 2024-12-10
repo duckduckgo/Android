@@ -524,7 +524,6 @@ class BrowserTabViewModelTest {
             mockAutoCompleteRepository,
             mockTabRepository,
             mockUserStageStore,
-            coroutineRule.testDispatcherProvider,
             mockAutocompleteTabsFeature,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
