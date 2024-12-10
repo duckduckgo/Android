@@ -20,8 +20,6 @@
     <string name="cancel">Peruuta</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">Sähköposti</string>
-    <string name="addEmailText">Lisää sähköpostiosoite</string>
     <string name="manageEmail">Hallinnoi sähköpostia</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Tilausta ei löytynyt</string>
     <string name="subscriptionNotFoundDescription">Tähän Google Play -tiliin liitetty tilaus ei ole enää voimassa.</string>
     <string name="purchaseRestored">Ostosi on palautettu.</string>
-    <string name="restoreSubscriptionTitle">Aktivoi tilauksesi tällä laitteella</string>
-    <string name="restoreSubscriptionDescription">Pääset Privacy Pro -tilaukseesi tällä laitteella Google Playn tai sähköpostiosoitteen kautta.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Tilauksesi on automaattisesti saatavilla DuckDuckGossa kaikilla laitteilla, joilla on kirjauduttu Google Play -tilillesi.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Palauta osto</string>
-    <string name="restoreSubscriptionEmailDescription">Aktivoi tilauksesi tällä laitteella sähköpostiosoitteellasi.</string>
-    <string name="restoreSubscriptionEmailButton">Anna sähköpostiosoite</string>
+    <string name="restoreSubscriptionTitle">Lisää Privacy Pro -tilauksesi tähän laitteeseen</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Lisää Google Play -tilin kautta</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Palauta tilauksesi Android-laitteissa käyttämällä Google Play -tiliäsi.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Palauta osto</string>
+    <string name="restoreSubscriptionEmailTitle">Lisää sähköpostin kautta</string>
+    <string name="restoreSubscriptionEmailDescription">Lisää Privacy Pro tähän laitteeseen linkittämällä sähköpostiosoite tilaukseesi.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Aloita</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Poista tilaus</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Vuositilaus</string>
     <string name="renews">uusiutuu</string>
     <string name="expires">päättyy</string>
-    <string name="activateOnOtherDevices">Aktivoi muilla laitteilla</string>
-    <string name="addEmailPrimaryText">Lisää sähköpostiosoite</string>
-    <string name="addEmailSecondaryText">Lisää tilaukseesi valinnainen sähköpostiosoite, jotta voit käyttää Privacy Prota muilla laitteilla.</string>
+    <string name="activateOnOtherDevices">Lisää Privacy Pro muihin laitteisiin</string>
+    <string name="addToDevicePrimaryText">Lisää laitteeseen</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisää Privacy Pro muihin laitteisiisi Google Playn kautta tai linkittämällä sähköpostiosoite.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Privacy Pro &gt; Minulla on tilaus.</string>
     <string name="editEmailPrimaryText">Muokkaa sähköpostiosoitetta</string>
-    <string name="editEmailSecondaryText">Aktivoi tilauksesi tällä sähköpostiosoitteella muiden laitteiden DuckDuckGo-sovelluksessa kohdassa Asetukset &gt; Privacy Pro.</string>
     <string name="learnMore">Lue lisää</string>
     <string name="privacyProFaq">Tarvitsetko apua Privacy Pron kanssa?</string>
     <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä Privacy Pron tukeen ohjesivuiltamme. Ominaisuuden saatavuus vaihtelee maittain.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tilaukset</string>
     <string name="activitySubscriptionSettings">Tilauksen asetukset</string>
-    <string name="activityActivateSubscription">Aktivoi tilaus</string>
+    <string name="activityActivateSubscription">Minulla on tilaus</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
 </resources>
