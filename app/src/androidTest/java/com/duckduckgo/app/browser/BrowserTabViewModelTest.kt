@@ -3035,8 +3035,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3052,8 +3050,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3063,8 +3059,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3074,8 +3068,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -3092,8 +3084,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -5896,14 +5886,6 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
-    }
-
-    private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
-        whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
-    }
-
-    private fun givenLocationPermissionIsEnabled(state: Boolean) {
-        whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
