@@ -157,7 +157,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Before
-    fun setup() {
+    fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
         testee = BrowserWebViewClient(
@@ -199,6 +199,7 @@ class BrowserWebViewClientTest {
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
+        whenever(mockMaliciousSiteProtection.shouldOverrideUrlLoading(any(), any(), any(), any())).thenReturn(false)
     }
 
     @UiThreadTest
@@ -318,8 +319,8 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
-        val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
-        testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", EXAMPLE_URL, EXAMPLE_URL)
+        testee.onReceivedHttpAuthRequest(webView, mockHandler, "example.com", EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
     }
 
@@ -768,6 +769,7 @@ class BrowserWebViewClientTest {
     private fun getImmediatelyInvokedMockWebView(): WebView {
         val mockWebView = mock<WebView>()
         whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.post(any())).thenAnswer { invocation ->
             invocation.getArgument(0, Runnable::class.java).run()
             null
@@ -1074,6 +1076,10 @@ class BrowserWebViewClientTest {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
         }
+
+        override fun getUrl(): String {
+            return EXAMPLE_URL
+        }
     }
 
     private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {
@@ -1152,6 +1158,6 @@ class BrowserWebViewClientTest {
     }
 
     companion object {
-        const val EXAMPLE_URL = "example.com"
+        const val EXAMPLE_URL = "https://example.com"
     }
 }

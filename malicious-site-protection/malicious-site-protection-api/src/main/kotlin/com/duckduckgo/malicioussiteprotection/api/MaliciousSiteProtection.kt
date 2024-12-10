@@ -21,6 +21,4 @@ import android.net.Uri
 interface MaliciousSiteProtection {
 
     suspend fun isMalicious(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean
-
-    val isFeatureEnabled: Boolean
 }

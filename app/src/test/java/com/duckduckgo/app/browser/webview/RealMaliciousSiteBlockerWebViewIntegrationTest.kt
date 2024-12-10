@@ -3,6 +3,10 @@ package com.duckduckgo.app.browser.webview
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -10,6 +14,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -19,20 +24,29 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
-    private lateinit var testee: RealMaliciousSiteBlockerWebViewIntegration
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val maliciousSiteProtection: MaliciousSiteProtection = mock(MaliciousSiteProtection::class.java)
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val maliciousUri = "http://malicious.com".toUri()
     private val exampleUri = "http://example.com".toUri()
+    private val testee = RealMaliciousSiteBlockerWebViewIntegration(
+        maliciousSiteProtection,
+        androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+        dispatchers = coroutineRule.testDispatcherProvider,
+        appCoroutineScope = coroutineRule.testScope,
+        isMainProcess = true,
+    )
 
     @Before
     fun setup() {
-        testee = RealMaliciousSiteBlockerWebViewIntegration(maliciousSiteProtection)
-        whenever(maliciousSiteProtection.isFeatureEnabled).thenReturn(true)
+        updateFeatureEnabled(true)
     }
 
     @Test
     fun `shouldOverrideUrlLoading returns false when feature is disabled`() = runTest {
-        whenever(maliciousSiteProtection.isFeatureEnabled).thenReturn(false)
+        updateFeatureEnabled(false)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, null, true) {}
         assertFalse(result)
@@ -42,7 +56,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldInterceptRequest returns null when feature is disabled`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
-        whenever(maliciousSiteProtection.isFeatureEnabled).thenReturn(false)
+        updateFeatureEnabled(false)
 
         val result = testee.shouldIntercept(request, null) {}
         assertNull(result)
@@ -127,5 +141,10 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         testee.processedUrls.add(exampleUri.toString())
         testee.onPageLoadStarted()
         assertTrue(testee.processedUrls.isEmpty())
+    }
+
+    private fun updateFeatureEnabled(enabled: Boolean) {
+        fakeAndroidBrowserConfigFeature.enableMaliciousSiteProtection().setRawStoredState(State(enabled))
+        testee.onPrivacyConfigDownloaded()
     }
 }
