@@ -42,11 +42,11 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
-import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
@@ -98,7 +98,7 @@ class WebViewRequestInterceptorTest {
         fakeToggle,
         fakeUserAllowListRepository,
     )
-    private val mockMaliciousSiteProtection: MaliciousSiteProtection = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     private var webView: WebView = mock()
 
@@ -130,7 +130,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
         assertCancelledResponse(response)
@@ -143,7 +143,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -157,7 +157,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -172,7 +172,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -187,7 +187,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
         verify(mockHttpsUpgrader).upgrade(any())
@@ -203,7 +203,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -217,7 +217,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
         verify(mockDuckPlayer).intercept(any(), any(), any())
@@ -231,7 +231,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -245,7 +245,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -259,7 +259,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
         assertRequestCanContinueToLoad(response)
@@ -272,7 +272,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "duckduckgo.com/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -286,7 +286,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "donttrack.us/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -300,7 +300,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "spreadprivacy.com/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -314,7 +314,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "duckduckhack.com/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -328,7 +328,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "privatebrowsingmyths.com/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -342,7 +342,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "duck.co/a/b/c?q=123".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -359,7 +359,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockListener,
         )
 
@@ -377,7 +377,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockListener,
         )
 
@@ -395,7 +395,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -418,7 +418,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -442,7 +442,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -457,7 +457,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -474,7 +474,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -492,7 +492,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -510,7 +510,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -528,7 +528,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -546,7 +546,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -563,7 +563,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -580,7 +580,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -597,7 +597,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -614,7 +614,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = null,
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = mockWebViewClientListener,
         )
 
@@ -674,7 +674,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -713,7 +713,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -735,7 +735,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
@@ -755,7 +755,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             documentUri = "foo.com".toUri(),
             webView = webView,
-            maliciousSiteProtection = mockMaliciousSiteProtection,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
