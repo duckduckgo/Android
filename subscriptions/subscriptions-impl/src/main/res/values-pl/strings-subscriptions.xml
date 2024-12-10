@@ -20,8 +20,6 @@
     <string name="cancel">Anuluj</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-mail</string>
-    <string name="addEmailText">Dodaj adres e-mail</string>
     <string name="manageEmail">Zarządzaj adresem e-mail</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Nie znaleziono subskrypcji</string>
     <string name="subscriptionNotFoundDescription">Subskrypcja powiązana z tym kontem Google Play nie jest już aktywna.</string>
     <string name="purchaseRestored">Zakupy zostały przywrócone.</string>
-    <string name="restoreSubscriptionTitle">Aktywuj subskrypcję na tym urządzeniu</string>
-    <string name="restoreSubscriptionDescription">Uzyskaj dostęp do subskrypcji Privacy Pro na tym urządzeniu za pośrednictwem Google Play lub adresu e-mail.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Twoja subskrypcja jest automatycznie dostępna w DuckDuckGo na każdym urządzeniu, na którym zalogujesz się na konto Google Play.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Przywróć zakup</string>
-    <string name="restoreSubscriptionEmailDescription">Użyj adresu e-mail, aby aktywować subskrypcję na tym urządzeniu.</string>
-    <string name="restoreSubscriptionEmailButton">Wpisz adres e-mail</string>
+    <string name="restoreSubscriptionTitle">Dodaj subskrypcję Privacy Pro do tego urządzenia</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Dodaj za pośrednictwem konta Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Przywróć subskrypcję na urządzeniach z systemem Android za pomocą konta Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Przywróć zakup</string>
+    <string name="restoreSubscriptionEmailTitle">Dodaj za pośrednictwem adresu e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Połącz adres e-mail z subskrypcją, aby dodać Privacy Pro do tego urządzenia.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Rozpocznij</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Usuń subskrypcję</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Subskrypcja roczna</string>
     <string name="renews">zostaje odnowiona</string>
     <string name="expires">wygasa</string>
-    <string name="activateOnOtherDevices">Aktywuj na innych urządzeniach</string>
-    <string name="addEmailPrimaryText">Dodaj adres e-mail</string>
-    <string name="addEmailSecondaryText">Dodaj opcjonalny adres e-mail do subskrypcji, aby uzyskać dostęp do Privacy Pro na innych urządzeniach.</string>
+    <string name="activateOnOtherDevices">Dodaj Privacy Pro do innych urządzeń</string>
+    <string name="addToDevicePrimaryText">Dodaj do urządzenia</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Dodaj Privacy Pro do innych urządzeń za pośrednictwem Google Play lub połączenia adresu e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Użyj powyższego adresu e-mail, aby dodać subskrypcję na innych urządzeniach w aplikacji DuckDuckGo. Wybierz kolejno Ustawienia &gt; Privacy Pro &gt; Mam subskrypcję.</string>
     <string name="editEmailPrimaryText">Edytuj adres e-mail</string>
-    <string name="editEmailSecondaryText">Użyj tego adresu e-mail, aby aktywować subskrypcję poprzez wybór opcji Ustawienia &gt; Privacy Pro w aplikacji DuckDuckGo na innych urządzeniach.</string>
     <string name="learnMore">Dowiedz się więcej</string>
     <string name="privacyProFaq">Potrzebujesz pomocy z Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Uzyskaj odpowiedzi na często zadawane pytania lub skontaktuj się z pomocą techniczną Privacy Pro na naszych stronach pomocy. Dostępność funkcji różni się w zależności od kraju.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Subskrypcje</string>
     <string name="activitySubscriptionSettings">Ustawienia subskrypcji</string>
-    <string name="activityActivateSubscription">Aktywuj subskrypcję</string>
+    <string name="activityActivateSubscription">Mam subskrypcję</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Wyślij opinię</string>
 </resources>
