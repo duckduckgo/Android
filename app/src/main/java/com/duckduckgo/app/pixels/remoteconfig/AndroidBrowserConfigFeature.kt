@@ -19,6 +19,7 @@ package com.duckduckgo.app.pixels.remoteconfig
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
  * This is the class that represents the browser feature flags
@@ -83,4 +84,13 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(false)
     fun featuresRequestHeader(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "enableMaliciousSiteProtection" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(false)
+    fun enableMaliciousSiteProtection(): Toggle
 }

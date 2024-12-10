@@ -40,9 +40,7 @@ class RealMaliciousSiteProtection @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MaliciousSiteProtection, PrivacyConfigCallbackPlugin {
 
-    private var _isFeatureEnabled = false
-    override val isFeatureEnabled: Boolean
-        get() = _isFeatureEnabled
+    private var isFeatureEnabled = false
 
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
@@ -59,7 +57,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            _isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
+            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     hashPrefixUpdateFrequency = settings.getLong("hashPrefixUpdateFrequency")

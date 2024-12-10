@@ -21,28 +21,58 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.URLDecoder
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ContributesBinding(AppScope::class)
+@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
+@ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val maliciousSiteProtection: MaliciousSiteProtection,
-) : MaliciousSiteBlockerWebViewIntegration {
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    @IsMainProcess private val isMainProcess: Boolean,
+) : MaliciousSiteBlockerWebViewIntegration, PrivacyConfigCallbackPlugin {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val processedUrls = mutableListOf<String>()
+    private var isFeatureEnabled = false
+
+    init {
+        if (isMainProcess) {
+            loadToMemory()
+        }
+    }
+
+    private fun loadToMemory() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            isFeatureEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled()
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        loadToMemory()
+    }
 
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
         onSiteBlockedAsync: () -> Unit,
     ): WebResourceResponse? {
-        if (!maliciousSiteProtection.isFeatureEnabled) {
+        if (!isFeatureEnabled) {
             return null
         }
         val url = request.url.let {
@@ -81,7 +111,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         isForMainFrame: Boolean,
         onSiteBlockedAsync: () -> Unit,
     ): Boolean {
-        if (!maliciousSiteProtection.isFeatureEnabled) {
+        if (!isFeatureEnabled) {
             return false
         }
         val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
