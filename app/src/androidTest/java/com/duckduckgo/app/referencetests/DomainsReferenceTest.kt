@@ -52,6 +52,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -119,6 +120,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -198,6 +200,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUri = testCase.siteURL.toUri(),
             webView = webView,
+            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 

@@ -66,6 +66,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -117,6 +118,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
+    private val maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -125,6 +127,10 @@ class BrowserWebViewClient @Inject constructor(
     private var start: Long? = null
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
+
+    private val onSiteBlockedAsync: () -> Unit = {
+        // TODO (cbarreiro): Handle site blocked asynchronously
+    }
 
     init {
         appCoroutineScope.launch {
@@ -158,6 +164,20 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
+
+            if (runBlocking {
+                maliciousSiteProtectionWebViewIntegration.shouldOverrideUrlLoading(
+                        url,
+                        webView.url?.toUri(),
+                        isForMainFrame,
+                        onSiteBlockedAsync,
+                    )
+            }
+            ) {
+                // TODO (cbarreiro): Handle site blocked synchronously
+                return true
+            }
+
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
@@ -407,6 +427,7 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                maliciousSiteProtectionWebViewIntegration.onPageLoadStarted()
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -509,7 +530,13 @@ class BrowserWebViewClient @Inject constructor(
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
+            requestInterceptor.shouldIntercept(
+                request,
+                webView,
+                documentUrl?.toUri(),
+                maliciousSiteProtectionWebViewIntegration,
+                webViewClientListener,
+            )
         }
     }
 

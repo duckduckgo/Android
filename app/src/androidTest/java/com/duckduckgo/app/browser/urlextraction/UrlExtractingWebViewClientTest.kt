@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.test.TestScope
@@ -50,6 +51,7 @@ class UrlExtractingWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val urlExtractor: DOMUrlExtractor = mock()
     private val mockWebView: WebView = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     @UiThreadTest
     @Before
@@ -63,6 +65,7 @@ class UrlExtractingWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
+            mockMaliciousSiteProtection,
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }

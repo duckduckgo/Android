@@ -16,6 +16,7 @@
 
 package com.duckduckgo.malicioussiteprotection.impl
 
+import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -28,6 +29,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
@@ -38,7 +40,10 @@ class RealMaliciousSiteProtection @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MaliciousSiteProtection, PrivacyConfigCallbackPlugin {
 
-    private var isFeatureEnabled = false
+    private var _isFeatureEnabled = false
+    override val isFeatureEnabled: Boolean
+        get() = _isFeatureEnabled
+
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
 
@@ -54,7 +59,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
+            _isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     hashPrefixUpdateFrequency = settings.getLong("hashPrefixUpdateFrequency")
@@ -62,5 +67,11 @@ class RealMaliciousSiteProtection @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun isMalicious(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean {
+        Timber.tag("MaliciousSiteProtection").d("isMalicious $url")
+        // TODO (cbarreiro): Implement the logic to check if the URL is malicious
+        return false
     }
 }

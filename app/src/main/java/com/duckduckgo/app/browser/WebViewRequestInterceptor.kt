@@ -29,6 +29,7 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -48,6 +49,7 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
+        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
@@ -92,9 +94,19 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
+        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri? = request.url
+
+        val onSiteBlockedAsync: () -> Unit = {
+            // TODO (cbarreiro): Handle site blocked asynchronously
+        }
+
+        maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
+            // TODO (cbarreiro): Handle site blocked synchronously
+            return it
+        }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
