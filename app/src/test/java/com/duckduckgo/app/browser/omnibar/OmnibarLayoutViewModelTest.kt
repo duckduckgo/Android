@@ -627,7 +627,9 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryEmptyThenViewStateCorrect() = runTest {
         val query = ""
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus)
+        val clearQuery = true
+        val deleteLastCharacter = false
+        testee.onInputStateChanged(query, hasFocus, clearQuery, deleteLastCharacter)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -645,7 +647,9 @@ class OmnibarLayoutViewModelTest {
     fun whenInputStateChangedAndQueryNotEmptyThenViewStateCorrect() = runTest {
         val query = "query"
         val hasFocus = true
-        testee.onInputStateChanged(query, hasFocus)
+        val clearQuery = true
+        val deleteLastCharacter = false
+        testee.onInputStateChanged(query, hasFocus, clearQuery, deleteLastCharacter)
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -812,6 +816,92 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             awaitItem().assertCommand(Command.CancelTrackersAnimation::class)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarTextClearedAndBackPressedThenUrlIsShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        testee.onClearTextButtonPressed()
+        testee.onBackKeyPressed()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun whenHidingKeyboardAfterClearingInputWhileInSiteThenURLisShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        testee.onClearTextButtonPressed()
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = false
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(RANDOM_URL, false, false, false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun whenHidingKeyboardAfterClearingInputWhileInSERPThenURLisShown() = runTest {
+        givenSiteLoaded(SERP_URL)
+
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = false
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(SERP_URL, false, false, false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == SERP_URL)
+        }
+    }
+
+    @Test
+    fun whenClosingKeyboardAfterDeletingLastCharacterFromOmnibaWhileInSERPThenURLisShown() = runTest {
+        givenSiteLoaded(SERP_URL)
+
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = true
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(SERP_URL, false, false, deleteLastCharacter)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == SERP_URL)
+        }
+    }
+
+    @Test
+    fun whenClosingKeyboardAfterDeletingLastCharacterFromOmnibaWhileInSitehenURLisShown() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        val hasFocus = true
+        val clearQuery = true
+        val deleteLastCharacter = true
+
+        testee.onClearTextButtonPressed()
+        testee.onInputStateChanged("", hasFocus, clearQuery, deleteLastCharacter)
+        testee.onOmnibarFocusChanged(false, "")
+        testee.onInputStateChanged(RANDOM_URL, false, false, deleteLastCharacter)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.omnibarText == RANDOM_URL)
         }
     }
 
