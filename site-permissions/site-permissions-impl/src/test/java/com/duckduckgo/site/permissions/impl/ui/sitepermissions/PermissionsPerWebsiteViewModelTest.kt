@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions
+package com.duckduckgo.site.permissions.impl.ui.sitepermissions
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingOption
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSetting
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class PermissionsPerWebsiteViewModelTest {
 
@@ -148,7 +149,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
-            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingOption.ASK)
+            WebsitePermissionSetting(R.drawable.ic_video_24, R.string.sitePermissionsSettingsCamera, ASK)
         viewModel.permissionSettingSelected(websitePermissionSetting)
 
         viewModel.commands.test {

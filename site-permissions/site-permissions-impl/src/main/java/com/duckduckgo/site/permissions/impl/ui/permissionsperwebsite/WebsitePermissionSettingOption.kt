@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions.permissionsperwebsite
+package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 
 import androidx.annotation.StringRes
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import java.io.Serializable
 
