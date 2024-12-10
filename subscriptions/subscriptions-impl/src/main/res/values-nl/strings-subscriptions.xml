@@ -20,8 +20,6 @@
     <string name="cancel">Annuleren</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-mail</string>
-    <string name="addEmailText">E-mailadres toevoegen</string>
     <string name="manageEmail">E-mail beheren</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Abonnement niet gevonden</string>
     <string name="subscriptionNotFoundDescription">Je abonnement dat aan dit Google Play-account is gekoppeld, is niet langer actief.</string>
     <string name="purchaseRestored">Je aankopen zijn hersteld.</string>
-    <string name="restoreSubscriptionTitle">Activeer je abonnement op dit apparaat</string>
-    <string name="restoreSubscriptionDescription">Krijg op dit apparaat toegang tot je Privacy Pro-abonnement via Google Play of een e-mailadres.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Je abonnement is automatisch beschikbaar in DuckDuckGo op elk apparaat dat is aangemeld bij je Google Play-account.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Aankoop herstellen</string>
-    <string name="restoreSubscriptionEmailDescription">Gebruik je e-mailadres om je abonnement op dit apparaat te activeren.</string>
-    <string name="restoreSubscriptionEmailButton">E-mailadres invoeren</string>
+    <string name="restoreSubscriptionTitle">Voeg je Privacy Pro-abonnement toe aan dit apparaat</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Toevoegen via Google Play-account</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Herstel je abonnement op Android-apparaten met je Google Play-account.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Aankoop herstellen</string>
+    <string name="restoreSubscriptionEmailTitle">Toevoegen via e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Koppel een e-mailadres aan je abonnement om Privacy Pro aan dit apparaat toe te voegen.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Aan de slag</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Abonnement verwijderen</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Jaarabonnement</string>
     <string name="renews">wordt verlengd</string>
     <string name="expires">vervalt</string>
-    <string name="activateOnOtherDevices">Activeren op andere apparaten</string>
-    <string name="addEmailPrimaryText">E-mailadres toevoegen</string>
-    <string name="addEmailSecondaryText">Voeg een optioneel e-mailadres toe aan je abonnement om toegang te krijgen tot Privacy Pro op andere apparaten.</string>
+    <string name="activateOnOtherDevices">Privacy Pro toevoegen aan andere apparaten</string>
+    <string name="addToDevicePrimaryText">Toevoegen aan apparaat</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Voeg Privacy Pro toe aan je andere apparaten via Google Play of door een e-mailadres te koppelen.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Gebruik het e-mailadres hierboven om je abonnement toe te voegen op je andere apparaten in de DuckDuckGo-app. Ga naar Instellingen &gt; Privacy Pro &gt; Ik heb een abonnement.</string>
     <string name="editEmailPrimaryText">E-mailadres bewerken</string>
-    <string name="editEmailSecondaryText">Gebruik dit e-mailadres om je abonnement te activeren in \'Instellingen\' &gt; \'Privacy Pro\' in de DuckDuckGo-app op je andere apparaten.</string>
     <string name="learnMore">Meer informatie</string>
     <string name="privacyProFaq">Hulp nodig met Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Krijg antwoorden op veelgestelde vragen of neem contact op met de klantenservice van Privacy Pro via onze hulppagina\'s. De beschikbaarheid van functies verschilt per land.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonnementen</string>
     <string name="activitySubscriptionSettings">Abonnementinstellingen</string>
-    <string name="activityActivateSubscription">Abonnement activeren</string>
+    <string name="activityActivateSubscription">Ik heb een abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Verstuur feedback</string>
 </resources>
