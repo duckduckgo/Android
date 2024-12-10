@@ -79,6 +79,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
+import com.google.android.material.snackbar.Snackbar
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
@@ -126,10 +127,6 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
-    private val confirmationCallback: (isMalicious: Boolean) -> Unit = {
-        // TODO (cbarreiro): Handle site blocked asynchronously
-    }
-
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
@@ -162,7 +159,7 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-            if (requestInterceptor.shouldOverrideUrlLoading(url, isForMainFrame)) {
+            if (requestInterceptor.shouldOverrideUrlLoading(webView, url, isForMainFrame)) {
                 return true
             }
 

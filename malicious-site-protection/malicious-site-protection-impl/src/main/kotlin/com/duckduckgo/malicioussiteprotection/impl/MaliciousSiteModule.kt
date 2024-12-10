@@ -26,6 +26,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.security.MessageDigest
 
 @Module
 @ContributesTo(AppScope::class)
@@ -44,5 +45,11 @@ class MaliciousSiteModule {
     @SingleInstanceIn(AppScope::class)
     fun provideMaliciousSiteDao(database: MaliciousSitesDatabase): MaliciousSiteDao {
         return database.maliciousSiteDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideMessageDigest(): MessageDigest {
+        return MessageDigest.getInstance("SHA-256")
     }
 }

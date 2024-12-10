@@ -17,22 +17,66 @@
 package com.duckduckgo.malicioussiteprotection.impl.domain
 
 import android.net.Uri
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
-import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
+import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.security.MessageDigest
+import java.util.regex.Pattern
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
-    maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val maliciousSiteRepository: MaliciousSiteRepository,
+    private val messageDigest: MessageDigest,
 ) : MaliciousSiteProtection {
 
     override suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult {
         Timber.tag("MaliciousSiteProtection").d("isMalicious $url")
-        // TODO (cbarreiro): Implement the logic to check if the URL is malicious
-        return IsMaliciousResult.SAFE
+
+        val hostname = url.host ?: return IsMaliciousResult.SAFE
+        val hash = messageDigest
+            .digest(hostname.toByteArray())
+            .joinToString("") { "%02x".format(it) }
+        val hashPrefix = hash.substring(0, 8)
+
+        if (!maliciousSiteRepository.containsHashPrefix(hashPrefix)) {
+            Timber.d("\uD83D\uDFE2 Cris: should not block (no hash) $hashPrefix,  $url")
+            return IsMaliciousResult.SAFE
+        }
+        maliciousSiteRepository.getFilter(hash)?.let {
+            if (Pattern.matches(it.regex, url.toString())) {
+                Timber.d("\uD83D\uDFE2 Cris: shouldBlock $url")
+                return IsMaliciousResult.MALICIOUS
+            }
+        }
+        appCoroutineScope.launch(dispatchers.io()) {
+            confirmationCallback(matches(hashPrefix, url, hostname, hash))
+        }
+        return IsMaliciousResult.WAIT_FOR_CONFIRMATION
+    }
+
+    private suspend fun matches(
+        hashPrefix: String,
+        url: Uri,
+        hostname: String,
+        hash: String,
+    ): Boolean {
+        val matches = maliciousSiteRepository.matches(hashPrefix)
+        return matches.any { match ->
+            Pattern.matches(match.regex, url.toString()) &&
+                (hostname == match.hostname) &&
+                (hash == match.hash)
+        }.also { matched ->
+            Timber.d("\uD83D\uDFE2 Cris: should block $matched")
+        }
     }
 }
