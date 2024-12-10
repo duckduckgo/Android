@@ -39,6 +39,7 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -100,11 +101,13 @@ class WebViewRequestInterceptor(
         val url: Uri? = request.url
 
         val onSiteBlockedAsync: () -> Unit = {
+            Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
             // TODO (cbarreiro): Handle site blocked asynchronously
         }
 
         maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
             // TODO (cbarreiro): Handle site blocked synchronously
+            Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
             return it
         }
 

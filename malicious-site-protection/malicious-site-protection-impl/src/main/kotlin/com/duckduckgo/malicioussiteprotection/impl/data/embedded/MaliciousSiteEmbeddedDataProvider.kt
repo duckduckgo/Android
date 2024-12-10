@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.annotation.RawRes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.R
-import com.duckduckgo.malicioussiteprotection.impl.data.FilterSetResponse
-import com.duckduckgo.malicioussiteprotection.impl.data.HashPrefixResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
