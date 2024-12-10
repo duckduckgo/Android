@@ -20,8 +20,6 @@
     <string name="cancel">Zrušit</string>
     <string name="ok">Dobře</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">Emailová adresa</string>
-    <string name="addEmailText">Přidat e-mail</string>
     <string name="manageEmail">Spravovat e-mail</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Předplatné nenalezeno</string>
     <string name="subscriptionNotFoundDescription">Předplatné spojené s tímhle účtem Google Play už není aktivní.</string>
     <string name="purchaseRestored">Tvoje nákupy byly obnovené.</string>
-    <string name="restoreSubscriptionTitle">Aktivuj si předplatné na tomhle zařízení</string>
-    <string name="restoreSubscriptionDescription">Získej na tomhle zařízení přístup ke svému předplatnému Privacy Pro přes Google Play nebo e-mailovou adresu.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Tvoje předplatné se na DuckDuckGo automaticky aktivuje na jakémkoli zařízení přihlášeném ke tvému účtu Google Play.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Obnovit nákup</string>
-    <string name="restoreSubscriptionEmailDescription">Pokud chceš na tomhle zařízení aktivovat svoje předplatné, musíš nejdřív do e-mailu.</string>
-    <string name="restoreSubscriptionEmailButton">Zadej e-mail</string>
+    <string name="restoreSubscriptionTitle">Přidej do tohoto zařízení své předplatné Privacy Pro</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Přidání přes účet Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Obnov své předplatné na zařízeních Android pomocí svého účtu Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Obnovit nákup</string>
+    <string name="restoreSubscriptionEmailTitle">Přidání prostřednictvím e-mailu</string>
+    <string name="restoreSubscriptionEmailDescription">Pokud si do tohoto zařízení chceš přidat předplatné Privacy Pro, přidej si k předplatnému e-mailovou adresu.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Začínáme</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Odebrat předplatné</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Roční předplatné</string>
     <string name="renews">se obnoví</string>
     <string name="expires">vyprší</string>
-    <string name="activateOnOtherDevices">Aktivovat na jiných zařízeních</string>
-    <string name="addEmailPrimaryText">Přidat e-mail</string>
-    <string name="addEmailSecondaryText">Přidej si k předplatnému nepovinný e-mail, ať můžeš službu Privacy Pro využívat i na jiných zařízeních.</string>
+    <string name="activateOnOtherDevices">Přidej předplatné Privacy Pro do dalších zařízení</string>
+    <string name="addToDevicePrimaryText">Přidat do zařízení</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Přidej předplatné Privacy Pro do svých dalších zařízení přes Google Play nebo propojením e-mailové adresy.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Pomocí uvedeného e-mailu si v aplikaci DuckDuckGo přidej předplatné do ostatních zařízení. Přejdi do Nastavení &gt; Privacy Pro &gt; Mám předplatné.</string>
     <string name="editEmailPrimaryText">Upravit e-mail</string>
-    <string name="editEmailSecondaryText">Pomocí tohohle e-mailu si v aplikaci DuckDuckGo aktivuješ předplatné i na jiných zařízeních. Stačí přejít do Nastavení &gt; Privacy Pro.</string>
     <string name="learnMore">Více informací</string>
     <string name="privacyProFaq">Potřebuješ pomoct se službou Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Získej odpovědi na časté otázky nebo přes naše stránky nápovědy kontaktuj podporu služby Privacy Pro. Dostupnost se v jednotlivých zemích liší.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Předplatné</string>
     <string name="activitySubscriptionSettings">Nastavení předplatného</string>
-    <string name="activityActivateSubscription">Aktivace předplatného</string>
+    <string name="activityActivateSubscription">Mám předplatné</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 </resources>
