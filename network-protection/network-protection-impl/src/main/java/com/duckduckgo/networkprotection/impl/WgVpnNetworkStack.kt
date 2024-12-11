@@ -58,6 +58,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val dnsProvider: DnsProvider,
     private val crashLogger: CrashLogger,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
 ) : VpnNetworkStack {
     private var wgConfig: Config? = null
 
@@ -75,7 +76,7 @@ class WgVpnNetworkStack @Inject constructor(
             logcat { "Wireguard configuration:\n$wgConfig" }
 
             val privateDns = dnsProvider.getPrivateDns()
-            val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled()) {
+            val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowBlockMalware().isEnabled()) {
                 // if the user has configured "block malware" we calculate the malware DNS from the DDG default DNS(s)
                 wgConfig!!.`interface`.dnsServers.map { it.computeBlockMalwareDnsOrSame() }.toSet()
             } else {
