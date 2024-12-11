@@ -282,7 +282,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -642,8 +641,6 @@ class BrowserTabViewModelTest {
             ampLinks = mockAmpLinks,
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
-            voiceSearchAvailability = voiceSearchAvailability,
-            voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
             adClickManager = mockAdClickManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
@@ -1159,18 +1156,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = runTest {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(omnibarViewState().isEditing)
-    }
-
-    @Test
-    fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertFalse(omnibarViewState().isEditing)
-    }
-
-    @Test
     fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() {
         assertEquals("", omnibarViewState().omnibarText)
     }
@@ -1293,121 +1278,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyShield.isEnabled())
-        assertFalse(browserViewState().showSearchIcon)
-    }
-
-    @Test
-    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        testee.onUserSubmittedQuery("foo")
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyShield.isEnabled())
-        assertFalse(browserViewState().showSearchIcon)
-    }
-
-    @Test
-    fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyShield.isEnabled())
-    }
-
-    @Test
-    fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        testee.onUserSubmittedQuery("foo")
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyShield.isEnabled())
-        assertTrue(browserViewState().showSearchIcon)
-    }
-
-    @Test
     fun whenInitialisedThenFireButtonIsShown() {
         assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is HighlightableButton.Gone)
-    }
-
-    @Test
-    fun whenInitialisedThenTabsButtonIsShown() {
-        assertTrue(browserViewState().showTabsButton)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showTabsButton)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showTabsButton)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndNoQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showTabsButton)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndQueryThenTabsButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showTabsButton)
-    }
-
-    @Test
     fun whenInitialisedThenMenuButtonIsShown() {
         assertTrue(browserViewState().showMenuButton.isEnabled())
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton.isEnabled())
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton.isEnabled())
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton.isEnabled())
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
@@ -1445,27 +1322,6 @@ class BrowserTabViewModelTest {
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
         assertTrue(autoCompleteViewState().showFavorites)
-    }
-
-    @Test
-    fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
-        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
-        assertFalse(autoCompleteViewState().showSuggestions)
-    }
-
-    @Test
-    fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = true)
-        assertFalse(autoCompleteViewState().showSuggestions)
-    }
-
-    @Test
-    fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
-        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = true)
-        assertFalse(autoCompleteViewState().showSuggestions)
     }
 
     @Test
@@ -2992,28 +2848,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingDDGSiteThenDaxIconIsVisible() {
-        val url = "https://duckduckgo.com?q=test%20search"
-        loadUrl(url, isBrowserShowing = true)
-        assertTrue(browserViewState().showDaxIcon)
-        assertFalse(browserViewState().showSearchIcon)
-    }
-
-    @Test
-    fun whenBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsNotVisible() {
-        val url = "https://example.com"
-        loadUrl(url, isBrowserShowing = true)
-        assertFalse(browserViewState().showDaxIcon)
-        assertTrue(browserViewState().showPrivacyShield.isEnabled())
-    }
-
-    @Test
-    fun whenNotBrowsingAndDDGUrlPresentThenDaxIconIsNotVisible() {
-        loadUrl("https://duckduckgo.com?q=test%20search", isBrowserShowing = false)
-        assertFalse(browserViewState().showDaxIcon)
-    }
-
-    @Test
     fun whenQueryIsNotHierarchicalThenUnsupportedOperationExceptionIsHandled() {
         whenever(mockOmnibarConverter.convertQueryToUrl("about:blank", null)).thenReturn("about:blank")
         testee.onUserSubmittedQuery("about:blank")
@@ -4072,44 +3906,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShouldShowVoiceSearchAndUserSubmittedQueryThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
-
-        testee.onUserSubmittedQuery("foo")
-
-        assertTrue(browserViewState().showVoiceSearch)
-    }
-
-    @Test
-    fun whenShouldShowVoiceSearchAndUserNavigatesHomeThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
-        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
-
-        testee.onUserPressedBack()
-
-        assertTrue(browserViewState().showVoiceSearch)
-    }
-
-    @Test
-    fun whenShouldShowVoiceSearchAndUserLoadedUrlThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
-
-        loadUrl("https://test.com")
-
-        assertTrue(browserViewState().showVoiceSearch)
-    }
-
-    @Test
-    fun whenShouldShowVoiceSearchAndOmnibarInputStateChangedThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
-
-        testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
-
-        assertTrue(browserViewState().showVoiceSearch)
-    }
-
-    @Test
     fun whenInitializedAndVoiceSearchNotSupportedThenDontLogVoiceSearch() {
         verify(voiceSearchPixelLogger, never()).log()
     }
@@ -4200,26 +3996,22 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
-        configureOmnibarNotEditing()
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
 
     @Test
     fun whenEditingUrlBarAndNotCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        configureOmnibarEditing()
         assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
 
     @Test
     fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        configureOmnibarNotEditing()
         testee.cancelPendingAutofillRequestToChooseCredentials()
         assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
 
     @Test
     fun whenEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        configureOmnibarEditing()
         testee.cancelPendingAutofillRequestToChooseCredentials()
         assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
     }
@@ -4334,15 +4126,6 @@ class BrowserTabViewModelTest {
         )
 
         assertFalse(omnibarViewState().forceExpand)
-    }
-
-    @Test
-    fun whenVoiceSearchIsDisabledThenShowVoiceSearchShouldBeFalse() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(false)
-
-        testee.voiceSearchDisabled()
-
-        assertFalse(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -5174,8 +4957,6 @@ class BrowserTabViewModelTest {
 
         assertEquals(EXPIRED, browserViewState().sslError)
         assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
-        assertEquals(false, browserViewState().showDaxIcon)
-        assertEquals(false, browserViewState().showSearchIcon)
         assertEquals(false, loadingViewState().isLoading)
     }
 
@@ -5214,8 +4995,6 @@ class BrowserTabViewModelTest {
 
         assertEquals(EXPIRED, browserViewState().sslError)
         assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
-        assertEquals(false, browserViewState().showDaxIcon)
-        assertEquals(false, browserViewState().showSearchIcon)
         assertEquals(false, loadingViewState().isLoading)
     }
 
@@ -5328,8 +5107,6 @@ class BrowserTabViewModelTest {
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(false, browserViewState().browserShowing)
         assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
-        assertEquals(true, browserViewState().showSearchIcon)
-        assertEquals(false, browserViewState().showDaxIcon)
 
         assertEquals(false, loadingViewState().isLoading)
 
@@ -5705,24 +5482,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewPageWithUrlYouTubeNoCookieThenShowDuckPlayerIcon() = runTest {
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
-        whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
-            "duck://player/1234",
-        )
-        whenever(mockDuckPlayer.isDuckPlayerUri("duck://player/1234")).thenReturn(true)
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-
-        testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
-
-        assertTrue(browserViewState().showDuckPlayerIcon)
-    }
-
-    @Test
     fun whenNewPageAndBrokenSitePromptVisibleThenHideCta() = runTest {
         setCta(BrokenSitePromptDialogCta())
 
@@ -5899,14 +5658,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
         }
-    }
-
-    private fun configureOmnibarEditing() {
-        testee.onOmnibarInputStateChanged(hasFocus = true, query = "", hasQueryChanged = false)
-    }
-
-    private fun configureOmnibarNotEditing() {
-        testee.onOmnibarInputStateChanged(hasFocus = false, query = "", hasQueryChanged = false)
     }
 
     private fun buildNavigationHistoryStack(stackSize: Int) {
