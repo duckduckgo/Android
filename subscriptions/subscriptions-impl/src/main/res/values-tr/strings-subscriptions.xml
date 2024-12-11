@@ -20,8 +20,6 @@
     <string name="cancel">Vazgeç</string>
     <string name="ok">Tamam</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-posta</string>
-    <string name="addEmailText">E-posta Ekle</string>
     <string name="manageEmail">E-postayı Yönet</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Abonelik Bulunamadı</string>
     <string name="subscriptionNotFoundDescription">Bu Google Play hesabıyla ilişkili abonelik artık aktif değil.</string>
     <string name="purchaseRestored">Satın aldıklarınız geri yüklendi.</string>
-    <string name="restoreSubscriptionTitle">Bu cihazda aboneliğinizi etkinleştirin</string>
-    <string name="restoreSubscriptionDescription">Bu cihazda Privacy Pro aboneliğinize Google Play veya bir e-posta adresi aracılığıyla erişin.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Aboneliğiniz, Google Play hesabınızla oturum açtığınız tüm cihazlarda DuckDuckGo\'da otomatik olarak kullanılabilir.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Satın Almayı Geri Yükle</string>
-    <string name="restoreSubscriptionEmailDescription">Bu cihazda aboneliğinizi etkinleştirmek için e-postanızı kullanın.</string>
-    <string name="restoreSubscriptionEmailButton">E-posta Girin</string>
+    <string name="restoreSubscriptionTitle">Privacy Pro aboneliğinizi bu cihaza ekleyin</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Google Play Hesabı üzerinden ekleyin</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Google Play hesabınızı kullanarak Android cihazlarda aboneliğinizi geri yükleyin.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Satın Almayı Geri Yükle</string>
+    <string name="restoreSubscriptionEmailTitle">E-posta ile ekleyin</string>
+    <string name="restoreSubscriptionEmailDescription">Privacy Pro\'yu bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Başlayın</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Aboneliği Kaldır</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Yıllık Abonelik</string>
     <string name="renews">yenilenecek</string>
     <string name="expires">sona erecek</string>
-    <string name="activateOnOtherDevices">Diğer Cihazlarda Etkinleştir</string>
-    <string name="addEmailPrimaryText">E-posta Ekle</string>
-    <string name="addEmailSecondaryText">Privacy Pro\'ya diğer cihazlardan erişmek için aboneliğinize isteğe bağlı bir e-posta ekleyin.</string>
+    <string name="activateOnOtherDevices">Privacy Pro\'yu Diğer Cihazlara Ekleyin</string>
+    <string name="addToDevicePrimaryText">Cihaza Ekle</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Privacy Pro\'yu diğer cihazlarınıza Google Play üzerinden veya bir e-posta adresi bağlayarak ekleyin.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Privacy Pro &gt; Aboneliğim Var\'a gidin.</string>
     <string name="editEmailPrimaryText">E-postayı Düzenle</string>
-    <string name="editEmailSecondaryText">Bu e-postayı, diğer cihazlarınızdaki DuckDuckGo uygulamasında Ayarlar &gt; Privacy Pro bölümünde aboneliğinizi etkinleştirmek için kullanın.</string>
     <string name="learnMore">Daha Fazla Bilgi</string>
     <string name="privacyProFaq">Privacy Pro ile ilgili yardıma mı ihtiyacınız var?</string>
     <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonelikler</string>
     <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
-    <string name="activityActivateSubscription">Aboneliği Etkinleştir</string>
+    <string name="activityActivateSubscription">Aboneliğim Var</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
 </resources>
