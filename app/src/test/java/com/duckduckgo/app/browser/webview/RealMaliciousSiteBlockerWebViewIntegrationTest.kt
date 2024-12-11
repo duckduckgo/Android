@@ -8,6 +8,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -75,7 +76,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(true)
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         assertNotNull(result)
@@ -87,7 +88,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(true)
         whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe"))
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         assertNotNull(result)
@@ -98,7 +99,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(false)
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         assertNull(result)
@@ -106,7 +107,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverride returns false when feature is enabled, is malicious, and is not mainframe`() = runTest {
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, false) {}
         assertFalse(result)
@@ -114,7 +115,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverride returns true when feature is enabled, is malicious, and is mainframe`() = runTest {
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, true) {}
         assertTrue(result)
@@ -122,7 +123,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverride returns false when feature is enabled, is malicious, and not mainframe nor iframe`() = runTest {
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, false) {}
         assertFalse(result)
@@ -130,7 +131,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
     @Test
     fun `shouldOverride returns true when feature is enabled, is malicious, and is mainframe but webView has different host`() = runTest {
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, exampleUri, true) {}
         assertFalse(result)

@@ -99,11 +99,11 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri? = request.url
 
-        val onSiteBlockedAsync: () -> Unit = {
+        val confirmationCallback: (isMalicious: Boolean) -> Unit = {
             // TODO (cbarreiro): Handle site blocked asynchronously
         }
 
-        maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, onSiteBlockedAsync)?.let {
+        maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, confirmationCallback)?.let {
             // TODO (cbarreiro): Handle site blocked synchronously
             return it
         }
