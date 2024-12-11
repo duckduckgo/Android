@@ -39,13 +39,19 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
 import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.ui.AppPrivacyDashboardPayloadAdapter.ToggleReportOptions
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchAppFeedback
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacy.dashboard.impl.ui.ScreenKind.BREAKAGE_FORM
@@ -93,6 +99,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
     private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
+    private val toggleReports: ToggleReports,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
@@ -102,8 +109,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+        class LaunchToggleReport(val opener: DashboardOpener) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
+        class FetchToggleData(val toggleData: String) : Command()
+        data object LaunchAppFeedback : Command()
         data object GoBack : Command()
     }
 
@@ -276,6 +286,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
+    fun launchAppFeedbackFlow() {
+        viewModelScope.launch(dispatcher.io()) {
+            command.send(LaunchAppFeedback)
+        }
+    }
+
     fun onSiteChanged(site: Site?) {
         this.site.value = site
     }
@@ -321,6 +337,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
 
             delay(CLOSE_ON_PROTECTIONS_TOGGLE_DELAY)
+
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (event.isProtected) {
@@ -349,10 +366,15 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     }
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
-                    if (dashboardOpenedFromCustomTab) {
-                        if (event.eventOrigin.screen == PRIMARY_SCREEN) {
-                            pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
+                    if (event.eventOrigin.screen == PRIMARY_SCREEN) {
+                        if (toggleReports.shouldPrompt()) {
+                            viewModelScope.launch(dispatcher.main()) {
+                                command.send(LaunchToggleReport(opener = DashboardOpener.DASHBOARD))
+                            }
                         }
+                    }
+                    if (dashboardOpenedFromCustomTab) {
+                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
                     } else {
                         val pixelName = when (event.eventOrigin.screen) {
                             PRIMARY_SCREEN -> PRIVACY_DASHBOARD_ALLOWLIST_ADD
@@ -380,6 +402,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private companion object {
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
         val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
+        val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }
@@ -404,7 +427,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitBrokenSiteReport(payload: String, reportFlow: ReportFlow) {
+    fun onSubmitBrokenSiteReport(
+        payload: String,
+        reportFlow: ReportFlow,
+    ) {
         viewModelScope.launch(dispatcher.io()) {
             if (!webBrokenSiteFormFeature.isEnabled()) return@launch
             val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
@@ -441,9 +467,99 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
             )
 
-            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
             delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
+            command.send(GoBack)
+        }
+    }
+
+    fun onGetToggleReportOptions() {
+        viewModelScope.launch(dispatcher.io()) {
+            val site = site.value ?: return@launch
+            val siteUrl = site.url
+
+            val options = ToggleReportOptions(
+                data = listOf(
+                    ToggleReportOptions.ToggleReportOption(
+                        id = "siteUrl",
+                        additional = ToggleReportOptions.Additional(url = siteUrl),
+                    ),
+                    ToggleReportOptions.ToggleReportOption(id = "wvVersion"),
+                    ToggleReportOptions.ToggleReportOption(id = "requests"),
+                    ToggleReportOptions.ToggleReportOption(id = "features"),
+                    ToggleReportOptions.ToggleReportOption(id = "appVersion"),
+                    ToggleReportOptions.ToggleReportOption(id = "atb"),
+                    ToggleReportOptions.ToggleReportOption(id = "errorDescriptions"),
+                    ToggleReportOptions.ToggleReportOption(id = "extensionVersion"),
+                    ToggleReportOptions.ToggleReportOption(id = "httpErrorCodes"),
+                    ToggleReportOptions.ToggleReportOption(id = "lastSentDay"),
+                    ToggleReportOptions.ToggleReportOption(id = "device"),
+                    ToggleReportOptions.ToggleReportOption(id = "os"),
+                    ToggleReportOptions.ToggleReportOption(id = "reportFlow"),
+                    ToggleReportOptions.ToggleReportOption(id = "listVersions"),
+                    ToggleReportOptions.ToggleReportOption(id = "didOpenReportInfo"),
+                    ToggleReportOptions.ToggleReportOption(id = "toggleReportCounter"),
+                    ToggleReportOptions.ToggleReportOption(id = "openerContext"),
+                    ToggleReportOptions.ToggleReportOption(id = "userRefreshCount"),
+                    ToggleReportOptions.ToggleReportOption(id = "jsPerformance"),
+                    ToggleReportOptions.ToggleReportOption(id = "locale"),
+                ),
+            )
+            privacyDashboardPayloadAdapter.onGetToggleReportOptions(options).takeIf { it.isNotEmpty() }?.let {
+                command.send(FetchToggleData(it))
+            }
+        }
+    }
+
+    fun onToggleReportPromptDismissed() {
+        viewModelScope.launch(dispatcher.io()) {
+            toggleReports.onPromptDismissed()
+            delay(CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY)
+        }
+    }
+
+    fun onSubmitToggleReport(opener: DashboardOpener) {
+        viewModelScope.launch(dispatcher.io()) {
+            val site = site.value ?: return@launch
+            val siteUrl = site.url
+            if (siteUrl.isEmpty()) return@launch
+
+            val brokenSite = BrokenSite(
+                category = null,
+                description = null,
+                siteUrl = siteUrl,
+                upgradeHttps = site.upgradedHttps,
+                blockedTrackers = site.trackingEvents
+                    .filter { it.status == BLOCKED }
+                    .map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
+                    .distinct().joinToString(","),
+                surrogates = site.surrogates
+                    .map { Uri.parse(it.name).baseHost }
+                    .distinct()
+                    .joinToString(","),
+                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                urlParametersRemoved = site.urlParametersRemoved,
+                consentManaged = site.consentManaged,
+                consentOptOutFailed = site.consentOptOutFailed,
+                consentSelfTestFailed = site.consentSelfTestFailed,
+                errorCodes = moshi.adapter<List<String>>(
+                    Types.newParameterizedType(List::class.java, String::class.java),
+                ).toJson(site.errorCodeEvents.toList()).toString(),
+                httpErrorCodes = site.httpErrorCodeEvents.distinct().joinToString(","),
+                loginSite = null,
+                reportFlow = when (opener) {
+                    DashboardOpener.MENU -> ReportFlow.TOGGLE_MENU
+                    else -> ReportFlow.TOGGLE_DASHBOARD
+                },
+                userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
+                openerContext = site.realBrokenSiteContext.openerContext?.context,
+                jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+            )
+
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = true)
+            toggleReports.onReportSent()
+            delay(CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY)
             command.send(GoBack)
         }
     }

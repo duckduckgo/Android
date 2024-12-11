@@ -12,8 +12,7 @@ tags:
 - tapOn:
       text: "search or type URL"
 - inputText: "https://www.search-company.site/"
-- tapOn:
-      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- pressKey: Enter
 - assertVisible:
       text: ".*keep browsing.*"
 - tapOn:
@@ -22,9 +21,8 @@ tags:
       text: "Search engine"
 - tapOn:
       text: "https://www.search-company.site/"
-- inputText: "https://privacy-test-pages.glitch.me"
-- tapOn:
-      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- inputText: "https://privacy-test-pages.site"
+- pressKey: Enter
 - assertVisible:
       text: "Privacy Test Pages"
 - tapOn:

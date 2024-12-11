@@ -91,11 +91,7 @@ tags:
     text: "convert.ad-company.site"
 - action: back
 - action: back
-- tapOn:
-    id: "com.android.systemui:id/recent_apps"
-- swipe:
-    start: 100,500
-    end: 100,200
+- killApp
 - launchApp:
     clearState: false
 - assertVisible:

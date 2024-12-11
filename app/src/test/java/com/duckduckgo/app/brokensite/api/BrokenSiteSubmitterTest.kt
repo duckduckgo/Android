@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
+import com.duckduckgo.app.pixels.AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -58,6 +59,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -174,7 +176,7 @@ class BrokenSiteSubmitterTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -189,7 +191,7 @@ class BrokenSiteSubmitterTest {
         whenever(networkProtectionState.isRunning()).thenReturn(true)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -206,7 +208,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(true)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -223,7 +225,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -240,7 +242,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -259,7 +261,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(true)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -276,7 +278,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -292,7 +294,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockBrokenSiteLastSentReport.getLastSentDay(any())).thenReturn(lastSentDay)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -311,7 +313,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -329,7 +331,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -344,7 +346,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(reportFlow = MENU)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -358,7 +360,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(reportFlow = DASHBOARD)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -372,7 +374,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(reportFlow = null)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -386,7 +388,7 @@ class BrokenSiteSubmitterTest {
         val params = mapOf("test_key" to "test_value")
         whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
 
-        testee.submitBrokenSiteFeedback(getBrokenSite())
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -404,7 +406,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(usLocale)
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
@@ -418,7 +420,7 @@ class BrokenSiteSubmitterTest {
     fun whenUserRefreshCountIsZeroThenIncludeParam() {
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -432,7 +434,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(userRefreshCount = 5)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -446,7 +448,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(openerContext = SERP.context)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -460,7 +462,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(openerContext = EXTERNAL.context)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -474,7 +476,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(openerContext = NAVIGATION.context)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -487,7 +489,7 @@ class BrokenSiteSubmitterTest {
     fun whenOpenerContextIsNullThenIncludeEmptyStringAsParam() {
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -500,7 +502,7 @@ class BrokenSiteSubmitterTest {
     fun whenJsPerformanceIsNullThenIncludeEmptyStringAsParam() {
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -514,7 +516,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
             .copy(jsPerformance = listOf(123.45))
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -528,7 +530,7 @@ class BrokenSiteSubmitterTest {
         val webViewVersion = "some WebView version"
         whenever(webViewVersionProvider.getFullVersion()).thenReturn(webViewVersion)
 
-        testee.submitBrokenSiteFeedback(getBrokenSite())
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
@@ -538,9 +540,9 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenSubmitReportThenSendBothPixels() {
+    fun whenSubmitReportThenSendBothBrokenSitePixelsButNotTogglePixel() {
         val brokenSite = getBrokenSite()
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), any(), eq(Count))
 
@@ -548,6 +550,8 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
         val params = paramsCaptor.firstValue
         assertEquals(brokenSite.siteUrl, params[Pixel.PixelParameter.URL])
+
+        verify(mockPixel, never()).fire(eq(PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName), any(), any(), eq(Count))
     }
 
     @Test
@@ -555,7 +559,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
         whenever(ampLinks.lastAmpLinkInfo).thenReturn(null)
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
@@ -570,7 +574,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
         whenever(ampLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(ampLink = TRACKING_URL, destinationUrl = "https://someotherurl.com"))
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
@@ -585,7 +589,7 @@ class BrokenSiteSubmitterTest {
         val brokenSite = getBrokenSite()
         whenever(ampLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(ampLink = TRACKING_URL, destinationUrl = brokenSite.siteUrl))
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
@@ -600,11 +604,23 @@ class BrokenSiteSubmitterTest {
         assignToExperiment()
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite)
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals("tdsNextExperimentTest_treatment", paramsCaptor.lastValue["blockListExperiment"])
+    }
+
+    @Test
+    fun whenToggleReportSendTogglePixelWithoutUnnecessaryParams() {
+        val brokenSite = getBrokenSite()
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = true)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.lastValue
+        assertEquals(brokenSite.siteUrl, params["siteUrl"])
+        assertFalse(params.containsKey("protectionsState"))
     }
 
     private fun assignToExperiment() {

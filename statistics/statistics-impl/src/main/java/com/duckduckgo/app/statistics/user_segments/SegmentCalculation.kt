@@ -19,9 +19,9 @@ package com.duckduckgo.app.statistics.user_segments
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.UserSegment
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -90,11 +90,9 @@ interface SegmentCalculation {
 class RealSegmentCalculation @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val store: StatisticsDataStore,
-    private val variantManager: VariantManager,
+    private val appBuildConfig: AppBuildConfig,
 ) : SegmentCalculation {
 
-    private val returningAtb: Boolean
-        get() = variantManager.getVariantKey() == "ru"
     private val cohortAtb: String by lazy {
         store.atb?.version!!
     }
@@ -270,7 +268,7 @@ class RealSegmentCalculation @Inject constructor(
             }
         }
 
-        if (this.returningAtb && newSetAtb.asNumber() <= cohortAtb.asNumber() + 28) {
+        if (appBuildConfig.isAppReinstall() && newSetAtb.asNumber() <= cohortAtb.asNumber() + 28) {
             segments.add("reinstaller")
         }
 
