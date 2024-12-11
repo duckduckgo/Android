@@ -20,8 +20,6 @@
     <string name="cancel">Anulează</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-mail</string>
-    <string name="addEmailText">Adaugă adresa de e-mail</string>
     <string name="manageEmail">Gestionează adresa de e-mail</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Abonament inexistent</string>
     <string name="subscriptionNotFoundDescription">Abonamentul asociat acestui cont Google Play nu mai este activ.</string>
     <string name="purchaseRestored">Achizițiile tale au fost restaurate.</string>
-    <string name="restoreSubscriptionTitle">Activează-ți abonamentul pe acest dispozitiv</string>
-    <string name="restoreSubscriptionDescription">Accesează-ți abonamentul Privacy Pro pe acest dispozitiv prin Google Play sau o adresă de e-mail.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Abonamentul tău este disponibil automat în DuckDuckGo pe orice dispozitiv conectat la contul tău Google Play.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Restabilește achiziția</string>
-    <string name="restoreSubscriptionEmailDescription">Folosește-ți e-mailul pentru a-ți activa abonamentul pe acest dispozitiv.</string>
-    <string name="restoreSubscriptionEmailButton">Completează adresa de e-mail</string>
+    <string name="restoreSubscriptionTitle">Adaugă abonamentul tău Privacy Pro pe acest dispozitiv</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Adaugă prin intermediul contului Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restabilește-ți abonamentul pe dispozitivele Android folosind contul tău Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Restabilește achiziția</string>
+    <string name="restoreSubscriptionEmailTitle">Adaugă prin e-mail</string>
+    <string name="restoreSubscriptionEmailDescription">Adaugă o adresă de e-mail la abonamentul tău pentru a adăuga Privacy Pro pe acest dispozitiv.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Să începem</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Elimină abonamentul</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Abonament anual</string>
     <string name="renews">se reînnoiește</string>
     <string name="expires">expiră</string>
-    <string name="activateOnOtherDevices">Activează pe alte dispozitive</string>
-    <string name="addEmailPrimaryText">Adaugă adresa de e-mail</string>
-    <string name="addEmailSecondaryText">Adaugă o adresă de e-mail opțională la abonamentul tău pentru a accesa Privacy Pro pe alte dispozitive.</string>
+    <string name="activateOnOtherDevices">Adaugă Privacy Pro pe alte dispozitive</string>
+    <string name="addToDevicePrimaryText">Adaugă pe dispozitiv</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Adaugă Privacy Pro pe celelalte dispozitive ale tale prin Google Play sau prin conectarea unei adrese de e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Folosește adresa de e-mail de mai sus pentru a-ți adăuga abonamentul pe celelalte dispozitive în aplicația DuckDuckGo. Accesează Setări &gt; Privacy Pro &gt; Am un abonament.</string>
     <string name="editEmailPrimaryText">Editează adresa de e-mail</string>
-    <string name="editEmailSecondaryText">Folosește această adresă de e-mail pentru a-ți activa abonamentul în Setări &gt; Privacy Pro în aplicația DuckDuckGo pe celelalte dispozitive ale tale.</string>
     <string name="learnMore">Află mai multe</string>
     <string name="privacyProFaq">Ai nevoie de ajutor cu Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Primește răspunsuri la întrebările frecvente sau contactează asistența Privacy Pro din paginile noastre de ajutor. Disponibilitatea funcțiilor variază în funcție de țară.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonamente</string>
     <string name="activitySubscriptionSettings">Setări pentru abonament</string>
-    <string name="activityActivateSubscription">Activează abonamentul</string>
+    <string name="activityActivateSubscription">Am un abonament</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Trimite feedback</string>
 </resources>
