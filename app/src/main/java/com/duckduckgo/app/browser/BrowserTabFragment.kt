@@ -920,13 +920,6 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
-    private fun onOmnibarClearTextButtonPressed() {
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            viewModel.onClearOmnibarTextInput()
-            omnibar.setText("")
-        }
-    }
-
     private fun configureCustomTab() {
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
@@ -2333,10 +2326,6 @@ class BrowserTabFragment :
 
                 override fun onPrivacyShieldPressed() {
                     onOmnibarPrivacyShieldButtonPressed()
-                }
-
-                override fun onClearTextPressed() {
-                    onOmnibarClearTextButtonPressed()
                 }
 
                 override fun onCustomTabClosePressed() {

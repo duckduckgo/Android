@@ -361,7 +361,6 @@ class OmnibarLayout @JvmOverloads constructor(
             if (isAttachedToWindow) {
                 viewModel.onClearTextButtonPressed()
             }
-            omnibarItemPressedListener?.onClearTextPressed()
         }
         voiceSearchButton.setOnClickListener {
             omnibarItemPressedListener?.onVoiceSearchPressed()

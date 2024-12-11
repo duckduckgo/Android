@@ -89,7 +89,6 @@ class Omnibar(
         fun onFireButtonPressed()
         fun onBrowserMenuPressed()
         fun onPrivacyShieldPressed()
-        fun onClearTextPressed()
         fun onCustomTabClosePressed()
         fun onCustomTabPrivacyDashboardPressed()
         fun onVoiceSearchPressed()
