@@ -701,7 +701,16 @@ class RealSubscriptionsManager @Inject constructor(
 
             // refresh any existing account / subscription data
             when {
-                isSignedInV2() -> refreshSubscriptionData()
+                isSignedInV2() -> try {
+                    refreshSubscriptionData()
+                } catch (e: HttpException) {
+                    if (e.code() == 400) {
+                        // expected if this is a first ever purchase using this account - ignore
+                    } else {
+                        throw e
+                    }
+                }
+
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 

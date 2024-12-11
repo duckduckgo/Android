@@ -66,6 +66,7 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation project(path: ':common-test')
     testImplementation project(':data-store-test')
     testImplementation CashApp.turbine

@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
@@ -90,6 +91,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
         val hasFocus: Boolean = false,
+        val query: String = "",
         val omnibarText: String = "",
         val url: String = "",
         val expanded: Boolean = false,
@@ -171,6 +173,20 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
+                val shouldUpdateOmnibarText = it.viewMode is Browser
+                Timber.d("Omnibar: lost focus in Browser mode $shouldUpdateOmnibarText")
+                val omnibarText = if (shouldUpdateOmnibarText) {
+                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
+                        Timber.d("Omnibar: is DDG url, showing query ${it.query}")
+                        it.query
+                    } else {
+                        Timber.d("Omnibar: is url, showing URL ${it.url}")
+                        it.url
+                    }
+                } else {
+                    Timber.d("Omnibar: not browser mode, not changing omnibar text")
+                    it.omnibarText
+                }
                 it.copy(
                     hasFocus = false,
                     expanded = false,
@@ -187,6 +203,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                         urlLoaded = _viewState.value.url,
                     ),
                     shouldMoveCaretToStart = true,
+                    updateOmnibarText = shouldUpdateOmnibarText,
+                    omnibarText = omnibarText,
                 )
             }
         }
@@ -386,13 +404,28 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onInputStateChanged(
         query: String,
         hasFocus: Boolean,
+        clearQuery: Boolean,
+        deleteLastCharacter: Boolean,
     ) {
-        Timber.d("Omnibar: onInputStateChanged")
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
+        Timber.d("Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter")
+
         _viewState.update {
+            val updatedQuery = if (deleteLastCharacter) {
+                Timber.d("Omnibar: deleting last character, old query ${it.query} also deleted")
+                it.url
+            } else if (clearQuery) {
+                Timber.d("Omnibar: clearing old query ${it.query}, we keep it as reference")
+                it.query
+            } else {
+                Timber.d("Omnibar: not clearing or deleting old query ${it.query}, updating query to $query")
+                query
+            }
+
             it.copy(
+                query = updatedQuery,
                 omnibarText = query,
                 updateOmnibarText = false,
                 hasFocus = hasFocus,
@@ -501,6 +534,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onUserTouchedOmnibarTextInput(touchAction: Int) {
+        Timber.d("Omnibar: onUserTouchedOmnibarTextInput")
         if (touchAction == ACTION_UP) {
             firePixelBasedOnCurrentUrl(
                 AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
@@ -517,6 +551,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
             AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
         )
+        _viewState.update {
+            it.copy(
+                omnibarText = it.url,
+                updateOmnibarText = true,
+            )
+        }
     }
 
     fun onEnterKeyPressed() {

@@ -18,7 +18,6 @@ package com.duckduckgo.installation.impl.installer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -26,6 +25,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface InstallSourceExtractor {
+
+    /**
+     * Extracts the installer package name from the PackageManager.
+     */
     fun extract(): String?
 }
 
@@ -37,7 +40,7 @@ class RealInstallSourceExtractor @Inject constructor(
 
     @SuppressLint("NewApi")
     override fun extract(): String? {
-        return if (appBuildConfig.sdkInt >= VERSION_CODES.R) {
+        return if (appBuildConfig.sdkInt >= 30) {
             installationSourceModern(context.packageName)
         } else {
             installationSourceLegacy(context.packageName)
@@ -49,7 +52,7 @@ class RealInstallSourceExtractor @Inject constructor(
         return context.packageManager.getInstallerPackageName(packageName)
     }
 
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     private fun installationSourceModern(packageName: String): String? {
         return context.packageManager.getInstallSourceInfo(packageName).installingPackageName
     }

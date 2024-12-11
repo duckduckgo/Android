@@ -4309,7 +4309,7 @@
         throw new Error("unreachable, missing form");
       const radioElements = this.shadowRoot?.querySelectorAll("md-radio");
       form.reset();
-      for (let element of Array.from(radioElements)) {
+      for (const element of Array.from(radioElements)) {
         if (element.value === initial) {
           element.checked = true;
         }

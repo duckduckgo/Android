@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
+    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Προστασία προσωπικών δεδομένων</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
     <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
@@ -134,6 +135,7 @@
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
     <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
     <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>
+    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Επόμενα βήματα</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
     <string name="settingsDarkTheme">Σκοτεινό</string>
@@ -156,9 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
+    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Κύριες ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
+    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Διαγραφή δεδομένων</string>
+    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Προσθήκη μικροεφαρμογής στην Αρχική οθόνη</string>
+    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
+    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Ενεργοποίηση φωνητικής αναζήτησης</string>
+    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">Το DuckDuckGo σε άλλες πλατφόρμες</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
@@ -714,6 +722,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Κωδικοί πρόσβασης</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
 

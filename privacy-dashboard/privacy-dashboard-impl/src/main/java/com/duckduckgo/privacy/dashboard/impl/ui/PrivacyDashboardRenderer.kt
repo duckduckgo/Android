@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.WebView
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
@@ -37,11 +38,16 @@ class PrivacyDashboardRenderer(
     private val onOpenSettings: (String) -> Unit,
     private val onClose: () -> Unit,
     private val onSubmitBrokenSiteReport: (String) -> Unit,
+    private val onGetToggleReportOptions: () -> Unit,
+    private val onSendToggleReport: () -> Unit,
+    private val onRejectToggleReport: () -> Unit,
+    private val onSeeWhatIsSent: () -> Unit,
+    private val onShowNativeFeedback: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
 
-    fun loadDashboard(webView: WebView, initialScreen: InitialScreen) {
+    fun loadDashboard(webView: WebView, initialScreen: InitialScreen, toggleOpener: DashboardOpener) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
                 onBrokenSiteClicked = { onBrokenSiteClicked() },
@@ -56,10 +62,15 @@ class PrivacyDashboardRenderer(
                 },
                 onClose = { onClose() },
                 onSubmitBrokenSiteReport = onSubmitBrokenSiteReport,
+                onGetToggleReportOptions = onGetToggleReportOptions,
+                onSendToggleReport = onSendToggleReport,
+                onRejectToggleReport = onRejectToggleReport,
+                onSeeWhatIsSent = onSeeWhatIsSent,
+                onShowNativeFeedback = onShowNativeFeedback,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
-        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}")
+        webView.loadUrl("file:///android_asset/html/android.html?screen=${initialScreen.value}&opener=${toggleOpener.value}")
     }
 
     fun render(viewState: ViewState) {
@@ -108,5 +119,6 @@ class PrivacyDashboardRenderer(
     enum class InitialScreen(val value: String) {
         PRIMARY("primaryScreen"),
         BREAKAGE_FORM("breakageForm"),
+        TOGGLE_REPORT("toggleReport"),
     }
 }
