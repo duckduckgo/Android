@@ -20,8 +20,6 @@
     <string name="cancel">Отменить</string>
     <string name="ok">Хорошо</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">Электронная почта</string>
-    <string name="addEmailText">Добавить адрес эл. почты</string>
     <string name="manageEmail">Управление электронной почтой</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Подписка не найдена</string>
     <string name="subscriptionNotFoundDescription">Подписка, закрепленная за этой учетной записью Google Play, утратила активный статус.</string>
     <string name="purchaseRestored">Ваши покупки восстановлены.</string>
-    <string name="restoreSubscriptionTitle">Активировать подписку на этом устройстве</string>
-    <string name="restoreSubscriptionDescription">Преимуществами подписки Privacy Pro можно пользоваться на этом устройстве с помощью Google Play или адреса электронной почты.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Ваша подписка на DuckDuckGo автоматически доступна на любом устройстве: просто войдите в учетную запись Google Play.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Восстановить покупку</string>
-    <string name="restoreSubscriptionEmailDescription">Используйте адрес электронной почты, чтобы активировать подписку на этом устройстве.</string>
-    <string name="restoreSubscriptionEmailButton">Ввести адрес эл. почты</string>
+    <string name="restoreSubscriptionTitle">Добавьте подписку Privacy Pro на это устройство</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Добавление через Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Чтобы восстановить подписку на устройствах Android, используйте учетную запись Google Play.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Восстановить покупку</string>
+    <string name="restoreSubscriptionEmailTitle">Добавление через электронную почту</string>
+    <string name="restoreSubscriptionEmailDescription">Чтобы добавить подписку Privacy Pro на это устройство, привяжите к ней адрес электронной почты.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Приступим!</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Удалить подписку</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Годовая подписка</string>
     <string name="renews">продлится</string>
     <string name="expires">завершится</string>
-    <string name="activateOnOtherDevices">Активация подписки на других устройствах</string>
-    <string name="addEmailPrimaryText">Добавить адрес эл. почты</string>
-    <string name="addEmailSecondaryText">Привяжите к подписке дополнительный адрес электронной почты, чтобы пользоваться преимуществами тарифа Privacy Pro на других устройствах.</string>
+    <string name="activateOnOtherDevices">Добавление подписки Privacy Pro на другие устройства</string>
+    <string name="addToDevicePrimaryText">Добавление на устройство</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Подписку Privacy Pro можно добавить на другие устройства с помощью учетной записи Google Play или адреса электронной почты.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Чтобы добавить подписку на других устройствах, используйте указанный выше адрес электронной почты. Откройте в приложении DuckDuckGo раздел «Настройки &gt; Privacy Pro &gt; У меня уже есть подписка».</string>
     <string name="editEmailPrimaryText">Изменить адрес почты</string>
-    <string name="editEmailSecondaryText">Используйте этот адрес для активации подписки в разделе «Настройки &gt; Privacy Pro» в приложении DuckDuckGo на других устройствах.</string>
     <string name="learnMore">Узнать больше</string>
     <string name="privacyProFaq">Нужна помощь с Privacy Pro?</string>
     <string name="privacyProFaqSecondary">На страницах справки вы найдете ответы на распространенные вопросы, а также контакты поддержки Privacy Pro. Доступность функций зависит от страны.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Подписки</string>
     <string name="activitySubscriptionSettings">Настройки подписки</string>
-    <string name="activityActivateSubscription">Активация подписки</string>
+    <string name="activityActivateSubscription">У меня уже есть подписка</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
 </resources>
