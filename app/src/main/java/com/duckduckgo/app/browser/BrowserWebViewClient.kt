@@ -128,7 +128,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
-    private val onSiteBlockedAsync: () -> Unit = {
+    private val confirmationCallback: (isMalicious: Boolean) -> Unit = {
         // TODO (cbarreiro): Handle site blocked asynchronously
     }
 
@@ -170,7 +170,7 @@ class BrowserWebViewClient @Inject constructor(
                         url,
                         webView.url?.toUri(),
                         isForMainFrame,
-                        onSiteBlockedAsync,
+                        confirmationCallback,
                     )
             }
             ) {

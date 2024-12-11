@@ -27,6 +27,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,14 +42,14 @@ interface MaliciousSiteBlockerWebViewIntegration {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
-        onSiteBlockedAsync: () -> Unit,
+        confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): WebResourceResponse?
 
     suspend fun shouldOverrideUrlLoading(
         url: Uri,
         webViewUrl: Uri?,
         isForMainFrame: Boolean,
-        onSiteBlockedAsync: () -> Unit,
+        confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean
 
     fun onPageLoadStarted()
@@ -87,7 +88,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
-        onSiteBlockedAsync: () -> Unit,
+        confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): WebResourceResponse? {
         if (!isFeatureEnabled) {
             return null
@@ -109,12 +110,12 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         }
 
         if (request.isForMainFrame && decodedUrl.toUri() == documentUri) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), onSiteBlockedAsync)) {
+            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
                 return WebResourceResponse(null, null, null)
             }
             processedUrls.add(decodedUrl)
         } else if (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), onSiteBlockedAsync)) {
+            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
                 return WebResourceResponse(null, null, null)
             }
             processedUrls.add(decodedUrl)
@@ -126,7 +127,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         url: Uri,
         webViewUrl: Uri?,
         isForMainFrame: Boolean,
-        onSiteBlockedAsync: () -> Unit,
+        confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean {
         if (!isFeatureEnabled) {
             return false
@@ -140,7 +141,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         }
 
         if (isForMainFrame && decodedUrl.toUri() == webViewUrl) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), onSiteBlockedAsync)) {
+            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
                 return true
             }
             processedUrls.add(decodedUrl)
