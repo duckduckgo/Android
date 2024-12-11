@@ -608,8 +608,6 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
-    var isInitialized = false
-
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -843,8 +841,9 @@ class BrowserTabFragment :
         configureOmnibar()
 
         if (savedInstanceState == null) {
-            if (isActiveTab) {
-                initFragmentIfNecessary()
+            viewModel.onViewReady()
+            messageFromPreviousTab?.let {
+                processMessage(it)
             }
         } else {
             viewModel.onViewRecreated()
@@ -853,7 +852,7 @@ class BrowserTabFragment :
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
-                override fun onPause(owner: LifecycleOwner) {
+                override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
                         updateOrDeleteWebViewPreview()
                     }
@@ -1152,21 +1151,8 @@ class BrowserTabFragment :
         startActivity(TabSwitcherActivity.intent(activity, tabId))
     }
 
-    private fun initFragmentIfNecessary() {
-        if (!isInitialized) {
-            isInitialized = true
-
-            viewModel.onViewReady()
-            messageFromPreviousTab?.let {
-                processMessage(it)
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-
-        initFragmentIfNecessary()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
             requireActivity().recreate()
@@ -1336,10 +1322,6 @@ class BrowserTabFragment :
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
-                    }
-
-                    if (isActiveTab) {
-                        initFragmentIfNecessary()
                     }
                 }
             },
