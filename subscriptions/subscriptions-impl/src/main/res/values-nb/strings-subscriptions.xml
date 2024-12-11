@@ -20,8 +20,6 @@
     <string name="cancel">Avbryt</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-post</string>
-    <string name="addEmailText">Legg til e-postadresse</string>
     <string name="manageEmail">Administrer e-postadresse</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Abonnementet ble ikke funnet</string>
     <string name="subscriptionNotFoundDescription">Abonnementet tilknyttet denne Google Play-kontoen er ikke lenger aktiv.</string>
     <string name="purchaseRestored">Kjøpene dine er gjenopprettet.</string>
-    <string name="restoreSubscriptionTitle">Aktiver abonnementet ditt på denne enheten</string>
-    <string name="restoreSubscriptionDescription">Få tilgang til Privacy Pro-abonnementet ditt på denne enheten via Google Play eller en e-postadresse.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Abonnementet ditt er automatisk tilgjengelig i DuckDuckGo på alle enheter som er logget på Google Play-kontoen din.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Gjenopprett kjøp</string>
-    <string name="restoreSubscriptionEmailDescription">Bruk e-postadressen din til å aktivere abonnementet ditt på denne enheten.</string>
-    <string name="restoreSubscriptionEmailButton">Skriv inn e-postadresse</string>
+    <string name="restoreSubscriptionTitle">Legg til Privacy Pro-abonnementet ditt på denne enheten</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Legg til via Google Play-konto</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Gjenopprett abonnementet ditt på Android-enheter ved å bruke Google Play-kontoen din.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Gjenopprett kjøp</string>
+    <string name="restoreSubscriptionEmailTitle">Legg til via e-postadresse</string>
+    <string name="restoreSubscriptionEmailDescription">Koble en e-postadresse til abonnementet ditt for å legge til Privacy Pro på denne enheten.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Kom i gang</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Fjern abonnement</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Årsabonnement</string>
     <string name="renews">fornyes</string>
     <string name="expires">utløper</string>
-    <string name="activateOnOtherDevices">Aktiver på andre enheter</string>
-    <string name="addEmailPrimaryText">Legg til e-postadresse</string>
-    <string name="addEmailSecondaryText">Legg til en valgfri e-postadresse i abonnementet ditt for å få tilgang til Privacy Pro på andre enheter.</string>
+    <string name="activateOnOtherDevices">Legg til Privacy Pro på andre enheter</string>
+    <string name="addToDevicePrimaryText">Legg til på enheten</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Legg til Privacy Pro på dine andre enheter via Google Play eller ved å koble til en e-postadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Privacy Pro &gt; Jeg har et abonnement.</string>
     <string name="editEmailPrimaryText">Rediger e-postadresse</string>
-    <string name="editEmailSecondaryText">Bruk denne e-postadressen til å aktivere abonnementet ditt i Innstillinger &gt; Privacy Pro i DuckDuckGo-appen på de andre enhetene.</string>
     <string name="learnMore">Finn ut mer</string>
     <string name="privacyProFaq">Trenger du hjelp med Privacy Pro?</string>
     <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt Privacy Pro-støtte fra hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonnementer</string>
     <string name="activitySubscriptionSettings">Abonnementsinnstillinger</string>
-    <string name="activityActivateSubscription">Aktiver abonnement</string>
+    <string name="activityActivateSubscription">Jeg har et abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbakemelding</string>
 </resources>
