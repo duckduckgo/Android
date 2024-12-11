@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN on sisse lülitatud</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN on välja lülitatud</string>
+    <string name="netpManagementDescriptionOff">Ühendage kõigi oma seadme kaitsmiseks\n Internetiliiklus.</string>
+    <string name="netpManagementDescriptionOn">Kogu seadme internetiliiklus on turvatud\nläbi VPN-i.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Ühendamine ...</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Ühendatud · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Ei ole ühendatud</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN on praegu beetaversioonis. <annotation type="report_issues_link">Jaga tagasisidet</annotation>, et aidata meil paremaks saada!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">Kas VPN põhjustab probleeme mõne rakendusega?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">Sa saad rakendusi VPN-ist välja jätta ilma VPN-i välja lülitamata.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Välista rakendus</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Lülita VPN välja</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Ära kunagi enam küsi</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Valitud asukoht</string>
+    <string name="netpManagementLocationHeaderVpnOn">Ühendatud asukoht</string>
+    <string name="netpManagementLocationNearest">(Lähim)</string>
+    <string name="netpManagementLocationPlaceholder">Lähim asukoht</string>
+    <string name="netpManagementLocationCustom">(Kohandatud)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Ühenduse üksikasjad</string>
+    <string name="netpManagementConnectionDetailsIp">IP-aadress</string>
+    <string name="netpManagementConnectionDetailsDns">DNS server</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Andmemaht</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN on ühendatud.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN on ühendatud ja suunab seadme liikluse läbi &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Sinu VPN-rakenduse ühendus võib olla katkestatud</string>
+    <string name="netpVpnConflictMessage">Android lubab korraga ainult ühte aktiivset VPN-ühendust. DuckDuckGo VPN-i lubamine võib katkestada sinu seadme aktiivse VPN-ühenduse.</string>
+    <string name="netpActionGotIt">Sain aru</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Sinu VPN-rakendus blokeerib DuckDuckGo VPN-i</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android lubab korraga ainult ühte aktiivset VPN-ühendust. Ava Võrgusätted &gt; VPN. Otsi üles VPN-rakendus, mis on „Alati sees“ ja keela see funktsioon.</string>
+    <string name="netpActionOpenSettings">Ava sätted</string>
+    <string name="netpActionCancel">Loobu</string>
+    <string name="netpActionNotNow">Mitte praegu</string>
+    <string name="netpActionGoToSettings">Ava Sätted</string>
+    <string name="netpAlwaysOnPromotionHeading">Vali Alati sees</string>
+    <string name="netpAlwaysOnPromotionBody">Ava oma seadme DuckDuckGo VPN-i sätted ja luba <b>Alati sees olev VPN</b>, et vältida Androidi kaitse keelamist.\n\nKontrolli, et teine säte oleks VÄLJA lülitatud.</string>
+    <string name="netpAlwaysOnLockdownBody">Rakenduse probleemide vältimiseks ava oma seadme <b>DuckDuckGo VPN-i sätted</b> ja keela <b>Ilma VPN-ita ühenduste blokeerimine.</b></string>
+    <string name="netpAlwaysOnLockdownHeading">Muuda oma VPN-i sätteid</string>
+    <string name="netpBannerVpnRevoked"><b>VPN on keelatud.</b>\nSinu seadmes olev VPN-rakendus võib olla selle keelanud. Kasuta lülitit uuesti lubamiseks.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Sekkumine on vajalik!</b> Rakenduseprobleemide vältimiseks tuleb muuta Androidi sätteid. <annotation type="open_settings_link">Muuda sätteid</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Rakendus hangub või läheb krahhi</string>
+    <string name="netpReportBreakageCategoryMessages">Sõnumite kohaletoimetamine nurjub</string>
+    <string name="netpReportBreakageCategoryCalls">Häälkõned ei tööta</string>
+    <string name="netpReportBreakageCategoryContent">Sisu laaditakse aeglaselt</string>
+    <string name="netpReportBreakageCategoryConnection">Rakendusel pole ühendust</string>
+    <string name="netpReportBreakageCategoryIot">Ei saa ühendada kohalikku seadet</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Funktsiooni taotlus</string>
+    <string name="netpReportBreakageCategoryOther">Midagi muud</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN on beetaversiooni ajal tasuta kasutada.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Halda</string>
+    <string name="netpManagementManageItemExclusion">Välistatud rakendused</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Puudub</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d rakendus</item>
+        <item quantity="other">%1$d rakendused</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">VPN-i seaded</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Üldine</string>
+    <string name="netpVpnSettingsSystemHeader">Süsteem</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN-i teavitused</string>
+    <string name="netpVpnSettingsTitle">VPN-i seaded</string>
+    <string name="netpVpnSettingKillSwitch">Alati sisse lülitatud</string>
+    <string name="netpVpnSettingAlwaysOn">Alati sisse lülitatud</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Luba rakenduse piiramatu akukasutus</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">Luba rakenduse akuseadetes piiramatu kasutus, et Android ei keelaks taustal VPN-i</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Rakenduse akukasutus on piiramatu</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">Rakenduse akuseadetes takistab see Androidil VPN-i taustal väljalülitamist</string>
+    <string name="netpVpnSettingAlwaysOnByline">VPN-ühendus taastatakse pärast katkestust automaatselt</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Kohtvõrkude välistamine</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Suuna VPN-ist mööda kohalike võrguühenduste jaoks, näiteks printeriga.</string>
+    <string name="netpVpnSettingDnsLeak">DuckDuckGo VPN takistab DNS-i lekkeid sinu internetiteenuse pakkujale, suunates DNS-päringud läbi VPN-tunneli meie enda lahendajasse.</string>
+    <string name="netpVpnSettingGeoswitching">Eelistatud asukoht</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Lähim saadaolev</string>
+
+    <string name="netpVpnNotificationSettings">VPN-i teavitused</string>
+    <string name="netpVpnNotificationSettingsByLine">Saad teate, kui sinu ühendus katkeb või VPN-i olek muutub</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Piiramatu aku kasutamine</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Takistab Androidil VPN-i peatamast.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Peata VPN Wi-Fi-kõnede ajal</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">VPN-i ajutine peatamine, kui Wi-Fi-kõned on käimas ja automaatne taasühendamine pärast seda, kui</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Telefoni luba on vajalik</string>
+    <string name="netpGrantPhonePermissionByline">Selle seadistuse lubamiseks pead laskma DuckDuckGol teha ja hallata telefonikõnesid süsteemiseadete kaudu.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Sätted</string>
+    <string name="netpGrantPhonePermissionActionNegative">Loobu</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Teavitused on välja lülitatud</string>
+    <string name="netpVpnNotifyMeByLine">Saad teateid VPN sündmuste kohta</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Halda rakendusi</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN töötab vaikimisi kõigis rakendustes. Kui sul tekib rakendusega probleeme, kui VPN on lubatud, proovi selle rakenduse kaitse välja lülitada.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN on keelatud.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Käsitsi keelatud</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Käsitsi lubatud</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Kui see on lubatud, võib esineda probleeme rakendusega</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Kaitse on lubatud</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Kaitse on keelatud</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Kõik</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Kas teatada probleemist?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Palun anna meile teada, kui sa keelasid VPN-i %1$s jaoks, kuna sul tekkis rakendusega probleeme.\n\nSamuti keelame teenuse App Tracking Protection %1$s jaoks.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Teata probleemist</string>
+    <string name="netpExclusionListManuallyCTANotNow">Mitte praegu</string>
+    <string name="netpExclusionListManuallyCTACancel">Loobu</string>
+    <string name="netpExclusionListManuallyCTARestore">Taasta</string>
+    <string name="netpExclusionListManuallyMenuRestore">Kõikide rakenduste kaitse taastamine</string>
+    <string name="netpExclusionListManuallyMenuReport">Teata rakendusega seotud probleemist</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Kas taastada kaitse kõigile rakendustele?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">See ajakohastab sinu kohandatud kaitse seaded ja lubab VPN-i kõigi rakenduste jaoks. Saad hiljem alati oma kaitsesätteid uuesti muuta.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Kaitse taastati vaikesätetele</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Kaitse lubamine saadab rakenduse nime DuckDuckGo\'le.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Androidi süsteemirakendused</string>
+    <string name="netpExclusionListWarningTitle">Süsteemirakenduste välistamise teave</string>
+    <string name="netpExclusionListWarningMessage">VPN ei kaitse selle rakenduste rühma poolt kasutatavat internetiliiklust, sealhulgas taustaliideseid. Kui see ei lahenda probleemi, kaalu selle uuesti sisselülitamist, et vältida ootamatuid andmelekked.</string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Teave</string>
+    <string name="netpManagementAboutItemFaqs">KKK ja tugi</string>
+    <string name="netpManagementAboutItemShareFeedback">Saada tagasisidet</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">KKK ja tugi</string>
+    <string name="netpFaqQuestionOne">Kuidas DuckDuckGo VPN töötab?</string>
+    <string name="netpFaqAnswerOne">VPN kasutab avatud lähtekoodiga WireGuard protokolli, et seadistada sinu seadmes virtuaalne privaatvõrk (VPN). Kui see on lubatud, krüpteeritakse kogu sinu seadme liiklus esmalt ja suunatakse seejärel läbi lähima VPN-serveri, et kaitsta sinu sirvimistegevust internetiteenuse pakkujate eest ja varjata sinu asukohta rakenduste ja veebisaitide eest, mida külastad.</string>
+    <string name="netpFaqQuestionTwo">Kas ainult minu veebisirvimine on kaitstud?</string>
+    <string name="netpFaqAnswerTwo">Kogu võrgutegevus sinu seadmes on kaitstud.</string>
+    <string name="netpFaqQuestionThree">Kas DuckDuckGo salvestab minu andmete logisid?</string>
+    <string name="netpFaqAnswerThree">Ei, me ei säilita logisid.</string>
+    <string name="netpFaqQuestionFour">Kus asuvad VPN serverid?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo pakub piiratud arvu servereid, samal ajal kui DuckDuckGo VPN on beetaversioonis ja asub Ameerika Ühendriikides, Kanadas ja Euroopas.</string>
+    <string name="netpFaqQuestionSix">Miks mõned rakendused ei tööta, kui VPN on sisse lülitatud?</string>
+    <string name="netpFaqAnswerSix">Mõned veebisaidid ja rakendused piiravad tahtlikult juurdepääsu VPN-i kasutavatele inimestele. Näiteks võivad nad paluda sul lahendada CAPTCHA, et veenduda, et oled roboti asemel tõeline inimene. Kui sul tekib rakendusega korduvaid probleeme, saad selle DuckDuckGo VPN-i seadete alt VPN-ist täielikult välja jätta.</string>
+    <string name="netpFaqQuestionSeven">Miks ma ei saa VPN-i teateid eemaldada?</string>
+    <string name="netpFaqAnswerSeven">Android nõuab, et VPN-id kuvaksid püsivat teavitust, kui VPN on sisse lülitatud.</string>
+    <string name="netpFaqQuestionEight">Kas VPN ühildub teenusega App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Jah, nii VPN kui ka App Tracking Protection võivad olla samaaegselt sisse lülitatud. Ükski teine VPN ei ühildu DuckDuckGo funktsiooniga App Tracking Protection.</string>
+    <string name="netpFaqQuestionNine">Kas VPN on tasuta kasutada?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN on beetaversiooni ajal tasuta kasutada. Lõpuks pakutakse seda tasulise teenusena.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Ühenda</string>
+    <string name="netpNotificationCTAReportIssue">Kas rakendusega on probleeme?</string>
+    <string name="netpNotificationDisabled">VPN on lahti ühendatud. Puuduta, et jätkata oma seadme liikluse turvamist.</string>
+    <string name="netpNotificationDisabledByVpn">Sinu seadmes olev VPN-rakendus katkestas DuckDuckGo VPN-i ühenduse. Puuduta uuesti ühenduse loomiseks.</string>
+    <string name="netpUnsafeWifi">Ühendatud ebaturvalise WIFI-ga.</string>
+    <string name="netpNotificationCTAReconnectNow">Ühenda kohe uuesti</string>
+    <string name="netpNotificationSnoozeTitle">VPN on uinutatud</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN loob uuesti ühenduse %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN-ühendus katkestati aegunud tellimuse tõttu. DuckDuckGo VPN-i taasühendamiseks telli Privacy Pro.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN-i asukoht</string>
+    <string name="netpGeoswitchingHeaderRecommended">Soovitatav</string>
+    <string name="netpGeoswitchingDefaultTitle">Lähim saadaolev</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Loo automaatselt ühendus lähima leitud serveriga</string>
+    <string name="netpGeoswitchingHeaderCustom">Kohandatud</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d linnad</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">VPN-ühendus katkestati aegunud tellimuse tõttu</string>
+    <string name="netpDialogVpnAccessRevokedBody">DuckDuckGo VPN-i taasühendamiseks telli Privacy Pro.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Telli</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Loobu</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Kinnita tellimus</string>
+    <string name="netpVerifySubscriptionInProgress">Oota, kuni kontrollime su tellimust…</string>
+    <string name="netpVerifySubscriptionNoSubscription">Ups! Sul pole ühtegi kehtivat tellimust.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Ups! Sinu tellimus ei kehti DuckDuckGo VPN-i jaoks.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Lubatud</string>
+    <string name="netpSubscriptionSettingsConnecting">Ühendamine ...</string>
+    <string name="netpSubscriptionSettingsDisconnected">Keelatud</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS server</string>
+    <string name="netpPrivateDns">Privaatne DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (pahavara blokeerimine)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (soovitatav)</string>
+    <string name="netpCustomDnsCustom">Kohandatud</string>
+    <string name="netpCustomDnsInputAddressHint">IPv4 aadress</string>
+    <string name="netpCustomDnsApply">Rakenda</string>
+    <string name="netpCustomDnsCustomHeader">DNS server</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Privaatne DNS on juba süsteemi DNS-seadetes määratud. DuckDuckGo VPN-i jaoks kohandatud DNS-i määramiseks lülitage privaatne DNS välja. <annotation type="open_settings_link">Ava süsteemi seaded</annotation></string>
+    <string name="netpCustomDnsWarning">Kohandatud DNS-serveri kasutamine võib mõjutada sirvimise kiirust ja paljastada su tegevuse kolmandatele osapooltele, kui server ei ole turvaline või usaldusväärne.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo suunab DNS-päringud meie DNS-serverite kaudu, nii et sinu internetiteenuse pakkuja ei näe, milliseid veebisaite sa külastad.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Blokeeri pahavara</string>
+    <string name="netpDnsBlockMalwareByline">Blokeeri pahavara DNS-taseme blokeerimisnimekirjaga. Kui veebisait ei laadi, proovi blokeerimise välja lülitamist.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Kas tahad välistada rakendused, mis ei ühildu VPN-idega?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Leidsime %1$s VPN-i ühenduse ajal.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d uus rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
+        <item quantity="other">%1$d uut rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Kas tahad välja jätta kõik rakendused, mis ei ühildu VPN-idega?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d muu rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
+        <item quantity="other">%1$d muud rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Ühildumatud rakendused välistatakse automaatselt</string>
+    <string name="netpAutoExcludePromptActionAdd">Välista rakendused</string>
+    <string name="netpAutoExcludePromptActionCancel">Jäta vahele</string>
+    <string name="netpAutoExcludeToggleName">VPN-idega mitteühilduvate rakenduste automaatne välistamine</string>
+    <string name="netpExclusionListLabelAutoExclude">Ei ühildu VPN-idega</string>
+    <string name="netpExclusionListAutoExcludeDescription">Mõned rakendused, nagu pangandus- või voogedastusrakendused, ei tööta VPN-idega hästi. Kui see seade on lubatud, välistame need rakendused automaatselt.</string>
+</resources>

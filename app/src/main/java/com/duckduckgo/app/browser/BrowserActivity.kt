@@ -80,7 +80,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -340,7 +342,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 Timber.d("Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
-                return
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 Timber.w("open in current tab requested")
                 if (currentTab != null) {
@@ -349,7 +350,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     Timber.w("can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 }
-                return
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
@@ -362,15 +362,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
                 lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
-
-                return
             }
         } else {
-            Timber.i("shared text empty, opening last tab")
-        }
-
-        if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
-            viewModel.handleShowOnAppLaunchOption()
+            Timber.i("shared text empty, defaulting to show on app launch option")
+            if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
+                viewModel.handleShowOnAppLaunchOption()
+            }
         }
     }
 
@@ -428,9 +425,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
     }
 
-    fun launchPrivacyDashboard() {
-        currentTab?.tabId?.let {
-            val params = PrivacyDashboardPrimaryScreen(it)
+    fun launchPrivacyDashboard(toggle: Boolean) {
+        currentTab?.tabId?.let { tabId ->
+            val params = if (toggle) {
+                PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
+            } else {
+                PrivacyDashboardPrimaryScreen(
+                    tabId,
+                )
+            }
             val intent = globalActivityStarter.startIntent(this, params)
             intent?.let { startActivity(it) }
         }

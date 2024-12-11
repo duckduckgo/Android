@@ -116,6 +116,8 @@ import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
 import com.duckduckgo.app.browser.commands.Command.PrintLink
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
@@ -142,8 +144,6 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
@@ -153,6 +153,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpda
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
+import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -259,7 +260,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -287,6 +288,8 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -432,6 +435,7 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
+    private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
 ) : WebViewClientListener,
@@ -1499,7 +1503,13 @@ class BrowserTabViewModel @Inject constructor(
         if (domain != null) {
             allowlistRefreshTriggerJob = isDomainInUserAllowlist(domain)
                 .drop(count = 1) // skip current state - we're only interested in change events
-                .onEach { command.postValue(NavigationCommand.Refresh) }
+                .onEach { isInAllowList ->
+                    if (isInAllowList) {
+                        command.postValue(RefreshAndShowPrivacyProtectionDisabledConfirmation(domain))
+                    } else {
+                        command.postValue(RefreshAndShowPrivacyProtectionEnabledConfirmation(domain))
+                    }
+                }
                 .launchIn(viewModelScope)
         }
 
@@ -2287,10 +2297,19 @@ class BrowserTabViewModel @Inject constructor(
             if (isPrivacyProtectionDisabled(domain)) {
                 removeFromAllowList(domain, clickedFromCustomTab)
             } else {
+                performToggleReportCheck()
                 addToAllowList(domain, clickedFromCustomTab)
             }
 
             privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
+        }
+    }
+
+    private suspend fun performToggleReportCheck() {
+        if (toggleReports.shouldPrompt()) {
+            withContext(dispatchers.main()) {
+                command.value = ToggleReportFeedback(opener = DashboardOpener.MENU)
+            }
         }
     }
 
@@ -2310,7 +2329,6 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOff(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }
@@ -2331,7 +2349,6 @@ class BrowserTabViewModel @Inject constructor(
             it.onToggleOn(PrivacyToggleOrigin.MENU)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = false)
         }
     }
@@ -3475,7 +3492,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onBrokenSiteCtaOkButtonClicked(cta: BrokenSitePromptDialogCta): Command? {
         viewModelScope.launch {
-            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = PROMPT))
+            command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = RELOAD_THREE_TIMES_WITHIN_20_SECONDS))
             command.value = HideBrokenSitePromptCta(cta)
         }
         return null

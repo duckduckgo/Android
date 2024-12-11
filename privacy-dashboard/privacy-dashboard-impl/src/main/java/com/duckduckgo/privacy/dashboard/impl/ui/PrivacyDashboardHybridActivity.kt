@@ -32,17 +32,24 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
+import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchAppFeedback
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen
@@ -72,6 +79,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var browserNav: BrowserNav
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
     private val webView
@@ -93,18 +103,30 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
+                onShowNativeFeedback = { viewModel.launchAppFeedbackFlow() },
                 onSubmitBrokenSiteReport = { payload ->
                     val reportFlow = when (val params = params) {
-                        is PrivacyDashboardPrimaryScreen, null -> ReportFlow.DASHBOARD
                         is BrokenSiteForm -> {
                             when (params.reportFlow) {
                                 BrokenSiteForm.BrokenSiteFormReportFlow.MENU -> ReportFlow.MENU
-                                BrokenSiteForm.BrokenSiteFormReportFlow.PROMPT -> ReportFlow.PROMPT
+                                BrokenSiteForm.BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS ->
+                                    ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                             }
                         }
+                        else -> ReportFlow.DASHBOARD
                     }
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
                 },
+                onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
+                onSendToggleReport = {
+                    val opener = params?.opener ?: DashboardOpener.DASHBOARD
+                    viewModel.onSubmitToggleReport(opener)
+                },
+                onRejectToggleReport = {
+                    viewModel.onToggleReportPromptDismissed()
+                    this@PrivacyDashboardHybridActivity.finish()
+                },
+                onSeeWhatIsSent = {},
             ),
         )
     }
@@ -122,9 +144,12 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         val initialScreen = when (params) {
             is PrivacyDashboardPrimaryScreen, null -> InitialScreen.PRIMARY
             is BrokenSiteForm -> InitialScreen.BREAKAGE_FORM
+            is PrivacyDashboardToggleReportScreen -> InitialScreen.TOGGLE_REPORT
         }
 
-        dashboardRenderer.loadDashboard(webView, initialScreen)
+        val toggleOpener = params?.opener ?: DashboardOpener.NONE
+
+        dashboardRenderer.loadDashboard(webView, initialScreen, toggleOpener)
         configureObservers()
     }
 
@@ -147,6 +172,16 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is LaunchReportBrokenSite -> {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
+            is LaunchAppFeedback -> {
+                globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
+            }
+            is FetchToggleData -> fetchToggleData(it.toggleData)
+            is LaunchToggleReport -> {
+                params?.tabId?.let { tabId ->
+                    globalActivityStarter.startIntent(this, PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD))
+                        ?.let { startActivity(it) }
+                }
+            }
             is OpenURL -> openUrl(it.url)
             is OpenSettings -> openSettings(it.target)
             GoBack -> {
@@ -156,6 +191,15 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     finish()
                 }
             }
+        }
+    }
+
+    private fun fetchToggleData(data: String) {
+        webView.post {
+            webView.evaluateJavascript(
+                "javascript:window.onGetToggleReportOptionsResponse($data);",
+                null,
+            )
         }
     }
 
@@ -218,6 +262,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        if (params is PrivacyDashboardToggleReportScreen) {
+            viewModel.onToggleReportPromptDismissed()
+        }
         if (webView.canGoBack()) {
             webView.goBack()
         } else {

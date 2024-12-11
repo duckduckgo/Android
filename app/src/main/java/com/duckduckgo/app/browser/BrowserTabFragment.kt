@@ -226,7 +226,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.PROMPT
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -272,9 +272,11 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
@@ -957,7 +959,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        browserActivity?.launchPrivacyDashboard()
+        browserActivity?.launchPrivacyDashboard(toggle = false)
         if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
             viewModel.onPrivacyShieldSelected()
         }
@@ -970,8 +972,10 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarClearTextButtonPressed() {
-        viewModel.onClearOmnibarTextInput()
-        omnibar.setText("")
+        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
+            viewModel.onClearOmnibarTextInput()
+            omnibar.setText("")
+        }
     }
 
     private fun configureCustomTab() {
@@ -1544,8 +1548,14 @@ class BrowserTabFragment :
 
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
-            is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
-            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
+            is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
+                refresh()
+                privacyProtectionEnabledConfirmation(it.domain)
+            }
+            is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
+                refresh()
+                privacyProtectionDisabledConfirmation(it.domain)
+            }
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -1606,6 +1616,10 @@ class BrowserTabFragment :
 
             is Command.BrokenSiteFeedback -> {
                 launchBrokenSiteFeedback(it.data)
+            }
+
+            is Command.ToggleReportFeedback -> {
+                launchToggleReportFeedback(it.opener)
             }
 
             is Command.ShowFullScreen -> {
@@ -1926,15 +1940,20 @@ class BrowserTabFragment :
 
         if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
             val reportFlow = when (data.reportFlow) {
-                PROMPT -> BrokenSiteFormReportFlow.PROMPT
+                RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                 else -> BrokenSiteFormReportFlow.MENU
             }
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId, reportFlow))
+            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))
                 ?.let { startActivity(it) }
         } else {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
             startActivity(BrokenSiteActivity.intent(context, data), options)
         }
+    }
+
+    private fun launchToggleReportFeedback(opener: DashboardOpener) {
+        globalActivityStarter.startIntent(requireContext(), PrivacyDashboardToggleReportScreen(tabId, opener))
+            ?.let { startActivity(it) }
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
@@ -3561,6 +3580,8 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
+
+        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
 
         fun newInstance(
             tabId: String,

@@ -4,7 +4,6 @@ import com.duckduckgo.app.pixels.AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.referral.AppReferrerInstallPixelSender
@@ -35,14 +34,14 @@ class AppReferrerInstallPixelSenderTest {
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val appReferrerDataStore: AppReferrerDataStore = mock()
-    private val statisticsDataStore: StatisticsDataStore = mock()
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall = mock()
     private val captor = argumentCaptor<Map<String, String>>()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
         whenever(playStoreInstallChecker.installedFromPlayStore()).thenReturn(true)
+        configureAsNewUser()
     }
 
     private val testee = AppReferrerInstallPixelSender(
@@ -51,7 +50,6 @@ class AppReferrerInstallPixelSenderTest {
         appCoroutineScope = coroutineTestRule.testScope,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appBuildConfig = appBuildConfig,
-        statisticsDataStore = statisticsDataStore,
     )
 
     @Test
@@ -85,12 +83,12 @@ class AppReferrerInstallPixelSenderTest {
         verifyNoMoreInteractions(pixel)
     }
 
-    private fun configureAsReturningUser() {
-        whenever(statisticsDataStore.variant).thenReturn("ru")
+    private suspend fun configureAsReturningUser() {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
     }
 
-    private fun configureAsNewUser() {
-        whenever(statisticsDataStore.variant).thenReturn("")
+    private suspend fun configureAsNewUser() {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
     }
 
     private fun configureReferrerCampaign(campaign: String?) {

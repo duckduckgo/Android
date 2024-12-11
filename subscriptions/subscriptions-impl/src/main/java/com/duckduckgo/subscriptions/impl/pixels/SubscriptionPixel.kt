@@ -103,10 +103,6 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_welcome_add-device_click",
         type = Unique(),
     ),
-    ADD_DEVICE_ENTER_EMAIL_CLICK(
-        baseName = "m_privacy-pro_add-device_enter-email_click",
-        type = Count,
-    ),
     ONBOARDING_VPN_CLICK(
         baseName = "m_privacy-pro_welcome_vpn_click",
         type = Unique(),

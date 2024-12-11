@@ -22,6 +22,7 @@ import androidx.core.net.toUri
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.domain
+import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
@@ -39,6 +40,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.PRIMARY
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen.TOGGLE_REPORT
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
@@ -67,11 +69,16 @@ class PrivacyDashboardRendererTest {
         {},
         {},
         {},
+        {},
+        {},
+        {},
+        {},
+        {},
     )
 
     @Test
     fun whenLoadDashboardThenJSInterfaceInjected() {
-        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY, toggleOpener = DashboardOpener.DASHBOARD)
 
         verify(spyWebView).addJavascriptInterface(
             any<PrivacyDashboardJavascriptInterface>(),
@@ -81,16 +88,23 @@ class PrivacyDashboardRendererTest {
 
     @Test
     fun whenLoadDashboardWithInitialScreenPrimaryThenLoadLocalHtml() {
-        testee.loadDashboard(spyWebView, initialScreen = PRIMARY)
+        testee.loadDashboard(spyWebView, initialScreen = PRIMARY, toggleOpener = DashboardOpener.DASHBOARD)
 
-        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=primaryScreen")
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=primaryScreen&opener=dashboard")
     }
 
     @Test
     fun whenLoadDashboardWithInitialScreenBreakageFormThenLoadLocalHtml() {
-        testee.loadDashboard(spyWebView, initialScreen = BREAKAGE_FORM)
+        testee.loadDashboard(spyWebView, initialScreen = BREAKAGE_FORM, toggleOpener = DashboardOpener.DASHBOARD)
 
-        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=breakageForm")
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=breakageForm&opener=dashboard")
+    }
+
+    @Test
+    fun whenLoadDashboardWithInitialScreenToggleReportThenLoadLocalHtml() {
+        testee.loadDashboard(spyWebView, initialScreen = TOGGLE_REPORT, toggleOpener = DashboardOpener.MENU)
+
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html?screen=toggleReport&opener=menu")
     }
 
     @Test

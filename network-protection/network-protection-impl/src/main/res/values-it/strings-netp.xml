@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN è attiva</string>
+    <string name="netpManagementHeadlineStatusOff">DuckDuckGo VPN è disattivata</string>
+    <string name="netpManagementDescriptionOff">Connetti per proteggere tutto il traffico\nInternet del tuo dispositivo.</string>
+    <string name="netpManagementDescriptionOn">Tutto il traffico Internet del dispositivo è protetto\n tramite la VPN.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Connessione…</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connesso · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Non collegata</string>
+    <string name="netpManagementBetaDescription">La VPN di DuckDuckGo è attualmente in versione beta. <annotation type="report_issues_link">Esprimi un\'opinione</annotation> per aiutarci a migliorare!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">La VPN sta causando problemi con un\'app?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">Puoi escludere le app dalla VPN senza spegnerla.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Escludi un\'app</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Disattiva la VPN</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Non chiedere più</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Posizione selezionata</string>
+    <string name="netpManagementLocationHeaderVpnOn">Posizione connessa</string>
+    <string name="netpManagementLocationNearest">(Più vicino)</string>
+    <string name="netpManagementLocationPlaceholder">Posizione più vicina</string>
+    <string name="netpManagementLocationCustom">(Personalizzato)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Dettagli della connessione</string>
+    <string name="netpManagementConnectionDetailsIp">Indirizzo IP</string>
+    <string name="netpManagementConnectionDetailsDns">Server DNS</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Volume dati</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">La VPN è connessa.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">La VPN è connessa e sta instradando il traffico del dispositivo tramite &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">L\'app VPN potrebbe essere disconnessa</string>
+    <string name="netpVpnConflictMessage">Android consente solo una connessione VPN attiva alla volta. L\'attivazione della VPN di DuckDuckGo potrebbe disconnettere una VPN attiva sul tuo dispositivo.</string>
+    <string name="netpActionGotIt">Ho capito</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">La tua app VPN sta bloccando la VPN di DuckDuckGo</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android consente solo una connessione VPN attiva alla volta. Apri Impostazioni di rete &gt; VPN. Trova l\'app VPN \"sempre attiva\" e disattivala per continuare.</string>
+    <string name="netpActionOpenSettings">Apri Impostazioni</string>
+    <string name="netpActionCancel">Annulla</string>
+    <string name="netpActionNotNow">Non adesso</string>
+    <string name="netpActionGoToSettings">Vai a Impostazioni</string>
+    <string name="netpAlwaysOnPromotionHeading">Imposta su \"Sempre attiva\"</string>
+    <string name="netpAlwaysOnPromotionBody">Vai alle impostazioni VPN del tuo dispositivo per DuckDuckGo e attiva <b>VPN sempre attiva</b> per impedire che Android disattivi la protezione.\n\nAssicurati di lasciare l\'altra impostazione su OFF.</string>
+    <string name="netpAlwaysOnLockdownBody">Per evitare problemi con l\'app, vai alle <b>Impostazioni VPN per DuckDuckGo</b> del tuo dispositivo e disattiva <b>Blocca connessioni senza VPN</b>.</string>
+    <string name="netpAlwaysOnLockdownHeading">Modifica le impostazioni della VPN</string>
+    <string name="netpBannerVpnRevoked"><b>La VPN è disattivata.</b>\nPotrebbe essere stata disattivata da un\'app VPN presente sul tuo dispositivo. Usa il pulsante di attivazione per riattivare.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Azione necessaria.</b> Per evitare problemi con l\'app, è necessario modificare le impostazioni di Android. <annotation type="open_settings_link">Modifica impostazioni</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">L\'app si blocca o si arresta in modo anomalo</string>
+    <string name="netpReportBreakageCategoryMessages">I messaggi non vengono recapitati</string>
+    <string name="netpReportBreakageCategoryCalls">Le chiamate vocali non funzionano</string>
+    <string name="netpReportBreakageCategoryContent">Il caricamento dei contenuti è lento</string>
+    <string name="netpReportBreakageCategoryConnection">L\'app non riesce a connettersi</string>
+    <string name="netpReportBreakageCategoryIot">Non riesco a connettere il dispositivo locale</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Richiesta di funzionalità</string>
+    <string name="netpReportBreakageCategoryOther">Qualcos\'altro</string>
+
+    <string name="netpBetaDisclaimerFooter">La VPN di DuckDuckGo è gratuita in versione beta.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Gestisci</string>
+    <string name="netpManagementManageItemExclusion">App escluse</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Niente</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d app</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">Impostazioni VPN</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Generale</string>
+    <string name="netpVpnSettingsSystemHeader">Sistema</string>
+    <string name="netpVpnNotificationSettingsTitle">Notifiche VPN</string>
+    <string name="netpVpnSettingsTitle">Impostazioni VPN</string>
+    <string name="netpVpnSettingKillSwitch">Sempre attiva</string>
+    <string name="netpVpnSettingAlwaysOn">Sempre attiva</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Consenti utilizzo illimitato della batteria dell\'app</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">Nelle impostazioni della batteria dell\'app, consenti l\'utilizzo senza restrizioni per impedire ad Android di disattivare la VPN in background</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">L\'utilizzo della batteria dell\'app non è limitato</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">Nelle impostazioni della batteria app, questo impedisce ad Android di disattivare la VPN in background</string>
+    <string name="netpVpnSettingAlwaysOnByline">Ripristina automaticamente la connessione VPN dopo un\'interruzione</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Escludi reti locali</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Bypassa la VPN per le connessioni alla rete locale, come a una stampante.</string>
+    <string name="netpVpnSettingDnsLeak">La VPN di DuckDuckGo impedisce perdite DNS al tuo Internet Service Provider instradando le query DNS tramite il tunnel VPN al nostro resolver.</string>
+    <string name="netpVpnSettingGeoswitching">Posizione preferita</string>
+    <string name="netpVpnSettingGeoswitchingDefault">La più vicina disponibile</string>
+
+    <string name="netpVpnNotificationSettings">Notifiche VPN</string>
+    <string name="netpVpnNotificationSettingsByLine">Ricevi una notifica se la tua connessione si interrompe o lo stato della VPN cambia</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Utilizzo illimitato della batteria</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Impedisce ad Android di interrompere la VPN.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Metti in pausa la VPN durante le chiamate Wi-Fi</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Sospendi temporaneamente la VPN quando sono in corso chiamate Wi-Fi e riconnettiti automaticamente in seguito</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">È necessaria l\'autorizzazione per il telefono</string>
+    <string name="netpGrantPhonePermissionByline">Per abilitare questa impostazione, devi permettere a DuckDuckGo di effettuare e gestire le chiamate telefoniche tramite le impostazioni di sistema.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Impostazioni</string>
+    <string name="netpGrantPhonePermissionActionNegative">Annulla</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Le notifiche sono disabilitate</string>
+    <string name="netpVpnNotifyMeByLine">Ricevi notifiche sugli eventi VPN</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Gestisci le app</string>
+    <string name="netpExclusionListHeaderDefault">La VPN di DuckDuckGo funziona su tutte le app di default. Se riscontri problemi con un\'app mentre la VPN è abilitata, prova a disabilitare la protezione per quell\'app.</string>
+    <string name="netpExclusionListHeaderDisabled">La VPN di DuckDuckGo è disattivata.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Disattivata manualmente</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Attivata manualmente</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Se attivato, potrebbero verificarsi problemi con l\'app</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Protezione attivata</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Protezione disattivata</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Tutto</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Vuoi segnalare un problema?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Hai disattivato la VPN per %1$s perché hai riscontrato problemi con l\'app? Comunicacelo.\n\nDisattiverò anche l\'App Tracking Protection per %1$s.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Segnala problema</string>
+    <string name="netpExclusionListManuallyCTANotNow">Non adesso</string>
+    <string name="netpExclusionListManuallyCTACancel">Annulla</string>
+    <string name="netpExclusionListManuallyCTARestore">Ripristina</string>
+    <string name="netpExclusionListManuallyMenuRestore">Ripristina la protezione per tutte le app</string>
+    <string name="netpExclusionListManuallyMenuReport">Segnala un problema con un\'app</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Ripristinare la protezione per tutte le app?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Questo aggiornerà le tue impostazioni di protezione personalizzate e abiliterà la VPN per tutte le app. È sempre possibile modificare nuovamente le impostazioni di protezione in un secondo momento.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Protezione ripristinata nelle impostazioni predefinite</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">L\'attivazione della protezione invia il nome dell\'app a DuckDuckGo.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">App di sistema Android</string>
+    <string name="netpExclusionListWarningTitle">Informazioni sulle esclusioni delle app di sistema</string>
+    <string name="netpExclusionListWarningMessage">Il traffico internet, comprese le connessioni in background, utilizzato da questo gruppo di app non sarà protetto dalla VPN. Valuta di riattivarlo se questo non risolve il problema, per evitare perdite di dati impreviste.</string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Informazioni</string>
+    <string name="netpManagementAboutItemFaqs">Domande frequenti e assistenza</string>
+    <string name="netpManagementAboutItemShareFeedback">Invia feedback</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Domande frequenti e assistenza</string>
+    <string name="netpFaqQuestionOne">Come funziona la VPN di DuckDuckGo?</string>
+    <string name="netpFaqAnswerOne">La VPN usa il protocollo open source WireGuard per configurare una rete privata virtuale (VPN) sul tuo dispositivo. Quando abilitata, tutto il traffico del tuo dispositivo viene prima crittografato e poi instradato attraverso il server VPN più vicino per proteggere la tua attività di navigazione dai fornitori di servizi Internet e nascondere la tua posizione alle app e ai siti che visiti.</string>
+    <string name="netpFaqQuestionTwo">È protetta solo la mia navigazione sul web?</string>
+    <string name="netpFaqAnswerTwo">Tutte le attività di rete sul tuo dispositivo sono protette.</string>
+    <string name="netpFaqQuestionThree">DuckDuckGo tiene traccia dei miei dati?</string>
+    <string name="netpFaqAnswerThree">No, non memorizziamo i registri.</string>
+    <string name="netpFaqQuestionFour">Dove si trovano i server della VPN?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo offre un numero limitato di server mentre la VPN di DuckDuckGo è in beta, situata negli Stati Uniti, in Canada e in Europa.</string>
+    <string name="netpFaqQuestionSix">Perché alcune app non funzionano quando la VPN è attiva?</string>
+    <string name="netpFaqAnswerSix">Alcuni siti web e app limitano intenzionalmente l\'accesso a chi usa una VPN. Ad esempio, potrebbero chiederti di risolvere un CAPTCHA per assicurarti che tu sia una persona reale invece di un bot. Se si ripetono i problemi con un\'app, puoi escluderla del tutto dalla VPN nelle impostazioni della VPN di DuckDuckGo.</string>
+    <string name="netpFaqQuestionSeven">Perché non posso ignorare le notifiche VPN?</string>
+    <string name="netpFaqAnswerSeven">Android richiede che le VPN mostrino una notifica persistente mentre la VPN è abilitata.</string>
+    <string name="netpFaqQuestionEight">La VPN è compatibile con App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Sì, sia la VPN che App Tracking Protection possono essere attive contemporaneamente. Nessun\'altra VPN è compatibile con DuckDuckGo App Tracking Protection.</string>
+    <string name="netpFaqQuestionNine">L\'uso della VPN è gratuito?</string>
+    <string name="netpFaqAnswerNine">L\'uso della VPN di DuckDuckGo è gratuito in fase beta. Alla conclusione della fase sarà offerto come servizio a pagamento.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Connettiti</string>
+    <string name="netpNotificationCTAReportIssue">Hai problemi con un\'app?</string>
+    <string name="netpNotificationDisabled">La VPN è disconnessa. Tocca per continuare a proteggere il traffico del tuo dispositivo.</string>
+    <string name="netpNotificationDisabledByVpn">La tua app VPN ha disconnesso la VPN di DuckDuckGo. Tocca per riconnetterti.</string>
+    <string name="netpUnsafeWifi">Connesso a un Wi-Fi non sicuro.</string>
+    <string name="netpNotificationCTAReconnectNow">Riconnettiti ora</string>
+    <string name="netpNotificationSnoozeTitle">La VPN è sospesa</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">La VPN si riconnetterà a %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">La VPN si è scollegata perché l\'abbonamento è scaduto. Iscriviti a Privacy Pro per riconnettere la VPN di DuckDuckGo.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">Posizione VPN</string>
+    <string name="netpGeoswitchingHeaderRecommended">Consigliato</string>
+    <string name="netpGeoswitchingDefaultTitle">La più vicina disponibile</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Connettiti automaticamente al server più vicino che troviamo</string>
+    <string name="netpGeoswitchingHeaderCustom">Personalizzato</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d città</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">La VPN si è scollegata a causa di un abbonamento scaduto</string>
+    <string name="netpDialogVpnAccessRevokedBody">Iscriviti a Privacy Pro per riconnettere DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Iscriviti</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Ignora</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Verifica l\'abbonamento</string>
+    <string name="netpVerifySubscriptionInProgress">Attendi mentre verifico l\'abbonamento...</string>
+    <string name="netpVerifySubscriptionNoSubscription">Siamo spiacenti. Non hai un abbonamento valido.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Siamo spiacenti. Il tuo abbonamento non è valido per la VPN di DuckDuckGo.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Attivato</string>
+    <string name="netpSubscriptionSettingsConnecting">Connessione…</string>
+    <string name="netpSubscriptionSettingsDisconnected">Disattivato</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">Server DNS</string>
+    <string name="netpPrivateDns">DNS privato</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blocca malware)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (consigliato)</string>
+    <string name="netpCustomDnsCustom">Personalizzato</string>
+    <string name="netpCustomDnsInputAddressHint">Indirizzo IPv4</string>
+    <string name="netpCustomDnsApply">Applica</string>
+    <string name="netpCustomDnsCustomHeader">Server DNS</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Il DNS privato è già specificato nelle impostazioni DNS di sistema. Disattiva il DNS privato per impostare un DNS personalizzato per la VPN di DuckDuckGo. <annotation type="open_settings_link">Apri le impostazioni di sistema</annotation></string>
+    <string name="netpCustomDnsWarning">L\'utilizzo di un server DNS personalizzato può incidere sulla velocità di navigazione ed esporre la tua attività a terzi se il server non è sicuro o affidabile.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo instrada le query DNS tramite i nostri server DNS in modo che il tuo provider internet non possa vedere quali siti web visiti.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Blocca malware</string>
+    <string name="netpDnsBlockMalwareByline">Blocca il malware con una lista di blocco a livello DNS. Se un sito web non si carica, prova a disattivare il blocco.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Vuoi escludere le app che non sono compatibili con le VPN?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Abbiamo trovato %1$s mentre la VPN è connessa.</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d nuova app che non è compatibile con le VPN. Escludila per poterla usare</item>
+        <item quantity="other">%1$d nuove app che non sono compatibili con le VPN. Escludile per poterle usare</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Vuoi escludere tutte le app che non sono compatibili con le VPN?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d altra app che non è compatibile con le VPN. Escludi questa app per poterla utilizzare</item>
+        <item quantity="other">%1$d altre app che non sono compatibili con le VPN. Escludi queste app per poterle utilizzare</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Escludi automaticamente le app incompatibili</string>
+    <string name="netpAutoExcludePromptActionAdd">Escludi app</string>
+    <string name="netpAutoExcludePromptActionCancel">Salta</string>
+    <string name="netpAutoExcludeToggleName">Escludi automaticamente le app incompatibili con le VPN</string>
+    <string name="netpExclusionListLabelAutoExclude">Incompatibile con le VPN</string>
+    <string name="netpExclusionListAutoExcludeDescription">Alcune app, come quelle bancarie o di streaming, non funzionano bene con le VPN. Quando questa impostazione è attivata, escluderemo automaticamente quelle app.</string>
+</resources>

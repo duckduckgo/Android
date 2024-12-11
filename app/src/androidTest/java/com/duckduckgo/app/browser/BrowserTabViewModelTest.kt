@@ -79,10 +79,10 @@ import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
-import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
@@ -228,6 +228,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
+import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -499,6 +500,7 @@ class BrowserTabViewModelTest {
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
+    private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
@@ -553,6 +555,7 @@ class BrowserTabViewModelTest {
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
+        whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -673,6 +676,7 @@ class BrowserTabViewModelTest {
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
+            toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
         )
@@ -2015,12 +2019,44 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
+    fun whenPrivacyProtectionMenuClickedToTurnOffProtectionsThenTogglePromptIsShownWhenCheckIsTrue() = runTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
-            assertEquals("www.example.com", this.domain)
+        verify(mockToggleReports).shouldPrompt()
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForNonAllowListedSiteThenRefreshAndShowDisabledConfirmationMessage() = runTest {
+        val domain = "www.example.com"
+        val url = "http://www.example.com/home.html"
+
+        val allowlistFlow = MutableStateFlow(listOf<String>())
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(allowlistFlow)
+
+        loadUrl(url)
+        testee.onPrivacyProtectionMenuClicked()
+        allowlistFlow.value = listOf(domain)
+
+        assertCommandIssued<RefreshAndShowPrivacyProtectionDisabledConfirmation> {
+            assertEquals(domain, this.domain)
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenRefreshAndShowEnabledConfirmationMessage() = runTest {
+        val domain = "www.example.com"
+        val url = "http://www.example.com/home.html"
+
+        val allowlistFlow = MutableStateFlow(listOf(domain))
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(allowlistFlow)
+
+        loadUrl(url)
+        testee.onPrivacyProtectionMenuClicked()
+        allowlistFlow.value = emptyList()
+
+        assertCommandIssued<RefreshAndShowPrivacyProtectionEnabledConfirmation> {
+            assertEquals(domain, this.domain)
         }
     }
 
@@ -2032,16 +2068,6 @@ class BrowserTabViewModelTest {
         verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
         assertEquals(1, protectionTogglePlugin.toggleOn)
-    }
-
-    @Test
-    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
-        loadUrl("http://www.example.com/home.html")
-        testee.onPrivacyProtectionMenuClicked()
-        assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
-            assertEquals("www.example.com", this.domain)
-        }
     }
 
     @Test
