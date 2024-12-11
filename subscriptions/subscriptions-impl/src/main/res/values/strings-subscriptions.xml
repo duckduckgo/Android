@@ -18,7 +18,7 @@
 <resources>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
-    <string name="privacyPro">Privacy Pro</string>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
     <string name="manageEmail">Manage Email</string>
 
     <!--Restore Subscriptions Activity-->
@@ -86,10 +86,10 @@
     <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle">Personal Information Removal</string>
+    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
-    <string name="itrSettingTitle">Identity Theft Restoration</string>
+    <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Update Plan or Cancel</string>
@@ -98,8 +98,8 @@
     <!-- PIR Activity-->
     <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
     <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
-    <string name="pirWindowsButton">Windows</string>
-    <string name="pirMacOsButton">Mac</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Open</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
@@ -118,8 +118,8 @@
     <string name="feedbackCategoryHeader">SELECT A CATEGORY</string>
     <string name="feedbackCategorySubscription">Subscription and Payments</string>
     <string name="feedbackCategoryVpn">VPN</string>
-    <string name="feedbackCategoryPir">Personal Information Removal</string>
-    <string name="feedbackCategoryItr">Identity Theft Restoration</string>
+    <string name="feedbackCategoryPir" translatable="false">Personal Information Removal</string>
+    <string name="feedbackCategoryItr" translatable="false">Identity Theft Restoration</string>
     <string name="feedbackSubCategoryHeader">SELECT A CATEGORY</string>
 
     <string name="feedbackSubCategoryVpnConnection">VPN fails to connect</string>
