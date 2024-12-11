@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- *
- * This is a copy of FragmentStateAdapter.java from the AndroidX library, with the following changes:
- * - The package name has been changed to com.duckduckgo.app.browser.tabs.adapter
- * - The fragments are removed from the FragmentManager when they are recycled, rather they are hidden until
- * a limit is reached (TabManager.MAX_ACTIVE_TABS). When the limit is reached, the oldest fragment is removed
- * - The list of fragments to remove is managed by a FIFO queue (itemIdQueue)
  */
 
 package com.duckduckgo.app.browser.tabs.adapter;
@@ -76,6 +70,15 @@ import timber.log.Timber;
  *   <li>RecyclerView.Adapter#onAttachedToWindow we attach the {@link Fragment} to a container.
  *   <li>{@link RecyclerView.Adapter#onViewRecycled} we remove, save state, destroy the {@link
  *       Fragment}.
+ * </ul>
+ *
+ * <p>This is a copy of FragmentStateAdapter.java from the AndroidX library, with the following
+ * changes: < ul>
+ * <li>The package name has been changed to <code>com.duckduckgo.app.browser.tabs.adapter</code>
+ * <li>The fragments are removed from the FragmentManager when they are recycled, rather they are
+ *     hidden until a limit is reached (<code>TabManager.MAX_ACTIVE_TABS</code>). When the limit is
+ *     reached, the oldest fragment is removed
+ * <li>The list of fragments to remove is managed by a FIFO queue (<code>itemIdQueue</code>)
  * </ul>
  */
 public abstract class FragmentStateAdapter extends RecyclerView.Adapter<FragmentViewHolder>
