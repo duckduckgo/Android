@@ -68,4 +68,10 @@
     <string name="onboardingPrivacyProDealDaxDialogTitle">Ready for a deal…?</string>
     <string name="onboardingPrivacyProDealDaxDialogDescription"><![CDATA[Get 3 premium protections for the price of 1, including our <b>VPN</b>.<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
 
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Protect your personal data every time with DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">If you love protecting your data, make us your default browser. All site links will open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
+
 </resources>
