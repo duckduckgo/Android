@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -67,9 +68,9 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
     }
 
-    override suspend fun isMalicious(url: Uri, onSiteBlockedAsync: () -> Unit): Boolean {
+    override suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult {
         Timber.tag("MaliciousSiteProtection").d("isMalicious $url")
         // TODO (cbarreiro): Implement the logic to check if the URL is malicious
-        return false
+        return IsMaliciousResult.SAFE
     }
 }
