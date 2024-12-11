@@ -21,6 +21,7 @@ import androidx.test.core.app.*
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.model.Atoms.script
@@ -88,6 +89,9 @@ class RequestBlockingTest {
         onView(withId(R.id.browserMenu)).perform(click())
         onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
         onView(withId(R.id.privacyProtectionMenuItem)).perform(click())
+
+        // handle the privacy protection toggle check screen showing
+        onView(isRoot()).perform(ViewActions.pressBack())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
