@@ -2425,7 +2425,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userFindingInPage(searchTerm: String) {
         val currentViewState = currentFindInPageViewState()
-        if (!currentViewState.visible) {
+        if (!currentViewState.visible && searchTerm.isEmpty()) {
             return
         }
 
