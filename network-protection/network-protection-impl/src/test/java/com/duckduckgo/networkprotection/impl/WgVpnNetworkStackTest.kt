@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl
 
 import android.annotation.SuppressLint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
@@ -103,11 +104,13 @@ class WgVpnNetworkStackTest {
 
     private lateinit var wgVpnNetworkStack: WgVpnNetworkStack
     private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
+    private lateinit var vpnRemoteFeatures: VpnRemoteFeatures
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         netPSettingsLocalConfig = FakeNetPSettingsLocalConfigFactory.create()
+        vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
 
         privateDnsProvider = FakeDnsProvider()
         networkProtectionRepository = RealNetworkProtectionRepository(
@@ -127,6 +130,7 @@ class WgVpnNetworkStackTest {
             privateDnsProvider,
             mock(),
             netPSettingsLocalConfig,
+            vpnRemoteFeatures,
         )
     }
 
@@ -149,13 +153,31 @@ class WgVpnNetworkStackTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenBlockMalwareIsConfigureDNSIsConputed() = runTest {
+    fun whenBlockMalwareIsConfigureDNSIsComputed() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
         netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
+        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = true))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
         val expected = wgConfig.toTunnelConfig().copy(
             dns = wgConfig.toTunnelConfig().dns.map { it.computeBlockMalwareDnsOrSame() }.toSet(),
+        )
+        assertNotNull(actual)
+        assertEquals(expected, actual)
+
+        verify(netpPixels).reportEnableAttempt()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenBlockMalwareKillSwitched() = runTest {
+        whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
+        netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
+        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = false))
+
+        val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
+        val expected = wgConfig.toTunnelConfig().copy(
+            dns = wgConfig.toTunnelConfig().dns.toSet(),
         )
         assertNotNull(actual)
         assertEquals(expected, actual)
