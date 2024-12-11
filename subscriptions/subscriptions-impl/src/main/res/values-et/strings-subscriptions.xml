@@ -20,8 +20,6 @@
     <string name="cancel">Tühista</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
-    <string name="email">E-post</string>
-    <string name="addEmailText">Lisa e-post</string>
     <string name="manageEmail">Halda e-posti</string>
 
     <!--Restore Subscriptions Activity-->
@@ -33,12 +31,13 @@
     <string name="subscriptionNotFound">Tellimust ei leitud</string>
     <string name="subscriptionNotFoundDescription">Selle Google Play kontoga seotud tellimus ei ole enam aktiivne.</string>
     <string name="purchaseRestored">Sinu ostud on taastatud.</string>
-    <string name="restoreSubscriptionTitle">Aktiveeri oma tellimus selles seadmes</string>
-    <string name="restoreSubscriptionDescription">Pääse oma Privacy Pro tellimusele selles seadmes ligi Google Play või e-posti aadressi kaudu.</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Sinu tellimus on automaatselt saadaval rakenduses DuckDuckGo mis tahes seadmes, mis on sinu Google Play kontole sisse loginud.</string>
-    <string name="restoreSubscriptionGooglePlayButton">Taasta ost</string>
-    <string name="restoreSubscriptionEmailDescription">Kasuta oma e-posti, et aktiveerida oma tellimus selles seadmes.</string>
-    <string name="restoreSubscriptionEmailButton">Sisesta e-posti aadress</string>
+    <string name="restoreSubscriptionTitle">Lisa sellele seadmele oma Privacy Pro tellimus</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Lisa Google Play konto kaudu</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Taastage oma tellimus Android-seadmetes, kasutades oma Google Play kontot.</string>
+    <string name="restoreSubscriptionGooglePlayGetStarted">Taasta ost</string>
+    <string name="restoreSubscriptionEmailTitle">Lisa e-posti kaudu</string>
+    <string name="restoreSubscriptionEmailDescription">Lisage e-posti aadress oma tellimusele, et lisada Privacy Pro sellele seadmele.</string>
+    <string name="restoreSubscriptionEmailGetStarted">Alustage</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Eemalda tellimus</string>
@@ -52,11 +51,11 @@
     <string name="yearlySubscription">Aastane tellimus</string>
     <string name="renews">uueneb</string>
     <string name="expires">aegub</string>
-    <string name="activateOnOtherDevices">Aktiveeri teistes seadmetes</string>
-    <string name="addEmailPrimaryText">Lisa e-post</string>
-    <string name="addEmailSecondaryText">Lisa oma tellimusele valikuline e-posti aadress, et pääseda Privacy Pro\'le ligi teistes seadmetes.</string>
+    <string name="activateOnOtherDevices">Lisa Privacy Pro teistele seadmetele</string>
+    <string name="addToDevicePrimaryText">Lisa seadmele</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisage Privacy Pro oma teistesse seadmetesse Google Play kaudu või e-posti aadressi linkimise teel.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Kasutage ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Avage jaotis Seaded &gt; Privacy Pro &gt; Mul on tellimus.</string>
     <string name="editEmailPrimaryText">Muuda e-posti</string>
-    <string name="editEmailSecondaryText">Kasuta seda e-kirja, et aktiveerida oma tellimus jaotises Seaded &gt; Privacy Pro rakenduses DuckDuckGo oma teistes seadmetes.</string>
     <string name="learnMore">Loe edasi</string>
     <string name="privacyProFaq">Kas vajad abi Privacy Pro\'ga?</string>
     <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
@@ -161,7 +160,7 @@
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tellimused</string>
     <string name="activitySubscriptionSettings">Tellimuse seaded</string>
-    <string name="activityActivateSubscription">Aktiveeri püsitellimus</string>
+    <string name="activityActivateSubscription">Mul on tellimus</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
 </resources>
