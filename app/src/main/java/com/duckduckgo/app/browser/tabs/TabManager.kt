@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.tabs
 
 import android.os.Message
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 
 interface TabManager {
     companion object {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.tabs
+package com.duckduckgo.app.browser.tabs.adapter
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -25,9 +25,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.browser.tabs.adapter.FragmentStateAdapter
 import com.duckduckgo.app.tabs.model.TabEntity
-import timber.log.Timber
 
 class TabPagerAdapter(
     lifecycleOwner: LifecycleOwner,
@@ -53,8 +51,6 @@ class TabPagerAdapter(
             .firstOrNull { it.tabId == getSelectedTabId() }
 
     override fun createFragment(position: Int): Fragment {
-        Timber.d("### TabPagerAdapter.createFragment: $position")
-
         val tab = getTabById(tabIds[position]) ?: requestNewTab()
         val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
