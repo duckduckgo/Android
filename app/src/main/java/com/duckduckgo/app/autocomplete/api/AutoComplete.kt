@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
@@ -153,15 +152,10 @@ class AutoCompleteApi @Inject constructor(
             getAutoCompleteSearchResults(query),
         ) { bookmarks, favorites, tabs, historyResults, searchResults ->
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
-            Timber.d("Navigational: search results ${searchResults.toList()}")
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
-            Timber.d("Navigational: topHits ${topHits.toList()}")
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
-            Timber.d("Navigational: filteredBookmarksFavoritesTabsAndHistory ${filteredBookmarksFavoritesTabsAndHistory.toList()}")
-            val filteredSearchResults = filterSearchResults(searchResults, bookmarks, favorites)
-            Timber.d("Navigational: filteredSearchResults ${filteredSearchResults.toList()}")
-            val distinctSearchResults = getDistinctSearchResults(filteredSearchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
-            Timber.d("Navigational: distinctSearchResults ${distinctSearchResults.toList()}")
+            val middleSectionSearchResults = makeSearchResultsNotAllowedInTopHits(searchResults)
+            val distinctSearchResults = getDistinctSearchResults(middleSectionSearchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
             (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
@@ -207,8 +201,6 @@ class AutoCompleteApi @Inject constructor(
                 is AutoCompleteSearchSuggestion -> it.isAllowedInTopHits
                 else -> false
             }
-        }.also {
-            Timber.d("Navigational: possible top hits ${it.toList()}")
         }.take(maximumNumberOfTopHits)
     }
 
@@ -222,11 +214,7 @@ class AutoCompleteApi @Inject constructor(
             .take(maxBottomSection)
     }
 
-    private fun filterSearchResults(
-        searchResults: List<AutoCompleteSearchSuggestion>,
-        bookmarks: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
-        favorites: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
-    ): List<AutoCompleteSearchSuggestion> {
+    private fun makeSearchResultsNotAllowedInTopHits(searchResults: List<AutoCompleteSearchSuggestion>): List<AutoCompleteSearchSuggestion> {
         // we allow for search results to show navigational links if they are not favorites or bookmarks and not in top hits
         return searchResults.map {
             it.copy(
@@ -241,17 +229,8 @@ class AutoCompleteApi @Inject constructor(
         filteredBookmarksAndTabsAndHistory: List<AutoCompleteSuggestion>,
     ): List<AutoCompleteSearchSuggestion> {
         // we allow for navigational search results if they are not part of top hits
-        val navigationalLinks = searchResults.filter { it.isUrl }
-            .distinctBy { it.phrase }
-            .filterNot { it.javaClass in topHits.map { it.javaClass } }
-            .map { it.copy(isAllowedInTopHits = false) }
-        Timber.d("Navigational: navigational links not in top hits ${navigationalLinks.toList()}")
-
         val distinctPhrases = (filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
-        Timber.d("Navigational: distinctPhrases ${distinctPhrases.toList()}")
-
         val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
-        Timber.d("Navigational: distinctPairs $distinctPairs")
 
         val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
         return searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
