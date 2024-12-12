@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_UPDATE_LOGIN_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_UPDATE_LOGIN_PROMPT_SAVED
@@ -62,6 +63,9 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     @Inject
     lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
+
+    @Inject
+    lateinit var partialCredentialSaveStore: PartialCredentialSaveStore
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it

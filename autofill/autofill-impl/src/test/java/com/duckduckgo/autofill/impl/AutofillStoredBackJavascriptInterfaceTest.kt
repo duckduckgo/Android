@@ -34,11 +34,13 @@ import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillStoreFormDataCredentialsRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillStoreFormDataRequest
+import com.duckduckgo.autofill.impl.jsbridge.request.FormSubmissionTriggerType.FORM_SUBMISSION
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -79,6 +81,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val loginDeduplicator: AutofillLoginDeduplicator = NoopDeduplicator()
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val partialCredentialSaveStore: PartialCredentialSaveStore = mock()
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
     private val testCallback = TestCallback()
@@ -107,6 +110,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             loginDeduplicator = loginDeduplicator,
             systemAutofillServiceSuppressor = systemAutofillServiceSuppressor,
             neverSavedSiteRepository = neverSavedSiteRepository,
+            partialCredentialSaveStore = partialCredentialSaveStore,
         )
         testee.callback = testCallback
         testee.webView = testWebView
@@ -340,7 +344,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         password: String?,
     ) {
         val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = password)
-        val topLevelRequest = AutofillStoreFormDataRequest(credentials)
+        val topLevelRequest = AutofillStoreFormDataRequest(credentials, FORM_SUBMISSION)
         whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(Result.success(topLevelRequest))
         whenever(passwordEventResolver.decideActions(anyOrNull(), any())).thenReturn(listOf(Actions.PromptToSave))
     }
