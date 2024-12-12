@@ -39,7 +39,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -80,6 +79,7 @@ interface AutoComplete {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
             val isUrl: Boolean,
+            val isAllowedInTopHits: Boolean,
         ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteDefaultSuggestion(
@@ -134,7 +134,6 @@ class AutoCompleteApi @Inject constructor(
     private val autoCompleteRepository: AutoCompleteRepository,
     private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
-    private val dispatcherProvider: DispatcherProvider,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
 ) : AutoComplete {
 
@@ -155,7 +154,8 @@ class AutoCompleteApi @Inject constructor(
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
-            val distinctSearchResults = getDistinctSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
+            val middleSectionSearchResults = makeSearchResultsNotAllowedInTopHits(searchResults)
+            val distinctSearchResults = getDistinctSearchResults(middleSectionSearchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
             (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
@@ -193,11 +193,12 @@ class AutoCompleteApi @Inject constructor(
         bookmarksAndFavoritesAndTabsAndHistory: List<AutoCompleteSuggestion>,
         searchResults: List<AutoCompleteSearchSuggestion>,
     ): List<AutoCompleteSuggestion> {
-        return (searchResults + bookmarksAndFavoritesAndTabsAndHistory).filter {
+        return (bookmarksAndFavoritesAndTabsAndHistory + searchResults).filter {
             when (it) {
                 is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                 is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                 is AutoCompleteUrlSuggestion -> true
+                is AutoCompleteSearchSuggestion -> it.isAllowedInTopHits
                 else -> false
             }
         }.take(maximumNumberOfTopHits)
@@ -213,13 +214,24 @@ class AutoCompleteApi @Inject constructor(
             .take(maxBottomSection)
     }
 
+    private fun makeSearchResultsNotAllowedInTopHits(searchResults: List<AutoCompleteSearchSuggestion>): List<AutoCompleteSearchSuggestion> {
+        // we allow for search results to show navigational links if they are not favorites or bookmarks and not in top hits
+        return searchResults.map {
+            it.copy(
+                isAllowedInTopHits = false,
+            )
+        }
+    }
+
     private fun getDistinctSearchResults(
         searchResults: List<AutoCompleteSearchSuggestion>,
         topHits: List<AutoCompleteSuggestion>,
         filteredBookmarksAndTabsAndHistory: List<AutoCompleteSuggestion>,
     ): List<AutoCompleteSearchSuggestion> {
-        val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
+        // we allow for navigational search results if they are not part of top hits
+        val distinctPhrases = (filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
         val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
+
         val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
         return searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
     }
@@ -300,6 +312,7 @@ class AutoCompleteApi @Inject constructor(
                 val searchSuggestion = AutoCompleteSearchSuggestion(
                     phrase = rawResult.phrase.formatIfUrl(),
                     isUrl = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
+                    isAllowedInTopHits = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
                 )
                 searchSuggestionsList.add(searchSuggestion)
             }
@@ -422,6 +435,7 @@ class AutoCompleteApi @Inject constructor(
                             isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
+
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
                             phrase = entry.query.formatIfUrl(),
@@ -484,7 +498,7 @@ class AutoCompleteApi @Inject constructor(
         return this.toUri().toStringDropScheme().removePrefix("www.")
     }
 
-    private data class RankedSuggestion<T : AutoCompleteSuggestion> (
+    private data class RankedSuggestion<T : AutoCompleteSuggestion>(
         val suggestion: T,
         val score: Int = DEFAULT_SCORE,
     )
