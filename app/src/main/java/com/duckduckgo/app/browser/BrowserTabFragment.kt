@@ -212,7 +212,8 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UrlOnlyMatch
-import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchMissingPassword
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
@@ -711,7 +712,7 @@ class BrowserTabFragment :
             withContext(dispatchers.main()) {
                 when (matchType) {
                     ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
-                    UsernameMatch -> showAutofillDialogUpdatePassword(currentUrl, credentials)
+                    UsernameMatchMissingPassword, UsernameMatchDifferentPassword -> showAutofillDialogUpdatePassword(currentUrl, credentials)
                     UsernameMissing -> showAutofillDialogUpdateUsername(currentUrl, credentials)
                     NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
                     UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
@@ -2728,10 +2729,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
@@ -2739,10 +2737,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
@@ -2750,10 +2745,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 

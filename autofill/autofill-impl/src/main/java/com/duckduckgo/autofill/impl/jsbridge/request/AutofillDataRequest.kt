@@ -78,3 +78,15 @@ enum class SupportedAutofillTriggerType {
     @Json(name = "autoprompt")
     AUTOPROMPT,
 }
+
+enum class FormSubmissionTriggerType {
+    @Json(name = "formSubmission")
+    FORM_SUBMISSION,
+
+    @Json(name = "partialSave")
+    PARTIAL_SAVE,
+
+    UNKNOWN,
+
+    ;
+}

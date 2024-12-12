@@ -22,7 +22,8 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UrlOnlyMatch
-import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchMissingPassword
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
@@ -159,7 +160,24 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "differentPassword")
-        assertUsernameMatch(result)
+        assertUsernameMatchDifferentPassword(result)
+    }
+
+    @Test
+    fun whenStoreContainsDomainAndUsernameButMissingPassword() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://example.com", "username", null)
+        val result = testee.containsCredentials("example.com", "username", "differentPassword")
+        assertUsernameMatchMissingPassword(result)
+    }
+
+    @Test
+    fun whenStoreContainsMultipleDomainAndUsernameMatchesDifferentPasswordTakesPrecedence() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://example.com", "username", null)
+        storeCredentials(2, "https://example.com", "username", "password")
+        val result = testee.containsCredentials("example.com", "username", "differentPassword")
+        assertUsernameMatchDifferentPassword(result)
     }
 
     @Test
@@ -522,8 +540,18 @@ class SecureStoreBackedAutofillStoreTest {
         assertTrue(String.format("Expected UsernameMissing but was %s", result.javaClass.simpleName), result is UsernameMissing)
     }
 
-    private fun assertUsernameMatch(result: ContainsCredentialsResult) {
-        assertTrue(String.format("Expected UsernameMatch but was %s", result.javaClass.simpleName), result is UsernameMatch)
+    private fun assertUsernameMatchDifferentPassword(result: ContainsCredentialsResult) {
+        assertTrue(
+            String.format("Expected UsernameMatchDifferentPassword but was %s", result.javaClass.simpleName),
+            result is UsernameMatchDifferentPassword,
+        )
+    }
+
+    private fun assertUsernameMatchMissingPassword(result: ContainsCredentialsResult) {
+        assertTrue(
+            String.format("Expected UsernameMatchMissingPassword but was %s", result.javaClass.simpleName),
+            result is UsernameMatchMissingPassword,
+        )
     }
 
     private fun assertExactMatch(result: ContainsCredentialsResult) {
@@ -534,7 +562,7 @@ class SecureStoreBackedAutofillStoreTest {
         id: Long,
         domain: String,
         username: String?,
-        password: String,
+        password: String?,
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
         notes: String = "notes",
     ): LoginCredentials {
