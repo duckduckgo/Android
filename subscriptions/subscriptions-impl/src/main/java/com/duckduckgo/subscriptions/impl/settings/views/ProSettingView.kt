@@ -169,18 +169,22 @@ class ProSettingView @JvmOverloads constructor(
                 }
             }
             else -> {
-                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-                binding.subscriptionBuy.setSecondaryText(
-                    when (viewState.region) {
-                        ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
-                        US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
-                        else -> ""
-                    },
-                )
-                binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
-                binding.subscriptionBuyContainer.show()
-                binding.subscriptionSettingContainer.gone()
-                binding.subscriptionRestoreContainer.show()
+                with(binding) {
+                    subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                    subscriptionBuy.setSecondaryText(
+                        when (viewState.region) {
+                            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
+                            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
+                            else -> ""
+                        },
+                    )
+                    subscriptionGet.setText(R.string.subscriptionSettingGet)
+
+                    subscriptionBuyContainer.isVisible = true
+                    subscriptionRestoreContainer.isVisible = true
+
+                    subscriptionSettingContainer.isGone = true
+                }
             }
         }
     }
