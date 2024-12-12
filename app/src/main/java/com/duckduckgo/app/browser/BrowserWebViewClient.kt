@@ -163,8 +163,10 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.onShouldOverride()
 
             val confirmationCallback: (isMalicious: Boolean) -> Unit = {
-                // TODO (cbarreiro): Handle site blocked asynchronously
-                Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
+                if (it) {
+                    // TODO (cbarreiro): Handle site blocked asynchronously
+                    Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
+                }
             }
 
             if (

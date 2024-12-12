@@ -100,8 +100,10 @@ class WebViewRequestInterceptor(
         val url: Uri? = request.url
 
         val confirmationCallback: (isMalicious: Boolean) -> Unit = {
-            // TODO (cbarreiro): Handle site blocked asynchronously
-            Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
+            if (it) {
+                // TODO (cbarreiro): Handle site blocked asynchronously
+                Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
+            }
         }
 
         maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri, confirmationCallback)?.let {
