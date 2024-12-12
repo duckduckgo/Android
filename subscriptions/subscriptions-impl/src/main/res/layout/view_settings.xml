@@ -60,6 +60,16 @@
         android:visibility="gone"
         tools:visibility="visible">
 
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscribedSubscriptionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSetting"
+            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:ignore="RtlSymmetry" />
+
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/subscriptionSetting"
             android:layout_width="match_parent"

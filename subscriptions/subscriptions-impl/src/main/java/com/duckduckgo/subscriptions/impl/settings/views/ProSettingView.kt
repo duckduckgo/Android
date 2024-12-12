@@ -138,14 +138,20 @@ class ProSettingView @JvmOverloads constructor(
     private fun renderView(viewState: ViewState) {
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
-                binding.subscriptionBuyContainer.gone()
-                binding.subscriptionRestoreContainer.gone()
-                binding.subscriptionSettingContainer.show()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+                    subscriptionSetting.isGone = true
+
+                    subscribedSubscriptionSetting.isVisible = true
+                    subscriptionSettingContainer.isVisible = true
+                }
             }
             WAITING -> {
                 with(binding) {
                     subscriptionBuyContainer.isGone = true
                     subscriptionRestoreContainer.isGone = true
+                    subscribedSubscriptionSetting.isGone = true
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingActivating))
@@ -155,6 +161,7 @@ class ProSettingView @JvmOverloads constructor(
                 with(binding) {
                     subscriptionBuyContainer.isGone = true
                     subscriptionRestoreContainer.isGone = true
+                    subscribedSubscriptionSetting.isGone = true
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
