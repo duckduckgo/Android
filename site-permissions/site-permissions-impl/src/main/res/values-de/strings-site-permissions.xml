@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ möchte deine DRM-Software öffnen</string>
+    <string name="drmSiteDialogSubtitle">Zum Abspielen geschützter Medieninhalte ist eine Digital Rights Management-Software erforderlich, die aber auch Zugriff auf Gerätekennungen ermöglicht. Erlaube nur Websites, denen du vertraust, den Zugriff auf diese Daten. Du kannst die Berechtigungen jederzeit in den Einstellungen verwalten. <annotation type="drm_learn_more_link">Mehr erfahren</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Immer</string>
+    <string name="drmSiteDialogAllowOnce">Nur für diese Sitzung</string>
+    <string name="drmSiteDialogDenyAlways">Immer ablehnen</string>
+    <string name="drmSiteDialogDenyOnce">Für diese Sitzung ablehnen</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ möchte auf deinen Standort zugreifen</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Meine Auswahl merken</string>
+    <string name="preciseLocationDDGDialogSubtitle">Wir verwenden deinen anonymen Standort nur, um dir bessere Ergebnisse in deiner Nähe zu liefern. Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">DuckDuckGo erlauben, um Zugriff auf den Standort auf diesem Gerät zu bitten</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Websites können deinen Standort nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">DuckDuckGo erlauben, um Zugriff auf den Standort zu bitten</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Website-Berechtigungen</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Du kannst die Mikrofon- und Kamerazugriffsberechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Du kannst die Mikrofonzugriffsberechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Du kannst die Kamerazugriffsberechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ möchte auf die Kamera und das Mikrofon zugreifen</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s“ möchte auf das Mikrofon zugreifen</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ möchte auf die Kamera zugreifen</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Websites können deine Kamera und dein Mikrofon nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Einstellungen öffnen</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Abbrechen</string>
+
+    <string name="sitePermissionsSettingsDescription">Von dir besuchte Websites bitten möglicherweise um Zugriff auf den Standort, die Kamera, das Mikrofon oder die DRM-Software (Digital Rights Management) deines Geräts. Sie können darauf nicht zugreifen, es sei denn, du erteilst ihnen ausdrücklich die Erlaubnis.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Allen Websites erlauben, um Folgendes zu bitten:</string>
+    <string name="sitePermissionsSettingsLocation">Standort</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Websites verwalten</string>
+    <string name="sitePermissionsSettingsEmptyText">Noch keine Websites</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Berechtigungen für alle Websites entfernt</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Berechtigungen für „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Jedes Mal fragen</string>
+    <string name="permissionsPerWebsiteDenySetting">Ablehnen</string>
+    <string name="permissionsPerWebsiteAllowSetting">Zulassen</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Für alle Websites deaktiviert</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-Berechtigung für %2$s</string>
+
 </resources>

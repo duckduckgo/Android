@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" DRM yazılımınızı açmak istiyor</string>
+    <string name="drmSiteDialogSubtitle">Dijital Haklar Yönetimi yazılımı, korumalı medya içeriğini yürütmek için gereklidir, ancak aynı zamanda cihaz tanımlayıcılara erişim sağlar. Bu veriler için yalnızca güvendiğiniz sitelere izin verin. İzinleri istediğiniz zaman Ayarlar\'dan yönetebilirsiniz. <annotation type="drm_learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Her zaman</string>
+    <string name="drmSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
+    <string name="drmSiteDialogDenyAlways">Her Zaman Reddet</string>
+    <string name="drmSiteDialogDenyOnce">Bu Oturum için Reddet</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" konumunuza erişmek istiyor</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Seçimimi hatırla</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonim konumunuzu yalnızca size daha yakın, daha iyi sonuçlar sunmak için kullanıyoruz. Ayrı ayrı sitelere verdiğiniz konum erişimi izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">DuckDuckGo\'nun bu cihazda konum erişimi istemesine izin ver</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Siteler konumunuzu yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">DuckDuckGo\'nun konum erişimi istemesine izin ver</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Site İzinleri</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Sitelere verdiğiniz mikrofon ve kamera erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Sitelere verdiğiniz mikrofona erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Sitelere verdiğiniz kamera erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" kameraya ve mikrofona erişmek istiyor</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" mikrofona erişmek istiyor</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" kameraya erişmek istiyor</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Siteler kameranızı ve mikrofonunuzu yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Ayarları Aç</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">İptal</string>
+
+    <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına, mikrofonuna veya DRM (Dijital Haklar Yönetimi) yazılımına erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>
+    <string name="sitePermissionsSettingsLocation">Konum</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
+    <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
+    <string name="permissionsPerWebsiteAskSetting">Her seferinde sor</string>
+    <string name="permissionsPerWebsiteDenySetting">Reddet</string>
+    <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için devre dışı</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
+
 </resources>

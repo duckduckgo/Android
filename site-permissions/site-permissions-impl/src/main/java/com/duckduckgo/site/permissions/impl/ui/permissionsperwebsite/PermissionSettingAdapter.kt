@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions.permissionsperwebsite
+package com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.databinding.ItemSitePermissionSettingSelectionBinding
-import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionSettingAdapter.ViewHolder
+import com.duckduckgo.site.permissions.impl.databinding.ItemSitePermissionSettingSelectionBinding
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionSettingAdapter.ViewHolder
 
 class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewModel) : RecyclerView.Adapter<ViewHolder>() {
 

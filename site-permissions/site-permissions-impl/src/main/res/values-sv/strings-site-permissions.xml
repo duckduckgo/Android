@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">”%1$s” vill öppna din DRM-programvara</string>
+    <string name="drmSiteDialogSubtitle">DRM-programvara (Digital Rights Management) krävs för att spela upp skyddat medieinnehåll, men ger också tillgång till enhetsidentifierare. Ge endast behörighet att hantera dessa uppgifter till webbplatser du litar på.Du kan hantera behörigheter när som helst i Inställningar. <annotation type="drm_learn_more_link">Läs mer</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Alltid</string>
+    <string name="drmSiteDialogAllowOnce">Endast för denna session</string>
+    <string name="drmSiteDialogDenyAlways">Neka alltid</string>
+    <string name="drmSiteDialogDenyOnce">Neka för denna session</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt din plats</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Kom ihåg mitt val</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi använder bara din anonyma plats för att ge dig bättre resultat, närmare dig. Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinformation som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinf\bormation som du har beviljat för enskilda webbplatser.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Tillåt DuckDuckGo att be om platsåtkomst på den här enheten</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Webbplatser kan endast använda din plats om du tillåter DuckDuckGo att be om åtkomst.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Tillåt DuckDuckGo att be om platsåtkomst</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomst som du har beviljat för enskilda webbplatser till enhetens mikrofon och kamera.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomst som du har beviljat för enskilda webbplatser till enhetens mikrofon.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomst som du har beviljat för enskilda webbplatser till enhetens kamera.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt kameran och mikrofonen</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt mikrofonen</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">”%1$s” vill komma åt kameran</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Webbplatser kan endast använda din kamera och mikrofon om du tillåter DuckDuckGo att be om åtkomst.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Öppna inställningar</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Avbryt</string>
+
+    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
+    <string name="sitePermissionsSettingsLocation">Plats</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
+    <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Behörigheter har tagits bort för alla webbplatser</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Behörigheter för %1$s </string>
+    <string name="permissionsPerWebsiteAskSetting">Fråga varje gång</string>
+    <string name="permissionsPerWebsiteDenySetting">Neka</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Inaktiverat för alla webbplatser</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
+
 </resources>

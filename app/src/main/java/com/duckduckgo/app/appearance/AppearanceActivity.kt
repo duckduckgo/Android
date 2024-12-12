@@ -205,7 +205,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 ),
                 OmnibarPosition.entries.indexOf(position) + 1,
             )
-            .setPositiveButton(R.string.dialogSave)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {

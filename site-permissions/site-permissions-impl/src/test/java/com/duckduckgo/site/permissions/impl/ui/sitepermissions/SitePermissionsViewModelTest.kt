@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitepermissions
+package com.duckduckgo.site.permissions.impl.ui.sitepermissions
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,9 +35,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class SitePermissionsViewModelTest {
 
