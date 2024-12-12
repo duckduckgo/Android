@@ -2367,9 +2367,9 @@ class BrowserTabViewModelTest {
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
+        val suggestions = listOf(AutoCompleteSearchSuggestion("", false, false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
-        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false, false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
