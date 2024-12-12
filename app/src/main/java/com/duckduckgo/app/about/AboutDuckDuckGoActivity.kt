@@ -26,6 +26,8 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +45,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -52,6 +55,9 @@ import kotlinx.coroutines.flow.onEach
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AboutScreenNoParams::class)
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var settingsFeature: NewSettingsFeature
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
@@ -75,6 +81,14 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        if (settingsFeature.self().isEnabled()) {
+            supportActionBar?.setTitle(R.string.aboutActivityTitleNew)
+            binding.includeContent.aboutTextNew.isVisible = true
+
+            binding.includeContent.aboutText.isGone = true
+            binding.includeContent.aboutProvideFeedback.isGone = true
+        }
+
         configureUiEventHandlers()
         observeViewModel()
         configureClickableLinks()
@@ -86,14 +100,27 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLinks() {
-        with(binding.includeContent.aboutText) {
-            text = addClickableLinks()
-            movementMethod = LinkMovementMethod.getInstance()
+        if (settingsFeature.self().isEnabled()) {
+            with(binding.includeContent.aboutTextNew) {
+                text = addClickableLinks()
+                movementMethod = LinkMovementMethod.getInstance()
+            }
+        } else {
+            with(binding.includeContent.aboutText) {
+                text = addClickableLinks()
+                movementMethod = LinkMovementMethod.getInstance()
+            }
         }
     }
 
     private fun addClickableLinks(): SpannableString {
-        val fullText = getText(R.string.aboutDescription) as SpannedString
+        val fullText = getText(
+            if (settingsFeature.self().isEnabled()) {
+                R.string.aboutDescriptionNew
+            } else {
+                R.string.aboutDescription
+            },
+        ) as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
 

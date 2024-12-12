@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
@@ -33,13 +34,11 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_MAC_APP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WINDOWS_APP_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -51,14 +50,15 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopu
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchMacOs
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWindows
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -70,8 +70,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -96,6 +99,8 @@ class NewSettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -108,6 +113,7 @@ class NewSettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isVoiceSearchVisible: Boolean = false,
     )
 
     sealed class Command {
@@ -119,8 +125,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAddHomeScreenWidget : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
-        data object LaunchMacOs : Command()
-        data object LaunchWindows : Command()
         data object LaunchSyncSettings : Command()
         data object LaunchPrivateSearchWebPage : Command()
         data object LaunchWebTrackingProtectionScreen : Command()
@@ -130,6 +134,9 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
+        data object LaunchFeedback : Command()
+        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchOtherPlatforms : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -168,6 +175,7 @@ class NewSettingsViewModel @Inject constructor(
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                    isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),
             )
         }
@@ -201,6 +209,14 @@ class NewSettingsViewModel @Inject constructor(
 
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch { command.send(LaunchAddHomeScreenWidget) }
+    }
+
+    fun onChangeAddressBarPositionClicked() {
+        viewModelScope.launch { command.send(LaunchAppearanceScreen) }
+    }
+
+    fun onEnableVoiceSearchClicked() {
+        viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
     }
 
     fun onDefaultBrowserSettingClicked() {
@@ -258,18 +274,6 @@ class NewSettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
 
-    fun onMacOsSettingClicked() {
-        viewModelScope.launch { command.send(LaunchMacOs) }
-        pixel.fire(SETTINGS_MAC_APP_PRESSED)
-    }
-
-    fun windowsSettingClicked() {
-        viewModelScope.launch {
-            command.send(LaunchWindows)
-        }
-        pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
-    }
-
     fun onAppTPSettingClicked() {
         viewModelScope.launch {
             if (appTrackingProtection.isOnboarded()) {
@@ -305,8 +309,23 @@ class NewSettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
+    fun onShareFeedbackClicked() {
+        viewModelScope.launch {
+            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(LaunchPproUnifiedFeedback)
+            } else {
+                command.send(LaunchFeedback)
+            }
+        }
+        pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
+    }
+
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)
+    }
+
+    fun onDdgOnOtherPlatformsClicked() {
+        viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
 
     companion object {

@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Du kan slå av passordlagring når som helst.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Åpne innstillinger</string>
+
+    <string name="newTabPageShortcutPasswords">Passord</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importer Google-passord</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d passord importert fra Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d passord importert fra CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importer passord fra Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importer passord fra Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkroniser DuckDuckGo-passord</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkroniser DuckDuckGo-passord</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importer Google-passordene dine</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be deg om å logge inn eller skrive inn passordet ditt for å bekrefte.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Åpne Google Passord</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Velg en CSV-fil</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer fra skrivebordsnettleseren</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importer til DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import fullført</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Den er grei</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Import av passord mislyktes</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Hoppet over (duplikat eller ugyldig): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Passord importert: <b>%1$d</b>]]></string>
+
 </resources>

@@ -234,4 +234,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Je kunt het opslaan van wachtwoorden op elk gewenst moment uitschakelen.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Open Instellingen</string>
+
+    <string name="newTabPageShortcutPasswords">Wachtwoorden</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Google-wachtwoorden importeren</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d wachtwoorden geïmporteerd van Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d wachtwoorden geïmporteerd uit CSV-bestand</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Wachtwoorden importeren van Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Wachtwoorden importeren van Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-wachtwoorden synchroniseren</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-wachtwoorden synchroniseren</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importeer je Google-wachtwoorden</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Google wachtwoorden openen</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Kies een CSV-bestand</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importeren vanuit de desktopbrowser</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importeren naar DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Importeren voltooid</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Ik snap het</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Wachtwoord importeren mislukt</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Overgeslagen (duplicaat of ongeldig): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Wachtwoorden geïmporteerd: <b>%1$d</b>]]></string>
+
 </resources>

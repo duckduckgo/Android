@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Ukladanie hesla môžete kedykoľvek vypnúť.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Otvoriť nastavenia</string>
+
+    <string name="newTabPageShortcutPasswords">Heslá</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importovať heslá Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d hesiel importovaných z Google</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d hesiel importovaných zo súboru CSV</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importovať heslá z Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importujte heslá z Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovať heslá DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovať heslá DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importujte svoje heslá Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google vás môže požiadať, aby ste sa prihlásili alebo zadali svoje heslo na potvrdenie.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Otvorte heslá Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Vyberte súbor CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovať z prehliadača na počítači</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importovať do DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import bol dokončený</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Mám to</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Import hesla zlyhal</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Preskočené (duplicitné alebo neplatné): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Počet importovaných hesiel: <b>%1$d</b>]]></string>
+
 </resources>

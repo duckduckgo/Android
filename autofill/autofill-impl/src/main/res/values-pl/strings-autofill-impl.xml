@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Zapisywanie haseł można wyłączyć w dowolnym momencie.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Otwórz ustawienia</string>
+
+    <string name="newTabPageShortcutPasswords">Hasła</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importuj hasła Google</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hasła zaimportowane z Google: %1$d</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hasła zaimportowane z CSV: %1$d</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importuj hasła z Google</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importuj hasła z Google</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizuj hasła DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizuj hasła DuckDuckGo</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Importuj swoje hasła Google</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Otwórz hasła Google</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Wybierz plik CSV</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuj z przeglądarki komputerowej</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Importuj do DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Import zakończony</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Rozumiem</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Importowanie haseł nie powiodło się</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Pominięto (duplikat lub nieprawidłowy): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Zaimportowane hasła: <b>%1$d</b>]]></string>
+
 </resources>

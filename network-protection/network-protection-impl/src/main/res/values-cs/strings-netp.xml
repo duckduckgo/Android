@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
+    <string name="netpManagementHeadlineStatusOn">VPN DuckDuckGo je zapnutá</string>
+    <string name="netpManagementHeadlineStatusOff">VPN DuckDuckGo je vypnutá</string>
+    <string name="netpManagementDescriptionOff">Připojte se a zabezpečte všechna svá zařízení\nInternetový provoz.</string>
+    <string name="netpManagementDescriptionOn">Veškerý internetový provoz zařízení je zabezpečený\n pomocí VPN.</string>
+    <string name="netpManagementToggleTitle" translatable="false">VPN</string>
+    <string name="netpManagementToggleSubtitleConnecting">Připojování...</string>
+    <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Připojeno · %1$s</string>
+    <string name="netpManagementToggleSubtitleDisconnected">Nepřipojeno</string>
+    <string name="netpManagementBetaDescription">DuckDuckGo VPN je momentálně v beta verzi. <annotation type="report_issues_link">Poděl se o zpětnou vazbu</annotation> a pomoz nám se zlepšovat!</string>
+
+    <!-- Exclude App Prompt -->
+    <string name="netpManagementExcludeAppPromptTitle">Způsobuje ti VPN problémy s aplikací?</string>
+    <string name="netpManagementExcludeAppPromptSubtitle">VPN můžeš vypnout jen pro vybrané aplikace.</string>
+    <string name="netpManagementExcludeAppPromptActionDisableOne">Vypnout pro aplikaci</string>
+    <string name="netpManagementExcludeAppPromptActionDisableAll">Vypnout VPN</string>
+    <string name="netpManagementExcludeAppPromptActionDisablePermanent">Už se znovu neptat</string>
+
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Vybrané umístění</string>
+    <string name="netpManagementLocationHeaderVpnOn">Připojené umístění</string>
+    <string name="netpManagementLocationNearest">(nejbližší)</string>
+    <string name="netpManagementLocationPlaceholder">Nejbližší umístění</string>
+    <string name="netpManagementLocationCustom">(Vlastní)</string>
+
+    <!-- Connection details -->
+    <string name="netpManagementConnectionDetailsHeader">Podrobnosti o připojení</string>
+    <string name="netpManagementConnectionDetailsIp">IP adresa</string>
+    <string name="netpManagementConnectionDetailsDns">DNS server</string>
+    <string name="netpManagementConnectionDetailsDataVolume">Objem dat</string>
+
+    <!-- NetP enabled notification -->
+    <string name="netpEnabledNotificationInitialTitle">VPN je připojená.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">VPN je připojená a směruje provoz zařízení přes &lt;b&gt;%1$s&lt;/b&gt;.</string>
+
+    <!-- VPN conflict -->
+    <string name="netpVpnConflictTitle">Tvoje VPN aplikace může být odpojená</string>
+    <string name="netpVpnConflictMessage">Android umožňuje vždycky jenom jedno aktivní připojení VPN. Povolení DuckDuckGo VPN může vést k odpojení jakékoli aktivní VPN na tvém zařízení.</string>
+    <string name="netpActionGotIt">Mám to</string>
+
+    <!-- Always on -->
+    <string name="netpAlwaysOnVpnConflictTitle">Tvoje aplikace VPN blokuje DuckDuckGo VPN</string>
+    <string name="netpAlwaysOnVpnConflictMessage">Android umožňuje vždycky jenom jedno aktivní připojení VPN. Otevřete Nastavení sítě &gt; VPN. Najdi aplikaci VPN, která je \"stále zapnutá\", a vypni ji, aby bylo možné pokračovat.</string>
+    <string name="netpActionOpenSettings">Otevřít nastavení</string>
+    <string name="netpActionCancel">Zrušit</string>
+    <string name="netpActionNotNow">Teď ne</string>
+    <string name="netpActionGoToSettings">Přejdi do Nastavení</string>
+    <string name="netpAlwaysOnPromotionHeading">Nastavit na Vždy zapnout</string>
+    <string name="netpAlwaysOnPromotionBody">Přejdi ve svém zařízení do nastavení VPN pro DuckDuckGo a vyber <b>Vždy zapnout VPN</b>. Tím zabráníš vypnutí naší ochrany v systému Android.\n\nUjisti se, že ostatní nastavení jsou vypnutá.</string>
+    <string name="netpAlwaysOnLockdownBody">Problémům s aplikací předejdeš tak, že v <b>nastavení VPN ve svém zařízení pro DuckDuckGo</b> zakážeš možnost <b>Blokovat připojení bez VPN</b>.</string>
+    <string name="netpAlwaysOnLockdownHeading">Změň si nastavení sítě VPN</string>
+    <string name="netpBannerVpnRevoked"><b>VPN je vypnutá.</b>\nMohla ji zakázat aplikace pro VPN ve tvém zařízení. Přepínačem ji můžeš znovu povolit.</string>
+    <string name="netpBannerAlwaysOnLockDownEnabled"><b>Je potřeba něco udělat!</b> Pokud se chceš vyhnout problémům s aplikací, musíš změnit nastavení systému Android. <annotation type="open_settings_link">Změnit nastavení</annotation></string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">Aplikace se seká nebo padá</string>
+    <string name="netpReportBreakageCategoryMessages">Nejde doručit zprávu</string>
+    <string name="netpReportBreakageCategoryCalls">Nefungují hlasové hovory</string>
+    <string name="netpReportBreakageCategoryContent">Obsah se načítá pomalu</string>
+    <string name="netpReportBreakageCategoryConnection">Aplikace se nepřipojí k internetu</string>
+    <string name="netpReportBreakageCategoryIot">Místní zařízení nejde připojit</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Požadavek na funkci</string>
+    <string name="netpReportBreakageCategoryOther">Něco jiného</string>
+
+    <string name="netpBetaDisclaimerFooter">DuckDuckGo VPN můžeš v rámci beta verze používat bezplatně.</string>
+
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Spravovat</string>
+    <string name="netpManagementManageItemExclusion">Vyloučené aplikace</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">Žádný</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one">%1$d aplikace</item>
+        <item quantity="few">%1$d aplikace</item>
+        <item quantity="many">%1$d aplikace</item>
+        <item quantity="other">%1$d aplikací</item>
+    </plurals>
+    <string name="netpManagementVpnSettings">Nastavení sítě VPN</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingsGeneralHeader">Obecné</string>
+    <string name="netpVpnSettingsSystemHeader">Systém</string>
+    <string name="netpVpnNotificationSettingsTitle">Oznámení sítě VPN</string>
+    <string name="netpVpnSettingsTitle">Nastavení sítě VPN</string>
+    <string name="netpVpnSettingKillSwitch">Vždycky zapnuté</string>
+    <string name="netpVpnSettingAlwaysOn">Vždycky zapnuté</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Povol neomezené využití baterie aplikacemi</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">V nastaveních spotřeby baterie aplikacemi povol možnost Neomezené využití, aby Android nevypínal VPN na pozadí</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">Využití baterie aplikacemi je neomezené</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">V nastavení spotřeby baterie aplikacemi brání tahle možnost systému Android ve vypnutí VPN na pozadí.</string>
+    <string name="netpVpnSettingAlwaysOnByline">Po přerušení automaticky obnovit připojení VPN</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Vyloučení místních sítí</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Obejdi VPN, pokud se chceš připojit k místní síti, třeba k tiskárně.</string>
+    <string name="netpVpnSettingDnsLeak">VPN DuckDuckGo zabraňuje únikům DNS k poskytovateli internetových služeb tím, že směruje dotazy DNS přes tunel VPN na náš vlastní resolver.</string>
+    <string name="netpVpnSettingGeoswitching">Preferovaná lokalita</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Nejbližší dostupná</string>
+
+    <string name="netpVpnNotificationSettings">Oznámení sítě VPN</string>
+    <string name="netpVpnNotificationSettingsByLine">Nech si poslat upozornění, když se přeruší připojení nebo se změní stav VPN</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Neomezené využití baterie</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Brání Androidu ve vypnutí VPN.</string>
+
+    <string name="netpVpnSettingsPauseDuringCalls">Pozastavení VPN během Wi-Fi hovorů</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Dočasně pozastav VPN, když probíhají hovory přes Wi-Fi, a automaticky se znovu připoj po jejich ukončení.</string>
+
+    <!-- Pause during calls -->
+    <string name="netpGrantPhonePermissionTitle">Je potřeba přístup k telefonu</string>
+    <string name="netpGrantPhonePermissionByline">Jestli chceš toto nastavení zapnout, musíš DuckDuckGo v nastaveních systému povolit uskutečňování a správu telefonních hovorů.</string>
+    <string name="netpGrantPhonePermissionActionPositive">Nastavení</string>
+    <string name="netpGrantPhonePermissionActionNegative">Zrušit</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnNotifyMeTitle">Oznámení jsou vypnutá</string>
+    <string name="netpVpnNotifyMeByLine">Nech si posílat upozornění na události VPN</string>
+
+    <!-- Exclusion list -->
+    <string name="netpExclusionListTitle">Spravovat aplikace</string>
+    <string name="netpExclusionListHeaderDefault">DuckDuckGo VPN ve výchozím nastavení funguje ve všech aplikacích. Pokud máš při zapnuté VPN s nějakou aplikací problémy, zkus ochranu pro danou aplikaci vypnout.</string>
+    <string name="netpExclusionListHeaderDisabled">DuckDuckGo VPN je vypnutá.</string>
+    <string name="netpExclusionListExcludedReasonManuallyDisabled">Ručně vypnuto</string>
+    <string name="netpExclusionListExcludedReasonManuallyEnabled">Ručně zapnuto</string>
+    <string name="netpExclusionListExcludedReasonIssuesMayOccur">Povolení může způsobit problémy s aplikací</string>
+    <string name="netpExclusionListFilterMenuProtectedLabel">Ochrana je zapnutá</string>
+    <string name="netpExclusionListFilterMenuUnprotectedLabel">Ochrana je vypnutá</string>
+    <string name="netpExclusionListFilterMenuAllLabel">Vše</string>
+    <string name="netpExclusionListManuallyDisableAppDialogTitle">Nahlásit problém?</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Dej nám prosím vědět, jestli jsi deaktivoval(a) VPN pro %1$s, protože jsi zaznamenal(a) problémy s aplikací.\n\nTaky pro aplikaci %1$s vypneme funkci App Tracking Protection.</string>
+    <string name="netpExclusionListManuallyCTAReportIssue">Nahlásit problém</string>
+    <string name="netpExclusionListManuallyCTANotNow">Teď ne</string>
+    <string name="netpExclusionListManuallyCTACancel">Zrušit</string>
+    <string name="netpExclusionListManuallyCTARestore">Obnovit</string>
+    <string name="netpExclusionListManuallyMenuRestore">Obnovit ochranu pro všechny aplikace</string>
+    <string name="netpExclusionListManuallyMenuReport">Nahlášení problému s aplikací</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Obnovit ochranu pro všechny aplikace?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Tímhle krokem aktualizuješ vlastní nastavení ochrany a zapneš VPN pro všechny aplikace. Nastavení ochrany můžeš pak kdykoli zase změnit.</string>
+    <string name="netpExclusionListRestoreDefaultSnackbar">Ochrana obnovena na výchozí nastavení</string>
+    <string name="netpExclusionListRestoreDefaultsDisclaimer">Zapnutí ochrany odešle název aplikace do DuckDuckGo.</string>
+
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Systémové aplikace Android</string>
+    <string name="netpExclusionListWarningTitle">O vyloučení systémových aplikací</string>
+    <string name="netpExclusionListWarningMessage">Internetový provoz, včetně připojení na pozadí, používaný touto skupinou aplikací nebude VPN chránit. Pokud se tím problém nevyřeší, zvaž opětovné zapnutí VPN, ať předejdeš možným únikům dat.</string>
+    <string name="netpExclusionListWarningActionPositive">Dobře</string>
+
+    <!-- About -->
+    <string name="netpManagementAboutHeader">Informace</string>
+    <string name="netpManagementAboutItemFaqs">Časté dotazy a podpora</string>
+    <string name="netpManagementAboutItemShareFeedback">Odeslat zpětnou vazbu</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Časté dotazy a podpora</string>
+    <string name="netpFaqQuestionOne">Jak DuckDuckGo VPN funguje?</string>
+    <string name="netpFaqAnswerOne">VPN používá ke konfiguraci virtuální privátní sítě (VPN) na tvém zařízení open source protokol WireGuard. Když je tahle funkce povolená, veškerý provoz tvého zařízení se nejdřív zašifruje a pak přesměruje přes nejbližší server VPN, aby byla tvoje aktivita na webu chráněná před poskytovateli internetových služeb a aby aplikace a navštívené stránky nemohly zjistit tvoji polohu.</string>
+    <string name="netpFaqQuestionTwo">Je chráněné jenom moje prohlížení webu?</string>
+    <string name="netpFaqAnswerTwo">Veškerá síťová aktivita na tvém zařízení je chráněná.</string>
+    <string name="netpFaqQuestionThree">Uchovává DuckDuckGo protokoly o mých datech?</string>
+    <string name="netpFaqAnswerThree">Ne, protokoly neukládáme.</string>
+    <string name="netpFaqQuestionFour">Kde se nacházejí VPN servery?</string>
+    <string name="netpFaqAnswerFour">Dokud je DuckDuckGo VPN v beta verzi, nabízí DuckDuckGo omezený počet serverů umístěných ve Spojených státech, Kanadě a Evropě.</string>
+    <string name="netpFaqQuestionSix">Proč některé aplikace nefungují, když je VPN zapnutá?</string>
+    <string name="netpFaqAnswerSix">Některé webové stránky a aplikace záměrně omezují přístup lidem, kteří používají VPN. Můžou tě například požádat, ať vyřešíš test CAPTCHA a potvrdíš, že jsi skutečná osoba a ne robot. Pokud máš s aplikací opakovaně problémy, můžeš pro ni VPN v nastaveních DuckDuckGo VPN úplně vypnout.</string>
+    <string name="netpFaqQuestionSeven">Proč nemůžu zavřít oznámení o VPN?</string>
+    <string name="netpFaqAnswerSeven">Systém Android vyžaduje, aby se při zapnuté VPN zobrazovalo trvalé oznámení.</string>
+    <string name="netpFaqQuestionEight">Je VPN kompatibilní s funkcí App Tracking Protection?</string>
+    <string name="netpFaqAnswerEight">Ano, VPN a App Tracking Protection můžeš mít zapnuté současně. Žádná jiná VPN není kompatibilní s funkcí App Tracking Protection od DuckDuckGo.</string>
+    <string name="netpFaqQuestionNine">Můžu VPN používat zadarmo?</string>
+    <string name="netpFaqAnswerNine">DuckDuckGo VPN můžeš v rámci beta verze používat bezplatně. Potom ji nabídneme jako placenou službu.</string>
+
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Připojit</string>
+    <string name="netpNotificationCTAReportIssue">Máš problémy s aplikací?</string>
+    <string name="netpNotificationDisabled">VPN je odpojená. Klepnutím si provoz zařízení zabezpečíš.</string>
+    <string name="netpNotificationDisabledByVpn">VPN aplikace na tvém zařízení odpojila DuckDuckGo VPN. Klepnutím připojení obnovíš.</string>
+    <string name="netpUnsafeWifi">Připojeno k nebezpečné Wi-Fi.</string>
+    <string name="netpNotificationCTAReconnectNow">Znovu se připojit</string>
+    <string name="netpNotificationSnoozeTitle">VPN je pozastavená</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN se znovu připojí v %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN byla odpojena kvůli vypršení platnosti předplatného. Předplať si službu Privacy Pro, ať můžeš DuckDuckGo VPN dál používat.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">Umístění VPN</string>
+    <string name="netpGeoswitchingHeaderRecommended">Doporučeno</string>
+    <string name="netpGeoswitchingDefaultTitle">Nejbližší dostupná</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Automatické připojení k nejbližšímu nalezenému serveru</string>
+    <string name="netpGeoswitchingHeaderCustom">Vlastní</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">Počet měst: %1$d</string>
+
+    <!-- Access revoked-->
+    <string name="netpDialogVpnAccessRevokedTitle">VPN byla odpojena kvůli vypršení platnosti předplatného</string>
+    <string name="netpDialogVpnAccessRevokedBody">Předplať si službu Privacy Pro, ať můžeš DuckDuckGo VPN dál používat.</string>
+    <string name="netpDialogVpnAccessRevokedPositiveAction">Odebírat novinky</string>
+    <string name="netpDialogVpnAccessRevokedNegativeAction">Odmítnout</string>
+
+    <!-- Susbcription -->
+    <string name="netpVerifySubscriptionLabel">Ověřit předplatné</string>
+    <string name="netpVerifySubscriptionInProgress">Počkej prosím, než ověříme tvoje předplatné…</string>
+    <string name="netpVerifySubscriptionNoSubscription">Jejda! Nemáš žádné aktivní předplatné.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Jejda! Tvoje předplatné nezahrnuje DuckDuckGo VPN.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Povoleno</string>
+    <string name="netpSubscriptionSettingsConnecting">Připojování...</string>
+    <string name="netpSubscriptionSettingsDisconnected">Zakázáno</string>
+
+    <!-- Custom DNS -->
+    <string name="netpSetttingDnsHeader" translatable="false">DNS</string>
+    <string name="netpCustomDnsSettingText">DNS server</string>
+    <string name="netpPrivateDns">Soukromý DNS</string>
+    <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokování malwaru)</string>
+    <string name="netpCustomDnsDefaultOption">DuckDuckGo (doporučeno)</string>
+    <string name="netpCustomDnsCustom">Vlastní</string>
+    <string name="netpCustomDnsInputAddressHint">Adresa IPv4</string>
+    <string name="netpCustomDnsApply">Aplikovat</string>
+    <string name="netpCustomDnsCustomHeader">DNS server</string>
+    <string name="netpCustomDnsPrivateDnsWarning">Soukromý DNS už je specifikovaný v systémových nastaveních DNS. Pokud chceš nastavit vlastní DNS pro DuckDuckGo VPN, vypni soukromý DNS. <annotation type="open_settings_link">Otevřít systémová nastavení</annotation></string>
+    <string name="netpCustomDnsWarning">Používání vlastního serveru DNS může ovlivnit rychlost procházení a odhalit tvoji aktivitu třetím stranám, pokud server není bezpečný nebo spolehlivý.</string>
+    <string name="netpDdgDnsByLine">DuckDuckGo směruje dotazy DNS přes naše DNS servery, takže tvůj poskytovatel internetu nevidí, jaké webové stránky navštěvuješ.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwarePrimary">Blokování malwaru</string>
+    <string name="netpDnsBlockMalwareByline">Blokuj malware pomocí seznamu blokovaných na úrovni DNS. Pokud se webová stránka nenačte, zkus blokování vypnout.</string>
+
+    <!-- Auto-exclude -->
+    <string name="netpAutoExcludePromptTitle">Chceš vyloučit aplikace, které nejsou kompatibilní s VPN?</string>
+    <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Něco jsme našli. %1$s (Když je VPN připojená.)</string>
+    <plurals name="netpAutoExcludeAppLabel">
+        <item quantity="one">%1$d nová aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
+        <item quantity="few">%1$d nové aplikace, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="many">%1$d nových aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="other">%1$d nových aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+    </plurals>
+
+    <string name="netpAutoExcludePromptExcludeAllTitle">Chceš vyloučit všechny aplikace, které nejsou kompatibilní s VPN?</string>
+    <plurals name="netpAutoExcludeAllAppLabel">
+        <item quantity="one">%1$d další aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
+        <item quantity="few">%1$d další aplikace, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="many">%1$d dalších aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="other">%1$d dalších aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+    </plurals>
+    <string name="netpAutoExcludePromptOptionEnable">Automaticky vyloučit nekompatibilní aplikace</string>
+    <string name="netpAutoExcludePromptActionAdd">Vyloučit aplikace</string>
+    <string name="netpAutoExcludePromptActionCancel">Přeskočit</string>
+    <string name="netpAutoExcludeToggleName">Automaticky vyloučit aplikace, které nejsou kompatibilní s VPN</string>
+    <string name="netpExclusionListLabelAutoExclude">Nekompatibilní s VPN</string>
+    <string name="netpExclusionListAutoExcludeDescription">Některé aplikace, jako jsou bankovní nebo streamovací aplikace, si s VPN moc nerozumí. Pokud je toto nastavení zapnuté, automaticky tyhle aplikace vyloučíme.</string>
+</resources>

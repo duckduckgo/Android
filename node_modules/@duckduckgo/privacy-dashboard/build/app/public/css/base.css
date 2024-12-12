@@ -503,6 +503,13 @@ select {
   font-weight: bold;
 }
 
+strong {
+  font-weight: bold;
+}
+.environment--browser strong {
+  font-weight: 600;
+}
+
 /* Links */
 a {
   color: var(--color-accent-blue);
@@ -601,6 +608,11 @@ a.link-action--rounded {
   text-align: left;
 }
 
+/* Text Wrap */
+.text--balance {
+  text-wrap: balance;
+}
+
 /* Borders */
 .border--top {
   border-top: 1px solid var(--color-lines-light);
@@ -634,6 +646,11 @@ a.link-action--rounded {
 .padding-y {
   padding-top: 16px;
   padding-bottom: 16px;
+}
+
+.padding-y-third {
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .padding-y--reduced {

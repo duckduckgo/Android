@@ -246,4 +246,30 @@
 
     <string name="autofillDisableInSettingsSnackbarText">Spremanje lozinke možeš isključiti u svakom trenutku.</string>
     <string name="autofillDisableInSettingsSnackbarAction">Otvori postavke</string>
+
+    <string name="newTabPageShortcutPasswords">Lozinke</string>
+
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Uvezi Google lozinke</string>
+    <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lozinki uvezeno s Googlea</string>
+    <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lozinki uvezeno iz CSV-a</string>
+
+    <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Uvezi lozinke s Googlea</string>
+    <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Uvezi lozinke s Googlea</string>
+
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinkroniziraj DuckDuckGo lozinke</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinkroniziraj DuckDuckGo lozinke</string>
+
+    <string name="importPasswordsChooseMethodDialogTitle">Uvezi svoje Google lozinke</string>
+    <string name="importPasswordsChooseMethodDialogSubtitle">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Otvori Google lozinke</string>
+    <string name="importPasswordsChooseMethodDialogCsvButton">Odaberi CSV datoteku</string>
+    <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Uvoz iz preglednika na radnoj površini</string>
+
+    <string name="importPasswordsProcessingResultDialogTitleBeforeSuccess">Uvezi u DuckDuckGo</string>
+    <string name="importPasswordsProcessingResultDialogTitleUponSuccess">Uvoz završen</string>
+    <string name="importPasswordsProcessingResultDialogDoneButtonText">Shvatio/la sam</string>
+    <string name="importPasswordsProcessingResultDialogResultImportFailed">Uvoz lozinke nije uspio</string>
+    <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Preskočeno (duplicirano ili nevažeće): <b>%1$d</b>]]></string>
+    <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Uvezene lozinke: <b>%1$d</b>]]></string>
+
 </resources>

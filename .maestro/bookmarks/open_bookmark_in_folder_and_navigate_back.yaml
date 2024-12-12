@@ -11,9 +11,8 @@ tags:
 
 - tapOn:
       text: "search or type URL"
-- inputText: "https://privacy-test-pages.glitch.me/"
-- tapOn:
-      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- inputText: "https://privacy-test-pages.site/"
+- pressKey: Enter
 - assertVisible:
       text: ".*keep browsing.*"
 - tapOn:
@@ -27,10 +26,9 @@ tags:
 - tapOn:
       text: "add bookmark"
 - tapOn:
-      text: "https://privacy-test-pages.glitch.me/"
+      text: "https://privacy-test-pages.site/"
 - inputText: "https://www.search-company.site/"
-- tapOn:
-    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- pressKey: Enter
 - assertVisible:
     text: "Search engine"
 - tapOn:
