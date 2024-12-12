@@ -29,8 +29,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.updateLayoutParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
