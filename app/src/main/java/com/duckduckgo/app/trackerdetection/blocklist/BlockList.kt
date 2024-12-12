@@ -50,6 +50,18 @@ interface BlockList {
     fun tdsNextExperimentBaselineBackup(): Toggle
 
     @Toggle.DefaultValue(false)
+    fun tdsNextExperimentBaselineBackup2(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun tdsNextExperimentBaselineBackup3(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun tdsNextExperimentBaselineBackup4(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun tdsNextExperimentBaselineBackup5(): Toggle
+
+    @Toggle.DefaultValue(false)
     fun tdsNextExperimentNov24(): Toggle
 
     @Toggle.DefaultValue(false)
