@@ -41,14 +41,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.ROW
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.US
+import com.duckduckgo.subscriptions.impl.databinding.LegacyViewSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenRestoreScreen
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.ViewState.SubscriptionRegion.ROW
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.ViewState.SubscriptionRegion.US
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
@@ -62,7 +62,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ProSettingView @JvmOverloads constructor(
+class LegacyProSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -76,10 +76,10 @@ class ProSettingView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsBinding by viewBinding()
+    private val binding: LegacyViewSettingsBinding by viewBinding()
 
-    private val viewModel: ProSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingViewModel::class.java]
+    private val viewModel: LegacyProSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyProSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()

@@ -29,10 +29,10 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenRestoreScreen
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingViewModel.ViewState.SubscriptionRegion
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class ProSettingViewModel @Inject constructor(
+class LegacyProSettingViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
