@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Chci dostat upozornění</string>
 
@@ -32,4 +32,9 @@
     <string name="removeAll">Odstranit vše</string>
     <string name="undo">Vrátit</string>
     <string name="cancel">Zrušit</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn" translatable="false">Always On</string>
+    <string name="on" translatable="false">On</string>
+    <string name="off" translatable="false">Off</string>
 </resources>
