@@ -80,6 +80,7 @@ interface AutoComplete {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
             val isUrl: Boolean,
+            val isAllowedInTopHits: Boolean,
         ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteDefaultSuggestion(
@@ -152,10 +153,13 @@ class AutoCompleteApi @Inject constructor(
             getAutoCompleteSearchResults(query),
         ) { bookmarks, favorites, tabs, historyResults, searchResults ->
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
+            Timber.d("Navigational: search results ${searchResults.toList()}")
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
             Timber.d("Navigational: topHits ${topHits.toList()}")
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
+            Timber.d("Navigational: filteredBookmarksFavoritesTabsAndHistory ${filteredBookmarksFavoritesTabsAndHistory.toList()}")
             val distinctSearchResults = getDistinctSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
+            Timber.d("Navigational: distinctSearchResults ${distinctSearchResults.toList()}")
 
             (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
@@ -201,6 +205,8 @@ class AutoCompleteApi @Inject constructor(
                 is AutoCompleteSearchSuggestion -> it.isUrl
                 else -> false
             }
+        }.also {
+            Timber.d("Navigational: possible top hits ${it.toList()}")
         }.take(maximumNumberOfTopHits)
     }
 
@@ -219,10 +225,13 @@ class AutoCompleteApi @Inject constructor(
         topHits: List<AutoCompleteSuggestion>,
         filteredBookmarksAndTabsAndHistory: List<AutoCompleteSuggestion>,
     ): List<AutoCompleteSearchSuggestion> {
+        // we allow for navigational search results if they are not part of top hits
+        val navigationalLinks = searchResults.filter { it.isUrl }.distinctBy { it.phrase }.filterNot { it.javaClass in topHits.map { it.javaClass } }
+        Timber.d("Navigational: navigational links not in top hits ${navigationalLinks.toList()}")
         val distinctPhrases = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { it.phrase }.map { it.phrase }.toSet()
         val distinctPairs = (topHits + filteredBookmarksAndTabsAndHistory).distinctBy { Pair(it.phrase, it::class.java) }.size
         val maxSearchResults = maximumNumberOfSuggestions - distinctPairs
-        return searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }.take(maxSearchResults)
+        return navigationalLinks.plus(searchResults.distinctBy { it.phrase }.filterNot { it.phrase in distinctPhrases }).take(maxSearchResults)
     }
 
     private fun removeDuplicates(
