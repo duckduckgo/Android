@@ -184,7 +184,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
@@ -230,7 +230,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "2"),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
@@ -282,7 +282,7 @@ class AutoCompleteApiTest {
                 listOf(
                     AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                     AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
-                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                     AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "4"),
                     AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
                 ),
@@ -344,11 +344,11 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "iii.com", title = "title", url = "https://iii.com", isFavorite = true),
                 AutoCompleteSwitchToTabSuggestion(phrase = "lll.com", title = "title", url = "https://lll.com", tabId = "1"),
-                AutoCompleteSearchSuggestion(phrase = "aaa", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "bbb", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "ccc", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "ddd", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "eee", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "aaa", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "bbb", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "ccc", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "ddd", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "eee", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSwitchToTabSuggestion(phrase = "mmm.com", title = "title", url = "https://mmm.com", tabId = "2"),
                 AutoCompleteSwitchToTabSuggestion(phrase = "nnn.com", title = "title", url = "https://nnn.com", tabId = "3"),
                 AutoCompleteSwitchToTabSuggestion(phrase = "ooo.com", title = "title", url = "https://ooo.com", tabId = "4"),
@@ -401,7 +401,7 @@ class AutoCompleteApiTest {
                 listOf(
                     AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
                     AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
-                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                     AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
                 ),
                 value.suggestions,
@@ -453,7 +453,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
@@ -495,7 +495,7 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteHistorySearchSuggestion(phrase = "query", true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -524,7 +524,7 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySearchSuggestion(phrase = "query", false),
             ),
             value.suggestions,
@@ -576,7 +576,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com/test", "title", "https://bar.com/test", isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "foo.com/test", "title", "https://foo.com/test", isAllowedInTopHits = false),
             ),
@@ -613,7 +613,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com", isFavorite = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = true),
             ),
             value.suggestions,
@@ -702,7 +702,7 @@ class AutoCompleteApiTest {
                     "https://foo.com/path/to/foo",
                     isFavorite = true,
                 ),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
+                AutoCompleteSearchSuggestion(phrase = "baz.com", isUrl = true, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com",
                     title = "title foo",
@@ -794,8 +794,8 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
-                AutoCompleteSearchSuggestion(phrase = "example.com", false),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "baz.com", isUrl = true, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
             ),
             value.suggestions,
@@ -1098,7 +1098,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
             ),
             value.suggestions,
@@ -1151,7 +1151,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
             ),
             value.suggestions,
@@ -1381,11 +1381,11 @@ class AutoCompleteApiTest {
         assertEquals(5, value.suggestions.size)
         assertEquals(
             listOf(
-                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true),
-                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -1423,11 +1423,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
-                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true),
-                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -1475,10 +1475,10 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
                 AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = false),
-                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -1533,10 +1533,54 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = true),
                 AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
-                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndAnotherTabResultAppearsThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "espn nfl", url = "https://espn.com/nfl"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(7, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com/nfl", "espn nfl", "https://espn.com/nfl", tabId = "2"),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
