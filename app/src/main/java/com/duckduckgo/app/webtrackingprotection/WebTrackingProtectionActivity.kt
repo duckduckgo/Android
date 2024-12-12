@@ -19,10 +19,13 @@ package com.duckduckgo.app.webtrackingprotection
 import android.app.ActivityOptions
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,10 +38,13 @@ import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.NewSettingsFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,12 +56,24 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var newSettingsFeature: NewSettingsFeature
+
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
 
+    // TODO eligible for extraction and use in AutoConsent as well when removing old settings
     private val clickableSpan = object : ClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.onLearnMoreSelected()
+        }
+
+        override fun updateDrawState(ds: TextPaint) {
+            super.updateDrawState(ds)
+            if (newSettingsFeature.self().isEnabled()) {
+                ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
+                ds.isUnderlineText = false
+            }
         }
     }
 
@@ -64,6 +82,19 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (newSettingsFeature.self().isEnabled()) {
+            with(binding) {
+                webTrackingProtectionHeaderImage.isGone = true
+                webTrackingProtectionTitle.isGone = true
+                webTrackingProtectionDescription.isGone = true
+
+                webTrackingProtectionHeaderImageNew.isVisible = true
+                webTrackingProtectionTitleNew.isVisible = true
+                statusIndicator.isVisible = true
+                webTrackingProtectionDescriptionNew.isVisible = true
+            }
+        }
 
         configureUiEventHandlers()
         configureClickableLink()
@@ -76,11 +107,20 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlGPCText = getString(R.string.webTrackingProtectionDescription).html(this)
+        val htmlGPCText = getString(
+            if (newSettingsFeature.self().isEnabled()) {
+                R.string.webTrackingProtectionDescriptionNew
+            } else {
+                R.string.webTrackingProtectionDescription
+            },
+        ).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
             gpcSpannableString.apply {
+                if (newSettingsFeature.self().isEnabled()) {
+                    insert(getSpanStart(it), "\n")
+                }
                 setSpan(
                     clickableSpan,
                     gpcSpannableString.getSpanStart(it),
@@ -91,9 +131,16 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        binding.webTrackingProtectionDescription.apply {
-            text = gpcSpannableString
-            movementMethod = LinkMovementMethod.getInstance()
+        if (newSettingsFeature.self().isEnabled()) {
+            binding.webTrackingProtectionDescriptionNew.apply {
+                text = gpcSpannableString
+                movementMethod = LinkMovementMethod.getInstance()
+            }
+        } else {
+            binding.webTrackingProtectionDescription.apply {
+                text = gpcSpannableString
+                movementMethod = LinkMovementMethod.getInstance()
+            }
         }
     }
 
