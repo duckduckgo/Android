@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -60,6 +62,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
 class ProSettingView @JvmOverloads constructor(
@@ -147,13 +150,15 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionRestoreContainer.show()
             }
             EXPIRED, INACTIVE -> {
-                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
-                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
-                binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
-                binding.subscriptionBuyContainer.show()
-                binding.subscriptionSettingContainer.show()
-                binding.subscriptionWaitingContainer.gone()
-                binding.subscriptionRestoreContainer.gone()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionWaitingContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+
+                    subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
+                    subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_red_16)
+                }
             }
             else -> {
                 binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
