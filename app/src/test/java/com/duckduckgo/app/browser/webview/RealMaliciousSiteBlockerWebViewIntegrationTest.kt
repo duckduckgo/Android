@@ -130,6 +130,17 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
+    fun `shouldIntercept returns null when feature is enabled, is malicious, and is mainframe but webView has different host`() = runTest {
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(false)
+
+        val result = testee.shouldIntercept(request, exampleUri) {}
+        assertNull(result)
+    }
+
+    @Test
     fun `onPageLoadStarted clears processedUrls`() = runTest {
         testee.processedUrls.add(exampleUri.toString())
         testee.onPageLoadStarted()
