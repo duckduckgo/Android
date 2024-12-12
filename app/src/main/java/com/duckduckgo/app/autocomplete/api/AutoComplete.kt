@@ -228,7 +228,7 @@ class AutoCompleteApi @Inject constructor(
         favorites: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
     ): List<AutoCompleteSearchSuggestion> {
         // we allow for search results to show navigational links if they are not favorites or bookmarks and not in top hits
-        return searchResults.filter { it.phrase !in bookmarks.map { it.suggestion.phrase } && it.phrase !in favorites.map { it.suggestion.phrase } }.map {
+        return searchResults.map {
             it.copy(
                 isAllowedInTopHits = false,
             )
