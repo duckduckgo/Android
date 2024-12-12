@@ -43,7 +43,7 @@
             android:id="@+id/subscriptionGet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
+            android:layout_marginStart="56dp"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_3"
             app:textType="primary"
@@ -102,7 +102,7 @@
             android:id="@+id/subscriptionRestore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="32dp"
+            android:paddingStart="40dp"
             app:primaryText="@string/subscriptionSettingRestore"
             tools:ignore="RtlSymmetry" />
 
