@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -42,9 +43,13 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(500)
-class ProSettings @Inject constructor() : ProSettingsPlugin {
+class ProSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return LegacyProSettingView(context)
+        return if(newSettingsFeature.self().isEnabled()) {
+            ProSettingView(context)
+        } else {
+            LegacyProSettingView(context)
+        }
     }
 }
 
