@@ -149,7 +149,6 @@ class ProSettingView @JvmOverloads constructor(
             EXPIRED, INACTIVE -> {
                 binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
                 binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
-                binding.subscriptionBuy.setItemStatus(ALERT)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.show()
@@ -165,7 +164,6 @@ class ProSettingView @JvmOverloads constructor(
                         else -> ""
                     },
                 )
-                binding.subscriptionBuy.setItemStatus(DISABLED)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
