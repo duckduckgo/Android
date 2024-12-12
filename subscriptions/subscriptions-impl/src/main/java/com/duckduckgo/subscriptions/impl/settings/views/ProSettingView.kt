@@ -140,19 +140,20 @@ class ProSettingView @JvmOverloads constructor(
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionRestoreContainer.gone()
-                binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionSettingContainer.show()
             }
             WAITING -> {
-                binding.subscriptionBuyContainer.gone()
-                binding.subscriptionWaitingContainer.show()
-                binding.subscriptionSettingContainer.gone()
-                binding.subscriptionRestoreContainer.show()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+
+                    subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingActivating))
+                }
             }
             EXPIRED, INACTIVE -> {
                 with(binding) {
                     subscriptionBuyContainer.isGone = true
-                    subscriptionWaitingContainer.isGone = true
                     subscriptionRestoreContainer.isGone = true
 
                     subscriptionSettingContainer.isVisible = true
@@ -172,7 +173,6 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
-                binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
             }
         }
