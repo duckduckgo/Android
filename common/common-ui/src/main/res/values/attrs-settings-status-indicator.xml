@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,10 +15,15 @@
   -->
 
 <resources>
-    <declare-styleable name="SettingsListItem">
-        <attr name="leadingIcon" />
-        <attr name="primaryText" />
-        <attr name="showBetaPill" />
+    <attr name="indicatorStatus">
+        <enum name="alwaysOn" value="0" />
+        <enum name="on" value="1" />
+        <enum name="off" value="2" />
+    </attr>
+    <attr name="labelText" format="string" />
+
+    <declare-styleable name="StatusIndicator">
         <attr name="indicatorStatus" />
+        <attr name="labelText" />
     </declare-styleable>
 </resources>
