@@ -50,6 +50,7 @@ class RealMaliciousSiteProtectionEmbeddedDataProvider @Inject constructor(
             val adapter = moshi.adapter(FilterSetResponse::class.java)
             adapter.fromJson(String(filterSetData))
         } catch (e: Exception) {
+            Timber.d("\uD83D\uDD34 Failed to fetch embedded phishing filter set")
             null
         }
     }
@@ -82,7 +83,7 @@ class RealMaliciousSiteProtectionEmbeddedDataProvider @Inject constructor(
             val adapter = moshi.adapter(HashPrefixResponse::class.java)
             adapter.fromJson(String(hashPrefixData))
         } catch (e: Exception) {
-            Timber.d("\uD83D\uDD34 Cris: Failed to fetch embedded malware hash prefixes")
+            Timber.d("\uD83D\uDD34 Failed to fetch embedded malware hash prefixes")
             null
         }
     }
