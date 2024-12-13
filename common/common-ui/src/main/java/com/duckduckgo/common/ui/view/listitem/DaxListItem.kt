@@ -134,8 +134,8 @@ abstract class DaxListItem(
     }
 
     /** Sets the leading icon background image type */
-    fun setLeadingIconSize(imageSize: LeadingIconSize) {
-        val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+    fun setLeadingIconSize(imageSize: IconSize) {
+        val size = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         leadingIcon.layoutParams.width = size
         leadingIcon.layoutParams.height = size
     }
@@ -145,8 +145,8 @@ abstract class DaxListItem(
      * depends on the size of the image
      */
 
-    fun setLeadingIconSize(imageSize: LeadingIconSize, type: ImageBackground) {
-        val iconSize = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+    fun setLeadingIconSize(imageSize: IconSize, type: ImageBackground) {
+        val iconSize = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         val backgroundSize = if (type == ImageBackground.None) {
             iconSize
         } else {
@@ -211,6 +211,13 @@ abstract class DaxListItem(
     fun showTrailingIcon() {
         trailingIconContainer.show()
         trailingSwitch.gone()
+    }
+
+    /** Sets the trailing icon size */
+    fun setTrailingIconSize(imageSize: IconSize) {
+        val size = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
+        trailingIcon.layoutParams.width = size
+        trailingIcon.layoutParams.height = size
     }
 
     /** Hides all trailing items */
@@ -287,7 +294,7 @@ abstract class DaxListItem(
         }
     }
 
-    enum class LeadingIconSize {
+    enum class IconSize {
         Small,
         Medium,
         Large,
@@ -295,7 +302,7 @@ abstract class DaxListItem(
         ;
 
         companion object {
-            fun from(size: Int): LeadingIconSize {
+            fun from(size: Int): IconSize {
                 // same order as attrs-lists.xml
                 return when (size) {
                     0 -> Small
@@ -306,7 +313,7 @@ abstract class DaxListItem(
                 }
             }
 
-            fun dimension(size: LeadingIconSize): Int {
+            fun dimension(size: IconSize): Int {
                 return when (size) {
                     Small -> R.dimen.listItemImageSmallSize
                     Medium -> R.dimen.listItemImageMediumSize
