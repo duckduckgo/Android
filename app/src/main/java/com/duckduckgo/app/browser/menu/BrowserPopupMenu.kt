@@ -87,6 +87,13 @@ class BrowserPopupMenu(
         }
     }
 
+    internal val defaultBrowserMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+            BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+        }
+    }
+
     internal val sharePageMenuItem: View by lazy {
         when (omnibarPosition) {
             TOP -> topBinding.sharePageMenuItem
@@ -239,6 +246,8 @@ class BrowserPopupMenu(
 
         newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
         sharePageMenuItem.isVisible = viewState.canSharePage
+
+        defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
 
         bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
         downloadsMenuItem.isVisible = !displayedInCustomTabScreen
