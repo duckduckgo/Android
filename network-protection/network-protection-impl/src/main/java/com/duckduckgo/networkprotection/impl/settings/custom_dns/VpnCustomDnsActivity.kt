@@ -162,12 +162,8 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 binding.customDns.isEditable = false
                 binding.customDnsSection.gone()
 
-                if (state.allowBlockMalware) {
-                    binding.blockMalwareSection.show()
-                    binding.blockMalwareToggle.quietlySetIsChecked(state.blockMalware, blockMalwareToggleListener)
-                } else {
-                    binding.blockMalwareSection.gone()
-                }
+                binding.blockMalwareSection.show()
+                binding.blockMalwareToggle.quietlySetIsChecked(state.blockMalware, blockMalwareToggleListener)
             }
 
             is CustomDns -> {
@@ -261,7 +257,6 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         data class DefaultDns(
             val allowChange: Boolean,
             val blockMalware: Boolean,
-            val allowBlockMalware: Boolean,
         ) : State()
 
         data class CustomDns(

@@ -137,23 +137,18 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
+        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = false))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
 
         assertNotNull(actual)
         assertEquals(wgConfig.toTunnelConfig(), actual)
-
-        val expectedServerDetails = ServerDetails(
-            serverName = "euw.1",
-            ipAddress = "10.10.10.10",
-            location = "Stockholm, Sweden",
-        )
         verify(netpPixels).reportEnableAttempt()
     }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenBlockMalwareIsConfigureDNSIsComputed() = runTest {
+    fun whenBlockMalwareIsConfiguredDNSIsComputed() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
         netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
         vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = true))

@@ -43,7 +43,7 @@ class VpnCustomDnsViewSettingViewModel(
     private fun onInit(): Flow<State> = flow {
         netpVpnSettingsDataStore.customDns?.let {
             emit(State.CustomDns(it))
-        } ?: if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowBlockMalware().isEnabled()) {
+        } ?: if (netPSettingsLocalConfig.blockMalware().isEnabled()) {
             emit(State.DefaultBlockMalware)
         } else {
             emit(State.Default)
