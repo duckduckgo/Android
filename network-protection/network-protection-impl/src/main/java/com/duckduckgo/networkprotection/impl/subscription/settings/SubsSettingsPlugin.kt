@@ -28,6 +28,6 @@ import javax.inject.Inject
 @PriorityKey(200)
 class ProSettingsNetP @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ProSettingNetPView(context)
+        return LegacyProSettingNetPView(context)
     }
 }

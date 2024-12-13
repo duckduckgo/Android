@@ -30,14 +30,14 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.impl.databinding.ViewSettingsNetpBinding
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Factory
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.databinding.LegacyViewSettingsNetpBinding
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Factory
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.ShowState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +48,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ProSettingNetPView @JvmOverloads constructor(
+class LegacyProSettingNetPView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -62,10 +62,10 @@ class ProSettingNetPView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsNetpBinding by viewBinding()
+    private val binding: LegacyViewSettingsNetpBinding by viewBinding()
 
-    private val viewModel: ProSettingNetPViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingNetPViewModel::class.java]
+    private val viewModel: LegacyProSettingNetPViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyProSettingNetPViewModel::class.java]
     }
 
     override fun onAttachedToWindow() {

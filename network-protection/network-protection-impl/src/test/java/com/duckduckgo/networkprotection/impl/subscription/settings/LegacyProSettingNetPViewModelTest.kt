@@ -30,10 +30,10 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.ShowState
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -44,7 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ProSettingNetPViewModelTest {
+class LegacyProSettingNetPViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -52,11 +52,11 @@ class ProSettingNetPViewModelTest {
     private val pixel: Pixel = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
-    private lateinit var proSettingNetPViewModel: ProSettingNetPViewModel
+    private lateinit var proSettingNetPViewModel: LegacyProSettingNetPViewModel
 
     @Before
     fun before() {
-        proSettingNetPViewModel = ProSettingNetPViewModel(
+        proSettingNetPViewModel = LegacyProSettingNetPViewModel(
             networkProtectionAccessState,
             networkProtectionState,
             coroutineTestRule.testDispatcherProvider,
