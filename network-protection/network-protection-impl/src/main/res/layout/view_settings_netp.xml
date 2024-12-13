@@ -14,12 +14,11 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.OneLineListItem
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:id="@+id/netpPSetting"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-app:leadingIconSize="small"
-app:leadingIcon="@drawable/ic_check_grey_round_16"
-app:primaryText="@string/netpSubscriptionSettingsTitle" />
+<com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/netpPSetting"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:leadingIcon="@drawable/ic_vpn_color_24"
+    app:indicatorStatus="off"
+    app:primaryText="@string/netpSubscriptionSettingsTitle" />
