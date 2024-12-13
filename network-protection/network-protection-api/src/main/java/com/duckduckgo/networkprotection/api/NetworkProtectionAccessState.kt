@@ -25,13 +25,13 @@ interface NetworkProtectionAccessState {
      * Returns the state of the NetP
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    suspend fun getState(): NetPAccessState
+    suspend fun getLegacyState(): LegacyNetPAccessState
 
     /**
      * Returns a flow of the states of the NetP access
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    suspend fun getStateFlow(): Flow<NetPAccessState>
+    suspend fun getLegacyStateFlow(): Flow<LegacyNetPAccessState>
 
     /**
      * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
@@ -43,8 +43,8 @@ interface NetworkProtectionAccessState {
      */
     suspend fun getScreenForCurrentState(): ActivityParams?
 
-    sealed class NetPAccessState {
-        data object Locked : NetPAccessState()
-        data object UnLocked : NetPAccessState()
+    sealed class LegacyNetPAccessState {
+        data object Locked : LegacyNetPAccessState()
+        data object UnLocked : LegacyNetPAccessState()
     }
 }

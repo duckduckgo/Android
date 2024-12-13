@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.subscription
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.Locked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.Locked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
@@ -68,7 +68,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnInactiveAndNetpDisabledThenReturnNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -78,7 +78,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnExpiredAndNetpDisabledThenReturnNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -88,7 +88,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpDisabledThenReturnNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -98,7 +98,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnInactiveAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verify(networkProtectionState).stop()
         }
@@ -108,7 +108,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnExpiredAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verify(networkProtectionState).stop()
         }
@@ -118,7 +118,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getState().also {
+        testee.getLegacyState().also {
             assertEquals(Locked, it)
             verify(networkProtectionState).stop()
         }
@@ -128,7 +128,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnInactiveAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(INACTIVE))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -138,7 +138,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnExpiredAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(EXPIRED))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -148,7 +148,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnSingedOutAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(SIGNED_OUT))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verifyNoInteractions(networkProtectionRepository)
         }
@@ -158,7 +158,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnInactiveAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(INACTIVE))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verify(networkProtectionState).stop()
         }
@@ -168,7 +168,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnExpiredAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(EXPIRED))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verify(networkProtectionState).stop()
         }
@@ -178,7 +178,7 @@ class NetworkProtectionAccessStateImplTest {
     fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
         whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(SIGNED_OUT))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        testee.getStateFlow().test {
+        testee.getLegacyStateFlow().test {
             assertEquals(Locked, expectMostRecentItem())
             verify(networkProtectionState).stop()
         }

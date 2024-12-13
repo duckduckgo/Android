@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.quickaccess
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.UnLocked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.UnLocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.quickaccess.VpnTileStateProvider.VpnTileState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,7 +40,7 @@ class RealVpnTileStateProvider @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
 ) : VpnTileStateProvider {
     override suspend fun getVpnTileState(): VpnTileState {
-        return netpAccessState.getState().run {
+        return netpAccessState.getLegacyState().run {
             if (this !is UnLocked) {
                 VpnTileState.UNAVAILABLE
             } else {

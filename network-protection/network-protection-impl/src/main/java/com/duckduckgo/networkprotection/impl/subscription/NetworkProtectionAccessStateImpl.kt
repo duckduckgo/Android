@@ -20,9 +20,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.Locked
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.UnLocked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.Locked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.UnLocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -39,7 +39,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetworkProtectionAccessState {
 
-    override suspend fun getState(): NetPAccessState = withContext(dispatcherProvider.io()) {
+    override suspend fun getLegacyState(): LegacyNetPAccessState = withContext(dispatcherProvider.io()) {
         return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
             // if entitlement check succeeded and no entitlement, reset state and hide access.
             handleRevokedVPNState()
@@ -49,7 +49,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
+    override suspend fun getLegacyStateFlow(): Flow<LegacyNetPAccessState> = withContext(dispatcherProvider.io()) {
         netpSubscriptionManager.vpnStatus().map { status ->
             if (!status.isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
@@ -68,7 +68,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams? {
-        return when (getState()) {
+        return when (getLegacyState()) {
             is UnLocked -> {
                 if (networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams

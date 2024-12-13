@@ -29,7 +29,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
@@ -86,7 +86,7 @@ class LegacyProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(networkProtectionAccessState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
+            combine(networkProtectionAccessState.getLegacyStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
@@ -107,11 +107,11 @@ class LegacyProSettingNetPViewModel(
     }
 
     private suspend fun getNetworkProtectionEntryState(
-        accessState: NetPAccessState,
+        accessState: LegacyNetPAccessState,
         networkProtectionConnectionState: ConnectionState,
     ): NetPEntryState {
         return when (accessState) {
-            is NetPAccessState.UnLocked -> {
+            is LegacyNetPAccessState.UnLocked -> {
                 if (networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
@@ -134,7 +134,7 @@ class LegacyProSettingNetPViewModel(
                 }
             }
 
-            NetPAccessState.Locked -> Hidden
+            LegacyNetPAccessState.Locked -> Hidden
         }
     }
 
