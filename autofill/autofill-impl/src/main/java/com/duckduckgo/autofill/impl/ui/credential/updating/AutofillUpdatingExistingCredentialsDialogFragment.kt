@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
@@ -47,6 +48,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -77,6 +82,14 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         ViewModelProvider(this, viewModelFactory)[AutofillUpdatingExistingCredentialViewModel::class.java]
     }
 
+    private val wasUsernameBackFilled: Deferred<Boolean> = lifecycleScope.async(start = LAZY) {
+        val usernameToSave = getCredentialsToSave().username ?: return@async false
+        partialCredentialSaveStore.wasBackFilledRecently(url = getOriginalUrl(), username = usernameToSave).also {
+            Timber.v("Determined that username was %sbackFilled", if (it) "" else "not ")
+        }
+    }
+
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -96,7 +109,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Shown)?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForUpdateLoginPixel())
+            }
+        }
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
 
@@ -144,7 +161,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
 
         binding.updateCredentialsButton.setOnClickListener {
-            pixelNameDialogEvent(Updated)?.let { pixel.fire(it) }
+            pixelNameDialogEvent(Updated)?.let {
+                lifecycleScope.launch {
+                    pixel.fire(it, paramsForUpdateLoginPixel())
+                }
+            }
 
             val result = Bundle().also {
                 it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
@@ -186,7 +207,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
         Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
-        pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Dismissed)?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForUpdateLoginPixel())
+            }
+        }
     }
 
     private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {
@@ -196,6 +221,10 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             is Updated -> AUTOFILL_UPDATE_LOGIN_PROMPT_SAVED
             else -> null
         }
+    }
+
+    private suspend fun paramsForUpdateLoginPixel(): Map<String, String> {
+        return mapOf(PIXEL_PARAM_WAS_USERNAME_BACKFILLED to wasUsernameBackFilled.await().toString())
     }
 
     private interface DialogEvent {
@@ -228,5 +257,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
                 }
             return fragment
         }
+
+        private const val PIXEL_PARAM_WAS_USERNAME_BACKFILLED = "backfilled"
     }
 }
