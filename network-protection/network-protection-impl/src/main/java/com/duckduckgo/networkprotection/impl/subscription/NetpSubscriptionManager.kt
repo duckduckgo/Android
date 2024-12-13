@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -37,6 +38,7 @@ interface NetpSubscriptionManager {
         EXPIRED,
         SIGNED_OUT,
         INACTIVE,
+        WAITING,
     }
 }
 
@@ -52,6 +54,7 @@ fun VpnStatus.isExpired(): Boolean {
 class RealNetpSubscriptionManager @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
+    private val newSettingsFeature: NewSettingsFeature,
 ) : NetpSubscriptionManager {
 
     override suspend fun getVpnStatus(): VpnStatus {
@@ -70,9 +73,22 @@ class RealNetpSubscriptionManager @Inject constructor(
 
     private fun hasValidEntitlementFlow(): Flow<Boolean> = subscriptions.getEntitlementStatus().map { it.contains(NetP) }
 
-    private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus {
+    private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus = if (newSettingsFeature.self().isEnabled()) {
+        when (subscriptions.getSubscriptionStatus()) {
+            SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
+            SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
+            SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD -> {
+                if (hasValidEntitlement) {
+                    VpnStatus.ACTIVE
+                } else {
+                    VpnStatus.INACTIVE
+                }
+            }
+            SubscriptionStatus.WAITING -> VpnStatus.WAITING
+        }
+    } else {
         val subscriptionState = subscriptions.getSubscriptionStatus()
-        return when (subscriptionState) {
+        when (subscriptionState) {
             SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
             SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
             else -> {
