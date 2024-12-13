@@ -23,9 +23,15 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.Locked
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.UnLocked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.WAITING
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +66,31 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getState(): NetPVisibilityState {
+        return if (netpSubscriptionManager.getVpnStatus().isActive()) {
+            NetPVisibilityState.Visible.Subscribed
+        } else {
+            // if entitlement check succeeded and not an active subscription then reset state
+            handleRevokedVPNState()
+            NetPVisibilityState.Hidden
+        }
+    }
+
+    override suspend fun getStateFlow(): Flow<NetPVisibilityState> =
+        netpSubscriptionManager.vpnStatus().map { status ->
+            if (!status.isActive()) {
+                // if entitlement check succeeded and not an active subscription then reset state
+                handleRevokedVPNState()
+            }
+
+            when (status) {
+                ACTIVE -> NetPVisibilityState.Visible.Subscribed
+                INACTIVE, EXPIRED -> NetPVisibilityState.Visible.Expired
+                WAITING -> NetPVisibilityState.Visible.Activating
+                SIGNED_OUT -> NetPVisibilityState.Hidden
+            }
+        }
 
     private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {

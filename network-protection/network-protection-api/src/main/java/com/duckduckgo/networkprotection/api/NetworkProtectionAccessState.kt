@@ -34,6 +34,18 @@ interface NetworkProtectionAccessState {
     suspend fun getLegacyStateFlow(): Flow<LegacyNetPAccessState>
 
     /**
+     * Returns the visibility state of the NetP
+     * The caller DOES NOT need to specify the dispatcher when calling this method
+     */
+    suspend fun getState(): NetPVisibilityState
+
+    /**
+     * Returns a flow of the visibility state of the NetP access
+     * The caller DOES NOT need to specify the dispatcher when calling this method
+     */
+    suspend fun getStateFlow(): Flow<NetPVisibilityState>
+
+    /**
      * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
      * state of the VPN
      * The caller DOES NOT need to specify the dispatcher when calling this method
@@ -46,5 +58,19 @@ interface NetworkProtectionAccessState {
     sealed class LegacyNetPAccessState {
         data object Locked : LegacyNetPAccessState()
         data object UnLocked : LegacyNetPAccessState()
+    }
+
+    /**
+     * This sealed interface represents whether a user should see the Network Protection feature
+     * and the state of subscription
+     */
+    sealed interface NetPVisibilityState {
+
+        sealed interface Visible : NetPVisibilityState {
+            data object Subscribed : Visible
+            data object Expired : Visible
+            data object Activating : Visible
+        }
+        data object Hidden: NetPVisibilityState
     }
 }
