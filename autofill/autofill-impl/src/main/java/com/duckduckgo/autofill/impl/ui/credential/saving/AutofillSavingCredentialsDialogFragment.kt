@@ -32,11 +32,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
@@ -76,9 +78,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -108,6 +114,12 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
 
+    @Inject
+    lateinit var partialCredentialSaveStore: PartialCredentialSaveStore
+
+    @Inject
+    lateinit var autofillFeature: AutofillFeature
+
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
@@ -120,6 +132,13 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
+    }
+
+    private val wasUsernameBackFilled: Deferred<Boolean> = lifecycleScope.async(start = LAZY) {
+        val usernameToSave = getCredentialsToSave().username ?: return@async false
+        partialCredentialSaveStore.wasBackFilledRecently(url = getOriginalUrl(), username = usernameToSave).also {
+            Timber.v("Determined that username was %sbackFilled", if (it) "" else "not ")
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -162,7 +181,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         keyFeaturesContainer.isVisible = viewState.expandedDialog
         configureSecondaryButtons(viewState.expandedDialog)
         (dialog as? BottomSheetDialog)?.behavior?.isDraggable = viewState.expandedDialog
-        pixelNameDialogEvent(Shown, viewState.expandedDialog)?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Shown, viewState.expandedDialog)?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForPixel())
+            }
+        }
     }
 
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
@@ -182,7 +205,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         binding.saveLoginButton.setOnClickListener {
             Timber.v("onSave: AutofillSavingCredentialsDialogFragment. User saved credentials")
 
-            pixelNameDialogEvent(Accepted, binding.keyFeaturesContainer.isVisible)?.let { pixel.fire(it) }
+            pixelNameDialogEvent(Accepted, binding.keyFeaturesContainer.isVisible)?.let {
+                lifecycleScope.launch {
+                    pixel.fire(it, paramsForPixel())
+                }
+            }
 
             lifecycleScope.launch(dispatcherProvider.io()) {
                 faviconManager.persistCachedFavicon(getTabId(), getOriginalUrl())
@@ -209,7 +236,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         onUserRejectedToSaveCredentials()
 
-        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForPixel())
+            }
+        }
     }
 
     private fun onUserRejectedToSaveCredentials() {
@@ -228,7 +259,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun onUserChoseNotNow() {
-        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Dismissed, isOnboardingMode())?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForPixel())
+            }
+        }
 
         // this is another way to refuse saving credentials, so ensure that normal logic still runs
         onUserRejectedToSaveCredentials()
@@ -238,7 +273,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun onUserChoseNeverSaveThisSite() {
-        pixelNameDialogEvent(Exclude, isOnboardingMode())?.let { pixel.fire(it) }
+        pixelNameDialogEvent(Exclude, isOnboardingMode())?.let {
+            lifecycleScope.launch {
+                pixel.fire(it, paramsForPixel())
+            }
+        }
         viewModel.addSiteToNeverSaveList(getOriginalUrl())
 
         // this is another way to refuse saving credentials, so ensure that normal logic still runs
@@ -287,6 +326,16 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
+    private suspend fun paramsForPixel(): Map<String, String> {
+        return withContext(dispatcherProvider.io()) {
+            if (autofillFeature.partialFormSaves().isEnabled()) {
+                mapOf(PIXEL_PARAM_WAS_USERNAME_BACKFILLED to wasUsernameBackFilled.await().toString())
+            } else {
+                emptyMap()
+            }
+        }
+    }
+
     private fun isOnboardingMode() = if (this::keyFeaturesContainer.isInitialized) {
         keyFeaturesContainer.isVisible
     } else {
@@ -326,6 +375,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 }
             return fragment
         }
+
+        private const val PIXEL_PARAM_WAS_USERNAME_BACKFILLED = "backfilled"
     }
 
     internal class AutofillSavingPixelEventNames {
