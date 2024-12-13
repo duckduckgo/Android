@@ -53,7 +53,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             return IsMaliciousResult.SAFE
         }
         maliciousSiteRepository.getFilter(hash)?.let {
-            if (Pattern.matches(it.regex, url.toString())) {
+            if (Pattern.compile(it.regex).matcher(url.toString()).find()) {
                 Timber.d("\uD83D\uDFE2 Cris: shouldBlock $url")
                 return IsMaliciousResult.MALICIOUS
             }
@@ -72,7 +72,7 @@ class RealMaliciousSiteProtection @Inject constructor(
     ): Boolean {
         val matches = maliciousSiteRepository.matches(hashPrefix)
         return matches.any { match ->
-            Pattern.matches(match.regex, url.toString()) &&
+            Pattern.compile(match.regex).matcher(url.toString()).find() &&
                 (hostname == match.hostname) &&
                 (hash == match.hash)
         }.also { matched ->
