@@ -100,14 +100,14 @@ data class HashPrefixResponse(
     val insert: Set<String>,
     val delete: Set<String>,
     val revision: Int,
-    val replace: Boolean,
+    val replace: String,
 )
 
 data class FilterSetResponse(
     val insert: Set<Filter>,
     val delete: Set<Filter>,
     val revision: Int,
-    val replace: Boolean,
+    val replace: String,
 )
 
 data class Filter(
