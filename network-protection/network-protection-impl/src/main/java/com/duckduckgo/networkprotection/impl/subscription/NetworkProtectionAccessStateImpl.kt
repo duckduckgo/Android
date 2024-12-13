@@ -30,6 +30,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INELIGIBLE
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.WAITING
 import com.squareup.anvil.annotations.ContributesBinding
@@ -88,7 +89,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
                 ACTIVE -> NetPVisibilityState.Visible.Subscribed
                 INACTIVE, EXPIRED -> NetPVisibilityState.Visible.Expired
                 WAITING -> NetPVisibilityState.Visible.Activating
-                SIGNED_OUT -> NetPVisibilityState.Hidden
+                SIGNED_OUT, INELIGIBLE -> NetPVisibilityState.Hidden
             }
         }
 

@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
 import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -39,6 +40,7 @@ interface NetpSubscriptionManager {
         SIGNED_OUT,
         INACTIVE,
         WAITING,
+        INELIGIBLE,
     }
 }
 
@@ -74,17 +76,16 @@ class RealNetpSubscriptionManager @Inject constructor(
     private fun hasValidEntitlementFlow(): Flow<Boolean> = subscriptions.getEntitlementStatus().map { it.contains(NetP) }
 
     private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus = if (newSettingsFeature.self().isEnabled()) {
-        when (subscriptions.getSubscriptionStatus()) {
-            SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
-            SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
-            SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD -> {
-                if (hasValidEntitlement) {
-                    VpnStatus.ACTIVE
-                } else {
-                    VpnStatus.INACTIVE
+        when {
+            !hasValidEntitlement -> VpnStatus.INELIGIBLE
+            else -> {
+                when (subscriptions.getSubscriptionStatus()) {
+                    SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
+                    SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
+                    SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD -> VpnStatus.ACTIVE
+                    SubscriptionStatus.WAITING -> VpnStatus.WAITING
                 }
             }
-            SubscriptionStatus.WAITING -> VpnStatus.WAITING
         }
     } else {
         val subscriptionState = subscriptions.getSubscriptionStatus()
