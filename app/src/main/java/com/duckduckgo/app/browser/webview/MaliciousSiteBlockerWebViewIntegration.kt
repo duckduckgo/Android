@@ -109,7 +109,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return null
         }
 
-        if (request.isForMainFrame && decodedUrl.toUri() == documentUri) {
+        if (request.isForMainFrame) {
             if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
                 return WebResourceResponse(null, null, null)
             }
