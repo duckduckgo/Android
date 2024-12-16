@@ -94,7 +94,7 @@ class ProSettingViewModel @Inject constructor(
                     MONTHLY_PLAN_US -> SubscriptionRegion.US
                     else -> null
                 }
-                _viewState.emit(viewState.value.copy(status = EXPIRED, region = SubscriptionRegion.US))
+                _viewState.emit(viewState.value.copy(status = subscriptionStatus, region = region))
             }.launchIn(viewModelScope)
     }
 

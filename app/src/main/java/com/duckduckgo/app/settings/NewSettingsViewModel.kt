@@ -173,7 +173,7 @@ class NewSettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
-                    isPrivacyProEnabled = true,
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),
@@ -192,7 +192,7 @@ class NewSettingsViewModel @Inject constructor(
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = true,
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                 )
                 delay(1_000)
             }
