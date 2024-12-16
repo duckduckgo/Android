@@ -18,4 +18,5 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
+    <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 </resources>

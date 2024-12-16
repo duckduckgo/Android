@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +45,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
+import com.duckduckgo.privacy.dashboard.impl.R
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
@@ -116,6 +118,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                         else -> ReportFlow.DASHBOARD
                     }
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
+                    Toast.makeText(this, R.string.brokenSiteSubmittedReportMessage, Toast.LENGTH_LONG).show()
+                    this@PrivacyDashboardHybridActivity.finish()
+
                 },
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
