@@ -84,7 +84,6 @@ class UrlExtractingWebViewClient(
                 request,
                 webView,
                 documentUrl,
-                maliciousSiteProtection,
                 null,
             )
         }

@@ -165,14 +165,11 @@ class BrowserWebViewClient @Inject constructor(
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
 
-            if (runBlocking {
-                maliciousSiteProtectionWebViewIntegration.shouldOverrideUrlLoading(
-                        url,
-                        webView.url?.toUri(),
-                        isForMainFrame,
-                        confirmationCallback,
-                    )
-            }
+            if (maliciousSiteProtectionWebViewIntegration.shouldOverrideUrlLoading(
+                    url,
+                    isForMainFrame,
+                    confirmationCallback,
+                )
             ) {
                 // TODO (cbarreiro): Handle site blocked synchronously
                 return true
@@ -534,7 +531,6 @@ class BrowserWebViewClient @Inject constructor(
                 request,
                 webView,
                 documentUrl?.toUri(),
-                maliciousSiteProtectionWebViewIntegration,
                 webViewClientListener,
             )
         }

@@ -49,7 +49,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldOverrideUrlLoading returns false when feature is disabled`() = runTest {
         updateFeatureEnabled(false)
 
-        val result = testee.shouldOverrideUrlLoading(exampleUri, null, true) {}
+        val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertFalse(result)
     }
 
@@ -67,7 +67,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldOverrideUrlLoading returns false when url is already processed`() = runTest {
         testee.processedUrls.add(exampleUri.toString())
 
-        val result = testee.shouldOverrideUrlLoading(exampleUri, exampleUri, true) {}
+        val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertFalse(result)
     }
 
@@ -109,7 +109,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldOverride returns false when feature is enabled, is malicious, and is not mainframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
-        val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, false) {}
+        val result = testee.shouldOverrideUrlLoading(maliciousUri, false) {}
         assertFalse(result)
     }
 
@@ -117,7 +117,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldOverride returns true when feature is enabled, is malicious, and is mainframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
-        val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, true) {}
+        val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
         assertTrue(result)
     }
 
@@ -125,15 +125,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldOverride returns false when feature is enabled, is malicious, and not mainframe nor iframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
 
-        val result = testee.shouldOverrideUrlLoading(maliciousUri, maliciousUri, false) {}
-        assertFalse(result)
-    }
-
-    @Test
-    fun `shouldOverride returns true when feature is enabled, is malicious, and is mainframe but webView has different host`() = runTest {
-        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
-
-        val result = testee.shouldOverrideUrlLoading(maliciousUri, exampleUri, true) {}
+        val result = testee.shouldOverrideUrlLoading(maliciousUri, false) {}
         assertFalse(result)
     }
 
