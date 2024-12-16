@@ -5842,6 +5842,36 @@ class BrowserTabViewModelTest {
         verify(mockShowOnAppLaunchHandler).handleResolvedUrlStorage(eq("https://example.com"), any(), any())
     }
 
+    @Test
+    fun whenNewTabPressedAndUserOnSiteThenPixelIsSent() = runTest {
+        val domain = "https://www.example.com"
+        givenCurrentSite(domain)
+
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+    }
+
+    @Test
+    fun whenNewTabPressedAndUserOnSerpThenPixelIsSent() = runTest {
+        setBrowserShowing(false)
+
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+    }
+
+    @Test
+    fun whenNewTabPressedAndUserOnNewTabThenPixelIsSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+        val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
+        givenCurrentSite(domain)
+
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
