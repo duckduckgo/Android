@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
@@ -70,6 +70,6 @@ class PIRSettings @Inject constructor(private val newSettingsFeature: NewSetting
 @PriorityKey(400)
 class ITRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ItrSettingView(context)
+        return LegacyItrSettingView(context)
     }
 }
