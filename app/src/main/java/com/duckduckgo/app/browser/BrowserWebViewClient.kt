@@ -171,10 +171,10 @@ class BrowserWebViewClient @Inject constructor(
 
             if (
                 maliciousSiteProtectionWebViewIntegration.shouldOverrideUrlLoading(
-                        url,
-                        isForMainFrame,
-                        confirmationCallback,
-                    )
+                    url,
+                    isForMainFrame,
+                    confirmationCallback,
+                )
             ) {
                 Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
                 // TODO (cbarreiro): Handle site blocked synchronously
