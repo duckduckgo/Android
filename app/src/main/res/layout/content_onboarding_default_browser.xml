@@ -86,7 +86,7 @@
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_1"
         android:layout_height="wrap_content"
-        android:text="@string/defaultBrowserLetsDoIt"
+        android:text="@string/setAsDefaultBrowser"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
