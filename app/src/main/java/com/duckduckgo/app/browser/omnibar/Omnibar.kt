@@ -618,6 +618,7 @@ class Omnibar(
             binding.focusDummy.requestFocus()
             findInPage.findInPageContainer.gone()
             findInPage.findInPageInput.hideKeyboard()
+            findInPage.findInPageInput.text.clear()
         }
     }
 

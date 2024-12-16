@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ иска да отвори софтуера за DRM</string>
+    <string name="drmSiteDialogSubtitle">Софтуерът за управление на цифровите права (DRM) е необходим за възпроизвеждане на защитено мултимедийно съдържание, но освен това осигурява достъп до идентификаторите на устройствата. Дайте разрешение за използване на тези данни само на сайтове, на които имате доверие. Можете да управлявате разрешенията по всяко време в Настройки. <annotation type="drm_learn_more_link">Научете повече</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Винаги</string>
+    <string name="drmSiteDialogAllowOnce">Само за тази сесия</string>
+    <string name="drmSiteDialogDenyAlways">Винаги да се отказва</string>
+    <string name="drmSiteDialogDenyOnce">Отказ само за тази сесия</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до местоположението</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Запомни моя избор</string>
+    <string name="preciseLocationDDGDialogSubtitle">Използваме анонимното Ви местоположение само за да Ви осигурим по-добри резултати близо до мястото, на което се намирате. В Настройки можете да управлявате разрешенията за достъп до местоположението, които сте дали на отделни сайтове.</string>
+    <string name="preciseLocationSiteDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до местоположението, които сте дали на отделни сайтове.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Разрешаване на DuckDuckGo да иска достъп до местоположението на това устройство</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Сайтовете могат да използват местоположението, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Разрешаване на DuckDuckGo да иска достъп до местоположението</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Разрешения за сайтове</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до микрофона и камерата, които сте дали на отделни сайтове.</string>
+    <string name="sitePermissionsMicDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до микрофона, които сте дали на отделни сайтове.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до камерата, които сте дали на отделни сайтове.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата и микрофона</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до микрофона</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Сайтовете могат да използват камерата и микрофона, само ако разрешите на DuckDuckGo да поиска достъп.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Отвори Настройки</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Отмени</string>
+
+    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата, микрофона или софтуера за управление на цифровите права (DRM) на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
+    <string name="sitePermissionsSettingsLocation">Местоположение</string>
+    <string name="sitePermissionsSettingsCamera">Камера</string>
+    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
+    <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешенията са премахнати за всички сайтове</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения за \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Питай всеки път</string>
+    <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
+    <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Деактивирано за всички сайтове</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
+
 </resources>

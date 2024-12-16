@@ -48,39 +48,55 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:text="@string/aboutHeader"
             android:gravity="center"
+            android:text="@string/aboutHeader"
             app:typography="h3" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutSeparator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="..."
-            android:gravity="center"
-            app:textType="secondary"
-            app:typography="title"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_6"
-            tools:text="..."
-            tools:ignore="HardcodedText" />
+            android:gravity="center"
+            android:text="..."
+            app:textType="secondary"
+            app:typography="title"
+            tools:ignore="HardcodedText"
+            tools:text="..." />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:paddingStart="@dimen/keyline_6"
             android:paddingEnd="@dimen/keyline_6"
             android:paddingBottom="@dimen/keyline_4"
             android:text="@string/aboutDescription"
-            android:gravity="start"
             app:textType="secondary"
             app:typography="body1"
-            tools:text="Long description would go here\n\nLots and lots of words" />
+            tools:text="Long description would go here\n\nLots and lots of words"
+            tools:visibility="gone" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/aboutTextNew"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_4"
+            android:text="@string/aboutDescriptionNew"
+            android:visibility="gone"
+            app:textType="secondary"
+            app:typography="body1"
+            tools:text="Long description would go here\n\nLots and lots of words"
+            tools:visibility="visible" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/keyline_2" />
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/aboutPrivacyPolicy"

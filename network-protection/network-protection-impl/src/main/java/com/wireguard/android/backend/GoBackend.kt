@@ -109,6 +109,12 @@ class GoBackend @Inject constructor(
         return shouldAllowDomain(sni, uid)
     }
 
+    // Called from native code
+    @Suppress("unused")
+    fun recordMalwareBlock(domain: String) {
+        logcat { "Malware blocked in $domain" }
+    }
+
     private fun shouldAllowDomain(
         name: String,
         uid: Int,

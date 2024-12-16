@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci jest włączona</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nigdy Cię nie śledzi. Ponadto staramy się jak najlepiej chronić Twoją prywatność. Ciągle tworzymy i udoskonalamy zabezpieczenia, aby dostosować się do najnowszych sposobów śledzenia i oferować liczne zabezpieczenia, których inne przeglądarki nie oferują domyślnie. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
+    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
 
     <string name="settingsAutomaticallyClearWhat">Usuwaj automatycznie…</string>
+    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Usuwaj automatycznie…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitleNew" translatable="false">About</string>
     <string name="aboutHeader">Witaj po Kaczej Stronie Mocy!</string>
     <string name="aboutDescription">DuckDuckGo to założona w 2008 roku niezależna firma zajmująca się prywatnością w Internecie dla osób, które mają dosyć śledzenia online i poszukują łatwego w obsłudze rozwiązania. Jesteśmy dowodem na to, że możesz uzyskać prawdziwą ochronę prywatności online bez kompromisów.\n\nWszechstronna przeglądarka DuckDuckGo jest wyposażona w funkcje, których potrzebujesz, takie jak zakładki, karty, hasła i inne, a także <annotation type="privacy_protection_link">kilkanaście zaawansowanych mechanizmów ochrony prywatności</annotation>, które nie są domyślnie oferowane w większości popularnych przeglądarek. Ten wyjątkowo zaawansowany zestaw mechanizmów ochrony prywatności pomaga chronić działania w Internecie, od wyszukiwania po przeglądanie, obsługę wiadomości e-mail i nie tylko.\n\nDo korzystania z mechanizmów ochrony prywatności nie jest wymagana znajomość szczegółów technicznych ani skomplikowane ustawienia. Aby uzyskać ochronę prywatności, wystarczy ustawić na wszystkich urządzeniach domyślną przeglądarkę DuckDuckGo.\n\nJeśli interesują Cię szczegóły techniczne, więcej informacji o działaniu mechanizmów ochrony prywatności DuckDuckGo można znaleźć na <annotation type="learn_more_link">stronach pomocy</annotation></string>
+    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
     <string name="no_suggestions">Brak sugestii</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Zobacz, co wysłano</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informacje przesyłane w raportach nie mogą zostać wykorzystane do Twojej identyfikacji:</b><br/><br/>• Adres URL strony (bez informacji umożliwiających identyfikację)<br/>• Marka, model i producent urządzenia<br/>• Numer wersji systemu operacyjnego<br/>• Numer wersji aplikacji<br/>• Anonimowa grupa eksperymentalna do testowania funkcji<br/>• Informacje o tym, które wersje naszych zabezpieczeń były aktywne<br/>• Numer wersji silnika przeglądarki internetowej<br/>• Lista zabezpieczeń i funkcji przeglądarki, które były aktywne<br/>• Nazwy hostów zablokowanych mechanizmów śledzących, żądań zastępczych, ignorowanych żądań i żądań, których nie ma na liście blokowanych mechanizmów śledzących<br/>• Błędy zgłoszone przez przeglądarkę<br/>• Kody stanu odpowiedzi witryny (HTTP) <br/>• Wykorzystany sposób raportowania (menu, panel itp.)<br/>• Data ostatniego wysłania raportu dla tej witryny<br/>• Czy wyrażono zgodę na wyświetlanie informacji o tym raporcie<br/>• Liczba wyłączeń zabezpieczeń<br/>• Szybkość ładowania elementów strony<br/>• Sposób przejścia do tej witryny: „SERP” (wyszukiwanie DuckDuckGo), „Nawigacja” (link/URL), lub „Zewnętrzne” (inne sposoby)<br/>• Liczba odświeżeń od załadowania strony<br/>• Podstawowy język i kraj urządzenia<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potwierdź</string>
-    <string name="dialogSave">Zapisz</string>
-    <string name="delete">Usuń</string>
-    <string name="edit">Edytuj</string>
-    <string name="remove">Usuń</string>
-    <string name="removeAll">Usuń wszystko</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
@@ -669,23 +666,6 @@
     <string name="autoconsentSetting">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ukryte wyskakujące okienka</string>
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
-
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Uprawnienia witryny</string>
-    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji urządzenia, kamery, mikrofonu lub oprogramowania DRM (Digital Rights Management). Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
-    <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
-    <string name="sitePermissionsSettingsCamera">Aparat</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
-    <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Pytaj za każdym razem</string>
-    <string name="permissionsPerWebsiteDenySetting">Odmów</string>
-    <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono dla wszystkich witryn</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
