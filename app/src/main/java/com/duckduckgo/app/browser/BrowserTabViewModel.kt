@@ -2642,22 +2642,6 @@ class BrowserTabViewModel @Inject constructor(
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
 
-        pixel.fire(AppPixelName.TAB_MANAGER_OPENED)
-        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_DAILY, type = Daily())
-
-        if (!currentBrowserViewState().browserShowing) {
-            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
-        } else {
-            val url = site?.url
-            if (url != null) {
-                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
-                } else {
-                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
-                }
-            }
-        }
-
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
@@ -2871,6 +2855,20 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
+
+        if (!currentBrowserViewState().browserShowing) {
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+        } else {
+            val url = site?.url
+            if (url != null) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                } else {
+                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                }
+            }
+        }
+
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 

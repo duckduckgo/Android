@@ -5843,33 +5843,50 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabPressedAndUserOnSiteThenPixelIsSent() = runTest {
+    fun whenTabSwitcherPressedAndUserOnSiteThenPixelIsSent() = runTest {
+        givenTabManagerData()
         val domain = "https://www.example.com"
         givenCurrentSite(domain)
 
-        testee.userRequestedOpeningNewTab()
+        testee.userLaunchingTabSwitcher()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
     }
 
     @Test
-    fun whenNewTabPressedAndUserOnSerpThenPixelIsSent() = runTest {
+    fun whenTabSwitcherPressedAndUserOnSerpThenPixelIsSent() = runTest {
+        givenTabManagerData()
         setBrowserShowing(false)
 
-        testee.userRequestedOpeningNewTab()
+        testee.userLaunchingTabSwitcher()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
     }
 
     @Test
-    fun whenNewTabPressedAndUserOnNewTabThenPixelIsSent() = runTest {
+    fun whenTabSwitcherPressedAndUserOnNewTabThenPixelIsSent() = runTest {
+        givenTabManagerData()
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
         val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
         givenCurrentSite(domain)
 
-        testee.userRequestedOpeningNewTab()
+        testee.userLaunchingTabSwitcher()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+    }
+
+    private fun givenTabManagerData() = runTest {
+        val tabCount = "61-80"
+        val active7d = "21+"
+        val inactive1w = "11-20"
+        val inactive2w = "6-10"
+        val inactive3w = "0"
+
+        whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+        whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+        whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+        whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+        whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
     }
 
     private fun aCredential(): LoginCredentials {
