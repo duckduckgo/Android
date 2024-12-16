@@ -8,6 +8,21 @@
 /* CSS Arrow */
 /* links */
 /** Separators */
+/** Latest color pallette as CSS custom properties */
+body {
+  --color-blue-0: #ccdaff;
+  --color-blue-10: #adc2fc;
+  --color-blue-20: #8fabf9;
+  --color-blue-30: #7295f6;
+  --color-blue-40: #557ff3;
+  --color-blue-50: #3969ef;
+  --color-blue-60: #2b55ca;
+  --color-blue-70: #1e42a4;
+  --color-blue-80: #14307e;
+  --color-blue-90: #0b2059;
+  --color-blue-100: #051133;
+}
+
 /* Status icons */
 /* Colors */
 /* Dark theme */
@@ -18,6 +33,21 @@
 /* CSS Arrow */
 /* links */
 /** Separators */
+/** Latest color pallette as CSS custom properties */
+body {
+  --color-blue-0: #ccdaff;
+  --color-blue-10: #adc2fc;
+  --color-blue-20: #8fabf9;
+  --color-blue-30: #7295f6;
+  --color-blue-40: #557ff3;
+  --color-blue-50: #3969ef;
+  --color-blue-60: #2b55ca;
+  --color-blue-70: #1e42a4;
+  --color-blue-80: #14307e;
+  --color-blue-90: #0b2059;
+  --color-blue-100: #051133;
+}
+
 /* Logo */
 /* Font groupings */
 .uppercase {
