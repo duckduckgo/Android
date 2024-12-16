@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossible de lancer l\'écran des paramètres par défaut de l\'application</string>
-    <string name="settingsDefaultBrowserEnabled">Définir comme navigateur par défaut</string>
+    <string name="setAsDefaultBrowser">Définir comme navigateur par défaut</string>
     <string name="defaultBrowserMaybeLater">Peut-être plus tard</string>
-    <string name="defaultBrowserLetsDoIt">Définir comme navigateur par défaut</string>
     <string name="defaultBrowserDescriptionNoDefault">Des liens ouverts en toute tranquillité d\'esprit, à chaque fois.</string>
     <string name="defaultBrowserInstructions">Sélectionnez DuckDuckGo et appuyez sur <font color="#678fff">Toujours </font>.</string>
 

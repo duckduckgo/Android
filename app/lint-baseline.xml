@@ -5366,17 +5366,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.settingsDefaultBrowserEnabled` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settingsDefaultBrowserEnabled&quot;>Set as Default Browser&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="35"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.addFavoriteMenuTitle` appears to be unused"
         errorLine1="    &lt;string name=&quot;addFavoriteMenuTitle&quot;>Add Favorite&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">

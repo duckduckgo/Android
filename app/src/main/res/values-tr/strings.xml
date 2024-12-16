@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
-    <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
+    <string name="setAsDefaultBrowser">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserMaybeLater">Belki Sonra</string>
-    <string name="defaultBrowserLetsDoIt">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla bağlantıları açın.</string>
     <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
