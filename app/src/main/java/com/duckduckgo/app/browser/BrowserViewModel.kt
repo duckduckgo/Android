@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -125,10 +123,9 @@ class BrowserViewModel @Inject constructor(
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
 
-    val isOnboardingCompleted: LiveData<Boolean> = userStageStore.currentAppStage
+    val isOnboardingCompleted: Flow<Boolean> = userStageStore.currentAppStage
         .distinctUntilChanged()
         .map { it != AppStage.DAX_ONBOARDING }
-        .asLiveData()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
