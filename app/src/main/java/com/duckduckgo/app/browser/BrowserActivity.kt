@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
@@ -715,6 +716,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         tabPager.doOnPreDraw {
             tabPager.setCurrentItem(index, false)
+            (tabPager.getChildAt(0) as? RecyclerView)?.apply {
+                scrollBy(-1, 0)
+                scrollBy(1, 0)
+            }
         }
     }
 
