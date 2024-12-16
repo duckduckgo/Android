@@ -141,7 +141,7 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
         subtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
         title.setText(R.string.onboardingDefaultBrowserTitle)
-        primaryButton.setText(R.string.defaultBrowserLetsDoIt)
+        primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
     }
 
@@ -149,7 +149,7 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         headerImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
         subtitle.setText(R.string.onboardingDefaultBrowserDescription)
         title.setText(R.string.onboardingDefaultBrowserTitle)
-        primaryButton.setText(R.string.defaultBrowserLetsDoIt)
+        primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
     }
 
