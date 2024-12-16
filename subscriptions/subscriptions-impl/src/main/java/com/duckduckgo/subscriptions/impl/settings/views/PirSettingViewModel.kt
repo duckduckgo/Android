@@ -23,17 +23,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.ACTIVE
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.EXPIRED
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.INACTIVE
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.INELIGIBLE
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.SIGNED_OUT
-import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus.WAITING
+import com.duckduckgo.subscriptions.api.Product.PIR
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.ACTIVE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INACTIVE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INELIGIBLE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.SIGNED_OUT
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class PirSettingViewModel @Inject constructor(
-    private val pirSubscriptionManager: PirSubscriptionManager,
+    private val productSubscriptionManager: ProductSubscriptionManager,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -59,7 +59,7 @@ class PirSettingViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val pirState: PirState = Hidden) {
+    data class ViewState(val pirState: PirState = PirState.Hidden) {
 
         sealed class PirState {
 
@@ -81,7 +81,7 @@ class PirSettingViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
-        pirSubscriptionManager.pirStatus().onEach { status ->
+        productSubscriptionManager.entitlementStatus(PIR).onEach { status ->
             val pirState = when (status) {
                 ACTIVE -> PirState.Subscribed
                 INACTIVE, EXPIRED -> PirState.Expired
