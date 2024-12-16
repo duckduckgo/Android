@@ -90,7 +90,8 @@ interface NetworkProtectionState {
     enum class ConnectionState {
         CONNECTED,
         CONNECTING,
-        DISCONNECTED;
+        DISCONNECTED,
+        ;
 
         fun isConnected(): Boolean = this == CONNECTED
     }

@@ -71,6 +71,6 @@ interface NetworkProtectionAccessState {
             data object Expired : Visible
             data object Activating : Visible
         }
-        data object Hidden: NetPVisibilityState
+        data object Hidden : NetPVisibilityState
     }
 }

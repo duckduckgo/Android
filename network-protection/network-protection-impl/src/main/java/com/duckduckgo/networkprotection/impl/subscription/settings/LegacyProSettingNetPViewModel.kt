@@ -86,7 +86,10 @@ class LegacyProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(networkProtectionAccessState.getLegacyStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
+            combine(
+                networkProtectionAccessState.getLegacyStateFlow(),
+                networkProtectionState.getConnectionStateFlow(),
+            ) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),

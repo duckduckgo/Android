@@ -27,10 +27,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Hidden
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Activating
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Expired
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Subscribed
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Hidden
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED

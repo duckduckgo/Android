@@ -31,7 +31,6 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ViewSettingsNetpBinding
-import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Pending
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Factory
@@ -93,7 +92,8 @@ class ProSettingNetPView @JvmOverloads constructor(
             when (networkProtectionEntryState) {
                 Hidden -> isGone = true
                 Activating,
-                Expired -> {
+                Expired,
+                -> {
                     isVisible = true
                     isClickable = false
                     setLeadingIconResource(R.drawable.ic_vpn_grayscale_color_24)

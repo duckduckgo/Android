@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
 import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus

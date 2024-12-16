@@ -29,7 +29,7 @@ import javax.inject.Inject
 @PriorityKey(200)
 class ProSettingsNetP @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if(newSettingsFeature.self().isEnabled()) {
+        return if (newSettingsFeature.self().isEnabled()) {
             ProSettingNetPView(context)
         } else {
             return LegacyProSettingNetPView(context)
