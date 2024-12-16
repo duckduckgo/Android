@@ -216,6 +216,7 @@ class BrowserModule {
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
         duckPlayer: DuckPlayer,
+        maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -228,6 +229,7 @@ class BrowserModule {
             cloakedCnameDetector,
             requestFilterer,
             duckPlayer,
+            maliciousSiteBlockerWebViewIntegration,
         )
 
     @Provides

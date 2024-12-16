@@ -172,6 +172,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             duckPlayer = mockDuckPlayer,
         )
     }
@@ -189,7 +190,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUri = testCase.siteURL.toUri(),
             webView = webView,
-            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 

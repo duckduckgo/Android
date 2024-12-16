@@ -176,6 +176,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist, mockUserAllowListRepository),
             requestFilterer = mockRequestFilterer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             duckPlayer = mockDuckPlayer,
         )
     }
@@ -200,7 +201,6 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUri = testCase.siteURL.toUri(),
             webView = webView,
-            maliciousSiteProtectionWebViewIntegration = mockMaliciousSiteProtection,
             webViewClientListener = null,
         )
 
