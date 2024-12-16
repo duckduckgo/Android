@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Stránka na novej karte</string>
     <string name="showOnAppLaunchOptionSpecificPage">Špecifická stránka</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Ďakujeme! Vaše hlásenie pomáha zlepšovať DuckDuckGo pre všetkých!</string>
+
 </resources>

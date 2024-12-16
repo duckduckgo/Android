@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik side</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle!</string>
+
 </resources>

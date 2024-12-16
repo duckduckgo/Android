@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
+
 </resources>

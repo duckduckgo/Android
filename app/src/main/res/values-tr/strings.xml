@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
+
 </resources>

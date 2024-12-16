@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Nova stranica kartice</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifična stranica</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Hvala! Tvoje prijave pomažu nam poboljšati DuckDuckGo za sve!</string>
+
 </resources>

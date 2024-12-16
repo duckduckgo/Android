@@ -63,3 +63,7 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
         override val opener: DashboardOpener = NONE,
     ) : PrivacyDashboardHybridScreenParams()
 }
+
+object PrivacyDashboardHybridScreenResult {
+    const val REPORT_SUBMITTED = 1
+}

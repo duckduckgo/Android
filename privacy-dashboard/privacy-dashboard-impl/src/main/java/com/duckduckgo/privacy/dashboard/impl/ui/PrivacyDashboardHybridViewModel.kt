@@ -377,7 +377,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     private companion object {
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
-        val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
         val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
     }
 
@@ -441,9 +440,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
-
-            delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
-            command.send(GoBack)
         }
     }
 
