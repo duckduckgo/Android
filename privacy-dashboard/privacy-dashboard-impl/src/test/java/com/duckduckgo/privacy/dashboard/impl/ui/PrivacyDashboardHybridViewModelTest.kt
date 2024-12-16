@@ -325,24 +325,6 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
-        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
-
-        testee.onSiteChanged(site())
-
-        testee.onSubmitBrokenSiteReport(
-            payload = """{"category":"login","description":"I can't sign in!"}""",
-            reportFlow = DASHBOARD,
-        )
-
-        verify(brokenSiteSender).submitBrokenSiteFeedback(any(), any())
-
-        testee.commands().test {
-            assertEquals(GoBack, awaitItem())
-        }
-    }
-
-    @Test
     fun whenUserClicksOnSubmitToggleReportThenCommandIsSent() = runTest {
         testee.onSiteChanged(site())
 

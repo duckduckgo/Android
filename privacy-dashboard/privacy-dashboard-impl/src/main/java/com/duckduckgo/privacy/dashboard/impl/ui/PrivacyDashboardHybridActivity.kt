@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParam
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResult
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
@@ -103,7 +104,10 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
-                onShowNativeFeedback = { viewModel.launchAppFeedbackFlow() },
+                onShowNativeFeedback = {
+                    viewModel.launchAppFeedbackFlow()
+                    finish()
+                },
                 onSubmitBrokenSiteReport = { payload ->
                     val reportFlow = when (val params = params) {
                         is BrokenSiteForm -> {
@@ -116,6 +120,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                         else -> ReportFlow.DASHBOARD
                     }
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
+                    setResult(PrivacyDashboardHybridScreenResult.REPORT_SUBMITTED)
+                    finish()
                 },
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
