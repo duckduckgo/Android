@@ -5845,6 +5845,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTabSwitcherPressedAndUserOnSiteThenPixelIsSent() = runTest {
         givenTabManagerData()
+        setBrowserShowing(true)
         val domain = "https://www.example.com"
         givenCurrentSite(domain)
 
@@ -5866,6 +5867,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTabSwitcherPressedAndUserOnNewTabThenPixelIsSent() = runTest {
         givenTabManagerData()
+        setBrowserShowing(true)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
         val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
         givenCurrentSite(domain)
