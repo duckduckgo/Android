@@ -70,7 +70,7 @@ class RealMaliciousSiteProtection @Inject constructor(
         hostname: String,
         hash: String,
     ): Boolean {
-        val matches = maliciousSiteRepository.matches(hashPrefix)
+        val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))
         return matches.any { match ->
             Pattern.compile(match.regex).matcher(url.toString()).find() &&
                 (hostname == match.hostname) &&
