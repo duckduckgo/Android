@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Stran z novim zavihkom</string>
     <string name="showOnAppLaunchOptionSpecificPage">Določena stran</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
+
 </resources>

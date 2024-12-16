@@ -74,9 +74,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
@@ -463,20 +460,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchNewSearch(intent: Intent): Boolean {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
-    }
-
-    fun launchPrivacyDashboard(toggle: Boolean) {
-        currentTab?.tabId?.let { tabId ->
-            val params = if (toggle) {
-                PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
-            } else {
-                PrivacyDashboardPrimaryScreen(
-                    tabId,
-                )
-            }
-            val intent = globalActivityStarter.startIntent(this, params)
-            intent?.let { startActivity(it) }
-        }
     }
 
     fun launchFire() {

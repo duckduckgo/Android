@@ -787,4 +787,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
+
 </resources>

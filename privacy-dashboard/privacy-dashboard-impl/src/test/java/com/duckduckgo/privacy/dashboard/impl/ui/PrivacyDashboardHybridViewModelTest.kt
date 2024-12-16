@@ -273,6 +273,7 @@ class PrivacyDashboardHybridViewModelTest {
         val isToggleReport = false
 
         verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite, isToggleReport)
+        verify(pixel).fire(REPORT_BROKEN_SITE_SENT, mapOf("opener" to "dashboard"), type = Count)
     }
 
     @Test
@@ -290,19 +291,10 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnSubmitReportThenCommandIsSent() = runTest {
-        testee.onSiteChanged(site())
+    fun whenUserClicksOnSubmitReportThenPixelIsSent() = runTest {
+        testee.onReportBrokenSiteShown()
 
-        testee.onSubmitBrokenSiteReport(
-            payload = """{"category":"login","description":"I can't sign in!"}""",
-            reportFlow = DASHBOARD,
-        )
-
-        verify(brokenSiteSender).submitBrokenSiteFeedback(any(), any())
-
-        testee.commands().test {
-            assertEquals(GoBack, awaitItem())
-        }
+        verify(pixel).fire(REPORT_BROKEN_SITE_SHOWN, mapOf("opener" to "dashboard"), type = Count)
     }
 
     @Test

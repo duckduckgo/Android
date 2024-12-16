@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Strona nowej karty</string>
     <string name="showOnAppLaunchOptionSpecificPage">Określona strona</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć DuckDuckGo u wszystkich użytkowników!</string>
+
 </resources>

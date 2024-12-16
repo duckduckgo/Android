@@ -270,10 +270,11 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResult
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -619,6 +620,15 @@ class BrowserTabFragment :
         }
     }
 
+    private val activityResultPrivacyDashboard = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == PrivacyDashboardHybridScreenResult.REPORT_SUBMITTED) {
+            binding.rootView.makeSnackbarWithNoBottomInset(
+                resId = string.brokenSiteSubmittedReportMessage,
+                duration = Snackbar.LENGTH_LONG,
+            ).show()
+        }
+    }
+
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
@@ -894,10 +904,10 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
-        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+        val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        intent?.let { startActivity(it) }
+        intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
 
@@ -1875,6 +1885,16 @@ class BrowserTabFragment :
         }
     }
 
+    private fun launchPrivacyDashboard(toggle: Boolean) {
+        val params = if (toggle) {
+            PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
+        } else {
+            PrivacyDashboardPrimaryScreen(tabId)
+        }
+        globalActivityStarter.startIntent(requireContext(), params)
+            ?.let { activityResultPrivacyDashboard.launch(it) }
+    }
+
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         val context = context ?: return
 
@@ -1883,7 +1903,7 @@ class BrowserTabFragment :
             else -> BrokenSiteFormReportFlow.MENU
         }
         globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))
-            ?.let { startActivity(it) }
+            ?.let { activityResultPrivacyDashboard.launch(it) }
     }
 
     private fun launchToggleReportFeedback(opener: DashboardOpener) {

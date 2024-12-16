@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Σελίδα νέας καρτέλας</string>
     <string name="showOnAppLaunchOptionSpecificPage">Συγκεκριμένη σελίδα</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Σε ευχαριστούμε! Η αναφορά σας βοηθάει ώστε να γίνει το DuckDuckGo καλύτερο για όλους!</string>
+
 </resources>
