@@ -1,0 +1,17 @@
+name: Pull Request Review Submitted
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  pr-reviewed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Asana task -> PR reviewed
+        uses: duckduckgo/native-github-asana-sync@
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          trigger-phrase: "Task/Issue URL:"
+          pr-review-state: ${{ github.event.review.state }}
+          action: 'notify-pr-reviewed'
