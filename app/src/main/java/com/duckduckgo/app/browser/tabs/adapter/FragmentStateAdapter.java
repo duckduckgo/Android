@@ -526,7 +526,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         }
 
         if (fragment.isAdded() && !fragment.isHidden()) {
-            mFragmentManager.beginTransaction().hide(fragment).commitNow();
+            mFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss();
         }
     }
 
