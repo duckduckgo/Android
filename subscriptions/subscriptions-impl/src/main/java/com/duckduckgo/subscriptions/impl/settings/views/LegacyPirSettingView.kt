@@ -31,11 +31,11 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.databinding.LegacyViewPirSettingsBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class PirSettingView @JvmOverloads constructor(
+class LegacyPirSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -60,10 +60,10 @@ class PirSettingView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewPirSettingsBinding by viewBinding()
+    private val binding: LegacyViewPirSettingsBinding by viewBinding()
 
-    private val viewModel: PirSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
+    private val viewModel: LegacyPirSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyPirSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()

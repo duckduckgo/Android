@@ -26,7 +26,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command.OpenPir
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class PirSettingViewModel @Inject constructor(
+class LegacyPirSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {

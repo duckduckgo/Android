@@ -5,7 +5,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command.OpenPir
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -18,17 +18,17 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class PirSettingViewModelTest {
+class LegacyPirSettingViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private lateinit var viewModel: PirSettingViewModel
+    private lateinit var viewModel: LegacyPirSettingViewModel
 
     @Before
     fun before() {
-        viewModel = PirSettingViewModel(subscriptions, pixelSender)
+        viewModel = LegacyPirSettingViewModel(subscriptions, pixelSender)
     }
 
     @Test

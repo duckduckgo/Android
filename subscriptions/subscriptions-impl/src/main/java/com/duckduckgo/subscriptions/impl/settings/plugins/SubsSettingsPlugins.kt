@@ -26,7 +26,7 @@ import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -57,7 +57,7 @@ class ProSettings @Inject constructor(private val newSettingsFeature: NewSetting
 @PriorityKey(300)
 class PIRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return PirSettingView(context)
+        return LegacyPirSettingView(context)
     }
 }
 
