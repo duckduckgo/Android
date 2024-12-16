@@ -113,7 +113,7 @@ class RealMaliciousSiteProtectionTest {
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
         whenever(maliciousSiteRepository.getFilter(hash)).thenReturn(filter)
-        whenever(maliciousSiteRepository.matches(hashPrefix))
+        whenever(maliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
             .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash)))
 
         realMaliciousSiteProtection.isMalicious(url) {
