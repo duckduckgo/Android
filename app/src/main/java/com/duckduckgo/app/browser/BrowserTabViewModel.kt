@@ -2633,12 +2633,28 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userRequestedOpeningNewTab(longPress: Boolean = false) {
+    fun userRequestedOpeningNewTab(
+        longPress: Boolean = false,
+        url: String,
+        inNewTabPage: Boolean,
+    ) {
         command.value = GenerateWebViewPreviewImage
         command.value = LaunchNewTab
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
+
+        pixel.fire(AppPixelName.TAB_MANAGER_OPENED)
+        pixel.fire(AppPixelName.TAB_MANAGER_OPENED_DAILY, type = Daily())
+
+        if (inNewTabPage) {
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+        } else if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+        } else {
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+        }
+
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
@@ -3539,6 +3555,7 @@ class BrowserTabViewModel @Inject constructor(
                     "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding$cohortOrigin".toUri(),
                 )
             }
+
             is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
