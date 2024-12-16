@@ -25,7 +25,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pir.PirSubscriptionManager.PirStatus
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -132,7 +131,6 @@ class RealPirSubscriptionManagerTest {
             awaitComplete()
         }
     }
-
 }
 
 private class FakeSubscriptions(
@@ -154,7 +152,7 @@ private class FakeSubscriptions(
 
     override fun launchPrivacyPro(
         context: Context,
-        uri: Uri?
+        uri: Uri?,
     ) {
         // no-op
     }
