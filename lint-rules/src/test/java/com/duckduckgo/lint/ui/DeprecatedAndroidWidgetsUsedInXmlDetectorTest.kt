@@ -138,7 +138,7 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
                     style="@style/SettingsSwitch"
                     android:paddingTop="14dp"
                     android:paddingBottom="14dp"
-                    android:text="@string/settingsDefaultBrowserEnabled"
+                    android:text="@string/setAsDefaultBrowser"
                     android:theme="@style/SettingsSwitchTheme" />
 
 
@@ -236,7 +236,7 @@ class DeprecatedAndroidWidgetsUsedInXmlDetectorTest {
                     style="@style/SettingsSwitch"
                     android:paddingTop="14dp"
                     android:paddingBottom="14dp"
-                    android:text="@string/settingsDefaultBrowserEnabled"
+                    android:text="@string/setAsDefaultBrowser"
                     android:theme="@style/SettingsSwitchTheme" />
 
 
