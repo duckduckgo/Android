@@ -32,10 +32,10 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.databinding.LegacyViewItrSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingViewModel.Command.OpenItr
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ItrSettingView @JvmOverloads constructor(
+class LegacyItrSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -61,10 +61,10 @@ class ItrSettingView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewItrSettingsBinding by viewBinding()
+    private val binding: LegacyViewItrSettingsBinding by viewBinding()
 
-    private val viewModel: ItrSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ItrSettingViewModel::class.java]
+    private val viewModel: LegacyItrSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyItrSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
