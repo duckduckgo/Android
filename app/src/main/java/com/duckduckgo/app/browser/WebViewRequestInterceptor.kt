@@ -49,7 +49,6 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
-        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
@@ -73,6 +72,7 @@ class WebViewRequestInterceptor(
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
     private val duckPlayer: DuckPlayer,
+    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : RequestInterceptor {
 
@@ -94,7 +94,6 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         documentUri: Uri?,
-        maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri? = request.url
@@ -103,7 +102,7 @@ class WebViewRequestInterceptor(
             // TODO (cbarreiro): Handle site blocked asynchronously
         }
 
-        maliciousSiteProtectionWebViewIntegration.shouldIntercept(request, documentUri, confirmationCallback)?.let {
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri, confirmationCallback)?.let {
             // TODO (cbarreiro): Handle site blocked synchronously
             return it
         }

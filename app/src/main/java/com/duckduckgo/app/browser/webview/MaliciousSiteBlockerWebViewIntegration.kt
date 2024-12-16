@@ -31,10 +31,12 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.net.URLDecoder
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 interface MaliciousSiteBlockerWebViewIntegration {
@@ -45,9 +47,8 @@ interface MaliciousSiteBlockerWebViewIntegration {
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): WebResourceResponse?
 
-    suspend fun shouldOverrideUrlLoading(
+    fun shouldOverrideUrlLoading(
         url: Uri,
-        webViewUrl: Uri?,
         isForMainFrame: Boolean,
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean
@@ -55,6 +56,7 @@ interface MaliciousSiteBlockerWebViewIntegration {
     fun onPageLoadStarted()
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
 @ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
@@ -123,30 +125,32 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         return null
     }
 
-    override suspend fun shouldOverrideUrlLoading(
+    override fun shouldOverrideUrlLoading(
         url: Uri,
-        webViewUrl: Uri?,
         isForMainFrame: Boolean,
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean {
-        if (!isFeatureEnabled) {
-            return false
-        }
-        val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
-
-        if (processedUrls.contains(decodedUrl)) {
-            processedUrls.remove(decodedUrl)
-            Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-            return false
-        }
-
-        if (isForMainFrame && decodedUrl.toUri() == webViewUrl) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
-                return true
+        return runBlocking {
+            if (!isFeatureEnabled) {
+                return@runBlocking false
             }
-            processedUrls.add(decodedUrl)
+            val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+
+            if (processedUrls.contains(decodedUrl)) {
+                processedUrls.remove(decodedUrl)
+                Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
+                return@runBlocking false
+            }
+
+            // iframes always go through the shouldIntercept method, so we only need to check the main frame here
+            if (isForMainFrame) {
+                if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
+                    return@runBlocking true
+                }
+                processedUrls.add(decodedUrl)
+            }
+            false
         }
-        return false
     }
 
     private fun isForIframe(request: WebResourceRequest) = request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||

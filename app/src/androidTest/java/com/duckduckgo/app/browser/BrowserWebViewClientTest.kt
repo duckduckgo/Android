@@ -199,7 +199,7 @@ class BrowserWebViewClientTest {
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
-        whenever(mockMaliciousSiteProtection.shouldOverrideUrlLoading(any(), any(), any(), any())).thenReturn(false)
+        whenever(mockMaliciousSiteProtection.shouldOverrideUrlLoading(any(), any(), any())).thenReturn(false)
     }
 
     @UiThreadTest
@@ -338,7 +338,7 @@ class BrowserWebViewClientTest {
         TestScope().launch {
             val webResourceRequest = mock<WebResourceRequest>()
             testee.shouldInterceptRequest(webView, webResourceRequest)
-            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any(), any())
+            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any())
         }
     }
 
