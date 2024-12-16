@@ -30,6 +30,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -398,14 +399,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         // listen to onboarding completion to enable/disable swiping
-        viewModel.isOnboardingCompleted.observe(this) { isOnboardingCompleted ->
-            tabPager.isUserInputEnabled = isOnboardingCompleted
+        lifecycleScope.launch {
+            viewModel.isOnboardingCompleted.flowWithLifecycle(lifecycle).collectLatest { isOnboardingCompleted ->
+                tabPager.isUserInputEnabled = isOnboardingCompleted
+            }
         }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
-        viewModel.isOnboardingCompleted.removeObservers(this)
     }
 
     private fun processCommand(command: Command) {
@@ -711,7 +713,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun onMoveToTabRequested(index: Int) {
         Timber.d("### onMoveToTabRequested: $index")
 
-        tabPager.post {
+        tabPager.doOnPreDraw {
             tabPager.setCurrentItem(index, false)
         }
     }
