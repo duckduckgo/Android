@@ -20,18 +20,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ALERT
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -135,42 +134,53 @@ class ProSettingView @JvmOverloads constructor(
     private fun renderView(viewState: ViewState) {
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
-                binding.subscriptionBuyContainer.gone()
-                binding.subscriptionRestoreContainer.gone()
-                binding.subscriptionWaitingContainer.gone()
-                binding.subscriptionSettingContainer.show()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+                    subscriptionSetting.isGone = true
+
+                    subscribedSubscriptionSetting.isVisible = true
+                    subscriptionSettingContainer.isVisible = true
+                }
             }
             WAITING -> {
-                binding.subscriptionBuyContainer.gone()
-                binding.subscriptionWaitingContainer.show()
-                binding.subscriptionSettingContainer.gone()
-                binding.subscriptionRestoreContainer.show()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+                    subscribedSubscriptionSetting.isGone = true
+
+                    subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingActivating))
+                }
             }
             EXPIRED, INACTIVE -> {
-                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
-                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
-                binding.subscriptionBuy.setItemStatus(ALERT)
-                binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
-                binding.subscriptionBuyContainer.show()
-                binding.subscriptionSettingContainer.show()
-                binding.subscriptionWaitingContainer.gone()
-                binding.subscriptionRestoreContainer.gone()
+                with(binding) {
+                    subscriptionBuyContainer.isGone = true
+                    subscriptionRestoreContainer.isGone = true
+                    subscribedSubscriptionSetting.isGone = true
+
+                    subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
+                    subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_red_16)
+                }
             }
             else -> {
-                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-                binding.subscriptionBuy.setSecondaryText(
-                    when (viewState.region) {
-                        ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
-                        US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
-                        else -> ""
-                    },
-                )
-                binding.subscriptionBuy.setItemStatus(DISABLED)
-                binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
-                binding.subscriptionBuyContainer.show()
-                binding.subscriptionSettingContainer.gone()
-                binding.subscriptionWaitingContainer.gone()
-                binding.subscriptionRestoreContainer.show()
+                with(binding) {
+                    subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                    subscriptionBuy.setSecondaryText(
+                        when (viewState.region) {
+                            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
+                            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
+                            else -> ""
+                        },
+                    )
+                    subscriptionGet.setText(R.string.subscriptionSettingGet)
+
+                    subscriptionBuyContainer.isVisible = true
+                    subscriptionRestoreContainer.isVisible = true
+
+                    subscriptionSettingContainer.isGone = true
+                }
             }
         }
     }

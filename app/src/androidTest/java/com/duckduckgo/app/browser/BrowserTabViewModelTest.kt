@@ -142,7 +142,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
@@ -370,8 +369,6 @@ class BrowserTabViewModelTest {
 
     private val mockFileDownloader: FileDownloader = mock()
 
-    private val geoLocationPermissions: GeoLocationPermissions = mock()
-
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler = mock()
 
     private val mockEmailManager: EmailManager = mock()
@@ -524,7 +521,6 @@ class BrowserTabViewModelTest {
             mockAutoCompleteRepository,
             mockTabRepository,
             mockUserStageStore,
-            coroutineRule.testDispatcherProvider,
             mockAutocompleteTabsFeature,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
@@ -2371,9 +2367,9 @@ class BrowserTabViewModelTest {
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
+        val suggestions = listOf(AutoCompleteSearchSuggestion("", false, false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
-        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false, false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
@@ -2387,7 +2383,7 @@ class BrowserTabViewModelTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
-        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false, false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
@@ -3038,8 +3034,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3055,8 +3049,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3066,8 +3058,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         loadUrl("https://www.example.com", isBrowserShowing = true)
 
@@ -3077,8 +3067,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = runTest {
         val domain = "https://www.example.com"
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -3095,8 +3083,6 @@ class BrowserTabViewModelTest {
         )
 
         givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -5899,14 +5885,6 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
-    }
-
-    private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
-        whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
-    }
-
-    private fun givenLocationPermissionIsEnabled(state: Boolean) {
-        whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

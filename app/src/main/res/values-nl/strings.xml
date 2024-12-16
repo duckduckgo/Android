@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking is ingeschakeld</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatisch wissen…</string>
+    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
+    <string name="aboutActivityTitleNew" translatable="false">About</string>
     <string name="aboutHeader">Welkom bij de Duck kant!</string>
     <string name="aboutDescription">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je privacy op internet écht beschermd kan worden zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige functies voor privacybescherming</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide privacybescherming helpt je online activiteiten te beschermen – of je nu zoekt, surft of mailt.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar DuckDuckGo op al je apparaten te installeren en geniet dan standaard van privacy.\n\nWil je toch een kijkje nemen onder de motorkap? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation> vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
+    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
     <string name="no_suggestions">Geen suggesties</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Bekijk wat er is verzonden</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>De in de rapporten verzonden informatie kan niet worden gebruikt om je te identificeren:</b><br/><br/>• URL van de pagina (zonder identificeerbare info)<br/>• Merk, model en fabrikant van het apparaat<br/>• Versienummer van het besturingssysteem<br/>• Versienummer van de app<br/>• Anonieme experimentgroep voor het testen van functies<br/>• Informatie over welke versies van onze beveiligingen actief waren<br/>• Versienummer van de webbrowser-engine<br/>• Lijst met welke beveiligingen en browserfuncties actief waren<br/>• Hostnamen van geblokkeerde trackers, surrogaatverzoeken, genegeerde verzoeken en verzoeken die niet in de lijst met geblokkeerde trackers staan<br/>• Door de browser gerapporteerde fouten<br/>• Responsstatuscodes van websites (HTTP)<br/>• Welk rapportageformulier je hebt gebruikt (menu, dashboard, enz.)<br/>• Datum van het laatst verzonden rapport voor deze site<br/>• Of je er wel of niet voor hebt gekozen om deze rapportgegevens te tonen<br/>• Aantal keren dat beveiligingen zijn uitgeschakeld<br/>• Hoe snel delen van de pagina zijn geladen<br/>• Hoe je op deze pagina bent gekomen, ofwel: SERP (DuckDuckGo-zoekopdracht), Navigatie (link/URL), of Extern (andere middelen)<br/>• Aantal vernieuwingen sinds het laden van de pagina<br/>• Primaire taal en land van je apparaat<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bevestigen</string>
-    <string name="dialogSave">Opslaan</string>
-    <string name="delete">Verwijderen</string>
-    <string name="edit">Bewerken</string>
-    <string name="remove">Verwijderen</string>
-    <string name="removeAll">Alles verwijderen</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Zoek in DuckDuckGo</string>
@@ -669,23 +666,6 @@
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up verborgen</string>
     <string name="autoconsentManagedNoticeAnimationText">Beheerde cookies</string>
-
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Sitetoestemmingen</string>
-    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen toegang vragen tot de software, je camera, je microfoon of DRM (Digital Rights Management) op je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>
-    <string name="sitePermissionsSettingsLocation">Locatie</string>
-    <string name="sitePermissionsSettingsCamera">Camera</string>
-    <string name="sitePermissionsSettingsMicrophone">Microfoon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Sites beheren</string>
-    <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Toestemmingen verwijderd voor alle sites</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Toestemmingen voor \'%1$s\' </string>
-    <string name="permissionsPerWebsiteAskSetting">Elke keer vragen</string>
-    <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
-    <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Uitgeschakeld voor alle sites</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Toestemming voor %1$s voor %2$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Blijf op de hoogte van downloads</string>

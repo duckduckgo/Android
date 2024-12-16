@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+        android:id="@+id/subscriptionBuyContainer"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.duckduckgo.common.ui.view.listitem.CheckListItem
+            android:id="@+id/subscriptionBuy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSettingSubscribe"
+            app:primaryTextTruncated="false" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/subscriptionGet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_3"
+            app:textType="primary"
+            app:typography="body1"
+            android:text="@string/subscriptionSettingGet" />
+
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
+
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+        android:id="@+id/subscriptionSettingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscriptionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:paddingStart="32dp"
+            app:primaryText="@string/subscriptionSetting"
+            tools:ignore="RtlSymmetry" />
+
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
+
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+            android:id="@+id/subscriptionWaitingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/subscriptionWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSettingWaiting"
+            app:secondaryText="@string/subscriptionSettingWaitingSubtitle"
+            app:leadingIcon="@drawable/ic_info_16"
+            app:leadingIconSize="small"
+            tools:ignore="RtlSymmetry" />
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
+
+    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
+        android:id="@+id/subscriptionRestoreContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscriptionRestore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="32dp"
+            app:primaryText="@string/subscriptionSettingRestore"
+            tools:ignore="RtlSymmetry" />
+
+    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
+
+</LinearLayout>
