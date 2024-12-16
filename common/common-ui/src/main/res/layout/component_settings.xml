@@ -34,18 +34,34 @@
         app:primaryText="Settings List Item" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+        android:id="@+id/settingsListItemAlwaysOn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:indicatorStatus="alwaysOn"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Settings List Item Always On" />
+
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemOn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:isOn="true"
+        app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item on" />
+
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+        android:id="@+id/settingsListItemOff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:indicatorStatus="off"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Settings List Item Off" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/settingsListItemWithBetaTag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:isOn="true"
+        app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with Beta Pill"
         app:showBetaPill="true" />
@@ -54,7 +70,7 @@
         android:id="@+id/settingsListItemWithBetaTagAndLongText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:isOn="true"
+        app:indicatorStatus="on"
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap"
         app:showBetaPill="true" />

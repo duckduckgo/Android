@@ -21,9 +21,11 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,9 +43,13 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(500)
-class ProSettings @Inject constructor() : ProSettingsPlugin {
+class ProSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ProSettingView(context)
+        return if (newSettingsFeature.self().isEnabled()) {
+            ProSettingView(context)
+        } else {
+            LegacyProSettingView(context)
+        }
     }
 }
 

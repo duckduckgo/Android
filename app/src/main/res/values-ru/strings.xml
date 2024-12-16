@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Включена защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
+    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
 
     <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
+    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
+    <string name="aboutActivityTitleNew" translatable="false">About</string>
     <string name="aboutHeader">Добро пожаловать на Утиную сторону!</string>
     <string name="aboutDescription">DuckDuckGo — основанная в 2008 году независимая компания, специализирующаяся на защите личных данных в Интернете. Мы предлагаем простое решение тем, кто хочет, чтобы за ними перестали следить онлайн. DuckDuckGo своим примером показывает, что защита конфиденциальности онлайн возможна без всяких компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли и многое другое, а также <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей . Такой исчерпывающий набор инструментов может скрыть от посторонних глаз всю сетевую активность, включая поиск, навигацию и почту.\n\nСредства защиты конфиденциальности не требуют от пользователей знания технических особенностей или понимания сложных настроек .Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность станет вашим режимом по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на страницах <annotation type="learn_more_link">справки</annotation>.</string>
+    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
     <string name="no_suggestions">Нет предложений</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Что было отправлено</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>В отчет включаются следующие сведения (по которым невозможно установить вашу личность):</b><br/><br/>• адрес веб-страницы (без идентифицирующих данных);<br/>• марка, модель и изготовитель устройства;<br/>• номер операционной системы;<br/>• номер версии приложения;<br/>• анонимная экспериментальная группа для тестирования функций;<br/>• версии задействованных функций защиты;<br/>• номер версии движка браузера;<br/>• список активных средств защиты и функций браузера;<br/>• имена хостов заблокированных трекеров, суррогатные и проигнорированные запросы, а также запросы, не входящие в список блокировки трекеров;<br/>• ошибки, зафиксированные браузером;<br/>• коды состояния ответа сайта (HTTP);<br/>• способ отправки отчета (через меню, панель управления и так далее);<br/>• дата отправки последнего отчета по этому сайту;<br/>• отметка о том, готовы ли вы раскрыть содержимое отчета;<br/>• количество отключений функций защиты;<br/>• скорость загрузки разных частей страницы;<br/>• информация о том, как вы попали на данную страницу — через результаты поиска (в DuckDuckGo), путем навигации (по ссылке/URL-адресу) или иным (внешним) способом;<br/>• количество обновлений страницы с момента ее загрузки;<br/>• основной язык и регион вашего устройства.<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Подтвердить</string>
-    <string name="dialogSave">Сохранить</string>
-    <string name="delete">Удалить</string>
-    <string name="edit">Редактировать</string>
-    <string name="remove">Удалить</string>
-    <string name="removeAll">Удалить все</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Поиск в DuckDuckGo</string>
@@ -669,23 +666,6 @@
     <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
-
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Разрешения для сайтов</string>
-    <string name="sitePermissionsSettingsDescription">Посещаемые вами сайты могут запрашивать доступ к геопозиции, камере, микрофону или программам DRM (защиты авторских прав) вашего устройства. Доступ предоставляется только с вашего разрешения.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешить всем сайтам запрашивать:</string>
-    <string name="sitePermissionsSettingsLocation">Геопозиция</string>
-    <string name="sitePermissionsSettingsCamera">Камера</string>
-    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление сайтами</string>
-    <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешения удалены для всех сайтов</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения для «%1$s» </string>
-    <string name="permissionsPerWebsiteAskSetting">Спрашивать каждый раз</string>
-    <string name="permissionsPerWebsiteDenySetting">Отказать</string>
-    <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Отключено в отношении всех сайтов</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>

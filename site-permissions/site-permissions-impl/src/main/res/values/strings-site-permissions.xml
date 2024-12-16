@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" wants to open your DRM software</string>
+    <string name="drmSiteDialogSubtitle">Digital Rights Management software is required to play protected media content, but also provides access to device identifiers. Only grant permission to sites you trust with this data. You can manage permissions at any time in Settings. <annotation type="drm_learn_more_link">Learn More</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Always</string>
+    <string name="drmSiteDialogAllowOnce">Only for This Session</string>
+    <string name="drmSiteDialogDenyAlways">Deny Always</string>
+    <string name="drmSiteDialogDenyOnce">Deny for This Session</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access your location</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Remember my choice</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Allow DuckDuckGo to ask for location access on this device</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Sites can only use your location if you allow DuckDuckGo to ask for access.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Allow DuckDuckGo to ask for location access</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Site Permissions</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">You can manage the microphone and camera access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="sitePermissionsMicDialogSubtitle">You can manage the microphone access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">You can manage the camera access permissions you’ve granted to individual sites in Settings.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access the camera and microphone</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access the microphone</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access the camera</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites can only use your camera and microphone if you allow DuckDuckGo to ask for access.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Open Settings</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Cancel</string>
+
+    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, microphone, or DRM (Digital Rights Management) software. They won’t be able to access these unless you explicitly give them permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
+    <string name="sitePermissionsSettingsLocation">Location</string>
+    <string name="sitePermissionsSettingsCamera">Camera</string>
+    <string name="sitePermissionsSettingsMicrophone">Microphone</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
+    <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permissions for \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Ask every time</string>
+    <string name="permissionsPerWebsiteDenySetting">Deny</string>
+    <string name="permissionsPerWebsiteAllowSetting">Allow</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Disabled for all sites</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permission for %2$s</string>
+
 </resources>

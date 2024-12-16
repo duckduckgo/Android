@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.faviconLocation
@@ -75,11 +74,6 @@ class DuckDuckGoFaviconManagerTest {
             faviconPersister = mockFaviconPersister,
             savedSitesDao = mockSavedSitesDao,
             fireproofWebsiteRepository = FireproofWebsiteRepositoryImpl(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
-            locationPermissionsRepository = LocationPermissionsRepositoryImpl(
-                mockLocationPermissionsDao,
-                mock(),
-                coroutineRule.testDispatcherProvider,
-            ),
             savedSitesRepository = mockSavedSitesRepository,
             faviconDownloader = mockFaviconDownloader,
             dispatcherProvider = coroutineRule.testDispatcherProvider,

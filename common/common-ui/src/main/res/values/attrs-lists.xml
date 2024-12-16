@@ -54,6 +54,12 @@
         <!-- Extra Large 40dp -->
         <enum name="extra_large" value="3" />
     </attr>
+    <attr name="trailingIconSize">
+        <!-- Small 16dp -->
+        <enum name="small" value="0" />
+        <!-- Medium 24dp (default) -->
+        <enum name="medium" value="1" />
+    </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
 
@@ -87,6 +93,7 @@
         <attr name="leadingIconBackground"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
+        <attr name="trailingIconSize"/>
         <attr name="showBetaPill"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
