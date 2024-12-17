@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -31,11 +33,13 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -75,10 +79,6 @@ class ItrSettingView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        binding.itrSettings.setClickListener {
-            viewModel.onItr()
-        }
-
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -100,10 +100,23 @@ class ItrSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        if (viewState.hasSubscription) {
-            binding.itrSettings.show()
-        } else {
-            binding.itrSettings.gone()
+        with(binding.itrSettings) {
+            when (viewState.itrState) {
+                is ItrState.Subscribed -> {
+                    isVisible = true
+                    setStatus(isOn = true)
+                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_color_24)
+                    isClickable = true
+                    setClickListener { viewModel.onItr() }
+                }
+                ItrState.Expired, ItrState.Activating -> {
+                    isVisible = true
+                    isClickable = false
+                    setStatus(isOn = false)
+                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_grayscale_color_24)
+                }
+                ItrState.Hidden -> isGone = true
+            }
         }
     }
 
