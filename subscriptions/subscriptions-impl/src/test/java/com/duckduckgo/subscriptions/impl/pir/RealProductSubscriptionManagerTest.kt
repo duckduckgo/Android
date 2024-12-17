@@ -21,7 +21,9 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Product.PIR
+import com.duckduckgo.subscriptions.api.Product.ROW_ITR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus
@@ -39,7 +41,7 @@ class RealProductSubscriptionManagerTest {
     var coroutineRule = CoroutineTestRule()
 
     @Test
-    fun `when user does not have pir entitlement then pir status returns ineligible`() = runTest {
+    fun `when user does not have entitlement then status returns ineligible`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.UNKNOWN)
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -51,7 +53,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement but subscription is inactive then pir status returns expired`() = runTest {
+    fun `when multiple entitlement status requested and is not entitled then returns ineligible`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.UNKNOWN)
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.INELIGIBLE, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement but subscription is inactive then status returns expired`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.INACTIVE, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -63,7 +77,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement but subscription is expired then pir status returns expired`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status inactive then status returns expired`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.INACTIVE, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.EXPIRED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement but subscription is expired then status returns expired`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.EXPIRED, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -75,7 +101,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement but subscription is unknown then pir status returns signed out`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status expired then status returns expired`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.EXPIRED, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.EXPIRED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement but subscription is unknown then status returns signed out`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.UNKNOWN, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -87,7 +125,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement and subscription is auto renewable then pir status returns active`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status unknown then status returns signed out`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.UNKNOWN, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.SIGNED_OUT, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement and subscription is auto renewable then status returns active`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.AUTO_RENEWABLE, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -99,7 +149,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement and subscription is not auto renewable then pir status returns active`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status auto renewable then status returns active`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.AUTO_RENEWABLE, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.ACTIVE, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement and subscription is not auto renewable then status returns active`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.NOT_AUTO_RENEWABLE, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -111,7 +173,19 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement and subscription is grace period then pir status returns active`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status not auto renewable then status returns active`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.NOT_AUTO_RENEWABLE, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.ACTIVE, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement and subscription is grace period then status returns active`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.GRACE_PERIOD, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
@@ -123,12 +197,36 @@ class RealProductSubscriptionManagerTest {
     }
 
     @Test
-    fun `when user has pir entitlement and subscription is waiting then pir status returns waiting`() = runTest {
+    fun `when multiple entitlement status requested and has single entitlement with status grace period then status returns active`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.GRACE_PERIOD, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
+            assertEquals(ProductStatus.ACTIVE, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when user has entitlement and subscription is waiting then status returns waiting`() = runTest {
         val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.WAITING, listOf(PIR))
 
         val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
 
         productSubscriptionManager.entitlementStatus(PIR).test {
+            assertEquals(ProductStatus.WAITING, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `when multiple entitlement status requested and has single entitlement with status waiting then status returns waiting`() = runTest {
+        val subscriptions: Subscriptions = FakeSubscriptions(SubscriptionStatus.WAITING, listOf(ROW_ITR))
+
+        val productSubscriptionManager = RealProductSubscriptionManager(subscriptions)
+
+        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).test {
             assertEquals(ProductStatus.WAITING, awaitItem())
             awaitComplete()
         }
