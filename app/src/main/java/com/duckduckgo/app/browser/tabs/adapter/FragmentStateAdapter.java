@@ -530,6 +530,18 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         }
     }
 
+    public void clearFragments() {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        for (int i = 0; i < mFragments.size(); i++) {
+            long key = mFragments.keyAt(i);
+            Fragment fragment = mFragments.get(key);
+            if (fragment != null) {
+                transaction.remove(fragment);
+            }
+        }
+        transaction.commit();
+    }
+
     private void showFragment(long itemId) {
         Fragment fragment = mFragments.get(itemId);
 

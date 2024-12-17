@@ -819,8 +819,10 @@ class BrowserTabFragment :
 
     private fun resumeWebView() {
         Timber.d("Resuming webview: $tabId")
-        webView?.let {
-            if (it.isShown) it.onResume()
+        webView?.let { webView ->
+            webView.post {
+                if (webView.isShown) webView.onResume()
+            }
         }
     }
 
@@ -1163,7 +1165,7 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
-            requireActivity().recreate()
+            (requireActivity() as BrowserActivity).reload()
             return
         }
 

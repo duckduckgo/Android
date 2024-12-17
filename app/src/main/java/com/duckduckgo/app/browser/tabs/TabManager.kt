@@ -36,5 +36,6 @@ interface TabManager {
     fun launchNewTab()
     fun openQueryInNewTab(query: String, sourceTabId: String?)
 
+    fun clearTabsInMemory()
     fun onCleanup()
 }

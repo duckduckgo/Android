@@ -124,7 +124,7 @@ class DefaultTabManager @Inject constructor(
                     url = null,
                     skipHome = false,
                     isExternal = browserActivity.intent?.getBooleanExtra(
-                        BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA,
+                        LAUNCH_FROM_EXTERNAL_EXTRA,
                         false,
                     ) == true,
                 )
@@ -153,6 +153,10 @@ class DefaultTabManager @Inject constructor(
                 sourceTabId = sourceTabId,
             )
         }
+    }
+
+    override fun clearTabsInMemory() {
+        tabPagerAdapter.clearFragments()
     }
 
     override fun onCleanup() {
