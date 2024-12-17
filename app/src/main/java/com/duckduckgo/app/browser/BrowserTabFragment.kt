@@ -820,8 +820,14 @@ class BrowserTabFragment :
     private fun resumeWebView() {
         Timber.d("Resuming webview: $tabId")
         webView?.let { webView ->
-            webView.post {
-                if (webView.isShown) webView.onResume()
+            if (webView.isShown) {
+                webView.onResume()
+            } else {
+                webView.post {
+                    if (webView.isShown) {
+                        webView.onResume()
+                    }
+                }
             }
         }
     }
