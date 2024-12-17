@@ -60,6 +60,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
@@ -114,6 +115,7 @@ class BrowserViewModel @Inject constructor(
         .map { tab -> tab?.tabId }
         .filterNotNull()
         .distinctUntilChanged()
+        .debounce(100)
 
     val tabs: Flow<List<String>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> tab.tabId } }
