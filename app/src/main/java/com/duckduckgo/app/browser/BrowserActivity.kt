@@ -67,6 +67,7 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -175,6 +176,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.d("### onPageChanged: $position")
                 tabManager.tabPagerAdapter.onPageChanged(position)
                 wasSwipingStarted = false
+
+                pixel.fire(AppPixelName.SWIPE_TABS_USED)
+                pixel.fire(pixel = AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
             }
         }
 
