@@ -46,11 +46,3 @@ data class FilterEntity(
     val regex: String,
     val type: String,
 )
-
-data class DataWithFilters(
-    val revision: RevisionEntity,
-    val phishingFilters: List<FilterEntity>,
-    val malwareFilters: List<FilterEntity>,
-    val phishingHashPrefixes: List<HashPrefixEntity>,
-    val malwareHashPrefixes: List<HashPrefixEntity>,
-)
