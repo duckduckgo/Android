@@ -49,6 +49,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -330,6 +331,11 @@ class BrowserViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             tabRepository.updateTabLastAccess(tabId)
         }
+    }
+
+    fun onTabsSwiped() {
+        pixel.fire(AppPixelName.SWIPE_TABS_USED)
+        pixel.fire(pixel = AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
     }
 }
 
