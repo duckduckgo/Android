@@ -64,6 +64,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -99,7 +100,8 @@ class BrowserViewModel @Inject constructor(
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
-        data class OpenSavedSite(val url: String) : Command()
+        data class SwitchToTab(val tabId: String) : Command()
+        data class OpenInNewTab(val url: String) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -306,8 +308,16 @@ class BrowserViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onBookmarksActivityResult(url: String) {
-        command.value = Command.OpenSavedSite(url)
+    fun onBookmarksActivityResult(url: String) = launch {
+        val existingTab = tabRepository.flowTabs
+            .first()
+            .firstOrNull { tab -> tab.url == url }
+
+        if (existingTab == null) {
+            command.value = Command.OpenInNewTab(url)
+        } else {
+            command.value = Command.SwitchToTab(existingTab.tabId)
+        }
     }
 
     fun onTabSelected(tabId: String) {
