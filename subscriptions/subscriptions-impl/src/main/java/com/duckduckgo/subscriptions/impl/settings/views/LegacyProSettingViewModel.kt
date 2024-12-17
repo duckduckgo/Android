@@ -88,7 +88,8 @@ class LegacyProSettingViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .distinctUntilChanged()
             .onEach { subscriptionStatus ->
-                val region = when (subscriptionsManager.getSubscriptionOffer()?.monthlyPlanId) {
+                val offer = subscriptionsManager.getSubscriptionOffer().firstOrNull()
+                val region = when (offer?.planId) {
                     MONTHLY_PLAN_ROW -> SubscriptionRegion.ROW
                     MONTHLY_PLAN_US -> SubscriptionRegion.US
                     else -> null
