@@ -226,6 +226,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -1012,6 +1013,9 @@ class BrowserTabFragment :
             onMenuItemClicked(newTabMenuItem) {
                 onOmnibarNewTabRequested()
             }
+            onMenuItemClicked(duckChatMenuItem) {
+                launchDuckChat()
+            }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
                 pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
@@ -1135,6 +1139,13 @@ class BrowserTabFragment :
     private fun launchTabSwitcher() {
         val activity = activity ?: return
         startActivity(TabSwitcherActivity.intent(activity, tabId))
+    }
+
+    private fun launchDuckChat() {
+        globalActivityStarter.start(requireContext(), WebViewActivityWithParams(
+            url = DUCK_CHAT_WEB_LINK,
+            screenTitle = getString(string.duckChatScreenTitle),
+        ))
     }
 
     override fun onResume() {
@@ -3558,7 +3569,7 @@ class BrowserTabFragment :
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
 
-        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
+        private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5" // 5 identifies Android
 
         fun newInstance(
             tabId: String,
