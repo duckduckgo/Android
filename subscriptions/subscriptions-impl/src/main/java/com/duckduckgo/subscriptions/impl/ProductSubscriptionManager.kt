@@ -27,7 +27,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface ProductSubscriptionManager {
-    fun entitlementStatus(product: Product): Flow<ProductStatus>
+
+    fun entitlementStatus(vararg products: Product): Flow<ProductStatus>
 
     enum class ProductStatus {
         ACTIVE,
@@ -44,9 +45,11 @@ class RealProductSubscriptionManager @Inject constructor(
     private val subscriptions: Subscriptions,
 ) : ProductSubscriptionManager {
 
-    override fun entitlementStatus(product: Product): Flow<ProductStatus> = hasEntitlement(product).map { getEntitlementStatusInternal(it) }
+    override fun entitlementStatus(vararg products: Product): Flow<ProductStatus> =
+        hasEntitlement(*products).map { getEntitlementStatusInternal(it) }
 
-    private fun hasEntitlement(product: Product): Flow<Boolean> = subscriptions.getEntitlementStatus().map { it.contains(product) }
+    private fun hasEntitlement(vararg products: Product): Flow<Boolean> =
+        subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.any { products.contains(it) } }
 
     private suspend fun getEntitlementStatusInternal(hasValidEntitlement: Boolean): ProductStatus = when {
         !hasValidEntitlement -> ProductStatus.INELIGIBLE
