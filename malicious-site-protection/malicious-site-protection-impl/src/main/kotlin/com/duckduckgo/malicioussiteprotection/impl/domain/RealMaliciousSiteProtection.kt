@@ -22,14 +22,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.security.MessageDigest
 import java.util.regex.Pattern
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
@@ -37,10 +38,16 @@ class RealMaliciousSiteProtection @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val maliciousSiteRepository: MaliciousSiteRepository,
     private val messageDigest: MessageDigest,
+    private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
 ) : MaliciousSiteProtection {
 
     override suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult {
         Timber.tag("MaliciousSiteProtection").d("isMalicious $url")
+
+        if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
+            Timber.d("\uD83D\uDFE2 Cris: should not block (feature disabled) $url")
+            return IsMaliciousResult.SAFE
+        }
 
         val hostname = url.host ?: return IsMaliciousResult.SAFE
         val hash = messageDigest
