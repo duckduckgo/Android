@@ -30,7 +30,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -73,6 +72,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -221,6 +221,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.tabPager.hide()
+
         setContentView(binding.root)
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
@@ -246,6 +248,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
 
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (!binding.tabPager.isShown) {
+            binding.tabPager.show()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -419,7 +429,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
-            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.SwitchToTab -> tabManager.openExistingTab(command.tabId)
+            is Command.OpenInNewTab -> tabManager.openQueryInNewTab(command.url)
         }
     }
 
@@ -718,7 +729,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun onMoveToTabRequested(index: Int) {
         Timber.d("### onMoveToTabRequested: $index")
 
-        tabPager.doOnPreDraw {
+        tabPager.post {
             tabPager.setCurrentItem(index, false)
         }
     }
