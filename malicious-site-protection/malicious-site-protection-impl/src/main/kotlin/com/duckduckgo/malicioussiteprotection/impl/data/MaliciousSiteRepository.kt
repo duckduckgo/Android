@@ -83,7 +83,7 @@ class RealMaliciousSiteRepository @Inject constructor(
     }
 
     override suspend fun getFilter(hash: String): Filter? {
-        return maliciousSiteDao.getPhishingFilters().firstOrNull { it.hash == hash }?.let {
+        return maliciousSiteDao.getFilter(hash)?.let {
             Filter(it.hash, it.regex)
         }
     }
