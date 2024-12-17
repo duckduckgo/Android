@@ -32,6 +32,7 @@ object SubscriptionsConstants {
     const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
     const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
     const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
+    val privacyProActivePlans = listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"

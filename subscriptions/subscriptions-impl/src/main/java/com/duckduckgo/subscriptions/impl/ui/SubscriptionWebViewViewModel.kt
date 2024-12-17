@@ -36,11 +36,15 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -236,31 +240,45 @@ class SubscriptionWebViewViewModel @Inject constructor(
             )
 
             if (privacyProFeature.allowPurchase().isEnabled()) {
-                subscriptionsManager.getSubscriptionOffer()?.let { offer ->
-                    val yearlyJson = OptionsJson(
-                        id = offer.yearlyPlanId,
-                        cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
-                    )
+                val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
+                if (subscriptionOffers.isNotEmpty()) {
+                    val options = when {
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                            subscriptionOffers.getValue(MONTHLY_PLAN_US) to subscriptionOffers.getValue(YEARLY_PLAN_US)
+                        }
+
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) &&
+                            privacyProFeature.isLaunchedROW().isEnabled() -> {
+                            subscriptionOffers.getValue(MONTHLY_PLAN_ROW) to subscriptionOffers.getValue(YEARLY_PLAN_ROW)
+                        }
+
+                        else -> return@launch
+                    }
 
                     val monthlyJson = OptionsJson(
-                        id = offer.monthlyPlanId,
-                        cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
+                        id = options.first.planId,
+                        cost = CostJson(displayPrice = options.first.pricingPhases.first().formattedPrice, recurrence = MONTHLY),
+                    )
+
+                    val yearlyJson = OptionsJson(
+                        id = options.second.planId,
+                        cost = CostJson(displayPrice = options.second.pricingPhases.first().formattedPrice, recurrence = YEARLY),
                     )
 
                     subscriptionOptions = SubscriptionOptionsJson(
                         options = listOf(yearlyJson, monthlyJson),
-                        features = offer.features.map(::FeatureJson),
+                        features = options.first.features.map(::FeatureJson),
                     )
                 }
-            }
 
-            val response = JsCallbackData(
-                featureName = featureName,
-                method = method,
-                id = id,
-                params = JSONObject(jsonAdapter.toJson(subscriptionOptions)),
-            )
-            command.send(SendResponseToJs(response))
+                val response = JsCallbackData(
+                    featureName = featureName,
+                    method = method,
+                    id = id,
+                    params = JSONObject(jsonAdapter.toJson(subscriptionOptions)),
+                )
+                command.send(SendResponseToJs(response))
+            }
         }
     }
 
