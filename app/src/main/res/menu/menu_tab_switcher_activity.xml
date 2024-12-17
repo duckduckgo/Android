@@ -44,6 +44,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/duckChat"
+        android:title="@string/duckChatTitle"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/closeAllTabs"
         android:title="@string/closeAllTabsMenuItem"
         app:showAsAction="never" />

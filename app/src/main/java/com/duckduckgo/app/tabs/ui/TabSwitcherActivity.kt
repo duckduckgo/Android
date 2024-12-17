@@ -61,6 +61,8 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -69,6 +71,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -112,6 +115,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -326,6 +335,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.fire -> onFire()
             R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
             R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
+            R.id.duckChat -> duckChat.openDuckChat()
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
@@ -341,6 +351,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
         closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
+        val duckChatMenuItem = menu?.findItem(R.id.duckChat)
+        runBlocking {
+            duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
+        }
+
         return super.onPrepareOptionsMenu(menu)
     }
 
