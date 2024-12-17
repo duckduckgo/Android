@@ -21,7 +21,8 @@ import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,7 @@ import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -55,6 +57,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardRenderer.InitialScreen
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -118,9 +121,15 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                         else -> ReportFlow.DASHBOARD
                     }
                     viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
-                    Toast.makeText(this, R.string.brokenSiteSubmittedReportMessage, Toast.LENGTH_LONG).show()
-                    this@PrivacyDashboardHybridActivity.finish()
-
+                    binding.root.makeSnackbarWithNoBottomInset(
+                        HtmlCompat.fromHtml(getString(R.string.brokenSiteSubmittedReportMessage), FROM_HTML_MODE_LEGACY),
+                        Snackbar.LENGTH_LONG,
+                    ).addCallback(object : Snackbar.Callback() {
+                        override fun onDismissed(confirmationSnackbar: Snackbar?, event: Int) {
+                            super.onDismissed(confirmationSnackbar, event)
+                            this@PrivacyDashboardHybridActivity.finish()
+                        }
+                    }).show()
                 },
                 onGetToggleReportOptions = { viewModel.onGetToggleReportOptions() },
                 onSendToggleReport = {
