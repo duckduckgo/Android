@@ -48,6 +48,7 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
@@ -131,6 +132,7 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
+        data object LaunchDuckChatScreen: Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
@@ -302,6 +304,10 @@ class NewSettingsViewModel @Inject constructor(
     fun onPermissionsSettingClicked() {
         viewModelScope.launch { command.send(LaunchPermissionsScreen) }
         pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
+    }
+
+    fun onDuckChatSettingClicked() {
+        viewModelScope.launch { command.send(LaunchDuckChatScreen) }
     }
 
     fun onAppearanceSettingClicked() {
