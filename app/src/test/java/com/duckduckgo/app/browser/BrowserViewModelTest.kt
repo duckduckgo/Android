@@ -33,10 +33,12 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -238,13 +240,29 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() {
+    fun whenOnBookmarksActivityResultCalledAndSiteAlreadyOpenedThenSwitchToTabCommandTriggered() = runTest {
         val bookmarkUrl = "https://www.example.com"
+        val tab = TabEntity("123", url = bookmarkUrl)
+
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.SwitchToTab(tab.tabId), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenOnBookmarksActivityResultCalledAndSiteNotOpenedThenOpenInNewTabCommandTriggered() = runTest {
+        val bookmarkUrl = "https://www.example.com"
+        val tab = TabEntity("123", url = "https://cnn.com")
+
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
+
+        testee.onBookmarksActivityResult(bookmarkUrl)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
