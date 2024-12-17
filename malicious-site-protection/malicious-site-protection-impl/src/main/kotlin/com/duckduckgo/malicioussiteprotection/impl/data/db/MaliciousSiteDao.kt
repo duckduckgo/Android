@@ -38,29 +38,6 @@ interface MaliciousSiteDao {
     @Query("SELECT * FROM revisions LIMIT 1")
     suspend fun getLatestRevision(): RevisionEntity?
 
-    @Transaction
-    @Query("SELECT * FROM revisions")
-    suspend fun getMaliciousSiteData(): DataWithFilters? {
-        val revision = getLatestRevision() ?: return null
-        val phishingHashPrefixes = getPhishingHashPrefixes()
-        val phishingFilters = getPhishingFilters()
-        val malwareHashPrefixes = getMalwareHashPrefixes()
-        val malwareFilters = getMalwareFilters()
-        return DataWithFilters(revision, phishingFilters, malwareFilters, phishingHashPrefixes, malwareHashPrefixes)
-    }
-
-    @Query("SELECT * FROM hash_prefixes WHERE type = 'phishing'")
-    suspend fun getPhishingHashPrefixes(): List<HashPrefixEntity>
-
-    @Query("SELECT * FROM hash_prefixes WHERE type = 'malware'")
-    suspend fun getMalwareHashPrefixes(): List<HashPrefixEntity>
-
-    @Query("SELECT * FROM filters WHERE type = 'phishing'")
-    suspend fun getPhishingFilters(): List<FilterEntity>
-
-    @Query("SELECT * FROM filters WHERE type = 'malware'")
-    suspend fun getMalwareFilters(): List<FilterEntity>
-
     @Query("DELETE FROM revisions")
     suspend fun deleteRevisions()
 
