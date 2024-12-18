@@ -182,11 +182,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            Timber.d("### onPageChanged requested for: $position")
             if (wasSwipingStarted) {
-                Timber.d("### onPageChanged: $position")
-                tabManager.tabPagerAdapter.onPageChanged(position)
                 wasSwipingStarted = false
+
+                viewModel.onTabsSwiped()
+                tabManager.tabPagerAdapter.onPageChanged(position)
             }
         }
 

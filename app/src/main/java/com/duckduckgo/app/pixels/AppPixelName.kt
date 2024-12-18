@@ -355,6 +355,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TAB_MANAGER_OPENED_FROM_SITE("m_tab_manager_open_from_website"),
     TAB_MANAGER_OPENED_FROM_NEW_TAB("m_tab_manager_open_from_newtabpage"),
 
+    SWIPE_TABS_USED("m_swipe_tabs_used"),
+    SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
+
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
