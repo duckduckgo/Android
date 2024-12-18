@@ -165,14 +165,6 @@ class BrowserViewModel @Inject constructor(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onNewTabRequested(sourceTabId: String? = null): String {
-        return if (sourceTabId != null) {
-            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
-        } else {
-            tabRepository.add()
-        }
-    }
-
     suspend fun onOpenInNewTabRequested(
         query: String,
         sourceTabId: String?,

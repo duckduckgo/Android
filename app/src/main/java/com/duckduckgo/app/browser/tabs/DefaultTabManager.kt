@@ -116,11 +116,11 @@ class DefaultTabManager @Inject constructor(
         if (swipingTabsFeature.isEnabled) {
             openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
                 tabPagerAdapter.setMessageForNewFragment(message)
-                browserActivity.viewModel.onNewTabRequested(sourceTabId)
+                openNewTab(sourceTabId)
             }
         } else {
             openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
-                val tabId = browserActivity.viewModel.onNewTabRequested(sourceTabId)
+                val tabId = openNewTab(sourceTabId)
                 val fragment = openNewTab(
                     tabId = tabId,
                     url = null,
@@ -144,7 +144,7 @@ class DefaultTabManager @Inject constructor(
     }
 
     override fun launchNewTab() {
-        browserActivity.lifecycleScope.launch { browserActivity.viewModel.onNewTabRequested() }
+        browserActivity.lifecycleScope.launch { openNewTab() }
     }
 
     override fun openInNewTab(
@@ -169,8 +169,16 @@ class DefaultTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
+    private suspend fun openNewTab(sourceTabId: String? = null): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
+        } else {
+            tabRepository.add()
+        }
+    }
+
     private fun requestNewTab(): TabEntity = runBlocking(dispatchers.io()) {
-        val tabId = browserActivity.viewModel.onNewTabRequested()
+        val tabId = openNewTab()
         return@runBlocking tabRepository.flowTabs.transformWhile { result ->
             result.firstOrNull { it.tabId == tabId }?.let { entity ->
                 emit(entity)
