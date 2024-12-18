@@ -25,7 +25,7 @@ interface TabManager {
         const val MAX_ACTIVE_TABS = 20
     }
 
-    var currentTab: BrowserTabFragment?
+    val currentTab: BrowserTabFragment?
     val tabPagerAdapter: TabPagerAdapter
 
     fun onSelectedTabChanged(tabId: String)

@@ -878,7 +878,9 @@ class BrowserTabFragment :
             dialog.deleteBookmarkListener = viewModel
         }
 
-        disableSwipingOutsideTheOmnibar()
+        if (swipingTabsFeature.isEnabled) {
+            disableSwipingOutsideTheOmnibar()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1174,7 +1176,11 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
-            (requireActivity() as BrowserActivity).clearTabsAndRecreate()
+            if (swipingTabsFeature.isEnabled) {
+                (requireActivity() as BrowserActivity).clearTabsAndRecreate()
+            } else {
+                requireActivity().recreate()
+            }
             return
         }
 
@@ -1524,7 +1530,11 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                requireBrowserActivity().tabManager.openInNewTab(it.query, it.sourceTabId)
+                if (swipingTabsFeature.isEnabled) {
+                    requireBrowserActivity().tabManager.openInNewTab(it.query, it.sourceTabId)
+                } else {
+                    browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                }
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -1536,7 +1546,11 @@ class BrowserTabFragment :
                         isLaunchedFromExternalApp,
                     )
                 } else {
-                    requireBrowserActivity().tabManager.openMessageInNewTab(it.message, it.sourceTabId)
+                    if (swipingTabsFeature.isEnabled) {
+                        requireBrowserActivity().tabManager.openMessageInNewTab(it.message, it.sourceTabId)
+                    } else {
+                        browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                    }
                 }
             }
 
@@ -1544,7 +1558,13 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
 
-            is Command.LaunchNewTab -> requireBrowserActivity().tabManager.launchNewTab()
+            is Command.LaunchNewTab -> {
+                if (swipingTabsFeature.isEnabled) {
+                    requireBrowserActivity().tabManager.launchNewTab()
+                } else {
+                    browserActivity?.launchNewTab()
+                }
+            }
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
@@ -1787,7 +1807,12 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                requireBrowserActivity().tabManager.openExistingTab(it.tabId)
+
+                if (swipingTabsFeature.isEnabled) {
+                    requireBrowserActivity().tabManager.openExistingTab(it.tabId)
+                } else {
+                    browserActivity?.openExistingTab(it.tabId)
+                }
             }
             else -> {
                 // NO OP
@@ -2515,14 +2540,17 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+        if (swipingTabsFeature.isEnabled) {
+            binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+        }
+
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
-        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
+        ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)!!
 
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()

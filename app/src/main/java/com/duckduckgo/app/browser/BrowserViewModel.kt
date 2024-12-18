@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -49,6 +50,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RA
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -81,8 +83,10 @@ class BrowserViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
+    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
     userStageStore: UserStageStore,
 ) : ViewModel(),
     CoroutineScope {
@@ -103,6 +107,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
         data class SwitchToTab(val tabId: String) : Command()
         data class OpenInNewTab(val url: String) : Command()
+        data class OpenSavedSite(val url: String) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -112,19 +117,21 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    val selectedTab: Flow<String> = tabRepository.flowSelectedTab
+    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
         .map { tab -> tab?.tabId }
         .filterNotNull()
         .distinctUntilChanged()
         .debounce(100)
 
-    val tabs: Flow<List<String>> = tabRepository.flowTabs
+    val tabsFlow: Flow<List<String>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> tab.tabId } }
         .distinctUntilChanged()
 
-    val selectedTabIndex: Flow<Int> = combine(tabs, selectedTab) { tabs, selectedTab ->
+    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
 
@@ -164,6 +171,39 @@ class BrowserViewModel @Inject constructor(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
+    suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
+        } else {
+            tabRepository.add()
+        }
+    }
+
+    suspend fun onOpenInNewTabRequested(
+        query: String,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false,
+    ): String {
+        val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+            query
+        } else {
+            queryUrlConverter.convertQueryToUrl(query)
+        }
+
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(
+                url = url,
+                skipHome = skipHome,
+                sourceTabId = sourceTabId,
+            )
+        } else {
+            tabRepository.add(
+                url = url,
+                skipHome = skipHome,
+            )
+        }
+    }
+
     suspend fun onOpenFavoriteFromWidget(query: String) {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
         tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
@@ -174,6 +214,14 @@ class BrowserViewModel @Inject constructor(
             AppPixelName.APP_THIRD_PARTY_LAUNCH,
             mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
         )
+    }
+
+    suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
+        if (tabs.isNullOrEmpty()) {
+            Timber.i("Tabs list is null or empty; adding default tab")
+            tabRepository.addDefaultTab()
+            return
+        }
     }
 
     /**
@@ -268,15 +316,27 @@ class BrowserViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onBookmarksActivityResult(url: String) = launch {
-        val existingTab = tabRepository.flowTabs
-            .first()
-            .firstOrNull { tab -> tab.url == url }
+    fun onBookmarksActivityResult(url: String) {
+        if (swipingTabsFeature.isEnabled) {
+            launch {
+                val existingTab = tabRepository.flowTabs
+                    .first()
+                    .firstOrNull { tab -> tab.url == url }
 
-        if (existingTab == null) {
-            command.value = Command.OpenInNewTab(url)
+                if (existingTab == null) {
+                    command.value = Command.OpenInNewTab(url)
+                } else {
+                    command.value = Command.SwitchToTab(existingTab.tabId)
+                }
+            }
         } else {
-            command.value = Command.SwitchToTab(existingTab.tabId)
+            command.value = Command.OpenSavedSite(url)
+        }
+    }
+
+    fun onTabSelected(tabId: String) {
+        launch(dispatchers.io()) {
+            tabRepository.select(tabId)
         }
     }
 
@@ -285,6 +345,12 @@ class BrowserViewModel @Inject constructor(
             viewModelScope.launch {
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
+        }
+    }
+
+    fun onTabActivated(tabId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.updateTabLastAccess(tabId)
         }
     }
 }
