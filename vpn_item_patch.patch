@@ -1,0 +1,175 @@
+Subject: [PATCH] vpn item patch
+---
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/app/build.gradle	(date 1734426914237)
+@@ -121,7 +121,6 @@
+     }
+     buildTypes {
+         debug {
+-            applicationIdSuffix ".debug"
+             pseudoLocalesEnabled false
+             manifestPlaceholders = [
+                     appIcon     : "@mipmap/ic_launcher_blue",
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/RealSubscriptions.kt	(date 1734438689432)
+@@ -36,6 +36,8 @@
+ import com.duckduckgo.feature.toggles.api.Toggle.State
+ import com.duckduckgo.navigation.api.GlobalActivityStarter
+ import com.duckduckgo.subscriptions.api.Product
++import com.duckduckgo.subscriptions.api.Product.NetP
++import com.duckduckgo.subscriptions.api.Product.PIR
+ import com.duckduckgo.subscriptions.api.SubscriptionStatus
+ import com.duckduckgo.subscriptions.api.Subscriptions
+ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
+@@ -51,6 +53,7 @@
+ import javax.inject.Inject
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.flowOf
+ import kotlinx.coroutines.launch
+ import kotlinx.coroutines.runBlocking
+ 
+@@ -71,7 +74,8 @@
+     }
+ 
+     override fun getEntitlementStatus(): Flow<List<Product>> {
+-        return subscriptionsManager.entitlements
++        return flowOf(listOf(NetP))
++        // return subscriptionsManager.entitlements
+     }
+ 
+     override suspend fun isEligible(): Boolean {
+Index: subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsManager.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsManager.kt b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsManager.kt
+--- a/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsManager.kt	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/SubscriptionsManager.kt	(date 1734430985633)
+@@ -439,11 +439,12 @@
+     }
+ 
+     override suspend fun subscriptionStatus(): SubscriptionStatus {
+-        return if (isSignedIn()) {
++        return SubscriptionStatus.AUTO_RENEWABLE
++/*        return if (isSignedIn()) {
+             authRepository.getStatus()
+         } else {
+             UNKNOWN
+-        }
++        }*/
+     }
+ 
+     @Deprecated("This method will be removed after migrating to auth v2")
+Index: app/src/main/java/com/duckduckgo/app/settings/NewSettingsViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/duckduckgo/app/settings/NewSettingsViewModel.kt b/app/src/main/java/com/duckduckgo/app/settings/NewSettingsViewModel.kt
+--- a/app/src/main/java/com/duckduckgo/app/settings/NewSettingsViewModel.kt	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/app/src/main/java/com/duckduckgo/app/settings/NewSettingsViewModel.kt	(date 1734426914242)
+@@ -173,7 +173,7 @@
+                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
+                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
+-                    isPrivacyProEnabled = subscriptions.isEligible(),
++                    isPrivacyProEnabled = true,
+                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
+                 ),
+@@ -192,7 +192,7 @@
+                 val currentState = currentViewState()
+                 viewState.value = currentState.copy(
+                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
+-                    isPrivacyProEnabled = subscriptions.isEligible(),
++                    isPrivacyProEnabled = true,
+                 )
+                 delay(1_000)
+             }
+Index: network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/state/NetworkProtectionStateImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/state/NetworkProtectionStateImpl.kt b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/state/NetworkProtectionStateImpl.kt
+--- a/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/state/NetworkProtectionStateImpl.kt	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/network-protection/network-protection-impl/src/main/java/com/duckduckgo/networkprotection/impl/state/NetworkProtectionStateImpl.kt	(date 1734426914249)
+@@ -21,12 +21,8 @@
+ import com.duckduckgo.di.scopes.AppScope
+ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
+-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLING
+ import com.duckduckgo.networkprotection.api.NetworkProtectionState
+ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
+ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+ import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
+@@ -37,7 +33,7 @@
+ import javax.inject.Inject
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.flow.Flow
+-import kotlinx.coroutines.flow.map
++import kotlinx.coroutines.flow.flowOf
+ import kotlinx.coroutines.launch
+ import kotlinx.coroutines.runBlocking
+ import kotlinx.coroutines.withContext
+@@ -99,13 +95,14 @@
+     }
+ 
+     override fun getConnectionStateFlow(): Flow<ConnectionState> {
+-        return vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).map {
++        return flowOf(DISCONNECTED)
++/*        return vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).map {
+             when (it.state) {
+                 ENABLED -> CONNECTED
+                 ENABLING -> CONNECTING
+                 else -> DISCONNECTED
+             }
+-        }
++        }*/
+     }
+ 
+     override suspend fun getExcludedApps(): List<String> = withContext(dispatcherProvider.io()) {
+Index: app/src/main/java/com/duckduckgo/app/settings/LegacySettingsViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/duckduckgo/app/settings/LegacySettingsViewModel.kt b/app/src/main/java/com/duckduckgo/app/settings/LegacySettingsViewModel.kt
+--- a/app/src/main/java/com/duckduckgo/app/settings/LegacySettingsViewModel.kt	(revision d69001dc7d4e71f978684f04c04ea51c5f6394bb)
++++ b/app/src/main/java/com/duckduckgo/app/settings/LegacySettingsViewModel.kt	(date 1734430806242)
+@@ -134,7 +134,7 @@
+                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
+                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
+                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
+-                    isPrivacyProEnabled = subscriptions.isEligible(),
++                    isPrivacyProEnabled = true,
+                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                 ),
+             )
+@@ -153,7 +153,7 @@
+                 viewState.value = currentState.copy(
+                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
+                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
+-                    isPrivacyProEnabled = subscriptions.isEligible(),
++                    isPrivacyProEnabled = true,
+                 )
+                 delay(1_000)
+             }
