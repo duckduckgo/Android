@@ -148,7 +148,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabManager.currentTab = value
         }
 
-    val viewModel: BrowserViewModel by bindViewModel()
+    private val viewModel: BrowserViewModel by bindViewModel()
 
     private var instanceStateBundles: CombinedInstanceState? = null
 
