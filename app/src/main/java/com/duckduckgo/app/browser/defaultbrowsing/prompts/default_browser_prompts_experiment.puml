@@ -1,25 +1,5 @@
 @startuml
-
-interface DefaultBrowserPromptsExperiment {
-  + val showOverflowMenuDot: StateFlow<Boolean>
-  + val showOverflowMenuItem: StateFlow<Boolean>
-  + val commands: SharedFlow<DefaultBrowserPromptsExperiment.Command>
-
-  + fun onOverflowMenuOpened()
-  + fun onOverflowMenuItemClicked()
-
-  + fun onMessageDialogOpened()
-  + fun onMessageDialogDismissed()
-  + fun onMessageDialogSetBrowserButtonClicked()
-  + fun onMessageDialogNotNowButtonClicked()
-
-  + fun onSystemDefaultBrowserDialogOpened()
-  + fun onSystemDefaultBrowserDialogSuccess()
-  + fun onSystemDefaultBrowserDialogCanceled()
-
-  + fun onSystemDefaultAppsActivityOpened()
-  + fun onSystemDefaultAppsActivityClosed()
-}
+allowmixing
 
 abstract class DefaultBrowserPromptsExperimentCommand as "(sealed class) DefaultBrowserPromptsExperiment.Command"
 
@@ -39,37 +19,76 @@ DefaultBrowserPromptsExperimentCommand <|-- OpenMessageDialog : extends
 DefaultBrowserPromptsExperimentCommand <|-- OpenSystemDefaultBrowserDialog : extends
 DefaultBrowserPromptsExperimentCommand <|-- OpenSystemDefaultAppsActivity : extends
 
+interface DefaultBrowserPromptsExperiment {
+  + val highlightOverflowMenu: StateFlow<Boolean>
+  + val showOverflowMenuItem: StateFlow<Boolean>
+  + val commands: SharedFlow<DefaultBrowserPromptsExperiment.Command>
+
+  + fun onOverflowMenuOpened()
+  + fun onOverflowMenuItemClicked()
+
+  + fun onMessageDialogOpened()
+  + fun onMessageDialogDismissed()
+  + fun onMessageDialogSetBrowserButtonClicked()
+  + fun onMessageDialogNotNowButtonClicked()
+
+  + fun onSystemDefaultBrowserDialogOpened()
+  + fun onSystemDefaultBrowserDialogSuccess()
+  + fun onSystemDefaultBrowserDialogCanceled()
+
+  + fun onSystemDefaultAppsActivityOpened()
+  + fun onSystemDefaultAppsActivityClosed()
+}
+
 DefaultBrowserPromptsExperiment::commands -> DefaultBrowserPromptsExperimentCommand : uses
 
+class DefaultBrowserPromptsOverflowMenuState as "(data class) DefaultBrowserPromptsOverflowMenuState" {
+  + activatedDate: String
+  + highlightOverflowMenu: Boolean
+}
+
+interface DefaultBrowserPromptsDataStore {
+  + val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?>
+  + val messageDialogOpenedCount: Flow<Int>
+
+  + suspend fun storeOverflowMenuState(state: DefaultBrowserPromptsOverflowMenuState?)
+  + suspend fun storeMessageDialogOpenedCount(count: Int)
+}
+
+DefaultBrowserPromptsDataStore::overflowMenuState -> DefaultBrowserPromptsOverflowMenuState : uses
+
 class DefaultBrowserPromptsExperimentImpl {
-  - defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
-  - defaultBrowserDetector: DefaultBrowserDetector
-  - defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+  - val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
+  - val defaultBrowserDetector: DefaultBrowserDetector
+  - val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+  - val appDaysUsedRepository: AppDaysUsedRepository
+  - val appInstallStore: AppInstallStore
+  - val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore
 }
 
 DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : implements
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore --> DefaultBrowserPromptsDataStore : uses
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+component BrowserViewModel
+BrowserViewModel --> DefaultBrowserPromptsExperiment : uses
+note top of BrowserViewModel
+  Monitors the experiment to open the message dialog
+  that encourages users to set the DDG app as default browser.
+end note
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+component OmnibarLayoutViewModel
+OmnibarLayoutViewModel --> DefaultBrowserPromptsExperiment : uses
+note top of OmnibarLayoutViewModel
+  Monitors the experiment to show
+  a blue highlight dot next to overflow menu three-dots.
+end note
 
-class ArrayList {
-Object[] elementData
-size()
-}
-
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
-}
+component BrowserTabViewModel
+BrowserTabViewModel --> DefaultBrowserPromptsExperiment : uses
+note top of BrowserTabViewModel
+  Monitors the experiment to add
+  an overflow menu item to set browser as default.
+end note
 
 @enduml

@@ -21,9 +21,13 @@ import androidx.datastore.preferences.core.Preferences
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface DefaultBrowserPromptsDataStore {
+    val showOverflowMenuDot: Flow<Boolean>
+    val
+
     // val data: Flow<TabSwitcherData>
 
     // suspend fun setUserState(userState: UserState)
