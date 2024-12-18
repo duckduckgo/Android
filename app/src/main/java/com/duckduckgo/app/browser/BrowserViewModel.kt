@@ -322,14 +322,6 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    fun onTabSelected(tabId: String) {
-        launch(dispatchers.io()) {
-            if (tabId != tabRepository.getSelectedTab()?.tabId) {
-                tabRepository.select(tabId)
-            }
-        }
-    }
-
     fun handleShowOnAppLaunchOption() {
         if (showOnAppLaunchFeature.self().isEnabled()) {
             viewModelScope.launch {

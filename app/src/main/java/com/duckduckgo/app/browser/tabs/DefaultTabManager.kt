@@ -56,6 +56,8 @@ class DefaultTabManager @Inject constructor(
     private val keepSingleTab: Boolean
         get() = !browserActivity.tabPager.isUserInputEnabled
 
+    private val coroutineScope = browserActivity.lifecycleScope
+
     override val tabPagerAdapter by lazy {
         TabPagerAdapter(
             fragmentManager = supportFragmentManager,
@@ -64,7 +66,7 @@ class DefaultTabManager @Inject constructor(
             getSelectedTabId = ::getSelectedTabId,
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
-            onTabSelected = { tabId -> browserActivity.viewModel.onTabSelected(tabId) },
+            onTabSelected = { tabId -> openExistingTab(tabId) },
         )
     }
 
@@ -134,8 +136,10 @@ class DefaultTabManager @Inject constructor(
     }
 
     override fun openExistingTab(tabId: String) {
-        browserActivity.lifecycleScope.launch {
-            browserActivity.viewModel.onTabSelected(tabId)
+        coroutineScope.launch(dispatchers.io()) {
+            if (tabId != tabRepository.getSelectedTab()?.tabId) {
+                tabRepository.select(tabId)
+            }
         }
     }
 
