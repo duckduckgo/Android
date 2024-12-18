@@ -19,11 +19,6 @@ package com.duckduckgo.networkprotection.impl.subscription.settings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Expired
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Subscribed
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
@@ -33,11 +28,15 @@ import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManage
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.WAITING
 import com.duckduckgo.networkprotection.impl.subscription.isActive
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Activating
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Expired
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Subscribed
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 
 @ContributesBinding(AppScope::class)
