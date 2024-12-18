@@ -25,15 +25,15 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Hidden
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Activating
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Expired
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Subscribed
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Activating
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Expired
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Subscribed
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,11 +46,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
-    private val networkProtectionAccessState: NetworkProtectionAccessState,
+    private val networkProtectionSettingsState: NetworkProtectionSettingsState,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
@@ -78,7 +77,7 @@ class ProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(networkProtectionAccessState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
+            combine(networkProtectionSettingsState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
@@ -90,19 +89,16 @@ class ProSettingNetPViewModel(
 
     fun onNetPSettingClicked() {
         viewModelScope.launch {
-            val screen = networkProtectionAccessState.getScreenForCurrentState()
-            screen?.let {
-                command.send(OpenNetPScreen(screen))
-                pixel.fire(NETP_SETTINGS_PRESSED)
-            } ?: logcat { "Get screen for current NetP state is null" }
+            command.send(OpenNetPScreen(NetworkProtectionManagementScreenNoParams))
+            pixel.fire(NETP_SETTINGS_PRESSED)
         }
     }
 
     private fun getNetworkProtectionEntryState(
-        availabilityState: NetPVisibilityState,
+        settingsState: NetPSettingsState,
         networkProtectionConnectionState: ConnectionState,
     ): NetPEntryState =
-        when (availabilityState) {
+        when (settingsState) {
             Hidden -> NetPEntryState.Hidden
             Subscribed -> NetPEntryState.Subscribed(isActive = networkProtectionConnectionState.isConnected())
             Activating -> NetPEntryState.Activating
@@ -111,7 +107,7 @@ class ProSettingNetPViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val networkProtectionAccessState: NetworkProtectionAccessState,
+        private val networkProtectionSettingsState: NetworkProtectionSettingsState,
         private val networkProtectionState: NetworkProtectionState,
         private val dispatcherProvider: DispatcherProvider,
         private val pixel: Pixel,
@@ -120,7 +116,7 @@ class ProSettingNetPViewModel(
             return with(modelClass) {
                 when {
                     isAssignableFrom(ProSettingNetPViewModel::class.java) -> ProSettingNetPViewModel(
-                        networkProtectionAccessState,
+                        networkProtectionSettingsState,
                         networkProtectionState,
                         dispatcherProvider,
                         pixel,
