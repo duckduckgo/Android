@@ -22,7 +22,9 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.SkipUrlConversionOnNewTabFeature
 import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.Companion.MAX_ACTIVE_TABS
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesBinding(ActivityScope::class)
@@ -47,6 +50,8 @@ class DefaultTabManager @Inject constructor(
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
+    private val queryUrlConverter: OmnibarEntryConverter,
+    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : TabManager {
     private val browserActivity = activity as BrowserActivity
     private val lastActiveTabs = TabList()
@@ -107,6 +112,12 @@ class DefaultTabManager @Inject constructor(
         } else {
             clearStaleTabs(updatedTabIds)
         }
+        if (updatedTabIds.isEmpty()) {
+            coroutineScope.launch(dispatchers.io()) {
+                Timber.i("Tabs list is null or empty; adding default tab")
+                tabRepository.addDefaultTab()
+            }
+        }
     }
 
     override fun openMessageInNewTab(
@@ -114,12 +125,12 @@ class DefaultTabManager @Inject constructor(
         sourceTabId: String?,
     ) {
         if (swipingTabsFeature.isEnabled) {
-            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+            openMessageInNewTabJob = coroutineScope.launch {
                 tabPagerAdapter.setMessageForNewFragment(message)
                 openNewTab(sourceTabId)
             }
         } else {
-            openMessageInNewTabJob = browserActivity.lifecycleScope.launch {
+            openMessageInNewTabJob = coroutineScope.launch {
                 val tabId = openNewTab(sourceTabId)
                 val fragment = openNewTab(
                     tabId = tabId,
@@ -144,7 +155,7 @@ class DefaultTabManager @Inject constructor(
     }
 
     override fun launchNewTab() {
-        browserActivity.lifecycleScope.launch { openNewTab() }
+        coroutineScope.launch { openNewTab() }
     }
 
     override fun openInNewTab(
@@ -152,12 +163,25 @@ class DefaultTabManager @Inject constructor(
         sourceTabId: String?,
         skipHome: Boolean,
     ) {
-        browserActivity.lifecycleScope.launch {
-            browserActivity.viewModel.onOpenInNewTabRequested(
-                query = query,
-                sourceTabId = sourceTabId,
-                skipHome = skipHome,
-            )
+        coroutineScope.launch {
+            val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+                query
+            } else {
+                queryUrlConverter.convertQueryToUrl(query)
+            }
+
+            if (sourceTabId != null) {
+                tabRepository.addFromSourceTab(
+                    url = url,
+                    skipHome = skipHome,
+                    sourceTabId = sourceTabId,
+                )
+            } else {
+                tabRepository.add(
+                    url = url,
+                    skipHome = skipHome,
+                )
+            }
         }
     }
 
@@ -196,11 +220,13 @@ class DefaultTabManager @Inject constructor(
         tabRepository.getTab(tabId)
     }
 
-    private fun selectTab(tabId: String) = browserActivity.lifecycleScope.launch {
+    private fun selectTab(tabId: String) = coroutineScope.launch {
         if (tabId != currentTab?.tabId) {
             lastActiveTabs.add(tabId)
 
-            browserActivity.viewModel.onTabActivated(tabId)
+            withContext(dispatchers.io()) {
+                tabRepository.updateTabLastAccess(tabId)
+            }
 
             val fragment = supportFragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
             if (fragment == null) {

@@ -81,7 +81,6 @@ class BrowserViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
-    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     userStageStore: UserStageStore,
@@ -165,31 +164,6 @@ class BrowserViewModel @Inject constructor(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onOpenInNewTabRequested(
-        query: String,
-        sourceTabId: String?,
-        skipHome: Boolean,
-    ): String {
-        val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
-            query
-        } else {
-            queryUrlConverter.convertQueryToUrl(query)
-        }
-
-        return if (sourceTabId != null) {
-            tabRepository.addFromSourceTab(
-                url = url,
-                skipHome = skipHome,
-                sourceTabId = sourceTabId,
-            )
-        } else {
-            tabRepository.add(
-                url = url,
-                skipHome = skipHome,
-            )
-        }
-    }
-
     suspend fun onOpenFavoriteFromWidget(query: String) {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
         tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
@@ -200,14 +174,6 @@ class BrowserViewModel @Inject constructor(
             AppPixelName.APP_THIRD_PARTY_LAUNCH,
             mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
         )
-    }
-
-    suspend fun onTabsUpdated(areTabsEmpty: Boolean) {
-        if (areTabsEmpty) {
-            Timber.i("Tabs list is null or empty; adding default tab")
-            tabRepository.addDefaultTab()
-            return
-        }
     }
 
     /**
@@ -319,12 +285,6 @@ class BrowserViewModel @Inject constructor(
             viewModelScope.launch {
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
-        }
-    }
-
-    fun onTabActivated(tabId: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            tabRepository.updateTabLastAccess(tabId)
         }
     }
 }

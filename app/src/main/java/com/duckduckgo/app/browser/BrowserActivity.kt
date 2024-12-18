@@ -379,7 +379,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.tabs.flowWithLifecycle(lifecycle).collectLatest {
                 tabManager.onTabsUpdated(it)
-                viewModel.onTabsUpdated(it.isEmpty())
             }
         }
 
