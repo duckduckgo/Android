@@ -67,7 +67,7 @@ class RealSubscriptionsChecker @Inject constructor(
     }
 
     override suspend fun runChecker() {
-        if (!subscriptionsManager.isSignedIn()) return
+        if (!subscriptionsManager.canRefreshSubscription()) return
 
         workManager.enqueueUniquePeriodicWork(
             TAG_WORKER_SUBSCRIPTION_CHECK,
@@ -94,7 +94,7 @@ class SubscriptionsCheckWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            if (subscriptionsManager.isSignedIn()) {
+            if (subscriptionsManager.canRefreshSubscription()) {
                 if (subscriptionsManager.isSignedInV2()) {
                     subscriptionsManager.refreshSubscriptionData()
                     val subscription = subscriptionsManager.getSubscription()
@@ -112,10 +112,6 @@ class SubscriptionsCheckWorker(
                     }
                 } else {
                     subscriptionsManager.fetchAndStoreAllData()
-                    val subscription = subscriptionsManager.getSubscription()
-                    if (subscription?.status == null || subscription.status == UNKNOWN) {
-                        workManager.cancelUniqueWork(TAG_WORKER_SUBSCRIPTION_CHECK)
-                    }
                 }
             } else {
                 workManager.cancelUniqueWork(TAG_WORKER_SUBSCRIPTION_CHECK)
@@ -139,3 +135,7 @@ private fun buildSubscriptionCheckPeriodicWorkRequest(nextScheduleTimeOverride: 
             }
         }
         .build()
+
+private suspend fun SubscriptionsManager.canRefreshSubscription(): Boolean {
+    return isSignedIn() && subscriptionStatus() != UNKNOWN
+}
