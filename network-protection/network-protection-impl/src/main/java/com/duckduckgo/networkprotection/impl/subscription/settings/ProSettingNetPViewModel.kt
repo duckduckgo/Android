@@ -77,7 +77,7 @@ class ProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(networkProtectionSettingsState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
+            combine(networkProtectionSettingsState.getNetPSettingsStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),

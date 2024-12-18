@@ -24,7 +24,7 @@ interface NetworkProtectionSettingsState {
      * Returns a flow of the visibility states of NetP
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    suspend fun getStateFlow(): Flow<NetPSettingsState>
+    suspend fun getNetPSettingsStateFlow(): Flow<NetPSettingsState>
 
     /**
      * If the Netp Settings Item should be visible to the user and it's current subscription state

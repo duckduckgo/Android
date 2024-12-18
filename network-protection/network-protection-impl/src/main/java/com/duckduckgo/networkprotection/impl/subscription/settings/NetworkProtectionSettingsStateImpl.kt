@@ -47,7 +47,7 @@ class NetworkProtectionSettingsStateImpl @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetworkProtectionSettingsState {
 
-    override suspend fun getStateFlow(): Flow<NetPSettingsState> =
+    override suspend fun getNetPSettingsStateFlow(): Flow<NetPSettingsState> =
         netpSubscriptionManager.vpnStatus().map { status ->
             if (!status.isActive()) {
                 // if entitlement check succeeded and not an active subscription then reset state
