@@ -25,7 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
@@ -46,11 +46,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
     private val networkProtectionSettingsState: NetworkProtectionSettingsState,
     private val networkProtectionState: NetworkProtectionState,
+    private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -89,8 +91,11 @@ class ProSettingNetPViewModel(
 
     fun onNetPSettingClicked() {
         viewModelScope.launch {
-            command.send(OpenNetPScreen(NetworkProtectionManagementScreenNoParams))
-            pixel.fire(NETP_SETTINGS_PRESSED)
+            val screen = networkProtectionAccessState.getScreenForCurrentState()
+            screen?.let {
+                command.send(OpenNetPScreen(screen))
+                pixel.fire(NETP_SETTINGS_PRESSED)
+            } ?: logcat { "Get screen for current NetP state is null" }
         }
     }
 
@@ -109,6 +114,7 @@ class ProSettingNetPViewModel(
     class Factory @Inject constructor(
         private val networkProtectionSettingsState: NetworkProtectionSettingsState,
         private val networkProtectionState: NetworkProtectionState,
+        private val networkProtectionAccessState: NetworkProtectionAccessState,
         private val dispatcherProvider: DispatcherProvider,
         private val pixel: Pixel,
     ) : ViewModelProvider.NewInstanceFactory() {
@@ -118,6 +124,7 @@ class ProSettingNetPViewModel(
                     isAssignableFrom(ProSettingNetPViewModel::class.java) -> ProSettingNetPViewModel(
                         networkProtectionSettingsState,
                         networkProtectionState,
+                        networkProtectionAccessState,
                         dispatcherProvider,
                         pixel,
                     )
