@@ -21,7 +21,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * [ViewHolder] implementation for handling [Fragment]s. Used in [ ].
+ * [ViewHolder] implementation for handling [Fragment]s. Used in [FragmentStateAdapter].
  */
 class FragmentViewHolder private constructor(container: FrameLayout) :
     RecyclerView.ViewHolder(container) {

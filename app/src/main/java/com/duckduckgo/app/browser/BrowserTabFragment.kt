@@ -525,6 +525,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -820,7 +823,9 @@ class BrowserTabFragment :
         webView?.let { webView ->
             if (webView.isShown) {
                 webView.onResume()
-            } else {
+            } else if (swipingTabsFeature.isEnabled) {
+                // Sometimes the tab is brought back from the background but the WebView is not visible yet due to
+                // ViewPager page change delay; this fixes an issue when a tab was blank.
                 webView.post {
                     if (webView.isShown) {
                         webView.onResume()
@@ -1169,7 +1174,7 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
-            (requireActivity() as BrowserActivity).reload()
+            (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             return
         }
 

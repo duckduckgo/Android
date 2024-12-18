@@ -379,9 +379,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.tabs.flowWithLifecycle(lifecycle).collectLatest {
                 tabManager.onTabsUpdated(it)
-                lifecycleScope.launch {
-                    viewModel.onTabsUpdated(it.isEmpty())
-                }
+                viewModel.onTabsUpdated(it.isEmpty())
             }
         }
 
@@ -441,7 +439,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun reload() {
+    fun clearTabsAndRecreate() {
         tabManager.clearTabsInMemory()
         recreate()
     }
@@ -604,7 +602,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun initializeTabs() {
         if (swipingTabsFeature.isEnabled) {
             tabPager.adapter = tabManager.tabPagerAdapter
-            // tabPager.offscreenPageLimit = 1
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2).toPx().toInt()))
 
@@ -715,7 +712,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         playStoreUtils.launchPlayStore()
     }
 
-    fun onMoveToTabRequested(index: Int) {
+    private fun onMoveToTabRequested(index: Int) {
         Timber.d("### onMoveToTabRequested: $index")
 
         tabPager.post {
