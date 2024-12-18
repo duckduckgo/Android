@@ -74,28 +74,30 @@ class RealNetpSubscriptionManager @Inject constructor(
 
     private fun hasValidEntitlementFlow(): Flow<Boolean> = subscriptions.getEntitlementStatus().map { it.contains(NetP) }
 
-    private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus = if (newSettingsFeature.self().isEnabled()) {
-        when {
-            !hasValidEntitlement -> VpnStatus.INELIGIBLE
-            else -> {
-                when (subscriptions.getSubscriptionStatus()) {
-                    SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
-                    SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
-                    SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD -> VpnStatus.ACTIVE
-                    SubscriptionStatus.WAITING -> VpnStatus.WAITING
+    private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus {
+        return if (newSettingsFeature.self().isEnabled()) {
+            when {
+                !hasValidEntitlement -> VpnStatus.INELIGIBLE
+                else -> {
+                    when (subscriptions.getSubscriptionStatus()) {
+                        SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
+                        SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
+                        SubscriptionStatus.AUTO_RENEWABLE, SubscriptionStatus.NOT_AUTO_RENEWABLE, SubscriptionStatus.GRACE_PERIOD -> VpnStatus.ACTIVE
+                        SubscriptionStatus.WAITING -> VpnStatus.WAITING
+                    }
                 }
             }
-        }
-    } else {
-        val subscriptionState = subscriptions.getSubscriptionStatus()
-        when (subscriptionState) {
-            SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
-            SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
-            else -> {
-                if (hasValidEntitlement) {
-                    VpnStatus.ACTIVE
-                } else {
-                    VpnStatus.INACTIVE
+        } else {
+            val subscriptionState = subscriptions.getSubscriptionStatus()
+            when (subscriptionState) {
+                SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
+                SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
+                else -> {
+                    if (hasValidEntitlement) {
+                        VpnStatus.ACTIVE
+                    } else {
+                        VpnStatus.INACTIVE
+                    }
                 }
             }
         }
