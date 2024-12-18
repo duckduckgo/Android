@@ -25,6 +25,7 @@ import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
@@ -68,8 +69,12 @@ class PIRSettings @Inject constructor(private val newSettingsFeature: NewSetting
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(400)
-class ITRSettings @Inject constructor() : ProSettingsPlugin {
+class ITRSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ItrSettingView(context)
+        return if (newSettingsFeature.self().isEnabled()) {
+            ItrSettingView(context)
+        } else {
+            LegacyItrSettingView(context)
+        }
     }
 }
