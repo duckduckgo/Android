@@ -38,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.tabs.model.TabDataRepositoryTest.Companion.TAB_ID
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -91,6 +92,10 @@ class BrowserViewModelTest {
 
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
 
+    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+
+    private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -98,6 +103,7 @@ class BrowserViewModelTest {
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
 
         configureSkipUrlConversionInNewTabState(enabled = true)
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
 
         initTestee()
 
@@ -150,13 +156,13 @@ class BrowserViewModelTest {
 
     @Test
     fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runTest {
-        testee.onTabsUpdated(areTabsEmpty = true)
+        testee.onTabsUpdated(listOf())
         verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
-        testee.onTabsUpdated(areTabsEmpty = false)
+        testee.onTabsUpdated(listOf(TabEntity("123")))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -320,6 +326,7 @@ class BrowserViewModelTest {
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             userStageStore = userStageStore,
+            swipingTabsFeature = swipingTabsFeatureProvider,
         )
     }
 
