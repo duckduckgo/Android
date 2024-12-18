@@ -56,12 +56,15 @@ class DefaultTabManager @Inject constructor(
 
     private val coroutineScope = browserActivity.lifecycleScope
 
+    var selectedTabId: String? = null
+        private set
+
     override val tabPagerAdapter by lazy {
         TabPagerAdapter(
             fragmentManager = supportFragmentManager,
             lifecycleOwner = browserActivity,
             activityIntent = browserActivity.intent,
-            getSelectedTabId = ::getSelectedTabId,
+            getSelectedTabId = { selectedTabId },
             getTabById = ::getTabById,
             requestNewTab = ::requestNewTab,
             onTabSelected = { tabId -> openExistingTab(tabId) },
@@ -73,6 +76,8 @@ class DefaultTabManager @Inject constructor(
 
     override fun onSelectedTabChanged(tabId: String) {
         Timber.d("### TabManager.onSelectedTabChanged: $tabId")
+        selectedTabId = tabId
+
         if (keepSingleTab) {
             tabPagerAdapter.onTabsUpdated(listOf(tabId))
         }
@@ -81,7 +86,7 @@ class DefaultTabManager @Inject constructor(
     override fun onTabsUpdated(updatedTabIds: List<String>) {
         Timber.d("### TabManager.onTabsUpdated: $updatedTabIds")
         if (keepSingleTab) {
-            updatedTabIds.firstOrNull { it == getSelectedTabId() }?.let {
+            updatedTabIds.firstOrNull { it == selectedTabId }?.let {
                 tabPagerAdapter.onTabsUpdated(listOf(it))
             }
         } else {
@@ -167,10 +172,6 @@ class DefaultTabManager @Inject constructor(
             }
             return@transformWhile false
         }.first()
-    }
-
-    private fun getSelectedTabId(): String? = runBlocking {
-        tabRepository.getSelectedTab()?.tabId
     }
 
     private fun getTabById(tabId: String): TabEntity? = runBlocking {
