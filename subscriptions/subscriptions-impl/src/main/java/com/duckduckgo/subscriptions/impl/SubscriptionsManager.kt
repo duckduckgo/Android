@@ -665,10 +665,7 @@ class RealSubscriptionsManager @Inject constructor(
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
-                        PricingPhase(
-                            formattedPrice = phase.formattedPrice,
-                            billingPeriod = phase.billingPeriod,
-                        )
+                        PricingPhase(formattedPrice = phase.formattedPrice)
                     }
 
                     val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
@@ -957,7 +954,6 @@ data class SubscriptionOfferDetails(
 
 data class PricingPhase(
     val formattedPrice: String,
-    val billingPeriod: String,
 )
 
 data class ValidatedTokenPair(

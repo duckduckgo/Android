@@ -15,8 +15,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PricingPhase
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionOffer
+import com.duckduckgo.subscriptions.impl.SubscriptionOfferDetails
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -196,17 +197,22 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "monthly",
-                monthlyFormattedPrice = "$1",
-                yearlyPlanId = "yearly",
-                yearlyFormattedPrice = "$10",
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOfferDetails(
+                planId = "monthly",
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOfferDetails(
+                planId = "yearly",
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -246,16 +252,22 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "monthly",
-                monthlyFormattedPrice = "$1",
-                yearlyPlanId = "yearly",
-                yearlyFormattedPrice = "$10",
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOfferDetails(
+                planId = "monthly",
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOfferDetails(
+                planId = "yearly",
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
