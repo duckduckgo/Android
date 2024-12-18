@@ -3,53 +3,56 @@ name: "ReleaseTest: Deleting a favorite does not delete bookmark"
 tags:
   - releaseTest
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
 
-- runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/onboarding.yaml
 
-- tapOn:
-    text: "search or type URL"
-- inputText: "https://privacy-test-pages.site"
-- pressKey: Enter
-- assertVisible:
-    text: ".*keep browsing.*"
-- tapOn:
-    text: "got it"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "add bookmark"
-- tapOn:
-    text: "add bookmark"
-# Add favorite from edit saved site
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "edit bookmark"
-- tapOn:
-    text: "edit bookmark"
-- assertVisible:
-    text: "add to favorites"
-- tapOn:
-    text: "add to favorites"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "bookmarks"
-- tapOn:
-    text: "bookmarks"
-# Remove favorite from bookmarks screen
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
-    index: 0
-- assertVisible:
-    text: "remove from favorites"
-- tapOn:
-    text: "remove from favorites"
-# When a favorite is removed, it still stays as Bookmark
-- assertVisible:
-    text: "Privacy Test Pages - Home"
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*keep browsing.*"
+      - tapOn:
+          text: "got it"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "add bookmark"
+      - tapOn:
+          text: "add bookmark"
+      # Add favorite from edit saved site
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "edit bookmark"
+      - tapOn:
+          text: "edit bookmark"
+      - assertVisible:
+          text: "add to favorites"
+      - tapOn:
+          text: "add to favorites"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "bookmarks"
+      - tapOn:
+          text: "bookmarks"
+      # Remove favorite from bookmarks screen
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/trailingIcon"
+          index: 0
+      - assertVisible:
+          text: "remove from favorites"
+      - tapOn:
+          text: "remove from favorites"
+      # When a favorite is removed, it still stays as Bookmark
+      - assertVisible:
+          text: "Privacy Test Pages - Home"

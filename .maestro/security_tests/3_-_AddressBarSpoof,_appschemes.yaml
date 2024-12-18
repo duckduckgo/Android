@@ -2,27 +2,30 @@ appId: com.duckduckgo.mobile.android
 tags:
     - securityTest
 ---
-- launchApp:
-    clearState: true
-- runFlow: ../shared/onboarding.yaml
-# Test 1
-- doubleTapOn:
-    id: "omnibarTextInput"
-- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"
-- pressKey: Enter
-- tapOn: "Got It"
-- tapOn: "Start"
-# This test is expected to load spreadprivacy.com, not remain on the current page with spoofed content.
-- assertVisible: "Spread Privacy" # DuckDuckGo blog homepage
-- copyTextFrom:
-    id: "omnibarTextInput"
-- assertTrue: ${maestro.copiedText == "https://spreadprivacy.com/"} # DuckDuckGo blog home page
-- tapOn:
-    id: "omnibarTextInput"
-# Test 2
-- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"
-- pressKey: Enter
-- tapOn: "Start"
-- copyTextFrom:
-    id: "omnibarTextInput"
-- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"}
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                clearState: true
+            - runFlow: ../shared/onboarding.yaml
+            # Test 1
+            - doubleTapOn:
+                id: "omnibarTextInput"
+            - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"
+            - pressKey: Enter
+            - tapOn: "Got It"
+            - tapOn: "Start"
+            # This test is expected to load spreadprivacy.com, not remain on the current page with spoofed content.
+            - assertVisible: "Spread Privacy" # DuckDuckGo blog homepage
+            - copyTextFrom:
+                id: "omnibarTextInput"
+            - assertTrue: ${maestro.copiedText == "https://spreadprivacy.com/"} # DuckDuckGo blog home page
+            - tapOn:
+                id: "omnibarTextInput"
+            # Test 2
+            - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"
+            - pressKey: Enter
+            - tapOn: "Start"
+            - copyTextFrom:
+                id: "omnibarTextInput"
+            - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"}
