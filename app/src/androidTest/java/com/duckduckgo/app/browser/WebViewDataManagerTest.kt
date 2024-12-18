@@ -51,6 +51,7 @@ class WebViewDataManagerTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockFileDeleter: FileDeleter = mock()
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
+    private val localStorageManager: LocalStorageManager = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val testee = WebViewDataManager(
         context,
@@ -59,6 +60,7 @@ class WebViewDataManagerTest {
         mockFileDeleter,
         mockWebViewHttpAuthStore,
         feature,
+        localStorageManager,
     )
 
     @Before
