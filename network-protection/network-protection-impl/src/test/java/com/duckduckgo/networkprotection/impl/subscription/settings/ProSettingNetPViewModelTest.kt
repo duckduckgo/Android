@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Activating
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Expired
@@ -50,13 +50,15 @@ class ProSettingNetPViewModelTest {
     private val pixel: Pixel = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
+    private val networkProtectionSettingsState: NetworkProtectionSettingsState = mock()
     private lateinit var proSettingNetPViewModel: ProSettingNetPViewModel
 
     @Before
     fun before() {
         proSettingNetPViewModel = ProSettingNetPViewModel(
-            networkProtectionAccessState,
+            networkProtectionSettingsState,
             networkProtectionState,
+            networkProtectionAccessState,
             coroutineTestRule.testDispatcherProvider,
             pixel,
         )
@@ -80,7 +82,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateIsHiddenThenNetPEntryStateIsHidden() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Hidden))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Hidden))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -95,7 +97,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateIsActivatingThenNetPEntryStateIsActivating() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Visible.Activating))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Activating))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -110,7 +112,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateConnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndActive() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Visible.Subscribed))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -125,7 +127,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateDisconnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndInactive() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Visible.Subscribed))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -140,7 +142,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateIsConnectingThenNetPEntryStateIsSubscribedAndNotActive() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Visible.Subscribed))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -155,7 +157,7 @@ class ProSettingNetPViewModelTest {
     @Test
     fun whenNetPVisibilityStateIsExpiredThenNetPEntryStateIsExpired() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(NetPVisibilityState.Visible.Expired))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Expired))
 
         proSettingNetPViewModel.onStart(mock())
 
