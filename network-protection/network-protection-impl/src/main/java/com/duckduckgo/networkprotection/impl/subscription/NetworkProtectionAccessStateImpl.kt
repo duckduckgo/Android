@@ -20,19 +20,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.Locked
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.UnLocked
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.Locked
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.UnLocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INELIGIBLE
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.WAITING
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -46,7 +39,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetworkProtectionAccessState {
 
-    override suspend fun getLegacyState(): LegacyNetPAccessState = withContext(dispatcherProvider.io()) {
+    override suspend fun getState(): NetPAccessState = withContext(dispatcherProvider.io()) {
         return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
             // if entitlement check succeeded and no entitlement, reset state and hide access.
             handleRevokedVPNState()
@@ -56,7 +49,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLegacyStateFlow(): Flow<LegacyNetPAccessState> = withContext(dispatcherProvider.io()) {
+    override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
         netpSubscriptionManager.vpnStatus().map { status ->
             if (!status.isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
@@ -68,31 +61,6 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
         }
     }
 
-    override suspend fun getState(): NetPVisibilityState {
-        return if (netpSubscriptionManager.getVpnStatus().isActive()) {
-            NetPVisibilityState.Visible.Subscribed
-        } else {
-            // if entitlement check succeeded and not an active subscription then reset state
-            handleRevokedVPNState()
-            NetPVisibilityState.Hidden
-        }
-    }
-
-    override suspend fun getStateFlow(): Flow<NetPVisibilityState> =
-        netpSubscriptionManager.vpnStatus().map { status ->
-            if (!status.isActive()) {
-                // if entitlement check succeeded and not an active subscription then reset state
-                handleRevokedVPNState()
-            }
-
-            when (status) {
-                ACTIVE -> NetPVisibilityState.Visible.Subscribed
-                INACTIVE, EXPIRED -> NetPVisibilityState.Visible.Expired
-                WAITING -> NetPVisibilityState.Visible.Activating
-                SIGNED_OUT, INELIGIBLE -> NetPVisibilityState.Hidden
-            }
-        }
-
     private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {
             networkProtectionState.stop()
@@ -100,7 +68,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams? {
-        return when (getLegacyState()) {
+        return when (getState()) {
             is UnLocked -> {
                 if (networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams

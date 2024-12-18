@@ -18,11 +18,9 @@ package com.duckduckgo.networkprotection.impl.quickaccess
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.LegacyNetPAccessState.UnLocked
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPVisibilityState.Visible.Subscribed
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.UnLocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.quickaccess.VpnTileStateProvider.VpnTileState
-import com.duckduckgo.settings.api.NewSettingsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -40,32 +38,18 @@ interface VpnTileStateProvider {
 class RealVpnTileStateProvider @Inject constructor(
     private val netpAccessState: NetworkProtectionAccessState,
     private val networkProtectionState: NetworkProtectionState,
-    private val newSettingsFeature: NewSettingsFeature,
 ) : VpnTileStateProvider {
-    override suspend fun getVpnTileState(): VpnTileState =
-        if (!newSettingsFeature.self().isEnabled()) {
-            when (netpAccessState.getState()) {
-                is Subscribed -> {
-                    if (networkProtectionState.isRunning()) {
-                        VpnTileState.CONNECTED
-                    } else {
-                        VpnTileState.DISCONNECTED
-                    }
-                }
-
-                else -> VpnTileState.UNAVAILABLE
-            }
-        } else {
-            netpAccessState.getLegacyState().run {
-                if (this !is UnLocked) {
-                    VpnTileState.UNAVAILABLE
+    override suspend fun getVpnTileState(): VpnTileState {
+        return netpAccessState.getState().run {
+            if (this !is UnLocked) {
+                VpnTileState.UNAVAILABLE
+            } else {
+                if (networkProtectionState.isRunning()) {
+                    VpnTileState.CONNECTED
                 } else {
-                    if (networkProtectionState.isRunning()) {
-                        VpnTileState.CONNECTED
-                    } else {
-                        VpnTileState.DISCONNECTED
-                    }
+                    VpnTileState.DISCONNECTED
                 }
             }
         }
+    }
 }
