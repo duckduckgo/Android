@@ -19,9 +19,14 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.SingleInstanceIn
 import java.io.File
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
+import javax.inject.Provider
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
@@ -33,18 +38,12 @@ interface LocalStorageManager {
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoLocalStorageManager @Inject constructor(
-    private val context: Context,
+    private val databaseProvider: Provider<DB>,
 ) : LocalStorageManager {
 
     override fun clearLocalStorage() {
-        val options = Options().apply { createIfMissing(false) }
-        val database: DB = factory.open(
-            File(context.applicationInfo.dataDir, "app_webview/Default/Local Storage/leveldb"),
-            options,
-        )
-
-        database.use {
-            val iterator = it.iterator()
+        databaseProvider.get().use { db ->
+            val iterator = db.iterator()
             iterator.seekToFirst()
 
             while (iterator.hasNext()) {
@@ -52,7 +51,7 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
                 val key = String(entry.key, StandardCharsets.UTF_8)
 
                 if (!isAllowedKey(key)) {
-                    it.delete(entry.key)
+                    db.delete(entry.key)
                     Timber.d("LocalStorageManager: Deleted key: $key")
                 }
             }
@@ -62,7 +61,7 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
     private fun isAllowedKey(key: String): Boolean {
         val allowedDomains = listOf("duckduckgo.com")
 
-        // Entries have the format example.com??value
+        // Entries have the format _https://example.com??value
         val separator = '\u0000'
 
         return if (key.contains(separator)) {
@@ -71,5 +70,20 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
         } else {
             allowedDomains.any { key.endsWith(it) }
         }
+    }
+}
+
+@Module
+@ContributesTo(AppScope::class)
+class LocalStorageManagerModule {
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideLocalStorageManagerDB(context: Context): DB {
+        val options = Options().apply { createIfMissing(false) }
+        return factory.open(
+            File(context.applicationInfo.dataDir, "app_webview/Default/Local Storage/leveldb"),
+            options,
+        )
     }
 }

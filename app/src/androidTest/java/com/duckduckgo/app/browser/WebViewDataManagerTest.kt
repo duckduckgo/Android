@@ -18,9 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.webkit.ValueCallback
 import android.webkit.WebStorage
-import android.webkit.WebStorage.Origin
 import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -33,14 +31,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @Suppress("RemoveExplicitTypeArguments")
 @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -62,15 +56,6 @@ class WebViewDataManagerTest {
         feature,
         localStorageManager,
     )
-
-    @Before
-    fun setup() {
-        doAnswer { invocation ->
-            val callback = invocation.arguments[0] as ValueCallback<Map<String, Origin>>
-            callback.onReceiveValue(emptyMap()) // Simulate callback invocation
-            null
-        }.whenever(mockStorage).getOrigins(any())
-    }
 
     @Test
     fun whenDataClearedThenWebViewHistoryCleared() = runTest {
@@ -104,7 +89,7 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage)
-            // we call deleteOrigin() instead and we should make sure we don't call deleteAllData()
+            verify(localStorageManager).clearLocalStorage()
             verify(mockStorage, never()).deleteAllData()
         }
     }
