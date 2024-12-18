@@ -147,7 +147,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
@@ -526,9 +525,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
-    @Inject
-    lateinit var tabManager: TabManager
-
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -776,6 +772,8 @@ class BrowserTabFragment :
     private val jsOrientationHandler = JsOrientationHandler()
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
+
+    private fun requireBrowserActivity(): BrowserActivity = requireNotNull(browserActivity)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1521,7 +1519,7 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                tabManager.openQueryInNewTab(it.query, it.sourceTabId)
+                requireBrowserActivity().tabManager.openInNewTab(it.query, it.sourceTabId)
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -1533,7 +1531,7 @@ class BrowserTabFragment :
                         isLaunchedFromExternalApp,
                     )
                 } else {
-                    tabManager.openMessageInNewTab(it.message, it.sourceTabId)
+                    requireBrowserActivity().tabManager.openMessageInNewTab(it.message, it.sourceTabId)
                 }
             }
 
@@ -1541,7 +1539,7 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
 
-            is Command.LaunchNewTab -> tabManager.launchNewTab()
+            is Command.LaunchNewTab -> requireBrowserActivity().tabManager.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
@@ -1784,7 +1782,7 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                tabManager.openExistingTab(it.tabId)
+                requireBrowserActivity().tabManager.openExistingTab(it.tabId)
             }
             else -> {
                 // NO OP
