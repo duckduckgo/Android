@@ -34,7 +34,7 @@ interface TabManager {
     fun openMessageInNewTab(message: Message, sourceTabId: String?)
     fun openExistingTab(tabId: String)
     fun launchNewTab()
-    fun openQueryInNewTab(query: String, sourceTabId: String? = null)
+    fun openInNewTab(query: String, sourceTabId: String? = null, skipHome: Boolean = false)
 
     fun clearTabsInMemory()
     fun onCleanup()

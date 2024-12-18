@@ -143,14 +143,16 @@ class DefaultTabManager @Inject constructor(
         browserActivity.lifecycleScope.launch { browserActivity.viewModel.onNewTabRequested() }
     }
 
-    override fun openQueryInNewTab(
+    override fun openInNewTab(
         query: String,
         sourceTabId: String?,
+        skipHome: Boolean,
     ) {
         browserActivity.lifecycleScope.launch {
             browserActivity.viewModel.onOpenInNewTabRequested(
                 query = query,
                 sourceTabId = sourceTabId,
+                skipHome = skipHome,
             )
         }
     }

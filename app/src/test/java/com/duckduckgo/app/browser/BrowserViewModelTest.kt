@@ -135,7 +135,7 @@ class BrowserViewModelTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
-        testee.onOpenInNewTabRequested(url)
+        testee.onOpenInNewTabRequested(url, null, false)
         verify(mockTabRepository).add(url = url, skipHome = false)
     }
 
@@ -144,7 +144,7 @@ class BrowserViewModelTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
-        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId")
+        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId", skipHome = false)
         verify(mockTabRepository).addFromSourceTab(url = url, skipHome = false, sourceTabId = "tabId")
     }
 
@@ -268,14 +268,14 @@ class BrowserViewModelTest {
     @Test
     fun whenOpenInNewTabWithSkipUrlConversionEnabledThenQueryNotConverted() = runTest {
         configureSkipUrlConversionInNewTabState(enabled = true)
-        testee.onOpenInNewTabRequested(query = "query")
+        testee.onOpenInNewTabRequested(query = "query", sourceTabId = null, skipHome = false)
         verify(mockOmnibarEntryConverter, never()).convertQueryToUrl("query")
     }
 
     @Test
     fun whenOpenInNewTabWithSkipUrlConversionDisabledThenQueryConverted() = runTest {
         configureSkipUrlConversionInNewTabState(enabled = false)
-        testee.onOpenInNewTabRequested(query = "query")
+        testee.onOpenInNewTabRequested(query = "query", sourceTabId = null, skipHome = false)
         verify(mockOmnibarEntryConverter).convertQueryToUrl("query")
     }
 

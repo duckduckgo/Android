@@ -72,7 +72,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -221,8 +220,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
-        binding.tabPager.hide()
-
         setContentView(binding.root)
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
@@ -248,14 +245,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
 
         super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (!binding.tabPager.isShown) {
-            binding.tabPager.show()
-        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -359,7 +348,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.submitQuery(sharedText)
                 } else {
                     Timber.w("can't use current tab, opening in new tab instead")
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                    tabManager.openInNewTab(query = sharedText, skipHome = true)
                 }
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
@@ -372,7 +361,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
-                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+                tabManager.openInNewTab(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
             }
         } else {
             Timber.i("shared text empty, defaulting to show on app launch option")
@@ -430,7 +419,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
             is Command.SwitchToTab -> tabManager.openExistingTab(command.tabId)
-            is Command.OpenInNewTab -> tabManager.openQueryInNewTab(command.url)
+            is Command.OpenInNewTab -> tabManager.openInNewTab(command.url)
         }
     }
 
