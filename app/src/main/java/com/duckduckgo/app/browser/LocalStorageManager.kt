@@ -60,7 +60,7 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
     }
 
     private fun isAllowedKey(key: String): Boolean {
-        val domains = listOf("cnn.com")
+        val domains = listOf("duckduckgo.com")
 
         // Valid entries have these formats:
         // _https://example.com<NULL><SOH>value
