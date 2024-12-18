@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -50,6 +51,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -59,16 +61,19 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
 class BrowserViewModel @Inject constructor(
     private val tabRepository: TabRepository,
@@ -82,6 +87,7 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
     userStageStore: UserStageStore,
 ) : ViewModel(),
     CoroutineScope {
@@ -100,6 +106,8 @@ class BrowserViewModel @Inject constructor(
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
+        data class SwitchToTab(val tabId: String) : Command()
+        data class OpenInNewTab(val url: String) : Command()
         data class OpenSavedSite(val url: String) : Command()
     }
 
@@ -110,19 +118,21 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    val selectedTab: Flow<String> = tabRepository.flowSelectedTab
+    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
         .map { tab -> tab?.tabId }
         .filterNotNull()
         .distinctUntilChanged()
         .debounce(100)
 
-    val tabs: Flow<List<String>> = tabRepository.flowTabs
+    val tabsFlow: Flow<List<String>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> tab.tabId } }
         .distinctUntilChanged()
 
-    val selectedTabIndex: Flow<Int> = combine(tabs, selectedTab) { tabs, selectedTab ->
+    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
 
@@ -207,8 +217,8 @@ class BrowserViewModel @Inject constructor(
         )
     }
 
-    suspend fun onTabsUpdated(areTabsEmpty: Boolean) {
-        if (areTabsEmpty) {
+    suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
+        if (tabs.isNullOrEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.addDefaultTab()
             return
@@ -308,14 +318,26 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onBookmarksActivityResult(url: String) {
-        command.value = Command.OpenSavedSite(url)
+        if (swipingTabsFeature.isEnabled) {
+            launch {
+                val existingTab = tabRepository.flowTabs
+                    .first()
+                    .firstOrNull { tab -> tab.url == url }
+
+                if (existingTab == null) {
+                    command.value = Command.OpenInNewTab(url)
+                } else {
+                    command.value = Command.SwitchToTab(existingTab.tabId)
+                }
+            }
+        } else {
+            command.value = Command.OpenSavedSite(url)
+        }
     }
 
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
-            if (tabId != tabRepository.getSelectedTab()?.tabId) {
-                tabRepository.select(tabId)
-            }
+            tabRepository.select(tabId)
         }
     }
 

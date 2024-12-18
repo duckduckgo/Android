@@ -22,6 +22,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.browser.SwipingTabsFeature
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -36,6 +38,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
@@ -87,6 +91,10 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var statisticsDataStore: StatisticsDataStore
 
+    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+
+    private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+
     private lateinit var testee: TabSwitcherViewModel
 
     private val repoDeletableTabs = Channel<List<TabEntity>>()
@@ -98,6 +106,8 @@ class TabSwitcherViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
 
         whenever(mockTabRepository.flowDeletableTabs)
             .thenReturn(repoDeletableTabs.consumeAsFlow())
@@ -120,6 +130,7 @@ class TabSwitcherViewModelTest {
             mockAdClickManager,
             coroutinesTestRule.testDispatcherProvider,
             mockPixel,
+            swipingTabsFeatureProvider,
         )
         testee.command.observeForever(mockCommandObserver)
     }

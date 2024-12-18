@@ -438,6 +438,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2633,20 +2634,28 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userRequestedOpeningNewTab(longPress: Boolean = false) {
+    fun userRequestedOpeningNewTab(
+        longPress: Boolean = false,
+    ) {
         command.value = GenerateWebViewPreviewImage
 
-        val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
-        if (emptyTab != null) {
-            viewModelScope.launch {
-                tabRepository.select(tabId = emptyTab)
+        if (swipingTabsFeature.isEnabled) {
+            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+            if (emptyTab != null) {
+                viewModelScope.launch {
+                    tabRepository.select(tabId = emptyTab)
+                }
+            } else {
+                command.value = LaunchNewTab
             }
         } else {
             command.value = LaunchNewTab
         }
+
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
+
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
@@ -2860,6 +2869,20 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
+
+        if (!currentBrowserViewState().browserShowing) {
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+        } else {
+            val url = site?.url
+            if (url != null) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+                } else {
+                    pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
+                }
+            }
+        }
+
         onUserDismissedCta(ctaViewState.value?.cta)
     }
 
@@ -3547,6 +3570,7 @@ class BrowserTabViewModel @Inject constructor(
                     "https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding$cohortOrigin".toUri(),
                 )
             }
+
             is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()

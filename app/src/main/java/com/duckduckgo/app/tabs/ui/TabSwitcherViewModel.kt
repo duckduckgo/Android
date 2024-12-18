@@ -22,6 +22,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,7 +36,6 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -48,16 +48,13 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : ViewModel() {
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
-
-    val isDeletingEnabled = tabRepository.flowTabs.map { it.size > 1 }
-        .distinctUntilChanged()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -71,12 +68,17 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
-        if (emptyTab != null) {
-            tabRepository.select(tabId = emptyTab)
+        if (swipingTabsFeature.isEnabled) {
+            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+            if (emptyTab != null) {
+                tabRepository.select(tabId = emptyTab)
+            } else {
+                tabRepository.add()
+            }
         } else {
             tabRepository.add()
         }
+
         command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)

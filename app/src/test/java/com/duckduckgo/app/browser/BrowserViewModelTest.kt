@@ -34,10 +34,12 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -90,6 +92,10 @@ class BrowserViewModelTest {
 
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
 
+    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+
+    private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -97,6 +103,7 @@ class BrowserViewModelTest {
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
 
         configureSkipUrlConversionInNewTabState(enabled = true)
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
 
         initTestee()
 
@@ -134,7 +141,7 @@ class BrowserViewModelTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
-        testee.onOpenInNewTabRequested(url)
+        testee.onOpenInNewTabRequested(url, null, false)
         verify(mockTabRepository).add(url = url, skipHome = false)
     }
 
@@ -143,19 +150,19 @@ class BrowserViewModelTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
-        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId")
+        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId", skipHome = false)
         verify(mockTabRepository).addFromSourceTab(url = url, skipHome = false, sourceTabId = "tabId")
     }
 
     @Test
     fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runTest {
-        testee.onTabsUpdated(areTabsEmpty = true)
+        testee.onTabsUpdated(listOf())
         verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
-        testee.onTabsUpdated(areTabsEmpty = false)
+        testee.onTabsUpdated(listOf(TabEntity("123")))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -246,26 +253,42 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() {
+    fun whenOnBookmarksActivityResultCalledAndSiteAlreadyOpenedThenSwitchToTabCommandTriggered() = runTest {
         val bookmarkUrl = "https://www.example.com"
+        val tab = TabEntity("123", url = bookmarkUrl)
+
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.SwitchToTab(tab.tabId), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenOnBookmarksActivityResultCalledAndSiteNotOpenedThenOpenInNewTabCommandTriggered() = runTest {
+        val bookmarkUrl = "https://www.example.com"
+        val tab = TabEntity("123", url = "https://cnn.com")
+
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(tab)))
+
+        testee.onBookmarksActivityResult(bookmarkUrl)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
     fun whenOpenInNewTabWithSkipUrlConversionEnabledThenQueryNotConverted() = runTest {
         configureSkipUrlConversionInNewTabState(enabled = true)
-        testee.onOpenInNewTabRequested(query = "query")
+        testee.onOpenInNewTabRequested(query = "query", sourceTabId = null, skipHome = false)
         verify(mockOmnibarEntryConverter, never()).convertQueryToUrl("query")
     }
 
     @Test
     fun whenOpenInNewTabWithSkipUrlConversionDisabledThenQueryConverted() = runTest {
         configureSkipUrlConversionInNewTabState(enabled = false)
-        testee.onOpenInNewTabRequested(query = "query")
+        testee.onOpenInNewTabRequested(query = "query", sourceTabId = null, skipHome = false)
         verify(mockOmnibarEntryConverter).convertQueryToUrl("query")
     }
 
@@ -310,6 +333,7 @@ class BrowserViewModelTest {
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             userStageStore = userStageStore,
+            swipingTabsFeature = swipingTabsFeatureProvider,
         )
     }
 
