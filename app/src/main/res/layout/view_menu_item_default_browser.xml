@@ -32,8 +32,9 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/settingsDefaultBrowserEnabled"
-            android:textColor="?attr/daxColorAccentBlue"
-            app:typography="body1" />
+            android:textColor="@color/blue50"
+            app:typography="body1"
+            tools:ignore="InvalidColorAttribute" />
 
     </LinearLayout>
 
