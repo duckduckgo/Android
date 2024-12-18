@@ -5,7 +5,10 @@ tags:
 ---
 # Pre-requisite: None (can be run whether auth is required or not)
 
-- launchApp:
-      clearState: true
-- runFlow: ../shared/onboarding.yaml
-- runFlow: steps/access_passwords_screen.yaml
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+            clearState: true
+      - runFlow: ../shared/onboarding.yaml
+      - runFlow: steps/access_passwords_screen.yaml

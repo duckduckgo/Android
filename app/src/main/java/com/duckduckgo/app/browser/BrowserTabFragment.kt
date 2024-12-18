@@ -911,7 +911,6 @@ class BrowserTabFragment :
 
     private fun onOmnibarNewTabRequested() {
         viewModel.userRequestedOpeningNewTab()
-        pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
     }
 
     private fun onOmnibarCustomTabClosed() {
