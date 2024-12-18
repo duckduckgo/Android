@@ -1,0 +1,75 @@
+@startuml
+
+interface DefaultBrowserPromptsExperiment {
+  + val showOverflowMenuDot: StateFlow<Boolean>
+  + val showOverflowMenuItem: StateFlow<Boolean>
+  + val commands: SharedFlow<DefaultBrowserPromptsExperiment.Command>
+
+  + fun onOverflowMenuOpened()
+  + fun onOverflowMenuItemClicked()
+
+  + fun onMessageDialogOpened()
+  + fun onMessageDialogDismissed()
+  + fun onMessageDialogSetBrowserButtonClicked()
+  + fun onMessageDialogNotNowButtonClicked()
+
+  + fun onSystemDefaultBrowserDialogOpened()
+  + fun onSystemDefaultBrowserDialogSuccess()
+  + fun onSystemDefaultBrowserDialogCanceled()
+
+  + fun onSystemDefaultAppsActivityOpened()
+  + fun onSystemDefaultAppsActivityClosed()
+}
+
+abstract class DefaultBrowserPromptsExperimentCommand as "(sealed class) DefaultBrowserPromptsExperiment.Command"
+
+class OpenMessageDialog as "(data class) OpenMessageDialog" {
+  + intent: Intent
+}
+
+class OpenSystemDefaultBrowserDialog as "(data class) OpenSystemDefaultBrowserDialog" {
+  + intent: Intent
+}
+
+class OpenSystemDefaultAppsActivity as "(data class) OpenSystemDefaultAppsActivity" {
+  + intent: Intent
+}
+
+DefaultBrowserPromptsExperimentCommand <|-- OpenMessageDialog : extends
+DefaultBrowserPromptsExperimentCommand <|-- OpenSystemDefaultBrowserDialog : extends
+DefaultBrowserPromptsExperimentCommand <|-- OpenSystemDefaultAppsActivity : extends
+
+DefaultBrowserPromptsExperiment::commands -> DefaultBrowserPromptsExperimentCommand : uses
+
+class DefaultBrowserPromptsExperimentImpl {
+  - defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
+  - defaultBrowserDetector: DefaultBrowserDetector
+  - defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+}
+
+DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : implements
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+Object[] elementData
+size()
+}
+
+enum TimeUnit {
+DAYS
+HOURS
+MINUTES
+}
+
+@enduml
