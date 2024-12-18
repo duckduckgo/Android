@@ -42,7 +42,6 @@ import timber.log.Timber
 @SingleInstanceIn(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
     activity: DaggerActivity,
-    // private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val queryUrlConverter: OmnibarEntryConverter,
