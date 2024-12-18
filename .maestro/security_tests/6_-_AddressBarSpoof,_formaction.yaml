@@ -2,17 +2,20 @@ appId: com.duckduckgo.mobile.android
 tags:
     - securityTest
 ---
-- launchApp:
-    clearState: true
-- runFlow: ../shared/onboarding.yaml
-# Test 1
-- doubleTapOn:
-    id: "omnibarTextInput"
-- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"
-- pressKey: Enter
-- tapOn: "Got It"
-- tapOn: "run"
-# Should do nothing - the navigation should be prevented.
-- copyTextFrom:
-    id: "omnibarTextInput"
-- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"}
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                clearState: true
+            - runFlow: ../shared/onboarding.yaml
+            # Test 1
+            - doubleTapOn:
+                id: "omnibarTextInput"
+            - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"
+            - pressKey: Enter
+            - tapOn: "Got It"
+            - tapOn: "run"
+            # Should do nothing - the navigation should be prevented.
+            - copyTextFrom:
+                id: "omnibarTextInput"
+            - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"}

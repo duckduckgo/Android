@@ -6,7 +6,6 @@ name: "Autofill: Run all tests"
 
 - launchApp:
     clearState: true
-- runFlow: ../shared/onboarding.yaml
 - runFlow: 1_autofill_shown_in_overflow.yaml
 - runFlow: 2_autofill_add_search_update_delete_creds.yaml
 - runFlow: 3_autofill_prompted_to_save_creds_on_form.yaml
