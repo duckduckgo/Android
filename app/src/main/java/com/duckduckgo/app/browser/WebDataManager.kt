@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.webkit.WebStorage
-import android.webkit.WebStorage.Origin
 import android.webkit.WebView
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -32,7 +31,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import timber.log.Timber
 
 interface WebDataManager {
     suspend fun clearData(
@@ -52,6 +50,7 @@ class WebViewDataManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val localStorageManager: LocalStorageManager,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -77,24 +76,13 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearWebStorage(webStorage: WebStorage) {
         suspendCoroutine { continuation ->
-            webStorage.getOrigins { origins ->
-                kotlin.runCatching {
-                    for (origin in origins.values) {
-                        val originString = (origin as Origin).origin
-
-                        // Check if this is the domain to exclude
-                        if (!originString.endsWith(".duckduckgo.com")) {
-                            // Delete all other origins
-                            Timber.d("aitor delete $originString / $origin")
-                            webStorage.deleteOrigin(originString)
-                        }
-                    }
-                    continuation.resume(Unit)
-                }.onFailure {
-                    // fallback, if we crash we delete everything
-                    webStorage.deleteAllData()
-                    continuation.resume(Unit)
-                }
+            kotlin.runCatching {
+                localStorageManager.clearLocalStorage()
+                continuation.resume(Unit)
+            }.onFailure {
+                // fallback, if we crash we delete everything
+                webStorage.deleteAllData()
+                continuation.resume(Unit)
             }
         }
     }

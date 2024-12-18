@@ -424,6 +424,11 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation("org.iq80.leveldb:leveldb:_") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    // Required by LevelDB
+    implementation("com.google.guava:guava:_")
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
