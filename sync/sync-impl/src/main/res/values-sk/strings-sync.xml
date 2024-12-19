@@ -36,7 +36,6 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpečne synchronizujte záložky a heslá medzi svojimi zariadeniami.</string>
     <string name="sync_off_hint">Vaše údaje sú šifrované na oboch koncoch (end-to-end) a DuckDuckGo nemá prístup k šifrovaciemu kľúču.</string>
     <string name="sync_setup_single_device_title">Nastavenie jedného zariadenia</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
     <string name="sync_setup_single_recover_data_cta_title">Obnovenie synchronizovaných údajov</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchronizujte a zálohujte toto zariadenie</string>
 

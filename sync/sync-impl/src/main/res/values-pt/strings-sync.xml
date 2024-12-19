@@ -36,7 +36,6 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sincroniza os marcadores e palavras-passe entre os teus dispositivos em segurança.</string>
     <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de encriptação.</string>
     <string name="sync_setup_single_device_title">Configuração de dispositivo único</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperar dados sincronizados</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
 
