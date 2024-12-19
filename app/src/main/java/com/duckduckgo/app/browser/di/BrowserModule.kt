@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -213,6 +214,7 @@ class BrowserModule {
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
         duckPlayer: DuckPlayer,
+        maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -225,6 +227,7 @@ class BrowserModule {
             cloakedCnameDetector,
             requestFilterer,
             duckPlayer,
+            maliciousSiteBlockerWebViewIntegration,
         )
 
     @Provides

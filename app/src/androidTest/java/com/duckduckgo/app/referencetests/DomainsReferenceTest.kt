@@ -28,6 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
@@ -119,6 +120,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -174,6 +176,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist, mockUserAllowListRepository),
             requestFilterer = mockRequestFilterer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             duckPlayer = mockDuckPlayer,
         )
     }
