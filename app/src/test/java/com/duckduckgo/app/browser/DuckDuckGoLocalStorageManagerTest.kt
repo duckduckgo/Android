@@ -123,6 +123,16 @@ class DuckDuckGoLocalStorageManagerTest {
         verify(mockDB).delete(key3)
     }
 
+    @Test
+    fun whenClearLocalStorageThenDBIsClosed() {
+        whenever(mockDB.iterator()).thenReturn(mockIterator)
+        whenever(mockIterator.hasNext()).thenReturn(false)
+
+        testee.clearLocalStorage()
+
+        verify(mockDB).close()
+    }
+
     private fun createMockDBEntry(key: ByteArray): MutableMap.MutableEntry<ByteArray, ByteArray> {
         return object : MutableMap.MutableEntry<ByteArray, ByteArray> {
             override val key: ByteArray = key

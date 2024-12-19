@@ -55,7 +55,6 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
                     Timber.d("LocalStorageManager: Deleted key: $key")
                 }
             }
-            db.close()
         }
     }
 
