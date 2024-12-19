@@ -139,40 +139,41 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onCtaShown(cta: Cta) {
-        cta.shownPixel?.let {
-            val canSendPixel = when (cta) {
-                is DaxCta -> cta.canSendShownPixel()
-                else -> true
-            }
-            if (canSendPixel) {
-                pixel.fire(it, cta.pixelShownParameters())
-            }
-        }
-        if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
-            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-        }
-        if (cta is BrokenSitePromptDialogCta) {
-            brokenSitePrompt.ctaShown()
-        }
         withContext(dispatchers.io()) {
+            cta.shownPixel?.let {
+                val canSendPixel = when (cta) {
+                    is DaxCta -> cta.canSendShownPixel()
+                    else -> true
+                }
+                if (canSendPixel) {
+                    pixel.fire(it, cta.pixelShownParameters())
+                }
+            }
+            if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
+            if (cta is BrokenSitePromptDialogCta) {
+                brokenSitePrompt.ctaShown()
+            }
+
             if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
                 extendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel()?.getPixelDefinitions()?.forEach {
                     pixel.fire(it.pixelName, it.params)
                 }
             }
-        }
 
-        // Temporary pixel
-        val isVisitSiteSuggestionsCta =
-            cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
-                cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
-        if (isVisitSiteSuggestionsCta) {
-            if (userBrowserProperties.daysSinceInstalled() <= MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN) {
-                val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
-                pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
-                onboardingStore.visitSiteCtaDisplayCount = count + 1
-            } else {
-                onboardingStore.clearVisitSiteCtaDisplayCount()
+            // Temporary pixel
+            val isVisitSiteSuggestionsCta =
+                cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
+                    cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
+            if (isVisitSiteSuggestionsCta) {
+                if (userBrowserProperties.daysSinceInstalled() <= MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN) {
+                    val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
+                    pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
+                    onboardingStore.visitSiteCtaDisplayCount = count + 1
+                } else {
+                    onboardingStore.clearVisitSiteCtaDisplayCount()
+                }
             }
         }
     }
@@ -250,8 +251,8 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
-        if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
+            if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
             if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                 return@withContext OnboardingDaxDialogCta.DaxExperimentFireButtonCta(onboardingStore, appInstallStore)
             } else {
@@ -261,8 +262,8 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta? {
-        if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
         return withContext(dispatchers.io()) {
+            if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
             if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                 return@withContext OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta(onboardingStore, appInstallStore)
             } else {
@@ -272,8 +273,8 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxExperimentEndStaticCta? {
-        if (!daxOnboardingActive() && daxDialogEndShown()) return null
         return withContext(dispatchers.io()) {
+            if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
             return@withContext OnboardingDaxDialogCta.DaxExperimentEndStaticCta(onboardingStore, appInstallStore)
         }
     }
@@ -473,7 +474,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isSiteNotAllowedForOnboarding(site: Site): Boolean {
+    private fun isSiteNotAllowedForOnboarding(site: Site): Boolean {
         val uri = site.url.toUri()
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
@@ -502,9 +503,11 @@ class CtaViewModel @Inject constructor(
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
-        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-        val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
-        return noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+        return withContext(dispatchers.io()) {
+            val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+            val bubbleCtasShown = daxDialogEndShown() && (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
+            noBrowserCtaExperiment || bubbleCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+        }
     }
 
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
