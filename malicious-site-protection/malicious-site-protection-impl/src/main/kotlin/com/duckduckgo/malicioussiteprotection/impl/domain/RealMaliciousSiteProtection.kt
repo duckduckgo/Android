@@ -39,6 +39,7 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val maliciousSiteRepository: MaliciousSiteRepository,
     private val messageDigest: MessageDigest,
     private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
+    private val urlCanonicalization: UrlCanonicalization,
 ) : MaliciousSiteProtection {
 
     override suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult {
@@ -49,7 +50,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             return IsMaliciousResult.SAFE
         }
 
-        val hostname = url.host ?: return IsMaliciousResult.SAFE
+        val hostname = url.host?.let { urlCanonicalization.canonicalizeDomain(it) } ?: return IsMaliciousResult.SAFE
         val hash = messageDigest
             .digest(hostname.toByteArray())
             .joinToString("") { "%02x".format(it) }
@@ -60,7 +61,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             return IsMaliciousResult.SAFE
         }
         maliciousSiteRepository.getFilter(hash)?.let {
-            if (Pattern.compile(it.regex).matcher(url.toString()).find()) {
+            if (Pattern.compile(it.regex).matcher(urlCanonicalization.canonicalizeUrl(url).toString()).find()) {
                 Timber.d("\uD83D\uDFE2 Cris: shouldBlock $url")
                 return IsMaliciousResult.MALICIOUS
             }
