@@ -32,7 +32,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
 import android.graphics.Typeface
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
