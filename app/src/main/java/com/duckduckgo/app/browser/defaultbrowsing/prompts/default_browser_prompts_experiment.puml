@@ -1,6 +1,15 @@
 @startuml
 allowmixing
 
+component MainProcessLifecycleObserver
+note top of MainProcessLifecycleObserver
+  The implementation class is the process observer so that it can check
+  whether DDG is the default browser app whenever the process resumes.
+  This allows us to check the state on app launch,
+  but also when app is already running and user changed the default
+  either via the system dialog or manually in system settings.
+end note
+
 abstract class DefaultBrowserPromptsExperimentCommand as "(sealed class) DefaultBrowserPromptsExperiment.Command"
 
 class OpenMessageDialog as "(data class) OpenMessageDialog" {
@@ -65,19 +74,31 @@ interface DefaultBrowserPromptsDataStore {
 
 DefaultBrowserPromptsDataStore::overflowMenuState -> DefaultBrowserPromptsOverflowMenuState : uses
 
+class DefaultBrowserPromptsDataStoreImpl {
+  - val dataStore: DataStore<Preferences>
+}
+
+DefaultBrowserPromptsDataStore <|--- DefaultBrowserPromptsDataStoreImpl : implements
+
 class DefaultBrowserPromptsExperimentImpl {
+  - val appContext: Context
   - val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
   - val defaultBrowserDetector: DefaultBrowserDetector
   - val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
   - val defaultBrowserSystemSettings: DefaultBrowserSystemSettings
   - val appDaysUsedRepository: AppDaysUsedRepository
   - val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore
-  - val appInstallStore: AppInstallStore
 }
+
+MainProcessLifecycleObserver <|--- DefaultBrowserPromptsExperimentImpl : implements
 
 DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : implements
 
 DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore --> DefaultBrowserPromptsDataStore : uses
+
+note left of DefaultBrowserPromptsExperimentImpl::appContext
+  Used to create intents.
+end note
 
 note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsFeatureToggles
   Used to manage cohorts and enrolment.
@@ -104,14 +125,6 @@ end note
 note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore
   Used to persist the stage of the experiment.
   Includes count of dialogs opened and overflow menu state.
-end note
-
-note left of DefaultBrowserPromptsExperimentImpl::appInstallStore
-  Used to observe if the default browser state has changed.
-
-  Extend the AppInstallStore by a "//val defaultBrowserStateChanged: SharedFlow<Boolean>//",
-  or refactor it to be based on //DataStore<Preference>// instead of //SharedPreferences//,
-  so that we can observe if the default browser has been changed while the app is running.
 end note
 
 component BrowserViewModel
