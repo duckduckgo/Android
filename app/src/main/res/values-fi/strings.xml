@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
 
     <string name="settingsAutomaticallyClearWhat">Tyhjennä automaattisesti…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>

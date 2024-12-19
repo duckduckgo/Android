@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
 
     <string name="settingsAutomaticallyClearWhat">Samodejno počisti …</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>

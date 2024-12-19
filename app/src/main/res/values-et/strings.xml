@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
 
     <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>

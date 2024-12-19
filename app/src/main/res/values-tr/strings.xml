@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
     <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Temizle...</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>

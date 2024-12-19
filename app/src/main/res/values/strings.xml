@@ -212,7 +212,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatically Clear…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>

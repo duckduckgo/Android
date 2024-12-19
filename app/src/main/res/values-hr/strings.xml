@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatski obriši…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>

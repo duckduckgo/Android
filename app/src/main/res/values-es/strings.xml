@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
 
     <string name="settingsAutomaticallyClearWhat">Borrar automáticamente…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Borrar automáticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ninguno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Pestañas</string>

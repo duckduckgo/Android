@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
     <string name="settingsAutomaticallyClearWhat">Automātiski notīrīt…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>

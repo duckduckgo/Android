@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
 
     <string name="settingsAutomaticallyClearWhat">Ryd automatisk …</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
