@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Protection contre les fenêtres contextuelles des cookies</string>
     <string name="autoconsentDescription"><![CDATA[Lorsque DuckDuckGo détecte les fenêtres contextuelles des cookies sur les sites que vous visitez, vos préférences peuvent être configurées automatiquement de façon à ce que les cookies soient réduits au minimum et la confidentialité maximisée, puis les fenêtres contextuelles sont fermées. <u><a href=\"\">En savoir plus</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Laisser DuckDuckGo gérer les fenêtres contextuelles des cookies</string>
 </resources>

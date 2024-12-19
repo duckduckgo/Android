@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Küpsiste hüpikakna kaitse</string>
     <string name="autoconsentDescription"><![CDATA[Kui DuckDuckGo tuvastab külastatavatel veebisaitidel küpsiste hüpikaknad, saame automaatselt seadistada sinu küpsiste eelistused selliselt, et minimeeritaks küpsised ja maksimeeritaks privaatsust, ning seejärel hüpikaknad sulgeda.  <u><a href=\"\">Lisateave</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Lase DuckDuckGol küpsiste hüpikaknaid hallata</string>
 </resources>
