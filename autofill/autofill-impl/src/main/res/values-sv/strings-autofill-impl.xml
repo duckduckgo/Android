@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avsluta inställningen</string>
 
     <string name="autofillManagementScreenTitle">Lösenord</string>
+    <string name="autofillManagementScreenTitleNew">Lösenord och automatisk ifyllning</string>
     <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
     <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
     <string name="credentialManagementAutofillSubtitle">Lösenorden är krypterade. Ingen annan än du kan se dem, inte ens vi. <annotation type="learn_more_link">Läs mer</annotation></string>

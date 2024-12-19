@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avslutt oppsett</string>
 
     <string name="autofillManagementScreenTitle">Passord</string>
+    <string name="autofillManagementScreenTitleNew">Passord og autofyll</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen passord er lagret ennå</string>
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll ut passord automatisk</string>
     <string name="credentialManagementAutofillSubtitle">Passord krypteres. Ingen andre enn du kan se dem, ikke engang vi. <annotation type="learn_more_link">Les mer</annotation></string>
