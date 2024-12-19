@@ -91,6 +91,13 @@
                 app:iconDrawable="@drawable/ic_add_16"
                 app:primaryText="@string/newTabMenuItem" />
 
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/duckChatMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_ai_chat_16"
+                app:primaryText="@string/duckChatMenuItem" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
