@@ -36,6 +36,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface WebDataManager {
     suspend fun clearData(
@@ -88,6 +89,7 @@ class WebViewDataManager @Inject constructor(
                 localStorageManager.clearLocalStorage()
                 continuation.resume(Unit)
             }.onFailure { e ->
+                Timber.e(e, "WebDataManager: Could not selectively clear web storage")
                 sendCrashPixel(e)
                 // fallback, if we crash we delete everything
                 webStorage.deleteAllData()

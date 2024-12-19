@@ -64,9 +64,11 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
         // Valid entries have these formats:
         // _https://example.com<NULL><SOH>value
         // META:https://example.com
+        // METAACCESS:https://example.com
         val regexList = listOf(
             "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
             "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
+            "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
         )
         val regexPatterns = domains.flatMap { domain ->
             val escapedDomain = Regex.escape(domain)
