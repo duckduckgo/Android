@@ -191,7 +191,6 @@ class BrowserWebViewClientTest {
             mockDuckDuckGoUrlDetector,
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
-            mockMaliciousSiteProtection,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

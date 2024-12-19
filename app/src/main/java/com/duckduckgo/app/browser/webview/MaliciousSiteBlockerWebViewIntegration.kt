@@ -31,7 +31,6 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import java.net.URLDecoder
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +55,6 @@ interface MaliciousSiteBlockerWebViewIntegration {
     fun onPageLoadStarted()
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
 @ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(

@@ -65,7 +65,6 @@ class UrlExtractingWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
-            mockMaliciousSiteProtection,
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }
