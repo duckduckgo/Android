@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Usuń z tego urządzenia</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc i wsparcie</string>
     <string name="subscriptionSettingSendFeedback">Wyślij opinię</string>
+    <string name="subscriptionSettingActivating">Aktywacja</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Wszystko gotowe.</string>
