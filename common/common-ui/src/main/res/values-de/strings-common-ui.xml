@@ -33,8 +33,4 @@
     <string name="undo">Rückgängig machen</string>
     <string name="cancel">Abbrechen</string>
 
-    <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
 </resources>
