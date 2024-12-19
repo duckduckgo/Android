@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Szinkronizáld biztonságosan a könyvjelzőket és jelszavakat az eszközök között.</string>
     <string name="sync_off_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a titkosítási kulcshoz.</string>
     <string name="sync_setup_single_device_title">Egyeszközös beállítás</string>
+    <string name="sync_setup_other_options_title">Egyéb lehetőségek</string>
     <string name="sync_setup_single_recover_data_cta_title">Szinkronizált adatok helyreállítása</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Az eszköz szinkronizálása és biztonsági mentése</string>
 

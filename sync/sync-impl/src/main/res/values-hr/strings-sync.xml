@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sigurno sinkroniziraj oznake i lozinke između svojih uređaja.</string>
     <string name="sync_off_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
     <string name="sync_setup_single_device_title">Postavljanje jednog uređaja</string>
+    <string name="sync_setup_other_options_title">Ostale mogućnosti</string>
     <string name="sync_setup_single_recover_data_cta_title">Oporavak sinkroniziranih podataka</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
 
