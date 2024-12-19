@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
+    <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Käyttöoikeudet</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
 
     <string name="settingsAutomaticallyClearWhat">Tyhjennä automaattisesti…</string>
+    <string name="settingsAutomaticallyClearData">Tyhjennä tiedot automaattisesti...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
+    <string name="aboutActivityTitleNew">Tietoa meistä</string>
     <string name="aboutHeader">Tervetuloa Duckin puolelle!</string>
     <string name="aboutDescription">DuckDuckGo on vuonna 2008 perustettu riippumaton internetissä tietosuojaa tarjoava yritys niille, jotka ovat kyllästyneet siihen, että heitä seurataan netissä, ja haluavat yksinkertaisen ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki parhaiden selainten ominaisuudet, kuten kirjanmerkit, välilehdet, salasanat ja paljon muuta, sekä yli <annotation type="privacy_protection_link">kymmenkunta tehokasta tietosuojausta, joita</annotation> ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuoja auttaa turvaamaan haut, selaamisen, sähköpostin lähettämiseen ja muun toimintasi verkossa.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikilla laitteillasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuillamme</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo on vuonna 2008 perustettu riippumaton internetin tietosuoja-alan yritys kaikille, jotka ovat kyllästyneet siihen, että heitä seurataan verkossa, ja haluavat helpon ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki selainten perusominaisuudet, kuten kirjanmerkit, välilehdet ja salasanat, sekä yli <annotation type="privacy_protection_link">kymmenen tehokasta tietosuojausta</annotation>, joita ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuojapaketti auttaa suojaamaan verkkoaktiviteettisi, kuten hakemisen, selaamisen ja sähköpostin lähettämisen.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikissa laitteissasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, löydät lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuiltamme</annotation>.</string>
     <string name="no_suggestions">Ei ehdotuksia</string>
 
     <!-- Broken Site Activity -->
