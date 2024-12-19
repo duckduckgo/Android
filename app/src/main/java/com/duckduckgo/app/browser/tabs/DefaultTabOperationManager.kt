@@ -23,11 +23,11 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface TabOperationManager {
     fun setTabManager(tabViewManager: TabManager)
