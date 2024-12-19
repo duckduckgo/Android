@@ -36,7 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Yer imlerini ve parolaları cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
     <string name="sync_off_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifreleme anahtarına erişimi yoktur.</string>
     <string name="sync_setup_single_device_title">Tek Cihaz Kurulumu</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
+    <string name="sync_setup_other_options_title">Diğer Seçenekler</string>
     <string name="sync_setup_single_recover_data_cta_title">Senkronize Edilen Verileri Kurtar</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Bu Cihazı Senkronize Et ve Yedekle</string>
 

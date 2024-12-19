@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Удалить с этого устройства</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
     <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
+    <string name="subscriptionSettingActivating">Выполняется активация</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Все готово!</string>

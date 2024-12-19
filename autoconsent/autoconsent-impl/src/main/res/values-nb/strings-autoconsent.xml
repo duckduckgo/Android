@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentDescription"><![CDATA[Når DuckDuckGo oppdager popup-vinduer om informasjonskapsler på nettsteder du besøker, kan vi automatisk angi innstillingene for å minimere informasjonskapslene og maksimere personvernet, og deretter lukke popup-vinduene. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">La DuckDuckGo håndtere popup-vinduer om informasjonskapsler</string>
 </resources>

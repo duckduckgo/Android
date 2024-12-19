@@ -34,7 +34,7 @@
     <string name="cancel">Annullér</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Altid aktiv</string>
+    <string name="on">Til</string>
+    <string name="off">Fra</string>
 </resources>

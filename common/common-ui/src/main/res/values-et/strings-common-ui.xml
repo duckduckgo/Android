@@ -34,7 +34,7 @@
     <string name="cancel">Tühista</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Alati sisse lülitatud</string>
+    <string name="on">Sees</string>
+    <string name="off">Väljas</string>
 </resources>

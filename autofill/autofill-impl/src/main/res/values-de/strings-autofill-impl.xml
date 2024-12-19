@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Einrichtung beenden</string>
 
     <string name="autofillManagementScreenTitle">Passwörter</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Passwörter und Autovervollständigen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
     <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
     <string name="credentialManagementAutofillSubtitle">Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
