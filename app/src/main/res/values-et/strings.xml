@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse on lubatud</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Andmete kustutamine</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Load</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
 
     <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt…</string>
+    <string name="settingsAutomaticallyClearData">Kustuta andmed automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
+    <string name="aboutActivityTitleNew">Teave</string>
     <string name="aboutHeader">Tere tulemast Pardipoolele!</string>
     <string name="aboutDescription">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte igaühele, kellel on kõrini varjatud jälgimisest internetis ja kes soovib lihtsat lahendust selle vältimiseks. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse funktsiooni</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitse aitab kaitsta sinu tegevust internetis alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaks teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mis sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu – ja vaikeprivaatsus ongi tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte kõigile, kes on väsinud jälgimisest internetis ja soovivad lihtsat lahendust. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitsekomplekt aitab kaitsta sinu tegevusi internetis, alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaksid teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mida sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu ja vaikeprivaatsus on tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
