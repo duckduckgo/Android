@@ -1133,6 +1133,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenGetSubscriptionOfferThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
 
         val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
@@ -1147,16 +1148,18 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenGetSubscriptionOfferAndNoFeaturesThenReturnNull() = runTest {
+    fun whenGetSubscriptionOfferAndNoFeaturesThenReturnEmptyList() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+        authRepository.setFeatures(YEARLY_PLAN_US, emptySet())
         givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
 
-        assertNull(subscriptionsManager.getSubscriptionOffer())
+        assertEquals(emptyList<SubscriptionOfferDetails>(), subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
     fun whenGetSubscriptionOfferAndRowPlansAvailableThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(true)
 
@@ -1172,12 +1175,13 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnNull() = runTest {
-        authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnEmptyList() = runTest {
+        authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(false)
 
-        assertNull(subscriptionsManager.getSubscriptionOffer())
+        assertEquals(emptyList<SubscriptionOfferDetails>(), subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
