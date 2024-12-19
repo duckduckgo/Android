@@ -700,6 +700,12 @@
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s does not match *.%2$s. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Warning: This site may put your personal information at risk</string>
+    <string name="maliciousSiteHeadline">DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information. Learn more</string>
+    <string name="maliciousSiteLeaveCTA">Leave This Site</string>
+    <string name="maliciousSiteAdvancedCTA">Advanced</string>
+    <string name="maliciousSiteExpandedHeadline">If you believe this website is safe, you can report an error. You can still visit the website at your own risk.\n\nAccept Risk and Visit Site</string>
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a better, more private internet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>

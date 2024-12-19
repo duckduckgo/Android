@@ -579,6 +579,9 @@ class BrowserTabFragment :
     private val errorView
         get() = binding.includeErrorView
 
+    private val warningView
+        get() = binding.maliciousSiteWarningLayout
+
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
@@ -1335,6 +1338,26 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
+    private fun showWarning(url: Uri) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabContainerLayout.gone()
+        sslErrorView.gone()
+        // TODO (cbarreiro) we should probably define a new view mode
+        omnibar.setViewMode(Omnibar.ViewMode.Error)
+        webView?.onPause()
+        webView?.hide()
+        warningView.bind(/*handler, errorResponse*/) /*{ action ->
+            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
+        }*/
+        warningView.show()
+        // warningView.leaveSiteButton.setOnClickListener {
+        //     viewModel.closeCurrentTab()
+        //     // TODO (cbarreiro) Fix, not working
+        //     renderer.showNewTab()
+        // }
+    }
+
     private fun showSSLWarning(
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
@@ -1677,6 +1700,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
+            is Command.WebViewWarningMaliciousSite -> showWarning(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
@@ -3940,7 +3964,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showNewTab() {
+        fun showNewTab() {
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
                 if (newBrowserTab.newTabContainerLayout.childCount == 0) {
                     newBrowserTab.newTabContainerLayout.addView(
