@@ -59,10 +59,12 @@ class RealMaliciousSiteProtection @Inject constructor(
             Timber.d("\uD83D\uDFE2 Cris: should not block (no hash) $hashPrefix,  $url")
             return IsMaliciousResult.SAFE
         }
-        maliciousSiteRepository.getFilter(hash)?.let {
-            if (Pattern.compile(it.regex).matcher(url.toString()).find()) {
-                Timber.d("\uD83D\uDFE2 Cris: shouldBlock $url")
-                return IsMaliciousResult.MALICIOUS
+        maliciousSiteRepository.getFilters(hash)?.let {
+            for (filter in it) {
+                if (Pattern.compile(filter.regex).matcher(url.toString()).find()) {
+                    Timber.d("\uD83D\uDFE2 Cris: shouldBlock $url")
+                    return IsMaliciousResult.MALICIOUS
+                }
             }
         }
         appCoroutineScope.launch(dispatchers.io()) {
