@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface TabOperationManager {
-    fun setTabManager(tabViewManager: TabManager)
+    fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean)
     fun getSelectedTabId(): String?
     fun onSelectedTabChanged(tabId: String)
 
@@ -48,11 +48,13 @@ class DefaultTabOperationManager @Inject constructor(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : TabOperationManager {
-    private lateinit var tabViewManager: TabManager
+    private lateinit var onTabsUpdated: (List<String>) -> Unit
+    private lateinit var shouldKeepSingleTab: () -> Boolean
     private var selectedTabId: String? = null
 
-    override fun setTabManager(tabViewManager: TabManager) {
-        this.tabViewManager = tabViewManager
+    override fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean) {
+        this.onTabsUpdated = onTabsUpdated
+        this.shouldKeepSingleTab = shouldKeepSingleTab
     }
 
     override fun getSelectedTabId(): String? = selectedTabId
@@ -61,19 +63,19 @@ class DefaultTabOperationManager @Inject constructor(
         Timber.d("### TabManager.onSelectedTabChanged: $tabId")
         selectedTabId = tabId
 
-        if (tabViewManager.keepSingleTab) {
-            tabViewManager.onTabsUpdated(listOf(tabId))
+        if (shouldKeepSingleTab()) {
+            onTabsUpdated(listOf(tabId))
         }
     }
 
     override suspend fun onTabsChanged(updatedTabIds: List<String>) {
         Timber.d("### TabManager.onTabsUpdated: $updatedTabIds")
-        if (tabViewManager.keepSingleTab) {
+        if (shouldKeepSingleTab()) {
             updatedTabIds.firstOrNull { it == selectedTabId }?.let {
-                tabViewManager.onTabsUpdated(listOf(it))
+                onTabsUpdated(listOf(it))
             }
         } else {
-            tabViewManager.onTabsUpdated(updatedTabIds)
+            onTabsUpdated(updatedTabIds)
         }
 
         if (updatedTabIds.isEmpty()) {

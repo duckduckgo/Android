@@ -38,7 +38,6 @@ interface TabManager : CoroutineScope {
         const val MAX_ACTIVE_TABS = 20
     }
 
-    val keepSingleTab: Boolean
     val tabOperationManager: TabOperationManager
 
     val currentTab: BrowserTabFragment?
@@ -48,7 +47,6 @@ interface TabManager : CoroutineScope {
     fun openMessageInNewTab(message: Message, sourceTabId: String?)
     fun clearTabsInMemory()
     fun onCleanup()
-    fun onTabsUpdated(updatedTabIds: List<String>)
 
     fun onSelectedTabChanged(tabId: String) = tabOperationManager.onSelectedTabChanged(tabId)
     fun onTabsChanged(updatedTabIds: List<String>) = launch { tabOperationManager.onTabsChanged(updatedTabIds) }
@@ -68,9 +66,6 @@ class DefaultTabManager @Inject constructor(
 
     private var openMessageInNewTabJob: Job? = null
 
-    override val keepSingleTab: Boolean
-        get() = !browserActivity.tabPager.isUserInputEnabled
-
     override val tabPagerAdapter by lazy {
         TabPagerAdapter(
             fragmentManager = supportFragmentManager,
@@ -83,7 +78,7 @@ class DefaultTabManager @Inject constructor(
     }
 
     init {
-        tabOperationManager.setTabManager(this)
+        tabOperationManager.registerCallbacks(::onTabsUpdated, ::shouldKeepSingleTab)
     }
 
     override fun onTabPageSwiped(newPosition: Int) {
@@ -111,9 +106,11 @@ class DefaultTabManager @Inject constructor(
         openMessageInNewTabJob?.cancel()
     }
 
-    override fun onTabsUpdated(updatedTabIds: List<String>) {
+    private fun onTabsUpdated(updatedTabIds: List<String>) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
+
+    private fun shouldKeepSingleTab() = !browserActivity.tabPager.isUserInputEnabled
 
     private fun getTabById(tabId: String): TabEntity? = runBlocking {
         return@runBlocking tabOperationManager.getTabById(tabId)
