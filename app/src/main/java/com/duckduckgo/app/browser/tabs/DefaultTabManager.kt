@@ -51,7 +51,9 @@ interface TabManager : CoroutineScope {
     fun onSelectedTabChanged(tabId: String) = tabOperationManager.onSelectedTabChanged(tabId)
     fun onTabsChanged(updatedTabIds: List<String>) = launch { tabOperationManager.onTabsChanged(updatedTabIds) }
     fun switchToTab(tabId: String) = launch { tabOperationManager.selectTab(tabId) }
-    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) = launch { tabOperationManager.openNewTab() }
+    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) = launch {
+        tabOperationManager.openNewTab(query, sourceTabId, skipHome)
+    }
 }
 
 @ContributesBinding(ActivityScope::class)
