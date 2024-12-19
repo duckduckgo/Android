@@ -33,7 +33,7 @@ import timber.log.Timber
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
-    suspend fun getFilter(hash: String): Filter?
+    suspend fun getFilters(hash: String): List<Filter>?
     suspend fun matches(hashPrefix: String): List<Match>
 }
 
@@ -86,9 +86,11 @@ class RealMaliciousSiteRepository @Inject constructor(
         return maliciousSiteDao.getHashPrefix(hashPrefix) != null
     }
 
-    override suspend fun getFilter(hash: String): Filter? {
+    override suspend fun getFilters(hash: String): List<Filter>? {
         return maliciousSiteDao.getFilter(hash)?.let {
-            Filter(it.hash, it.regex)
+            it.map {
+                Filter(it.hash, it.regex)
+            }
         }
     }
 
