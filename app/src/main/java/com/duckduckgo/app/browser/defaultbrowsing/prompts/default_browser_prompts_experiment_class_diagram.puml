@@ -67,10 +67,16 @@ class DefaultBrowserPromptsOverflowMenuState as "(data class) DefaultBrowserProm
 interface DefaultBrowserPromptsDataStore {
   + val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?>
   + val messageDialogOpenedCount: Flow<Int>
+  + val alreadyConverted: Boolean
 
   + suspend fun storeOverflowMenuState(state: DefaultBrowserPromptsOverflowMenuState?)
   + suspend fun storeMessageDialogOpenedCount(count: Int)
 }
+
+note left of DefaultBrowserPromptsDataStore::alreadyConverted
+  Notes if the user has already set the DDG browser as default while enrolled.
+  Prevents counting users that keep changing the default browser multiple time.
+end note
 
 DefaultBrowserPromptsDataStore::overflowMenuState -> DefaultBrowserPromptsOverflowMenuState : uses
 

@@ -1,0 +1,79 @@
+@startuml
+start
+note
+  Flow run each time when user opens or comes back to the app.
+end note
+:App process resumed;
+if (Feature toggle enabled?) then (true)
+  if (Is in the Variant_2 cohort?) then (yes)
+    if (Has user converted already?) then (no)
+      if (Is DDG the default browser app) then (no)
+        switch (Number of message dialogs shown)
+        case (0)
+        note
+          Is this case for new users truly needed?
+          Let's debate during the mid-mortem.
+        end note
+          if (App active use days since enrollment >= 1?) then (yes)
+            :Show message dialog;
+          else (no)
+          endif
+        case (1)
+          if (App active use days since enrollment >= 20?) then (yes)
+            :Show message dialog;
+          else (no)
+          endif
+        case (2)
+          if (App active use days since enrollment >= 40?) then (yes)
+            :Show message dialog;
+            :Show overflow menu highlight;
+            :Show overflow menu item;
+          else (no)
+          endif
+        case (3)
+          if (App active use days since enrollment >= 50?) then (yes)
+            :Remove overflow menu highlight;
+            :Remove overflow menu item;
+          else (no)
+          endif
+        endswitch
+        stop
+      else (yes)
+        :Send conversion pixel;
+        :Persist information that user converted;
+      endif
+    else (yes)
+    endif
+  else (no)
+  endif
+else (false)
+endif
+:Remove overflow menu highlight;
+:Remove overflow menu item;
+stop
+
+start
+note
+  Flow run each time user clicks the overflow menu button.
+end note
+:Overflow menu opened;
+:Remove overflow menu highlight;
+stop
+
+start
+note
+  Flow run each time user clicks "Set as Default Browser" in the message dialog.
+end note
+:Message dialog's call-to-action accepted (primary button clicked);
+:Open system's default browser selection dialog;
+if (System's default browser selection dialog canceled in less than 500 ms?) then (yes)
+  :Open system's default apps settings activity;
+  note
+    Workaround in case user selected "Don't ask again" in the system dialog.
+    Details in [[https://app.asana.com/0/0/1208996977455495/f this Asana task]].
+  end note
+else (no)
+endif
+stop
+
+@enduml
