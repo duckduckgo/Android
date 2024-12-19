@@ -33,4 +33,8 @@
     <string name="undo">Atsaukt</string>
     <string name="cancel">Atcelt</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Vienmēr ieslēgts</string>
+    <string name="on">Ieslēgts</string>
+    <string name="off">Izslēgts</string>
 </resources>

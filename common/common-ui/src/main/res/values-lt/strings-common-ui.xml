@@ -33,4 +33,8 @@
     <string name="undo">Anuliuoti</string>
     <string name="cancel">Atšaukti</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Visada įjungta</string>
+    <string name="on">Įjungti</string>
+    <string name="off">Išjungti</string>
 </resources>

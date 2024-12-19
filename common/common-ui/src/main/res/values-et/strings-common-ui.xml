@@ -33,4 +33,8 @@
     <string name="undo">Võta tagasi</string>
     <string name="cancel">Tühista</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Alati sisse lülitatud</string>
+    <string name="on">Sees</string>
+    <string name="off">Väljas</string>
 </resources>

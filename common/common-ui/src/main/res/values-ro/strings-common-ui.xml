@@ -33,4 +33,8 @@
     <string name="undo">Anulează</string>
     <string name="cancel">Anulează</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Întotdeauna activat</string>
+    <string name="on">Activat</string>
+    <string name="off">Dezactivat</string>
 </resources>

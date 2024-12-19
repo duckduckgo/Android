@@ -33,4 +33,8 @@
     <string name="undo">Rückgängig machen</string>
     <string name="cancel">Abbrechen</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Immer aktiviert</string>
+    <string name="on">Ein</string>
+    <string name="off">Aus</string>
 </resources>

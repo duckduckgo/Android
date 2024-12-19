@@ -33,4 +33,8 @@
     <string name="undo">Poništi</string>
     <string name="cancel">Odustani</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Uvijek uključeno</string>
+    <string name="on">Uključeno</string>
+    <string name="off">Isključeno</string>
 </resources>
