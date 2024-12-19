@@ -17,6 +17,8 @@
 package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import android.annotation.SuppressLint
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -24,17 +26,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Expired
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Subscribed
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.ShowState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -49,15 +55,14 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class ProSettingNetPViewModel(
-    private val networkProtectionSettingsState: NetworkProtectionSettingsState,
-    private val networkProtectionState: NetworkProtectionState,
+class LegacyProSettingNetPViewModel(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
+    private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val networkProtectionEntryState: NetPEntryState = NetPEntryState.Hidden)
+    data class ViewState(val networkProtectionEntryState: NetPEntryState = Hidden)
 
     sealed class Command {
         data class OpenNetPScreen(val params: ActivityParams) : Command()
@@ -65,9 +70,11 @@ class ProSettingNetPViewModel(
 
     sealed class NetPEntryState {
         data object Hidden : NetPEntryState()
-        data class Subscribed(val isActive: Boolean) : NetPEntryState()
-        data object Expired : NetPEntryState()
-        data object Activating : NetPEntryState()
+        data object Pending : NetPEntryState()
+        data class ShowState(
+            @DrawableRes val icon: Int,
+            @StringRes val subtitle: Int,
+        ) : NetPEntryState()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -79,10 +86,7 @@ class ProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(
-                networkProtectionSettingsState.getNetPSettingsStateFlow(),
-                networkProtectionState.getConnectionStateFlow(),
-            ) { accessState, connectionState ->
+            combine(networkProtectionAccessState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
@@ -102,32 +106,51 @@ class ProSettingNetPViewModel(
         }
     }
 
-    private fun getNetworkProtectionEntryState(
-        settingsState: NetPSettingsState,
+    private suspend fun getNetworkProtectionEntryState(
+        accessState: NetPAccessState,
         networkProtectionConnectionState: ConnectionState,
-    ): NetPEntryState =
-        when (settingsState) {
-            Hidden -> NetPEntryState.Hidden
-            Subscribed -> NetPEntryState.Subscribed(isActive = networkProtectionConnectionState.isConnected())
-            Activating -> NetPEntryState.Activating
-            Expired -> NetPEntryState.Expired
+    ): NetPEntryState {
+        return when (accessState) {
+            is NetPAccessState.UnLocked -> {
+                if (networkProtectionState.isOnboarded()) {
+                    val subtitle = when (networkProtectionConnectionState) {
+                        CONNECTED -> R.string.netpSubscriptionSettingsConnected
+                        CONNECTING -> R.string.netpSubscriptionSettingsConnecting
+                        else -> R.string.netpSubscriptionSettingsDisconnected
+                    }
+
+                    val netPItemIcon = if (networkProtectionConnectionState != DISCONNECTED) {
+                        CommonR.drawable.ic_check_green_round_16
+                    } else {
+                        CommonR.drawable.ic_exclamation_yellow_16
+                    }
+
+                    ShowState(
+                        icon = netPItemIcon,
+                        subtitle = subtitle,
+                    )
+                } else {
+                    Pending
+                }
+            }
+
+            NetPAccessState.Locked -> Hidden
         }
+    }
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val networkProtectionSettingsState: NetworkProtectionSettingsState,
-        private val networkProtectionState: NetworkProtectionState,
         private val networkProtectionAccessState: NetworkProtectionAccessState,
+        private val networkProtectionState: NetworkProtectionState,
         private val dispatcherProvider: DispatcherProvider,
         private val pixel: Pixel,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ProSettingNetPViewModel::class.java) -> ProSettingNetPViewModel(
-                        networkProtectionSettingsState,
-                        networkProtectionState,
+                    isAssignableFrom(LegacyProSettingNetPViewModel::class.java) -> LegacyProSettingNetPViewModel(
                         networkProtectionAccessState,
+                        networkProtectionState,
                         dispatcherProvider,
                         pixel,
                     )

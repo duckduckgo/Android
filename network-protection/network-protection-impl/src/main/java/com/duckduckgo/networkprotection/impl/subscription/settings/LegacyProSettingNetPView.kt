@@ -20,25 +20,24 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.databinding.ViewSettingsNetpBinding
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Factory
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Expired
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Subscribed
+import com.duckduckgo.networkprotection.impl.databinding.LegacyViewSettingsNetpBinding
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.Factory
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.ShowState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +48,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ProSettingNetPView @JvmOverloads constructor(
+class LegacyProSettingNetPView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -63,10 +62,10 @@ class ProSettingNetPView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsNetpBinding by viewBinding()
+    private val binding: LegacyViewSettingsNetpBinding by viewBinding()
 
-    private val viewModel: ProSettingNetPViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingNetPViewModel::class.java]
+    private val viewModel: LegacyProSettingNetPViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyProSettingNetPViewModel::class.java]
     }
 
     override fun onAttachedToWindow() {
@@ -74,6 +73,10 @@ class ProSettingNetPView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+
+        binding.netpPSetting.setClickListener {
+            viewModel.onNetPSettingClicked()
+        }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -90,21 +93,14 @@ class ProSettingNetPView @JvmOverloads constructor(
     private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
         with(binding.netpPSetting) {
             when (networkProtectionEntryState) {
-                Hidden -> isGone = true
-                Activating,
-                Expired,
-                -> {
-                    isVisible = true
-                    isClickable = false
-                    setLeadingIconResource(R.drawable.ic_vpn_grayscale_color_24)
-                    setStatus(isOn = false)
+                Hidden -> this.gone()
+                Pending -> {
+                    this.show()
+                    this.setLeadingIconResource(CommonR.drawable.ic_check_grey_round_16)
                 }
-                is Subscribed -> {
-                    isVisible = true
-                    isClickable = true
-                    setClickListener { viewModel.onNetPSettingClicked() }
-                    setLeadingIconResource(R.drawable.ic_vpn_color_24)
-                    setStatus(isOn = networkProtectionEntryState.isActive)
+                is ShowState -> {
+                    this.show()
+                    this.setLeadingIconResource(networkProtectionEntryState.icon)
                 }
             }
         }
