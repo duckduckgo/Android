@@ -97,7 +97,7 @@ class RealMaliciousSiteRepository @Inject constructor(
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
             maliciousSiteService.getMatches(hashPrefix).matches.also {
-                Timber.d("\uD83D\uDFE2 Cris: Fetched $it matches for hash prefix $hashPrefix")
+                Timber.d("\uD83D\uDFE2 Cris: hash prefix $hashPrefix. Fetched $it matches")
             }
         } catch (e: Exception) {
             Timber.d("\uD83D\uDD34 Cris: Failed to fetch matches for hash prefix $hashPrefix")
