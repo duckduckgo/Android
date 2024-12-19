@@ -98,7 +98,7 @@ class WebViewDataManager @Inject constructor(
 
     private fun sendCrashPixel(e: Throwable) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            crashLogger.logCrash(CrashLogger.Crash(shortName = "web_storage_clear", t = e))
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = e))
         }
     }
 
