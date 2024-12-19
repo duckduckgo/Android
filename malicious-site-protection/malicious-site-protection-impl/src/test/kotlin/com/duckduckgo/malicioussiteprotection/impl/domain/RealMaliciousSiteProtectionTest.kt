@@ -81,7 +81,7 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*malicious.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilter(hash)).thenReturn(filter)
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
@@ -97,7 +97,7 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*malicious.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilter(hash)).thenReturn(filter)
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(false)
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
@@ -114,7 +114,7 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*unsafe.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilter(hash)).thenReturn(filter)
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
@@ -131,7 +131,7 @@ class RealMaliciousSiteProtectionTest {
         var onSiteBlockedAsyncCalled = false
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilter(hash)).thenReturn(filter)
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
         whenever(maliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
             .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash)))
 
