@@ -157,6 +157,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
+import com.duckduckgo.app.browser.commands.Command.WebViewWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
@@ -3105,6 +3106,11 @@ class BrowserTabViewModel @Inject constructor(
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         command.postValue(WebViewError(errorType, url))
+    }
+
+    override fun onReceivedMaliciousSiteWarning(url: Uri) {
+        // TODO (cbarreiro): Fire pixel
+        command.postValue(WebViewWarningMaliciousSite(url))
     }
 
     override fun recordErrorCode(
