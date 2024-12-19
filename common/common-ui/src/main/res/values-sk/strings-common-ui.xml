@@ -33,8 +33,4 @@
     <string name="undo">Zrušiť zmenu</string>
     <string name="cancel">Zrušiť</string>
 
-    <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
 </resources>
