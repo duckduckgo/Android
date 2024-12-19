@@ -19,10 +19,13 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,6 +34,8 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface WebDataManager {
     suspend fun clearData(
@@ -51,6 +56,9 @@ class WebViewDataManager @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val localStorageManager: LocalStorageManager,
+    private val crashLogger: CrashLogger,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -79,11 +87,18 @@ class WebViewDataManager @Inject constructor(
             kotlin.runCatching {
                 localStorageManager.clearLocalStorage()
                 continuation.resume(Unit)
-            }.onFailure {
+            }.onFailure { e ->
+                sendCrashPixel(e)
                 // fallback, if we crash we delete everything
                 webStorage.deleteAllData()
                 continuation.resume(Unit)
             }
+        }
+    }
+
+    private fun sendCrashPixel(e: Throwable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "web_storage_clear", t = e))
         }
     }
 
