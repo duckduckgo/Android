@@ -247,8 +247,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             subscriptionOffers.getValue(MONTHLY_PLAN_US) to subscriptionOffers.getValue(YEARLY_PLAN_US)
                         }
 
-                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) &&
-                            privacyProFeature.isLaunchedROW().isEnabled() -> {
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
                             subscriptionOffers.getValue(MONTHLY_PLAN_ROW) to subscriptionOffers.getValue(YEARLY_PLAN_ROW)
                         }
 

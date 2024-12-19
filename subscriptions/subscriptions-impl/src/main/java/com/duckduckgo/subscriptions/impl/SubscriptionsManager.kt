@@ -43,7 +43,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.privacyProActivePlans
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
@@ -656,12 +655,19 @@ class RealSubscriptionsManager @Inject constructor(
         data class Failure(val message: String) : RecoverSubscriptionResult()
     }
 
+    private suspend fun activePlanIds(): List<String> =
+        if (isLaunchedRow()) {
+            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
+        } else {
+            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
+        }
+
     override suspend fun getSubscriptionOffer(): List<SubscriptionOfferDetails> =
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
             .orEmpty()
-            .filter { privacyProActivePlans.contains(it.basePlanId) }
+            .filter { activePlanIds().contains(it.basePlanId) }
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
@@ -875,6 +881,10 @@ class RealSubscriptionsManager @Inject constructor(
             }
             throw e
         }
+    }
+
+    private suspend fun isLaunchedRow(): Boolean = withContext(dispatcherProvider.io()) {
+        privacyProFeature.get().isLaunchedROW().isEnabled()
     }
 
     private fun parseError(e: HttpException): ResponseError? {
