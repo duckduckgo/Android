@@ -2524,6 +2524,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onSetDefaultBrowserSelected() {
+        // no-op, to be implemented
+    }
+
     fun onShareSelected() {
         url?.let {
             viewModelScope.launch(dispatchers.io()) {

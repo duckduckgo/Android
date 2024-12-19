@@ -34,6 +34,7 @@ data class BrowserViewState(
     val showTabsButton: Boolean = true,
     val fireButton: HighlightableButton = HighlightableButton.Visible(),
     val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
+    val showSelectDefaultBrowserMenuItem: Boolean = false,
     val canSharePage: Boolean = false,
     val canSaveSite: Boolean = false,
     val bookmark: SavedSite.Bookmark? = null,
