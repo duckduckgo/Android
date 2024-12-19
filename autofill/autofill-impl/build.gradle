@@ -72,7 +72,7 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation AndroidX.biometric
 
-    implementation "net.zetetic:android-database-sqlcipher:_"
+    implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"
 
     // Testing dependencies
