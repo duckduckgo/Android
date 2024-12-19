@@ -18,29 +18,29 @@ package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
+// import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-interface DefaultBrowserPromptsDataStore {
-    val showOverflowMenuDot: Flow<Boolean>
-    val
+// interface DefaultBrowserPromptsDataStore {
+//     val showOverflowMenuDot: Flow<Boolean>
+    // val
 
     // val data: Flow<TabSwitcherData>
 
     // suspend fun setUserState(userState: UserState)
-}
+// }
 
-@ContributesBinding(AppScope::class)
-class DefaultBrowserPromptsPrefsDataStore @Inject constructor(
-    @DefaultBrowserPrompts private val store: DataStore<Preferences>,
-) : DefaultBrowserPromptsDataStore {
-    companion object {
-        const val KEY_USER_STATE = "KEY_USER_STATE"
-        const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
-    }
+// @ContributesBinding(AppScope::class)
+// class DefaultBrowserPromptsPrefsDataStore @Inject constructor(
+//     @DefaultBrowserPrompts private val store: DataStore<Preferences>,
+// ) : DefaultBrowserPromptsDataStore {
+//     companion object {
+//         const val KEY_USER_STATE = "KEY_USER_STATE"
+//         const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
+//     }
 
     // override val data: Flow<TabSwitcherData> = store.data.map { preferences ->
     //     TabSwitcherData(
@@ -60,4 +60,4 @@ class DefaultBrowserPromptsPrefsDataStore @Inject constructor(
     //         preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] = layoutType.name
     //     }
     // }
-}
+// }

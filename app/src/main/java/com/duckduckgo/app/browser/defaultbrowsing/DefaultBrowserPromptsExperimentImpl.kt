@@ -18,6 +18,10 @@ package com.duckduckgo.app.browser.defaultbrowsing
 
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohorts
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,8 +31,10 @@ class DefaultBrowserPromptsExperimentImpl(
 ) {
     private val _showOverflowMenuDot = MutableStateFlow(false)
     private val _showOverflowMenuItem = MutableStateFlow(false)
+    private val _test = MutableSharedFlow<Boolean>()
     val showOverflowMenuDot: StateFlow<Boolean> = _showOverflowMenuDot.asStateFlow()
     val showOverflowMenuItem: StateFlow<Boolean> = _showOverflowMenuItem.asStateFlow()
+    private val command = Channel<Command>(1, DROP_OLDEST)
 
     init {
         when {

@@ -22,7 +22,7 @@ DefaultBrowserPromptsExperimentCommand <|-- OpenSystemDefaultAppsActivity : exte
 interface DefaultBrowserPromptsExperiment {
   + val highlightOverflowMenu: StateFlow<Boolean>
   + val showOverflowMenuItem: StateFlow<Boolean>
-  + val commands: SharedFlow<DefaultBrowserPromptsExperiment.Command>
+  + val commands: Flow<DefaultBrowserPromptsExperiment.Command>
 
   + fun onOverflowMenuOpened()
   + fun onOverflowMenuItemClicked()
@@ -41,6 +41,14 @@ interface DefaultBrowserPromptsExperiment {
 }
 
 DefaultBrowserPromptsExperiment::commands -> DefaultBrowserPromptsExperimentCommand : uses
+
+note left of DefaultBrowserPromptsExperiment::commands
+  Backed by a //Conflated Channel// so that the experiment
+  can prepare an intent to be launched without being coupled
+  with Activity/Fragment's lifecycle.
+
+  The Activity/Fragment will pick up and execute the intent whenever its ready to do so.
+end note
 
 class DefaultBrowserPromptsOverflowMenuState as "(data class) DefaultBrowserPromptsOverflowMenuState" {
   + activatedDate: String

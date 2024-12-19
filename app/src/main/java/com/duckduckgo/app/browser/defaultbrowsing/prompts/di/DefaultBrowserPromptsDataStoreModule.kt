@@ -26,18 +26,18 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
 
-@ContributesTo(AppScope::class)
-@Module
-object DefaultBrowserPromptsDataStoreModule {
-
-    private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "default_browser_prompts",
-    )
-
-    @Provides
-    @DefaultBrowserPrompts
-    fun defaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
-}
-
-@Qualifier
-annotation class DefaultBrowserPrompts
+// @ContributesTo(AppScope::class)
+// @Module
+// object DefaultBrowserPromptsDataStoreModule {
+//
+//     private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
+//         name = "default_browser_prompts",
+//     )
+//
+//     @Provides
+//     @DefaultBrowserPrompts
+//     fun defaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
+// }
+//
+// @Qualifier
+// annotation class DefaultBrowserPrompts
