@@ -32,6 +32,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
 import android.graphics.Typeface
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -631,7 +632,14 @@ class BrowserTabFragment :
             binding.rootView.makeSnackbarWithNoBottomInset(
                 resId = string.brokenSiteSubmittedReportMessage,
                 duration = Snackbar.LENGTH_LONG,
-            ).show()
+            )
+                .setBackgroundTint(
+                    ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.gray90)
+                )
+                .setTextColor(
+                    ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.white84)
+                )
+                .show()
         }
     }
 
