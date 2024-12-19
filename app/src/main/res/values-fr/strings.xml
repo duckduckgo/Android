@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">La protection contre le pistage sur le Web est activée</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ne vous suit jamais et fait de son mieux pour préserver votre vie privée. Nous ne cessons d\'entretenir et de développer des couches de protection pour ne jamais nous laisser dépasser par les nouvelles méthodes de pistage. Nous fournissons aussi de nombreuses protections que les autres navigateurs ne proposent pas par défaut. <u><a href=\"\">En savoir plus</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>

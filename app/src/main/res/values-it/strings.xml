@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionTitle">La protezione dal tracciamento Web è abilitata</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protezione pop-up dei cookie</string>

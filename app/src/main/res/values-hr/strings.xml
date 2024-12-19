@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu je omogućena</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo te nikad ne prati i nastojimo zaštititi tvoju privatnost što je više moguće. Neprestano održavamo i razvijamo slojeve zaštite kako bismo bili u toku s novim metodama praćenja i pružamo mnoge zaštite koje drugi preglednici ne nude prema zadanim postavkama. <u><a href=\"\">Saznaj više</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>

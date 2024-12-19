@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionTitle">Nettsporingsbeskyttelse er aktivert</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer deg aldri, og vi er opptatt av å beskytte personvernet ditt så godt som mulig. Vi vedlikeholder og utvikler kontinuerlig beskyttelseslag for å holde tritt med nye sporingsmetoder og tilbyr mange beskyttelsestiltak som andre nettlesere ikke har som standard. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>

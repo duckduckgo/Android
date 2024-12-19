@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>

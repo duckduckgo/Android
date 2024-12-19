@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu je povolená</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>

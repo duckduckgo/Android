@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecția împotriva urmăririi pe web este activată</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>

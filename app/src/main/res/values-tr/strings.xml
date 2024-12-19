@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
