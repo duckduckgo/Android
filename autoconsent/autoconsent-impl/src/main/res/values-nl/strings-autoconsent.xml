@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Bescherming tegen cookiepop-ups</string>
     <string name="autoconsentDescription"><![CDATA[Wanneer DuckDuckGo cookiepop-ups op bezochte websites detecteert, kunnen we automatisch je cookievoorkeuren instellen om het aantal cookies tot een minimum te beperken en je privacy te beschermen. De pop-ups worden vervolgens gesloten. <u><a href=\"\">Meer informatie</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Laat DuckDuckGo cookiepop-ups verwerken</string>
 </resources>

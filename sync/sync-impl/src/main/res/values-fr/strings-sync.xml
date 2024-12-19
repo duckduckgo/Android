@@ -36,7 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synchronisez en toute sécurité les signets et mots de passe entre vos appareils.</string>
     <string name="sync_off_hint">Vos données sont cryptées de bout en bout et DuckDuckGo n\'a pas accès à la clé de chiffrement.</string>
     <string name="sync_setup_single_device_title">Configuration d\'un seul appareil</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
+    <string name="sync_setup_other_options_title">Autres options</string>
     <string name="sync_setup_single_recover_data_cta_title">Récupérer les données synchronisées</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchroniser et sauvegarder cet appareil</string>
 

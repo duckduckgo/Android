@@ -19,6 +19,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Protezione pop-up dei cookie</string>
     <string name="autoconsentDescription"><![CDATA[Quando DuckDuckGo rileva la presenza di popup sui cookie sui siti che visiti, può impostare automaticamente le tue preferenze in modo da ridurre al minimo i cookie e aumentare la privacy, chiudendo poi i popup. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
+    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo cercherà di selezionare le impostazioni con la massima privacy e nasconderà questi popup per te.<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="autoconsentToggle">Lascia che DuckDuckGo gestisca i pop-up cookie</string>
 </resources>

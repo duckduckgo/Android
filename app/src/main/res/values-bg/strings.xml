@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Защита на поверителността</string>
+    <string name="settingsHeadingPrivacyProtections">Защита на поверителността</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
     <string name="settingsHeadingCustomize">Персонализиране</string>
     <string name="settingsHeadingAbout">За нас</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Защита на имейл</string>
     <string name="settingsEmailProtectionSubtitle">Блокирайте имейл тракерите и скрийте своя адрес</string>
     <string name="settingsHeadingMore">Още от DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Следващи стъпки</string>
+    <string name="settingsHeadingNextSteps">Следващи стъпки</string>
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тъмен</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Основни настройки</string>
+    <string name="settingsHeadingMainSettings">Основни настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Изчистване на данни</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Добавяне на приспособлението към началния екран</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Задайте позицията на адресната лента</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Активиране на гласово търсене</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo на други платформи</string>
+    <string name="settingsDataClearing">Изчистване на данни</string>
+    <string name="settingsAddWidget">Добавяне на приспособлението към началния екран</string>
+    <string name="settingsAddressBarPosition">Задайте позицията на адресната лента</string>
+    <string name="settingsEnableVoiceSearch">Активиране на гласово търсене</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo на други платформи</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">поверително търсене</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защитата от проследяване в мрежата е активирана</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo никога не Ви проследява и се стремим да защитим Вашата поверителност във възможно най-голяма степен. Непрекъснато поддържаме и развиваме слоеве на защита, за да сме в крак с новите методи за проследяване и да осигуряваме много защити, които другите браузъри не предлагат по подразбиране. <u><a href=\"\">Научете повече</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Изчистване на данни</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
 
     <string name="settingsAutomaticallyClearWhat">Автоматично изчистване…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Автоматично изчистване на данните…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматично изчистване…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">За нас</string>
     <string name="aboutHeader">Добре дошли на наша страна!</string>
     <string name="aboutDescription">DuckDuckGo е независима компания, основана през 2008 г., за защита на личните данни в интернет за всеки, на когото му е омръзнало да бъде проследяван онлайн и иска лесно решение на проблема. Ние сме доказателство, че можете да получите реална и безкомпромисна защита на личните данни онлайн.\n\nБраузърът DuckDuckGo притежава функциите, които очаквате от един основен браузър, като отметки, раздели, пароли и много други, както и <annotation type="privacy_protection_link">редица мощни защити на поверителността</annotation>, които повечето популярни браузъри не предлагат по подразбиране. Този уникален и комплексен набор от защити на поверителността предлага сигурност при онлайн дейностите – търсене, сърфиране, изпращане на имейли и др.\n\nЗа да работят, нашите защити на поверителността не изискват да имате технически познания или да се извършвате сложни настройки. Необходимо е да използвате браузъра DuckDuckGo на всички Ваши устройства и ще получите поверителност по подразбиране.\n\nНо ако искате да надникнете зад кулисите и да разберете как работят защитите на поверителността на DuckDuckGo, можете да намерите повече информация на нашите <annotation type="learn_more_link">страници за помощ</annotation>.</string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo е независима компания за защита на личните данни в интернет, основана през 2008 г., предлагаща продукт, подходящ за всеки, на когото му е омръзнало да бъде проследяван онлайн и иска лесно решение. Ние сме доказателство, че можеш да получиш реална защита на личните данни онлайн без компромиси.\n\nБраузърът DuckDuckGo притежава функциите, които очаквате от един основен браузър, като отметки, раздели, пароли и много други, както и <annotation type="privacy_protection_link">редица мощни защити на поверителността</annotation>, които повечето популярни браузъри не предлагат по подразбиране. Този уникален и комплексен набор от защити на поверителността предлага сигурност при онлайн дейностите – търсене, сърфиране, изпращане на имейли и др.\n\nЗа да работят, нашите защити на поверителността не изискват да имате технически познания или да се извършвате сложни настройки. Необходимо е само да използвате браузъра DuckDuckGo на всички свои устройства и ще получите поверителност по подразбиране.\n\nНо ако искате да надникнете зад кулисите и да разберете как работят защитите на поверителността на DuckDuckGo, можете да намерите повече информация на нашите <annotation type="learn_more_link">страници за помощ</annotation>.</string>
     <string name="no_suggestions">Няма предложения</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Пароли</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Пароли и автоматично попълване</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автоматично попълване</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
 

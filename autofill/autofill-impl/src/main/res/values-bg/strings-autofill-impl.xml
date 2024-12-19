@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Изход от настройката</string>
 
     <string name="autofillManagementScreenTitle">Пароли</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Пароли и автоматично попълване</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени пароли</string>
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на паролите</string>
     <string name="credentialManagementAutofillSubtitle">Паролите са криптирани. Никой освен Вас не може да ги види, дори ние. <annotation type="learn_more_link">Научете повече</annotation></string>

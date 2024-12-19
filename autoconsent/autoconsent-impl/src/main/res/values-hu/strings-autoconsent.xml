@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Felugró sütiablak elleni védelem</string>
     <string name="autoconsentDescription"><![CDATA[Amikor a DuckDuckGo a meglátogatott webhelyeken sütik elfogadására szolgáló felugró ablakokat észlel, a sütik minimalizálása és az adatvédelem maximalizálása érdekében automatikusan megadhatjuk a sütikre vonatkozó beállításaidat, és bezárhatjuk a felugró ablakokat. <u><a href=\"\">További részletek</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">A DuckDuckGo kezelje a felugró sütiablakokat</string>
 </resources>

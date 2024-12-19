@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Elimină de pe acest dispozitiv</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
     <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
+    <string name="subscriptionSettingActivating">Se activează</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Ești gata.</string>
