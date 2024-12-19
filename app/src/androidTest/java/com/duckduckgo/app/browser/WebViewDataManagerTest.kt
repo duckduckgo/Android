@@ -36,7 +36,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -55,7 +54,6 @@ class WebViewDataManagerTest {
     private val localStorageManager: LocalStorageManager = mock()
     private val mockCrashLogger: CrashLogger = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-    private val dataDir: String = "test_data_dir"
 
     private val testee = WebViewDataManager(
         context,
@@ -69,11 +67,6 @@ class WebViewDataManagerTest {
         TestScope(),
         CoroutineTestRule().testDispatcherProvider,
     )
-
-    @Before
-    fun setup() {
-        context.applicationInfo.dataDir = dataDir
-    }
 
     @Test
     fun whenDataClearedThenWebViewHistoryCleared() = runTest {
@@ -160,7 +153,7 @@ class WebViewDataManagerTest {
             testee.clearData(webView, mockStorage)
 
             verify(mockFileDeleter).deleteContents(
-                File(dataDir, "app_webview"),
+                File(context.applicationInfo.dataDir, "app_webview"),
                 listOf("Default", "Cookies"),
             )
         }
@@ -175,7 +168,7 @@ class WebViewDataManagerTest {
             testee.clearData(webView, mockStorage)
 
             verify(mockFileDeleter).deleteContents(
-                File(dataDir, "app_webview/Default"),
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
                 listOf("Cookies"),
             )
         }
@@ -190,7 +183,7 @@ class WebViewDataManagerTest {
             testee.clearData(webView, mockStorage)
 
             verify(mockFileDeleter).deleteContents(
-                File(dataDir, "app_webview/Default"),
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
                 listOf("Cookies", "Local Storage"),
             )
         }
