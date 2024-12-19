@@ -120,7 +120,6 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Afslut opsætning</string>
 
     <string name="autofillManagementScreenTitle">Adgangskoder</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
     <string name="credentialManagementAutofillSubtitle">Adgangskoderne er krypterede. Ingen andre end dig kan se dem, ikke engang os. <annotation type="learn_more_link">Få mere at vide</annotation></string>

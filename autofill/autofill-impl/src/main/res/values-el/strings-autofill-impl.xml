@@ -120,7 +120,6 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Έξοδος από την εγκατάσταση</string>
 
     <string name="autofillManagementScreenTitle">Κωδικοί πρόσβασης</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
     <string name="credentialManagementAutofillSubtitle">Οι κωδικοί πρόσβασης είναι κρυπτογραφημένοι. Κανείς άλλος εκτός από εσάς δεν μπορεί να τους βλέπει, ούτε καν εμείς. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
