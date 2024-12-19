@@ -29,11 +29,14 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -52,6 +55,8 @@ class WebViewDataManagerTest {
     private val localStorageManager: LocalStorageManager = mock()
     private val mockCrashLogger: CrashLogger = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val dataDir: String = "test_data_dir"
+
     private val testee = WebViewDataManager(
         context,
         WebViewSessionInMemoryStorage(),
@@ -64,6 +69,11 @@ class WebViewDataManagerTest {
         TestScope(),
         CoroutineTestRule().testDispatcherProvider,
     )
+
+    @Before
+    fun setup() {
+        context.applicationInfo.dataDir = dataDir
+    }
 
     @Test
     fun whenDataClearedThenWebViewHistoryCleared() = runTest {
@@ -139,6 +149,50 @@ class WebViewDataManagerTest {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage)
             verify(mockCookieManager).removeExternalCookies()
+        }
+    }
+
+    @Test
+    fun whenClearDataThenAppWebviewContentsDeletedExceptDefaultAndCookies() = runTest {
+        withContext(Dispatchers.Main) {
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(dataDir, "app_webview"),
+                listOf("Default", "Cookies"),
+            )
+        }
+    }
+
+    @Test
+    fun whenClearDataAndKillSwitchEnabledThenDefaultContentsDeletedExceptCookies() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.deleteLocalStorageKillSwitch().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(dataDir, "app_webview/Default"),
+                listOf("Cookies"),
+            )
+        }
+    }
+
+    @Test
+    fun whenClearDataAndKillSwitchDisabledThenDefaultContentsDeletedExceptCookiesAndLocalStorage() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.deleteLocalStorageKillSwitch().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(dataDir, "app_webview/Default"),
+                listOf("Cookies", "Local Storage"),
+            )
         }
     }
 
