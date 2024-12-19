@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Izhod iz nastavitev</string>
 
     <string name="autofillManagementScreenTitle">Gesla</string>
+    <string name="autofillManagementScreenTitleNew">Gesla in samodejno izpolnjevanje</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nobeno geslo še ni shranjeno</string>
     <string name="credentialManagementAutofillToggleLabel">Shranite in samodejno izpolnite gesla</string>
     <string name="credentialManagementAutofillSubtitle">Gesla so šifrirana. Nihče razen vas jih ne more videti, niti mi. <annotation type="learn_more_link">Več o tem</annotation></string>

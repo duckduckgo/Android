@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kilépés a beállításokból</string>
 
     <string name="autofillManagementScreenTitle">Jelszavak</string>
+    <string name="autofillManagementScreenTitleNew">Jelszavak és automatikus kitöltés</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett jelszavak</string>
     <string name="credentialManagementAutofillToggleLabel">Jelszavak mentése és automatikus kitöltése</string>
     <string name="credentialManagementAutofillSubtitle">A jelszavak titkosítva vannak. Rajtad kívül senki sem láthatja őket, még mi sem. <annotation type="learn_more_link">További tudnivalók</annotation></string>

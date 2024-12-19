@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Izađi iz postavljanja</string>
 
     <string name="autofillManagementScreenTitle">Lozinke</string>
+    <string name="autofillManagementScreenTitleNew">Lozinke i automatsko popunjavanje</string>
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih lozinki</string>
     <string name="credentialManagementAutofillToggleLabel">Spremi i automatski popuni lozinke</string>
     <string name="credentialManagementAutofillSubtitle">Lozinke su šifrirane. Nitko osim tebe ne može ih vidjeti, čak ni mi. <annotation type="learn_more_link">Saznaj više</annotation></string>
