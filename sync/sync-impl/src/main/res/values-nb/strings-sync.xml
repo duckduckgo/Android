@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synkroniser bokmerker og passord på en sikker måte mellom enhetene dine.</string>
     <string name="sync_off_hint">Dataene dine er ende-til-ende-kryptert og DuckDuckGo har ikke tilgang til krypteringsnøkkelen.</string>
     <string name="sync_setup_single_device_title">Oppsett for én enhet</string>
+    <string name="sync_setup_other_options_title">Andre alternativer</string>
     <string name="sync_setup_single_recover_data_cta_title">Gjenopprett synkroniserte data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synkroniser og sikkerhetskopier denne enheten</string>
 
