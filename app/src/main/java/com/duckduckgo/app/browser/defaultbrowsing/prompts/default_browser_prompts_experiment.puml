@@ -61,14 +61,50 @@ class DefaultBrowserPromptsExperimentImpl {
   - val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
   - val defaultBrowserDetector: DefaultBrowserDetector
   - val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+  - val defaultBrowserSystemSettings: DefaultBrowserSystemSettings
   - val appDaysUsedRepository: AppDaysUsedRepository
-  - val appInstallStore: AppInstallStore
   - val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore
+  - val appInstallStore: AppInstallStore
 }
 
 DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : implements
 
 DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore --> DefaultBrowserPromptsDataStore : uses
+
+note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsFeatureToggles
+  Used to manage cohorts and enrolment.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserDetector
+  Used to check if the browser is set as default.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::defaultRoleBrowserDialog
+  Used to generate the intent to open the system's
+  default browser dialog.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserSystemSettings
+  Used to generate the intent to open the system's
+  default app settings activity.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::appDaysUsedRepository
+  Used to monitor the active use days.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore
+  Used to persist the stage of the experiment.
+  Includes count of dialogs opened and overflow menu state.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::appInstallStore
+  Used to observe if the default browser state has changed.
+
+  Extend the AppInstallStore by a "//val defaultBrowserStateChanged: SharedFlow<Boolean>//",
+  or refactor it to be based on //DataStore<Preference>// instead of //SharedPreferences//,
+  so that we can observe if the default browser has been changed while the app is running.
+end note
 
 component BrowserViewModel
 BrowserViewModel --> DefaultBrowserPromptsExperiment : uses
