@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Personvern</string>
+    <string name="settingsHeadingPrivacyProtections">Personvern</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Tilpass</string>
     <string name="settingsHeadingAbout">Om</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-postbeskyttelse</string>
     <string name="settingsEmailProtectionSubtitle">Blokker e-postsporere og skjul adressen din</string>
     <string name="settingsHeadingMore">Mer fra DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Neste trinn</string>
+    <string name="settingsHeadingNextSteps">Neste trinn</string>
     <string name="settingsLightTheme">Lyst</string>
     <string name="settingsTheme">Utseende</string>
     <string name="settingsDarkTheme">Mørk</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
     <string name="settingsHeadingSettings">Innstillinger</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hovedinnstillinger</string>
+    <string name="settingsHeadingMainSettings">Hovedinnstillinger</string>
     <string name="settingsPermissionsSetting">Tillatelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Sletting av data</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Legg til widgeten på startskjermen</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Angi plassering av adressefeltet</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Aktiver talesøk</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo på andre plattformer</string>
+    <string name="settingsDataClearing">Sletting av data</string>
+    <string name="settingsAddWidget">Legg til widgeten på startskjermen</string>
+    <string name="settingsAddressBarPosition">Angi plassering av adressefeltet</string>
+    <string name="settingsEnableVoiceSearch">Aktiver talesøk</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre plattformer</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søk</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Passord</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Passord og autofyll</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Passord og autofyll</string>
     <string name="autofillLoginSavedSnackbarMessage">Passordet er lagret</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Passordet er oppdatert</string>
 

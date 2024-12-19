@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privātuma aizsardzība</string>
+    <string name="settingsHeadingPrivacyProtections">Privātuma aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
     <string name="settingsHeadingCustomize">Pielāgošana</string>
     <string name="settingsHeadingAbout">Par</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
     <string name="settingsEmailProtectionSubtitle">Bloķē e-pasta izsekotājus un paslēp savu adresi</string>
     <string name="settingsHeadingMore">Vairāk no DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Nākamie soļi</string>
+    <string name="settingsHeadingNextSteps">Nākamie soļi</string>
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
     <string name="settingsDarkTheme">Tumšs</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Galvenie iestatījumi</string>
+    <string name="settingsHeadingMainSettings">Galvenie iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datu notīrīšana</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Pievienot logrīku sākuma ekrānam</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Iestati adreses joslas pozīciju</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Iespējot balss meklēšanu</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo citās platformās</string>
+    <string name="settingsDataClearing">Datu notīrīšana</string>
+    <string name="settingsAddWidget">Pievienot logrīku sākuma ekrānam</string>
+    <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
+    <string name="settingsEnableVoiceSearch">Iespējot balss meklēšanu</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo citās platformās</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privāta meklēšana</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Paroles</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Paroles un automātiskā aizpildīšana</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Paroles un automātiskā aizpildīšana</string>
     <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>
 

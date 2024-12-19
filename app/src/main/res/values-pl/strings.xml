@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ustawienia</string>
     <string name="settingsMenuItemTitle">Ustawienia</string>
     <string name="settingsHeadingPrivacy">Prywatność</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Mechanizmy Ochrony Prywatności</string>
+    <string name="settingsHeadingPrivacyProtections">Mechanizmy Ochrony Prywatności</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
     <string name="settingsHeadingCustomize">Spersonalizuj</string>
     <string name="settingsHeadingAbout">Informacje</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres</string>
     <string name="settingsHeadingMore">Więcej możliwości DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Dalsze kroki</string>
+    <string name="settingsHeadingNextSteps">Dalsze kroki</string>
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Ustawienia główne</string>
+    <string name="settingsHeadingMainSettings">Ustawienia główne</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Czyszczenie danych</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Dodaj widżet do ekranu głównego</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Ustaw pozycję paska adresu</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Włącz wyszukiwanie głosowe</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na innych platformach</string>
+    <string name="settingsDataClearing">Czyszczenie danych</string>
+    <string name="settingsAddWidget">Dodaj widżet do ekranu głównego</string>
+    <string name="settingsAddressBarPosition">Ustaw pozycję paska adresu</string>
+    <string name="settingsEnableVoiceSearch">Włącz wyszukiwanie głosowe</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na innych platformach</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Prywatne Wyszukiwanie</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Hasła</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Hasła i autouzupełnianie</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Hasła i autouzupełnianie</string>
     <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
 

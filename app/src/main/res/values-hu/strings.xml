@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Adatvédelem</string>
+    <string name="settingsHeadingPrivacyProtections">Adatvédelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
     <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Következő lépések</string>
+    <string name="settingsHeadingNextSteps">Következő lépések</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Főbeállítások</string>
+    <string name="settingsHeadingMainSettings">Főbeállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Adattörlés</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Állítsd be a címsor elhelyezkedését</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Beszédhangalapú keresés engedélyezése</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo más platformokhoz</string>
+    <string name="settingsDataClearing">Adattörlés</string>
+    <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
+    <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
+    <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Jelszavak</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Jelszavak és automatikus kitöltés</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Jelszavak és automatikus kitöltés</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
 

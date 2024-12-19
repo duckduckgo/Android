@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nastavenia</string>
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Ochrana súkromia</string>
+    <string name="settingsHeadingPrivacyProtections">Ochrana súkromia</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
     <string name="settingsHeadingCustomize">Prispôsobiť</string>
     <string name="settingsHeadingAbout">O</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsEmailProtectionSubtitle">Zablokujte nástroje na sledovanie e‑mailov a skryte vašu adresu</string>
     <string name="settingsHeadingMore">Viac od DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Ďalšie kroky</string>
+    <string name="settingsHeadingNextSteps">Ďalšie kroky</string>
     <string name="settingsLightTheme">Svetlá</string>
     <string name="settingsTheme">Motív</string>
     <string name="settingsDarkTheme">Tmavý</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hlavné nastavenia</string>
+    <string name="settingsHeadingMainSettings">Hlavné nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Vymazanie údajov</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Pridať miniaplikáciu na domovskú obrazovku</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Nastavenie polohy panela s adresou</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Povoliť hlasové vyhľadávanie</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na iných platformách</string>
+    <string name="settingsDataClearing">Vymazanie údajov</string>
+    <string name="settingsAddWidget">Pridať miniaplikáciu na domovskú obrazovku</string>
+    <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
+    <string name="settingsEnableVoiceSearch">Povoliť hlasové vyhľadávanie</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Súkromné vyhľadávanie</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Heslo</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Heslá a automatické dopĺňanie</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Heslá a automatické dopĺňanie</string>
     <string name="autofillLoginSavedSnackbarMessage">Uložené heslo</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Aktualizácia hesla</string>
 

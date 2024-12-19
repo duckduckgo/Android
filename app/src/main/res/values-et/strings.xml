@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privaatsuskaitsed</string>
+    <string name="settingsHeadingPrivacyProtections">Privaatsuskaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
     <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
     <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Järgmised sammud</string>
+    <string name="settingsHeadingNextSteps">Järgmised sammud</string>
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tume</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Peamised seaded</string>
+    <string name="settingsHeadingMainSettings">Peamised seaded</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Andmete kustutamine</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Lisa vidin avakuvale</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Määra aadressiriba asukoht</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Luba häälotsing</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo muudel platvormidel</string>
+    <string name="settingsDataClearing">Andmete kustutamine</string>
+    <string name="settingsAddWidget">Lisa vidin avakuvale</string>
+    <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
+    <string name="settingsEnableVoiceSearch">Luba häälotsing</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privaatne otsing</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Paroolid</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Paroolid ja automaatne täitmine</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Paroolid ja automaatne täitmine</string>
     <string name="autofillLoginSavedSnackbarMessage">Parool salvestatud</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parool uuendatud</string>
 
