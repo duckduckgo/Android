@@ -48,6 +48,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(true)
     fun showExcludeAppPrompt(): Toggle // kill switch
+
+    @DefaultValue(true)
+    fun allowBlockMalware(): Toggle // kill switch
 }
 
 @ContributesBinding(AppScope::class)
