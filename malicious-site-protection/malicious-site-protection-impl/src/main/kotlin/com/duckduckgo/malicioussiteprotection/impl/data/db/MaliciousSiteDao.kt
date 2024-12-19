@@ -17,6 +17,7 @@
 package com.duckduckgo.malicioussiteprotection.impl.data.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -31,6 +32,12 @@ interface MaliciousSiteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHashPrefixes(items: List<HashPrefixEntity>)
+
+    @Delete(HashPrefixEntity::class)
+    suspend fun deleteHashPrefixes()
+
+    @Delete(FilterEntity::class)
+    suspend fun deleteFilters()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFilters(items: Set<FilterEntity>)
@@ -60,6 +67,8 @@ interface MaliciousSiteDao {
     ) {
         val lastRevision = getLatestRevision()
         deleteRevisions()
+        deleteFilters()
+        deleteHashPrefixes()
 
         insertRevision(
             RevisionEntity(
