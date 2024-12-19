@@ -38,7 +38,6 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -72,7 +71,6 @@ class OnboardingDaxDialogTests {
     private val onboardingStore: OnboardingStore = mock()
     private val userStageStore: UserStageStore = mock()
     private val tabRepository: TabRepository = mock()
-    private val dispatchers: DispatcherProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
@@ -95,7 +93,13 @@ class OnboardingDaxDialogTests {
             widgetCapabilities,
             dismissedCtaDao,
             userAllowListRepository,
-            settingsDataStore, onboardingStore, userStageStore, tabRepository, dispatchers, duckDuckGoUrlDetector, extendedOnboardingFeatureToggles,
+            settingsDataStore,
+            onboardingStore,
+            userStageStore,
+            tabRepository,
+            coroutineRule.testDispatcherProvider,
+            duckDuckGoUrlDetector,
+            extendedOnboardingFeatureToggles,
             subscriptions = mock(),
             mockDuckPlayer,
             mockHighlightsOnboardingExperimentManager,
