@@ -20,27 +20,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.databinding.LegacyViewPirSettingsBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Activating
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Expired
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Subscribed
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -51,7 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class PirSettingView @JvmOverloads constructor(
+class LegacyPirSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -65,10 +60,10 @@ class PirSettingView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewPirSettingsBinding by viewBinding()
+    private val binding: LegacyViewPirSettingsBinding by viewBinding()
 
-    private val viewModel: PirSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
+    private val viewModel: LegacyPirSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyPirSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -78,6 +73,10 @@ class PirSettingView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+
+        binding.pirSettings.setClickListener {
+            viewModel.onPir()
+        }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -100,23 +99,10 @@ class PirSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        with(binding.pirSettings) {
-            when (viewState.pirState) {
-                is Subscribed -> {
-                    isVisible = true
-                    setStatus(isOn = true)
-                    setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
-                    isClickable = true
-                    binding.pirSettings.setClickListener { viewModel.onPir() }
-                }
-                Expired, Activating -> {
-                    isVisible = true
-                    isClickable = false
-                    setStatus(isOn = false)
-                    setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
-                }
-                Hidden -> isGone = true
-            }
+        if (viewState.hasSubscription) {
+            binding.pirSettings.show()
+        } else {
+            binding.pirSettings.gone()
         }
     }
 
