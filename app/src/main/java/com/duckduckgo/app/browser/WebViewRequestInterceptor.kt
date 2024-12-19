@@ -59,6 +59,12 @@ interface RequestInterceptor {
     ): WebResourceResponse?
 
     fun onPageStarted(url: String)
+
+    @WorkerThread
+    fun shouldOverrideUrlLoading(
+        url: Uri,
+        isForMainFrame: Boolean,
+    ): Boolean
 }
 
 class WebViewRequestInterceptor(
@@ -78,6 +84,7 @@ class WebViewRequestInterceptor(
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
+        maliciousSiteBlockerWebViewIntegration.onPageLoadStarted()
     }
 
     /**
@@ -98,12 +105,10 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri? = request.url
 
-        val confirmationCallback: (isMalicious: Boolean) -> Unit = {
-            // TODO (cbarreiro): Handle site blocked asynchronously
-        }
-
-        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri, confirmationCallback)?.let {
-            // TODO (cbarreiro): Handle site blocked synchronously
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) {
+            handleSiteBlocked()
+        }?.let {
+            handleSiteBlocked()
             return it
         }
 
@@ -170,6 +175,24 @@ class WebViewRequestInterceptor(
         }
 
         return getWebResourceResponse(request, documentUrl, null)
+    }
+
+    override fun shouldOverrideUrlLoading(url: Uri, isForMainFrame: Boolean): Boolean {
+        if (maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
+                url,
+                isForMainFrame,
+            ) {
+                handleSiteBlocked()
+            }
+        ) {
+            handleSiteBlocked()
+            return true
+        }
+        return false
+    }
+
+    private fun handleSiteBlocked() {
+        // TODO (cbarreiro): Handle site blocked
     }
 
     private fun getWebResourceResponse(

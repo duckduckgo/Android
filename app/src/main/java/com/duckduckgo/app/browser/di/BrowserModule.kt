@@ -123,7 +123,6 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
-        maliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -134,7 +133,6 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
-            maliciousSiteProtection,
         )
     }
 
