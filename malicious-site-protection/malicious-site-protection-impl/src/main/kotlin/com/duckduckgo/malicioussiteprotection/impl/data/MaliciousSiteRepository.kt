@@ -23,15 +23,18 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.embedded.MaliciousSiteProtectionEmbeddedDataProvider
+import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
-    suspend fun getFilter(hash: String): Filter?
+    suspend fun getFilters(hash: String): List<Filter>?
+    suspend fun matches(hashPrefix: String): List<Match>
 }
 
 @ContributesBinding(AppScope::class)
@@ -41,6 +44,7 @@ class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDao: MaliciousSiteDao,
     @IsMainProcess private val isMainProcess: Boolean,
     maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
+    private val maliciousSiteService: MaliciousSiteService,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : MaliciousSiteRepository {
@@ -82,9 +86,22 @@ class RealMaliciousSiteRepository @Inject constructor(
         return maliciousSiteDao.getHashPrefix(hashPrefix) != null
     }
 
-    override suspend fun getFilter(hash: String): Filter? {
+    override suspend fun getFilters(hash: String): List<Filter>? {
         return maliciousSiteDao.getFilter(hash)?.let {
-            Filter(it.hash, it.regex)
+            it.map {
+                Filter(it.hash, it.regex)
+            }
+        }
+    }
+
+    override suspend fun matches(hashPrefix: String): List<Match> {
+        return try {
+            maliciousSiteService.getMatches(hashPrefix).matches.also {
+                Timber.d("\uD83D\uDFE2 Cris: Fetched $it matches for hash prefix $hashPrefix")
+            }
+        } catch (e: Exception) {
+            Timber.d("\uD83D\uDD34 Cris: Failed to fetch matches for hash prefix $hashPrefix")
+            listOf()
         }
     }
 }
@@ -94,20 +111,6 @@ data class Match(
     val url: String,
     val regex: String,
     val hash: String,
-)
-
-data class HashPrefixResponse(
-    val insert: Set<String>,
-    val delete: Set<String>,
-    val revision: Int,
-    val replace: String,
-)
-
-data class FilterSetResponse(
-    val insert: Set<Filter>,
-    val delete: Set<Filter>,
-    val revision: Int,
-    val replace: String,
 )
 
 data class Filter(
