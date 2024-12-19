@@ -200,7 +200,6 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Δικαιώματα</string>
