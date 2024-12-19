@@ -120,7 +120,6 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Esci dalla configurazione</string>
 
     <string name="autofillManagementScreenTitle">Password</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nessuna password ancora salvata</string>
     <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente le password</string>
     <string name="credentialManagementAutofillSubtitle">Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>

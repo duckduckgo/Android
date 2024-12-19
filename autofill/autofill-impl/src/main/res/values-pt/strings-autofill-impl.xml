@@ -120,7 +120,6 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Sair da instalação</string>
 
     <string name="autofillManagementScreenTitle">Palavras-passe</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
     <string name="credentialManagementAutofillSubtitle">As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. <annotation type="learn_more_link">Sabe mais</annotation></string>
