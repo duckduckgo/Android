@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.annotation.RawRes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.R
-import com.duckduckgo.malicioussiteprotection.impl.data.FilterSetResponse
-import com.duckduckgo.malicioussiteprotection.impl.data.HashPrefixResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -50,6 +50,7 @@ class RealMaliciousSiteProtectionEmbeddedDataProvider @Inject constructor(
             val adapter = moshi.adapter(FilterSetResponse::class.java)
             adapter.fromJson(String(filterSetData))
         } catch (e: Exception) {
+            Timber.d("\uD83D\uDD34 Failed to fetch embedded phishing filter set")
             null
         }
     }
@@ -82,7 +83,7 @@ class RealMaliciousSiteProtectionEmbeddedDataProvider @Inject constructor(
             val adapter = moshi.adapter(HashPrefixResponse::class.java)
             adapter.fromJson(String(hashPrefixData))
         } catch (e: Exception) {
-            Timber.d("\uD83D\uDD34 Cris: Failed to fetch embedded malware hash prefixes")
+            Timber.d("\uD83D\uDD34 Failed to fetch embedded malware hash prefixes")
             null
         }
     }
