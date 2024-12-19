@@ -20,6 +20,8 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOfferDetails
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -199,20 +201,20 @@ class SubscriptionWebViewViewModelTest {
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
         val testSubscriptionOfferList = listOf(
             SubscriptionOfferDetails(
-                planId = "monthly",
+                planId = MONTHLY_PLAN_US,
                 offerId = null,
                 pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOfferDetails(
-                planId = "yearly",
+                planId = YEARLY_PLAN_US,
                 offerId = null,
                 pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -224,8 +226,8 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("id", response.id)
             assertEquals("test", response.featureName)
             assertEquals("getSubscriptionOptions", response.method)
-            assertEquals("yearly", params?.options?.first()?.id)
-            assertEquals("monthly", params?.options?.last()?.id)
+            assertEquals(YEARLY_PLAN_US, params?.options?.first()?.id)
+            assertEquals(MONTHLY_PLAN_US, params?.options?.last()?.id)
         }
     }
 
@@ -254,13 +256,13 @@ class SubscriptionWebViewViewModelTest {
     fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
         val testSubscriptionOfferList = listOf(
             SubscriptionOfferDetails(
-                planId = "monthly",
+                planId = MONTHLY_PLAN_US,
                 offerId = null,
                 pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOfferDetails(
-                planId = "yearly",
+                planId = YEARLY_PLAN_US,
                 offerId = null,
                 pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
                 features = setOf(SubscriptionsConstants.NETP),
