@@ -102,6 +102,7 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation AndroidX.work.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
