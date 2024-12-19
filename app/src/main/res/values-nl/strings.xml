@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privacybescherming</string>
+    <string name="settingsHeadingPrivacyProtections">Privacybescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
     <string name="settingsHeadingCustomize">Aanpassen</string>
     <string name="settingsHeadingAbout">Over</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
     <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
     <string name="settingsHeadingMore">Meer over DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Volgende stappen</string>
+    <string name="settingsHeadingNextSteps">Volgende stappen</string>
     <string name="settingsLightTheme">Licht</string>
     <string name="settingsTheme">Thema</string>
     <string name="settingsDarkTheme">Donker</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hoofdinstellingen</string>
+    <string name="settingsHeadingMainSettings">Hoofdinstellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Gegevens wissen</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Widget toevoegen aan startscherm</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Positie van adresbalk instellen</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Zoeken via spraak inschakelen</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo op andere platforms</string>
+    <string name="settingsDataClearing">Gegevens wissen</string>
+    <string name="settingsAddWidget">Widget toevoegen aan startscherm</string>
+    <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
+    <string name="settingsEnableVoiceSearch">Zoeken via spraak inschakelen</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo op andere platforms</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privé-zoekopdracht</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Wachtwoorden</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Wachtwoorden en automatisch invullen</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Wachtwoorden en automatisch invullen</string>
     <string name="autofillLoginSavedSnackbarMessage">Wachtwoord opgeslagen</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Wachtwoord bijgewerkt</string>
 

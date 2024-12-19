@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Yksityisyyden suoja</string>
+    <string name="settingsHeadingPrivacyProtections">Yksityisyyden suoja</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
     <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
     <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
     <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Seuraavat vaiheet</string>
+    <string name="settingsHeadingNextSteps">Seuraavat vaiheet</string>
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tumma</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Pääasetukset</string>
+    <string name="settingsHeadingMainSettings">Pääasetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datan tyhjentäminen</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Lisää widget aloitusnäyttöön</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Aseta osoitekentän sijainti</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Ota käyttöön äänihaku</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo muilla alustoilla</string>
+    <string name="settingsDataClearing">Datan tyhjentäminen</string>
+    <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
+    <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
+    <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Yksityinen haku</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Salasanat</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Salasanat ja automaattinen täyttö</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Salasanat ja automaattinen täyttö</string>
     <string name="autofillLoginSavedSnackbarMessage">Salasana tallennettu</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Salasana päivitetty</string>
 

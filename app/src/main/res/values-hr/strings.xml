@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Zaštita privatnosti</string>
+    <string name="settingsHeadingPrivacyProtections">Zaštita privatnosti</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodba</string>
     <string name="settingsHeadingAbout">O</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Zaštita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokiraj programe za praćenje e-pošte i sakrij svoju adresu</string>
     <string name="settingsHeadingMore">Više od DuckDuckGoa</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Sljedeći koraci</string>
+    <string name="settingsHeadingNextSteps">Sljedeći koraci</string>
     <string name="settingsLightTheme">Svijetla</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamna</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsHeadingSettings">Postavke</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Glavne postavke</string>
+    <string name="settingsHeadingMainSettings">Glavne postavke</string>
     <string name="settingsPermissionsSetting">Dozvole</string>
     <string name="settingsSyncSetting">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Brisanje podataka</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Dodajte widget na početni zaslon</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Postavi položaj adresne trake</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Omogući glasovno pretraživanje</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na drugim platformama</string>
+    <string name="settingsDataClearing">Brisanje podataka</string>
+    <string name="settingsAddWidget">Dodajte widget na početni zaslon</string>
+    <string name="settingsAddressBarPosition">Postavi položaj adresne trake</string>
+    <string name="settingsEnableVoiceSearch">Omogući glasovno pretraživanje</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugim platformama</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatno pretraživanje</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Lozinke</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Lozinke i automatsko popunjavanje</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Lozinke i automatsko popunjavanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
 

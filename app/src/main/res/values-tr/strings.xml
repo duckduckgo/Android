@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Gizlilik Korumaları</string>
+    <string name="settingsHeadingPrivacyProtections">Gizlilik Korumaları</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
     <string name="settingsHeadingMore">DuckDuckGo\'dan Daha Fazlası</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Sonraki Adımlar</string>
+    <string name="settingsHeadingNextSteps">Sonraki Adımlar</string>
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Ana Ayarlar</string>
+    <string name="settingsHeadingMainSettings">Ana Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Veri Temizleme</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Widget\'ı Ana Ekrana Ekle</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Adres Çubuğu Konumunuzu Ayarlayın</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Sesli Arama\'yı Etkinleştir</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">Diğer Platformlarda DuckDuckGo</string>
+    <string name="settingsDataClearing">Veri Temizleme</string>
+    <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
+    <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
+    <string name="settingsEnableVoiceSearch">Sesli Arama\'yı Etkinleştir</string>
+    <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Gizli Arama</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Şifreler</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Şifreler ve Otomatik Doldurma</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Şifreler ve Otomatik Doldurma</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
 

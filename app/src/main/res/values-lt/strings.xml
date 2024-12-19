@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nustatymai</string>
     <string name="settingsMenuItemTitle">Nustatymai</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privatumo apsaugos priemonės</string>
+    <string name="settingsHeadingPrivacyProtections">Privatumo apsaugos priemonės</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
     <string name="settingsHeadingCustomize">Tinkinti</string>
     <string name="settingsHeadingAbout">Apie</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
     <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
     <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Tolesni veiksmai</string>
+    <string name="settingsHeadingNextSteps">Tolesni veiksmai</string>
     <string name="settingsLightTheme">Šviesi</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamsi</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsHeadingSettings">Nustatymai</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Pagrindiniai nustatymai</string>
+    <string name="settingsHeadingMainSettings">Pagrindiniai nustatymai</string>
     <string name="settingsPermissionsSetting">Leidimai</string>
     <string name="settingsSyncSetting">Sinchronizuoti ir kurti atsarginę kopiją</string>
     <string name="settingsFireButton">Mygtukas „Fire“</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Duomenų valymas</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Įtraukti valdiklį į pagrindinį ekraną</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Nustatykite adreso juostos padėtį</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Įgalinti paiešką balsu</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">„DuckDuckGo“ kitose platformose</string>
+    <string name="settingsDataClearing">Duomenų valymas</string>
+    <string name="settingsAddWidget">Įtraukti valdiklį į pagrindinį ekraną</string>
+    <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
+    <string name="settingsEnableVoiceSearch">Įgalinti paiešką balsu</string>
+    <string name="settingsDDGOnOtherPlatforms">„DuckDuckGo“ kitose platformose</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privati paieška</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Slaptažodžiai</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Slaptažodžiai ir automatinis užpildymas</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Slaptažodžiai ir automatinis užpildymas</string>
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
 

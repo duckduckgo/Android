@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Защита на поверителността</string>
+    <string name="settingsHeadingPrivacyProtections">Защита на поверителността</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
     <string name="settingsHeadingCustomize">Персонализиране</string>
     <string name="settingsHeadingAbout">За нас</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Защита на имейл</string>
     <string name="settingsEmailProtectionSubtitle">Блокирайте имейл тракерите и скрийте своя адрес</string>
     <string name="settingsHeadingMore">Още от DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Следващи стъпки</string>
+    <string name="settingsHeadingNextSteps">Следващи стъпки</string>
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тъмен</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Основни настройки</string>
+    <string name="settingsHeadingMainSettings">Основни настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Изчистване на данни</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Добавяне на приспособлението към началния екран</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Задайте позицията на адресната лента</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Активиране на гласово търсене</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo на други платформи</string>
+    <string name="settingsDataClearing">Изчистване на данни</string>
+    <string name="settingsAddWidget">Добавяне на приспособлението към началния екран</string>
+    <string name="settingsAddressBarPosition">Задайте позицията на адресната лента</string>
+    <string name="settingsEnableVoiceSearch">Активиране на гласово търсене</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo на други платформи</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">поверително търсене</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Пароли</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Пароли и автоматично попълване</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автоматично попълване</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
 

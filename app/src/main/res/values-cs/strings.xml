@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Ochrana osobních údajů</string>
+    <string name="settingsHeadingPrivacyProtections">Ochrana osobních údajů</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
     <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">Informace</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
     <string name="settingsHeadingMore">Další od DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Další kroky</string>
+    <string name="settingsHeadingNextSteps">Další kroky</string>
     <string name="settingsLightTheme">Světlo</string>
     <string name="settingsTheme">Barevný motiv</string>
     <string name="settingsDarkTheme">Tmavé</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hlavní nastavení</string>
+    <string name="settingsHeadingMainSettings">Hlavní nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Vymazání dat</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Přidat widget na domovskou obrazovku</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Nastavte pozici adresního řádku</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Povolit hlasové vyhledávání</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na jiných platformách</string>
+    <string name="settingsDataClearing">Vymazání dat</string>
+    <string name="settingsAddWidget">Přidat widget na domovskou obrazovku</string>
+    <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
+    <string name="settingsEnableVoiceSearch">Povolit hlasové vyhledávání</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na jiných platformách</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Soukromé vyhledávání</string>
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Hesla</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Hesla a automatické vyplňování</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Hesla a automatické vyplňování</string>
     <string name="autofillLoginSavedSnackbarMessage">Heslo je uložené</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Heslo je aktualizované</string>
 
