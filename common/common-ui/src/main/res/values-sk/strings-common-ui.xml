@@ -33,4 +33,8 @@
     <string name="undo">Zrušiť zmenu</string>
     <string name="cancel">Zrušiť</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Vždy zapnuté</string>
+    <string name="on">Zapnuté</string>
+    <string name="off">Vypnuté</string>
 </resources>

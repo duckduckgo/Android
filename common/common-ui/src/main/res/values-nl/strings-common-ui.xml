@@ -33,4 +33,8 @@
     <string name="undo">Ongedaan maken</string>
     <string name="cancel">Annuleren</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Altijd aan</string>
+    <string name="on">Aan</string>
+    <string name="off">Uit</string>
 </resources>

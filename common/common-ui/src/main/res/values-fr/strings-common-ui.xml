@@ -33,4 +33,8 @@
     <string name="undo">Annuler</string>
     <string name="cancel">Annuler</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Toujours activé</string>
+    <string name="on">Activé</string>
+    <string name="off">Off</string>
 </resources>

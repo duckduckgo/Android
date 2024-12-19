@@ -33,4 +33,8 @@
     <string name="undo">Geri al</string>
     <string name="cancel">Vazgeç</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Her Zaman Açık</string>
+    <string name="on">Açık</string>
+    <string name="off">Kapalı</string>
 </resources>

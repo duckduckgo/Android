@@ -33,4 +33,8 @@
     <string name="undo">Visszavonás</string>
     <string name="cancel">Mégsem</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Mindig be van kapcsolva</string>
+    <string name="on">Be</string>
+    <string name="off">Ki</string>
 </resources>

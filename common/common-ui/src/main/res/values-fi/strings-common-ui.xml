@@ -33,4 +33,8 @@
     <string name="undo">Kumoa</string>
     <string name="cancel">Peruuta</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Aina käytössä</string>
+    <string name="on">Päällä</string>
+    <string name="off">Pois</string>
 </resources>

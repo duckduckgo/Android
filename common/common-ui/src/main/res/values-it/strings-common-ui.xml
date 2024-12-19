@@ -33,4 +33,8 @@
     <string name="undo">Annulla</string>
     <string name="cancel">Annulla</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Sempre attiva</string>
+    <string name="on">On</string>
+    <string name="off">Disabilitato</string>
 </resources>

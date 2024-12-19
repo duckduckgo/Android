@@ -33,4 +33,8 @@
     <string name="undo">Отменить</string>
     <string name="cancel">Отменить</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Всегда включено</string>
+    <string name="on">вкл.</string>
+    <string name="off">Выкл</string>
 </resources>

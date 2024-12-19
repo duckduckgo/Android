@@ -33,4 +33,8 @@
     <string name="undo">Vrátit</string>
     <string name="cancel">Zrušit</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Vždycky zapnuté</string>
+    <string name="on">Aktivní</string>
+    <string name="off">Vypnout</string>
 </resources>

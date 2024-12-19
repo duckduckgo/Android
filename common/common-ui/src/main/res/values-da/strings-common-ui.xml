@@ -33,4 +33,8 @@
     <string name="undo">Fortryd</string>
     <string name="cancel">Annullér</string>
 
+    <!--Status Indicator-->
+    <string name="alwaysOn">Altid aktiv</string>
+    <string name="on">Til</string>
+    <string name="off">Fra</string>
 </resources>
