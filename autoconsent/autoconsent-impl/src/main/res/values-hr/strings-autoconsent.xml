@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Zaštita od kolačića i skočnih prozora</string>
     <string name="autoconsentDescription"><![CDATA[Kada DuckDuckGo otkrije skočne prozore kolačića na web lokacijama koje posjećuješ, možemo automatski postaviti tvoje postavke kolačića kako bismo minimizirali kolačiće i maksimizirali privatnost, a zatim zatvorili skočne prozore. <u><a href=\"\">Saznaj više</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Neka DuckDuckGo upravlja skočnim prozorima kolačića</string>
 </resources>

@@ -19,6 +19,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentDescription"><![CDATA[Όταν το DuckDuckGo εντοπίζει αναδυόμενα παράθυρα για cookies σε ιστότοπους που επισκέπτεστε, μπορούμε να ρυθμίσουμε αυτόματα τις προτιμήσεις σας για τα cookies ώστε να ελαχιστοποιήσετε τα cookies και να μεγιστοποιήσετε το απόρρητο. Έπειτα μπορείτε να κλείσετε τα αναδυόμενα παράθυρα. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Επιτρέψτε στο DuckDuckGo να διαχειρίζεται τα αναδυόμενα παράθυρα για cookies</string>
 </resources>
