@@ -63,7 +63,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
-    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
+    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs().distinctUntilChanged()
 
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
@@ -76,6 +76,8 @@ class TabDataRepository @Inject constructor(
         .distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
+
+    override val flowSelectedTab: Flow<TabEntity?> = tabsDao.flowSelectedTab().distinctUntilChanged()
 
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
@@ -329,6 +331,10 @@ class TabDataRepository @Inject constructor(
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
         }
+    }
+
+    override suspend fun getTab(tabId: String): TabEntity? {
+        return withContext(dispatchers.io()) { tabsDao.tab(tabId) }
     }
 
     override fun updateTabFavicon(

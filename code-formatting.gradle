@@ -5,6 +5,7 @@ spotless {
     java {
         target 'src/*/java/**/*.java'
         googleJavaFormat('1.22.0').aosp()
+        targetExclude("**/FragmentStateAdapter.java") // temporary
         removeUnusedImports()
         trimTrailingWhitespace()
         indentWithSpaces()
