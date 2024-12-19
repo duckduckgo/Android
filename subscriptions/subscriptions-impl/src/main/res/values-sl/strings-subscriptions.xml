@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Odstrani iz te naprave</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoč in podpora</string>
     <string name="subscriptionSettingSendFeedback">Pošljite povratne informacije</string>
+    <string name="subscriptionSettingActivating">Aktiviranje</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Vse je pripravljeno.</string>

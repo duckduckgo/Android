@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Noņemt no šīs ierīces</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Palīdzība un atbalsts</string>
     <string name="subscriptionSettingSendFeedback">Sūtīt atsauksmi</string>
+    <string name="subscriptionSettingActivating">Notiek aktivizēšana</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viss ir gatavs.</string>

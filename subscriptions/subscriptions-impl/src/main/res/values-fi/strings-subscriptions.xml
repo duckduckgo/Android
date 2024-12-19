@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Poista tältä laitteelta</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Apu ja tuki</string>
     <string name="subscriptionSettingSendFeedback">Lähetä palautetta</string>
+    <string name="subscriptionSettingActivating">Aktivoidaan</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kaikki on valmista.</string>
