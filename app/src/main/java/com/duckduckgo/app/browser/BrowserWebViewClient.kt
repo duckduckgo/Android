@@ -60,7 +60,6 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -118,7 +117,6 @@ class BrowserWebViewClient @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
-    private val maliciousSiteProtectionWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -164,14 +162,7 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-
-            if (maliciousSiteProtectionWebViewIntegration.shouldOverrideUrlLoading(
-                    url,
-                    isForMainFrame,
-                    confirmationCallback,
-                )
-            ) {
-                // TODO (cbarreiro): Handle site blocked synchronously
+            if (requestInterceptor.shouldOverrideUrlLoading(url, isForMainFrame)) {
                 return true
             }
 
@@ -424,12 +415,11 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
-                maliciousSiteProtectionWebViewIntegration.onPageLoadStarted()
+                requestInterceptor.onPageStarted(url)
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
-            requestInterceptor.onPageStarted(url)
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
