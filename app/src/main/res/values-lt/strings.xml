@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
 
     <string name="settingsAutomaticallyClearWhat">Valyti automatiškai…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>

@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatisch wissen…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>

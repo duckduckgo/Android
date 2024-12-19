@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
 
     <string name="settingsAutomaticallyClearWhat">Автоматично изчистване…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматично изчистване…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>

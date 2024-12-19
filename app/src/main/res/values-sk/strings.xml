@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
 
     <string name="settingsAutomaticallyClearWhat">Automaticky vymazať…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automaticky vymazať…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žiadne</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>

@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
 
     <string name="settingsAutomaticallyClearWhat">Usuwaj automatycznie…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Usuwaj automatycznie…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>

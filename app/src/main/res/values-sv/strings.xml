@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
 
     <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>

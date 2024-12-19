@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatisches Löschen von …</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisches Löschen von …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>

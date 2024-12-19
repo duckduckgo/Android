@@ -211,7 +211,6 @@
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
 
     <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nessuno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Schede</string>
