@@ -182,10 +182,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            Timber.d("### onPageChanged requested for: $position")
             if (wasSwipingStarted) {
-                Timber.d("### onPageChanged: $position")
-                tabManager.tabPagerAdapter.onPageChanged(position)
+                tabManager.onTabPageSwiped(position)
                 wasSwipingStarted = false
             }
         }
@@ -420,7 +418,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
             if (swipingTabsFeature.isEnabled) {
-                tabManager.openExistingTab(existingTabId)
+                tabManager.switchToTab(existingTabId)
             } else {
                 openExistingTab(existingTabId)
             }
@@ -442,7 +440,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 } else {
                     Timber.w("can't use current tab, opening in new tab instead")
                     if (swipingTabsFeature.isEnabled) {
-                        tabManager.openInNewTab(query = sharedText, skipHome = true)
+                        tabManager.launchNewTab(query = sharedText, skipHome = true)
                     } else {
                         lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                     }
@@ -459,7 +457,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
                 if (swipingTabsFeature.isEnabled) {
-                    tabManager.openInNewTab(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
+                    tabManager.launchNewTab(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
                 } else {
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
                 }
@@ -480,7 +478,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             lifecycleScope.launch {
                 viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
-                    tabManager.onTabsUpdated(it)
+                    tabManager.onTabsChanged(it)
                 }
             }
 
@@ -562,8 +560,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
-            is Command.SwitchToTab -> tabManager.openExistingTab(command.tabId)
-            is Command.OpenInNewTab -> tabManager.openInNewTab(command.url)
+            is Command.SwitchToTab -> tabManager.switchToTab(command.tabId)
+            is Command.OpenInNewTab -> tabManager.launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
         }
     }

@@ -1530,7 +1530,7 @@ class BrowserTabFragment :
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.openInNewTab(it.query, it.sourceTabId)
+                    requireBrowserActivity().tabManager.launchNewTab(it.query, it.sourceTabId)
                 } else {
                     browserActivity?.openInNewTab(it.query, it.sourceTabId)
                 }
@@ -1808,7 +1808,7 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
 
                 if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.openExistingTab(it.tabId)
+                    requireBrowserActivity().tabManager.switchToTab(it.tabId)
                 } else {
                     browserActivity?.openExistingTab(it.tabId)
                 }
