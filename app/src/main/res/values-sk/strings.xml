@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu je povolená</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vás nikdy nesleduje a snažíme sa čo najviac chrániť vaše súkromie. Neustále udržiavame a vyvíjame vrstvy ochrany, aby sme držali krok s novými metódami sledovania a poskytovali mnohé druhy ochrany, ktoré iné prehliadače štandardne neponúkajú. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
+    <string name="dataClearingActivityTitle">Vymazanie údajov</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
 
     <string name="settingsAutomaticallyClearWhat">Automaticky vymazať…</string>
+    <string name="settingsAutomaticallyClearData">Vymazať údaje automaticky…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automaticky vymazať…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žiadne</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">O</string>
     <string name="aboutHeader">Vitajte na Duck Side!</string>
     <string name="aboutDescription">DuckDuckGo je nezávislá spoločnosť na ochranu súkromia na internete založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžete získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré očakávate od prehliadača, ako sú záložky, karty, heslá a ďalšie funkcie, a viac ako <annotation type="privacy_protection_link">tuctom výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina populárnych prehliadačov štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť vaše online aktivity od vyhľadávania po prehliadanie, posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby ste museli poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získate predvolené súkromie.\n\nAk však máte záujem o podrobnejšie preskúmanie, viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdete na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo je nezávislá spoločnosť zaoberajúca sa ochranou súkromia na internete, ktorá bola založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžeš získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré od prehliadača očakávaš, ako sú záložky, karty, heslá a ďalšie, a má viac ako <annotation type="privacy_protection_link">tucet výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina obľúbených štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť tvoje online aktivity od vyhľadávania cez prehliadanie, až po posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby si musel poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získaš predvolené súkromie.\n\nAk však chceš nahliadnuť pod kapotu a zistiť viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdeš ich na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
     <string name="no_suggestions">Žiadne návrhy</string>
 
     <!-- Broken Site Activity -->
