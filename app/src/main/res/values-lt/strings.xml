@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Žiniatinklio sekimo apsauga įjungta</string>
     <string name="webTrackingProtectionDescription"><![CDATA[„DuckDuckGo“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
+    <string name="dataClearingActivityTitle">Duomenų valymas</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Leidimai</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
 
     <string name="settingsAutomaticallyClearWhat">Valyti automatiškai…</string>
+    <string name="settingsAutomaticallyClearData">Automatiškai išvalyti duomenis…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
+    <string name="aboutActivityTitleNew">Apie</string>
     <string name="aboutHeader">Sveiki prisijungę prie „Duck“!</string>
     <string name="aboutDescription">„DuckDuckGo“ yra nepriklausoma interneto privatumo bendrovė, įkurta 2008 metais ir skirta visiems, kurie pavargo nuo sekimo internete ir nori lengvo sprendimo. Esame įrodymas, kad galite gauti tikrą privatumo apsaugą internete be kompromisų.\n\n„DuckDuckGo“ naršyklėje yra funkcijų, kurių tikitės iš pagrindinės naršyklės, pavyzdžiui, žymės, skirtukai, slaptažodžiai ir kt., taip pat daugiau nei <annotation type="privacy_protection_link"> tuzinas galingų privatumo apsaugos priemonių,</annotation> kurios nesiūlomos daugumoje populiarių naršyklių. Šis unikalus išsamus privatumo apsaugos rinkinys padeda apsaugoti jūsų veiklą internete – nuo paieškos iki naršymo, el. pašto ir kt.\n\nMūsų privatumo apsaugos priemonės veikia nereikalaudamos nieko žinoti apie technines detales ar naudotis sudėtingais nustatymais. Tereikia visuose įrenginiuose perjungti naršyklę į „DuckDuckGo“ ir privatumas bus užtikrintas pagal numatytuosius nustatymus.\n\nTačiau jei norite daugiau informacijos apie tai, kaip veikia „DuckDuckGo“ privatumo apsaugos priemonės, žiūrėkite mūsų <annotation type="learn_more_link">pagalbos puslapius</annotation>.</string>
+    <string name="aboutDescriptionNew">„DuckDuckGo“ yra nepriklausoma interneto privatumo bendrovė, įkurta 2008 metais ir skirta visiems, kurie pavargo nuo sekimo internete ir nori lengvo sprendimo. Esame įrodymas, kad gali gauti tikrą privatumo apsaugą internete be kompromisų.\n\n„DuckDuckGo“ naršyklėje yra funkcijų, kurių tikiesi iš pagrindinės naršyklės, pavyzdžiui, žymės, skirtukai, slaptažodžiai ir kt., taip pat daugiau nei <annotation type="privacy_protection_link"> tuzinas galingų privatumo apsaugos priemonių,</annotation> kurių negali pasiūlyti dauguma populiarių naršyklių. Šis unikalus išsamus privatumo apsaugos rinkinys padeda apsaugoti tavo veiklą internete – nuo paieškos iki naršymo, el. pašto ir kt.\n\nMūsų privatumo apsaugos priemonės veikia taip, kad nereikia išmanyti techninių detalių ar naudotis sudėtingais nustatymais. Tereikia visuose įrenginiuose perjungti naršyklę į „DuckDuckGo“ ir privatumas bus užtikrintas pagal numatytuosius nustatymus.\n\nTačiau jei nori daugiau informacijos apie tai, kaip veikia „DuckDuckGo“ privatumo apsaugos priemonės, ją rasi mūsų <annotation type="learn_more_link">pagalbos puslapiuose</annotation>.</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
     <!-- Broken Site Activity -->
