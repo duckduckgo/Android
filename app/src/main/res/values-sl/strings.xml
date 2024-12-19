@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita spletnega sledenja je omogočena</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Gumb Fire Button</string>
+    <string name="dataClearingActivityTitle">Počiščenje podatkov</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dovoljenja</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
 
     <string name="settingsAutomaticallyClearWhat">Samodejno počisti …</string>
+    <string name="settingsAutomaticallyClearData">Samodejno počisti podatke…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Samodejno počisti …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">O nas</string>
     <string name="aboutHeader">Dobrodošli na strani Duck!</string>
     <string name="aboutDescription">DuckDuckGo je neodvisno podjetje za zasebnost v internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo je neodvisno podjetje za zasebnost na internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
     <string name="no_suggestions">Ni predlogov</string>
 
     <!-- Broken Site Activity -->
