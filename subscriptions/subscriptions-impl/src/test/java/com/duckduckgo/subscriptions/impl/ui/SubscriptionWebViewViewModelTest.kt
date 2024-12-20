@@ -234,6 +234,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
         privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))

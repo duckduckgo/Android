@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionOfferDetails
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
@@ -233,52 +234,67 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun getSubscriptionOptions(featureName: String, method: String, id: String) {
+        suspend fun sendOptionJson(optionsJson: SubscriptionOptionsJson) {
+            val response = JsCallbackData(
+                featureName = featureName,
+                method = method,
+                id = id,
+                params = JSONObject(jsonAdapter.toJson(optionsJson)),
+            )
+            command.send(SendResponseToJs(response))
+        }
+
         viewModelScope.launch(dispatcherProvider.io()) {
-            var subscriptionOptions = SubscriptionOptionsJson(
+            val defaultOptions = SubscriptionOptionsJson(
                 options = emptyList(),
                 features = emptyList(),
             )
 
-            if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
-                if (subscriptionOffers.isNotEmpty()) {
-                    val options = when {
-                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
-                            subscriptionOffers.getValue(MONTHLY_PLAN_US) to subscriptionOffers.getValue(YEARLY_PLAN_US)
-                        }
-
-                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
-                            subscriptionOffers.getValue(MONTHLY_PLAN_ROW) to subscriptionOffers.getValue(YEARLY_PLAN_ROW)
-                        }
-
-                        else -> return@launch
+                when {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
+                        createSubscriptionOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
+                        )
                     }
 
-                    val monthlyJson = OptionsJson(
-                        id = options.first.planId,
-                        cost = CostJson(displayPrice = options.first.pricingPhases.first().formattedPrice, recurrence = MONTHLY),
-                    )
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
+                        createSubscriptionOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
+                        )
+                    }
 
-                    val yearlyJson = OptionsJson(
-                        id = options.second.planId,
-                        cost = CostJson(displayPrice = options.second.pricingPhases.first().formattedPrice, recurrence = YEARLY),
-                    )
-
-                    subscriptionOptions = SubscriptionOptionsJson(
-                        options = listOf(yearlyJson, monthlyJson),
-                        features = options.first.features.map(::FeatureJson),
-                    )
+                    else -> defaultOptions
                 }
-
-                val response = JsCallbackData(
-                    featureName = featureName,
-                    method = method,
-                    id = id,
-                    params = JSONObject(jsonAdapter.toJson(subscriptionOptions)),
-                )
-                command.send(SendResponseToJs(response))
+            } else {
+                defaultOptions
             }
+
+            sendOptionJson(subscriptionOptions)
         }
+    }
+
+    private fun createSubscriptionOptions(
+        monthlyOffer: SubscriptionOfferDetails,
+        yearlyOffer: SubscriptionOfferDetails,
+    ): SubscriptionOptionsJson {
+        return SubscriptionOptionsJson(
+            options = listOf(
+                createOptionsJson(yearlyOffer, YEARLY),
+                createOptionsJson(monthlyOffer, MONTHLY),
+            ),
+            features = monthlyOffer.features.map(::FeatureJson),
+        )
+    }
+
+    private fun createOptionsJson(offer: SubscriptionOfferDetails, recurrence: String): OptionsJson {
+        return OptionsJson(
+            id = offer.planId,
+            cost = CostJson(displayPrice = offer.pricingPhases.first().formattedPrice, recurrence = recurrence),
+        )
     }
 
     private fun recoverSubscription() {
