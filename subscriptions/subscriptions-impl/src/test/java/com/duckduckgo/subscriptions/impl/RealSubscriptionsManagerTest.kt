@@ -1541,7 +1541,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             val offers = basePlanIds.map { basePlanId ->
                 mock<SubscriptionOfferDetails> { offer ->
                     whenever(offer.basePlanId).thenReturn(basePlanId)
-                    whenever(offer.basePlanId).thenReturn(basePlanId)
                     whenever(offer.pricingPhases).thenReturn(pricingPhases)
                 }
             }
