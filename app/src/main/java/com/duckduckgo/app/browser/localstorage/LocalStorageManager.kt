@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.localstorage
 
 import android.content.Context
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -27,6 +28,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.runBlocking
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
@@ -39,9 +41,23 @@ interface LocalStorageManager {
 @ContributesBinding(AppScope::class)
 class DuckDuckGoLocalStorageManager @Inject constructor(
     private val databaseProvider: Provider<DB>,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val localStorageSettingsJsonParser: LocalStorageSettingsJsonParser,
 ) : LocalStorageManager {
 
-    override fun clearLocalStorage() {
+    private var domains = emptyList<String>()
+    private var matchingRegex = emptyList<String>()
+
+    override fun clearLocalStorage() = runBlocking {
+        val settings = androidBrowserConfigFeature.localStorage().getSettings()
+        val localStorageSettings = localStorageSettingsJsonParser.parseJson(settings)
+
+        domains = localStorageSettings.domains.list
+        matchingRegex = localStorageSettings.matchingRegex.list
+
+        Timber.d("LocalStorageManager: Allowed domains: $domains")
+        Timber.d("LocalStorageManager: Matching regex: $matchingRegex")
+
         databaseProvider.get().use { db ->
             val iterator = db.iterator()
             iterator.seekToFirst()
@@ -59,20 +75,9 @@ class DuckDuckGoLocalStorageManager @Inject constructor(
     }
 
     private fun isAllowedKey(key: String): Boolean {
-        val domains = listOf("duckduckgo.com")
-
-        // Valid entries have these formats:
-        // _https://example.com<NULL><SOH>value
-        // META:https://example.com
-        // METAACCESS:https://example.com
-        val regexList = listOf(
-            "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
-            "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
-            "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
-        )
         val regexPatterns = domains.flatMap { domain ->
             val escapedDomain = Regex.escape(domain)
-            regexList.map { pattern ->
+            matchingRegex.map { pattern ->
                 pattern.replace("{domain}", escapedDomain)
             }
         }

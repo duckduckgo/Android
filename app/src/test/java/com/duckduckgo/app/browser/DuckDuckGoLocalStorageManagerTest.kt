@@ -16,7 +16,15 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.browser.localstorage.Domains
+import com.duckduckgo.app.browser.localstorage.DuckDuckGoLocalStorageManager
+import com.duckduckgo.app.browser.localstorage.LocalStorageSettings
+import com.duckduckgo.app.browser.localstorage.LocalStorageSettingsJsonParser
+import com.duckduckgo.app.browser.localstorage.MatchingRegex
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Provider
+import kotlinx.coroutines.test.runTest
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.DBIterator
 import org.iq80.leveldb.impl.Iq80DBFactory.bytes
@@ -32,12 +40,28 @@ class DuckDuckGoLocalStorageManagerTest {
     private val mockDB: DB = mock()
     private val mockIterator: DBIterator = mock()
     private val mockDatabaseProvider: Provider<DB> = mock()
+    private val mockLocalStorageSettingsJsonParser: LocalStorageSettingsJsonParser = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val mockToggle: Toggle = mock()
 
-    private val testee = DuckDuckGoLocalStorageManager(mockDatabaseProvider)
+    private val testee = DuckDuckGoLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockLocalStorageSettingsJsonParser)
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
+        whenever(mockAndroidBrowserConfigFeature.localStorage()).thenReturn(mockToggle)
+        whenever(mockToggle.getSettings()).thenReturn("settings")
+
+        val domains = Domains(list = listOf("duckduckgo.com"))
+        val matchingRegex = MatchingRegex(
+            list = listOf(
+                "^_https://([a-zA-Z0-9.-]+\\.)?{domain}\u0000\u0001.+$",
+                "^META:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
+                "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
+            ),
+        )
+        val localStorageSettings = LocalStorageSettings(domains = domains, matchingRegex = matchingRegex)
+        whenever(mockLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(localStorageSettings)
     }
 
     @Test

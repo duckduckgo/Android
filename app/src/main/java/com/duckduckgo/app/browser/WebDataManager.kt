@@ -21,6 +21,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.localstorage.LocalStorageManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
@@ -121,10 +122,10 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
-        if (androidBrowserConfigFeature.deleteLocalStorageKillSwitch().isEnabled()) {
-            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))
-        } else {
+        if (androidBrowserConfigFeature.localStorage().isEnabled()) {
             fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
+        } else {
+            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))
         }
     }
 
