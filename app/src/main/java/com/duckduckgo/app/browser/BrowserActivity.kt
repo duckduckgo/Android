@@ -31,6 +31,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -777,19 +778,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "WrongConstant")
     private fun initializeTabs() {
         if (swipingTabsFeature.isEnabled) {
             tabPager.adapter = tabManager.tabPagerAdapter
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2).toPx().toInt()))
-
-            binding.fragmentContainer.gone()
-            tabPager.show()
-        } else {
-            binding.fragmentContainer.show()
-            tabPager.gone()
         }
+
+        binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
+        tabPager.isVisible = swipingTabsFeature.isEnabled
     }
 
     private val Intent.launchedFromRecents: Boolean
