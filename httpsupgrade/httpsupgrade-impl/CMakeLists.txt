@@ -33,3 +33,7 @@ find_library( # Sets the name of the path variable.
         # Specifies the name of the NDK library that
         # you want CMake to locate.
         log)
+
+target_link_options(
+       https-bloom-lib
+       PRIVATE "-Wl,-z,max-page-size=16384")
