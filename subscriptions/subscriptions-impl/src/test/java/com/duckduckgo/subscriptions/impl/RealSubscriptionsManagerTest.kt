@@ -1160,6 +1160,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenGetSubscriptionOfferAndRowPlansAvailableThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(true)
 
