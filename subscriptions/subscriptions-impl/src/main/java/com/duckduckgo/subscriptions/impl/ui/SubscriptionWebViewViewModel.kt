@@ -314,7 +314,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
             OfferJson(
                 type = offerType,
                 id = it,
-                displayPrice = offer.pricingPhases.first().formattedPrice,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
                 isUserEligible = true, // TODO Noelia: Need to check if they already had a free trial before to return false
             )
@@ -361,7 +360,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     data class OfferJson(
         val type: OfferType,
         val id: String,
-        val displayPrice: String,
         val durationInDays: Int?,
         val isUserEligible: Boolean,
     )
