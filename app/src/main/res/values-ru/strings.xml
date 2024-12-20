@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Включена защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
+    <string name="dataClearingActivityTitle">Очистка данных</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
 
     <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
+    <string name="settingsAutomaticallyClearData">Автоудаление данных...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">О нас</string>
     <string name="aboutHeader">Добро пожаловать на Утиную сторону!</string>
     <string name="aboutDescription">DuckDuckGo — основанная в 2008 году независимая компания, специализирующаяся на защите личных данных в Интернете. Мы предлагаем простое решение тем, кто хочет, чтобы за ними перестали следить онлайн. DuckDuckGo своим примером показывает, что защита конфиденциальности онлайн возможна без всяких компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли и многое другое, а также <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей . Такой исчерпывающий набор инструментов может скрыть от посторонних глаз всю сетевую активность, включая поиск, навигацию и почту.\n\nСредства защиты конфиденциальности не требуют от пользователей знания технических особенностей или понимания сложных настроек .Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность станет вашим режимом по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на страницах <annotation type="learn_more_link">справки</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo — независимая компания, которая c 2008 года предоставляет услуги защиты личных данных в интернете. Мы предлагаем простое решение для тех, кому надоело отслеживание онлайн. Своим примером DuckDuckGo показывает, что защита конфиденциальности в Сети не требует компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли — плюс <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей. Наш всесторонний набор инструментов скроет от посторонних глаз всю вашу онлайн-активность, включая поиск, просмотр сайтов и чтение почты.\n\nСервисы DuckDuckGo не требуют особых технических познаний или работы со сложными настройками. Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность онлайн станет вашим спутником по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на наших <annotation type="learn_more_link">справочных страницах</annotation>.</string>
     <string name="no_suggestions">Нет предложений</string>
 
     <!-- Broken Site Activity -->
