@@ -100,7 +100,7 @@ interface SubscriptionsManager {
     /**
      * Returns available purchase options retrieved from Play Store
      */
-    suspend fun getSubscriptionOffer(): List<SubscriptionOfferDetails>
+    suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
     /**
      * Launches the purchase flow for a given plan id
@@ -662,7 +662,7 @@ class RealSubscriptionsManager @Inject constructor(
             listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
         }
 
-    override suspend fun getSubscriptionOffer(): List<SubscriptionOfferDetails> =
+    override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
@@ -671,7 +671,11 @@ class RealSubscriptionsManager @Inject constructor(
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
-                        PricingPhase(formattedPrice = phase.formattedPrice)
+                        PricingPhase(
+                            formattedPrice = phase.formattedPrice,
+                            billingPeriod = phase.billingPeriod,
+
+                        )
                     }
 
                     val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
@@ -686,7 +690,7 @@ class RealSubscriptionsManager @Inject constructor(
 
                     if (features.isEmpty()) return@let emptyList()
 
-                    SubscriptionOfferDetails(
+                    SubscriptionOffer(
                         planId = offer.basePlanId,
                         pricingPhases = pricingPhases,
                         offerId = offer.offerId,
@@ -948,14 +952,6 @@ sealed class CurrentPurchase {
 }
 
 data class SubscriptionOffer(
-    val monthlyPlanId: String,
-    val monthlyFormattedPrice: String,
-    val yearlyPlanId: String,
-    val yearlyFormattedPrice: String,
-    val features: Set<String>,
-)
-
-data class SubscriptionOfferDetails(
     val planId: String,
     val offerId: String?,
     val pricingPhases: List<PricingPhase>,
@@ -964,7 +960,17 @@ data class SubscriptionOfferDetails(
 
 data class PricingPhase(
     val formattedPrice: String,
-)
+    val billingPeriod: String,
+
+) {
+    internal fun getBillingPeriodInDays(): Int? =
+        when (billingPeriod) {
+            "P1W" -> 7
+            "P1M" -> 30
+            "P1Y" -> 365
+            else -> null
+        }
+}
 
 data class ValidatedTokenPair(
     val accessToken: String,

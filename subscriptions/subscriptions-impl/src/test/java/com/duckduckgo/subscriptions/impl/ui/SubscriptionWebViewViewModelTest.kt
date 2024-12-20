@@ -17,7 +17,7 @@ import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PricingPhase
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionOfferDetails
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
@@ -200,16 +200,16 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
         val testSubscriptionOfferList = listOf(
-            SubscriptionOfferDetails(
+            SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
-            SubscriptionOfferDetails(
+            SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
@@ -256,16 +256,16 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
         val testSubscriptionOfferList = listOf(
-            SubscriptionOfferDetails(
+            SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1")),
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
-            SubscriptionOfferDetails(
+            SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10")),
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )

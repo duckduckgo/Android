@@ -64,7 +64,7 @@ class RealSubscriptionsTest {
     private lateinit var subscriptions: RealSubscriptions
 
     private val testSubscriptionOfferList = listOf(
-        SubscriptionOfferDetails(
+        SubscriptionOffer(
             planId = "test",
             offerId = null,
             pricingPhases = emptyList(),

@@ -30,7 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionOfferDetails
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
@@ -278,8 +278,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun createSubscriptionOptions(
-        monthlyOffer: SubscriptionOfferDetails,
-        yearlyOffer: SubscriptionOfferDetails,
+        monthlyOffer: SubscriptionOffer,
+        yearlyOffer: SubscriptionOffer,
     ): SubscriptionOptionsJson {
         return SubscriptionOptionsJson(
             options = listOf(
@@ -290,11 +290,34 @@ class SubscriptionWebViewViewModel @Inject constructor(
         )
     }
 
-    private fun createOptionsJson(offer: SubscriptionOfferDetails, recurrence: String): OptionsJson {
+    private fun createOptionsJson(offer: SubscriptionOffer, recurrence: String): OptionsJson {
+        val offerDisplayPrice: String = offer.offerId?.let {
+            offer.pricingPhases.getOrNull(1)?.formattedPrice ?: offer.pricingPhases.first().formattedPrice
+        } ?: offer.pricingPhases.first().formattedPrice
+
         return OptionsJson(
             id = offer.planId,
             cost = CostJson(displayPrice = offer.pricingPhases.first().formattedPrice, recurrence = recurrence),
+            offer = getOfferJson(offer),
         )
+    }
+
+    private fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
+        return offer.offerId?.let {
+            val offerType = if (offer.pricingPhases.first().formattedPrice == "Free") {
+                OfferType.FREE_TRIAL
+            } else {
+                OfferType.UNKNOWN
+            }
+
+            OfferJson(
+                type = offerType,
+                id = it,
+                displayPrice = offer.pricingPhases.first().formattedPrice,
+                durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
+                isUserEligible = true, // TODO Noelia: Need to check if they already had a free trial before to return false
+            )
+        }
     }
 
     private fun recoverSubscription() {
@@ -326,10 +349,28 @@ class SubscriptionWebViewViewModel @Inject constructor(
     data class OptionsJson(
         val id: String,
         val cost: CostJson,
+        val offer: OfferJson?,
     )
 
-    data class CostJson(val displayPrice: String, val recurrence: String)
+    data class CostJson(
+        val displayPrice: String,
+        val recurrence: String,
+    )
+
+    data class OfferJson(
+        val type: OfferType,
+        val id: String,
+        val displayPrice: String,
+        val durationInDays: Int?,
+        val isUserEligible: Boolean,
+    )
+
     data class FeatureJson(val name: String)
+
+    enum class OfferType(val type: String) {
+        FREE_TRIAL("freeTrial"),
+        UNKNOWN("unknown"),
+    }
 
     sealed class PurchaseStateView {
         data object Inactive : PurchaseStateView()
