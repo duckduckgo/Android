@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionTitle">A proteção contra rastreamento na Internet está ativada</string>
     <string name="webTrackingProtectionDescription"><![CDATA[O DuckDuckGo nunca te rastreia. Queremos proteger a tua privacidade ao máximo. Mantemos e desenvolvemos continuamente camadas de proteção para acompanharmos os novos métodos de rastreamento e oferecermos muitas proteções que outros navegadores não oferecem por predefinição. <u><a href=\"\">Sabe mais</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet.\n<a href=\"\">Sabe mais</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Botão de proteção</string>
+    <string name="dataClearingActivityTitle">Limpeza de Dados</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissões</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
 
     <string name="settingsAutomaticallyClearWhat">Limpar automaticamente…</string>
+    <string name="settingsAutomaticallyClearData">Limpar os dados automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Limpar automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nenhum</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Separadores</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">Acerca de</string>
     <string name="aboutHeader">Bem-vindo ao Duck Side!</string>
     <string name="aboutDescription">A DuckDuckGo é a empresa independente de privacidade na Internet fundada em 2008 para quem está cansado de ser rastreado online e quer uma solução simples. Somos a prova de que podes proteger a tua privacidade online sem compromissos.\n\nO navegador DuckDuckGo vem com as funcionalidades que esperas num navegador de referência, como marcadores, separadores, palavras-passe, entre outras, além de <annotation type="privacy_protection_link">mais de uma dúzia de proteções de privacidade poderosas</annotation> que os navegadores mais populares não oferecem por predefinição. Este conjunto especialmente abrangente de proteções de privacidade ajuda a proteger as tuas atividades online, desde a pesquisa à navegação, e-mails, entre outras.\n\nPara utilizares as nossas proteções de privacidade, não tens de saber nada sobre os detalhes técnicos nem lidar com definições complicadas. Tudo o que tens de fazer é mudar o teu navegador para o DuckDuckGo em todos os teus dispositivos e desfrutar de privacidade como predefinição.\n\nMas, se quiseres espreitar os bastidores, podes consultar mais informações sobre como funcionam as proteções de privacidade do DuckDuckGo nas nossas <annotation type="learn_more_link">páginas de ajuda</annotation></string>
+    <string name="aboutDescriptionNew">A DuckDuckGo é a empresa independente de privacidade na Internet fundada em 2008 para quem está cansado de ser rastreado online e quer uma solução simples. Somos a prova de que podes usufruir de proteção da privacidade real online sem compromissos.\n\nO navegador DuckDuckGo vem com as funcionalidades que esperas num navegador de referência, como marcadores, separadores, palavras-passe, entre outras, além de dezenas de <annotation type="privacy_protection_link">proteções de privacidade poderosas</annotation> que os navegadores mais populares não oferecem por predefinição. Este conjunto especialmente abrangente de proteções de privacidade ajuda a proteger as tuas atividades online, desde a pesquisa à navegação, e-mails, entre outras.\n\nPara utilizares as nossas proteções de privacidade, não tens de saber nada sobre os detalhes técnicos nem lidar com definições complicadas. Tudo o que tens de fazer é mudar o teu navegador para o DuckDuckGo em todos os teus dispositivos e desfrutar de privacidade como predefinição.\n\nMas, se quiseres espreitar os bastidores, podes consultar mais informações sobre como funcionam as proteções de privacidade do DuckDuckGo nas nossas <annotation type="learn_more_link">páginas de ajuda</annotation></string>
     <string name="no_suggestions">Sem sugestões</string>
 
     <!-- Broken Site Activity -->
