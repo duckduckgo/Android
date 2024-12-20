@@ -184,8 +184,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             if (wasSwipingStarted) {
-                tabManager.onTabPageSwiped(position)
                 wasSwipingStarted = false
+
+                viewModel.onTabsSwiped()
+                tabManager.onTabPageSwiped(position)
             }
         }
 

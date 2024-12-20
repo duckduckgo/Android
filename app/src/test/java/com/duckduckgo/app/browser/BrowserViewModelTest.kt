@@ -33,6 +33,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -199,6 +200,13 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(AppPixelName.SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenTabsSwipedThenFireSwipingUsedPixels() = runTest {
+        testee.onTabsSwiped()
+        verify(mockPixel).fire(AppPixelName.SWIPE_TABS_USED)
+        verify(mockPixel).fire(AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
     }
 
     @Test
