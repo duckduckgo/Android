@@ -33,6 +33,6 @@ jobs:
         with:
           mattermost-team-id: ${{ env.MM_AUTH_TOKEN }}
           mattermost-token: ${{ env.MM_TEAM_ID }}
-          mattermost-channel-name: 'Thermostat'
+          mattermost-channel-name: 'david-mattermost-test'
           mattermost-message: ${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
