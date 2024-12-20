@@ -42,6 +42,8 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        // TODO remove
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
     }
     configurations.all {
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'
