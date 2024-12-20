@@ -7,7 +7,7 @@ on:
 jobs:
   pr-reviewed:
     name: Add PR reviewed comment
-    uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v1.4
+    uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v1.4.1
     with:
       trigger-phrase: "Task/Issue URL:"
     secrets:
