@@ -762,7 +762,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             tabPager.adapter = tabPagerAdapter
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
-            tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_2).toPx().toInt()))
+            tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
         }
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
