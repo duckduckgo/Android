@@ -27,3 +27,7 @@ target_link_libraries(
        # Links the target library to the log library
        # included in the NDK.
        ${log-lib} )
+
+target_link_options(
+       crash-ndk
+       PRIVATE "-Wl,-z,max-page-size=16384")
