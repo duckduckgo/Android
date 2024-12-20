@@ -26,28 +26,12 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           fetch-depth: 0
-          ref: feature/david/11-14-gha_notify_mattermost
 
-      - name: Make sure script can be executed
-        run: |
-          chmod +x send_chat_message.sh          
-
-      - name: Send Release started message
-        run: |        
-          ./send_chat_message.sh '${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
-
-      - name: Send Release task created message
-        run: |
-          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
-
-      - name: Send Release tag created
-        run: |
-          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
-
-      - name: Send Release task created message
-        run: |
-          echo -n '::notice title=Inputs::' && echo '${{ toJson(inputs) }}' | sed -z 's_\n_%0A_g'; echo
-          message="Release ${{ env.APP_VERSION }} task created"
-          message+="See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"          
-          ./send_chat_message.sh '${{env.emoji_info}}'" ${message}"
-          ./send_chat_message.sh '${{env.emoji_info}}'" Release task created https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}"
+      - name: Send test message
+        id: send-test-message
+        uses: duckduckgo/native-github-asana-sync@david/mattermost-action
+        with:
+          mattermost-token: ${{ env.MM_AUTH_TOKEN }}
+          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-message: ${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'send-mattermost-message'
