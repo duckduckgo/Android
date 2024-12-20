@@ -1046,6 +1046,9 @@ class BrowserTabFragment :
             onMenuItemClicked(changeBrowserModeMenuItem) {
                 viewModel.onChangeBrowserModeClicked()
             }
+            onMenuItemClicked(defaultBrowserMenuItem) {
+                viewModel.onSetDefaultBrowserSelected()
+            }
             onMenuItemClicked(sharePageMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
