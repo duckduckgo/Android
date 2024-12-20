@@ -232,6 +232,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         setContentView(binding.root)
+
+        initializeTabs()
+
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
@@ -756,7 +759,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private fun showWebContent() {
             Timber.d("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
-            initializeTabs()
             configureObservers()
             binding.clearingInProgressView.gone()
 
