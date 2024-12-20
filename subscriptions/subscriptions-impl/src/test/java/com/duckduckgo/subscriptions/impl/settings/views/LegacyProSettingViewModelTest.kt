@@ -62,6 +62,7 @@ class LegacyProSettingViewModelTest {
     @Test
     fun whenOnResumeEmitViewState() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
