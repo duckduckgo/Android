@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.SwipingTabsFeature
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -37,7 +37,7 @@ import timber.log.Timber
 @SingleInstanceIn(ActivityScope::class)
 class RealTabManager @Inject constructor(
     activity: DaggerActivity,
-    private val swipingTabsFeature: SwipingTabsFeature,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : TabManager {
     companion object {
         private const val MAX_ACTIVE_TABS = 40
@@ -51,7 +51,7 @@ class RealTabManager @Inject constructor(
     private var _currentTab: BrowserTabFragment? = null
     override var currentTab: BrowserTabFragment?
         get() {
-            return if (swipingTabsFeature.self().isEnabled()) {
+            return if (swipingTabsFeature.isEnabled) {
                 null
             } else {
                 _currentTab
@@ -62,7 +62,7 @@ class RealTabManager @Inject constructor(
         }
 
     override fun onSelectedTabChanged(tab: TabEntity?) {
-        if (swipingTabsFeature.self().isEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             return
         } else if (tab != null) {
             selectTab(tab)
@@ -70,7 +70,7 @@ class RealTabManager @Inject constructor(
     }
 
     override fun onTabsUpdated(updatedTabs: List<TabEntity>) {
-        if (swipingTabsFeature.self().isEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             return
         } else {
             clearStaleTabs(updatedTabs)
@@ -126,7 +126,7 @@ class RealTabManager @Inject constructor(
     }
 
     private fun selectTab(tab: TabEntity?) {
-        if (swipingTabsFeature.self().isEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             return
         }
 
@@ -186,7 +186,7 @@ class RealTabManager @Inject constructor(
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
-        if (swipingTabsFeature.self().isEnabled()) {
+        if (swipingTabsFeature.isEnabled) {
             return
         }
 
