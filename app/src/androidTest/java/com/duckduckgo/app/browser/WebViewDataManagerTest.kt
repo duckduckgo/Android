@@ -160,10 +160,11 @@ class WebViewDataManagerTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
-    fun whenClearDataAndKillSwitchEnabledThenDefaultContentsDeletedExceptCookies() = runTest {
+    fun whenClearDataAndLocalStorageFeatureDisabledThenDefaultContentsDeletedExceptCookies() = runTest {
         withContext(Dispatchers.Main) {
-            feature.deleteLocalStorageKillSwitch().setRawStoredState(State(enable = true))
+            feature.localStorage().setRawStoredState(State(enable = false))
             val webView = TestWebView(context)
 
             testee.clearData(webView, mockStorage)
@@ -175,10 +176,11 @@ class WebViewDataManagerTest {
         }
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
-    fun whenClearDataAndKillSwitchDisabledThenDefaultContentsDeletedExceptCookiesAndLocalStorage() = runTest {
+    fun whenClearDataAndLocalStorageFeatureEnabledThenDefaultContentsDeletedExceptCookiesAndLocalStorage() = runTest {
         withContext(Dispatchers.Main) {
-            feature.deleteLocalStorageKillSwitch().setRawStoredState(State(enable = false))
+            feature.localStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
             testee.clearData(webView, mockStorage)
