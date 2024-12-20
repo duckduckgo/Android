@@ -27,6 +27,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
@@ -90,8 +92,8 @@ class ProSettingViewModel @Inject constructor(
             .onEach { subscriptionStatus ->
                 val offer = subscriptionsManager.getSubscriptionOffer().firstOrNull()
                 val region = when (offer?.planId) {
-                    MONTHLY_PLAN_ROW -> SubscriptionRegion.ROW
-                    MONTHLY_PLAN_US -> SubscriptionRegion.US
+                    MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> SubscriptionRegion.ROW
+                    MONTHLY_PLAN_US, YEARLY_PLAN_US -> SubscriptionRegion.US
                     else -> null
                 }
                 _viewState.emit(viewState.value.copy(status = subscriptionStatus, region = region))
