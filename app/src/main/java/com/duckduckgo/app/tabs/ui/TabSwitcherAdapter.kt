@@ -49,7 +49,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHo
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.swap
 import java.io.File
-import java.util.Collections.swap
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

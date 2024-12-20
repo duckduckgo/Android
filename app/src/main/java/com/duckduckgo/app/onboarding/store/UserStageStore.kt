@@ -18,12 +18,15 @@ package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface UserStageStore {
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
     suspend fun moveToStage(appStage: AppStage)
+    val currentAppStage: Flow<AppStage>
 }
 
 class AppUserStageStore @Inject constructor(
@@ -57,6 +60,8 @@ class AppUserStageStore @Inject constructor(
     override suspend fun moveToStage(appStage: AppStage) {
         userStageDao.updateUserStage(appStage)
     }
+
+    override val currentAppStage: Flow<AppStage> = userStageDao.currentAppStage().map { it.appStage }
 }
 
 suspend fun UserStageStore.isNewUser(): Boolean {

@@ -26,5 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface SwipingTabsFeature {
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 }

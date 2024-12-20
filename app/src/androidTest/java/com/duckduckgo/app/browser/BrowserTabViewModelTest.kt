@@ -503,10 +503,15 @@ class BrowserTabViewModelTest {
     private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
         .create(ExtendedOnboardingFeatureToggles::class.java)
     private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
+    private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+    private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -675,6 +680,7 @@ class BrowserTabViewModelTest {
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
+            swipingTabsFeature = swipingTabsFeatureProvider,
         )
 
         testee.loadData("abc", null, false, false)
@@ -2445,11 +2451,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserRequestedToOpenNewTabThenNewTabCommandIssued() {
+    fun whenUserRequestedToOpenNewTabAndNoEmptyTabExistsThenNewTabCommandIssued() {
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
         testee.userRequestedOpeningNewTab()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabAndEmptyTabExistsThenSelectTheEmptyTab() = runTest {
+        val emptyTabId = "EMPTY_TAB"
+        tabsLiveData.value = listOf(TabEntity(emptyTabId))
+        testee.userRequestedOpeningNewTab()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertFalse(command is Command.LaunchNewTab)
+
+        verify(mockTabRepository).select(emptyTabId)
         verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
