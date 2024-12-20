@@ -33,6 +33,10 @@ object SubscriptionsConstants {
     const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
     const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
 
+    // List of offers
+    const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-monthly-renews-us"
+    const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-yearly-renews-us"
+
     // List of features
     const val LEGACY_FE_NETP = "vpn"
     const val LEGACY_FE_ITR = "identity-theft-restoration"

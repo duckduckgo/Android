@@ -79,6 +79,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1159,7 +1160,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenGetSubscriptionOfferAndRowPlansAvailableThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
-        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(true)
 
@@ -1526,9 +1526,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val productDetails: ProductDetails = mock { productDetails ->
             whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
 
-            val pricingPhaseList: List<PricingPhase> = listOf(
-                mock { pricingPhase -> whenever(pricingPhase.formattedPrice).thenReturn("1$") },
-            )
+            val mockPricingPhase: PricingPhase = mock {
+                on { formattedPrice } doReturn "1$"
+                on { billingPeriod } doReturn "P1M"
+            }
+
+            val pricingPhaseList: List<PricingPhase> = listOf(mockPricingPhase)
 
             val pricingPhases: PricingPhases = mock { pricingPhases ->
                 whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
@@ -1536,6 +1539,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
             val offers = basePlanIds.map { basePlanId ->
                 mock<SubscriptionOfferDetails> { offer ->
+                    whenever(offer.basePlanId).thenReturn(basePlanId)
                     whenever(offer.basePlanId).thenReturn(basePlanId)
                     whenever(offer.pricingPhases).thenReturn(pricingPhases)
                 }

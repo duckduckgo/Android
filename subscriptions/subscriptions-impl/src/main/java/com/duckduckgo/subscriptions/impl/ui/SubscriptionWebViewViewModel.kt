@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
@@ -44,6 +45,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -297,17 +299,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
         return OptionsJson(
             id = offer.planId,
-            cost = CostJson(displayPrice = offer.pricingPhases.first().formattedPrice, recurrence = recurrence),
+            cost = CostJson(displayPrice = offerDisplayPrice, recurrence = recurrence),
             offer = getOfferJson(offer),
         )
     }
 
     private fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
         return offer.offerId?.let {
-            val offerType = if (offer.pricingPhases.first().formattedPrice == "Free") {
-                OfferType.FREE_TRIAL
-            } else {
-                OfferType.UNKNOWN
+            val offerType = when (offer.offerId) {
+                MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US -> OfferType.FREE_TRIAL
+                else -> OfferType.UNKNOWN
             }
 
             OfferJson(
