@@ -1532,7 +1532,7 @@ class BrowserTabFragment :
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.launchNewTab(it.query, it.sourceTabId)
+                    browserActivity?.launchNewTab(it.query, it.sourceTabId)
                 } else {
                     browserActivity?.openInNewTab(it.query, it.sourceTabId)
                 }
@@ -1547,11 +1547,7 @@ class BrowserTabFragment :
                         isLaunchedFromExternalApp,
                     )
                 } else {
-                    if (swipingTabsFeature.isEnabled) {
-                        requireBrowserActivity().tabManager.openMessageInNewTab(it.message, it.sourceTabId)
-                    } else {
-                        browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
-                    }
+                    browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
                 }
             }
 
@@ -1560,11 +1556,7 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchNewTab -> {
-                if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.launchNewTab()
-                } else {
-                    browserActivity?.launchNewTab()
-                }
+                browserActivity?.launchNewTab()
             }
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
@@ -1809,11 +1801,7 @@ class BrowserTabFragment :
                 }
                 binding.autoCompleteSuggestionsList.gone()
 
-                if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.switchToTab(it.tabId)
-                } else {
-                    browserActivity?.openExistingTab(it.tabId)
-                }
+                browserActivity?.openExistingTab(it.tabId)
             }
             else -> {
                 // NO OP

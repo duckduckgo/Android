@@ -16,111 +16,123 @@
 
 package com.duckduckgo.app.browser.tabs
 
-import android.os.Message
-import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.SkipUrlConversionOnNewTabFeature
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
-import dagger.android.DaggerActivity
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-interface TabManager : CoroutineScope {
+interface TabManager {
     companion object {
         const val MAX_ACTIVE_TABS = 20
     }
 
-    val tabOperationManager: TabOperationManager
+    fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean)
+    fun getSelectedTabId(): String?
+    fun onSelectedTabChanged(tabId: String)
 
-    val currentTab: BrowserTabFragment?
-    val tabPagerAdapter: TabPagerAdapter
-
-    fun onTabPageSwiped(newPosition: Int)
-    fun openMessageInNewTab(message: Message, sourceTabId: String?)
-    fun clearTabsInMemory()
-    fun onCleanup()
-
-    fun onSelectedTabChanged(tabId: String) = tabOperationManager.onSelectedTabChanged(tabId)
-    fun onTabsChanged(updatedTabIds: List<String>) = launch { tabOperationManager.onTabsChanged(updatedTabIds) }
-    fun switchToTab(tabId: String) = launch { tabOperationManager.selectTab(tabId) }
-    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) = launch {
-        tabOperationManager.openNewTab(query, sourceTabId, skipHome)
-    }
+    suspend fun onTabsChanged(updatedTabIds: List<String>)
+    suspend fun switchToTab(tabId: String)
+    suspend fun requestAndWaitForNewTab(): TabEntity
+    suspend fun openNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false): String
+    suspend fun getTabById(tabId: String): TabEntity?
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
-    activity: DaggerActivity,
-    override val tabOperationManager: TabOperationManager,
+    private val tabRepository: TabRepository,
+    private val dispatchers: DispatcherProvider,
+    private val queryUrlConverter: OmnibarEntryConverter,
+    private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : TabManager {
-    private val browserActivity = activity as BrowserActivity
-    private val supportFragmentManager = activity.supportFragmentManager
-    private val coroutineScope = browserActivity.lifecycleScope
+    private lateinit var onTabsUpdated: (List<String>) -> Unit
+    private lateinit var shouldKeepSingleTab: () -> Boolean
+    private var selectedTabId: String? = null
 
-    private var openMessageInNewTabJob: Job? = null
-
-    override val tabPagerAdapter by lazy {
-        TabPagerAdapter(
-            fragmentManager = supportFragmentManager,
-            lifecycleOwner = browserActivity,
-            activityIntent = browserActivity.intent,
-            getSelectedTabId = { tabOperationManager.getSelectedTabId() },
-            getTabById = ::getTabById,
-            requestAndWaitForNewTab = ::requestAndWaitForNewTab,
-        )
+    override fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean) {
+        this.onTabsUpdated = onTabsUpdated
+        this.shouldKeepSingleTab = shouldKeepSingleTab
     }
 
-    init {
-        tabOperationManager.registerCallbacks(::onTabsUpdated, ::shouldKeepSingleTab)
-    }
+    override fun getSelectedTabId(): String? = selectedTabId
 
-    override fun onTabPageSwiped(newPosition: Int) {
-        val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
-        if (tabId != null) {
-            switchToTab(tabId)
+    override fun onSelectedTabChanged(tabId: String) {
+        selectedTabId = tabId
+
+        if (shouldKeepSingleTab()) {
+            onTabsUpdated(listOf(tabId))
         }
     }
 
-    override val currentTab: BrowserTabFragment?
-        get() = tabPagerAdapter.currentFragment
+    override suspend fun onTabsChanged(updatedTabIds: List<String>) {
+        if (shouldKeepSingleTab()) {
+            updatedTabIds.firstOrNull { it == selectedTabId }?.let {
+                onTabsUpdated(listOf(it))
+            }
+        } else {
+            onTabsUpdated(updatedTabIds)
+        }
 
-    override fun openMessageInNewTab(message: Message, sourceTabId: String?) {
-        openMessageInNewTabJob = coroutineScope.launch {
-            tabPagerAdapter.setMessageForNewFragment(message)
-            tabOperationManager.openNewTab(sourceTabId)
+        if (updatedTabIds.isEmpty()) {
+            withContext(dispatchers.io()) {
+                Timber.i("Tabs list is null or empty; adding default tab")
+                tabRepository.addDefaultTab()
+            }
         }
     }
 
-    override fun clearTabsInMemory() {
-        tabPagerAdapter.clearFragments()
+    override suspend fun requestAndWaitForNewTab(): TabEntity = withContext(dispatchers.io()) {
+        val tabId = openNewTab()
+        return@withContext tabRepository.flowTabs.transformWhile { result ->
+            result.firstOrNull { it.tabId == tabId }?.let { entity ->
+                emit(entity)
+                return@transformWhile true
+            }
+            return@transformWhile false
+        }.first()
     }
 
-    override fun onCleanup() {
-        openMessageInNewTabJob?.cancel()
+    override suspend fun switchToTab(tabId: String) = withContext(dispatchers.io()) {
+        if (tabId != tabRepository.getSelectedTab()?.tabId) {
+            tabRepository.select(tabId)
+        }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<String>) {
-        tabPagerAdapter.onTabsUpdated(updatedTabIds)
+    override suspend fun openNewTab(
+        query: String?,
+        sourceTabId: String?,
+        skipHome: Boolean,
+    ): String = withContext(dispatchers.io()) {
+        val url = query?.let {
+            if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+                query
+            } else {
+                queryUrlConverter.convertQueryToUrl(query)
+            }
+        }
+
+        return@withContext if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(
+                url = url,
+                skipHome = skipHome,
+                sourceTabId = sourceTabId,
+            )
+        } else {
+            tabRepository.add(
+                url = url,
+                skipHome = skipHome,
+            )
+        }
     }
 
-    private fun shouldKeepSingleTab() = !browserActivity.tabPager.isUserInputEnabled
-
-    private fun getTabById(tabId: String): TabEntity? = runBlocking {
-        return@runBlocking tabOperationManager.getTabById(tabId)
+    override suspend fun getTabById(tabId: String): TabEntity? = withContext(dispatchers.io()) {
+        return@withContext tabRepository.getTab(tabId)
     }
-
-    private fun requestAndWaitForNewTab(): TabEntity = runBlocking {
-        return@runBlocking tabOperationManager.requestAndWaitForNewTab()
-    }
-
-    override val coroutineContext: CoroutineContext = activity.lifecycleScope.coroutineContext
 }
