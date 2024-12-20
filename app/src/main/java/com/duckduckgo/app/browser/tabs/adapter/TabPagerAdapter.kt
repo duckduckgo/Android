@@ -32,9 +32,8 @@ class TabPagerAdapter(
     private val fragmentManager: FragmentManager,
     private val activityIntent: Intent?,
     private val getTabById: (String) -> TabEntity?,
-    private val requestNewTab: () -> TabEntity,
+    private val requestAndWaitForNewTab: () -> TabEntity,
     private val getSelectedTabId: () -> String?,
-    private val onTabSelected: (String) -> Unit,
 ) : FragmentStateAdapter(fragmentManager, lifecycleOwner.lifecycle) {
     private val tabIds = mutableListOf<String>()
     private var messageForNewFragment: Message? = null
@@ -51,7 +50,7 @@ class TabPagerAdapter(
             .firstOrNull { it.tabId == getSelectedTabId() }
 
     override fun createFragment(position: Int): Fragment {
-        val tab = getTabById(tabIds[position]) ?: requestNewTab()
+        val tab = getTabById(tabIds[position]) ?: requestAndWaitForNewTab()
         val isExternal = activityIntent?.getBooleanExtra(BrowserActivity.LAUNCH_FROM_EXTERNAL_EXTRA, false) == true
 
         return if (messageForNewFragment != null) {
@@ -77,9 +76,11 @@ class TabPagerAdapter(
         tabIds.addAll(newTabs)
     }
 
-    fun onPageChanged(position: Int) {
-        if (position < tabIds.size) {
-            onTabSelected(tabIds[position])
+    fun getTabIdAtPosition(position: Int): String? {
+        return if (position < tabIds.size) {
+            tabIds[position]
+        } else {
+            null
         }
     }
 

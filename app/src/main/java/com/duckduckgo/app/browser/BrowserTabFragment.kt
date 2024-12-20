@@ -835,10 +835,9 @@ class BrowserTabFragment :
         }
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
         omnibar = Omnibar(settingsDataStore.omnibarPosition, changeOmnibarPositionFeature.refactor().isEnabled(), binding)
 
         webViewContainer = binding.webViewContainer
@@ -1075,6 +1074,9 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(changeBrowserModeMenuItem) {
                 viewModel.onChangeBrowserModeClicked()
+            }
+            onMenuItemClicked(defaultBrowserMenuItem) {
+                viewModel.onSetDefaultBrowserSelected()
             }
             onMenuItemClicked(sharePageMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
@@ -1530,7 +1532,7 @@ class BrowserTabFragment :
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.openInNewTab(it.query, it.sourceTabId)
+                    requireBrowserActivity().tabManager.launchNewTab(it.query, it.sourceTabId)
                 } else {
                     browserActivity?.openInNewTab(it.query, it.sourceTabId)
                 }
@@ -1808,7 +1810,7 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
 
                 if (swipingTabsFeature.isEnabled) {
-                    requireBrowserActivity().tabManager.openExistingTab(it.tabId)
+                    requireBrowserActivity().tabManager.switchToTab(it.tabId)
                 } else {
                     browserActivity?.openExistingTab(it.tabId)
                 }
@@ -3017,15 +3019,17 @@ class BrowserTabFragment :
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        runCatching {
-            webView?.safeHitTestResult?.let {
-                val target = getLongPressTarget(it)
-                if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
-                    return true
+        if (this.isResumed) {
+            runCatching {
+                webView?.safeHitTestResult?.let {
+                    val target = getLongPressTarget(it)
+                    if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
+                        return true
+                    }
                 }
+            }.onFailure { exception ->
+                Timber.e(exception, "Failed to get HitTestResult")
             }
-        }.onFailure { exception ->
-            Timber.e(exception, "Failed to get HitTestResult")
         }
         return super.onContextItemSelected(item)
     }

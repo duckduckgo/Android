@@ -24,9 +24,16 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.PIR
-import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.ACTIVE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INACTIVE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INELIGIBLE
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.SIGNED_OUT
+import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -36,12 +43,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class PirSettingViewModel @Inject constructor(
-    private val subscriptions: Subscriptions,
+    private val productSubscriptionManager: ProductSubscriptionManager,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -51,7 +59,16 @@ class PirSettingViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val hasSubscription: Boolean = false)
+    data class ViewState(val pirState: PirState = PirState.Hidden) {
+
+        sealed class PirState {
+
+            data object Hidden : PirState()
+            data object Subscribed : PirState()
+            data object Expired : PirState()
+            data object Activating : PirState()
+        }
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -63,8 +80,16 @@ class PirSettingViewModel @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        subscriptions.getEntitlementStatus().onEach {
-            _viewState.emit(viewState.value.copy(hasSubscription = it.contains(PIR)))
+
+        productSubscriptionManager.entitlementStatus(PIR).onEach { status ->
+            val pirState = when (status) {
+                ACTIVE -> PirState.Subscribed
+                INACTIVE, EXPIRED -> PirState.Expired
+                WAITING -> PirState.Activating
+                SIGNED_OUT, INELIGIBLE -> PirState.Hidden
+            }
+
+            _viewState.update { it.copy(pirState = pirState) }
         }.launchIn(viewModelScope)
     }
 

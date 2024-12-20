@@ -1,4 +1,4 @@
-name: Pull Request Reviewed -> Asana Sync
+name: Pull Request Reviewed -> Sync With Asana
 
 on:
   pull_request_review:
@@ -6,8 +6,8 @@ on:
 
 jobs:
   pr-reviewed:
-    name: Update Asana task -> PR reviewed
-    uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@david/improve-pr-notifications
+    name: Add PR reviewed comment
+    uses: duckduckgo/native-github-asana-sync/.github/workflows/pr-review-notifications.yml@v1.4.1
     with:
       trigger-phrase: "Task/Issue URL:"
     secrets:
