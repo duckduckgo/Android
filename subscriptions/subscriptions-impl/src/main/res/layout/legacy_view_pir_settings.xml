@@ -14,11 +14,13 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/pirSettings"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:indicatorStatus="on"
-    app:leadingIcon="@drawable/ic_identity_blocked_pir_color_24"
-    app:primaryText="@string/pirSettingTitle" />
+<com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/pirSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/pirSettingTitle"
+        app:primaryTextTruncated="false"
+        app:leadingIconSize="small"
+        app:leadingIcon="@drawable/ic_check_green_round_16" />

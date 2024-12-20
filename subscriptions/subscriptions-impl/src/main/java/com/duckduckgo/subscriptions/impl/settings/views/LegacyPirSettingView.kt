@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
+import com.duckduckgo.subscriptions.impl.databinding.LegacyViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ItrSettingView @JvmOverloads constructor(
+class LegacyPirSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -63,10 +60,10 @@ class ItrSettingView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewItrSettingsBinding by viewBinding()
+    private val binding: LegacyViewPirSettingsBinding by viewBinding()
 
-    private val viewModel: ItrSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ItrSettingViewModel::class.java]
+    private val viewModel: LegacyPirSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyPirSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -76,6 +73,10 @@ class ItrSettingView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+
+        binding.pirSettings.setClickListener {
+            viewModel.onPir()
+        }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -98,35 +99,17 @@ class ItrSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        with(binding.itrSettings) {
-            when (viewState.itrState) {
-                is ItrState.Subscribed -> {
-                    isVisible = true
-                    setStatus(isOn = true)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_color_24)
-                    isClickable = true
-                    setClickListener { viewModel.onItr() }
-                }
-                ItrState.Expired, ItrState.Activating -> {
-                    isVisible = true
-                    isClickable = false
-                    setStatus(isOn = false)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_grayscale_color_24)
-                }
-                ItrState.Hidden -> isGone = true
-            }
+        if (viewState.hasSubscription) {
+            binding.pirSettings.show()
+        } else {
+            binding.pirSettings.gone()
         }
     }
 
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenItr -> {
-                globalActivityStarter.start(
-                    context,
-                    SubscriptionsWebViewActivityWithParams(
-                        url = SubscriptionsConstants.ITR_URL,
-                    ),
-                )
+            is OpenPir -> {
+                globalActivityStarter.start(context, PirScreenWithEmptyParams)
             }
         }
     }
