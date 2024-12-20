@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Veri Temizleme</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
     <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Temizle...</string>
+    <string name="settingsAutomaticallyClearData">Verileri Otomatik Olarak Temizle…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
+    <string name="aboutActivityTitleNew">Hakkında</string>
     <string name="aboutHeader">Duck Side\'a hoş geldiniz!</string>
     <string name="aboutDescription">DuckDuckGo, çevrim içi takip edilmeyi hiç istemeyen ve pratik bir çözüm arayan herkese hizmet veren, 2008 yılında kurulmuş bağımsız bir İnternet gizlilik şirketidir. Biz, çevrim içi ortamda ödün vermeden gerçek gizlilik koruması elde edebileceğinizin kanıtıyız.\n\nDuckDuckGo tarayıcı; yer imleri, sekmeler, parolalar ve daha fazlası gibi bir tarayıcıdan beklediğiniz özelliklerin yanı sıra varsayılan olarak çoğu popüler tarayıcıda sunulmayan <annotation type="privacy_protection_link">ondan fazla güçlü gizlilik koruması</annotation> ile birlikte gelir. Son derece kapsamlı olan bu gizlilik koruma seti, aramadan gezinmeye, e-posta göndermeye ve daha fazlasına kadar çevrim içi etkinliklerinizde koruma sağlamaya yardımcı olur.\n\nGizlilik korumalarımız, teknik ayrıntılar hakkında hiçbir şey bilmenize veya karmaşık ayarlarla uğraşmanıza gerek kalmadan çalışır. Tüm cihazlarınızda tarayıcı olarak DuckDuckGo\'yu kullanarak aradığınız gizliliği sağlayabilirsiniz.\n\nAncak ayrıntılara göz atmak istiyorsanız, DuckDuckGo gizlilik korumalarının nasıl çalıştığıyla ilgili daha fazla bilgiyi <annotation type="learn_more_link">yardım sayfalarımızda</annotation>bulabilirsiniz.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo, internette izlenmek istemeyen ve kolay bir çözüm arayan herkes için 2008 yılında kurulan bağımsız bir internet gizlilik şirketidir. Çevrimiçi ortamda ödün vermeden gerçek gizlilik koruması elde edebileceğinizin kanıtıyız.\n\nDuckDuckGo tarayıcı yer işaretleri, sekmeler, parolalar ve daha fazlası gibi bir tarayıcıdan beklediğiniz özelliklerin yanı sıra varsayılan olarak çoğu popüler tarayıcıda olmayan <annotation type="privacy_protection_link">ondan fazla güçlü gizlilik koruması</annotation> sunar. Bu benzersiz kapsamlı gizlilik koruma seti, aramadan gezinmeye, e-posta göndermeye ve daha fazlasına kadar internetteki etkinliklerinizi korumaya yardımcı olur.\n\nGizlilik korumalarımız, teknik ayrıntılar hakkında hiçbir şey bilmek veya karmaşık ayarlarla uğraşmak gerekmeksizin çalışır. Tüm cihazlarınızda kullandığınız tarayıcıyı DuckDuckGo\'ya değiştirip varsayılan olarak gizlilik elde edin.\n\nAncak kaputun altına bir göz atmak istiyorsanız, DuckDuckGo gizlilik korumalarının işleyişi hakkında daha fazla bilgiyi <annotation type="learn_more_link">yardım sayfalarımızda</annotation> bulabilirsiniz.</string>
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->
