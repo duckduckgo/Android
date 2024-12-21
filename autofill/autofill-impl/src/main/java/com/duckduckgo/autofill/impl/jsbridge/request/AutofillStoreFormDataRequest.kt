@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.jsbridge.request
 
 data class AutofillStoreFormDataRequest(
     val credentials: AutofillStoreFormDataCredentialsRequest?,
+    val trigger: FormSubmissionTriggerType,
 )
 
 data class AutofillStoreFormDataCredentialsRequest(

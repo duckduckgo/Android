@@ -94,6 +94,7 @@ class RealRuntimeConfigurationWriterTest {
                       "inlineIcon_credentials": true,
                       "emailProtection_incontext_signup": true,
                       "unknown_username_categorization": false,
+                      "partial_form_saves": false
                     }
                   }
                 }
@@ -109,6 +110,7 @@ class RealRuntimeConfigurationWriterTest {
                 showInlineKeyIcon = true,
                 showInContextEmailProtectionSignup = true,
                 unknownUsernameCategorization = false,
+                partialFormSaves = false,
             ),
         )
     }
