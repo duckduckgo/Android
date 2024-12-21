@@ -16,4 +16,15 @@
 
 package com.duckduckgo.malicioussiteprotection.api
 
-interface MaliciousSiteProtection
+import android.net.Uri
+
+interface MaliciousSiteProtection {
+
+    suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult
+
+    enum class IsMaliciousResult {
+        MALICIOUS,
+        SAFE,
+        WAIT_FOR_CONFIRMATION,
+    }
+}

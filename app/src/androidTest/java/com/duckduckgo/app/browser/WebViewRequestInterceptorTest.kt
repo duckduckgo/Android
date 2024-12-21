@@ -29,6 +29,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
@@ -97,6 +98,7 @@ class WebViewRequestInterceptorTest {
         fakeToggle,
         fakeUserAllowListRepository,
     )
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     private var webView: WebView = mock()
 
@@ -117,6 +119,7 @@ class WebViewRequestInterceptorTest {
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
             duckPlayer = mockDuckPlayer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
         )
     }
 
