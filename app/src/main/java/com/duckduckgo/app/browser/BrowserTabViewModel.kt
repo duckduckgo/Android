@@ -438,6 +438,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2641,7 +2642,20 @@ class BrowserTabViewModel @Inject constructor(
         longPress: Boolean = false,
     ) {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        if (swipingTabsFeature.isEnabled) {
+            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+            if (emptyTab != null) {
+                viewModelScope.launch {
+                    tabRepository.select(tabId = emptyTab)
+                }
+            } else {
+                command.value = LaunchNewTab
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
+
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
