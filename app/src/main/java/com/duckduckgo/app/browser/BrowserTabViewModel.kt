@@ -277,6 +277,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -428,6 +429,7 @@ class BrowserTabViewModel @Inject constructor(
     private val newTabPixels: Lazy<NewTabPixels>, // Lazy to construct the instance and deps only when actually sending the pixel
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
+    private val duckChat: DuckChat,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
@@ -826,6 +828,7 @@ class BrowserTabViewModel @Inject constructor(
                 hasQueryChanged = false,
                 urlLoaded = url ?: "",
             ),
+            showDuckChatOption = duckChat.showInBrowserMenu(),
         )
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
@@ -2513,12 +2516,14 @@ class BrowserTabViewModel @Inject constructor(
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
             val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
+            val showDuckChat = duckChat.showInBrowserMenu()
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
                     addToHomeVisible = addToHomeSupported,
                     showAutofill = showAutofill,
                     showVoiceSearch = showVoiceSearch,
+                    showDuckChatOption = showDuckChat,
                 )
             }
         }
