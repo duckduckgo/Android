@@ -84,9 +84,9 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp-tls:_"
 
     // see https://github.com/google/conscrypt/issues/649#issuecomment-808482460
-    compileOnly 'org.conscrypt:conscrypt-openjdk-uber:2.5.0'
-    runtimeOnly 'org.conscrypt:conscrypt-android:2.5.0'
-    testImplementation 'org.conscrypt:conscrypt-openjdk-uber:2.5.0'
+    compileOnly 'org.conscrypt:conscrypt-openjdk-uber:2.5.2'
+    runtimeOnly 'org.conscrypt:conscrypt-android:2.5.3'
+    testImplementation 'org.conscrypt:conscrypt-openjdk-uber:2.5.2'
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
