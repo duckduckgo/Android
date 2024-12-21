@@ -34,7 +34,7 @@
     <string name="cancel">Odustani</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Uvijek uključeno</string>
+    <string name="on">Uključeno</string>
+    <string name="off">Isključeno</string>
 </resources>

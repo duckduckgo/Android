@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Setări</string>
     <string name="settingsMenuItemTitle">Setări</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Măsuri de protecție a confidențialității</string>
+    <string name="settingsHeadingPrivacyProtections">Măsuri de protecție a confidențialității</string>
     <string name="settingsHeadingAppearance">Aspect</string>
     <string name="settingsHeadingCustomize">Personalizare</string>
     <string name="settingsHeadingAbout">Despre</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Blochează tehnologiile de urmărire prin e-mail și ascunde-ți adresa</string>
     <string name="settingsHeadingMore">Mai multe de la DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Pașii următori</string>
+    <string name="settingsHeadingNextSteps">Pașii următori</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Setări principale</string>
+    <string name="settingsHeadingMainSettings">Setări principale</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Ștergerea datelor</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Adaugă un widget la ecranul de întâmpinare</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Setează poziția barei de adrese</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Activează căutarea vocală</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo pe alte platforme</string>
+    <string name="settingsDataClearing">Ștergerea datelor</string>
+    <string name="settingsAddWidget">Adaugă un widget la ecranul de întâmpinare</string>
+    <string name="settingsAddressBarPosition">Setează poziția barei de adrese</string>
+    <string name="settingsEnableVoiceSearch">Activează căutarea vocală</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo pe alte platforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Căutare Confidențială</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecția împotriva urmăririi pe web este activată</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Ștergerea datelor</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
 
     <string name="settingsAutomaticallyClearWhat">Ștergere automată…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Șterge automat datele…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">Despre</string>
     <string name="aboutHeader">Welcome to the Duck Side!</string>
     <string name="aboutDescription">DuckDuckGo este o companie independentă înființată în 2008, care oferă confidențialitate pe internet pentru toți cei care s-au săturat să fie urmăriți online și doresc o soluție simplă.Suntem dovada că protecția confidențialității online fără compromisuri este reală.\n\nBrowserul DuckDuckGo oferă funcțiile la care vă așteptați de la browserul preferat, cum ar fi marcajele, filele, parolele și multe altele, plus peste <annotation type="privacy_protection_link">o duzină de protecții ale confidențialității remarcabile,</annotation> care nu sunt oferite implicit în majoritatea browserelor populare.Acest set unic și cuprinzător de măsuri de protecție a confidențialității vă ajută să vă protejați activitățile online, de la căutări la navigare, e-mailuri și multe altele.\n\nMăsurile noastre robuste de protecție a confidențialității funcționează fără a fi nevoie să cunoașteți detalii tehnice sau să aveți de-a face cu setări complicate.Tot ce trebuie să faceți este să folosiți browserul DuckDuckGo pe toate dispozitivele și veți beneficia automat de confidențialitate.\n\nDar dacă doriți să aflați detaliile din culise, puteți găsi mai multe informații despre modul în care funcționează protecțiile de confidențialitate DuckDuckGo pe paginile noastre de <annotation type="learn_more_link">ajutor</annotation></string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo este compania independentă de confidențialitate pe internet, fondată în 2008, pentru toți cei care s-au săturat să fie urmăriți online și își doresc o soluție simplă. Suntem dovada faptului că poți obține o protecție reală a confidențialității online, fără compromisuri.\n\nBrowserul DuckDuckGo oferă funcțiile la care te așteptai de la browserul preferat, cum ar fi marcajele, filele, parolele și multe altele, plus peste <annotation type="privacy_protection_link">o duzină de funcții de protecție a confidențialității remarcabile</annotation>, care nu sunt oferite implicit în majoritatea browserelor populare. Acest set unic și cuprinzător de măsuri de protecție a confidențialității te ajută să îți protejezi activitățile online, de la căutări la navigare, e-mailuri și multe altele.\n\nMăsurile noastre robuste de protecție a confidențialității funcționează fără a necesita cunoștințe tehnice din partea ta și fără a fi nevoie să faci setări complicate. Tot ce trebuie să faci este să folosești browserul DuckDuckGo pe toate dispozitivele și vei beneficia implicit de confidențialitate.\n\nDar, dacă dorești să afli detalii din culise, poți găsi mai multe informații despre modul în care funcționează măsurile de protecție a confidențialității DuckDuckGo în <annotation type="learn_more_link">paginile noastre de ajutor</annotation></string>
     <string name="no_suggestions">Fără sugestii</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Parole</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Parole și completare automată</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Parole și completare automată</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
 

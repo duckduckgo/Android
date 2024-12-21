@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Ta bort från den här enheten</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Hjälp och support</string>
     <string name="subscriptionSettingSendFeedback">Skicka återkoppling</string>
+    <string name="subscriptionSettingActivating">Aktiverar</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du är klar.</string>

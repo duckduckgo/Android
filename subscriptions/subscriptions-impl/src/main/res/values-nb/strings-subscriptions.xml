@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Fjern fra denne enheten</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Hjelp og kundestøtte</string>
     <string name="subscriptionSettingSendFeedback">Send tilbakemelding</string>
+    <string name="subscriptionSettingActivating">Aktiverer</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Alt klart.</string>

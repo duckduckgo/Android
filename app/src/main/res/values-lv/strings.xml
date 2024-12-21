@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privātuma aizsardzība</string>
+    <string name="settingsHeadingPrivacyProtections">Privātuma aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
     <string name="settingsHeadingCustomize">Pielāgošana</string>
     <string name="settingsHeadingAbout">Par</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
     <string name="settingsEmailProtectionSubtitle">Bloķē e-pasta izsekotājus un paslēp savu adresi</string>
     <string name="settingsHeadingMore">Vairāk no DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Nākamie soļi</string>
+    <string name="settingsHeadingNextSteps">Nākamie soļi</string>
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
     <string name="settingsDarkTheme">Tumšs</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Galvenie iestatījumi</string>
+    <string name="settingsHeadingMainSettings">Galvenie iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datu notīrīšana</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Pievienot logrīku sākuma ekrānam</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Iestati adreses joslas pozīciju</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Iespējot balss meklēšanu</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo citās platformās</string>
+    <string name="settingsDataClearing">Datu notīrīšana</string>
+    <string name="settingsAddWidget">Pievienot logrīku sākuma ekrānam</string>
+    <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
+    <string name="settingsEnableVoiceSearch">Iespējot balss meklēšanu</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo citās platformās</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privāta meklēšana</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Ir iespējota tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nekad tevi neizseko, un mēs cenšamies pēc iespējas labāk aizsargāt tavu konfidencialitāti. Mēs nepārtraukti uzturam un uzlabojam aizsardzības slāņus, lai pasargātu no jaunākajām izsekošanas metodēm un nodrošinātu dažādu veidu aizsardzību, ko citas pārlūkprogrammas pēc noklusējuma nepiedāvā. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Datu notīrīšana</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Atļaujas</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
     <string name="settingsAutomaticallyClearWhat">Automātiski notīrīt…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Automātiski notīrīt datus…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">Par</string>
     <string name="aboutHeader">Sveicināti Duck pusē!</string>
     <string name="aboutDescription">DuckDuckGo ir neatkarīgs 2008. gadā dibināts interneta privātuma uzņēmums ikvienam, kam ir apnikusi izsekošana tiešsaistē un kas vēlas vienkāršu risinājumu. Mēs esam pierādījums tam, ka tiešsaistē var iegūt reālu privātuma aizsardzību bez kompromisiem.\n\nDuckDuckGo pārlūkprogrammā ir visas funkcijas, ko gaidi no sava pārlūka: grāmatzīmes, cilnes, paroles u.c., kā arī vairāk nekā <annotation type="privacy_protection_link">desmit spēcīgu privātuma aizsardzības funkciju</annotation>, kas nav pieejamas vairumā populārāko pārlūkprogrammu pēc noklusējuma. Šis unikāli visaptverošais privātuma aizsardzības komplekts palīdz aizsargāt tavas darbības tiešsaistē, sākot no meklēšanas līdz pārlūkošanai, e-pasta sūtīšanai u.c.\n\nMūsu privātuma aizsardzība darbojas vienmēr – tev nav jāpārzina sarežģīti tehniskie aspekti vai iestatījumi. Tev vienkārši jālieto DuckDuckGo pārlūks visās savās ierīcēs, un privātums būs tavs standarta risinājums.\n\nBet, ja vēlies paskatīties, kas lācītim vēderā, vairāk informācijas par to, kā darbojas DuckDuckGo privātuma aizsardzība, vari atrast mūsu <annotation type="learn_more_link">palīdzības lapās</annotation></string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo ir neatkarīgs interneta konfidencialitātes uzņēmums, kas dibināts 2008. gadā un ir pieejams visiem, kam ir apnikusi izsekošana tiešsaistē un kas vēlas vienkāršu risinājumu. Mēs esam pierādījums tam, ka tiešsaistē ir iespējams saņemt reālu privātuma aizsardzību bez kompromisiem.\n\nDuckDuckGo pārlūkprogrammā ir visi līdzekļi, ko vari sagaidīt no sava pārlūka: grāmatzīmes, cilnes, paroles un citas iespējas, kā arī vairāk nekā <annotation type="privacy_protection_link">desmit spēcīgas privātuma aizsardzības funkcijas</annotation>, kas pēc noklusējuma nav pieejamas vairumā populārāko pārlūkprogrammu. Šis unikāli visaptverošais privātuma aizsardzības komplekts palīdz aizsargāt tavas darbības tiešsaistē, sākot no meklēšanas līdz pārlūkošanai, e-pasta ziņojumu sūtīšanai u.c.\n\nMūsu privātuma aizsardzība darbojas bez nepieciešamības zināt tehniskas detaļas vai vajadzības tikt galā ar sarežģītiem iestatījumiem. Tev vienkārši jāsāk lietot DuckDuckGo pārlūks visās savās ierīcēs, un tavs privātums tiks nodrošināts pēc noklusējuma.\n\nTaču, ja tu vēlies paskatīties, kas lācītim vēderā, vairāk informācijas par to, kā darbojas DuckDuckGo privātuma aizsardzība, vari atrast mūsu <annotation type="learn_more_link">palīdzības lapās</annotation></string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Paroles</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Paroles un automātiskā aizpildīšana</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Paroles un automātiskā aizpildīšana</string>
     <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>
 

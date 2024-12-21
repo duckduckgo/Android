@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Poistu asennuksesta</string>
 
     <string name="autofillManagementScreenTitle">Salasanat</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Salasanat ja automaattinen täyttö</string>
     <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
     <string name="credentialManagementAutofillSubtitle">Salasanat salataan. Kukaan muu kuin sinä ei näe niitä, emme edes me. <annotation type="learn_more_link">Lue lisää</annotation></string>

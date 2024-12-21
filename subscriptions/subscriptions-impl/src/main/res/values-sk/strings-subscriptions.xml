@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Odstrániť z tohto zariadenia</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc a podpora</string>
     <string name="subscriptionSettingSendFeedback">Odoslať spätnú väzbu</string>
+    <string name="subscriptionSettingActivating">Aktivácia</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Máš všetko pripravené.</string>

@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Bu Cihazdan Kaldır</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
     <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
+    <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Her şey hazır.</string>

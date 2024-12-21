@@ -19,6 +19,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Защита от всплывающих окон куки</string>
     <string name="autoconsentDescription"><![CDATA[Если DuckDuckGo обнаружит на сайте всплывающее окно выбора куки-файлов, мы можем автоматически выбрать минимум куки, максимально защитив ваши данные, а затем закроем окно. <u><a href=\"\">Подробнее...</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
+    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo по возможности откажется от куки-файлов и скроет подобные окна.\n<a href=\"\">Подробнее...</a>]]></string>
     <string name="autoconsentToggle">Разрешить DuckDuckGo взять на себя окна выбора куки-файлов</string>
 </resources>

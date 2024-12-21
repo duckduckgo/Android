@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Privacybescherming</string>
+    <string name="settingsHeadingPrivacyProtections">Privacybescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
     <string name="settingsHeadingCustomize">Aanpassen</string>
     <string name="settingsHeadingAbout">Over</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
     <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
     <string name="settingsHeadingMore">Meer over DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Volgende stappen</string>
+    <string name="settingsHeadingNextSteps">Volgende stappen</string>
     <string name="settingsLightTheme">Licht</string>
     <string name="settingsTheme">Thema</string>
     <string name="settingsDarkTheme">Donker</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hoofdinstellingen</string>
+    <string name="settingsHeadingMainSettings">Hoofdinstellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Gegevens wissen</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Widget toevoegen aan startscherm</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Positie van adresbalk instellen</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Zoeken via spraak inschakelen</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo op andere platforms</string>
+    <string name="settingsDataClearing">Gegevens wissen</string>
+    <string name="settingsAddWidget">Widget toevoegen aan startscherm</string>
+    <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
+    <string name="settingsEnableVoiceSearch">Zoeken via spraak inschakelen</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo op andere platforms</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privé-zoekopdracht</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking is ingeschakeld</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Gegevens wissen</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatisch wissen…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Gegevens automatisch wissen...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisch wissen…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">Over</string>
     <string name="aboutHeader">Welkom bij de Duck kant!</string>
     <string name="aboutDescription">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je privacy op internet écht beschermd kan worden zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige functies voor privacybescherming</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide privacybescherming helpt je online activiteiten te beschermen – of je nu zoekt, surft of mailt.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar DuckDuckGo op al je apparaten te installeren en geniet dan standaard van privacy.\n\nWil je toch een kijkje nemen onder de motorkap? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation> vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je echte privacybescherming online kunt krijgen zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige privacybeschermingsfuncties</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide set privacybeschermingen helpt je online activiteiten te beschermen, van zoeken tot browsen, e-mailen en meer.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar je browser op al je apparaten naar DuckDuckGo te veranderen en je krijgt standaard privacy.\n\nWil je toch iets meer weten? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation>vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
     <string name="no_suggestions">Geen suggesties</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Wachtwoorden</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Wachtwoorden en automatisch invullen</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Wachtwoorden en automatisch invullen</string>
     <string name="autofillLoginSavedSnackbarMessage">Wachtwoord opgeslagen</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Wachtwoord bijgewerkt</string>
 

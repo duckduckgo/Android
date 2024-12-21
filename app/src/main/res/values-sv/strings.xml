@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Integritetsskydd</string>
+    <string name="settingsHeadingPrivacyProtections">Integritetsskydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
     <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Nästa steg</string>
+    <string name="settingsHeadingNextSteps">Nästa steg</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Huvudinställningar</string>
+    <string name="settingsHeadingMainSettings">Huvudinställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datarensning</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Lägg till widget på startsidan</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Ange din adressfältsposition</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Aktivera röstsökning</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo på andra plattformar</string>
+    <string name="settingsDataClearing">Datarensning</string>
+    <string name="settingsAddWidget">Lägg till widget på startsidan</string>
+    <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
+    <string name="settingsEnableVoiceSearch">Aktivera röstsökning</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andra plattformar</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Skydd för webbspårning är aktiverat</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Datarensning</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Behörigheter</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
 
     <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Rensa data automatiskt …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">Om</string>
     <string name="aboutHeader">Välkommen till Duck-sidan!</string>
     <string name="aboutDescription">DuckDuckGo är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren DuckDuckGo har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till DuckDuckGo på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos DuckDuckGo fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren DuckDuckGo har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till DuckDuckGo på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos DuckDuckGo fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
     <string name="no_suggestions">Inga förslag</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Lösenord</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Lösenord och automatisk ifyllning</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Lösenord och automatisk ifyllning</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
 

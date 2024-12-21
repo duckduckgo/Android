@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Išeiti iš sąrankos</string>
 
     <string name="autofillManagementScreenTitle">Slaptažodžiai</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Slaptažodžiai ir automatinis užpildymas</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
     <string name="credentialManagementAutofillSubtitle">Slaptažodžiai yra užšifruoti. Niekas, išskyrus jus, negali jų matyti – net mes. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
