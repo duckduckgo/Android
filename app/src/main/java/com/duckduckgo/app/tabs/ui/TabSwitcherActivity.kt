@@ -395,10 +395,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun launchDuckChat() {
-        globalActivityStarter.start(this, WebViewActivityWithParams(
-            url = DuckChat.DUCK_CHAT_WEB_LINK,
-            screenTitle = getString(R.string.duckChatScreenTitle),
-        ))
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = DuckChat.DUCK_CHAT_WEB_LINK,
+                screenTitle = getString(R.string.duckChatScreenTitle),
+            ),
+        )
     }
 
     private fun updateTabGridItemDecorator(tab: TabEntity) {

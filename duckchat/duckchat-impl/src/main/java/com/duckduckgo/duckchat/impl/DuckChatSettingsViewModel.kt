@@ -20,18 +20,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @ContributesViewModel(ActivityScope::class)
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
 ) : ViewModel() {
 
-    val showInBrowserMenu: StateFlow<Boolean> = duckChat.observeShowInBrowserMenu()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+    data class ViewState(
+        val showInBrowserMenu: Boolean = false,
+    )
+
+    val viewState = duckChat.observeShowInBrowserMenu()
+        .map { showInBrowserMenu ->
+            ViewState(showInBrowserMenu)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
         duckChat.setShowInBrowserMenu(checked)

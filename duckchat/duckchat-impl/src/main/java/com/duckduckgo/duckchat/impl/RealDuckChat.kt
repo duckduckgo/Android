@@ -19,8 +19,9 @@ package com.duckduckgo.duckchat.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -28,6 +29,9 @@ interface DuckChatInternal : DuckChat {
      */
     fun setShowInBrowserMenu(showDuckChat: Boolean)
 
+    /**
+     * Observes whether DuckChat should be shown in browser menu based on user settings and remote config flag
+     */
     fun observeShowInBrowserMenu(): Flow<Boolean>
 }
 
@@ -35,16 +39,23 @@ interface DuckChatInternal : DuckChat {
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val duckChatFeature: DuckChatFeature,
 ) : DuckChatInternal {
+    override fun isEnabled(): Boolean {
+        return duckChatFeature.self().isEnabled()
+    }
+
     override fun setShowInBrowserMenu(showDuckChat: Boolean) {
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
     }
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeShowInBrowserMenu()
+        return duckChatFeatureRepository.observeShowInBrowserMenu().map {
+            it && duckChatFeature.self().isEnabled()
+        }
     }
 
     override fun showInBrowserMenu(): Boolean {
-        return duckChatFeatureRepository.shouldShowInBrowserMenu()
+        return duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
     }
 }

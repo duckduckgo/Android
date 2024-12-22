@@ -57,9 +57,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.showInBrowserMenu
+        viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { showInBrowserMenu -> renderViewState(showInBrowserMenu) }
+            .onEach { renderViewState(it.showInBrowserMenu) }
             .launchIn(lifecycleScope)
     }
 

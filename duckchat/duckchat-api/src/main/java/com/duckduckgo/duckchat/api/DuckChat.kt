@@ -21,7 +21,14 @@ package com.duckduckgo.duckchat.api
  */
 interface DuckChat {
     /**
-     * Checks whether DuckChat should be shown in browser menu
+     * Checks whether DuckChat is enabled based on remote config flag.
+     *
+     * @return true if DuckChat is enabled, false otherwise.
+     */
+    fun isEnabled(): Boolean
+
+    /**
+     * Checks whether DuckChat should be shown in browser menu based on user settings and remote config flag.
      *
      * @return true if DuckChat should be shown, false otherwise.
      */

@@ -255,6 +255,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                 }
             }.launchIn(lifecycleScope)
@@ -279,6 +280,14 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             viewsMain.settingsSectionDuckPlayer.show()
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
+        }
+    }
+
+    private fun updateDuckChat(isDuckChatEnabled: Boolean) {
+        if (isDuckChatEnabled) {
+            viewsMain.duckChatSetting.show()
+        } else {
+            viewsMain.duckChatSetting.gone()
         }
     }
 

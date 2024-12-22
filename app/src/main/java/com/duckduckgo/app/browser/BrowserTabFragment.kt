@@ -1146,10 +1146,13 @@ class BrowserTabFragment :
     }
 
     private fun launchDuckChat() {
-        globalActivityStarter.start(requireContext(), WebViewActivityWithParams(
-            url = DuckChat.DUCK_CHAT_WEB_LINK,
-            screenTitle = getString(string.duckChatScreenTitle),
-        ))
+        globalActivityStarter.start(
+            requireContext(),
+            WebViewActivityWithParams(
+                url = DuckChat.DUCK_CHAT_WEB_LINK,
+                screenTitle = getString(string.duckChatScreenTitle),
+            ),
+        )
     }
 
     override fun onResume() {
