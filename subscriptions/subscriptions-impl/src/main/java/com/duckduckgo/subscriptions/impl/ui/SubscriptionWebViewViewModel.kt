@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature.Cohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
@@ -255,6 +256,14 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
+                        privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT) -> {
+                        createSubscriptionOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
+                        )
+                    }
+
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
                         createSubscriptionOptions(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
