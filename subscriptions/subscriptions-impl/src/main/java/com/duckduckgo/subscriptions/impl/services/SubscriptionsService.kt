@@ -64,6 +64,8 @@ data class SubscriptionResponse(
 data class ConfirmationBody(
     val packageName: String,
     val purchaseToken: String,
+    val experimentName: String?,
+    val experimentCohort: String?,
 )
 
 data class ConfirmationResponse(
