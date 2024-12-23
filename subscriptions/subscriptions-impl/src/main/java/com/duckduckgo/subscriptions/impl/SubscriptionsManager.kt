@@ -406,11 +406,18 @@ class RealSubscriptionsManager @Inject constructor(
         packageName: String,
         purchaseToken: String,
     ): Boolean {
+        var experimentName: String? = null
+        val cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
+        if (cohort != null) {
+            experimentName = "privacyProFreeTrialJan25"
+        }
         return try {
             val confirmationResponse = subscriptionsService.confirm(
                 ConfirmationBody(
                     packageName = packageName,
                     purchaseToken = purchaseToken,
+                    experimentName = experimentName,
+                    experimentCohort = cohort,
                 ),
             )
 
