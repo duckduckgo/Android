@@ -22,11 +22,15 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -37,12 +41,19 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
-        // TODO: learn more link
+        binding.duckChatSettingsText.addClickableLink(
+            annotation = "learn_more_link",
+            textSequence = getText(R.string.duck_chat_settings_activity_description),
+            onClick = { viewModel.duckChatLearnMoreClicked() },
+        )
 
         setupToolbar(binding.includeToolbar.toolbar)
 
@@ -61,9 +72,28 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { renderViewState(it.showInBrowserMenu) }
             .launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(showInBrowserMenu: Boolean) {
         binding.showDuckChatInMenuToggle.setIsChecked(showInBrowserMenu)
+    }
+
+    private fun processCommand(command: DuckChatSettingsViewModel.Command) {
+        when (command) {
+            is DuckChatSettingsViewModel.Command.OpenLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = command.learnMoreLink,
+                        screenTitle = getString(R.string.duck_chat_title),
+                    ),
+                )
+            }
+        }
     }
 }

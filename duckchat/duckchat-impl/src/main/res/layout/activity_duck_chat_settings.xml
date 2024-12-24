@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/duckChatSettingsTitle"
                 android:layout_marginHorizontal="@dimen/keyline_4"
-                android:text="@string/duckChatTitle"
+                android:text="@string/duck_chat_title"
                 android:gravity="center"
                 app:typography="h2"/>
 
