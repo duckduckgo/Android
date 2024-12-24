@@ -85,7 +85,7 @@
         android:id="@+id/duckChatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/duckChatSetting"
+        app:primaryText="@string/duckChatTitle"
         app:leadingIcon="@drawable/ic_ai_chat_24"/>
 
     <LinearLayout

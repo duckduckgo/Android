@@ -398,8 +398,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         globalActivityStarter.start(
             this,
             WebViewActivityWithParams(
-                url = DuckChat.DUCK_CHAT_WEB_LINK,
-                screenTitle = getString(R.string.duckChatScreenTitle),
+                url = duckChat.getDuckChatWebLink(),
+                screenTitle = getString(R.string.duckChatTitle),
             ),
         )
     }

@@ -36,13 +36,12 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
-<!--            TODO: update icon-->
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/duckChatSettingsIcon"
                 android:layout_marginTop="24dp"
-                android:src="@drawable/ic_ai_chat_24"
+                android:src="@drawable/chat_private_128"
                 android:importantForAccessibility="no"
                 android:layout_gravity="center"/>
 
@@ -51,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/duckChatSettingsTitle"
                 android:layout_marginHorizontal="@dimen/keyline_4"
-                android:text="@string/duck_chat_settings_activity_title"
+                android:text="@string/duckChatTitle"
                 android:gravity="center"
                 app:typography="h2"/>
 

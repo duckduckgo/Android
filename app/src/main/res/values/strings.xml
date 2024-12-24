@@ -805,10 +805,4 @@
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
-    <!-- TODO - translations? pixels? -->
-    <!-- DuckChat -->
-    <string name="duckChatMenuItem">Chat</string>
-    <string name="duckChatSetting">AI Chat</string>
-    <string name="duckChatScreenTitle">DuckDuckGo AI Chat</string>
-
 </resources>

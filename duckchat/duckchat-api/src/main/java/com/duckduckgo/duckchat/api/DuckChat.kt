@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.api
 
 /**
- * DuckChat interface provides a set of methods for interacting with the DuckChat.
+ * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
  */
 interface DuckChat {
     /**
@@ -28,14 +28,16 @@ interface DuckChat {
     fun isEnabled(): Boolean
 
     /**
-     * Checks whether DuckChat should be shown in browser menu based on user settings and remote config flag.
+     * Checks whether DuckChat should be shown in browser menu based on user settings.
      *
      * @return true if DuckChat should be shown, false otherwise.
      */
     fun showInBrowserMenu(): Boolean
 
-    companion object {
-        /** Default link to DuckChat that identifies Android as the source */
-        const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-    }
+    /**
+     * Returns the DuckChat web link configured by remote config.
+     *
+     * @return the DuckChat web link.
+     */
+    fun getDuckChatWebLink(): String
 }

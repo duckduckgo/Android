@@ -525,6 +525,9 @@ class BrowserTabFragment :
     lateinit var duckPlayer: DuckPlayer
 
     @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     /**
@@ -1149,8 +1152,8 @@ class BrowserTabFragment :
         globalActivityStarter.start(
             requireContext(),
             WebViewActivityWithParams(
-                url = DuckChat.DUCK_CHAT_WEB_LINK,
-                screenTitle = getString(string.duckChatScreenTitle),
+                url = duckChat.getDuckChatWebLink(),
+                screenTitle = getString(string.duckChatTitle),
             ),
         )
     }

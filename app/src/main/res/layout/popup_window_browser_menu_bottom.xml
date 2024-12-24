@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_ai_chat_16"
-                app:primaryText="@string/duckChatMenuItem" />
+                app:primaryText="@string/duckChatTitle" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"

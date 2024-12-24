@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,12 +37,22 @@ interface DuckChatInternal : DuckChat {
     fun observeShowInBrowserMenu(): Flow<Boolean>
 }
 
+data class DuckChatSettingJson(
+    val aiChatURL: String,
+)
+
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
+    private val moshi: Moshi,
 ) : DuckChatInternal {
+
+    private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
+        moshi.adapter(DuckChatSettingJson::class.java)
+    }
+
     override fun isEnabled(): Boolean {
         return duckChatFeature.self().isEnabled()
     }
@@ -57,5 +69,20 @@ class RealDuckChat @Inject constructor(
 
     override fun showInBrowserMenu(): Boolean {
         return duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
+    }
+
+    override fun getDuckChatWebLink(): String {
+        val link = duckChatFeature.self().getSettings()?.let {
+            runCatching {
+                val settingsJson = jsonAdapter.fromJson(it)
+                settingsJson?.aiChatURL
+            }.getOrDefault(DUCK_CHAT_WEB_LINK)
+        } ?: DUCK_CHAT_WEB_LINK
+        return link
+    }
+
+    companion object {
+        /** Default link to DuckChat that identifies Android as the source */
+        private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 }
