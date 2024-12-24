@@ -226,6 +226,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -262,6 +263,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -521,6 +523,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -1012,6 +1017,9 @@ class BrowserTabFragment :
             onMenuItemClicked(newTabMenuItem) {
                 onOmnibarNewTabRequested()
             }
+            onMenuItemClicked(duckChatMenuItem) {
+                launchDuckChat()
+            }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
                 pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
@@ -1138,6 +1146,16 @@ class BrowserTabFragment :
     private fun launchTabSwitcher() {
         val activity = activity ?: return
         startActivity(TabSwitcherActivity.intent(activity, tabId))
+    }
+
+    private fun launchDuckChat() {
+        globalActivityStarter.start(
+            requireContext(),
+            WebViewActivityWithParams(
+                url = duckChat.getDuckChatWebLink(),
+                screenTitle = getString(string.duckChatTitle),
+            ),
+        )
     }
 
     override fun onResume() {
@@ -3560,8 +3578,6 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
-
-        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
 
         fun newInstance(
             tabId: String,
