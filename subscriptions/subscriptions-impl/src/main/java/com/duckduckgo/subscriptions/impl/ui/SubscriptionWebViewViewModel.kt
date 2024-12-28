@@ -256,8 +256,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
-                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
-                        privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT) -> {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) && isFreeTrialEligible() -> {
                         createSubscriptionOptions(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
@@ -286,6 +285,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
             sendOptionJson(subscriptionOptions)
         }
+    }
+
+    private fun isFreeTrialEligible(): Boolean {
+        val hasUsedFreeTrial: Boolean = true // TODO Noelia check previous purchases
+        return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT) && hasUsedFreeTrial
     }
 
     private fun createSubscriptionOptions(
