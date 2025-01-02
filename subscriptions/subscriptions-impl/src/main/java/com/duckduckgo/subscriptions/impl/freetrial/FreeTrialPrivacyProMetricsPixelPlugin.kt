@@ -97,7 +97,7 @@ class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
         )
     }
 
-    private fun getMetricsPixelValue(paywallImpressions: Int): String {
+    internal fun getMetricsPixelValue(paywallImpressions: Int): String {
         return when (paywallImpressions) {
             1, 2, 3, 4, 5 -> paywallImpressions.toString()
             in 6..10 -> "6-10"

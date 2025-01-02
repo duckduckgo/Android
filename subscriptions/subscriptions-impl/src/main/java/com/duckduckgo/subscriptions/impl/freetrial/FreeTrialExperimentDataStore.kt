@@ -44,7 +44,7 @@ interface FreeTrialExperimentDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-internal class FreeTrialExperimentDataStoreImpl @Inject constructor(
+class FreeTrialExperimentDataStoreImpl @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
 ) : FreeTrialExperimentDataStore {
