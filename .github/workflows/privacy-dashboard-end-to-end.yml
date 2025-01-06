@@ -58,20 +58,25 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: privacyDashboard_adClickTest_${{ github.sha }}
+          timeout: 120
           app-file: apk/release.apk
+          android-api-level: 30
           workspace: .maestro
           include-tags: adClickTest
 
       - name: Privacy Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: privacyDashboard_privacyTest_${{ github.sha }}
+          timeout: 120
           app-file: apk/release.apk
           workspace: .maestro
           include-tags: privacyTest
