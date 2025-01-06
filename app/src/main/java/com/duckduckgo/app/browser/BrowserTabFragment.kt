@@ -729,7 +729,9 @@ class BrowserTabFragment :
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
         ) {
-            if (triggerType == LoginTriggerType.AUTOPROMPT && !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow())) {
+            if (triggerType == LoginTriggerType.AUTOPROMPT &&
+                !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow()) && omnibar.isEditing()
+            ) {
                 Timber.d("AutoPrompt is disabled, not showing dialog")
                 return
             }
@@ -877,7 +879,10 @@ class BrowserTabFragment :
         userEnteredQuery(text)
     }
 
-    private fun onUserEnteredText(text: String, hasFocus: Boolean = true) {
+    private fun onUserEnteredText(
+        text: String,
+        hasFocus: Boolean = true,
+    ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
     }
 
@@ -1487,10 +1492,12 @@ class BrowserTabFragment :
                 refresh()
                 privacyProtectionEnabledConfirmation(it.domain)
             }
+
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
                 refresh()
                 privacyProtectionDisabledConfirmation(it.domain)
             }
+
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -1695,12 +1702,14 @@ class BrowserTabFragment :
                 contentScopeScripts.sendSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
+
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
             }
+
             is Command.SwitchToTab -> {
                 binding.focusedView.gone()
                 if (binding.autoCompleteSuggestionsList.isVisible) {
@@ -1709,6 +1718,7 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
+
             else -> {
                 // NO OP
             }
@@ -3804,6 +3814,7 @@ class BrowserTabFragment :
                 is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta, is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
                 is DaxBubbleCta.DaxExperimentEndCta, is DaxBubbleCta.DaxExperimentPrivacyProCta,
                 -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
+
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)

@@ -298,6 +298,10 @@ class Omnibar(
         return omniBarContainer.isPressed
     }
 
+    fun isEditing(): Boolean {
+        return newOmnibar.isEditing
+    }
+
     fun renderBrowserViewState(
         viewState: BrowserViewState,
         tabDisplayedInCustomTabScreen: Boolean,

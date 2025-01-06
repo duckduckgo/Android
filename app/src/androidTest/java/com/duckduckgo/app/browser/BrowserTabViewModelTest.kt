@@ -4000,11 +4000,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEditingUrlBarAndNotCancelledThenCannotAutomaticallyShowAutofillPrompt() {
-        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
-    }
-
-    @Test
     fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
         testee.cancelPendingAutofillRequestToChooseCredentials()
         assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())

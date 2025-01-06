@@ -208,6 +208,15 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
+    val isEditing: Boolean
+        get() {
+            return if (isAttachedToWindow) {
+                viewModel.viewState.value.hasFocus
+            } else {
+                false
+            }
+        }
+
     private var coroutineScope: CoroutineScope? = null
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
