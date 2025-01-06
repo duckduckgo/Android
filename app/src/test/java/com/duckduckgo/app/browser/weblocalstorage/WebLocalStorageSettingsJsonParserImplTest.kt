@@ -46,14 +46,14 @@ class WebLocalStorageSettingsJsonParserImplTest {
 
     @Test
     fun whenListsEmptyThenReturnEmptyDomainsAndRegex() = runTest {
-        val result = testee.parseJson("local_storage_empty".loadJsonFile())
+        val result = testee.parseJson("web_local_storage_empty".loadJsonFile())
         assertTrue(result.domains.list.isEmpty())
         assertTrue(result.matchingRegex.list.isEmpty())
     }
 
     @Test
     fun whenListsHaveSingleEntryThenReturnSingleDomainAndRegex() = runTest {
-        val result = testee.parseJson("local_storage_single_entry".loadJsonFile())
+        val result = testee.parseJson("web_local_storage_single_entry".loadJsonFile())
         assertEquals(1, result.domains.list.size)
         assertEquals(1, result.matchingRegex.list.size)
         assertEquals("example.com", result.domains.list[0])
@@ -62,7 +62,7 @@ class WebLocalStorageSettingsJsonParserImplTest {
 
     @Test
     fun whenListsHaveMultipleEntriesThenReturnMultipleDomainsAndRegex() = runTest {
-        val result = testee.parseJson("local_storage_multiple_entries".loadJsonFile())
+        val result = testee.parseJson("web_local_storage_multiple_entries".loadJsonFile())
         assertEquals(3, result.domains.list.size)
         assertEquals(3, result.matchingRegex.list.size)
 
