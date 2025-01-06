@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Andmete kustutamine</string>
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
-    <string name="settingsEnableVoiceSearch">Luba häälotsing</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
 
     <!-- Private Search -->

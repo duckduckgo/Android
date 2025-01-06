@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Gegevens wissen</string>
     <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
-    <string name="settingsEnableVoiceSearch">Zoeken via spraak inschakelen</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo op andere platforms</string>
 
     <!-- Private Search -->

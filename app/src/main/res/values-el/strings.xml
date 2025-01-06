@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
     <string name="settingsDataClearing">Διαγραφή δεδομένων</string>
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
-    <string name="settingsEnableVoiceSearch">Ενεργοποίηση φωνητικής αναζήτησης</string>
     <string name="settingsDDGOnOtherPlatforms">Το DuckDuckGo σε άλλες πλατφόρμες</string>
 
     <!-- Private Search -->

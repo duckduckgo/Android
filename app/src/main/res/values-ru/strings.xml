@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Кнопка «Тревога»</string>
     <string name="settingsDataClearing">Очистка данных</string>
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
-    <string name="settingsEnableVoiceSearch">Включить голосовой поиск</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo для других платформ</string>
 
     <!-- Private Search -->

@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Brisanje podataka</string>
     <string name="settingsAddressBarPosition">Postavi položaj adresne trake</string>
-    <string name="settingsEnableVoiceSearch">Omogući glasovno pretraživanje</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugim platformama</string>
 
     <!-- Private Search -->
