@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.browser.localstorage.Domains
-import com.duckduckgo.app.browser.localstorage.DuckDuckGoWebLocalStorageManager
-import com.duckduckgo.app.browser.localstorage.WebLocalStorageSettings
-import com.duckduckgo.app.browser.localstorage.WebLocalStorageSettingsJsonParser
-import com.duckduckgo.app.browser.localstorage.MatchingRegex
+import com.duckduckgo.app.browser.weblocalstorage.Domains
+import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManager
+import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
+import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings
+import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Provider
@@ -44,7 +44,11 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockToggle: Toggle = mock()
 
-    private val testee = DuckDuckGoWebLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockWebLocalStorageSettingsJsonParser)
+    private val testee = DuckDuckGoWebLocalStorageManager(
+        mockDatabaseProvider,
+        mockAndroidBrowserConfigFeature,
+        mockWebLocalStorageSettingsJsonParser,
+    )
 
     @Before
     fun setup() = runTest {

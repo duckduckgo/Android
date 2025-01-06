@@ -21,8 +21,8 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.localstorage.WebLocalStorageManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature

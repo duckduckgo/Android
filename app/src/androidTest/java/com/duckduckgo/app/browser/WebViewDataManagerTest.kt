@@ -23,8 +23,8 @@ import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.localstorage.WebLocalStorageManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
+import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule

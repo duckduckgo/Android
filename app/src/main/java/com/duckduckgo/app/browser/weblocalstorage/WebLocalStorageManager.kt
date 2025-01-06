@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.localstorage
+package com.duckduckgo.app.browser.weblocalstorage
 
 import android.content.Context
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
