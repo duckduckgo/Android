@@ -122,7 +122,7 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
-        if (androidBrowserConfigFeature.localStorage().isEnabled()) {
+        if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
             fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
         } else {
             fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))

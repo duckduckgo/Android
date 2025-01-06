@@ -49,7 +49,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     @Before
     fun setup() = runTest {
         whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
-        whenever(mockAndroidBrowserConfigFeature.localStorage()).thenReturn(mockToggle)
+        whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockToggle)
         whenever(mockToggle.getSettings()).thenReturn("settings")
 
         val domains = Domains(list = listOf("duckduckgo.com"))

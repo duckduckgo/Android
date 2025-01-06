@@ -85,10 +85,10 @@ interface AndroidBrowserConfigFeature {
     fun featuresRequestHeader(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "localStorage" androidBrowserConfig
+     * @return `true` when the remote config has the global "webLocalStorage" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
-    fun localStorage(): Toggle
+    fun webLocalStorage(): Toggle
 }

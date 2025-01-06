@@ -49,7 +49,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var matchingRegex = emptyList<String>()
 
     override fun clearLocalStorage() = runBlocking {
-        val settings = androidBrowserConfigFeature.localStorage().getSettings()
+        val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
         val localStorageSettings = localStorageSettingsJsonParser.parseJson(settings)
 
         domains = localStorageSettings.domains.list
