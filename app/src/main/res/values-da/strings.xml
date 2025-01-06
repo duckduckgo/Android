@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarydning</string>
-    <string name="settingsAddWidget">Tilføj widget til startskærmen</string>
     <string name="settingsAddressBarPosition">Angiv placeringen af adresselinjen</string>
     <string name="settingsEnableVoiceSearch">Aktivér stemmesøgning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre platforme</string>

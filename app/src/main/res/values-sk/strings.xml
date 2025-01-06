@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
     <string name="settingsDataClearing">Vymazanie údajov</string>
-    <string name="settingsAddWidget">Pridať miniaplikáciu na domovskú obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
     <string name="settingsEnableVoiceSearch">Povoliť hlasové vyhľadávanie</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>

@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
     <string name="settingsDataClearing">Adattörlés</string>
-    <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
     <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>

@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
-    <string name="settingsAddWidget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
     <string name="settingsEnableVoiceSearch">Activez la recherche vocale</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo sur d\'autres plateformes</string>

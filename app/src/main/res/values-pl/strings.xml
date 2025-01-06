@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
     <string name="settingsDataClearing">Czyszczenie danych</string>
-    <string name="settingsAddWidget">Dodaj widżet do ekranu głównego</string>
     <string name="settingsAddressBarPosition">Ustaw pozycję paska adresu</string>
     <string name="settingsEnableVoiceSearch">Włącz wyszukiwanie głosowe</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na innych platformach</string>
