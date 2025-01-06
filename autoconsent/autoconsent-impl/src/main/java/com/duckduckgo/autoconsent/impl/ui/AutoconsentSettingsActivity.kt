@@ -40,6 +40,7 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
@@ -78,7 +79,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
             if (newSettingsFeature.self().isEnabled()) {
-                ds.color = ContextCompat.getColor(applicationContext, CommonR.color.blue50)
+                ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
                 ds.isUnderlineText = false
             }
         }
