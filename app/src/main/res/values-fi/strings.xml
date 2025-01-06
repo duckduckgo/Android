@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire-painike</string>
     <string name="settingsDataClearing">Datan tyhjentäminen</string>
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
-    <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
 
     <!-- Private Search -->

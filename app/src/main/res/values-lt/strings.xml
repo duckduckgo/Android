@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Mygtukas „Fire“</string>
     <string name="settingsDataClearing">Duomenų valymas</string>
     <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
-    <string name="settingsEnableVoiceSearch">Įgalinti paiešką balsu</string>
     <string name="settingsDDGOnOtherPlatforms">„DuckDuckGo“ kitose platformose</string>
 
     <!-- Private Search -->
