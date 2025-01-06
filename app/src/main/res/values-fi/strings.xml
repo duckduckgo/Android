@@ -163,7 +163,6 @@
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
     <string name="settingsDataClearing">Datan tyhjentäminen</string>
-    <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
     <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
