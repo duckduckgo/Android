@@ -66,11 +66,19 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
-        return rawJs
-            .replace("// INJECT contentScope HERE", contentScope)
-            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
-            .replace("// INJECT userPreferences HERE", userPreferences)
-            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
+        return StringBuilder(rawJs).apply {
+            replacePlaceholder(this, TAG_INJECT_CONTENT_SCOPE, contentScope)
+            replacePlaceholder(this, TAG_INJECT_USER_UNPROTECTED_DOMAINS, userUnprotectedDomains)
+            replacePlaceholder(this, TAG_INJECT_USER_PREFERENCES, userPreferences)
+            replacePlaceholder(this, TAG_INJECT_AVAILABLE_INPUT_TYPES, availableInputTypes)
+        }.toString()
+    }
+
+    private fun replacePlaceholder(builder: StringBuilder, placeholder: String, replacement: String) {
+        val index = builder.indexOf(placeholder)
+        if (index != -1) {
+            builder.replace(index, index + placeholder.length, replacement)
+        }
     }
 
     private suspend fun generateAvailableInputTypes(url: String?): String {
@@ -139,4 +147,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
+
+    companion object {
+        private const val TAG_INJECT_CONTENT_SCOPE = "// INJECT contentScope HERE"
+        private const val TAG_INJECT_USER_UNPROTECTED_DOMAINS = "// INJECT userUnprotectedDomains HERE"
+        private const val TAG_INJECT_USER_PREFERENCES = "// INJECT userPreferences HERE"
+        private const val TAG_INJECT_AVAILABLE_INPUT_TYPES = "// INJECT availableInputTypes HERE"
+    }
 }
