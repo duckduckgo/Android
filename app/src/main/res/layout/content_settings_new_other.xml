@@ -46,6 +46,6 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_color_24"
         app:primaryText="@string/settingsDDGOnOtherPlatforms"
-        app:trailingIcon="@drawable/ic_open_in_24" />
+        app:trailingIcon="@drawable/ic_open_in_16" />
 
 </LinearLayout>
