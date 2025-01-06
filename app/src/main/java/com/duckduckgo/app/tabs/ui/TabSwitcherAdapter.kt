@@ -47,10 +47,11 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import java.io.File
-import java.util.Collections.swap
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class TabSwitcherAdapter(
@@ -58,6 +59,7 @@ class TabSwitcherAdapter(
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val dispatchers: DispatcherProvider,
 ) : Adapter<TabViewHolder>() {
 
     private val list = mutableListOf<TabEntity>()
@@ -174,14 +176,23 @@ class TabSwitcherAdapter(
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: RequestManager, holder: GridTabViewHolder) {
         val previewFile = tab.tabPreviewFile ?: return glide.clear(holder.tabPreview)
-        val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
-        if (!cachedWebViewPreview.exists()) return glide.clear(holder.tabPreview)
 
-        glide.load(cachedWebViewPreview)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(holder.tabPreview)
+        lifecycleOwner.lifecycleScope.launch {
+            val cachedWebViewPreview = withContext(dispatchers.io()) {
+                File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile)).takeIf { it.exists() }
+            }
 
-        holder.tabPreview.show()
+            if (cachedWebViewPreview == null) {
+                glide.clear(holder.tabPreview)
+                return@launch
+            }
+
+            glide.load(cachedWebViewPreview)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.tabPreview)
+
+            holder.tabPreview.show()
+        }
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
