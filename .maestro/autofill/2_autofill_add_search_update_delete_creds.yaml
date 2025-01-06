@@ -4,101 +4,103 @@ tags:
   - autofillNoAuthTests
 ---
 # Pre-requisite: on an autofill-eligible device
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/onboarding.yaml
+      - runFlow: steps/access_passwords_screen.yaml
 
-- launchApp:
-    clearState: true
-- runFlow: ../shared/onboarding.yaml
-- runFlow: steps/access_passwords_screen.yaml
+      - assertVisible:
+          text: "No passwords saved yet"
+      - assertNotVisible:
+          id: searchLogins
 
-- assertVisible:
-    text: "No passwords saved yet"
-- assertNotVisible:
-    id: searchLogins
+      - runScript: steps/2_script.js
 
-- runScript: steps/2_script.js
+      - repeat:
+            while:
+                true: ${output.addLogins.counter < output.addLogins.domains.length}
+            commands:
+                - tapOn:
+                        id: addLoginManually
+                - assertVisible:
+                        text: Add Password
+                - assertNotVisible:
+                        id: view_menu_save
 
-- repeat:
-      while:
-          true: ${output.addLogins.counter < output.addLogins.domains.length}
-      commands:
-          - tapOn:
-                  id: addLoginManually
-          - assertVisible:
-                  text: Add Password
-          - assertNotVisible:
-                  id: view_menu_save
+                - scrollUntilVisible:
+                    element:
+                      id: usernameEditText
+                - tapOn:
+                      id: usernameEditText
+                - inputText: "user"
 
-          - scrollUntilVisible:
-              element:
-                id: usernameEditText
-          - tapOn:
-                id: usernameEditText
-          - inputText: "user"
+                - assertVisible:
+                      id: view_menu_save
 
-          - assertVisible:
-                id: view_menu_save
+                - scrollUntilVisible:
+                    element:
+                      id: passwordEditText
+                - tapOn:
+                      id: passwordEditText
+                - inputText: "123"
 
-          - scrollUntilVisible:
-              element:
-                id: passwordEditText
-          - tapOn:
-                id: passwordEditText
-          - inputText: "123"
+                - scrollUntilVisible:
+                    element:
+                      id: domainEditText
+                - tapOn:
+                      id: domainEditText
+                - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
 
-          - scrollUntilVisible:
-              element:
-                id: domainEditText
-          - tapOn:
-                id: domainEditText
-          - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
+                - scrollUntilVisible:
+                    element:
+                      id: notesEditText
+                - tapOn:
+                      id: notesEditText
+                - inputText: "a note"
 
-          - scrollUntilVisible:
-              element:
-                id: notesEditText
-          - tapOn:
-                id: notesEditText
-          - inputText: "a note"
+                - tapOn:
+                      id: view_menu_save
+                      retryTapIfNoChange: false
 
-          - tapOn:
-                id: view_menu_save
-                retryTapIfNoChange: false
+                - scrollUntilVisible:
+                   element:
+                      text: "Last updated.*"
+                - assertVisible: "Last updated.*"
 
-          - scrollUntilVisible:
-             element:
-                text: "Last updated.*"
-          - assertVisible: "Last updated.*"
+                - tapOn: "Navigate up"
 
-          - tapOn: "Navigate up"
+                - assertVisible:
+                      text: "Save and autofill passwords"
+                - evalScript: ${output.addLogins.counter++}
 
-          - assertVisible:
-                text: "Save and autofill passwords"
-          - evalScript: ${output.addLogins.counter++}
+      - scrollUntilVisible:
+          element:
+            text: "#"
+      - assertVisible:
+          text: "#"
 
-- scrollUntilVisible:
-    element:
-      text: "#"
-- assertVisible:
-    text: "#"
+      - scrollUntilVisible:
+          element:
+            text: "a.example.com"
+      - assertVisible:
+          text: "a.example.com"
 
-- scrollUntilVisible:
-    element:
-      text: "a.example.com"
-- assertVisible:
-    text: "a.example.com"
+      - assertNotVisible:
+          text: "https://a.example.com"
 
-- assertNotVisible:
-    text: "https://a.example.com"
+      - scrollUntilVisible:
+          element:
+            text: "fill.dev"
+      - assertVisible:
+          text: "fill.dev"
 
-- scrollUntilVisible:
-    element:
-      text: "fill.dev"
-- assertVisible:
-    text: "fill.dev"
-
-- assertNotVisible:
-    text: "fill.dev/example"
+      - assertNotVisible:
+          text: "fill.dev/example"
 
 
-- runFlow: steps/search_logins.yaml
-- runFlow: steps/manual_update.yaml
-- runFlow: steps/delete_logins.yaml
+      - runFlow: steps/search_logins.yaml
+      - runFlow: steps/manual_update.yaml
+      - runFlow: steps/delete_logins.yaml

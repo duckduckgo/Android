@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Αφαίρεση από αυτήν τη συσκευή</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Βοήθεια και υποστήριξη</string>
     <string name="subscriptionSettingSendFeedback">Αποστολή σχολίου</string>
+    <string name="subscriptionSettingActivating">Ενεργοποίηση</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Είστε πανέτοιμοι.</string>

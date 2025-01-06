@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Премахване от това устройство</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
     <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
+    <string name="subscriptionSettingActivating">Активиране</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Всичко е готово.</string>

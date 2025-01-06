@@ -3,46 +3,49 @@ name: "ReleaseTest: Bookmark open and back navigation"
 tags:
     - releaseTest
 ---
-- launchApp:
-      clearState: true
-      stopApp: true
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+            clearState: true
+            stopApp: true
 
-- runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/onboarding.yaml
 
-- tapOn:
-      text: "search or type URL"
-- inputText: "https://www.search-company.site/"
-- pressKey: Enter
-- assertVisible:
-      text: ".*keep browsing.*"
-- tapOn:
-      text: "got it"
-- assertVisible:
-      text: "Search engine"
-- tapOn:
-      text: "https://www.search-company.site/"
-- inputText: "https://privacy-test-pages.site"
-- pressKey: Enter
-- assertVisible:
-      text: "Privacy Test Pages"
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-      text: "add bookmark"
-- tapOn:
-      text: "add bookmark"
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-      text: "bookmarks"
-- tapOn:
-      text: "bookmarks"
-- assertVisible:
-      text: "Privacy Test Pages - Home"
-- tapOn:
-      text: "Privacy Test Pages - Home"
-- assertVisible:
-      text: "Privacy Test Pages"
-- action: back
-- assertVisible:
-      text: "Search engine"
+      - tapOn:
+            text: "search or type URL"
+      - inputText: "https://www.search-company.site/"
+      - pressKey: Enter
+      - assertVisible:
+            text: ".*keep browsing.*"
+      - tapOn:
+            text: "got it"
+      - assertVisible:
+            text: "Search engine"
+      - tapOn:
+            text: "https://www.search-company.site/"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+            text: "Privacy Test Pages"
+      - tapOn:
+            id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+            text: "add bookmark"
+      - tapOn:
+            text: "add bookmark"
+      - tapOn:
+            id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+            text: "bookmarks"
+      - tapOn:
+            text: "bookmarks"
+      - assertVisible:
+            text: "Privacy Test Pages - Home"
+      - tapOn:
+            text: "Privacy Test Pages - Home"
+      - assertVisible:
+            text: "Privacy Test Pages"
+      - action: back
+      - assertVisible:
+            text: "Search engine"

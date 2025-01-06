@@ -19,21 +19,19 @@ package com.duckduckgo.networkprotection.impl.subscription.settings
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.Locked
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.UnLocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
+import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Activating
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Expired
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Subscribed
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -52,20 +50,22 @@ class ProSettingNetPViewModelTest {
     private val pixel: Pixel = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
+    private val networkProtectionSettingsState: NetworkProtectionSettingsState = mock()
     private lateinit var proSettingNetPViewModel: ProSettingNetPViewModel
 
     @Before
     fun before() {
         proSettingNetPViewModel = ProSettingNetPViewModel(
-            networkProtectionAccessState,
+            networkProtectionSettingsState,
             networkProtectionState,
+            networkProtectionAccessState,
             coroutineTestRule.testDispatcherProvider,
             pixel,
         )
     }
 
     @Test
-    fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
+    fun whenNetPSettingClickedThenNetPScreenOpened() = runTest {
         val testScreen = object : ActivityParams {}
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
 
@@ -80,9 +80,9 @@ class ProSettingNetPViewModelTest {
     }
 
     @Test
-    fun whenNetPIsNotUnlockedThenNetPEntryStateShouldShowHidden() = runTest {
+    fun whenNetPVisibilityStateIsHiddenThenNetPEntryStateIsHidden() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(Locked))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Hidden))
 
         proSettingNetPViewModel.onStart(mock())
 
@@ -95,108 +95,75 @@ class ProSettingNetPViewModelTest {
     }
 
     @Test
-    fun whenNetPStateIsInBetaButNotAcceptedTermsThenNetPEntryStateShouldShowPending() = runTest {
+    fun whenNetPVisibilityStateIsActivatingThenNetPEntryStateIsActivating() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Activating))
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Pending,
+                Activating,
                 expectMostRecentItem().networkProtectionEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPStateIsInBetaAndOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
+    fun whenNetPVisibilityStateConnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndActive() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                ShowState(
-                    icon = CommonR.drawable.ic_check_green_round_16,
-                    subtitle = R.string.netpSubscriptionSettingsConnected,
-                ),
+                Subscribed(isActive = true),
                 expectMostRecentItem().networkProtectionEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPStateIsInBetaAndNotOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+    fun whenNetPVisibilityStateDisconnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndInactive() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Pending,
+                Subscribed(isActive = false),
                 expectMostRecentItem().networkProtectionEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPStateIsInBetaOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-
-        proSettingNetPViewModel.onStart(mock())
-
-        proSettingNetPViewModel.viewState.test {
-            assertEquals(
-                ShowState(
-                    icon = CommonR.drawable.ic_check_green_round_16,
-                    subtitle = R.string.netpSubscriptionSettingsConnected,
-                ),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaAndConnectingThenNetPEntryStateShouldCorrectShowState() = runTest {
+    fun whenNetPVisibilityStateIsConnectingThenNetPEntryStateIsSubscribedAndNotActive() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                ShowState(
-                    icon = CommonR.drawable.ic_check_green_round_16,
-                    subtitle = R.string.netpSubscriptionSettingsConnecting,
-                ),
+                Subscribed(isActive = false),
                 expectMostRecentItem().networkProtectionEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPStateIsInBetaAndDisabledThenNetPEntryStateShouldCorrectShowState() = runTest {
+    fun whenNetPVisibilityStateIsExpiredThenNetPEntryStateIsExpired() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionAccessState.getStateFlow()).thenReturn(flowOf(UnLocked))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Expired))
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                ShowState(
-                    icon = CommonR.drawable.ic_exclamation_yellow_16,
-                    subtitle = R.string.netpSubscriptionSettingsDisconnected,
-                ),
+                Expired,
                 expectMostRecentItem().networkProtectionEntryState,
             )
         }

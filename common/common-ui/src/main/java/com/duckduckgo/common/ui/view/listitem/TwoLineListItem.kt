@@ -23,7 +23,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.DaxSwitch
-import com.duckduckgo.common.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Medium
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -100,7 +100,7 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             val leadingIconSize = if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
-                LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+                IconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
             } else {
                 Medium
             }
@@ -114,6 +114,10 @@ class TwoLineListItem @JvmOverloads constructor(
             setPillVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
+
+            val trailingIconSize = IconSize.from(getInt(R.styleable.TwoLineListItem_trailingIconSize, Medium.ordinal))
+            setTrailingIconSize(trailingIconSize)
+
             val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)
             when {
                 showSwitch -> showSwitch()

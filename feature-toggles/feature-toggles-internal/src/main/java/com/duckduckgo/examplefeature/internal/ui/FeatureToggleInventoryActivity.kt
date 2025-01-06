@@ -21,8 +21,9 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.AtomicReference
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
@@ -48,6 +49,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Buffer
@@ -64,21 +66,11 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var moshi: Moshi
 
-    private val featureNameFilter: AtomicReference<String> = AtomicReference("")
+    private val featureNameFilter = MutableStateFlow("")
 
     private val searchTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            when {
-                editable.toString().isBlank() -> {
-                    featureNameFilter.set("")
-                }
-                else -> {
-                    featureNameFilter.set(editable.toString())
-                }
-            }
-            lifecycleScope.launch {
-                populateViews()
-            }
+            featureNameFilter.value = editable.toString().trim()
         }
     }
 
@@ -99,12 +91,14 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
         binding.searchName.addTextChangedListener(searchTextWatcher)
 
         lifecycleScope.launch {
-            populateViews()
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                featureNameFilter.collect { populateViews(nameFilter = it) }
+            }
         }
     }
 
-    private suspend fun populateViews() = withContext(dispatcherProvider.io()) {
-        val views = getFeatureViews()
+    private suspend fun populateViews(nameFilter: String) = withContext(dispatcherProvider.io()) {
+        val views = getFeatureViews(nameFilter)
 
         withContext(dispatcherProvider.main()) {
             binding.featureToggle.removeAllViews()
@@ -114,9 +108,9 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
         }
     }
 
-    private suspend fun getFeatureViews(): List<View> = withContext(dispatcherProvider.io()) {
+    private suspend fun getFeatureViews(nameFilter: String): List<View> = withContext(dispatcherProvider.io()) {
         val toggles = this@FeatureToggleInventoryActivity.toggles.await()
-        val match = featureNameFilter.get().lowercase()
+        val match = nameFilter.lowercase()
         val parentFeatures = toggles
             .filter { it.featureName().parentName == null }
             .sortedBy { it.featureName().name.lowercase() }

@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Eemalda sellest seadmest</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
     <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
+    <string name="subscriptionSettingActivating">Aktiveerimine</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kõik on valmis.</string>

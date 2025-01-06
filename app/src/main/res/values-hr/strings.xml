@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Zaštita privatnosti</string>
+    <string name="settingsHeadingPrivacyProtections">Zaštita privatnosti</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodba</string>
     <string name="settingsHeadingAbout">O</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Zaštita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokiraj programe za praćenje e-pošte i sakrij svoju adresu</string>
     <string name="settingsHeadingMore">Više od DuckDuckGoa</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Sljedeći koraci</string>
+    <string name="settingsHeadingNextSteps">Sljedeći koraci</string>
     <string name="settingsLightTheme">Svijetla</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamna</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsHeadingSettings">Postavke</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Glavne postavke</string>
+    <string name="settingsHeadingMainSettings">Glavne postavke</string>
     <string name="settingsPermissionsSetting">Dozvole</string>
     <string name="settingsSyncSetting">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Brisanje podataka</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Dodajte widget na početni zaslon</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Postavi položaj adresne trake</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Omogući glasovno pretraživanje</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na drugim platformama</string>
+    <string name="settingsDataClearing">Brisanje podataka</string>
+    <string name="settingsAddWidget">Dodajte widget na početni zaslon</string>
+    <string name="settingsAddressBarPosition">Postavi položaj adresne trake</string>
+    <string name="settingsEnableVoiceSearch">Omogući glasovno pretraživanje</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugim platformama</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatno pretraživanje</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu je omogućena</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo te nikad ne prati i nastojimo zaštititi tvoju privatnost što je više moguće. Neprestano održavamo i razvijamo slojeve zaštite kako bismo bili u toku s novim metodama praćenja i pružamo mnoge zaštite koje drugi preglednici ne nude prema zadanim postavkama. <u><a href=\"\">Saznaj više</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatski blokira skrivene alate za praćenje dok \"surfaš\" po internetu.\n<a href=\"\">Saznaj više</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Brisanje podataka</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatski obriši…</string>
+    <string name="settingsAutomaticallyClearData">Automatsko brisanje podataka…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
+    <string name="aboutActivityTitleNew">O</string>
     <string name="aboutHeader">Dobrodošli na našu stranu!</string>
     <string name="aboutDescription">DuckDuckGo neovisna je tvrtka za privatnost na internetu osnovana 2008. godine namijenjena svakome tko je umoran od toga da ga prate na internetu i želi jednostavno rješenje za to. Mi smo dokaz da je prava zaštita privatnosti na internetu moguća bez kompromisa.\n\nPreglednik DuckDuckGo dolazi sa značajkama koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštite privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo je neovisna tvrtka za privatnost na internetu osnovana 2008. godine za sve koji su umorni od praćenja na internetu i žele jednostavno rješenje. Mi smo dokaz da možeš dobiti pravu zaštitu privatnosti na internetu, bez kompromisa.\n\nPreglednik DuckDuckGo sadrži značajke koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštita privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
     <string name="no_suggestions">Nema prijedloga</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pogledaj što je poslano</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podaci poslani u izvješćima ne mogu se koristiti za tvoju identifikaciju:</b><br/><br/>• URL stranice (bez podataka pomoću kojih se možeš identificirati)<br/>• Marka, model i proizvođač uređaja<br/>• Broj verzije operativnog sustava<br/>• Broj verzije aplikacije<br/>• Anonimna eksperimentalna grupa za testiranje značajki<br/>• Informacije o tome koje su verzije naših zaštita bile aktivne<br/>• Broj verzije motora internetskog preglednika<br/>• Popis aktivnih zaštita i značajki preglednika<br/>• Blokirana imena domaćina alata za praćenje, zamjenski zahtjevi, zanemareni zahtjevi i zahtjevi koji nisu na popisu blokiranih alata za praćenje<br/>• Pogreške koje je prijavio preglednik<br/>• Kodovi statusa odgovora web-mjesta (HTTP)<br/>• Koji je obrazac za izvješćivanje korišten (izbornik, nadzorna ploča itd.)<br/>• Datum posljednjeg izvješća poslanog za ovo web-mjesto<br/>• Je li odabrano prikazivanje ovih podataka o izvješću ili ne<br/>• Koliko je puta zaštita isključena<br/>• Koliko se brzo učitavaju dijelovi stranice<br/>• Kako si došao do ove stranice, ili: SERP (DuckDuckGo pretraživanje), Navigacija (veza/URL) ili Vanjska (drugi način)<br/>• Broj osvježavanja od učitavanja stranice<br/>• Primarni jezik i zemlja tvog uređaja<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potvrdi</string>
-    <string name="dialogSave">Spremi</string>
-    <string name="delete">Izbriši</string>
-    <string name="edit">Uredi</string>
-    <string name="remove">Ukloni</string>
-    <string name="removeAll">Odstrani sve</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Skočni prozor je sakriven</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Dozvole web lokacija</string>
-    <string name="sitePermissionsSettingsDescription">Stranice koje posjećuješ mogu tražiti pristup lokaciji tvog uređaja, fotoaparatu, mikrofonu ili DRM (Digital Rights Management) softveru. Neće im moći pristupiti osim ako im za to izričito ne daš dopuštenje.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Dopusti svim web-lokacijama da zatraže:</string>
-    <string name="sitePermissionsSettingsLocation">Lokacija</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje web-lokacijama</string>
-    <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Uklonjena su dopuštenja za sve web lokacije</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dopuštenja za „%1$s“ </string>
-    <string name="permissionsPerWebsiteAskSetting">Pitaj svaki puta</string>
-    <string name="permissionsPerWebsiteDenySetting">Odbij</string>
-    <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Onemogućeno za sva web-mjesta</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dopuštenje za %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saznaj kad su preuzimanja spremna</string>
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Lozinke</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Lozinke i automatsko popunjavanje</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Lozinke i automatsko popunjavanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
 

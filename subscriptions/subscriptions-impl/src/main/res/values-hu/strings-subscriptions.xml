@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Eltávolítás erről az eszközről</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Segítség és támogatás</string>
     <string name="subscriptionSettingSendFeedback">Visszajelzés küldése</string>
+    <string name="subscriptionSettingActivating">Aktiválás</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Minden készen áll.</string>

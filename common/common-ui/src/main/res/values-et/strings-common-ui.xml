@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Teavita mind</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lisa</string>
+    <string name="dialogEditTitle">Redigeeri</string>
+    <string name="dialogSaveAction">Salvesta</string>
+    <string name="dialogConfirmTitle">Kinnita</string>
+    <string name="dialogSave">Salvesta</string>
+    <string name="delete">Kustuta</string>
+    <string name="edit">Redigeeri</string>
+    <string name="remove">Eemaldage</string>
+    <string name="removeAll">Eemalda kõik</string>
+    <string name="undo">Võta tagasi</string>
+    <string name="cancel">Tühista</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Alati sisse lülitatud</string>
+    <string name="on">Sees</string>
+    <string name="off">Väljas</string>
 </resources>

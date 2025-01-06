@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.icu.text.DateFormat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -37,7 +38,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -83,7 +83,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
 
-        val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        val formatter = DateFormat.getInstanceForSkeleton("ddMMMMyyyy")
         val date = formatter.format(Date(subscription.expiresOrRenewsAt))
         val type = when (subscription.productId) {
             MONTHLY_PLAN_US, MONTHLY_PLAN_ROW -> Monthly

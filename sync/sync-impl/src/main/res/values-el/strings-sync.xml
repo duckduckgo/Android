@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
     <string name="sync_flows_disabled_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Συγχρονίστε με ασφάλεια σελιδοδείκτες και κωδικούς πρόσβασης μεταξύ των συσκευών σας.</string>
     <string name="sync_off_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί κρυπτογράφησης.</string>
     <string name="sync_setup_single_device_title">Εγκατάσταση μίας συσκευής</string>
+    <string name="sync_setup_other_options_title">Άλλες επιλογές</string>
     <string name="sync_setup_single_recover_data_cta_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
 

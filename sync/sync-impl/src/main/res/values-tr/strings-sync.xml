@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="sync_flows_disabled_new_version"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Yer imlerini ve parolaları cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
     <string name="sync_off_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifreleme anahtarına erişimi yoktur.</string>
     <string name="sync_setup_single_device_title">Tek Cihaz Kurulumu</string>
+    <string name="sync_setup_other_options_title">Diğer Seçenekler</string>
     <string name="sync_setup_single_recover_data_cta_title">Senkronize Edilen Verileri Kurtar</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Bu Cihazı Senkronize Et ve Yedekle</string>
 

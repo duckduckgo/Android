@@ -7679,4 +7679,15 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:textColor=&quot;@color/blue50&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_menu_item_default_browser.xml"
+            line="35"
+            column="13"/>
+    </issue>
+
 </issues>

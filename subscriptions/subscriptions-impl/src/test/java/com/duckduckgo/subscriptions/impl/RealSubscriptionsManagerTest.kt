@@ -15,7 +15,13 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
@@ -51,7 +57,6 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
-import java.lang.Exception
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -62,7 +67,10 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -71,6 +79,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1125,51 +1134,55 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenGetSubscriptionOfferThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
 
-        val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
 
-        with(subscriptionOffer) {
-            assertEquals(MONTHLY_PLAN_US, monthlyPlanId)
-            assertEquals("1$", monthlyFormattedPrice)
-            assertEquals(YEARLY_PLAN_US, yearlyPlanId)
-            assertEquals("1$", yearlyFormattedPrice)
-            assertEquals(setOf(NETP), features)
+        with(subscriptionOffers) {
+            assertTrue(any { it.planId == MONTHLY_PLAN_US })
+            assertEquals("1$", find { it.planId == MONTHLY_PLAN_US }?.pricingPhases?.first()?.formattedPrice)
+            assertTrue(any { it.planId == YEARLY_PLAN_US })
+            assertEquals("1$", find { it.planId == YEARLY_PLAN_US }?.pricingPhases?.first()?.formattedPrice)
+            assertEquals(setOf(NETP), first().features)
         }
     }
 
     @Test
-    fun whenGetSubscriptionOfferAndNoFeaturesThenReturnNull() = runTest {
+    fun whenGetSubscriptionOfferAndNoFeaturesThenReturnEmptyList() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+        authRepository.setFeatures(YEARLY_PLAN_US, emptySet())
         givenPlansAvailable(MONTHLY_PLAN_US, YEARLY_PLAN_US)
 
-        assertNull(subscriptionsManager.getSubscriptionOffer())
+        assertEquals(emptyList<SubscriptionOfferDetails>(), subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
     fun whenGetSubscriptionOfferAndRowPlansAvailableThenReturnValue() = runTest {
         authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(true)
 
-        val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
+        val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
 
-        with(subscriptionOffer) {
-            assertEquals(MONTHLY_PLAN_ROW, monthlyPlanId)
-            assertEquals("1$", monthlyFormattedPrice)
-            assertEquals(YEARLY_PLAN_ROW, yearlyPlanId)
-            assertEquals("1$", yearlyFormattedPrice)
-            assertEquals(setOf(NETP), features)
+        with(subscriptionOffers) {
+            assertTrue(any { it.planId == MONTHLY_PLAN_ROW })
+            assertEquals("1$", find { it.planId == MONTHLY_PLAN_ROW }?.pricingPhases?.first()?.formattedPrice)
+            assertTrue(any { it.planId == YEARLY_PLAN_ROW })
+            assertEquals("1$", find { it.planId == YEARLY_PLAN_ROW }?.pricingPhases?.first()?.formattedPrice)
+            assertEquals(setOf(NETP), first().features)
         }
     }
 
     @Test
-    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnNull() = runTest {
-        authRepository.setFeatures(MONTHLY_PLAN_US, emptySet())
+    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnEmptyList() = runTest {
+        authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
         givenIsLaunchedRow(false)
 
-        assertNull(subscriptionsManager.getSubscriptionOffer())
+        assertEquals(emptyList<SubscriptionOfferDetails>(), subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
@@ -1514,9 +1527,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val productDetails: ProductDetails = mock { productDetails ->
             whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
 
-            val pricingPhaseList: List<PricingPhase> = listOf(
-                mock { pricingPhase -> whenever(pricingPhase.formattedPrice).thenReturn("1$") },
-            )
+            val mockPricingPhase: PricingPhase = mock {
+                on { formattedPrice } doReturn "1$"
+                on { billingPeriod } doReturn "P1M"
+            }
+
+            val pricingPhaseList: List<PricingPhase> = listOf(mockPricingPhase)
 
             val pricingPhases: PricingPhases = mock { pricingPhases ->
                 whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)

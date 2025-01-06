@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
     <string name="sync_flows_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Droši sinhronizē grāmatzīmes un paroles starp ierīcēm.</string>
     <string name="sync_off_hint">Tavi dati tiek šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves šifrēšanas atslēgai.</string>
     <string name="sync_setup_single_device_title">Vienas ierīces iestatīšana</string>
+    <string name="sync_setup_other_options_title">Citas iespējas</string>
     <string name="sync_setup_single_recover_data_cta_title">Sinhronizēto datu atgūšana</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Šīs ierīces sinhronizācija un dublēšana</string>
 

@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" grib atvērt tavu DRM programmatūru</string>
+    <string name="drmSiteDialogSubtitle">Lai atskaņotu aizsargātu multivides saturu, ir nepieciešama digitālo tiesību pārvaldības programmatūra, kas nodrošina arī piekļuvi ierīces identifikatoriem. Piešķir atļauju tikai tām vietnēm, kurām uztici šos datus. Atļaujas jebkurā laikā vari pārvaldīt iestatījumos. <annotation type="drm_learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Vienmēr</string>
+    <string name="drmSiteDialogAllowOnce">Tikai šai sesijai</string>
+    <string name="drmSiteDialogDenyAlways">Vienmēr aizliegt</string>
+    <string name="drmSiteDialogDenyOnce">Aizliegt šai sesijai</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" grib piekļūt tavai atrašanās vietai</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Atcerēties manu izvēli</string>
+    <string name="preciseLocationDDGDialogSubtitle">Mēs izmantojam tavu anonīmo atrašanās vietu tikai tam, lai sniegtu labākus rezultātus tuvāk tev. Iestatījumu sadaļā vari pārvaldīt atrašanās vietas piekļuves atļaujas, kas piešķirtas atsevišķām vietnēm.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Iestatījumu sadaļā vari pārvaldīt atrašanās vietas piekļuves atļaujas, ko piešķīri atsevišķām vietnēm.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi atrašanās vietai šajā ierīcē</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Vietnes var izmantot tavu atrašanās vietu tikai tad, ja tu atļauj DuckDuckGo pieprasīt piekļuvi.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Atļauj DuckDuckGo prasīt piekļuvi atrašanās vietai</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Vietnes atļaujas</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Iestatījumu sadaļā tu vari pārvaldīt mikrofonam un kamerai piešķirtās piekļuves atļaujas atsevišķām vietnēm.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Iestatījumu sadaļā tu vari pārvaldīt mikrofona piekļuves atļaujas, kas ir piešķirtas atsevišķām vietnēm.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Iestatījumu sadaļā tu vari pārvaldīt kameras piekļuves atļaujas, kas ir piešķirtas atsevišķām vietnēm.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt kamerai un mikrofonam</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt mikrofonam</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" vēlas piekļūt kamerai</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Vietnes var izmantot tavu kameru un mikrofonu tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Atvērt iestatījumus</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Atcelt</string>
+
+    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
+    <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
+    <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Atļaujas ir noņemtas visām vietnēm</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Jautāt katru reizi</string>
+    <string name="permissionsPerWebsiteDenySetting">Liegt</string>
+    <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Atspējots visām vietnēm</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
+
 </resources>

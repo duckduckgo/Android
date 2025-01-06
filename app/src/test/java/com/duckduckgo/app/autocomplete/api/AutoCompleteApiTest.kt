@@ -108,7 +108,6 @@ class AutoCompleteApiTest {
             mockAutoCompleteRepository,
             mockTabRepository,
             mockUserStageStore,
-            coroutineTestRule.testDispatcherProvider,
             mockAutocompleteTabsFeature,
         )
     }
@@ -185,7 +184,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
@@ -231,7 +230,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "2"),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
@@ -283,7 +282,7 @@ class AutoCompleteApiTest {
                 listOf(
                     AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                     AutoCompleteSwitchToTabSuggestion(phrase = "bar.com", "title", "https://bar.com", tabId = "1"),
-                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                     AutoCompleteSwitchToTabSuggestion(phrase = "baz.com", title = "title", url = "https://baz.com", tabId = "4"),
                     AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
                 ),
@@ -345,11 +344,11 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "iii.com", title = "title", url = "https://iii.com", isFavorite = true),
                 AutoCompleteSwitchToTabSuggestion(phrase = "lll.com", title = "title", url = "https://lll.com", tabId = "1"),
-                AutoCompleteSearchSuggestion(phrase = "aaa", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "bbb", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "ccc", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "ddd", isUrl = false),
-                AutoCompleteSearchSuggestion(phrase = "eee", isUrl = false),
+                AutoCompleteSearchSuggestion(phrase = "aaa", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "bbb", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "ccc", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "ddd", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "eee", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSwitchToTabSuggestion(phrase = "mmm.com", title = "title", url = "https://mmm.com", tabId = "2"),
                 AutoCompleteSwitchToTabSuggestion(phrase = "nnn.com", title = "title", url = "https://nnn.com", tabId = "3"),
                 AutoCompleteSwitchToTabSuggestion(phrase = "ooo.com", title = "title", url = "https://ooo.com", tabId = "4"),
@@ -402,7 +401,7 @@ class AutoCompleteApiTest {
                 listOf(
                     AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
                     AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
-                    AutoCompleteSearchSuggestion("foo", false),
+                    AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                     AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
                 ),
                 value.suggestions,
@@ -454,7 +453,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
@@ -496,7 +495,7 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteHistorySearchSuggestion(phrase = "query", true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -525,7 +524,7 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySearchSuggestion(phrase = "query", false),
             ),
             value.suggestions,
@@ -577,7 +576,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com/test", "title", "https://bar.com/test", isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "foo.com/test", "title", "https://foo.com/test", isAllowedInTopHits = false),
             ),
@@ -614,7 +613,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com", isFavorite = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = true),
             ),
             value.suggestions,
@@ -656,22 +655,65 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsDuplicatedItemsThenDedup() = runTest {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+    fun whenNavResultsReturnedThenItShowsAsMiddleSectionIfUrlIsBookmarkAndTab() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("example")).thenReturn(
             listOf(
-                AutoCompleteServiceRawResult("example.com", false),
-                AutoCompleteServiceRawResult("foo.com", true),
-                AutoCompleteServiceRawResult("bar.com", true),
-                AutoCompleteServiceRawResult("baz.com", true),
+                AutoCompleteServiceRawResult("example", false),
+                AutoCompleteServiceRawResult("example.com", true),
+                AutoCompleteServiceRawResult("foo", false),
+                AutoCompleteServiceRawResult("bar", false),
+                AutoCompleteServiceRawResult("baz", false),
             ),
         )
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
             flowOf(
                 listOf(
                     bookmark(title = "title example", url = "https://example.com"),
-                    bookmark(title = "title foo", url = "https://foo.com/path/to/foo"),
-                    bookmark(title = "title foo", url = "https://foo.com"),
-                    bookmark(title = "title bar", url = "https://bar.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "example", url = "https://example.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("example")
+        val value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "example.com", "example", "https://example.com", tabId = "1"),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com", isFavorite = false),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "foo", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "bar", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "baz", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenNavResultsReturnedThenItShowsAsMiddleSectionIfUrlIsFavouriteAndTab() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("example")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("example", false),
+                AutoCompleteServiceRawResult("example.com", true),
+                AutoCompleteServiceRawResult("foo", false),
+                AutoCompleteServiceRawResult("bar", false),
+                AutoCompleteServiceRawResult("baz", false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "title example", url = "https://example.com"),
                 ),
             ),
         )
@@ -679,43 +721,30 @@ class AutoCompleteApiTest {
             flowOf(
                 listOf(
                     favorite(title = "title example", url = "https://example.com"),
-                    favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
-                    favorite(title = "title foo", url = "https://foo.com"),
-                    favorite(title = "title bar", url = "https://bar.com"),
                 ),
             ),
         )
 
-        val result = testee.autoComplete("title")
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "example", url = "https://example.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("example")
         val value = result.first()
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(
-                    phrase = "example.com",
-                    "title example",
-                    "https://example.com",
-                    isFavorite = true,
-                ),
-                AutoCompleteBookmarkSuggestion(
-                    phrase = "foo.com/path/to/foo",
-                    "title foo",
-                    "https://foo.com/path/to/foo",
-                    isFavorite = true,
-                ),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
-                AutoCompleteBookmarkSuggestion(
-                    phrase = "foo.com",
-                    title = "title foo",
-                    url = "https://foo.com",
-                    isFavorite = true,
-                ),
-                AutoCompleteBookmarkSuggestion(
-                    phrase = "bar.com",
-                    title = "title bar",
-                    url = "https://bar.com",
-                    isFavorite = true,
-                ),
+                AutoCompleteSwitchToTabSuggestion(phrase = "example.com", "example", "https://example.com", tabId = "1"),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com", isFavorite = true),
+                AutoCompleteSearchSuggestion(phrase = "example", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "foo", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "bar", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "baz", isUrl = false, isAllowedInTopHits = false),
             ),
             value.suggestions,
         )
@@ -771,7 +800,7 @@ class AutoCompleteApiTest {
     fun whenAutoCompleteReturnsDuplicatedItemsThenDedupConsideringQueryParams() = runTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
             listOf(
-                AutoCompleteServiceRawResult("example.com", false),
+                AutoCompleteServiceRawResult("example.com", true),
                 AutoCompleteServiceRawResult("foo.com", true),
                 AutoCompleteServiceRawResult("bar.com", true),
                 AutoCompleteServiceRawResult("baz.com", true),
@@ -795,8 +824,9 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
-                AutoCompleteSearchSuggestion(phrase = "example.com", false),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
+                AutoCompleteSearchSuggestion(phrase = "example.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "foo.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "baz.com", isUrl = true, isAllowedInTopHits = false),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
             ),
             value.suggestions,
@@ -1099,7 +1129,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
             ),
             value.suggestions,
@@ -1152,7 +1182,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
-                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteSearchSuggestion("foo", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
             ),
             value.suggestions,
@@ -1357,6 +1387,236 @@ class AutoCompleteApiTest {
         assertEquals("example.com/path?query1=1&query2=1", "http://www.example.com/path?query1=1&query2=1".formatIfUrl())
         assertEquals("example.com/path?query1=1&query2=1", "https://example.com/path?query1=1&query2=1".formatIfUrl())
         assertEquals("example.com/path?query1=1&query2=1", "https://www.example.com/path?query1=1&query2=1".formatIfUrl())
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsNotTabOrFavouriteOrBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(5, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndNotFavouriteOrBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(6, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndBookmarkThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "espn", url = "https://espn.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(7, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = false),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndFavoriteThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "espn", url = "https://espn.com"),
+                    bookmark(title = "title bar", url = "https://bar.com"),
+                    bookmark(title = "the title foo", url = "https://foo.com"),
+                    bookmark(title = "title foo baz", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(
+                    favorite(title = "espn", url = "https://espn.com"),
+                ),
+            ),
+        )
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "title", url = "https://baz.com"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(7, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteBookmarkSuggestion(phrase = "espn.com", title = "espn", url = "https://espn.com", isFavorite = true),
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsNavigationalLinkThatIsTabAndAnotherTabResultAppearsThenResultsAreShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(
+                listOf(
+                    TabEntity(tabId = "1", position = 1, title = "espn", url = "https://espn.com"),
+                    TabEntity(tabId = "2", position = 2, title = "espn nfl", url = "https://espn.com/nfl"),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(7, value.suggestions.size)
+        assertEquals(
+            listOf(
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com", "espn", "https://espn.com", tabId = "1"),
+                AutoCompleteSwitchToTabSuggestion(phrase = "espn.com/nfl", "espn nfl", "https://espn.com/nfl", tabId = "2"),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
     }
 
     private fun favorite(

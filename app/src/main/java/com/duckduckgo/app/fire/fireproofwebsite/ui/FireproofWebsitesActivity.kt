@@ -112,7 +112,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
                 ),
                 currentFireproofSetting,
             )
-            .setPositiveButton(R.string.dialogSave)
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {

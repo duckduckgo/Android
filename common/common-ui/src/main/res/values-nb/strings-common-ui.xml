@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Send meg et varsel</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Legg til</string>
+    <string name="dialogEditTitle">Rediger</string>
+    <string name="dialogSaveAction">Lagre</string>
+    <string name="dialogConfirmTitle">Bekreft</string>
+    <string name="dialogSave">Lagre</string>
+    <string name="delete">Slett</string>
+    <string name="edit">Rediger</string>
+    <string name="remove">Fjern</string>
+    <string name="removeAll">Fjern alle</string>
+    <string name="undo">Angre</string>
+    <string name="cancel">Avbryt</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Alltid på</string>
+    <string name="on">På</string>
+    <string name="off">Av</string>
 </resources>

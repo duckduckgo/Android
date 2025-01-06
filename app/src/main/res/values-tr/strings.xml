@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Gizlilik Korumaları</string>
+    <string name="settingsHeadingPrivacyProtections">Gizlilik Korumaları</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
     <string name="settingsHeadingMore">DuckDuckGo\'dan Daha Fazlası</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Sonraki Adımlar</string>
+    <string name="settingsHeadingNextSteps">Sonraki Adımlar</string>
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Ana Ayarlar</string>
+    <string name="settingsHeadingMainSettings">Ana Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Veri Temizleme</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Widget\'ı Ana Ekrana Ekle</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Adres Çubuğu Konumunuzu Ayarlayın</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Sesli Arama\'yı Etkinleştir</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">Diğer Platformlarda DuckDuckGo</string>
+    <string name="settingsDataClearing">Veri Temizleme</string>
+    <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
+    <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
+    <string name="settingsEnableVoiceSearch">Sesli Arama\'yı Etkinleştir</string>
+    <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Gizli Arama</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Veri Temizleme</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
     <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Temizle...</string>
+    <string name="settingsAutomaticallyClearData">Verileri Otomatik Olarak Temizle…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
+    <string name="aboutActivityTitleNew">Hakkında</string>
     <string name="aboutHeader">Duck Side\'a hoş geldiniz!</string>
     <string name="aboutDescription">DuckDuckGo, çevrim içi takip edilmeyi hiç istemeyen ve pratik bir çözüm arayan herkese hizmet veren, 2008 yılında kurulmuş bağımsız bir İnternet gizlilik şirketidir. Biz, çevrim içi ortamda ödün vermeden gerçek gizlilik koruması elde edebileceğinizin kanıtıyız.\n\nDuckDuckGo tarayıcı; yer imleri, sekmeler, parolalar ve daha fazlası gibi bir tarayıcıdan beklediğiniz özelliklerin yanı sıra varsayılan olarak çoğu popüler tarayıcıda sunulmayan <annotation type="privacy_protection_link">ondan fazla güçlü gizlilik koruması</annotation> ile birlikte gelir. Son derece kapsamlı olan bu gizlilik koruma seti, aramadan gezinmeye, e-posta göndermeye ve daha fazlasına kadar çevrim içi etkinliklerinizde koruma sağlamaya yardımcı olur.\n\nGizlilik korumalarımız, teknik ayrıntılar hakkında hiçbir şey bilmenize veya karmaşık ayarlarla uğraşmanıza gerek kalmadan çalışır. Tüm cihazlarınızda tarayıcı olarak DuckDuckGo\'yu kullanarak aradığınız gizliliği sağlayabilirsiniz.\n\nAncak ayrıntılara göz atmak istiyorsanız, DuckDuckGo gizlilik korumalarının nasıl çalıştığıyla ilgili daha fazla bilgiyi <annotation type="learn_more_link">yardım sayfalarımızda</annotation>bulabilirsiniz.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo, internette izlenmek istemeyen ve kolay bir çözüm arayan herkes için 2008 yılında kurulan bağımsız bir internet gizlilik şirketidir. Çevrimiçi ortamda ödün vermeden gerçek gizlilik koruması elde edebileceğinizin kanıtıyız.\n\nDuckDuckGo tarayıcı yer işaretleri, sekmeler, parolalar ve daha fazlası gibi bir tarayıcıdan beklediğiniz özelliklerin yanı sıra varsayılan olarak çoğu popüler tarayıcıda olmayan <annotation type="privacy_protection_link">ondan fazla güçlü gizlilik koruması</annotation> sunar. Bu benzersiz kapsamlı gizlilik koruma seti, aramadan gezinmeye, e-posta göndermeye ve daha fazlasına kadar internetteki etkinliklerinizi korumaya yardımcı olur.\n\nGizlilik korumalarımız, teknik ayrıntılar hakkında hiçbir şey bilmek veya karmaşık ayarlarla uğraşmak gerekmeksizin çalışır. Tüm cihazlarınızda kullandığınız tarayıcıyı DuckDuckGo\'ya değiştirip varsayılan olarak gizlilik elde edin.\n\nAncak kaputun altına bir göz atmak istiyorsanız, DuckDuckGo gizlilik korumalarının işleyişi hakkında daha fazla bilgiyi <annotation type="learn_more_link">yardım sayfalarımızda</annotation> bulabilirsiniz.</string>
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Onayla</string>
-    <string name="dialogSave">Kaydet</string>
-    <string name="delete">Sil</string>
-    <string name="edit">Düzenle</string>
-    <string name="remove">Kaldır</string>
-    <string name="removeAll">Tümünü Kaldır</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Açılır Pencere Gizli</string>
     <string name="autoconsentManagedNoticeAnimationText">Yönetilen Çerezler</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Site İzinleri</string>
-    <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına, mikrofonuna veya DRM (Dijital Haklar Yönetimi) yazılımına erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>
-    <string name="sitePermissionsSettingsLocation">Konum</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
-    <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tüm Siteler İçin İzinler Kaldırıldı</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">\"%1$s\" için izinler </string>
-    <string name="permissionsPerWebsiteAskSetting">Her seferinde sor</string>
-    <string name="permissionsPerWebsiteDenySetting">Reddet</string>
-    <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için devre dışı</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">İndirmeler hazır olduğunda bildirim alın</string>
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Şifreler</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Şifreler ve Otomatik Doldurma</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Şifreler ve Otomatik Doldurma</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
 

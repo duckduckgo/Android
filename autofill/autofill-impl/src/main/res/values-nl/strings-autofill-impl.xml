@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Instellen beëindigen</string>
 
     <string name="autofillManagementScreenTitle">Wachtwoorden</string>
+    <string name="autofillManagementScreenTitleNew">Wachtwoorden en automatisch invullen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen wachtwoorden opgeslagen</string>
     <string name="credentialManagementAutofillToggleLabel">Wachtwoorden opslaan en automatisch invullen</string>
     <string name="credentialManagementAutofillSubtitle">Wachtwoorden worden versleuteld. Niemand anders dan jij kunt ze zien, zelfs wij niet. <annotation type="learn_more_link">Meer informatie</annotation></string>

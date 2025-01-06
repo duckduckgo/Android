@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Iziet no iestatīšanas</string>
 
     <string name="autofillManagementScreenTitle">Paroles</string>
+    <string name="autofillManagementScreenTitleNew">Paroles un automātiskā aizpildīšana</string>
     <string name="credentialManagementNoLoginsSavedTitle">Vēl nav saglabāta neviena parole</string>
     <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt paroles</string>
     <string name="credentialManagementAutofillSubtitle">Paroles ir šifrētas. Neviens, izņemot tevi, tās nevar redzēt – pat mēs ne. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>

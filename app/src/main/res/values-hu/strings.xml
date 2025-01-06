@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Adatvédelem</string>
+    <string name="settingsHeadingPrivacyProtections">Adatvédelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
     <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Következő lépések</string>
+    <string name="settingsHeadingNextSteps">Következő lépések</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Főbeállítások</string>
+    <string name="settingsHeadingMainSettings">Főbeállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Adattörlés</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Állítsd be a címsor elhelyezkedését</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Beszédhangalapú keresés engedélyezése</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo más platformokhoz</string>
+    <string name="settingsDataClearing">Adattörlés</string>
+    <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
+    <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
+    <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
     <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tűz gomb</string>
+    <string name="dataClearingActivityTitle">Adattörlés</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
+    <string name="settingsAutomaticallyClearData">Adatok automatikus törlése…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
+    <string name="aboutActivityTitleNew">További információ</string>
     <string name="aboutHeader">Isten hozott a Kacsa oldalon!</string>
     <string name="aboutDescription">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
+    <string name="aboutDescriptionNew">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Elküldött adatok megtekintése</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>A jelentésekben elküldött adatok nem használhatók az azonosításodra:</b><br/><br/>• Oldal URL-címe (azonosítható adatok nélkül)<br/>• Eszköz gyártmánya, típusa és gyártója<br/>• Operációs rendszer verziószáma<br/>• Alkalmazás verziószáma<br/>• Funkciókat tesztelő névtelen kísérleti csoport<br/>• Aktív védelmeink verziójával kapcsolatos információ<br/>• Webböngészőmotor verziószáma<br/>• Azon védelmek és böngészőfunkciók listája, melyek aktívak voltak<br/>• A blokkolt nyomkövetők, helyettesítő kérések, figyelmen kívül hagyott kérések és a nyomkövetők blokkolási listáján nem szereplő kérések állomásnevei<br/>• Böngésző által jelentett hibák<br/>• Webhely válaszállapotának (HTTP) kódjai <br/>• Általad használt jelentési űrlap („menü”, „vezérlőpult” stb.)<br/>• A jelen webhelyről küldött utolsó jelentés időpontja<br/>• Kérted-e vagy sem e jelentésben szereplő információk megjelenítését<br/>• A védelmek kikapcsolásának száma<br/>• Milyen gyorsan töltődtek be az oldal részei<br/>• Miként jutottál el erre az oldalra, ami lehet: SERP (DuckDuckGo-keresés), Navigáció (link/URL-cím) vagy Külső (egyéb mód)<br/>• Frissítések száma az oldal betöltése óta<br/>• Az eszköz elsődleges nyelve és országa<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Megerősítés</string>
-    <string name="dialogSave">Mentés</string>
-    <string name="delete">Törlés</string>
-    <string name="edit">Szerkesztés</string>
-    <string name="remove">Eltávolítás</string>
-    <string name="removeAll">Összes eltávolítása</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Felugró ablak elrejtve</string>
     <string name="autoconsentManagedNoticeAnimationText">Kezelt sütik</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Webhelyengedélyek</string>
-    <string name="sitePermissionsSettingsDescription">A meglátogatott webhelyek hozzáférést kérhetnek az eszköz helyéhez, kamerájához, mikrofonjához vagy a digitális jogosultságokat kezelő (DRM) szoftveréhez. Ezekhez nem férhetnek hozzá, hacsak nem adsz rá kifejezett engedélyt.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Minden webhely kérheti a következőket:</string>
-    <string name="sitePermissionsSettingsLocation">Hely</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Webhelyek kezelése</string>
-    <string name="sitePermissionsSettingsEmptyText">Még nincsenek oldalak</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Minden webhely engedélye eltávolítva</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Engedélyek a következőhöz: „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Kérdezzen rá minden alkalommal</string>
-    <string name="permissionsPerWebsiteDenySetting">Megtagadás</string>
-    <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Letiltva minden webhely számára</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Készen álló letöltések jelzése</string>
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Jelszavak</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Jelszavak és automatikus kitöltés</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Jelszavak és automatikus kitöltés</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
 

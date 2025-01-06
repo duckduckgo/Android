@@ -21,9 +21,13 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyPirSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,24 +45,36 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(500)
-class ProSettings @Inject constructor() : ProSettingsPlugin {
+class ProSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ProSettingView(context)
+        return if (newSettingsFeature.self().isEnabled()) {
+            ProSettingView(context)
+        } else {
+            LegacyProSettingView(context)
+        }
     }
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(300)
-class PIRSettings @Inject constructor() : ProSettingsPlugin {
+class PIRSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return PirSettingView(context)
+        return if (newSettingsFeature.self().isEnabled()) {
+            PirSettingView(context)
+        } else {
+            LegacyPirSettingView(context)
+        }
     }
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(400)
-class ITRSettings @Inject constructor() : ProSettingsPlugin {
+class ITRSettings @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ItrSettingView(context)
+        return if (newSettingsFeature.self().isEnabled()) {
+            ItrSettingView(context)
+        } else {
+            LegacyItrSettingView(context)
+        }
     }
 }

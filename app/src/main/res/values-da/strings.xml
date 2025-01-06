@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Indstillinger</string>
     <string name="settingsMenuItemTitle">Indstillinger</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Beskyttelse af privatlivet</string>
+    <string name="settingsHeadingPrivacyProtections">Beskyttelse af privatlivet</string>
     <string name="settingsHeadingAppearance">udseende</string>
     <string name="settingsHeadingCustomize">Tilpas</string>
     <string name="settingsHeadingAbout">Omkring</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
     <string name="settingsEmailProtectionSubtitle">Bloker e-mailtrackere, og skjul din adresse</string>
     <string name="settingsHeadingMore">Mere fra DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Næste trin</string>
+    <string name="settingsHeadingNextSteps">Næste trin</string>
     <string name="settingsLightTheme">Let</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mørk</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Generelle indstillinger</string>
+    <string name="settingsHeadingMainSettings">Generelle indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datarydning</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Tilføj widget til startskærmen</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Angiv placeringen af adresselinjen</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Aktivér stemmesøgning</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo på andre platforme</string>
+    <string name="settingsDataClearing">Datarydning</string>
+    <string name="settingsAddWidget">Tilføj widget til startskærmen</string>
+    <string name="settingsAddressBarPosition">Angiv placeringen af adresselinjen</string>
+    <string name="settingsEnableVoiceSearch">Aktivér stemmesøgning</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre platforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søgning</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet er aktiveret</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer dig aldrig, og vi bestræber os på at beskytte dit privatliv så meget som muligt. Vi vedligeholder og udvikler løbende beskyttelseslagene for at holde trit med nye sporingsmetoder og beskytter mod mange ting, som andre browsere ikke tilbyder som standard. <u><a href=\"\">Lær mere</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Datarydning</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tilladelser</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
 
     <string name="settingsAutomaticallyClearWhat">Ryd automatisk …</string>
+    <string name="settingsAutomaticallyClearData">Ryd data automatisk…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">Omkring</string>
     <string name="aboutHeader">Velkommen til Duck siden</string>
     <string name="aboutDescription">DuckDuckGo er en uafhængig virksomhed, grundlagt i 2008, der beskytter privatlivet på internettet for alle, der er trætte af at blive sporet online og ønsker en nem løsning. Vi er bevis på, at du kan få ægte beskyttelse af privatlivet online uden at gå på kompromis.\n\nDuckDuckGo-browseren kommer med de funktioner, du forventer af en standardbrowser, som bogmærker, faner, adgangskoder og meget mere, plus over <annotation type="privacy_protection_link">et dusin kraftfulde beskyttelser af privatlivet</annotation>, som ikke tilbydes i de fleste populære browsere som standard. Dette unikke og omfattende sæt af beskyttelsesfunktioner hjælper med at beskytte dine onlineaktiviteter, fra søgning til browsing, e-mailing og meget mere.\n\nVores beskyttelse af privatlivet fungerer, uden at du behøver at vide noget om de tekniske detaljer eller håndtere komplicerede indstillinger. Det eneste, du skal gøre, er at skifte din browser til DuckDuckGo på alle dine enheder, så får du privatliv som standard.\n\nMen hvis du gerne vil have et kig under motorhjelmen, kan du finde flere oplysninger om, hvordan DuckDuckGos beskyttelse af privatlivet fungerer, på vores <annotation type="learn_more_link">hjælpesider</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo er det uafhængige internetprivatlivsfirma, grundlagt i 2008, for alle, der er trætte af at blive sporet online og ønsker en nem løsning. Vi er bevis på, at du kan få ægte beskyttelse af privatlivet online uden at gå på kompromis.\n\nDuckDuckGo-browseren kommer med de funktioner, du forventer af en standardbrowser, som bogmærker, faner, adgangskoder og meget mere, plus over <annotation type="privacy_protection_link">et dusin kraftfulde beskyttelser af privatlivet</annotation>, som ikke tilbydes i de fleste populære browsere som standard. Dette unikke og omfattende sæt af beskyttelsesfunktioner hjælper med at beskytte dine onlineaktiviteter, fra søgning til browsing, e-mailing og meget mere.\n\nVores beskyttelse af privatlivet fungerer, uden at du behøver at vide noget om de tekniske detaljer eller håndtere komplicerede indstillinger. Det eneste, du skal gøre, er at skifte din browser til DuckDuckGo på alle dine enheder, så får du privatliv som standard.\n\nMen hvis du gerne vil have et kig under motorhjelmen, kan du finde flere oplysninger om, hvordan DuckDuckGos beskyttelse af privatlivet fungerer, på vores <annotation type="learn_more_link">hjælpesider</annotation></string>
     <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se, hvad der bliver sendt</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Oplysninger sendt i rapporter kan ikke bruges til at identificere dig:</b><br/><br/>• Side-URL (uden identificerbare oplysninger)<br/>• Enhedsmærke, model og producent<br/>• Operativsystem-versionsnummer<br/>• App-versionsnummer<br/>• Anonym eksperimentgruppe til funktionstest<br/>• Oplysninger om, hvilke versioner af vores beskyttelser der var aktive<br/>• Webbrowser-motorversionsnummer<br/>• Liste over hvilke beskyttelser og browserfunktioner, der var aktive<br/>• Værtsnavne på blokerede trackere, surrogatanmodninger, ignorerede anmodninger og anmodninger, der ikke er på listen over trackerblokeringer<br/>• Browserrapporterede fejl<br/>• Websiteresponsstatuskoder (HTTP) <br/>• Hvilken rapporteringsformular du brugte (menu , dashboard osv.)<br/>• Dato for sidste rapport sendt for dette websted<br/>• Hvorvidt du valgte at vise disse rapportoplysninger<br/>• Antal gange, beskyttelse blev slået fra<br/>• Hvor hurtigt dele af siden blev indlæst<br/>• Hvordan du kom til denne side, enten: SERP (DuckDuckGo-søgning), Navigation (link/URL) eller Ekstern (på anden måde)<br/>• Antal opdateringer siden sideindlæsning<br/>• Din enheds primære sprog og land<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Bekræft</string>
-    <string name="dialogSave">Gem</string>
-    <string name="delete">Slet</string>
-    <string name="edit">Rediger</string>
-    <string name="remove">Fjern</string>
-    <string name="removeAll">Fjern alt</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Pop op-vindue skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Tilladelser til webstedet</string>
-    <string name="sitePermissionsSettingsDescription">Websteder, du besøger, kan bede om adgang til din enheds placering, kamera, mikrofon eller DRM-software (Digital Rights Management). De vil ikke kunne få adgang til disse, medmindre du udtrykkeligt giver dem tilladelse.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillad, at alle websteder beder om:</string>
-    <string name="sitePermissionsSettingsLocation">Placering</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer websteder</string>
-    <string name="sitePermissionsSettingsEmptyText">Ingen websteder endnu</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Tilladelser fjernet for alle websteder</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tilladelser til \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Spørg hver gang</string>
-    <string name="permissionsPerWebsiteDenySetting">Afvis</string>
-    <string name="permissionsPerWebsiteAllowSetting">Tillad</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Deaktiveret for alle websteder</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s tilladelse til %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Find ud af, hvornår downloads er klar</string>
     <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Adgangskoder og automatisk udfyldning</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Adgangskoder og automatisk udfyldning</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
 

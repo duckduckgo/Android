@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synchronisation et sauvegarde est indisponible</b>\nDésolé, mais Synchronisation et sauvegarde n’est pas disponible pour le moment. Veuillez réessayer plus tard.</string>
     <string name="sync_flows_disabled_new_version"><b>Synchronisation et sauvegarde est indisponible</b>\nDésolé, mais Synchronisation et sauvegarde n’est plus disponible dans cette version de l\'application. Veuillez mettre à jour DuckDuckGo avec la dernière version pour continuer.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synchronisez en toute sécurité les signets et mots de passe entre vos appareils.</string>
     <string name="sync_off_hint">Vos données sont cryptées de bout en bout et DuckDuckGo n\'a pas accès à la clé de chiffrement.</string>
     <string name="sync_setup_single_device_title">Configuration d\'un seul appareil</string>
+    <string name="sync_setup_other_options_title">Autres options</string>
     <string name="sync_setup_single_recover_data_cta_title">Récupérer les données synchronisées</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchroniser et sauvegarder cet appareil</string>
 

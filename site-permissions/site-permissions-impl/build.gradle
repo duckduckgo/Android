@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':site-permissions-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':navigation-api')
     api project(path: ':site-permissions-store')
 
     anvil project(path: ':anvil-compiler')

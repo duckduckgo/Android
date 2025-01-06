@@ -17,6 +17,28 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- DRM Permission -->
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s” chce uzyskać dostęp do oprogramowania DRM</string>
+    <string name="drmSiteDialogSubtitle">Oprogramowanie Digital Rights Management jest wymagane do odtwarzania chronionych treści multimedialnych, ale zapewnia również dostęp do identyfikatorów urządzeń. Udzielaj zgody na dostęp do tych danych tylko witrynom, którym ufasz. W każdej chwili możesz zarządzać uprawnieniami w ustawieniach. <annotation type="drm_learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="drmSiteDialogAllowAlways">Zawsze</string>
+    <string name="drmSiteDialogAllowOnce">Tylko dla tej sesji</string>
+    <string name="drmSiteDialogDenyAlways">Zawsze odmawiaj</string>
+    <string name="drmSiteDialogDenyOnce">Odmów w tej sesji</string>
+
+    <!-- Location Permission -->
+    <string name="sitePermissionsLocationDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do lokalizacji</string>
+    <string name="sitePermissionsDialogRememberMeCheckBox">Zapamiętaj mój wybór</string>
+    <string name="preciseLocationDDGDialogSubtitle">Używamy Twojej anonimowej lokalizacji tylko po to, aby zapewnić lepsze wyniki bliżej Ciebie. Uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom możesz zarządzać w Ustawieniach.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom możesz zarządzać w Ustawieniach.</string>
+    <string name="systemPermissionDialogLocationDeniedTitle">Zezwól aplikacji DuckDuckGo na żądanie dostępu do lokalizacji na tym urządzeniu</string>
+    <string name="systemPermissionDialogLocationDeniedContent">Witryny będą mogły wykorzystać Twoją lokalizację, tylko jeśli zezwolisz aplikacji DuckDuckGo na żądanie dostępu.</string>
+    <string name="sitePermissionsLocationDeniedSnackBarMessage">Zezwól DuckDuckGo na żądanie dostępu do lokalizacji</string>
+
+    <!-- Site Permission -->
+    <string name="settingsSitePermissions">Uprawnienia witryny</string>
+    <string name="sitePermissionsMicAndCameraDialogSubtitle">Uprawnieniami dostępu do mikrofonu i kamery przyznanymi poszczególnym witrynom możesz zarządzać w ustawieniach.</string>
+    <string name="sitePermissionsMicDialogSubtitle">Uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom możesz zarządzać w ustawieniach.</string>
+    <string name="sitePermissionsCameraDialogSubtitle">Uprawnieniami dostępu do kamery przyznanymi poszczególnym witrynom możesz zarządzać w ustawieniach.</string>
     <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do aparatu i mikrofonu</string>
     <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do mikrofonu</string>
     <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s” chce uzyskać dostęp do aparatu</string>
@@ -35,4 +57,20 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Witryny mogą korzystać z Twojej kamery i mikrofonu tylko wtedy, gdy pozwolisz DuckDuckGo poprosić o dostęp.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otwórz ustawienia</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Anuluj</string>
+
+    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji urządzenia, kamery, mikrofonu lub oprogramowania DRM (Digital Rights Management). Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
+    <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
+    <string name="sitePermissionsSettingsCamera">Aparat</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
+    <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Pytaj za każdym razem</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmów</string>
+    <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono dla wszystkich witryn</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
+
 </resources>

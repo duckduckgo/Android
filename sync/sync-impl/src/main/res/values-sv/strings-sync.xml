@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synkronisering och säkerhetskopiering inte tillgänglig</b>\nTyvärr är synkronisering och säkerhetskopiering inte tillgänglig för närvarande. Försök igen senare.</string>
     <string name="sync_flows_disabled_new_version"><b>Synkronisering och säkerhetskopiering inte tillgängligt</b>\nSynkronisering och säkerhetskopiering är dessvärre inte längre tillgängligt i denna version av appen. Uppdatera DuckDuckGo till den senaste versionen för att fortsätta.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Synkronisera bokmärken och lösenord mellan dina enheter på ett säkert sätt.</string>
     <string name="sync_off_hint">Dina data krypteras under hela vägen och DuckDuckGo har inte tillgång till krypteringsnyckeln.</string>
     <string name="sync_setup_single_device_title">Konfiguration för en enda enhet</string>
+    <string name="sync_setup_other_options_title">Andra alternativ</string>
     <string name="sync_setup_single_recover_data_cta_title">Återställ synkroniserade data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synkronisera och säkerhetskopiera denna enhet</string>
 

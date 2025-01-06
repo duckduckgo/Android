@@ -26,7 +26,6 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -56,7 +55,6 @@ class ClearPersonalDataActionTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockCookieManager: DuckDuckGoCookieManager = mock()
     private val mockAppCacheClearer: AppCacheClearer = mock()
-    private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockThirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
@@ -78,7 +76,6 @@ class ClearPersonalDataActionTest {
             settingsDataStore = mockSettingsDataStore,
             cookieManager = mockCookieManager,
             appCacheClearer = mockAppCacheClearer,
-            geoLocationPermissions = mockGeoLocationPermissions,
             thirdPartyCookieManager = mockThirdPartyCookieManager,
             adClickManager = mockAdClickManager,
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
@@ -131,7 +128,7 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockGeoLocationPermissions).clearAllButFireproofed()
+        verify(mockSitePermissionsManager).clearAllButFireproof(any())
     }
 
     @Test

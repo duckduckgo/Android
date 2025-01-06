@@ -110,7 +110,7 @@ class BookmarksListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
-                val imageSize = LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+                val imageSize = IconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
                 setLeadingIconSize(imageSize)
             }
 

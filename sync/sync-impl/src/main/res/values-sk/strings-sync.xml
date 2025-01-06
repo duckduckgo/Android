@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synchronizácia a zálohovanie nie sú dostupné</b>\nJe nám to ľúto, ale Synchronizácia a zálohovanie momentálne nie sú dostupné. Prosím, skúste to neskôr znova.</string>
     <string name="sync_flows_disabled_new_version"><b>Synchronizácia a zálohovanie sú nedostupné</b>\nĽutujeme, ale synchronizácia a zálohovanie už nie sú v tejto verzii aplikácie k dispozícii. Ak chcete pokračovať, aktualizujte DuckDuckGo na najnovšiu verziu.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpečne synchronizujte záložky a heslá medzi svojimi zariadeniami.</string>
     <string name="sync_off_hint">Vaše údaje sú šifrované na oboch koncoch (end-to-end) a DuckDuckGo nemá prístup k šifrovaciemu kľúču.</string>
     <string name="sync_setup_single_device_title">Nastavenie jedného zariadenia</string>
+    <string name="sync_setup_other_options_title">Ďalšie možnosti</string>
     <string name="sync_setup_single_recover_data_cta_title">Obnovenie synchronizovaných údajov</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchronizujte a zálohujte toto zariadenie</string>
 

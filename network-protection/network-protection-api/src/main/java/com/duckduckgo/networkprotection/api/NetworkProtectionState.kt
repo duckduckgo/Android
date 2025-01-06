@@ -91,5 +91,8 @@ interface NetworkProtectionState {
         CONNECTED,
         CONNECTING,
         DISCONNECTED,
+        ;
+
+        fun isConnected(): Boolean = this == CONNECTED
     }
 }

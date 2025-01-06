@@ -31,10 +31,11 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <com.duckduckgo.common.ui.view.listitem.CheckListItem
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/subscriptionBuy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
             app:primaryText="@string/subscriptionSettingSubscribe"
             app:primaryTextTruncated="false" />
 
@@ -42,7 +43,7 @@
             android:id="@+id/subscriptionGet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
+            android:layout_marginStart="56dp"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_3"
             app:textType="primary"
@@ -60,33 +61,25 @@
         tools:visibility="visible">
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscribedSubscriptionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSetting"
+            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:ignore="RtlSymmetry" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/subscriptionSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:paddingStart="32dp"
             app:primaryText="@string/subscriptionSetting"
+            app:leadingIcon="@drawable/ic_privacy_pro_color_24"
+            app:trailingIconSize="small"
             tools:ignore="RtlSymmetry" />
 
-    </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
-
-    <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
-            android:id="@+id/subscriptionWaitingContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/subscriptionWaiting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/subscriptionSettingWaiting"
-            app:secondaryText="@string/subscriptionSettingWaitingSubtitle"
-            app:leadingIcon="@drawable/ic_info_16"
-            app:leadingIconSize="small"
-            tools:ignore="RtlSymmetry" />
     </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 
     <com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout
@@ -101,7 +94,7 @@
             android:id="@+id/subscriptionRestore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="32dp"
+            android:paddingStart="40dp"
             app:primaryText="@string/subscriptionSettingRestore"
             tools:ignore="RtlSymmetry" />
 

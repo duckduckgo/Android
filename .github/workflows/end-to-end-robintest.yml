@@ -116,3 +116,14 @@ jobs:
           app-file: apk/release.apk
           android-api-level: 33
           workspace: .maestro/notifications_permissions_android13_plus
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - End to end tests (Robin)
+          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}

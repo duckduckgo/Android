@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.app.global.view.loadFavicon
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
@@ -44,7 +43,6 @@ class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
     private val savedSitesDao: SavedSitesEntitiesDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val savedSitesRepository: SavedSitesRepository,
     private val faviconDownloader: FaviconDownloader,
     private val dispatcherProvider: DispatcherProvider,
@@ -269,7 +267,6 @@ class DuckDuckGoFaviconManager constructor(
 
         return withContext(dispatcherProvider.io()) {
             savedSitesDao.countEntitiesByUrl(query) +
-                locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
                 savedSitesRepository.getFavoritesCountByDomain(query) +
                 autofillStore.getCredentials(domain).size

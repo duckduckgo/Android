@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ustawienia</string>
     <string name="settingsMenuItemTitle">Ustawienia</string>
     <string name="settingsHeadingPrivacy">Prywatność</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Mechanizmy Ochrony Prywatności</string>
+    <string name="settingsHeadingPrivacyProtections">Mechanizmy Ochrony Prywatności</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
     <string name="settingsHeadingCustomize">Spersonalizuj</string>
     <string name="settingsHeadingAbout">Informacje</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres</string>
     <string name="settingsHeadingMore">Więcej możliwości DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Dalsze kroki</string>
+    <string name="settingsHeadingNextSteps">Dalsze kroki</string>
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Ustawienia główne</string>
+    <string name="settingsHeadingMainSettings">Ustawienia główne</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Czyszczenie danych</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Dodaj widżet do ekranu głównego</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Ustaw pozycję paska adresu</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Włącz wyszukiwanie głosowe</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na innych platformach</string>
+    <string name="settingsDataClearing">Czyszczenie danych</string>
+    <string name="settingsAddWidget">Dodaj widżet do ekranu głównego</string>
+    <string name="settingsAddressBarPosition">Ustaw pozycję paska adresu</string>
+    <string name="settingsEnableVoiceSearch">Włącz wyszukiwanie głosowe</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na innych platformach</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Prywatne Wyszukiwanie</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci jest włączona</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nigdy Cię nie śledzi. Ponadto staramy się jak najlepiej chronić Twoją prywatność. Ciągle tworzymy i udoskonalamy zabezpieczenia, aby dostosować się do najnowszych sposobów śledzenia i oferować liczne zabezpieczenia, których inne przeglądarki nie oferują domyślnie. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
+    <string name="dataClearingActivityTitle">Czyszczenie danych</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
 
     <string name="settingsAutomaticallyClearWhat">Usuwaj automatycznie…</string>
+    <string name="settingsAutomaticallyClearData">Automatyczne czyszczenie danych…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Usuwaj automatycznie…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">Informacje</string>
     <string name="aboutHeader">Witaj po Kaczej Stronie Mocy!</string>
     <string name="aboutDescription">DuckDuckGo to założona w 2008 roku niezależna firma zajmująca się prywatnością w Internecie dla osób, które mają dosyć śledzenia online i poszukują łatwego w obsłudze rozwiązania. Jesteśmy dowodem na to, że możesz uzyskać prawdziwą ochronę prywatności online bez kompromisów.\n\nWszechstronna przeglądarka DuckDuckGo jest wyposażona w funkcje, których potrzebujesz, takie jak zakładki, karty, hasła i inne, a także <annotation type="privacy_protection_link">kilkanaście zaawansowanych mechanizmów ochrony prywatności</annotation>, które nie są domyślnie oferowane w większości popularnych przeglądarek. Ten wyjątkowo zaawansowany zestaw mechanizmów ochrony prywatności pomaga chronić działania w Internecie, od wyszukiwania po przeglądanie, obsługę wiadomości e-mail i nie tylko.\n\nDo korzystania z mechanizmów ochrony prywatności nie jest wymagana znajomość szczegółów technicznych ani skomplikowane ustawienia. Aby uzyskać ochronę prywatności, wystarczy ustawić na wszystkich urządzeniach domyślną przeglądarkę DuckDuckGo.\n\nJeśli interesują Cię szczegóły techniczne, więcej informacji o działaniu mechanizmów ochrony prywatności DuckDuckGo można znaleźć na <annotation type="learn_more_link">stronach pomocy</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo to założona w 2008 roku niezależna firma zajmująca się prywatnością w Internecie dla osób, które mają dosyć śledzenia online i poszukują łatwego w obsłudze rozwiązania. Jesteśmy dowodem na to, że możesz uzyskać prawdziwą ochronę prywatności online bez kompromisów.\n\nWszechstronna przeglądarka DuckDuckGo jest wyposażona w funkcje, których potrzebujesz, takie jak zakładki, karty, hasła i inne, a także <annotation type="privacy_protection_link">kilkanaście zaawansowanych mechanizmów ochrony prywatności</annotation>, które nie są domyślnie oferowane w większości popularnych przeglądarek. Ten wyjątkowo zaawansowany zestaw mechanizmów ochrony prywatności pomaga chronić działania w Internecie, od wyszukiwania po przeglądanie, obsługę wiadomości e-mail i nie tylko.\n\nDo korzystania z mechanizmów ochrony prywatności nie jest wymagana znajomość szczegółów technicznych ani skomplikowane ustawienia. Aby uzyskać ochronę prywatności, wystarczy ustawić na wszystkich urządzeniach domyślną przeglądarkę DuckDuckGo.\n\nJeśli interesują Cię szczegóły techniczne, więcej informacji o działaniu mechanizmów ochrony prywatności w DuckDuckGo można znaleźć na <annotation type="learn_more_link">stronach pomocy</annotation></string>
     <string name="no_suggestions">Brak sugestii</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Zobacz, co wysłano</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informacje przesyłane w raportach nie mogą zostać wykorzystane do Twojej identyfikacji:</b><br/><br/>• Adres URL strony (bez informacji umożliwiających identyfikację)<br/>• Marka, model i producent urządzenia<br/>• Numer wersji systemu operacyjnego<br/>• Numer wersji aplikacji<br/>• Anonimowa grupa eksperymentalna do testowania funkcji<br/>• Informacje o tym, które wersje naszych zabezpieczeń były aktywne<br/>• Numer wersji silnika przeglądarki internetowej<br/>• Lista zabezpieczeń i funkcji przeglądarki, które były aktywne<br/>• Nazwy hostów zablokowanych mechanizmów śledzących, żądań zastępczych, ignorowanych żądań i żądań, których nie ma na liście blokowanych mechanizmów śledzących<br/>• Błędy zgłoszone przez przeglądarkę<br/>• Kody stanu odpowiedzi witryny (HTTP) <br/>• Wykorzystany sposób raportowania (menu, panel itp.)<br/>• Data ostatniego wysłania raportu dla tej witryny<br/>• Czy wyrażono zgodę na wyświetlanie informacji o tym raporcie<br/>• Liczba wyłączeń zabezpieczeń<br/>• Szybkość ładowania elementów strony<br/>• Sposób przejścia do tej witryny: „SERP” (wyszukiwanie DuckDuckGo), „Nawigacja” (link/URL), lub „Zewnętrzne” (inne sposoby)<br/>• Liczba odświeżeń od załadowania strony<br/>• Podstawowy język i kraj urządzenia<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potwierdź</string>
-    <string name="dialogSave">Zapisz</string>
-    <string name="delete">Usuń</string>
-    <string name="edit">Edytuj</string>
-    <string name="remove">Usuń</string>
-    <string name="removeAll">Usuń wszystko</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ukryte wyskakujące okienka</string>
     <string name="autoconsentManagedNoticeAnimationText">Zarządzane pliki cookie</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Uprawnienia witryny</string>
-    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji urządzenia, kamery, mikrofonu lub oprogramowania DRM (Digital Rights Management). Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
-    <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
-    <string name="sitePermissionsSettingsCamera">Aparat</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
-    <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Usunięto uprawnienia wszystkich witryn</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Uprawnienia dla: „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Pytaj za każdym razem</string>
-    <string name="permissionsPerWebsiteDenySetting">Odmów</string>
-    <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Wyłączono dla wszystkich witryn</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Dowiedz się, kiedy pliki do pobrania będą gotowe</string>
     <string name="downloadsNotifyMeSubtitle">Otrzymuj powiadomienie po zakończeniu pobierania.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Hasła</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Hasła i autouzupełnianie</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Hasła i autouzupełnianie</string>
     <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
 

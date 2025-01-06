@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
     <string name="sync_flows_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Сигурно синхронизиране на отметките и паролите между отделни устройства.</string>
     <string name="sync_off_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за криптиране.</string>
     <string name="sync_setup_single_device_title">Настройка на едно устройство</string>
+    <string name="sync_setup_other_options_title">Други опции</string>
     <string name="sync_setup_single_recover_data_cta_title">Възстановяване на синхронизирани данни</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Синхронизиране и архивиране на това устройство</string>
 

@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sincronizare și backup indisponibilă</b>\nNe pare rău, dar Sincronizare și backup nu este disponibilă în prezent. Încearcă din nou mai târziu.</string>
     <string name="sync_flows_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
@@ -36,6 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sincronizează în siguranță marcajele și parolele între dispozitivele tale.</string>
     <string name="sync_off_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de criptare.</string>
     <string name="sync_setup_single_device_title">Configurare pe un singur dispozitiv</string>
+    <string name="sync_setup_other_options_title">Alte opțiuni</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperează datele sincronizate</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizează și fă backup pentru acest dispozitiv</string>
 

@@ -120,6 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Välju seadistusest</string>
 
     <string name="autofillManagementScreenTitle">Paroolid</string>
+    <string name="autofillManagementScreenTitleNew">Paroolid ja automaatne täitmine</string>
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
     <string name="credentialManagementAutofillSubtitle">Paroolid on krüpteeritud. Keegi peale sinu ei näe neid, isegi mitte meie. <annotation type="learn_more_link">Lisateave</annotation></string>

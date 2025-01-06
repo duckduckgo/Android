@@ -3,72 +3,75 @@ name: "Custom Tabs navigation in new tab"
 tags:
   - customTabsTest
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
-
-- assertVisible:
-    text: ".*Ready for a better, more private internet?.*"
-- tapOn: "let's do it!"
-- assertVisible:
-    text: ".*Privacy protections activated.*"
-- tapOn: "choose your browser"
-- runFlow:
-    when:
-      visible: "set as default"
+- retry:
+    maxRetries: 3
     commands:
-      - tapOn: "duckduckgo"
-      - tapOn: "set as default"
-      - assertVisible:
-          text: ".*Awesome! Welcome to the duck side.*"
-      - tapOn: "start browsing"
+      - launchApp:
+          clearState: true
+          stopApp: true
 
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- tapOn:
-    text: "settings"
-- scrollUntilVisible:
-    element:
-      text: "developer settings"
-    direction: DOWN
-- tapOn:
-    text: "developer settings"
-- scrollUntilVisible:
-    element:
-      text: "custom tabs"
-    direction: DOWN
-- tapOn:
-    text: "custom tabs"
-- tapOn:
-    text: "add your url here"
-- inputText: "https://www.search-company.site"
-- tapOn:
-    text: "load custom tab"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "running in duckduckgo"
-- action: back
-- tapOn:
-    text: "[Ad 2] Shopping Tab Ad (heuristic)"
-- assertVisible:
-    text: "Publisher site"
-- action: back
-- tapOn:
-    text: "[Ad 2] Shopping Tab Ad (heuristic)"
-- tapOn:
-    text: "Red shoes"
-- assertVisible:
-    text: "Checkout"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/backMenuItem"
-- assertVisible:
-    text: "Red shoes"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
-- assertVisible:
-    text: "Checkout"
+      - assertVisible:
+          text: ".*Ready for a better, more private internet?.*"
+      - tapOn: "let's do it!"
+      - assertVisible:
+          text: ".*Privacy protections activated.*"
+      - tapOn: "choose your browser"
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+            - assertVisible:
+                text: ".*Awesome! Welcome to the duck side.*"
+            - tapOn: "start browsing"
+
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "settings"
+      - scrollUntilVisible:
+          element:
+            text: "developer settings"
+          direction: DOWN
+      - tapOn:
+          text: "developer settings"
+      - scrollUntilVisible:
+          element:
+            text: "custom tabs"
+          direction: DOWN
+      - tapOn:
+          text: "custom tabs"
+      - tapOn:
+          text: "add your url here"
+      - inputText: "https://www.search-company.site"
+      - tapOn:
+          text: "load custom tab"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "running in duckduckgo"
+      - action: back
+      - tapOn:
+          text: "[Ad 2] Shopping Tab Ad (heuristic)"
+      - assertVisible:
+          text: "Publisher site"
+      - action: back
+      - tapOn:
+          text: "[Ad 2] Shopping Tab Ad (heuristic)"
+      - tapOn:
+          text: "Red shoes"
+      - assertVisible:
+          text: "Checkout"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/backMenuItem"
+      - assertVisible:
+          text: "Red shoes"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
+      - assertVisible:
+          text: "Checkout"

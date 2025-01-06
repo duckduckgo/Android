@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nastavenia</string>
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Ochrana súkromia</string>
+    <string name="settingsHeadingPrivacyProtections">Ochrana súkromia</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
     <string name="settingsHeadingCustomize">Prispôsobiť</string>
     <string name="settingsHeadingAbout">O</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsEmailProtectionSubtitle">Zablokujte nástroje na sledovanie e‑mailov a skryte vašu adresu</string>
     <string name="settingsHeadingMore">Viac od DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Ďalšie kroky</string>
+    <string name="settingsHeadingNextSteps">Ďalšie kroky</string>
     <string name="settingsLightTheme">Svetlá</string>
     <string name="settingsTheme">Motív</string>
     <string name="settingsDarkTheme">Tmavý</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Hlavné nastavenia</string>
+    <string name="settingsHeadingMainSettings">Hlavné nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Vymazanie údajov</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Pridať miniaplikáciu na domovskú obrazovku</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Nastavenie polohy panela s adresou</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Povoliť hlasové vyhľadávanie</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na iných platformách</string>
+    <string name="settingsDataClearing">Vymazanie údajov</string>
+    <string name="settingsAddWidget">Pridať miniaplikáciu na domovskú obrazovku</string>
+    <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
+    <string name="settingsEnableVoiceSearch">Povoliť hlasové vyhľadávanie</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Súkromné vyhľadávanie</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu je povolená</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vás nikdy nesleduje a snažíme sa čo najviac chrániť vaše súkromie. Neustále udržiavame a vyvíjame vrstvy ochrany, aby sme držali krok s novými metódami sledovania a poskytovali mnohé druhy ochrany, ktoré iné prehliadače štandardne neponúkajú. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
+    <string name="dataClearingActivityTitle">Vymazanie údajov</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
 
     <string name="settingsAutomaticallyClearWhat">Automaticky vymazať…</string>
+    <string name="settingsAutomaticallyClearData">Vymazať údaje automaticky…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automaticky vymazať…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žiadne</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">O</string>
     <string name="aboutHeader">Vitajte na Duck Side!</string>
     <string name="aboutDescription">DuckDuckGo je nezávislá spoločnosť na ochranu súkromia na internete založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžete získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré očakávate od prehliadača, ako sú záložky, karty, heslá a ďalšie funkcie, a viac ako <annotation type="privacy_protection_link">tuctom výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina populárnych prehliadačov štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť vaše online aktivity od vyhľadávania po prehliadanie, posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby ste museli poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získate predvolené súkromie.\n\nAk však máte záujem o podrobnejšie preskúmanie, viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdete na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo je nezávislá spoločnosť zaoberajúca sa ochranou súkromia na internete, ktorá bola založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžeš získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré od prehliadača očakávaš, ako sú záložky, karty, heslá a ďalšie, a má viac ako <annotation type="privacy_protection_link">tucet výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina obľúbených štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť tvoje online aktivity od vyhľadávania cez prehliadanie, až po posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby si musel poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získaš predvolené súkromie.\n\nAk však chceš nahliadnuť pod kapotu a zistiť viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdeš ich na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
     <string name="no_suggestions">Žiadne návrhy</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pozrite sa, čo bolo odoslané</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informácie odoslané v zostavách nie je možné použiť na vašu identifikáciu:</b><br/><br/>• Adresa URL stránky (bez identifikovateľných informácií)<br/>• Značka, model a výrobca zariadenia<br/>• Číslo verzie operačného systému<br/>• Číslo verzie aplikácie<br/>• Anonymná experimentálna skupina na testovanie funkcií<br/>• Informácie o tom, ktoré verzie našich ochrán boli aktívne<br/>• Číslo verzie webového prehliadača<br/>• Zoznam aktívnych ochrán a funkcií prehliadača<br/>• Názvy hostiteľov blokovaných sledovaní, žiadosti iných používateľovi, ignorované žiadosti a žiadosti, ktoré nie sú v zozname blokovania sledovačov<br/>• Chyby nahlásené prehliadačom<br/>• Kódy stavu odozvy webovej lokality (HTTP) <br/>• Ktorý formulár zostáv ste použili (ponuka, informačný panel atď.)<br/>• Dátum poslednej zostavy odoslanej pre túto lokalitu<br/>• Či ste sa rozhodli zobraziť informácie o tejto zostave<br/>• Koľkokrát boli ochrany vypnuté<br/>• Ako rýchlo sa časti stránky načítali<br/>• Ako ste sa dostali na túto stránku, buď: SERP (vyhľadávanie DuckDuckGo), Navigácia (odkaz/URL) alebo Externé (iné prostriedky)<br/>• Počet obnovení od načítania stránky<br/>• Primárny jazyk a krajina vášho zariadenia<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Potvrdiť</string>
-    <string name="dialogSave">Uložiť</string>
-    <string name="delete">Vymazať</string>
-    <string name="edit">Upraviť</string>
-    <string name="remove">Odstrániť</string>
-    <string name="removeAll">Odstrániť všetky</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Kontextové okno je skryté</string>
     <string name="autoconsentManagedNoticeAnimationText">Spravované súbory cookie</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
-    <string name="sitePermissionsSettingsDescription">Stránky, ktoré navštívite, môžu požiadať o prístup k polohe vášho zariadenia, fotoaparátu, mikrofónu alebo softvéru DRM (Digital Rights Management). Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>
-    <string name="sitePermissionsSettingsLocation">Poloha</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofón</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa lokalít</string>
-    <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Povolenia boli odstránené pre všetky lokality</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Povolenia pre „%1$s” </string>
-    <string name="permissionsPerWebsiteAskSetting">Vždy sa opýtať</string>
-    <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
-    <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Zakázané pre všetky lokality</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s povolenie pre %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Zistite, kedy budú stiahnuté súbory pripravené</string>
     <string name="downloadsNotifyMeSubtitle">Dostávajte upozornenia po dokončení sťahovania.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Heslo</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Heslá a automatické dopĺňanie</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Heslá a automatické dopĺňanie</string>
     <string name="autofillLoginSavedSnackbarMessage">Uložené heslo</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Aktualizácia hesla</string>
 

@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.view.listitem
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.StatusIndicatorView
@@ -38,13 +39,13 @@ class SettingsListItem @JvmOverloads constructor(
 
     private val binding: ViewSettingsListItemBinding by viewBinding()
 
-    val primaryText: DaxTextView
+    private val primaryText: DaxTextView
         get() = binding.primaryText
-    val leadingIcon: ImageView
+    private val leadingIcon: ImageView
         get() = binding.leadingIcon
-    val betaPill: ImageView
+    private val betaPill: ImageView
         get() = binding.betaPill
-    val statusIndicator: StatusIndicatorView
+    private val statusIndicator: StatusIndicatorView
         get() = binding.statusIndicator
 
     init {
@@ -65,9 +66,9 @@ class SettingsListItem @JvmOverloads constructor(
                 leadingIcon.gone()
             }
 
-            setPillVisible(getBoolean(R.styleable.SettingsListItem_showBetaPill, false))
+            betaPill.isVisible = getBoolean(R.styleable.SettingsListItem_showBetaPill, false)
 
-            val indicatorStatus = Status.from(getInt(R.styleable.SettingsListItem_indicatorStatus, 0))
+            val indicatorStatus = Status.from(getInt(R.styleable.SettingsListItem_indicatorStatus, 2))
             statusIndicator.setStatus(indicatorStatus)
 
             recycle()
@@ -79,11 +80,13 @@ class SettingsListItem @JvmOverloads constructor(
         binding.root.setOnClickListener { onClick() }
     }
 
+    /** Sets whether the status indicator is on or off */
     fun setStatus(isOn: Boolean) {
         statusIndicator.setStatus(if (isOn) Status.ON else Status.OFF)
     }
 
-    private fun setPillVisible(isVisible: Boolean) {
-        betaPill.isVisible = isVisible
+    /** Sets the leading icon image resource */
+    fun setLeadingIconResource(@DrawableRes idRes: Int) {
+        leadingIcon.setImageResource(idRes)
     }
 }

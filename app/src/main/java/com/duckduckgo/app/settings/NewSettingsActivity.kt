@@ -153,7 +153,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         get() = binding.includeSettings.contentSettingsInternal
 
     private val viewsPro
-        get() = binding.includeSettings.settingsSectionPro
+        get() = binding.includeSettings.contentSettingsPrivacyPro
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

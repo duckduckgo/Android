@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ajustes</string>
     <string name="settingsMenuItemTitle">Ajustes</string>
     <string name="settingsHeadingPrivacy">Privacidad</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Protecciones de privacidad</string>
+    <string name="settingsHeadingPrivacyProtections">Protecciones de privacidad</string>
     <string name="settingsHeadingAppearance">Apariencia</string>
     <string name="settingsHeadingCustomize">Personalizar</string>
     <string name="settingsHeadingAbout">Sobre</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Protección del correo electrónico</string>
     <string name="settingsEmailProtectionSubtitle">Bloquea los rastreadores de correo electrónico y oculta tu dirección</string>
     <string name="settingsHeadingMore">Más sobre DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Próximos pasos</string>
+    <string name="settingsHeadingNextSteps">Próximos pasos</string>
     <string name="settingsLightTheme">Claro</string>
     <string name="settingsTheme">Temas</string>
     <string name="settingsDarkTheme">Oscuro</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Protección de rastreo en la web</string>
     <string name="settingsWebTrackingProtectionDescription">Habilitado de forma predeterminada</string>
     <string name="settingsHeadingSettings">Ajustes</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Ajustes principales</string>
+    <string name="settingsHeadingMainSettings">Ajustes principales</string>
     <string name="settingsPermissionsSetting">Permisos</string>
     <string name="settingsSyncSetting">Sincronización y copia de seguridad</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Eliminación de datos</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Añadir widget a la pantalla de inicio</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Establece la posición de la barra de direcciones</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Habilitar búsqueda por voz</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo en otras plataformas</string>
+    <string name="settingsDataClearing">Eliminación de datos</string>
+    <string name="settingsAddWidget">Añadir widget a la pantalla de inicio</string>
+    <string name="settingsAddressBarPosition">Establece la posición de la barra de direcciones</string>
+    <string name="settingsEnableVoiceSearch">Habilitar búsqueda por voz</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo en otras plataformas</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Búsqueda Privada</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protección de rastreo en la web</string>
     <string name="webTrackingProtectionTitle">La protección de rastreo en la web está habilitada</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nunca te rastrea y nuestro objetivo es proteger tu privacidad tanto como sea posible. Mantenemos y desarrollamos continuamente capas de protección para mantenernos al día con los nuevos métodos de rastreo y proporcionar muchas formas de protección que otros navegadores no ofrecen por defecto. <u><a href=\"\">Más información</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloquea automáticamente los rastreadores ocultos mientras navegas por la web.\n<a href=\"\">Más información</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protección contra ventanas emergentes de cookies</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
+    <string name="dataClearingActivityTitle">Eliminación de datos</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisos</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
 
     <string name="settingsAutomaticallyClearWhat">Borrar automáticamente…</string>
+    <string name="settingsAutomaticallyClearData">Borrar datos automáticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Borrar automáticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ninguno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Pestañas</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de DuckDuckGo</string>
+    <string name="aboutActivityTitleNew">Sobre</string>
     <string name="aboutHeader">Bienvenidas al \"Lado Pato\"!</string>
     <string name="aboutDescription">DuckDuckGo es la empresa de privacidad en internet independiente fundada en 2008 para quienes estén cansados de ser rastreados en línea y quieran una solución sencilla. Somos la prueba de que es posible obtener protección de privacidad real en línea sin concesiones.\n\nEl navegador DuckDuckGo incluye las funciones que esperas de un navegador de referencia, como favoritos, pestañas, contraseñas y más, así como más de <annotation type="privacy_protection_link">una docena de potentes funciones de protección de privacidad</annotation> que no ofrecen los navegadores más populares de forma predeterminada. Este conjunto completo de funciones de protección de privacidad ayuda a proteger tu actividad en línea, desde la búsqueda hasta la navegación, el correo electrónico y mucho más.\n\nNuestra protección de privacidad funciona sin necesidad de conocimientos técnicos y sin tener que lidiar con configuraciones complicadas. Lo único que tienes que hacer es cambiar el navegador a DuckDuckGo en todos tus dispositivos y obtener privacidad de forma predeterminada.\n\nSin embargo, si quieres conocer los entresijos, puedes encontrar más información sobre cómo funciona la protección de privacidad de DuckDuckGo en nuestras <annotation type="learn_more_link">páginas de ayuda</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo es la empresa de privacidad en internet independiente fundada en 2008 para quienes estén cansados de ser rastreados en línea y quieran una solución sencilla. Somos la prueba de que es posible obtener protección de privacidad real en línea sin concesiones.\n\nEl navegador DuckDuckGo incluye las funciones que esperas de un navegador de referencia, como favoritos, pestañas, contraseñas y más, así como más de <annotation type="privacy_protection_link">una docena de potentes funciones de protección de privacidad</annotation> que no ofrecen los navegadores más populares de forma predeterminada. Este conjunto completo de funciones de protección de privacidad ayuda a proteger tu actividad en línea, desde la búsqueda hasta la navegación, el correo electrónico y mucho más.\n\nNuestra protección de privacidad funciona sin necesidad de conocimientos técnicos y sin tener que lidiar con configuraciones complicadas. Lo único que tienes que hacer es cambiar el navegador a DuckDuckGo en todos tus dispositivos y obtener privacidad de forma predeterminada.\n\nSin embargo, si quieres conocer los entresijos, puedes encontrar más información sobre cómo funciona la protección de privacidad de DuckDuckGo en nuestras <annotation type="learn_more_link">páginas de ayuda</annotation></string>
     <string name="no_suggestions">No hay sugerencias</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ver lo enviado</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>La información enviada en los informes no se puede usar para identificarte:</b><br/><br/>• URL de la página (sin información identificable)<br/>• Marca, modelo y fabricante del dispositivo<br/>• Número de versión del sistema operativo<br/>• Número de versión de la aplicación<br/>• Grupo de experimento anónimo para pruebas de funciones<br/>• Información sobre qué versiones de nuestras protecciones estaban activas<br/>• Número de versión del motor del navegador web<br/>• Lista de las protecciones y funciones del navegador que estaban activas<br/>• Nombres de host de rastreadores bloqueados, solicitudes de sustitución, solicitudes ignoradas y solicitudes que no están en la lista de bloqueo de rastreadores<br/>• Errores notificados por el navegador<br/>• Códigos de estado de respuesta del sitio web (HTTP)<br/>• Qué formulario de informes se ha utilizado (menú, panel de control, etc.).<br/>• Fecha del último informe enviado para este sitio<br/>• Si has optado o no por mostrar esta información del informe<br/>• Número de veces que se han desactivado las protecciones<br/>• La rapidez con la que se han cargado partes de la página<br/>• Cómo has llegado a esta página, ya sea: SERP (búsqueda de DuckDuckGo), Navegación (enlace/URL) o Externo (otros medios)<br/>• Número de actualizaciones desde la carga de la página<br/>• Idioma principal y país de tu dispositivo<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Confirmar</string>
-    <string name="dialogSave">Guardar</string>
-    <string name="delete">Eliminar</string>
-    <string name="edit">Editar</string>
-    <string name="remove">Eliminar</string>
-    <string name="removeAll">Eliminar todo</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Buscar en DuckDuckGo</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ventana emergente oculta</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies gestionadas</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Permisos del sitio</string>
-    <string name="sitePermissionsSettingsDescription">Los sitios que visites pueden pedirte acceso a la ubicación de tu dispositivo, a la cámara, al micrófono o al software DRM (Gestión de Derechos Digitales). No podrán acceder a ellos a menos que les des permiso explícitamente.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos los sitios soliciten:</string>
-    <string name="sitePermissionsSettingsLocation">Ubicación</string>
-    <string name="sitePermissionsSettingsCamera">Cámara</string>
-    <string name="sitePermissionsSettingsMicrophone">Micrófono</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrar sitios</string>
-    <string name="sitePermissionsSettingsEmptyText">Aún no hay sitios</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permisos eliminados para todos los sitios</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Permisos para \"%1$s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Preguntar cada vez</string>
-    <string name="permissionsPerWebsiteDenySetting">Rechazar</string>
-    <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Desactivado para todos los sitios</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s permiso para %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Entérate de cuándo están listas las descargas</string>
     <string name="downloadsNotifyMeSubtitle">Recibe una notificación cuando se completen las descargas.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Contraseñas</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Contraseñas y autocompletar</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Contraseñas y autocompletar</string>
     <string name="autofillLoginSavedSnackbarMessage">Contraseña guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Contraseña actualizada</string>
 

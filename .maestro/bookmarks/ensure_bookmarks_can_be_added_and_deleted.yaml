@@ -3,41 +3,44 @@ name: "ReleaseTest: Bookmarks can be added and deleted"
 tags:
   - releaseTest
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
 
-- runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/onboarding.yaml
 
-- tapOn:
-    text: "search or type URL"
-- inputText: "https://privacy-test-pages.site"
-- pressKey: Enter
-- assertVisible:
-    text: ".*keep browsing.*"
-- tapOn:
-    text: "got it"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "add bookmark"
-- tapOn:
-    text: "add bookmark"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "bookmarks"
-- tapOn:
-    text: "bookmarks"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
-- assertVisible:
-    text: "Delete"
-- tapOn:
-    text: "delete"
-- assertNotVisible:
-    text: "Privacy Test Pages - Home"
-- assertVisible:
-    text: "No bookmarks added yet"
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*keep browsing.*"
+      - tapOn:
+          text: "got it"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "add bookmark"
+      - tapOn:
+          text: "add bookmark"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - assertVisible:
+          text: "bookmarks"
+      - tapOn:
+          text: "bookmarks"
+      - assertVisible:
+          text: "Privacy Test Pages - Home"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/trailingIcon"
+      - assertVisible:
+          text: "Delete"
+      - tapOn:
+          text: "delete"
+      - assertNotVisible:
+          text: "Privacy Test Pages - Home"
+      - assertVisible:
+          text: "No bookmarks added yet"

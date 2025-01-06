@@ -264,7 +264,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
-        testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false))
+        testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false, isAllowedInTopHits = false))
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
@@ -598,7 +598,10 @@ class SystemSearchViewModelTest {
         const val BLANK_QUERY = ""
         const val AUTOCOMPLETE_RESULT = "autocomplete result"
         val deviceApp = DeviceApp("", "", Intent())
-        val autocompleteQueryResult = AutoCompleteResult(QUERY, listOf(AutoCompleteSearchSuggestion(QUERY, false)))
+        val autocompleteQueryResult = AutoCompleteResult(
+            QUERY,
+            listOf(AutoCompleteSearchSuggestion(QUERY, isUrl = false, isAllowedInTopHits = false)),
+        )
         val autocompleteBlankResult = AutoCompleteResult(BLANK_QUERY, emptyList())
         val appQueryResult = listOf(deviceApp)
         val appBlankResult = emptyList<DeviceApp>()

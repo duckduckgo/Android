@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Yksityisyyden suoja</string>
+    <string name="settingsHeadingPrivacyProtections">Yksityisyyden suoja</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
     <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
     <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
     <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Seuraavat vaiheet</string>
+    <string name="settingsHeadingNextSteps">Seuraavat vaiheet</string>
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tumma</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Pääasetukset</string>
+    <string name="settingsHeadingMainSettings">Pääasetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Datan tyhjentäminen</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Lisää widget aloitusnäyttöön</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Aseta osoitekentän sijainti</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Ota käyttöön äänihaku</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo muilla alustoilla</string>
+    <string name="settingsDataClearing">Datan tyhjentäminen</string>
+    <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
+    <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
+    <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Yksityinen haku</string>
@@ -192,6 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
@@ -200,6 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
+    <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Käyttöoikeudet</string>
@@ -211,6 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
 
     <string name="settingsAutomaticallyClearWhat">Tyhjennä automaattisesti…</string>
+    <string name="settingsAutomaticallyClearData">Tyhjennä tiedot automaattisesti...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>
@@ -227,8 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
+    <string name="aboutActivityTitleNew">Tietoa meistä</string>
     <string name="aboutHeader">Tervetuloa Duckin puolelle!</string>
     <string name="aboutDescription">DuckDuckGo on vuonna 2008 perustettu riippumaton internetissä tietosuojaa tarjoava yritys niille, jotka ovat kyllästyneet siihen, että heitä seurataan netissä, ja haluavat yksinkertaisen ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki parhaiden selainten ominaisuudet, kuten kirjanmerkit, välilehdet, salasanat ja paljon muuta, sekä yli <annotation type="privacy_protection_link">kymmenkunta tehokasta tietosuojausta, joita</annotation> ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuoja auttaa turvaamaan haut, selaamisen, sähköpostin lähettämiseen ja muun toimintasi verkossa.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikilla laitteillasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuillamme</annotation>.</string>
+    <string name="aboutDescriptionNew">DuckDuckGo on vuonna 2008 perustettu riippumaton internetin tietosuoja-alan yritys kaikille, jotka ovat kyllästyneet siihen, että heitä seurataan verkossa, ja haluavat helpon ratkaisun. Olemme todiste siitä, että voit saada todellista tietosuojaa verkossa ilman kompromisseja.\n\nDuckDuckGo-selaimessa on kaikki selainten perusominaisuudet, kuten kirjanmerkit, välilehdet ja salasanat, sekä yli <annotation type="privacy_protection_link">kymmenen tehokasta tietosuojausta</annotation>, joita ei ole oletuksena useimmissa suosituissa selaimissa. Tämä ainutlaatuisen kattava tietosuojapaketti auttaa suojaamaan verkkoaktiviteettisi, kuten hakemisen, selaamisen ja sähköpostin lähettämisen.\n\nTietosuojamme toimivat, vaikka et tietäisi mitään teknisistä yksityiskohdista tai osaisi käsitellä monimutkaisia asetuksia. Sinun tarvitsee vain vaihtaa selaimesi DuckDuckGohon kaikissa laitteissasi, ja saat tietosuojan oletuksena.\n\nJos kuitenkin haluat kurkistaa konepellin alle, löydät lisätietoja DuckDuckGon tietosuojan toiminnasta on <annotation type="learn_more_link">ohjesivuiltamme</annotation>.</string>
     <string name="no_suggestions">Ei ehdotuksia</string>
 
     <!-- Broken Site Activity -->
@@ -259,14 +264,6 @@
 
     <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Katso, mitä on lähetetty</string>
     <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporteissa lähetetyistä tiedoista ei voi tunnistaa sinua:</b><br/><br/>• Sivun URL-osoite (ilman tunnistettavia tietoja)<br/>• Laitteen merkki, malli ja valmistaja<br/>• Käyttöjärjestelmän versionumero<br/>• Sovelluksen versionumero<br/>• Nimetön kokeiluryhmä ominaisuuksien testaamista varten<br/>• Tietoa suojauksiemme aktiivisista versioista<br/>• Verkkoselainhakukoneen versionumero<br/>• Luettelo aktiivisista suojauksista ja selaimen ominaisuuksista<br/>• Estettyjen seurantatoimintojen isäntänimet, korvaavat pyynnöt, huomiotta jätetyt pyynnöt ja pyynnöt, jotka eivät ole seurannan estoluettelossa<br/>• Selaimen ilmoittamat virheet<br/>• Web-sivuston vastaustilan (HTTP) koodit<br/>• Mitä ilmoituslomaketta käytit (valikko, hallintapaneeli jne.)<br/>• Tämän sivuston viimeisen raportin lähetyspäivämäärä<br/>• Oletko valinnut tämän raportin tietojen näyttämisen vai et<br/>• Suojausten poiskytkeytymiskerrat<br/>• Kuinka nopeasti osat sivusta latautuivat<br/>• Miten pääsit tälle sivulle, joko: SERP (DuckDuckGo-haku), navigointi (linkki/URL) tai ulkoinen (muu keino)<br/>• Päivitysten määrä sivun latauksen jälkeen<br/>• Laitteesi ensisijainen kieli ja maa<br/>]]>"</string>
-
-    <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Vahvista</string>
-    <string name="dialogSave">Tallenna</string>
-    <string name="delete">Poista</string>
-    <string name="edit">Muokkaa</string>
-    <string name="remove">Poista</string>
-    <string name="removeAll">Poista kaikki</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
@@ -670,23 +667,6 @@
     <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallitut evästeet</string>
 
-    <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
-    <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
-    <string name="sitePermissionsSettingsLocation">Sijainti</string>
-    <string name="sitePermissionsSettingsCamera">Kamera</string>
-    <string name="sitePermissionsSettingsMicrophone">Mikrofoni</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Hallitse sivustoja</string>
-    <string name="sitePermissionsSettingsEmptyText">Ei vielä yhtään sivustoa</string>
-    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Käyttöoikeudet poistettu kaikilta sivustoilta</string>
-    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oikeudet: %1$s </string>
-    <string name="permissionsPerWebsiteAskSetting">Kysy joka kerta</string>
-    <string name="permissionsPerWebsiteDenySetting">Estä</string>
-    <string name="permissionsPerWebsiteAllowSetting">Salli</string>
-    <string name="permissionsPerWebsiteAskDisabledSetting">Poistettu käytöstä kaikilla sivustoilla</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
-
     <!-- Notify Me View on Downloads -->
     <string name="downloadsNotifyMeTitle">Saat tietää, milloin lataukset ovat valmiita</string>
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
@@ -722,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Salasanat</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Salasanat ja automaattinen täyttö</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Salasanat ja automaattinen täyttö</string>
     <string name="autofillLoginSavedSnackbarMessage">Salasana tallennettu</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Salasana päivitetty</string>
 

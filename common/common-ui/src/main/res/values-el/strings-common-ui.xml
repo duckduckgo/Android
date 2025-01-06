@@ -16,7 +16,25 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Να ειδοποιηθώ</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Προσθήκη</string>
+    <string name="dialogEditTitle">Επεξεργασία</string>
+    <string name="dialogSaveAction">Αποθήκευση</string>
+    <string name="dialogConfirmTitle">Επιβεβαίωση</string>
+    <string name="dialogSave">Αποθήκευση</string>
+    <string name="delete">Διαγραφή</string>
+    <string name="edit">Επεξεργασία</string>
+    <string name="remove">Αφαίρεση</string>
+    <string name="removeAll">Αφαίρεση όλων</string>
+    <string name="undo">Αναίρεση</string>
+    <string name="cancel">Ακύρωση</string>
+
+    <!--Status Indicator-->
+    <string name="alwaysOn">Πάντα σε λειτουργία</string>
+    <string name="on">Ενεργό</string>
+    <string name="off">Κλειστό</string>
 </resources>

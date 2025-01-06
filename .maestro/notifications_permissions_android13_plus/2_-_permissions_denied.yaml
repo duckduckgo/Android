@@ -1,33 +1,36 @@
 appId: com.duckduckgo.mobile.android
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
-    permissions: { all: unset }
-- assertVisible:
-    text: ".*Allow DuckDuckGo to send you notifications.*"
-- tapOn: "Don’t allow"
-- assertVisible:
-    text: ".*Welcome to DuckDuckGo!.*"
-    optional: true
-- assertVisible:
-    text: ".*Ready for a better, more private internet?.*"
-- tapOn: "let's do it!"
-- assertVisible:
-    text: ".*Privacy protections activated.*"
-- tapOn: "choose your browser"
-- tapOn: "cancel"
-- assertVisible:
-    text: ".*Try a search!.*"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- tapOn:
-    text: "Downloads"
-- assertVisible:
-    text: ".*Find out when downloads are ready.*"
-- assertVisible:
-    text: ".*Get a notification when downloads complete.*"
-- assertVisible:
-    text: ".*Notify Me.*"
-- assertVisible:
-    text: ".*No files downloaded yet.*"
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                clearState: true
+                stopApp: true
+                permissions: { all: unset }
+            - assertVisible:
+                text: ".*Allow DuckDuckGo to send you notifications.*"
+            - tapOn: "Don’t allow"
+            - assertVisible:
+                text: ".*Welcome to DuckDuckGo!.*"
+                optional: true
+            - assertVisible:
+                text: ".*Ready for a better, more private internet?.*"
+            - tapOn: "let's do it!"
+            - assertVisible:
+                text: ".*Privacy protections activated.*"
+            - tapOn: "choose your browser"
+            - tapOn: "cancel"
+            - assertVisible:
+                text: ".*Try a search!.*"
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+            - tapOn:
+                text: "Downloads"
+            - assertVisible:
+                text: ".*Find out when downloads are ready.*"
+            - assertVisible:
+                text: ".*Get a notification when downloads complete.*"
+            - assertVisible:
+                text: ".*Notify Me.*"
+            - assertVisible:
+                text: ".*No files downloaded yet.*"

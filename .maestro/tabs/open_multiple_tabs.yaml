@@ -3,49 +3,52 @@ name: "ReleaseTest: Multiple tabs can be opened"
 tags:
     - releaseTest
 ---
-- launchApp:
-      clearState: true
-      stopApp: true
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                  clearState: true
+                  stopApp: true
 
-- runFlow: ../shared/onboarding.yaml
+            - runFlow: ../shared/onboarding.yaml
 
-- tapOn:
-    text: "search or type URL"
-- inputText: "https://privacy-test-pages.site"
-- pressKey: Enter
-- assertVisible:
-    text: ".*keep browsing.*"
-- tapOn:
-    text: "got it"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/tabCount"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
-- tapOn: "New Tab"
-- assertVisible:
-    text: "Search or type URL"
-- inputText: "https://www.search-company.site"
-- pressKey: Enter
-- assertVisible:
-    text: "Search engine"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/tabCount"
-- assertVisible:
-    text: "Ad Click Flow"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
-- tapOn:
-    text: "Privacy Test Pages - Home"
-- assertNotVisible:
-    text: "Ad Click Flow"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/tabCount"
-- assertVisible:
-    text: "Ad Click Flow"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/close"
-    rightOf: "Ad Click Flow"
-- assertNotVisible:
-    text: "Ad Click Flow"
+            - tapOn:
+                text: "search or type URL"
+            - inputText: "https://privacy-test-pages.site"
+            - pressKey: Enter
+            - assertVisible:
+                text: ".*keep browsing.*"
+            - tapOn:
+                text: "got it"
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - assertVisible:
+                text: "Privacy Test Pages - Home"
+            - tapOn: "New Tab"
+            - assertVisible:
+                text: "Search or type URL"
+            - inputText: "https://www.search-company.site"
+            - pressKey: Enter
+            - assertVisible:
+                text: "Search engine"
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - assertVisible:
+                text: "Ad Click Flow"
+            - assertVisible:
+                text: "Privacy Test Pages - Home"
+            - tapOn:
+                text: "Privacy Test Pages - Home"
+            - assertNotVisible:
+                text: "Ad Click Flow"
+            - assertVisible:
+                text: "Privacy Test Pages - Home"
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - assertVisible:
+                text: "Ad Click Flow"
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/close"
+                rightOf: "Ad Click Flow"
+            - assertNotVisible:
+                text: "Ad Click Flow"
