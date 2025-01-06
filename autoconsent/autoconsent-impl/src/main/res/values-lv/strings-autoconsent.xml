@@ -19,6 +19,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
     <string name="autoconsentDescription"><![CDATA[Ja DuckDuckGo tevis apmeklētajās vietnēs atklāj sīkfailu piekrišanas uznirstošos logus, mēs varam automātiski iestatīt tavas sīkfailu preferences, lai samazinātu sīkfailus un uzlabotu privātumu, un pēc tam aizvērt šos uznirstošos logus. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
+    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo centīsies atlasīt visprivātākos pieejamos iestatījumus un paslēpt uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
 </resources>

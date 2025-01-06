@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Odísť z nastavení</string>
 
     <string name="autofillManagementScreenTitle">Heslá</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Heslá a automatické dopĺňanie</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne heslá</string>
     <string name="credentialManagementAutofillToggleLabel">Ukladať a automaticky dopĺňať heslá</string>
     <string name="credentialManagementAutofillSubtitle">Heslá sú zašifrované. Nikto okrem vás ich nemôže vidieť, dokonca ani my. <annotation type="learn_more_link">Zistiť viac</annotation></string>

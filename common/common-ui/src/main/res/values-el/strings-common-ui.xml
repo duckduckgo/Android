@@ -34,7 +34,7 @@
     <string name="cancel">Ακύρωση</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Πάντα σε λειτουργία</string>
+    <string name="on">Ενεργό</string>
+    <string name="off">Κλειστό</string>
 </resources>

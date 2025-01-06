@@ -19,6 +19,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Evästeiden ponnahdusikkuna -suojaus</string>
     <string name="autoconsentDescription"><![CDATA[Kun DuckDuckGo havaitsee evästeiden ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat. <u><a href=\"\">Lue lisää</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
+    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo yrittää valita valittavissa olevista asetuksista yksityisimmät ja piilottaa nämä ponnahdusikkunat puolestasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="autoconsentToggle">Anna DuckDuckGo hoitaa evästeiden ponnahdusikkunat</string>
 </resources>

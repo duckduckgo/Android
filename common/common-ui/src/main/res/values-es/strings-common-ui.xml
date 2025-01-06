@@ -34,7 +34,7 @@
     <string name="cancel">Cancelar</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Siempre activado</string>
+    <string name="on">Activado</string>
+    <string name="off">Desactivado</string>
 </resources>

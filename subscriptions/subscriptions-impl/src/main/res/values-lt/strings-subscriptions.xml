@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Pašalinti iš šio įrenginio</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Pagalba ir palaikymas</string>
     <string name="subscriptionSettingSendFeedback">Siųsti atsiliepimą</string>
+    <string name="subscriptionSettingActivating">Aktyvavimas</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viskas paruošta.</string>

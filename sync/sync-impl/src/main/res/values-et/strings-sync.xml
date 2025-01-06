@@ -36,7 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Sünkrooni järjehoidjaid ja paroole turvaliselt oma seadmete vahel.</string>
     <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse krüpteerimisvõtmele ligi.</string>
     <string name="sync_setup_single_device_title">Ühe seadme seadistamine</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
+    <string name="sync_setup_other_options_title">Muud valikud</string>
     <string name="sync_setup_single_recover_data_cta_title">Taasta sünkroonitud andmed</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Selle seadme sünkroonimine ja varundamine</string>
 

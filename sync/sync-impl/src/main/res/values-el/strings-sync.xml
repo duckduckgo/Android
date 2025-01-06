@@ -36,7 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Συγχρονίστε με ασφάλεια σελιδοδείκτες και κωδικούς πρόσβασης μεταξύ των συσκευών σας.</string>
     <string name="sync_off_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί κρυπτογράφησης.</string>
     <string name="sync_setup_single_device_title">Εγκατάσταση μίας συσκευής</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
+    <string name="sync_setup_other_options_title">Άλλες επιλογές</string>
     <string name="sync_setup_single_recover_data_cta_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
 
