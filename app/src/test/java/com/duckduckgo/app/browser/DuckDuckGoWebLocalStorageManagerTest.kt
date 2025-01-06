@@ -69,16 +69,16 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearLocalStorageThenIteratorSeeksToFirst() {
+    fun whenClearWebLocalStorageThenIteratorSeeksToFirst() {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockIterator).seekToFirst()
     }
 
     @Test
-    fun whenClearLocalStorageThenDeletesNonAllowedKeys() {
+    fun whenClearWebLocalStorageThenDeletesNonAllowedKeys() {
         val key1 = bytes("_https://example.com\u0000\u0001key1")
         val key2 = bytes("_https://duckduckgo.com\u0000\u0001key2")
         val entry1 = createMockDBEntry(key1)
@@ -88,14 +88,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockDB).delete(key1)
         verify(mockDB, never()).delete(key2)
     }
 
     @Test
-    fun whenClearLocalStorageThenDoesNotDeleteKeysWithValidSubdomains() {
+    fun whenClearWebLocalStorageThenDoesNotDeleteKeysWithValidSubdomains() {
         val key1 = bytes("_https://subdomain.duckduckgo.com\u0000\u0001key1")
         val key2 = bytes("_https://another.subdomain.duckduckgo.com\u0000\u0001key2")
 
@@ -106,14 +106,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockDB, never()).delete(key1)
         verify(mockDB, never()).delete(key2)
     }
 
     @Test
-    fun whenClearLocalStorageThenDeletesKeysWithPartialDomainMatch() {
+    fun whenClearWebLocalStorageThenDeletesKeysWithPartialDomainMatch() {
         val key1 = bytes("_https://notduckduckgo.com\u0000\u0001key1")
         val key2 = bytes("_https://duckduckgo.something.com\u0000\u0001key2")
 
@@ -124,14 +124,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockDB).delete(key1)
         verify(mockDB).delete(key2)
     }
 
     @Test
-    fun whenClearLocalStorageThenDeletesKeysWithInvalidFormat() {
+    fun whenClearWebLocalStorageThenDeletesKeysWithInvalidFormat() {
         val key1 = bytes("malformed-key")
         val key2 = bytes("_https://duckduckgo.com")
         val key3 = bytes("_https://duckduckgo.com\u0000\u0001")
@@ -144,7 +144,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         whenever(mockIterator.hasNext()).thenReturn(true, true, true, false)
         whenever(mockIterator.next()).thenReturn(entry1, entry2, entry3)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockDB).delete(key1)
         verify(mockDB).delete(key2)
@@ -152,11 +152,11 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearLocalStorageThenDBIsClosed() {
+    fun whenClearWebLocalStorageThenDBIsClosed() {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
         whenever(mockIterator.hasNext()).thenReturn(false)
 
-        testee.clearLocalStorage()
+        testee.clearWebLocalStorage()
 
         verify(mockDB).close()
     }

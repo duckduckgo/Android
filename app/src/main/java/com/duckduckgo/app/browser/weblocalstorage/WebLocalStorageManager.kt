@@ -35,7 +35,7 @@ import org.iq80.leveldb.impl.Iq80DBFactory.factory
 import timber.log.Timber
 
 interface WebLocalStorageManager {
-    fun clearLocalStorage()
+    fun clearWebLocalStorage()
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,15 +48,15 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var domains = emptyList<String>()
     private var matchingRegex = emptyList<String>()
 
-    override fun clearLocalStorage() = runBlocking {
+    override fun clearWebLocalStorage() = runBlocking {
         val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-        val localStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
+        val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-        domains = localStorageSettings.domains.list
-        matchingRegex = localStorageSettings.matchingRegex.list
+        domains = webLocalStorageSettings.domains.list
+        matchingRegex = webLocalStorageSettings.matchingRegex.list
 
-        Timber.d("LocalStorageManager: Allowed domains: $domains")
-        Timber.d("LocalStorageManager: Matching regex: $matchingRegex")
+        Timber.d("WebLocalStorageManager: Allowed domains: $domains")
+        Timber.d("WebLocalStorageManager: Matching regex: $matchingRegex")
 
         databaseProvider.get().use { db ->
             val iterator = db.iterator()
@@ -68,7 +68,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
                 if (!isAllowedKey(key)) {
                     db.delete(entry.key)
-                    Timber.d("LocalStorageManager: Deleted key: $key")
+                    Timber.d("WebLocalStorageManager: Deleted key: $key")
                 }
             }
         }
@@ -87,11 +87,11 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
 @Module
 @ContributesTo(AppScope::class)
-class LocalStorageManagerModule {
+class WebLocalStorageManagerModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideLocalStorageManagerDB(context: Context): DB {
+    fun provideWebLocalStorageManagerDB(context: Context): DB {
         val options = Options().apply { createIfMissing(false) }
         return factory.open(
             File(context.applicationInfo.dataDir, "app_webview/Default/Local Storage/leveldb"),

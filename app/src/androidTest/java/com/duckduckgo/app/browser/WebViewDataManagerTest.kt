@@ -101,7 +101,7 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage)
-            verify(webLocalStorageManager).clearLocalStorage()
+            verify(webLocalStorageManager).clearWebLocalStorage()
             verify(mockStorage, never()).deleteAllData()
         }
     }
@@ -111,9 +111,9 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val exception = RuntimeException("test")
             val webView = TestWebView(context)
-            whenever(webLocalStorageManager.clearLocalStorage()).thenThrow(exception)
+            whenever(webLocalStorageManager.clearWebLocalStorage()).thenThrow(exception)
             testee.clearData(webView, mockStorage)
-            verify(webLocalStorageManager).clearLocalStorage()
+            verify(webLocalStorageManager).clearWebLocalStorage()
             verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
             verify(mockStorage).deleteAllData()
         }
