@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Botão de proteção</string>
     <string name="settingsDataClearing">Limpeza de Dados</string>
     <string name="settingsAddressBarPosition">Define a Posição da Barra de Endereços</string>
-    <string name="settingsEnableVoiceSearch">Ativar Pesquisa por Voz</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo Noutras Plataformas</string>
 
     <!-- Private Search -->

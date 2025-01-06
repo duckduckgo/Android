@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarensning</string>
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
-    <string name="settingsEnableVoiceSearch">Aktivera röstsökning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andra plattformar</string>
 
     <!-- Private Search -->

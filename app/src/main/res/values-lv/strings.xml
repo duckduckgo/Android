@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datu notīrīšana</string>
     <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
-    <string name="settingsEnableVoiceSearch">Iespējot balss meklēšanu</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo citās platformās</string>
 
     <!-- Private Search -->

@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
-    <string name="settingsEnableVoiceSearch">Activez la recherche vocale</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo sur d\'autres plateformes</string>
 
     <!-- Private Search -->

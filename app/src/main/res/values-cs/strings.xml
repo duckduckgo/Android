@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Vymazání dat</string>
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
-    <string name="settingsEnableVoiceSearch">Povolit hlasové vyhledávání</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na jiných platformách</string>
 
     <!-- Private Search -->

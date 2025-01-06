@@ -164,7 +164,6 @@
     <string name="settingsFireButton">Gumb Fire Button</string>
     <string name="settingsDataClearing">Počiščenje podatkov</string>
     <string name="settingsAddressBarPosition">Nastavitev položaja naslovne vrstice</string>
-    <string name="settingsEnableVoiceSearch">Omogočanje glasovnega iskanja</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugih platformah</string>
 
     <!-- Private Search -->

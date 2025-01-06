@@ -164,7 +164,7 @@
     <string name="settingsDataClearing">Data Clearing</string>
     <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
-    <string name="settingsEnableVoiceSearch">Enable Voice Search</string>
+    <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
 
     <!-- Private Search -->
