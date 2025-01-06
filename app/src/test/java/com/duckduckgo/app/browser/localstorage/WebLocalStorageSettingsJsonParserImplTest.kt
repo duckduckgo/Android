@@ -23,12 +23,12 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
-class LocalStorageSettingsJsonParserImplTest {
+class WebLocalStorageSettingsJsonParserImplTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val testee = LocalStorageSettingsJsonParserImpl(coroutineTestRule.testDispatcherProvider)
+    private val testee = WebLocalStorageSettingsJsonParserImpl(coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenGibberishInputThenReturnEmptyDomainsAndRegex() = runTest {
@@ -77,7 +77,7 @@ class LocalStorageSettingsJsonParserImplTest {
 
     private fun String.loadJsonFile(): String {
         return FileUtilities.loadText(
-            LocalStorageSettingsJsonParserImplTest::class.java.classLoader!!,
+            WebLocalStorageSettingsJsonParserImplTest::class.java.classLoader!!,
             "json/$this.json",
         )
     }

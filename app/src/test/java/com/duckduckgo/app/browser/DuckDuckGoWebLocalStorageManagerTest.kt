@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.localstorage.Domains
 import com.duckduckgo.app.browser.localstorage.DuckDuckGoWebLocalStorageManager
-import com.duckduckgo.app.browser.localstorage.LocalStorageSettings
-import com.duckduckgo.app.browser.localstorage.LocalStorageSettingsJsonParser
+import com.duckduckgo.app.browser.localstorage.WebLocalStorageSettings
+import com.duckduckgo.app.browser.localstorage.WebLocalStorageSettingsJsonParser
 import com.duckduckgo.app.browser.localstorage.MatchingRegex
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -40,11 +40,11 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockDB: DB = mock()
     private val mockIterator: DBIterator = mock()
     private val mockDatabaseProvider: Provider<DB> = mock()
-    private val mockLocalStorageSettingsJsonParser: LocalStorageSettingsJsonParser = mock()
+    private val mockWebLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockToggle: Toggle = mock()
 
-    private val testee = DuckDuckGoWebLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockLocalStorageSettingsJsonParser)
+    private val testee = DuckDuckGoWebLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockWebLocalStorageSettingsJsonParser)
 
     @Before
     fun setup() = runTest {
@@ -60,8 +60,8 @@ class DuckDuckGoWebLocalStorageManagerTest {
                 "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
             ),
         )
-        val localStorageSettings = LocalStorageSettings(domains = domains, matchingRegex = matchingRegex)
-        whenever(mockLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(localStorageSettings)
+        val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, matchingRegex = matchingRegex)
+        whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
     }
 
     @Test

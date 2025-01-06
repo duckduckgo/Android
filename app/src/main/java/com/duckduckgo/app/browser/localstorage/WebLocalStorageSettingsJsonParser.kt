@@ -28,19 +28,19 @@ import kotlinx.coroutines.withContext
 data class Domains(val list: List<String> = emptyList())
 data class MatchingRegex(val list: List<String> = emptyList())
 
-data class LocalStorageSettings(
+data class WebLocalStorageSettings(
     val domains: Domains = Domains(),
     val matchingRegex: MatchingRegex = MatchingRegex(),
 )
 
-interface LocalStorageSettingsJsonParser {
-    suspend fun parseJson(json: String?): LocalStorageSettings
+interface WebLocalStorageSettingsJsonParser {
+    suspend fun parseJson(json: String?): WebLocalStorageSettings
 }
 
 @ContributesBinding(AppScope::class)
-class LocalStorageSettingsJsonParserImpl @Inject constructor(
+class WebLocalStorageSettingsJsonParserImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-) : LocalStorageSettingsJsonParser {
+) : WebLocalStorageSettingsJsonParser {
 
     private val jsonAdapter by lazy { buildJsonAdapter() }
 
@@ -49,15 +49,15 @@ class LocalStorageSettingsJsonParserImpl @Inject constructor(
         return moshi.adapter(SettingsJson::class.java)
     }
 
-    override suspend fun parseJson(json: String?): LocalStorageSettings = withContext(dispatcherProvider.io()) {
-        if (json == null) return@withContext LocalStorageSettings(Domains(), MatchingRegex())
+    override suspend fun parseJson(json: String?): WebLocalStorageSettings = withContext(dispatcherProvider.io()) {
+        if (json == null) return@withContext WebLocalStorageSettings(Domains(), MatchingRegex())
 
         kotlin.runCatching {
             val parsed = jsonAdapter.fromJson(json)
             val domains = parsed?.asDomains() ?: Domains()
             val matchingRegex = parsed?.asMatchingRegex() ?: MatchingRegex()
-            LocalStorageSettings(domains, matchingRegex)
-        }.getOrDefault(LocalStorageSettings(Domains(), MatchingRegex()))
+            WebLocalStorageSettings(domains, matchingRegex)
+        }.getOrDefault(WebLocalStorageSettings(Domains(), MatchingRegex()))
     }
 
     private fun SettingsJson.asDomains(): Domains {

@@ -42,7 +42,7 @@ interface WebLocalStorageManager {
 class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val databaseProvider: Provider<DB>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val localStorageSettingsJsonParser: LocalStorageSettingsJsonParser,
+    private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -50,7 +50,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 
     override fun clearLocalStorage() = runBlocking {
         val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-        val localStorageSettings = localStorageSettingsJsonParser.parseJson(settings)
+        val localStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
         domains = localStorageSettings.domains.list
         matchingRegex = localStorageSettings.matchingRegex.list
