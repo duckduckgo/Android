@@ -23,7 +23,7 @@ import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.localstorage.LocalStorageManager
+import com.duckduckgo.app.browser.localstorage.WebLocalStorageManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -52,7 +52,7 @@ class WebViewDataManagerTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockFileDeleter: FileDeleter = mock()
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
-    private val localStorageManager: LocalStorageManager = mock()
+    private val webLocalStorageManager: WebLocalStorageManager = mock()
     private val mockCrashLogger: CrashLogger = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
@@ -63,7 +63,7 @@ class WebViewDataManagerTest {
         mockFileDeleter,
         mockWebViewHttpAuthStore,
         feature,
-        localStorageManager,
+        webLocalStorageManager,
         mockCrashLogger,
         TestScope(),
         CoroutineTestRule().testDispatcherProvider,
@@ -101,7 +101,7 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage)
-            verify(localStorageManager).clearLocalStorage()
+            verify(webLocalStorageManager).clearLocalStorage()
             verify(mockStorage, never()).deleteAllData()
         }
     }
@@ -111,9 +111,9 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val exception = RuntimeException("test")
             val webView = TestWebView(context)
-            whenever(localStorageManager.clearLocalStorage()).thenThrow(exception)
+            whenever(webLocalStorageManager.clearLocalStorage()).thenThrow(exception)
             testee.clearData(webView, mockStorage)
-            verify(localStorageManager).clearLocalStorage()
+            verify(webLocalStorageManager).clearLocalStorage()
             verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
             verify(mockStorage).deleteAllData()
         }

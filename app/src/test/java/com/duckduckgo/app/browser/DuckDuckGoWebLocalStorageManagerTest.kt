@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.localstorage.Domains
-import com.duckduckgo.app.browser.localstorage.DuckDuckGoLocalStorageManager
+import com.duckduckgo.app.browser.localstorage.DuckDuckGoWebLocalStorageManager
 import com.duckduckgo.app.browser.localstorage.LocalStorageSettings
 import com.duckduckgo.app.browser.localstorage.LocalStorageSettingsJsonParser
 import com.duckduckgo.app.browser.localstorage.MatchingRegex
@@ -35,7 +35,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class DuckDuckGoLocalStorageManagerTest {
+class DuckDuckGoWebLocalStorageManagerTest {
 
     private val mockDB: DB = mock()
     private val mockIterator: DBIterator = mock()
@@ -44,7 +44,7 @@ class DuckDuckGoLocalStorageManagerTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockToggle: Toggle = mock()
 
-    private val testee = DuckDuckGoLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockLocalStorageSettingsJsonParser)
+    private val testee = DuckDuckGoWebLocalStorageManager(mockDatabaseProvider, mockAndroidBrowserConfigFeature, mockLocalStorageSettingsJsonParser)
 
     @Before
     fun setup() = runTest {

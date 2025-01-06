@@ -34,16 +34,16 @@ import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
 import timber.log.Timber
 
-interface LocalStorageManager {
+interface WebLocalStorageManager {
     fun clearLocalStorage()
 }
 
 @ContributesBinding(AppScope::class)
-class DuckDuckGoLocalStorageManager @Inject constructor(
+class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val databaseProvider: Provider<DB>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val localStorageSettingsJsonParser: LocalStorageSettingsJsonParser,
-) : LocalStorageManager {
+) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
     private var matchingRegex = emptyList<String>()

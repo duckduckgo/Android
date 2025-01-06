@@ -21,7 +21,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.localstorage.LocalStorageManager
+import com.duckduckgo.app.browser.localstorage.WebLocalStorageManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
@@ -57,7 +57,7 @@ class WebViewDataManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val localStorageManager: LocalStorageManager,
+    private val webLocalStorageManager: WebLocalStorageManager,
     private val crashLogger: CrashLogger,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -87,7 +87,7 @@ class WebViewDataManager @Inject constructor(
     private suspend fun clearWebStorage(webStorage: WebStorage) {
         suspendCoroutine { continuation ->
             kotlin.runCatching {
-                localStorageManager.clearLocalStorage()
+                webLocalStorageManager.clearLocalStorage()
                 continuation.resume(Unit)
             }.onFailure { e ->
                 Timber.e(e, "WebDataManager: Could not selectively clear web storage")
