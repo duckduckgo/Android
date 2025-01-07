@@ -23,7 +23,7 @@
 
     <include
         android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar"/>
+        layout="@layout/include_default_toolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -39,7 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/keyline_5">
+                android:paddingBottom="@dimen/keyline_5"
+                tools:visibility="gone">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/legacyDuckPlayerDisabledSection"
@@ -134,6 +135,132 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/duck_player_open_in_a_new_tab_setting"
+                    app:showSwitch="true" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/duckPlayerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/keyline_5"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/duckPlayerDisabledSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    app:cardCornerRadius="@dimen/keyline_3">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/keyline_3"
+                        android:layout_marginHorizontal="@dimen/keyline_4"
+                        android:layout_marginTop="@dimen/keyline_4"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/youtubeDisabledIcon"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:layout_gravity="center"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/youtube_warning_96" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/keyline_2"
+                            android:gravity="center"
+                            android:text="@string/duck_player_unavailable"
+                            app:typography="h3" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/keyline_1"
+                            android:gravity="center"
+                            android:text="@string/duck_player_settings_unavailable_description"
+                            app:textType="secondary"
+                            app:typography="body2" />
+
+                        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                            android:id="@+id/duckPlayerDisabledLearnMoreButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/keyline_3"
+                            android:text="@string/duck_player_unavailable_learn_more" />
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                    android:id="@+id/duckPlayerSettingsIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/clean_tube_128" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckPlayerSettingsTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:gravity="center"
+                    android:text="@string/duck_player_settings_activity_title"
+                    app:typography="h2" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckPlayerSettingsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:gravity="center"
+                    android:text="@string/duck_player_settings_activity_description"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/duckPlayerModeSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    app:primaryText="@string/duck_player_open_videos_setting" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1" />
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    app:primaryText="@string/duck_player_settings_video_preferences_header" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/openDuckPlayerInNewTabToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    app:primaryText="@string/duck_player_open_in_a_new_tab_setting_when_possible"
                     app:showSwitch="true" />
 
             </LinearLayout>
