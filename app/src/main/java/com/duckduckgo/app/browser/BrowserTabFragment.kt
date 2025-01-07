@@ -299,11 +299,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -317,6 +312,11 @@ import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -775,8 +775,6 @@ class BrowserTabFragment :
     private val jsOrientationHandler = JsOrientationHandler()
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
-
-    private fun requireBrowserActivity(): BrowserActivity = requireNotNull(browserActivity)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
