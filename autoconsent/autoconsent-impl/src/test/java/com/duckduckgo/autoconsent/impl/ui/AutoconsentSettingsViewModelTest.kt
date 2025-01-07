@@ -18,11 +18,22 @@ package com.duckduckgo.autoconsent.impl.ui
 
 import android.webkit.WebView
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.settings.api.NewSettingsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,11 +43,31 @@ class AutoconsentSettingsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val autoconsent: Autoconsent = FakeAutoconsent()
+    private val pixel: FakePixel = FakePixel()
+    private val newSettingsFeature: FakeNewSettingsFeature = FakeNewSettingsFeature()
 
-    private val viewModel = AutoconsentSettingsViewModel(autoconsent)
+    private lateinit var viewModel: AutoconsentSettingsViewModel
+
+    @Before
+    fun setup() {
+        newSettingsFeature.enabled = false
+        pixel.firedPixels.clear()
+    }
+
+    @Test
+    fun whenViewModelCreatedThenAutoConsentShownPixelFired() {
+        newSettingsFeature.enabled = true
+
+        initViewModel()
+
+        assertEquals(1, pixel.firedPixels.size)
+        assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_SHOWN.pixelName, pixel.firedPixels.first())
+    }
 
     @Test
     fun whenViewModelCreatedThenEmitViewState() = runTest {
+        initViewModel()
+
         viewModel.viewState.test {
             assertFalse(awaitItem().autoconsentEnabled)
             cancelAndIgnoreRemainingEvents()
@@ -45,6 +76,8 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnLearnMoreSelectedCalledThenLaunchLearnMoreWebPageCommandIsSent() = runTest {
+        initViewModel()
+
         viewModel.commands().test {
             viewModel.onLearnMoreSelected()
             assertEquals(AutoconsentSettingsViewModel.Command.LaunchLearnMoreWebPage(), awaitItem())
@@ -54,6 +87,8 @@ class AutoconsentSettingsViewModelTest {
 
     @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentEnabledIsTrue() = runTest {
+        initViewModel()
+
         viewModel.viewState.test {
             assertFalse(awaitItem().autoconsentEnabled)
             viewModel.onUserToggleAutoconsent(true)
@@ -64,7 +99,21 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
+    fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOnPixelIsFired() {
+        newSettingsFeature.enabled = true
+
+        initViewModel()
+
+        viewModel.onUserToggleAutoconsent(true)
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_ON.pixelName, pixel.firedPixels[1])
+    }
+
+    @Test
     fun whenOnUserToggleAutoconsentToFalseThenAutoconsentEnabledIsFalse() = runTest {
+        initViewModel()
+
         viewModel.viewState.test {
             viewModel.onUserToggleAutoconsent(false)
             assertFalse(awaitItem().autoconsentEnabled)
@@ -72,10 +121,29 @@ class AutoconsentSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOffPixelIsFired() {
+        newSettingsFeature.enabled = true
+
+        initViewModel()
+
+        viewModel.onUserToggleAutoconsent(false)
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_OFF.pixelName, pixel.firedPixels[1])
+    }
+
+    private fun initViewModel() {
+        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel, newSettingsFeature)
+    }
+
     internal class FakeAutoconsent : Autoconsent {
         var test: Boolean = false
 
-        override fun injectAutoconsent(webView: WebView, url: String) {
+        override fun injectAutoconsent(
+            webView: WebView,
+            url: String,
+        ) {
             // NO OP
         }
 
@@ -106,6 +174,77 @@ class AutoconsentSettingsViewModelTest {
 
         override fun firstPopUpHandled() {
             // NO OP
+        }
+    }
+
+    internal class FakePixel : Pixel {
+
+        val firedPixels = mutableListOf<String>()
+
+        override fun fire(
+            pixel: PixelName,
+            parameters: Map<String, String>,
+            encodedParameters: Map<String, String>,
+            type: PixelType,
+        ) {
+            firedPixels.add(pixel.pixelName)
+        }
+
+        override fun fire(
+            pixelName: String,
+            parameters: Map<String, String>,
+            encodedParameters: Map<String, String>,
+            type: PixelType,
+        ) {
+            firedPixels.add(pixelName)
+        }
+
+        override fun enqueueFire(
+            pixel: PixelName,
+            parameters: Map<String, String>,
+            encodedParameters: Map<String, String>,
+        ) {
+            firedPixels.add(pixel.pixelName)
+        }
+
+        override fun enqueueFire(
+            pixelName: String,
+            parameters: Map<String, String>,
+            encodedParameters: Map<String, String>,
+        ) {
+            firedPixels.add(pixelName)
+        }
+    }
+
+    internal class FakeNewSettingsFeature : NewSettingsFeature {
+
+        var enabled: Boolean = false
+
+        override fun self(): Toggle = object : Toggle {
+
+            override fun featureName(): FeatureName {
+                return FeatureName(null, "FakeNewSettingsFeature")
+            }
+
+            override fun isEnabled(cohort: CohortName): Boolean {
+                return enabled
+            }
+
+            override fun setRawStoredState(state: State) {
+                // NO OP
+            }
+
+            override fun getRawStoredState(): State? {
+                return null
+            }
+
+            override fun getSettings(): String? {
+                return null
+            }
+
+            override fun getCohort(): Cohort? {
+                return null
+            }
         }
     }
 }

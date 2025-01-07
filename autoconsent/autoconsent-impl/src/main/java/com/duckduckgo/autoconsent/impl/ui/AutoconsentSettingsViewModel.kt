@@ -20,9 +20,14 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_OFF
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_ON
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_SHOWN
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.NewSettingsFeature
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -33,7 +38,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: Autoconsent) : ViewModel() {
+class AutoconsentSettingsViewModel @Inject constructor(
+    private val autoconsent: Autoconsent,
+    private val pixel: Pixel,
+    private val newSettingsFeature: NewSettingsFeature,
+) : ViewModel() {
     data class ViewState(
         val autoconsentEnabled: Boolean,
     )
@@ -47,12 +56,27 @@ class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: 
         MutableStateFlow(ViewState(autoconsent.isSettingEnabled()))
     val viewState: StateFlow<ViewState> = viewStateFlow
 
+    init {
+        if (newSettingsFeature.self().isEnabled()) {
+            pixel.fire(SETTINGS_AUTOCONSENT_SHOWN)
+        }
+    }
+
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
     }
 
     fun onUserToggleAutoconsent(enabled: Boolean) {
         viewModelScope.launch {
+            if (newSettingsFeature.self().isEnabled()) {
+                pixel.fire(
+                    if (enabled) {
+                        SETTINGS_AUTOCONSENT_ON
+                    } else {
+                        SETTINGS_AUTOCONSENT_OFF
+                    },
+                )
+            }
             autoconsent.changeSetting(enabled)
             viewStateFlow.emit(ViewState(autoconsent.isSettingEnabled()))
         }
