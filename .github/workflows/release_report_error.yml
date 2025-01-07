@@ -29,7 +29,7 @@ jobs:
 
       - name: Send test message
         id: send-test-message
-        uses: duckduckgo/native-github-asana-sync@david/mattermost_action
+        uses: duckduckgo/native-github-asana-sync@v1.5
         with:
           mattermost-token: ${{ env.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ env.MM_TEAM_ID }}
