@@ -32,5 +32,5 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: 'david-mattermost-test'
-          mattermost-message: ":flight_departure:" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          mattermost-message: ${{env.emoji_start}} Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
