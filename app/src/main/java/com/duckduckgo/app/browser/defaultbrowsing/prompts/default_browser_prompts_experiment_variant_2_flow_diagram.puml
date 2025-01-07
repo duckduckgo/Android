@@ -5,7 +5,7 @@ note
 end note
 :App process resumed;
 if (Feature toggle enabled?) then (true)
-  if (Is in the Variant_2 cohort?) then (yes)
+  if (Is in the `variant_2` cohort?) then (yes)
     if (Has user converted already?) then (no)
       if (Is DDG the default browser app) then (no)
         switch (Number of message dialogs shown)
@@ -21,17 +21,12 @@ if (Feature toggle enabled?) then (true)
         case (1)
           if (App active use days since enrollment >= 20?) then (yes)
             :Show message dialog;
-          else (no)
-          endif
-        case (2)
-          if (App active use days since enrollment >= 40?) then (yes)
-            :Show message dialog;
             :Show overflow menu highlight;
             :Show overflow menu item;
           else (no)
           endif
-        case (3)
-          if (App active use days since enrollment >= 50?) then (yes)
+        case (2)
+          if (App active use days since enrollment >= 30?) then (yes)
             :Remove overflow menu highlight;
             :Remove overflow menu item;
           else (no)

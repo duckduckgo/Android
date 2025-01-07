@@ -64,6 +64,19 @@ class DefaultBrowserPromptsOverflowMenuState as "(data class) DefaultBrowserProm
   + highlightOverflowMenu: Boolean
 }
 
+enum AdditionalPromptsCohorts {
+  + CONTROL("control")
+  + VARIANT_1("variant_1")
+  + VARIANT_2("variant_2")
+  + VARIANT_3("variant_3")
+}
+
+interface DefaultBrowserPromptsFeatureToggles {
+  + additionalPrompts(): Toggle
+}
+
+DefaultBrowserPromptsFeatureToggles -> AdditionalPromptsCohorts : uses
+
 interface DefaultBrowserPromptsDataStore {
   + val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?>
   + val messageDialogOpenedCount: Flow<Int>
@@ -87,13 +100,14 @@ class DefaultBrowserPromptsDataStoreImpl {
 DefaultBrowserPromptsDataStore <|--- DefaultBrowserPromptsDataStoreImpl : implements
 
 class DefaultBrowserPromptsExperimentImpl {
-  - val appContext: Context
+  - val applicationContext: Context
   - val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
   - val defaultBrowserDetector: DefaultBrowserDetector
   - val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
   - val defaultBrowserSystemSettings: DefaultBrowserSystemSettings
   - val appDaysUsedRepository: AppDaysUsedRepository
   - val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore
+  - val pixelSender: PixelSender
 }
 
 MainProcessLifecycleObserver <|--- DefaultBrowserPromptsExperimentImpl : implements
@@ -102,7 +116,9 @@ DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : imple
 
 DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore --> DefaultBrowserPromptsDataStore : uses
 
-note left of DefaultBrowserPromptsExperimentImpl::appContext
+DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsFeatureToggles --> DefaultBrowserPromptsFeatureToggles : uses
+
+note left of DefaultBrowserPromptsExperimentImpl::applicationContext
   Used to create intents.
 end note
 
@@ -131,6 +147,10 @@ end note
 note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore
   Used to persist the stage of the experiment.
   Includes count of dialogs opened and overflow menu state.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::PixelSender
+  Used to send pixels defined in [[https://app.asana.com/0/1208671518894266/1208774988133227/f this Asana task]].
 end note
 
 component BrowserViewModel
