@@ -104,7 +104,7 @@ class BrowserViewModelTest {
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
 
         configureSkipUrlConversionInNewTabState(enabled = true)
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
 
         initTestee()
 
@@ -255,6 +255,8 @@ class BrowserViewModelTest {
 
     @Test
     fun whenOnBookmarksActivityResultCalledAndSiteAlreadyOpenedThenSwitchToTabCommandTriggered() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
         val bookmarkUrl = "https://www.example.com"
         val tab = TabEntity("123", url = bookmarkUrl)
 
@@ -268,6 +270,8 @@ class BrowserViewModelTest {
 
     @Test
     fun whenOnBookmarksActivityResultCalledAndSiteNotOpenedThenOpenInNewTabCommandTriggered() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
         val bookmarkUrl = "https://www.example.com"
         val tab = TabEntity("123", url = "https://cnn.com")
 
