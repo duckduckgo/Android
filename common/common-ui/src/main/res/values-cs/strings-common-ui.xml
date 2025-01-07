@@ -34,7 +34,7 @@
     <string name="cancel">Zrušit</string>
 
     <!--Status Indicator-->
-    <string name="alwaysOn" translatable="false">Always On</string>
-    <string name="on" translatable="false">On</string>
-    <string name="off" translatable="false">Off</string>
+    <string name="alwaysOn">Vždycky zapnuté</string>
+    <string name="on">Aktivní</string>
+    <string name="off">Vypnout</string>
 </resources>

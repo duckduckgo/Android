@@ -34,7 +34,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -60,9 +63,19 @@ class RealSubscriptionsTest {
     private val pixel: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
 
+    private val testSubscriptionOfferList = listOf(
+        SubscriptionOffer(
+            planId = "test",
+            offerId = null,
+            pricingPhases = emptyList(),
+            features = setOf(SubscriptionsConstants.NETP),
+        ),
+    )
+
     @Before
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel)
     }
 
@@ -104,36 +117,25 @@ class RealSubscriptionsTest {
     @Test
     fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "test",
-                yearlyFormattedPrice = "test",
-                yearlyPlanId = "test",
-                monthlyFormattedPrice = "test",
-                features = setOf(SubscriptionsConstants.NETP),
-            ),
-        )
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnFalseIfNotActiveOrWaiting() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
         assertFalse(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfWaiting() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(WAITING)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfActive() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
         assertTrue(subscriptions.isEligible())
     }
 
@@ -141,15 +143,7 @@ class RealSubscriptionsTest {
     fun whenIsEligibleIfNotEncryptionThenReturnTrueIfActive() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "test",
-                yearlyFormattedPrice = "test",
-                yearlyPlanId = "test",
-                monthlyFormattedPrice = "test",
-                features = setOf(SubscriptionsConstants.NETP),
-            ),
-        )
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         assertTrue(subscriptions.isEligible())
     }
 
@@ -157,29 +151,13 @@ class RealSubscriptionsTest {
     fun whenIsEligibleIfNotEncryptionAndNotActiveThenReturnFalse() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "test",
-                yearlyFormattedPrice = "test",
-                yearlyPlanId = "test",
-                monthlyFormattedPrice = "test",
-                features = setOf(SubscriptionsConstants.NETP),
-            ),
-        )
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         assertFalse(subscriptions.isEligible())
     }
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "test",
-                yearlyFormattedPrice = "test",
-                yearlyPlanId = "test",
-                monthlyFormattedPrice = "test",
-                features = setOf(SubscriptionsConstants.NETP),
-            ),
-        )
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
         assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
@@ -194,15 +172,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnTrue() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
-            SubscriptionOffer(
-                monthlyPlanId = "test",
-                yearlyFormattedPrice = "test",
-                yearlyPlanId = "test",
-                monthlyFormattedPrice = "test",
-                features = setOf(SubscriptionsConstants.NETP),
-            ),
-        )
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
         assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))

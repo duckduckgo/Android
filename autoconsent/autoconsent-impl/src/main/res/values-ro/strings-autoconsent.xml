@@ -19,6 +19,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="autoconsentTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
     <string name="autoconsentDescription"><![CDATA[Când DuckDuckGo detectează ferestre pop-up aferente modulelor cookie pe site-urile pe care le vizitezi, îți putem seta automat preferințele privind modulele cookie pentru a minimiza modulele cookie și a maximiza confidențialitatea și, apoi, pentru a închide ferestrele pop-up. <u><a href=\"\">Află mai multe</a><u/>]]></string>
-    <string name="autoconsentDescriptionNew" translatable="false"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
+    <string name="autoconsentDescriptionNew"><![CDATA[DuckDuckGo va încerca să selecteze cele mai private setări disponibile și să ascundă aceste ferestre pop-up pentru tine.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="autoconsentToggle">Lasă DuckDuckGo să se ocupe de ferestrele pop-up aferente modulelor cookie</string>
 </resources>

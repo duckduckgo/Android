@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Zaštita privatnosti</string>
+    <string name="settingsHeadingPrivacyProtections">Zaštita privatnosti</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodba</string>
     <string name="settingsHeadingAbout">O</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Zaštita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokiraj programe za praćenje e-pošte i sakrij svoju adresu</string>
     <string name="settingsHeadingMore">Više od DuckDuckGoa</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Sljedeći koraci</string>
+    <string name="settingsHeadingNextSteps">Sljedeći koraci</string>
     <string name="settingsLightTheme">Svijetla</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamna</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsHeadingSettings">Postavke</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Glavne postavke</string>
+    <string name="settingsHeadingMainSettings">Glavne postavke</string>
     <string name="settingsPermissionsSetting">Dozvole</string>
     <string name="settingsSyncSetting">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Brisanje podataka</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Dodajte widget na početni zaslon</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Postavi položaj adresne trake</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Omogući glasovno pretraživanje</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo na drugim platformama</string>
+    <string name="settingsDataClearing">Brisanje podataka</string>
+    <string name="settingsAddWidget">Dodajte widget na početni zaslon</string>
+    <string name="settingsAddressBarPosition">Postavi položaj adresne trake</string>
+    <string name="settingsEnableVoiceSearch">Omogući glasovno pretraživanje</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugim platformama</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatno pretraživanje</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu je omogućena</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo te nikad ne prati i nastojimo zaštititi tvoju privatnost što je više moguće. Neprestano održavamo i razvijamo slojeve zaštite kako bismo bili u toku s novim metodama praćenja i pružamo mnoge zaštite koje drugi preglednici ne nude prema zadanim postavkama. <u><a href=\"\">Saznaj više</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatski blokira skrivene alate za praćenje dok \"surfaš\" po internetu.\n<a href=\"\">Saznaj više</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Brisanje podataka</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatski obriši…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Automatsko brisanje podataka…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">O</string>
     <string name="aboutHeader">Dobrodošli na našu stranu!</string>
     <string name="aboutDescription">DuckDuckGo neovisna je tvrtka za privatnost na internetu osnovana 2008. godine namijenjena svakome tko je umoran od toga da ga prate na internetu i želi jednostavno rješenje za to. Mi smo dokaz da je prava zaštita privatnosti na internetu moguća bez kompromisa.\n\nPreglednik DuckDuckGo dolazi sa značajkama koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštite privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo je neovisna tvrtka za privatnost na internetu osnovana 2008. godine za sve koji su umorni od praćenja na internetu i žele jednostavno rješenje. Mi smo dokaz da možeš dobiti pravu zaštitu privatnosti na internetu, bez kompromisa.\n\nPreglednik DuckDuckGo sadrži značajke koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštita privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
     <string name="no_suggestions">Nema prijedloga</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Lozinke</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Lozinke i automatsko popunjavanje</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Lozinke i automatsko popunjavanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
 

@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Impostazioni</string>
     <string name="settingsMenuItemTitle">Impostazioni</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Protezioni della Privacy</string>
+    <string name="settingsHeadingPrivacyProtections">Protezioni della Privacy</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
     <string name="settingsHeadingCustomize">Personalizza</string>
     <string name="settingsHeadingAbout">Informazioni</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Protezione email</string>
     <string name="settingsEmailProtectionSubtitle">Blocca i sistemi di tracciamento delle email e nascondi il tuo indirizzo</string>
     <string name="settingsHeadingMore">Ulteriori informazioni su DuckDuckGo</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Passaggi successivi</string>
+    <string name="settingsHeadingNextSteps">Passaggi successivi</string>
     <string name="settingsLightTheme">Chiaro</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Scuro</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Impostazioni principali</string>
+    <string name="settingsHeadingMainSettings">Impostazioni principali</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Cancellazione dati</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Aggiungi widget alla schermata iniziale</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Imposta la posizione della barra degli indirizzi</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Abilita ricerca vocale</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo su altre piattaforme</string>
+    <string name="settingsDataClearing">Cancellazione dati</string>
+    <string name="settingsAddWidget">Aggiungi widget alla schermata iniziale</string>
+    <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
+    <string name="settingsEnableVoiceSearch">Abilita ricerca vocale</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo su altre piattaforme</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Ricerca privata</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionTitle">La protezione dal tracciamento Web è abilitata</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protezione pop-up dei cookie</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Cancellazione dati</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Autorizzazioni</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
 
     <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Cancellazione automatica dei dati…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nessuno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Schede</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">Informazioni</string>
     <string name="aboutHeader">Dax the Duck ti dà il benvenuto!</string>
     <string name="aboutDescription">Fondata nel 2008, DuckDuckGo è un\'azienda indipendente che tutela la privacy online per tutti coloro che sono stanchi di essere tracciati online e vogliono una soluzione semplice. Siamo la dimostrazione che si può garantire una vera protezione della privacy online senza compromessi.\n\nIl browser DuckDuckGo è ricco di funzioni essenziali come i segnalibri, le schede, le password e molto altro ancora, oltre a <annotation type="privacy_protection_link">numerose e potenti protezioni della privacy</annotation> che normalmente non vengono offerte dai browser più comuni. Stiamo parlando di uno straordinario set completo per la protezione della privacy, che aiuta a proteggere le attività online, dalla ricerca alla navigazione, alle e-mail e molto altro ancora.\n\nCon le nostre protezioni della privacy non è necessario conoscere particolari tecnici o dover affrontare configurazioni complesse. È sufficiente scegliere il browser DuckDuckGo su tutti i dispositivi personali per avere automaticamente garantita la privacy.\n\nPer saperne di più su come funzionano le protezioni della privacy di DuckDuckGo, è possibile consultare le nostre <annotation type="learn_more_link">pagine di aiuto</annotation></string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo è un\'azienda indipendente che tutela la privacy online fondata nel 2008 per tutti coloro che sono stanchi di essere tracciati online e vogliono una soluzione semplice. Puoi ottenere una vera protezione della privacy online senza compromessi.\n\nIl browser DuckDuckGo è ricco di funzioni essenziali come i segnalibri, le schede, le password e molto altro ancora, oltre a <annotation type="privacy_protection_link">numerose e potenti protezioni della privacy</annotation> che normalmente non vengono offerte dai browser più comuni. Stiamo parlando di uno straordinario set completo per la protezione della privacy, che aiuta a proteggere le attività online, dalla ricerca alla navigazione, alle e-mail e molto altro ancora.\n\nCon le nostre protezioni della privacy non è necessario conoscere particolari tecnici o affrontare configurazioni complesse. È sufficiente scegliere il browser DuckDuckGo su tutti i dispositivi personali per avere automaticamente garantita la privacy.\n\nPer saperne di più su come funzionano le protezioni della privacy di DuckDuckGo, è possibile consultare le nostre <annotation type="learn_more_link">pagine di aiuto</annotation></string>
     <string name="no_suggestions">Nessun suggerimento</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Password</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Password e compilazione automatica</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Password e compilazione automatica</string>
     <string name="autofillLoginSavedSnackbarMessage">Password salvata</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password aggiornata</string>
 

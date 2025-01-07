@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Wyjdź z konfiguracji</string>
 
     <string name="autofillManagementScreenTitle">Hasła</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Hasła i autouzupełnianie</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych haseł</string>
     <string name="credentialManagementAutofillToggleLabel">Zapisuj i automatycznie uzupełniaj hasła</string>
     <string name="credentialManagementAutofillSubtitle">Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>

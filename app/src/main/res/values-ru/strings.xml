@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Защита конфиденциальности</string>
+    <string name="settingsHeadingPrivacyProtections">Защита конфиденциальности</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
     <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
     <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Дальнейшие шаги</string>
+    <string name="settingsHeadingNextSteps">Дальнейшие шаги</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Основные настройки</string>
+    <string name="settingsHeadingMainSettings">Основные настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Очистка данных</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Добавьте виджет на домашний экран</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Настроить положение адресной строки</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Включить голосовой поиск</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo для других платформ</string>
+    <string name="settingsDataClearing">Очистка данных</string>
+    <string name="settingsAddWidget">Добавьте виджет на домашний экран</string>
+    <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
+    <string name="settingsEnableVoiceSearch">Включить голосовой поиск</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo для других платформ</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Включена защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Очистка данных</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
 
     <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Автоудаление данных...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">О нас</string>
     <string name="aboutHeader">Добро пожаловать на Утиную сторону!</string>
     <string name="aboutDescription">DuckDuckGo — основанная в 2008 году независимая компания, специализирующаяся на защите личных данных в Интернете. Мы предлагаем простое решение тем, кто хочет, чтобы за ними перестали следить онлайн. DuckDuckGo своим примером показывает, что защита конфиденциальности онлайн возможна без всяких компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли и многое другое, а также <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей . Такой исчерпывающий набор инструментов может скрыть от посторонних глаз всю сетевую активность, включая поиск, навигацию и почту.\n\nСредства защиты конфиденциальности не требуют от пользователей знания технических особенностей или понимания сложных настроек .Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность станет вашим режимом по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на страницах <annotation type="learn_more_link">справки</annotation>.</string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">DuckDuckGo — независимая компания, которая c 2008 года предоставляет услуги защиты личных данных в интернете. Мы предлагаем простое решение для тех, кому надоело отслеживание онлайн. Своим примером DuckDuckGo показывает, что защита конфиденциальности в Сети не требует компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли — плюс <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей. Наш всесторонний набор инструментов скроет от посторонних глаз всю вашу онлайн-активность, включая поиск, просмотр сайтов и чтение почты.\n\nСервисы DuckDuckGo не требуют особых технических познаний или работы со сложными настройками. Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность онлайн станет вашим спутником по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на наших <annotation type="learn_more_link">справочных страницах</annotation>.</string>
     <string name="no_suggestions">Нет предложений</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Пароли</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Пароли и автозаполнение</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автозаполнение</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
 

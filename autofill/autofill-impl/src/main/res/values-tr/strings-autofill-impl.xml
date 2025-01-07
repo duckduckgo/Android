@@ -120,7 +120,7 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kurulumdan Çık</string>
 
     <string name="autofillManagementScreenTitle">Şifreler</string>
-    <string name="autofillManagementScreenTitleNew" translatable="false">Passwords &amp; Autofill</string>
+    <string name="autofillManagementScreenTitleNew">Şifreler ve Otomatik Doldurma</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
     <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
     <string name="credentialManagementAutofillSubtitle">Parolalar şifrelenir. Onları sizden başka kimse göremez. Biz bile. <annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>

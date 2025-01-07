@@ -100,7 +100,7 @@ interface SubscriptionsManager {
     /**
      * Returns available purchase options retrieved from Play Store
      */
-    suspend fun getSubscriptionOffer(): SubscriptionOffer?
+    suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
     /**
      * Launches the purchase flow for a given plan id
@@ -309,6 +309,7 @@ class RealSubscriptionsManager @Inject constructor(
                             removeExpiredSubscriptionOnCancelledPurchase = false
                         }
                     }
+
                     else -> {
                         // NOOP
                     }
@@ -612,6 +613,7 @@ class RealSubscriptionsManager @Inject constructor(
                             RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
                         }
                     }
+
                     is StoreLoginResult.Failure -> {
                         RecoverSubscriptionResult.Failure("")
                     }
@@ -653,43 +655,48 @@ class RealSubscriptionsManager @Inject constructor(
         data class Failure(val message: String) : RecoverSubscriptionResult()
     }
 
-    override suspend fun getSubscriptionOffer(): SubscriptionOffer? =
+    private suspend fun activePlanIds(): List<String> =
+        if (isLaunchedRow()) {
+            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
+        } else {
+            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
+        }
+
+    override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
             .find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
             .orEmpty()
-            .associateBy { it.basePlanId }
+            .filter { activePlanIds().contains(it.basePlanId) }
             .let { availablePlans ->
-                when {
-                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
-                        availablePlans.getValue(MONTHLY_PLAN_US) to availablePlans.getValue(YEARLY_PLAN_US)
-                    }
-                    availablePlans.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) && isLaunchedRow() -> {
-                        availablePlans.getValue(MONTHLY_PLAN_ROW) to availablePlans.getValue(YEARLY_PLAN_ROW)
-                    }
-                    else -> null
-                }
-            }
-            ?.let { (monthlyOffer, yearlyOffer) ->
-                val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
-                    authRepository.getFeatures(monthlyOffer.basePlanId)
-                } else {
-                    when (monthlyOffer.basePlanId) {
-                        MONTHLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
-                        MONTHLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
-                        else -> throw IllegalStateException()
-                    }
-                }
+                availablePlans.map { offer ->
+                    val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
+                        PricingPhase(
+                            formattedPrice = phase.formattedPrice,
+                            billingPeriod = phase.billingPeriod,
 
-                if (features.isEmpty()) return@let null
+                        )
+                    }
 
-                SubscriptionOffer(
-                    monthlyPlanId = monthlyOffer.basePlanId,
-                    monthlyFormattedPrice = monthlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
-                    yearlyPlanId = yearlyOffer.basePlanId,
-                    yearlyFormattedPrice = yearlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
-                    features = features,
-                )
+                    val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
+                        authRepository.getFeatures(offer.basePlanId)
+                    } else {
+                        when (offer.basePlanId) {
+                            MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
+                            MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
+                            else -> throw IllegalStateException()
+                        }
+                    }
+
+                    if (features.isEmpty()) return@let emptyList()
+
+                    SubscriptionOffer(
+                        planId = offer.basePlanId,
+                        pricingPhases = pricingPhases,
+                        offerId = offer.offerId,
+                        features = features,
+                    )
+                }
             }
 
     override suspend fun purchase(
@@ -945,12 +952,25 @@ sealed class CurrentPurchase {
 }
 
 data class SubscriptionOffer(
-    val monthlyPlanId: String,
-    val monthlyFormattedPrice: String,
-    val yearlyPlanId: String,
-    val yearlyFormattedPrice: String,
+    val planId: String,
+    val offerId: String?,
+    val pricingPhases: List<PricingPhase>,
     val features: Set<String>,
 )
+
+data class PricingPhase(
+    val formattedPrice: String,
+    val billingPeriod: String,
+
+) {
+    internal fun getBillingPeriodInDays(): Int? =
+        when (billingPeriod) {
+            "P1W" -> 7
+            "P1M" -> 30
+            "P1Y" -> 365
+            else -> null
+        }
+}
 
 data class ValidatedTokenPair(
     val accessToken: String,

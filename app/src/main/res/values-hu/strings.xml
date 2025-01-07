@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingPrivacyProtections" tools:ignore="MissingTranslation">Adatvédelem</string>
+    <string name="settingsHeadingPrivacyProtections">Adatvédelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
@@ -135,7 +135,7 @@
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
     <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
-    <string name="settingsHeadingNextSteps" tools:ignore="MissingTranslation">Következő lépések</string>
+    <string name="settingsHeadingNextSteps">Következő lépések</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
@@ -158,15 +158,15 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsHeadingMainSettings" tools:ignore="MissingTranslation">Főbeállítások</string>
+    <string name="settingsHeadingMainSettings">Főbeállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
-    <string name="settingsDataClearing" tools:ignore="MissingTranslation">Adattörlés</string>
-    <string name="settingsAddWidget" tools:ignore="MissingTranslation">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
-    <string name="settingsAddressBarPosition" tools:ignore="MissingTranslation">Állítsd be a címsor elhelyezkedését</string>
-    <string name="settingsEnableVoiceSearch" tools:ignore="MissingTranslation">Beszédhangalapú keresés engedélyezése</string>
-    <string name="settingsDDGOnOtherPlatforms" tools:ignore="MissingTranslation">DuckDuckGo más platformokhoz</string>
+    <string name="settingsDataClearing">Adattörlés</string>
+    <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
+    <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
+    <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
+    <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
@@ -192,7 +192,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
     <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
-    <string name="webTrackingProtectionDescriptionNew" translatable="false"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
@@ -201,7 +201,7 @@
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tűz gomb</string>
-    <string name="dataClearingActivityTitle" translatable="false">Data Clearing</string>
+    <string name="dataClearingActivityTitle">Adattörlés</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
@@ -213,7 +213,7 @@
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
-    <string name="settingsAutomaticallyClearData" translatable="false">Automatically Clear Data…</string>
+    <string name="settingsAutomaticallyClearData">Adatok automatikus törlése…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
@@ -230,10 +230,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
-    <string name="aboutActivityTitleNew" translatable="false">About</string>
+    <string name="aboutActivityTitleNew">További információ</string>
     <string name="aboutHeader">Isten hozott a Kacsa oldalon!</string>
     <string name="aboutDescription">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
-    <string name="aboutDescriptionNew" translatable="false">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who\&apos;s tired of being tracked online and wants an easy solution. We\&apos;re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
+    <string name="aboutDescriptionNew">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
@@ -702,7 +702,7 @@
 
     <!-- Autofill -->
     <string name="settingsAutofillLoginsSetting">Jelszavak</string>
-    <string name="settingsPasswordsAndAutofillLoginsSetting" tools:ignore="MissingTranslation">Jelszavak és automatikus kitöltés</string>
+    <string name="settingsPasswordsAndAutofillLoginsSetting">Jelszavak és automatikus kitöltés</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
 

@@ -78,6 +78,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Verwijderen van dit apparaat</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
     <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
+    <string name="subscriptionSettingActivating">Bezig met activeren</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Je bent klaar.</string>

@@ -36,7 +36,7 @@
     <string name="sync_setup_with_another_device_cta_subtitle">Lesezeichen und Passwörter sicher zwischen deinen Geräten synchronisieren.</string>
     <string name="sync_off_hint">Deine Daten sind Ende-zu-Ende-verschlüsselt. DuckDuckGo hat keinen Zugriff auf den Verschlüsselungsschlüssel.</string>
     <string name="sync_setup_single_device_title">Einrichtung für ein einzelnes Gerät</string>
-    <string name="sync_setup_other_options_title" translatable="false">Other Options</string>
+    <string name="sync_setup_other_options_title">Andere Optionen</string>
     <string name="sync_setup_single_recover_data_cta_title">Synchronisierte Daten wiederherstellen</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Dieses Gerät synchronisieren und sichern</string>
 
