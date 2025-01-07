@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
 
 env:
-  MM_AUTH_TOKEN: ${{ secrets.MM_AUTH_TOKEN }}
-  MM_TEAM_ID: ${{ secrets.MM_TEAM_ID }}
   APP_VERSION: "5.220.0"
   emoji_start: ":flight_departure:" # 🛫 or ':soon:' 🔜
   emoji_info: ":information_source:" # ℹ️
@@ -31,8 +29,8 @@ jobs:
         id: send-test-message
         uses: duckduckgo/native-github-asana-sync@v1.5
         with:
-          mattermost-token: ${{ env.MM_AUTH_TOKEN }}
-          mattermost-team-id: ${{ env.MM_TEAM_ID }}
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: 'david-mattermost-test'
-          mattermost-message: ${{env.emoji_start}}'" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          mattermost-message: ":flight_departure:" Android Release ${{ env.APP_VERSION }} started by @${{ github.actor }}. https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
