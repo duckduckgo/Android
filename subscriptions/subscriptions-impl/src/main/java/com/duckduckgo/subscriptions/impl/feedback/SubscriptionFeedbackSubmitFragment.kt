@@ -27,8 +27,8 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
-import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
@@ -160,7 +160,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(context, com.duckduckgo.mobile.android.R.color.cornflowerBlue),
+                        context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue),
                     ),
                     spannableFullText.getSpanStart(it),
                     spannableFullText.getSpanEnd(it),
