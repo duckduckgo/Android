@@ -928,15 +928,8 @@ class BrowserTabFragment :
     private fun configureCustomTab() {
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
-                requireActivity(),
                 customTabToolbarColor,
                 viewModel.url?.extractDomain(),
-                onTabClosePressed = {
-                    onOmnibarCustomTabClosed()
-                },
-                onPrivacyShieldPressed = {
-                    onOmnibarCustomTabPrivacyDashboardPressed()
-                },
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
@@ -3723,7 +3716,7 @@ class BrowserTabFragment :
                     }
                 }
 
-                omnibar.renderBrowserViewState(viewState, tabDisplayedInCustomTabScreen)
+                omnibar.renderBrowserViewState(viewState)
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }

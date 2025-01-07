@@ -1541,22 +1541,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowDaxIcon(
-        currentUrl: String?,
-        showPrivacyShield: Boolean,
-    ): Boolean {
-        val url = currentUrl ?: return false
-        return showPrivacyShield && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
-    }
-
-    private fun shouldShowDuckPlayerIcon(
-        currentUrl: String?,
-        showPrivacyShield: Boolean,
-    ): Boolean {
-        val url = currentUrl ?: return false
-        return showPrivacyShield && duckPlayer.isDuckPlayerUri(url)
-    }
-
     private suspend fun updateLoadingStatePrivacy(domain: String) {
         val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {

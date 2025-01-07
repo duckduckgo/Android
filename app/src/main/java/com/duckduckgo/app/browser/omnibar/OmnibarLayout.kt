@@ -657,9 +657,6 @@ class OmnibarLayout @JvmOverloads constructor(
         )
     }
 
-    private fun onNewProgress(newProgress: Int) {
-    }
-
     private fun renderPrivacyShield(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,

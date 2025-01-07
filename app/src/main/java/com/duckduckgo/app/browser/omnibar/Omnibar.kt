@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
@@ -302,10 +301,7 @@ class Omnibar(
         return newOmnibar.isEditing
     }
 
-    fun renderBrowserViewState(
-        viewState: BrowserViewState,
-        tabDisplayedInCustomTabScreen: Boolean,
-    ) {
+    fun renderBrowserViewState(viewState: BrowserViewState) {
         newOmnibar.decorate(
             HighlightOmnibarItem(
                 fireButton = viewState.fireButton.isHighlighted(),
@@ -327,11 +323,8 @@ class Omnibar(
     }
 
     fun configureCustomTab(
-        context: Context,
         customTabToolbarColor: Int,
         customTabDomainText: String?,
-        onTabClosePressed: () -> Unit,
-        onPrivacyShieldPressed: () -> Unit,
     ) {
         newOmnibar.decorate(Mode(CustomTab(customTabToolbarColor, customTabDomainText)))
     }
