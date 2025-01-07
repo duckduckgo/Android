@@ -57,7 +57,7 @@
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@color/cornflowerBlue"
+            android:background="?daxColorAccentBlue"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title" />

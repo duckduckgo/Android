@@ -7484,17 +7484,6 @@
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="            android:background=&quot;@color/cornflowerBlue&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_user_survey.xml"
-            line="60"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="InvalidColorAttribute"
-        message="@colors are not allowed, used ?attr/daxColor instead"
         errorLine1="    tools:background=&quot;@color/white&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~">
         <location

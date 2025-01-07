@@ -23,5 +23,5 @@
       android:pathData="M36,36m-34,0a34,34 0,1 1,68 0a34,34 0,1 1,-68 0"
       android:strokeAlpha="1"
       android:strokeWidth="4"
-      android:strokeColor="@color/cornflowerBlue"/>
+      android:strokeColor="?daxColorAccentBlue"/>
 </vector>
