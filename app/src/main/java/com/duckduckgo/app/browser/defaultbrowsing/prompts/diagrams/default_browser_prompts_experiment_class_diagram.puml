@@ -101,6 +101,7 @@ class DefaultBrowserPromptsDataStoreImpl {
 DefaultBrowserPromptsDataStore <|--- DefaultBrowserPromptsDataStoreImpl : implements
 
 class DefaultBrowserPromptsExperimentImpl {
+  - val appCoroutineScope: CoroutineScope
   - val applicationContext: Context
   - val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles
   - val defaultBrowserDetector: DefaultBrowserDetector
@@ -118,6 +119,10 @@ DefaultBrowserPromptsExperiment <|-- DefaultBrowserPromptsExperimentImpl : imple
 DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore --> DefaultBrowserPromptsDataStore : uses
 
 DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsFeatureToggles --> DefaultBrowserPromptsFeatureToggles : uses
+
+note left of DefaultBrowserPromptsExperimentImpl::appCoroutineScope
+  Used to launch coroutines.
+end note
 
 note left of DefaultBrowserPromptsExperimentImpl::applicationContext
   Used to create intents.
