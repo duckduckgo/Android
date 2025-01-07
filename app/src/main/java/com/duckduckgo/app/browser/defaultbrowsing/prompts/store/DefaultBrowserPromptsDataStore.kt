@@ -18,46 +18,82 @@ package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-// import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-// interface DefaultBrowserPromptsDataStore {
-//     val showOverflowMenuDot: Flow<Boolean>
-    // val
+interface DefaultBrowserPromptsDataStore {
+    val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?>
+    val messageDialogOpenedCount: Flow<Int>
+    val alreadyConverted: Flow<Boolean>
 
-    // val data: Flow<TabSwitcherData>
+    suspend fun storeOverflowMenuState(state: DefaultBrowserPromptsOverflowMenuState?)
+    suspend fun storeMessageDialogOpenedCount(count: Int)
+    suspend fun convert()
+}
 
-    // suspend fun setUserState(userState: UserState)
-// }
+data class DefaultBrowserPromptsOverflowMenuState(
+    val activatedDate: String,
+    val highlightOverflowMenuIcon: Boolean,
+)
 
-// @ContributesBinding(AppScope::class)
-// class DefaultBrowserPromptsPrefsDataStore @Inject constructor(
-//     @DefaultBrowserPrompts private val store: DataStore<Preferences>,
-// ) : DefaultBrowserPromptsDataStore {
-//     companion object {
-//         const val KEY_USER_STATE = "KEY_USER_STATE"
-//         const val KEY_LAYOUT_TYPE = "KEY_LAYOUT_TYPE"
-//     }
+@ContributesBinding(AppScope::class)
+class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
+    @DefaultBrowserPrompts private val store: DataStore<Preferences>,
+) : DefaultBrowserPromptsDataStore {
+    companion object {
+        private const val PREF_KEY_MENU_STATE_ACTIVATED_DATE = "additional_default_browser_prompts_overflow_menu_activated_date"
+        private const val PREF_KEY_MENU_STATE_HIGHLIGHT_OVERFLOW_ICON = "additional_default_browser_prompts_overflow_menu_highlight_icon"
+        private const val PREF_KEY_DIALOG_OPENED_COUNT = "additional_default_browser_prompts_dialog_opened_count"
+        private const val PREF_KEY_ALREADY_CONVERTED = "additional_default_browser_prompts_already_converted"
+    }
 
-    // override val data: Flow<TabSwitcherData> = store.data.map { preferences ->
-    //     TabSwitcherData(
-    //         userState = UserState.valueOf(preferences[stringPreferencesKey(KEY_USER_STATE)] ?: UserState.UNKNOWN.name),
-    //         layoutType = LayoutType.valueOf(preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] ?: LayoutType.GRID.name),
-    //     )
-    // }
+    override val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?> = store.data.map { preferences ->
+        val activatedDate = preferences[stringPreferencesKey(PREF_KEY_MENU_STATE_ACTIVATED_DATE)] ?: return@map null
+        val highlightOverflowMenuIcon = preferences[booleanPreferencesKey(PREF_KEY_MENU_STATE_HIGHLIGHT_OVERFLOW_ICON)] ?: return@map null
 
-    // override suspend fun setUserState(userState: UserState) {
-    //     store.edit { preferences ->
-    //         preferences[stringPreferencesKey(KEY_USER_STATE)] = userState.name
-    //     }
-    // }
+        DefaultBrowserPromptsOverflowMenuState(
+            activatedDate = activatedDate,
+            highlightOverflowMenuIcon = highlightOverflowMenuIcon,
+        )
+    }
 
-    // override suspend fun setTabLayoutType(layoutType: LayoutType) {
-    //     store.edit { preferences ->
-    //         preferences[stringPreferencesKey(KEY_LAYOUT_TYPE)] = layoutType.name
-    //     }
-    // }
-// }
+    override val messageDialogOpenedCount: Flow<Int> = store.data.map { preferences ->
+        preferences[intPreferencesKey(PREF_KEY_DIALOG_OPENED_COUNT)] ?: 0
+    }
+
+    override val alreadyConverted: Flow<Boolean> = store.data.map { preferences ->
+        preferences[booleanPreferencesKey(PREF_KEY_ALREADY_CONVERTED)] ?: false
+    }
+
+    override suspend fun storeOverflowMenuState(state: DefaultBrowserPromptsOverflowMenuState?) {
+        store.edit { preferences ->
+            if (state != null) {
+                preferences[stringPreferencesKey(PREF_KEY_MENU_STATE_ACTIVATED_DATE)] = state.activatedDate
+                preferences[booleanPreferencesKey(PREF_KEY_MENU_STATE_HIGHLIGHT_OVERFLOW_ICON)] = state.highlightOverflowMenuIcon
+            } else {
+                preferences.remove(stringPreferencesKey(PREF_KEY_MENU_STATE_ACTIVATED_DATE))
+                preferences.remove(booleanPreferencesKey(PREF_KEY_MENU_STATE_HIGHLIGHT_OVERFLOW_ICON))
+            }
+        }
+    }
+
+    override suspend fun storeMessageDialogOpenedCount(count: Int) {
+        store.edit { preferences ->
+            preferences[intPreferencesKey(PREF_KEY_DIALOG_OPENED_COUNT)] = count
+        }
+    }
+
+    override suspend fun convert() {
+        store.edit { preferences ->
+            preferences[booleanPreferencesKey(PREF_KEY_ALREADY_CONVERTED)] = true
+        }
+    }
+}

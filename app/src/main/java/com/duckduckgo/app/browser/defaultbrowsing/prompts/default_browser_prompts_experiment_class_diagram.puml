@@ -80,15 +80,16 @@ DefaultBrowserPromptsFeatureToggles -> AdditionalPromptsCohorts : uses
 interface DefaultBrowserPromptsDataStore {
   + val overflowMenuState: Flow<DefaultBrowserPromptsOverflowMenuState?>
   + val messageDialogOpenedCount: Flow<Int>
-  + val alreadyConverted: Boolean
+  + val alreadyConverted: Flow<Boolean>
 
   + suspend fun storeOverflowMenuState(state: DefaultBrowserPromptsOverflowMenuState?)
   + suspend fun storeMessageDialogOpenedCount(count: Int)
+  + suspend fun convert()
 }
 
 note left of DefaultBrowserPromptsDataStore::alreadyConverted
   Notes if the user has already set the DDG browser as default while enrolled.
-  Prevents counting users that keep changing the default browser multiple time.
+  Prevents counting users that keep changing the default browser multiple times.
 end note
 
 DefaultBrowserPromptsDataStore::overflowMenuState -> DefaultBrowserPromptsOverflowMenuState : uses

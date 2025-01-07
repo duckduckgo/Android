@@ -16,7 +16,35 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
+import android.content.Intent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+
 interface DefaultBrowserPromptsExperiment {
 
-    sealed class Commands
+    val highlightOverflowMenu: StateFlow<Boolean>
+    val showOverflowMenuItem: StateFlow<Boolean>
+    val commands: Flow<Command>
+
+    fun onOverflowMenuOpened()
+    fun onOverflowMenuItemClicked()
+
+    fun onMessageDialogOpened()
+    fun onMessageDialogDismissed()
+    fun onMessageDialogSetBrowserButtonClicked()
+    fun onMessageDialogNotNowButtonClicked()
+
+    fun onSystemDefaultBrowserDialogOpened()
+    fun onSystemDefaultBrowserDialogSuccess()
+    fun onSystemDefaultBrowserDialogCanceled()
+
+    fun onSystemDefaultAppsActivityOpened()
+    fun onSystemDefaultAppsActivityClosed()
+
+    sealed class Command {
+        // todo consider making intent abstract param?
+        data class OpenMessageDialog(val intent: Intent) : Command()
+        data class OpenSystemDefaultBrowserDialog(val intent: Intent) : Command()
+        data class OpenSystemDefaultAppsActivity(val intent: Intent) : Command()
+    }
 }
