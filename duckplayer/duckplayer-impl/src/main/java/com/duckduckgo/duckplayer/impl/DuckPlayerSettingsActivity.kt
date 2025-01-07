@@ -58,7 +58,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        binding.duckPlayerSettingsText.addClickableLink(
+        binding.legacyDuckPlayerSettingsText.addClickableLink(
             annotation = "learn_more_link",
             textSequence = getText(R.string.duck_player_settings_activity_description),
             onClick = { viewModel.duckPlayerLearnMoreClicked() },
@@ -71,13 +71,13 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.duckPlayerModeSelector.setClickListener {
+        binding.legacyDuckPlayerModeSelector.setClickListener {
             viewModel.duckPlayerModeSelectorClicked()
         }
-        binding.duckPlayerDisabledLearnMoreButton.setOnClickListener {
+        binding.legacyDuckPlayerDisabledLearnMoreButton.setOnClickListener {
             viewModel.onContingencyLearnMoreClicked()
         }
-        binding.openDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
+        binding.legacyOpenDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onOpenDuckPlayerInNewTabToggled(isChecked)
         }
     }
@@ -154,20 +154,20 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState) {
             is ViewState.Enabled -> {
-                binding.duckPlayerModeSelector.isEnabled = true
-                binding.duckPlayerDisabledSection.isVisible = false
-                binding.openDuckPlayerInNewTabToggle.isVisible =
+                binding.legacyDuckPlayerModeSelector.isEnabled = true
+                binding.legacyDuckPlayerDisabledSection.isVisible = false
+                binding.legacyOpenDuckPlayerInNewTabToggle.isVisible =
                     viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
-                binding.openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
+                binding.legacyOpenDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
                 setDuckPlayerSectionVisibility(true)
             }
             is ViewState.DisabledWithHelpLink -> {
-                binding.duckPlayerModeSelector.isEnabled = false
-                binding.duckPlayerDisabledSection.isVisible = true
+                binding.legacyDuckPlayerModeSelector.isEnabled = false
+                binding.legacyDuckPlayerDisabledSection.isVisible = true
                 setDuckPlayerSectionVisibility(false)
             }
         }
-        binding.duckPlayerModeSelector.setSecondaryText(
+        binding.legacyDuckPlayerModeSelector.setSecondaryText(
             when (viewState.privatePlayerMode) {
                 Enabled -> getString(R.string.duck_player_mode_always)
                 Disabled -> getString(R.string.duck_player_mode_never)
@@ -177,8 +177,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setDuckPlayerSectionVisibility(isVisible: Boolean) {
-        binding.duckPlayerSettingsTitle.isVisible = isVisible
-        binding.duckPlayerSettingsIcon.isVisible = isVisible
-        binding.duckPlayerSettingsText.isVisible = isVisible
+        binding.legacyDuckPlayerSettingsTitle.isVisible = isVisible
+        binding.legacyDuckPlayerSettingsIcon.isVisible = isVisible
+        binding.legacyDuckPlayerSettingsText.isVisible = isVisible
     }
 }
