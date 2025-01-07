@@ -765,7 +765,7 @@ class OmnibarLayoutViewModelTest {
                     progress = 100,
                     url = SERP_URL,
                 ),
-            ) {},
+            ),
         )
 
         testee.viewState.test {
@@ -915,7 +915,7 @@ class OmnibarLayoutViewModelTest {
                     progress = 100,
                     url = loadedUrl,
                 ),
-            ) {},
+            ),
         )
     }
 

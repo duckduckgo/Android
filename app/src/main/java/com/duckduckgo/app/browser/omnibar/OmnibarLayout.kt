@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
@@ -52,6 +51,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.CancelAnimations
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
@@ -114,14 +114,12 @@ class OmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class Outline(val enabled: Boolean) : Decoration()
+        data class DisableVoiceSearch(val url: String) : Decoration()
     }
 
     sealed class StateChange {
         data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
-        data class LoadingStateChange(
-            val loadingViewState: LoadingViewState,
-            val onAnimationEnd: (Animator?) -> Unit,
-        ) : StateChange()
+        data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
     private val omnibarPosition: OmnibarPosition
@@ -207,6 +205,15 @@ class OmnibarLayout @JvmOverloads constructor(
         set(value) {
             if (isAttachedToWindow) {
                 viewModel.onOmnibarScrollingEnabledChanged(value)
+            }
+        }
+
+    val isEditing: Boolean
+        get() {
+            return if (isAttachedToWindow) {
+                viewModel.viewState.value.hasFocus
+            } else {
+                false
             }
         }
 
@@ -348,7 +355,7 @@ class OmnibarLayout @JvmOverloads constructor(
             if (isAttachedToWindow) {
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
-            omnibarItemPressedListener?.onFireButtonPressed(isPulseAnimationPlaying())
+            omnibarItemPressedListener?.onFireButtonPressed()
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
@@ -363,7 +370,9 @@ class OmnibarLayout @JvmOverloads constructor(
             if (isAttachedToWindow) {
                 viewModel.onClearTextButtonPressed()
             }
-            omnibarItemPressedListener?.onClearTextPressed()
+        }
+        voiceSearchButton.setOnClickListener {
+            omnibarItemPressedListener?.onVoiceSearchPressed()
         }
     }
 
@@ -470,6 +479,15 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarTextInput.setSelection(0)
         }
 
+        if (viewState.isLoading) {
+            pageLoadingIndicator.show()
+        }
+        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
+            if (!viewState.isLoading) {
+                pageLoadingIndicator.hide()
+            }
+        }
+
         isScrollingEnabled = viewState.scrollingEnabled
 
         renderTabIcon(viewState)
@@ -530,6 +548,10 @@ class OmnibarLayout @JvmOverloads constructor(
             is HighlightOmnibarItem -> {
                 viewModel.onHighlightItem(decoration)
             }
+
+            is DisableVoiceSearch -> {
+                viewModel.onVoiceSearchDisabled(decoration.url)
+            }
         }
     }
 
@@ -543,16 +565,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun reduceDeferred(stateChange: StateChange) {
-        when (stateChange) {
-            is StateChange.LoadingStateChange -> {
-                viewModel.onExternalStateChange(stateChange)
-                onNewProgress(stateChange.loadingViewState.progress, stateChange.onAnimationEnd)
-            }
-
-            else -> {
-                viewModel.onExternalStateChange(stateChange)
-            }
-        }
+        viewModel.onExternalStateChange(stateChange)
     }
 
     override fun setExpanded(expanded: Boolean) {
@@ -642,13 +655,6 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarViews = omnibarViews(),
             entities = events,
         )
-    }
-
-    private fun onNewProgress(
-        newProgress: Int,
-        onAnimationEnd: (Animator?) -> Unit,
-    ) {
-        smoothProgressAnimator.onNewProgress(newProgress, onAnimationEnd)
     }
 
     private fun renderPrivacyShield(
