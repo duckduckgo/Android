@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    android:background="@color/cornflowerDark"
+    android:background="@color/blue"
     tools:context="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
