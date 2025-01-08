@@ -54,7 +54,7 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        when(themingDataStore.theme){
+        when (themingDataStore.theme) {
             SYSTEM_DEFAULT -> {
                 val uiManager = getSystemService(requireContext(), UiModeManager::class.java)
                 when (uiManager?.nightMode) {
