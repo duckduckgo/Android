@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings">Основные настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>

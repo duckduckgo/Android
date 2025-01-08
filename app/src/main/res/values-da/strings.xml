@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
-    <string name="settingsHeadingMainSettings">Generelle indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>

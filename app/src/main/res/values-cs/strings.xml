@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
-    <string name="settingsHeadingMainSettings">Hlavní nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>

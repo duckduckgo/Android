@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
-    <string name="settingsHeadingMainSettings">Peamised seaded</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>

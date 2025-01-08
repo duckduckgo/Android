@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
-    <string name="settingsHeadingMainSettings">Haupteinstellungen</string>
     <string name="settingsPermissionsSetting">Berechtigungen</string>
     <string name="settingsSyncSetting">Synchronisieren und sichern</string>
     <string name="settingsFireButton">Fire Button</string>
