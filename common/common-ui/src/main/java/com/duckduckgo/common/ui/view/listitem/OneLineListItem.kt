@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Medium
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -107,6 +108,11 @@ class OneLineListItem @JvmOverloads constructor(
                 showSwitch -> showSwitch()
                 showTrailingIcon -> {
                     setTrailingIconDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon)!!)
+                    if (hasValue(R.styleable.OneLineListItem_trailingIconTint)) {
+                        val colorInt =
+                            getColor(R.styleable.OneLineListItem_trailingIconTint, context.getColorFromAttr(R.attr.daxColorPrimaryIcon))
+                        setTrailingIconTint(colorInt)
+                    }
                     showTrailingIcon()
                 }
                 else -> {
