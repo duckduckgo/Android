@@ -157,7 +157,7 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsHeadingMainSettings">Main Settings</string>
+    <string name="settingsHeadingMainSettings">Other Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>

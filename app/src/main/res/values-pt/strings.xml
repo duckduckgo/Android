@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
     <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
     <string name="settingsHeadingSettings">Definições</string>
-    <string name="settingsHeadingMainSettings">Definições Principais</string>
     <string name="settingsPermissionsSetting">Permissões</string>
     <string name="settingsSyncSetting">Sincronização e cópia de segurança</string>
     <string name="settingsFireButton">Botão de proteção</string>

@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
-    <string name="settingsHeadingMainSettings">Setări principale</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>

@@ -158,7 +158,6 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
-    <string name="settingsHeadingMainSettings">Ustawienia główne</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
