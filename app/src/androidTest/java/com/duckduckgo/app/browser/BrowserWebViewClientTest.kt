@@ -114,7 +114,7 @@ class BrowserWebViewClientTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: BrowserWebViewClient
-    private lateinit var webView: WebView
+    private lateinit var webView: TestWebView
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val requestRewriter: RequestRewriter = mock()
@@ -534,6 +534,23 @@ class BrowserWebViewClientTest {
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).onShouldOverride()
         verify(listener).openLinkInNewTab(EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerInNewTabButSameUrlThenDoNothing() = runTest {
+        openInNewTabFlow.emit(On)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.clientProvider = mock()
+        (webView as TestWebView).webViewUrl = EXAMPLE_URL
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        // verify(listener).onShouldOverride()
+        verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
     }
 
     @UiThreadTest
@@ -1110,6 +1127,13 @@ class BrowserWebViewClientTest {
     }
 
     private class TestWebView(context: Context) : WebView(context) {
+
+        var webViewUrl: String? = null
+
+        override fun getUrl(): String? {
+            return webViewUrl
+        }
+
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
         }

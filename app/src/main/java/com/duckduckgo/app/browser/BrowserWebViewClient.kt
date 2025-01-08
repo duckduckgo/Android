@@ -214,7 +214,7 @@ class BrowserWebViewClient @Inject constructor(
                             url,
                             webView,
                             isForMainFrame,
-                            openInNewTab = shouldOpenDuckPlayerInNewTab && isForMainFrame,
+                            openInNewTab = shouldOpenDuckPlayerInNewTab && isForMainFrame && webView.url != url.toString(),
                             willOpenDuckPlayer = isForMainFrame,
                         )
                     }
@@ -352,7 +352,7 @@ class BrowserWebViewClient @Inject constructor(
                             return false
                         }
                     } else if (openInNewTab) {
-                        webViewClientListener?.openLinkInNewTab(url)
+                        listener.openLinkInNewTab(url)
                         return true
                     } else {
                         val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
