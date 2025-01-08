@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.webkit.JavascriptInterface
 
 class PrivacyDashboardJavascriptInterface constructor(
-    val onBrokenSiteClicked: () -> Unit,
     val onPrivacyProtectionsClicked: (String) -> Unit,
     val onUrlClicked: (String) -> Unit,
     val onOpenSettings: (String) -> Unit,
@@ -39,11 +38,6 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun close() {
         onClose()
-    }
-
-    @JavascriptInterface
-    fun showBreakageForm() {
-        onBrokenSiteClicked()
     }
 
     @JavascriptInterface

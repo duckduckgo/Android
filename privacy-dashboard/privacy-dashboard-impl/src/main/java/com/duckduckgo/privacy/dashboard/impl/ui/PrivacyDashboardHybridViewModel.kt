@@ -31,7 +31,6 @@ import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -103,7 +102,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     sealed class Command {
-        class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class LaunchToggleReport(val opener: DashboardOpener) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
@@ -270,10 +268,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
-    }
-
-    fun onReportBrokenSiteSelected() {
-        // no-op
     }
 
     fun launchAppFeedbackFlow() {

@@ -31,7 +31,6 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
-import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -48,7 +47,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchAppFeedback
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
@@ -72,9 +70,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var autoconsentNav: AutoconsentNav
-
-    @Inject
-    lateinit var brokenSiteNav: BrokenSiteNav
 
     @Inject
     lateinit var browserNav: BrowserNav
@@ -101,7 +96,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onOpenSettings = { payload ->
                     viewModel.onOpenSettings(payload)
                 },
-                onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
                 onShowNativeFeedback = { viewModel.launchAppFeedbackFlow() },
                 onSubmitBrokenSiteReport = { payload ->
@@ -169,9 +163,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     private fun processCommands(it: Command) {
         when (it) {
-            is LaunchReportBrokenSite -> {
-                startActivity(brokenSiteNav.navigate(this, it.data))
-            }
             is LaunchAppFeedback -> {
                 globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
             }
