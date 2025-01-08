@@ -43,14 +43,15 @@ sealed class SavedSite(
     ) : SavedSite(id, title, url, lastModified)
 
     data class Bookmark(
-        override val id: String,
-        override val title: String,
-        override val url: String,
+        val id: String,
+        val title: String,
+        val url: String,
         val parentId: String = SavedSitesNames.BOOKMARKS_ROOT,
-        override val lastModified: String?,
-        override val deleted: String? = null,
+        val lastModified: String?,
+        val position: Int,
+        val deleted: String? = null,
         val isFavorite: Boolean = false,
-    ) : SavedSite(id, title, url, lastModified)
+    )
 }
 
 /**
