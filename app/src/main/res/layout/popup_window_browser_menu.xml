@@ -93,7 +93,7 @@
 
             <include
                 android:id="@+id/includeDuckChatMenuItem"
-                layout="@layout/view_menu_item_new_feature" />
+                layout="@layout/view_menu_item_duck_chat" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"

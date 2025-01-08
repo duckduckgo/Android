@@ -31,8 +31,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/duckChatTitle"
-            app:layout_constraintStart_toEndOf="@+id/icon"
-            app:layout_constraintEnd_toStartOf="@+id/newPill"
+            app:layout_constraintStart_toEndOf="@id/icon"
+            app:layout_constraintEnd_toStartOf="@id/newPill"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:typography="body1"/>
