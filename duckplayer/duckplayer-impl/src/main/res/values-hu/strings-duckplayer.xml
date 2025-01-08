@@ -22,6 +22,9 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül nézheted a YouTube-ot, és a megtekintett tartalmak nem befolyásolják a neked szóló ajánlásokat.\n<annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Videóbeállítások</string>
+    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Duck Player megnyitása új lapon, ha lehetséges</string>
+    <string name="duck_player_settings_unavailable_description">A Duck Player segítségével a DuckDuckGóban célzott hirdetések nélkül nézheted a YouTube-ot, és a megtekintett tartalmak nem befolyásolják a neked szóló ajánlásokat.</string>
     <string name="duck_player_mode_always">Mindig</string>
     <string name="duck_player_mode_never">Soha</string>
     <string name="duck_player_mode_always_ask">Kérdezzen rá minden alkalommal</string>
