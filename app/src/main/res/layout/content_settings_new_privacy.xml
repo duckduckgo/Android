@@ -25,7 +25,7 @@
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingPrivacyProtections" />
+        app:primaryText="@string/settingsHeadingProtections" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/setAsDefaultBrowserSetting"

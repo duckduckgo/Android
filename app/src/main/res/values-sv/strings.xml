@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsHeadingPrivacyProtections">Integritetsskydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>

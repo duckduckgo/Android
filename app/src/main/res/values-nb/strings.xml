@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
-    <string name="settingsHeadingPrivacyProtections">Personvern</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Tilpass</string>
     <string name="settingsHeadingAbout">Om</string>

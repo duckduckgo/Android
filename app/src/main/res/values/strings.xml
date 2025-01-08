@@ -124,7 +124,7 @@
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Privacy Protections</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Appearance</string>
     <string name="settingsHeadingCustomize">Customize</string>
     <string name="settingsHeadingAbout">About</string>

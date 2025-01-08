@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsHeadingPrivacyProtections">Gizlilik Korumaları</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>

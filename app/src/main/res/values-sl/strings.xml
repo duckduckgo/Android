@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Nastavitve</string>
     <string name="settingsMenuItemTitle">Nastavitve</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
-    <string name="settingsHeadingPrivacyProtections">Zaščita zasebnosti</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodi</string>
     <string name="settingsHeadingAbout">O nas</string>
