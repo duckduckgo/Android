@@ -20,6 +20,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/newTrackersBlockingAnimationView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
+
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"

@@ -63,6 +63,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTr
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -75,6 +77,7 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -94,7 +97,7 @@ class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour {
+) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour, TrackersAnimatorListener {
 
     sealed class Decoration {
         data class Mode(val viewMode: ViewMode) : Decoration()
@@ -173,6 +176,9 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
+
+    // internal val trackersBlockedAnimation: DaxTextView by lazy { findViewById(R.id.trackersBlockedTextView) }
+    // internal val trackersBlockedCountAnimation: DaxTextView by lazy { findViewById(R.id.trackersBlockedCountView) }
 
     init {
         val attr =
@@ -258,6 +264,8 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             stateBuffer.clear()
         }
+
+        animatorHelper.setListener(this)
     }
 
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
@@ -648,13 +656,28 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun startTrackersAnimation(events: List<Entity>?) {
-        animatorHelper.startTrackersAnimation(
-            context = context,
-            shieldAnimationView = shieldIcon,
-            trackersAnimationView = trackersAnimation,
-            omnibarViews = omnibarViews(),
-            entities = events,
-        )
+        // This is the animation we currently have in Production.
+//        animatorHelper.startTrackersAnimation(
+//            context = context,
+//            shieldAnimationView = shieldIcon,
+//            trackersAnimationView = trackersAnimation,
+//            omnibarViews = omnibarViews(),
+//            entities = events,
+//        )
+
+        if (this::animatorHelper.isInitialized) {
+            val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
+            val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
+
+            animatorHelper.startNewTrackersAnimation(
+                context = context,
+                shieldAnimationView = shieldIcon,
+                trackersBlockedAnimationView = trackersBlockedAnimation,
+                trackersBlockedCountAnimationView = trackersBlockedCountAnimation,
+                omnibarViews = omnibarViews(),
+                entities = events,
+            )
+        }
     }
 
     private fun renderPrivacyShield(
@@ -757,5 +780,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun onAnimationFinished(logos: List<TrackerLogo>) {
+        omnibarTextListener?.onTrackersCountFinished(logos)
     }
 }
