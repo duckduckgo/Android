@@ -186,6 +186,7 @@
     <color name="white9">#17FFFFFF</color>
     <color name="white6">#0FFFFFFF</color>
     <color name="white">#FFFFFF</color>
+    <color name="white_60">#F2F5F9</color>
 
     <color name="magenta">#A64FD1</color>
     <color name="purple">#D4A1EE</color>
@@ -200,20 +201,7 @@
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
     <!-- Legacy Raw -->
-    <color name="whiteFour">#f1f1f1</color>
-    <color name="whiteFive">#fafafa</color>
-    <color name="almostBlackDark">#222222</color>
-    <color name="almostBlack">#333333</color>
-    <color name="newBlack">#111111</color>
-    <color name="grayishBrown">#494949</color>
-    <color name="grayishTwo">#939393</color>
-    <color name="paleBrownishGray">#d0d0d0</color>
-    <color name="brownishGrayTwo">#666666</color>
-    <color name="cornflowerBlue">#678fff</color>
-    <color name="cornflowerBlue_10">#1A678fff</color>
-    <color name="cornflowerDark">#5078e9</color>
     <color name="translucentDark">#b000</color>
-    <color name="light_blue">#F2F5F9</color>
 
     <color name="ic_launcher_red_background">#DE5833</color>
     <color name="ic_launcher_white_background">#FFFFFF</color>

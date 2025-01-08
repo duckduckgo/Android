@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.*
-import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
@@ -30,11 +29,11 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R as CommonR
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -57,7 +56,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         configureListeners()
 
         webView.settings.javaScriptEnabled = true
-        webView.setBackgroundColor(ContextCompat.getColor(this, CommonR.color.cornflowerBlue))
+        webView.setBackgroundColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue))
         webView.webViewClient = SurveyWebViewClient()
 
         configureObservers()

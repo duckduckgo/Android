@@ -15,10 +15,10 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/cornflowerBlue" />
+    <solid android:color="?daxColorAccentBlue" />
     <stroke
         android:width="1dp"
-        android:color="@color/cornflowerBlue" />
+        android:color="?daxColorAccentBlue" />
     <corners
         android:topLeftRadius="8dp"
         android:topRightRadius="8dp" />
