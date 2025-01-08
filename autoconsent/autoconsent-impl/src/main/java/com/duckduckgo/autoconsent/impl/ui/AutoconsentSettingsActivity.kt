@@ -125,7 +125,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         if (newSettingsFeature.self().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.setImageResource(
-                    if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_popups_128,
+                    if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
                 )
                 autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
             }
