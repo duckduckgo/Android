@@ -83,10 +83,12 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
@@ -309,6 +311,7 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -3233,7 +3236,7 @@ class BrowserTabFragment :
 
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob += lifecycleScope.launch {
-            viewModel.downloadCommands().cancellable().collect {
+            viewModel.downloadCommands().cancellable().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).collectLatest {
                 processFileDownloadedCommand(it)
             }
         }
