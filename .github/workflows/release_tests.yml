@@ -61,6 +61,16 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
+      - name: Notify Mattermost of Maestro tests
+        id: send-mm-tests-started
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: Starting to run Release tests for version ${{ github.event.inputs.app-version }} successfully created. See https://app.asana.com/0/1184843898389381/1205105962934096
+          action: 'send-mattermost-message'
+
       - name: Release tests flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:

@@ -7,6 +7,7 @@ env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
   GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
+  emoji_info: ":information_source:" # ℹ️
 
 jobs:
   release-production:
@@ -76,10 +77,30 @@ jobs:
         run: |
           bundle exec fastlane deploy_playstore
 
+      - name: Notify Mattermost of Play Store upload
+        id: send-mm-message-ps-upload
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. AAB uploaded to Play Store. See https://play.google.com/console/u/0/developers/5949020878215944484/app/4974643806384870294/releases/overview
+          action: 'send-mattermost-message'
+
       - name: Upload Universal APK to Github
         id: upload_bundle_github
         run: |
           bundle exec fastlane deploy_github
+
+      - name: Notify Mattermost of GH upload
+        id: send-mm-message-gh-upload
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. Universal APK uploaded to Github. See https://github.com/duckduckgo/Android/releases
+          action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
