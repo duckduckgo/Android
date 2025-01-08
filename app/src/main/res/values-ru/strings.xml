@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
+    <string name="settingsHeadingProtections">Средства защиты</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
     <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
+    <string name="settingsHeadingMainSettings">Прочие настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>
     <string name="settingsDataClearing">Очистка данных</string>
+    <string name="settingsAddWidget">Добавьте виджет на домашний экран</string>
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
+    <string name="settingsEnableVoiceSearch">Включить конфиденциальный голосовой поиск</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo для других платформ</string>
 
     <!-- Private Search -->
