@@ -22,6 +22,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -58,6 +59,12 @@ interface RequestInterceptor {
     ): WebResourceResponse?
 
     fun onPageStarted(url: String)
+
+    @WorkerThread
+    fun shouldOverrideUrlLoading(
+        url: Uri,
+        isForMainFrame: Boolean,
+    ): Boolean
 }
 
 class WebViewRequestInterceptor(
@@ -71,11 +78,13 @@ class WebViewRequestInterceptor(
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
     private val duckPlayer: DuckPlayer,
+    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : RequestInterceptor {
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
+        maliciousSiteBlockerWebViewIntegration.onPageLoadStarted()
     }
 
     /**
@@ -95,6 +104,13 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri? = request.url
+
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) {
+            handleSiteBlocked()
+        }?.let {
+            handleSiteBlocked()
+            return it
+        }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
@@ -159,6 +175,24 @@ class WebViewRequestInterceptor(
         }
 
         return getWebResourceResponse(request, documentUrl, null)
+    }
+
+    override fun shouldOverrideUrlLoading(url: Uri, isForMainFrame: Boolean): Boolean {
+        if (maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
+                url,
+                isForMainFrame,
+            ) {
+                handleSiteBlocked()
+            }
+        ) {
+            handleSiteBlocked()
+            return true
+        }
+        return false
+    }
+
+    private fun handleSiteBlocked() {
+        // TODO (cbarreiro): Handle site blocked
     }
 
     private fun getWebResourceResponse(
