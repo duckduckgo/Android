@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
+    <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
+    <string name="settingsHeadingMainSettings">Diğer Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Veri Temizleme</string>
+    <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
+    <string name="settingsEnableVoiceSearch">Özel Sesli Aramayı Etkinleştir</string>
     <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
 
     <!-- Private Search -->
