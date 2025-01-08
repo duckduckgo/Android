@@ -194,6 +194,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLeadingAndTrailingIcons).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
