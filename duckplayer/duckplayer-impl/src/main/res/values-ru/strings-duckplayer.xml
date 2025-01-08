@@ -22,6 +22,9 @@
     <string name="duck_player_setting_title">Проигрыватель Duck Player</string>
     <string name="duck_player_settings_activity_title">Проигрыватель Duck Player</string>
     <string name="duck_player_settings_activity_description">Проигрыватель Duck Player позволяет смотреть видео из YouTube в браузере DuckDuckGo без целевой рекламы. Просмотренные ролики не влияют на рекомендации.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Настройки видео</string>
+    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">По возможности открывать Duck Player в новой вкладке</string>
+    <string name="duck_player_settings_unavailable_description">Проигрыватель Duck Player позволяет смотреть видео из YouTube в браузере DuckDuckGo без целевой рекламы. Просмотренные ролики не влияют на рекомендации.</string>
     <string name="duck_player_mode_always">Всегда</string>
     <string name="duck_player_mode_never">Никогда</string>
     <string name="duck_player_mode_always_ask">Спрашивать каждый раз</string>

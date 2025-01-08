@@ -22,6 +22,9 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.<annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Željene postavke videozapisa</string>
+    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Otvori Duck Player u novoj kartici kad god je to moguće</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player ti omogućuje gledanje YouTubea bez ciljanih oglasa u DuckDuckGou, a ono što gledaš neće utjecati na tvoje preporuke.</string>
     <string name="duck_player_mode_always">Uvijek</string>
     <string name="duck_player_mode_never">Nikada</string>
     <string name="duck_player_mode_always_ask">Pitaj svaki puta</string>

@@ -22,6 +22,9 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Videovoorkeuren</string>
+    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Open Duck Player waar mogelijk in een nieuw tabblad</string>
+    <string name="duck_player_settings_unavailable_description">Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen.</string>
     <string name="duck_player_mode_always">Altijd</string>
     <string name="duck_player_mode_never">Nooit</string>
     <string name="duck_player_mode_always_ask">Elke keer vragen</string>
