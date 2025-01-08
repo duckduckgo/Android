@@ -24,7 +24,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.os.SystemClock
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -32,9 +34,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.room.util.query
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
@@ -194,6 +196,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var openMessageInNewTabJob: Job? = null
 
     private val onTabPageChangeListener = object : ViewPager2.OnPageChangeCallback() {
+        private val TOUCH_DELAY_MS = 200L
         private var wasSwipingStarted = false
 
         override fun onPageSelected(position: Int) {
@@ -203,6 +206,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                 viewModel.onTabsSwiped()
                 onTabPageSwiped(position)
+
+                enableWebViewScrolling()
+            }
+        }
+
+        private fun enableWebViewScrolling() {
+            // ViewPager2 requires an artificial tap to disable intercepting touch events and enable nested scrolling
+            val time = SystemClock.uptimeMillis()
+            val motionEvent = MotionEvent.obtain(time, time + 1, MotionEvent.ACTION_DOWN, 0f, 0f, 0)
+
+            tabPager.postDelayed(TOUCH_DELAY_MS) {
+                tabPager.dispatchTouchEvent(motionEvent)
             }
         }
 
