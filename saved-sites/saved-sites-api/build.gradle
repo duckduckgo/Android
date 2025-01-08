@@ -33,7 +33,6 @@ kotlin {
 
 dependencies {
     implementation project(':common-utils')
-    implementation project(':feature-toggles-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android

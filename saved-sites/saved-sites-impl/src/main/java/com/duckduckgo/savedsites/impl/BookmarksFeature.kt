@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.api
+package com.duckduckgo.savedsites.impl
 
-interface BookmarksSortingFeature {
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "bookmarks",
+)
+interface BookmarksFeature {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 
     @Toggle.DefaultValue(false)
-    fun self(): Toggle
+    fun sorting(): Toggle
 }
