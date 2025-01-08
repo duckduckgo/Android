@@ -68,3 +68,14 @@ jobs:
           asana-task-name: GH Workflow Failure - Tag Android Release
           asana-task-description: Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+      - name: Notify Mattermost when workflow failed
+        if: ${{ failure() }}
+        id: send-mm-message-error
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{env.emoji_start}} Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'send-mattermost-message'
