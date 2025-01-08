@@ -48,7 +48,6 @@ sealed class SavedSite(
         override val url: String,
         val parentId: String = SavedSitesNames.BOOKMARKS_ROOT,
         override val lastModified: String?,
-        val position: Int,
         override val deleted: String? = null,
         val isFavorite: Boolean = false,
     ) : SavedSite(id, title, url, lastModified)
