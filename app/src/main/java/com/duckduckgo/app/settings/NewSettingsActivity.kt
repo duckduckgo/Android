@@ -192,7 +192,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
-            duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
+            includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
         with(viewsNextSteps) {
@@ -285,9 +285,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun updateDuckChat(isDuckChatEnabled: Boolean) {
         if (isDuckChatEnabled) {
-            viewsMain.duckChatSetting.show()
+            viewsMain.includeDuckChatSetting.duckChatSetting.show()
         } else {
-            viewsMain.duckChatSetting.gone()
+            viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
     }
 

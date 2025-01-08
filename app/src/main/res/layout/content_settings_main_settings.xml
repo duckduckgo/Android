@@ -59,7 +59,6 @@
         app:primaryText="@string/settingsPasswordsAndAutofillLoginsSetting"
         app:leadingIcon="@drawable/ic_key_color_24"/>
 
-    <!-- TODO: add DuckChat here as well -->
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
         android:layout_width="match_parent"
@@ -81,12 +80,9 @@
         app:primaryText="@string/settingsDataClearing"
         app:leadingIcon="@drawable/ic_fire_color_24"/>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/duckChatSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/duckChatTitle"
-        app:leadingIcon="@drawable/ic_ai_chat_24"/>
+    <include
+        android:id="@+id/includeDuckChatSetting"
+        layout="@layout/view_settings_item_duck_chat" />
 
     <LinearLayout
         android:id="@+id/settingsSectionDuckPlayer"
