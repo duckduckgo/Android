@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
@@ -41,6 +42,15 @@ interface BrowserTrackersAnimatorHelper {
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
+        omnibarViews: List<View>,
+        entities: List<Entity>?,
+    )
+
+    fun startNewTrackersAnimation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
     )
@@ -92,5 +102,5 @@ interface TrackersAnimatorListener {
      * Notifies the end of the animation.
      * The callback is not be invoked when a partial animation is paused.
      */
-    fun onAnimationFinished()
+    fun onAnimationFinished(logos: List<TrackerLogo>)
 }

@@ -189,6 +189,7 @@ import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -3784,6 +3785,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
+    }
+
+    fun onAnimationFinished(logos: List<TrackerLogo>) {
+        command.value = Command.StartTrackersAnimation(logos)
     }
 
     companion object {

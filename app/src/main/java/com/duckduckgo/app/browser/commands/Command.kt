@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -257,4 +258,5 @@ sealed class Command {
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
+    data class StartTrackersAnimation(val logos: List<TrackerLogo>) : Command()
 }
