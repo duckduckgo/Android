@@ -101,6 +101,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.TrackersCircleAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -136,6 +137,7 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -521,6 +523,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
+    @Inject
+    lateinit var animatorHelper: TrackersCircleAnimationHelper
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -779,6 +784,16 @@ class BrowserTabFragment :
     private val jsOrientationHandler = JsOrientationHandler()
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
+
+    private fun shoNewTrackersBlockingAnimation(logos: List<TrackerLogo>) {
+        animatorHelper.startTrackersCircleAnimation(
+            context = requireContext(),
+            trackersCircleAnimationView = binding.newTrackersBlockingAnimationView,
+            omnibarShieldAnimationView = omnibar.shieldIcon,
+            omnibarPosition = omnibar.omnibarPosition,
+            logos = logos,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1724,7 +1739,7 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
-
+            is Command.StartTrackersAnimation -> shoNewTrackersBlockingAnimation(it.logos)
             else -> {
                 // NO OP
             }
@@ -2395,6 +2410,10 @@ class BrowserTabFragment :
                         state.hasFocus,
                         true,
                     )
+                }
+
+                override fun onTrackersCountFinished(logos: List<TrackerLogo>) {
+                    viewModel.onAnimationFinished(logos)
                 }
             },
         )
