@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Nastavenia</string>
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
+    <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
     <string name="settingsHeadingCustomize">Prispôsobiť</string>
     <string name="settingsHeadingAbout">O</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
+    <string name="settingsHeadingMainSettings">Ďalšie nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
     <string name="settingsDataClearing">Vymazanie údajov</string>
+    <string name="settingsAddWidget">Pridať miniaplikáciu na domovskú obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
+    <string name="settingsEnableVoiceSearch">Povoliť súkromné hlasové vyhľadávanie</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>
 
     <!-- Private Search -->
