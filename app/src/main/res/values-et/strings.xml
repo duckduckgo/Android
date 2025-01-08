@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsHeadingPrivacyProtections">Privaatsuskaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>

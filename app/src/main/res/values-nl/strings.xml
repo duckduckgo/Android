@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Privacybescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
     <string name="settingsHeadingCustomize">Aanpassen</string>
     <string name="settingsHeadingAbout">Over</string>

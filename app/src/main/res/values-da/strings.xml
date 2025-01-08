@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Indstillinger</string>
     <string name="settingsMenuItemTitle">Indstillinger</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
-    <string name="settingsHeadingPrivacyProtections">Beskyttelse af privatlivet</string>
     <string name="settingsHeadingAppearance">udseende</string>
     <string name="settingsHeadingCustomize">Tilpas</string>
     <string name="settingsHeadingAbout">Omkring</string>

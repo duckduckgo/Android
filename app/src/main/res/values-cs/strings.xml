@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsHeadingPrivacyProtections">Ochrana osobních údajů</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
     <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">Informace</string>

@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingPrivacyProtections">Yksityisyyden suoja</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
     <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>

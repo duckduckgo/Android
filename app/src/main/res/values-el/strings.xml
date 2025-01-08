@@ -125,7 +125,6 @@
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
-    <string name="settingsHeadingPrivacyProtections">Προστασία προσωπικών δεδομένων</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
     <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
