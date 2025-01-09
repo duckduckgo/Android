@@ -85,6 +85,10 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.subscriptionStatus()
     }
 
+    override suspend fun getFeatures(): Set<String> {
+        return subscriptionsManager.getFeatures()
+    }
+
     override fun launchPrivacyPro(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
         val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return

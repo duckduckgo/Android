@@ -55,6 +55,11 @@ interface Subscriptions {
     suspend fun getSubscriptionStatus(): SubscriptionStatus
 
     /**
+     * @return a [Set<String>] of available features for the subscription or an empty set if subscription is not available
+     */
+    suspend fun getFeatures(): Set<String>
+
+    /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
     fun shouldLaunchPrivacyProForUrl(url: String): Boolean
