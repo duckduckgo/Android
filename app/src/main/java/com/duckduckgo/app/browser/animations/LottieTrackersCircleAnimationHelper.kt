@@ -58,7 +58,6 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
         layoutParams.gravity = gravity
         layoutParams.marginStart = negativeMarginPx
         if (gravity == Gravity.BOTTOM) {
-            layoutParams.bottomMargin = negativeMarginPx
             trackersCircleAnimationView.scaleY = -1f
         } else {
             layoutParams.topMargin = negativeMarginPx

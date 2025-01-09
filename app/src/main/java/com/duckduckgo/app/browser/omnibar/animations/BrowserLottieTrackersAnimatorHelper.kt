@@ -192,7 +192,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                             trackersBlockedCountAnimationView.gone()
                             animateOmnibarIn(omnibarViews).start()
                         },
-                        2000L,
+                        1500L,
                     )
                 }
 
