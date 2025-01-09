@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
+    <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
+    <string name="settingsHeadingMainSettings">Teised seaded</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Andmete kustutamine</string>
+    <string name="settingsAddWidget">Lisa vidin avakuvale</string>
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
+    <string name="settingsEnableVoiceSearch">Luba privaatne häälotsing</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
 
     <!-- Private Search -->
