@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
+    <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
     <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">Informace</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
+    <string name="settingsHeadingMainSettings">Další nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Vymazání dat</string>
+    <string name="settingsAddWidget">Přidat widget na domovskou obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
+    <string name="settingsEnableVoiceSearch">Povolit soukromé hlasové vyhledávání</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na jiných platformách</string>
 
     <!-- Private Search -->
@@ -187,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionIsEnabledTitle">Ochrana před sledováním na webu je povolená</string>
+    <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
 
