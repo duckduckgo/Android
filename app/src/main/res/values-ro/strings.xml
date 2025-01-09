@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Setări</string>
     <string name="settingsMenuItemTitle">Setări</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
+    <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
     <string name="settingsHeadingCustomize">Personalizare</string>
     <string name="settingsHeadingAbout">Despre</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
+    <string name="settingsHeadingMainSettings">Alte Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>
     <string name="settingsDataClearing">Ștergerea datelor</string>
+    <string name="settingsAddWidget">Adaugă un widget la ecranul de întâmpinare</string>
     <string name="settingsAddressBarPosition">Setează poziția barei de adrese</string>
+    <string name="settingsEnableVoiceSearch">Activează căutarea vocală privată</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo pe alte platforme</string>
 
     <!-- Private Search -->
@@ -187,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionIsEnabledTitle">Protecția împotriva urmăririi pe web este activată</string>
+    <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
 
