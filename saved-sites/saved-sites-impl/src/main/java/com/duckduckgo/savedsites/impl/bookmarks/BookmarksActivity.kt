@@ -184,7 +184,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             binding.appBarLayoutSorting.gone()
         }
         setupToolbar(toolbar)
-        toolbar.setTitle(getParentFolderName())
+        supportActionBar?.title = getParentFolderName()
     }
 
     private fun getParentFolderName() =
@@ -280,7 +280,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     state.bookmarkItems != null && state.bookmarkItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
-                setSearchMenuItemVisibility()
+                binding.searchMenu.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
                 exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
@@ -432,7 +432,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             exportMenuItem?.title = spannable
             exportMenuItem?.isEnabled = false
         }
-        setSearchMenuItemVisibility()
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -501,14 +501,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
         searchBar.handle(SearchBar.Event.DismissSearchBar)
         bookmarksAdapter.isInSearchMode = false
-    }
-
-    private fun setSearchMenuItemVisibility() {
-        if (bookmarksSortingFeature.self().isEnabled()) {
-            binding.searchMenu.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-        } else {
-            searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-        }
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
