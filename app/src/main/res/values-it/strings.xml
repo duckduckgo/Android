@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Impostazioni</string>
     <string name="settingsMenuItemTitle">Impostazioni</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
+    <string name="settingsHeadingProtections">Protezioni</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
     <string name="settingsHeadingCustomize">Personalizza</string>
     <string name="settingsHeadingAbout">Informazioni</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
+    <string name="settingsHeadingMainSettings">Altre impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Cancellazione dati</string>
+    <string name="settingsAddWidget">Aggiungi widget alla schermata iniziale</string>
     <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
+    <string name="settingsEnableVoiceSearch">Attiva la ricerca vocale privata</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo su altre piattaforme</string>
 
     <!-- Private Search -->
@@ -187,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionIsEnabledTitle">La protezione dal tracciamento Web è abilitata</string>
+    <string name="webTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
 
