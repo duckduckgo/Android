@@ -190,7 +190,7 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
-    <string name="webTrackingProtectionTitle">Bescherming tegen webtracking is ingeschakeld</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Bescherming tegen webtracking is ingeschakeld</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
 
