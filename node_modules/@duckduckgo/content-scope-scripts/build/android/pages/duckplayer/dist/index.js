@@ -6,6 +6,7 @@
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
@@ -25,6 +26,7 @@
     isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
     mod
   ));
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
   // ../node_modules/classnames/index.js
   var require_classnames = __commonJS({
@@ -2771,7 +2773,7 @@
   };
 
   // ../injected/src/features/duckplayer/util.js
-  var VideoParams = class _VideoParams {
+  var _VideoParams = class _VideoParams {
     /**
      * @param {string} id - the YouTube video ID
      * @param {string|null|undefined} time - an optional time
@@ -2780,8 +2782,6 @@
       this.id = id;
       this.time = time;
     }
-    static validVideoId = /^[a-zA-Z0-9-_]+$/;
-    static validTimestamp = /^[0-9hms]+$/;
     /**
      * @returns {string}
      */
@@ -2857,6 +2857,9 @@
       return new _VideoParams(id, time);
     }
   };
+  __publicField(_VideoParams, "validVideoId", /^[a-zA-Z0-9-_]+$/);
+  __publicField(_VideoParams, "validTimestamp", /^[0-9hms]+$/);
+  var VideoParams = _VideoParams;
 
   // pages/duckplayer/src/utils.js
   function createYoutubeURLForError(href, urlBase) {
