@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="2dp"
+        app:lottie_imageAssetsFolder="images"
         app:lottie_autoPlay="false"
         app:lottie_loop="false" />
 
@@ -33,6 +34,54 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:omnibarPosition="top" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/slideDownHeaderView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?daxColorSurface"
+        android:elevation="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/shield"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_shield_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/trackers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toEndOf="@id/shield"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:textType="secondary"
+            app:typography="body1_bold"
+            tools:text="3" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/website"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            app:textType="secondary"
+            tools:text="website.com" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
