@@ -487,6 +487,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             export.setDisabled()
         }
 
+        sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+
         popupMenu.apply {
             onMenuItemClicked(sortByName) { }
             onMenuItemClicked(sortManually) { }

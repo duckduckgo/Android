@@ -17,10 +17,12 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.PRIMARY
@@ -57,6 +59,13 @@ constructor(
                 }
                 setPrimaryTextType(primaryTextType)
             }
+
+            if (hasValue(R.styleable.PopupMenuItemView_trailingIcon)) {
+                setTrailingIconDrawable(getDrawable(R.styleable.PopupMenuItemView_trailingIcon)!!)
+            } else {
+                setTrailingIconVisibility(false)
+            }
+
             binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
             updateContentDescription()
             recycle()
@@ -94,6 +103,25 @@ constructor(
         spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
         setPrimaryText(spannable)
         isEnabled = false
+    }
+
+    fun setTrailingIconDrawable(drawable: Drawable) {
+        binding.trailingIcon.setImageDrawable(drawable)
+        setTrailingIconVisibility(true)
+    }
+
+    fun setTrailingIconResource(@DrawableRes resource: Int) {
+        binding.trailingIcon.setImageResource(resource)
+        setTrailingIconVisibility(true)
+    }
+
+    /** Sets the leading icon image visibility */
+    fun setTrailingIconVisibility(visible: Boolean) {
+        if (visible) {
+            binding.trailingIcon.show()
+        } else {
+            binding.trailingIcon.gone()
+        }
     }
 
     enum class PopupMenuItemType {
