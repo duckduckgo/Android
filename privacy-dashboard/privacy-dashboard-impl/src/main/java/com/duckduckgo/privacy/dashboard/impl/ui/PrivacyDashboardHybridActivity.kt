@@ -104,7 +104,10 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() },
-                onShowNativeFeedback = { viewModel.launchAppFeedbackFlow() },
+                onShowNativeFeedback = {
+                    viewModel.launchAppFeedbackFlow()
+                    finish()
+                },
                 onSubmitBrokenSiteReport = { payload ->
                     val reportFlow = when (val params = params) {
                         is BrokenSiteForm -> {
