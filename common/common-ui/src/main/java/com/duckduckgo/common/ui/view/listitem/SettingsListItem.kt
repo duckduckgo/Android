@@ -76,8 +76,8 @@ class SettingsListItem @JvmOverloads constructor(
     }
 
     /** Sets the item click listener */
-    fun setClickListener(onClick: () -> Unit) {
-        binding.root.setOnClickListener { onClick() }
+    fun setClickListener(onClick: (() -> Unit)?) {
+        binding.root.setOnClickListener { onClick?.invoke() }
     }
 
     /** Sets whether the status indicator is on or off */
