@@ -191,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionIsEnabledTitle">Veebijälgimise kaitse on lubatud</string>
+    <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
 

@@ -191,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionIsEnabledTitle">Защитата от проследяване в мрежата е активирана</string>
+    <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo никога не Ви проследява и се стремим да защитим Вашата поверителност във възможно най-голяма степен. Непрекъснато поддържаме и развиваме слоеве на защита, за да сме в крак с новите методи за проследяване и да осигуряваме много защити, които другите браузъри не предлагат по подразбиране. <u><a href=\"\">Научете повече</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
 
