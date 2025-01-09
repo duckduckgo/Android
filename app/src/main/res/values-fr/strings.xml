@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Apparence</string>
     <string name="settingsHeadingCustomize">Personnaliser</string>
     <string name="settingsHeadingAbout">À propos</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
+    <string name="settingsHeadingMainSettings">Autres paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
+    <string name="settingsAddWidget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
+    <string name="settingsEnableVoiceSearch">Activer la recherche vocale privée</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo sur d\'autres plateformes</string>
 
     <!-- Private Search -->
