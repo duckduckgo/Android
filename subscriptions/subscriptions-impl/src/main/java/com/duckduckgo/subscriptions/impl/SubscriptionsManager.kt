@@ -167,6 +167,11 @@ interface SubscriptionsManager {
     suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
+     * Returns a [Set<String>] of available features for the subscription or an empty set if subscription is not available
+     */
+    suspend fun getFeatures(): Set<String>
+
+    /**
      * Checks if user is signed in or not (using either auth API v1 or v2)
      */
     suspend fun isSignedIn(): Boolean
@@ -444,6 +449,16 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.getStatus()
         } else {
             UNKNOWN
+        }
+    }
+
+    override suspend fun getFeatures(): Set<String> {
+        val subscription = authRepository.getSubscription()
+
+        return if(subscription != null) {
+            authRepository.getFeatures(subscription.productId)
+        } else {
+            emptySet()
         }
     }
 

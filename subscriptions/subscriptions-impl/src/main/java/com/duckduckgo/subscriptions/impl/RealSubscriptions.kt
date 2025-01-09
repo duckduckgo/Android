@@ -85,6 +85,12 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.subscriptionStatus()
     }
 
+    override suspend fun getAvailableProducts(): Set<Product> {
+        return subscriptionsManager.getFeatures()
+            .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
+            .toSet()
+    }
+
     override fun launchPrivacyPro(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
         val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
