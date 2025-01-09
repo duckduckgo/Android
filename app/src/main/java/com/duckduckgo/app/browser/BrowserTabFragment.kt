@@ -895,7 +895,29 @@ class BrowserTabFragment :
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
+        configureVerticalScrollListener()
         configureCustomTab()
+    }
+
+    private fun configureVerticalScrollListener() {
+        binding.newOmnibar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            // Calculate the fraction of the AppBarLayout's total scroll range that has been completed.
+            val scrollFraction = -verticalOffset / totalScrollRange.toFloat()
+            notifyVerticalOffsetChanged(scrollFraction)
+        }
+    }
+
+    private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        // Move the slideDownHeaderView in sync with the top omnibar.
+        binding.slideDownHeaderView.translationY = -binding.slideDownHeaderView.height * (1 - scrollFraction)
+        if (scrollFraction == 0.0f) {
+            binding.slideDownHeaderView.gone()
+        } else {
+            binding.slideDownHeaderView.show()
+        }
+        binding.trackers.text = viewModel.trackersCount().toString()
+        binding.website.text = viewModel.url?.extractDomain()
     }
 
     private fun onOmnibarTabsButtonPressed() {

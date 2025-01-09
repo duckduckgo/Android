@@ -3791,6 +3791,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.StartTrackersAnimation(logos)
     }
 
+    fun trackersCount(): Int = site?.trackerCount ?: 0
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
