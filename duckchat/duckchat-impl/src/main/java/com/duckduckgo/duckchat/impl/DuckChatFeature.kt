@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "aiChat",
 )
 /**
- * This is the class that represents the duckPlayer feature flags
+ * This is the class that represents the aiChat feature flags
  */
 interface DuckChatFeature {
     /**
