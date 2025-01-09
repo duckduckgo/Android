@@ -22,6 +22,9 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Predvajalnik Duck Player vam s pomočjo DuckDuckGo omogoča gledanje YouTuba brez ciljanih oglasov, kar gledate pa ne bo vplivalo na vaša priporočila.\n<annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Nastavitve videoposnetkov</string>
+    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Odpri Duck Player v novem zavihku, kadar je to mogoče</string>
+    <string name="duck_player_settings_unavailable_description">Predvajalnik Duck Player vam s pomočjo DuckDuckGo omogoča gledanje YouTuba brez ciljanih oglasov, kar gledate pa ne bo vplivalo na vaša priporočila.</string>
     <string name="duck_player_mode_always">Vedno</string>
     <string name="duck_player_mode_never">Nikoli</string>
     <string name="duck_player_mode_always_ask">Vprašaj vsakič</string>
