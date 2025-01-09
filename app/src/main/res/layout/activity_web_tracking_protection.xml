@@ -67,7 +67,7 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:gravity="center"
-                android:text="@string/webTrackingProtectionTitle"
+                android:text="@string/webTrackingProtectionIsEnabledTitle"
                 app:typography="h2"
                 tools:visibility="gone" />
 
@@ -78,7 +78,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
-                android:text="@string/webTrackingProtectionTitle"
+                android:text="@string/webTrackingProtectionIsEnabledTitle"
                 android:visibility="gone"
                 app:typography="h2"
                 tools:visibility="visible" />
