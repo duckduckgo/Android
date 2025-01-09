@@ -17,6 +17,8 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
@@ -66,6 +68,10 @@ constructor(
         updateContentDescription()
     }
 
+    fun setPrimaryText(label: CharSequence) {
+        binding.label.text = label
+    }
+
     fun setPrimaryText(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
@@ -80,6 +86,14 @@ constructor(
 
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
+    }
+
+    fun setDisabled() {
+        val textColorAttr = R.attr.daxColorTextDisabled
+        val spannable = SpannableString(binding.label.text)
+        spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+        setPrimaryText(spannable)
+        isEnabled = false
     }
 
     enum class PopupMenuItemType {
