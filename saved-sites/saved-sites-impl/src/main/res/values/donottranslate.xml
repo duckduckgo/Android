@@ -26,4 +26,9 @@
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="newTabPageShortcutBookmarks">Bookmarks</string>
+
+    <!-- Bookmarks -->
+    <string name="popupBookmarksSortManually">Sort Manually</string>
+    <string name="popupBookmarksSortByName">Sort by Name</string>
+
 </resources>
