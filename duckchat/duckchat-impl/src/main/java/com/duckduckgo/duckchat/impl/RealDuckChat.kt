@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
     /**
-     * Stores setting to determine whether the DuckChat should be shown in browser menu.
+     * Stores setting to determine whether DuckChat should be shown in browser menu.
      * Sets IO dispatcher.
      */
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
