@@ -62,6 +62,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.impl.BookmarksSortingFeature
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
@@ -79,12 +80,13 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
-import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -107,6 +109,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var bookmarksSortingFeature: BookmarksSortingFeature
+
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
 
@@ -120,10 +125,20 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private lateinit var contentBookmarksBinding: ContentBookmarksBinding
 
     private val toolbar
-        get() = binding.toolbar
+        get() =
+            if (bookmarksSortingFeature.self().isEnabled()) {
+                binding.toolbarSorting
+            } else {
+                binding.toolbar
+            }
 
     private val searchBar
-        get() = binding.searchBar
+        get() =
+            if (bookmarksSortingFeature.self().isEnabled()) {
+                binding.searchBarSorting
+            } else {
+                binding.searchBar
+            }
 
     private val startBookmarkFoldersActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -151,6 +166,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun configureToolbar() {
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            binding.appBarLayout.gone()
+        } else {
+            binding.appBarLayoutSorting.gone()
+        }
         setupToolbar(toolbar)
         supportActionBar?.title = getParentFolderName()
     }
@@ -349,6 +369,21 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
         return true
+    }
+
+    override fun onMenuOpened(
+        featureId: Int,
+        menu: Menu,
+    ): Boolean {
+        return false
+        // return super.onMenuOpened(featureId, menu)
+    }
+
+    override fun onPanelClosed(
+        featureId: Int,
+        menu: Menu,
+    ) {
+        super.onPanelClosed(featureId, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
