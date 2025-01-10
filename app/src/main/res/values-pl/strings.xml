@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Ustawienia</string>
     <string name="settingsMenuItemTitle">Ustawienia</string>
     <string name="settingsHeadingPrivacy">Prywatność</string>
+    <string name="settingsHeadingProtections">Ochrona</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
     <string name="settingsHeadingCustomize">Spersonalizuj</string>
     <string name="settingsHeadingAbout">Informacje</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
+    <string name="settingsHeadingMainSettings">Inne ustawienia</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
     <string name="settingsDataClearing">Czyszczenie danych</string>
+    <string name="settingsAddWidget">Dodaj widżet do ekranu głównego</string>
     <string name="settingsAddressBarPosition">Ustaw pozycję paska adresu</string>
+    <string name="settingsEnableVoiceSearch">Włącz prywatne wyszukiwanie głosowe</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na innych platformach</string>
 
     <!-- Private Search -->
@@ -187,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionIsEnabledTitle">Ochrona przed śledzeniem w sieci jest włączona</string>
+    <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nigdy Cię nie śledzi. Ponadto staramy się jak najlepiej chronić Twoją prywatność. Ciągle tworzymy i udoskonalamy zabezpieczenia, aby dostosować się do najnowszych sposobów śledzenia i oferować liczne zabezpieczenia, których inne przeglądarki nie oferują domyślnie. <u><a href=\"\">Dowiedz się więcej</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
 
