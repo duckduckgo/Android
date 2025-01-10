@@ -125,6 +125,7 @@
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
+    <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
     <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
@@ -157,11 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
+    <string name="settingsHeadingMainSettings">Άλλες Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
     <string name="settingsDataClearing">Διαγραφή δεδομένων</string>
+    <string name="settingsAddWidget">Προσθήκη μικροεφαρμογής στην Αρχική οθόνη</string>
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
+    <string name="settingsEnableVoiceSearch">Ενεργοποίηση της Ιδιωτικής φωνητικής αναζήτησης</string>
     <string name="settingsDDGOnOtherPlatforms">Το DuckDuckGo σε άλλες πλατφόρμες</string>
 
     <!-- Private Search -->
@@ -187,6 +191,7 @@
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionIsEnabledTitle">Η προστασία παρακολούθησης ιστού είναι ενεργοποιημένη</string>
+    <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionDescription"><![CDATA[Το DuckDuckGo δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
 
