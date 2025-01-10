@@ -71,7 +71,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -352,9 +351,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
         closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        runBlocking {
-            duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
-        }
+        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
         return super.onPrepareOptionsMenu(menu)
     }

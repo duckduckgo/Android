@@ -43,7 +43,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         val showInBrowserMenu: Boolean = false,
     )
 
-    val viewState = duckChat.observeShowInBrowserMenu()
+    val viewState = duckChat.observeShowInBrowserMenuUserSetting()
         .map { showInBrowserMenu ->
             ViewState(showInBrowserMenu)
         }
@@ -55,7 +55,7 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
         viewModelScope.launch {
-            duckChat.setShowInBrowserMenu(checked)
+            duckChat.setShowInBrowserMenuUserSetting(checked)
         }
     }
 

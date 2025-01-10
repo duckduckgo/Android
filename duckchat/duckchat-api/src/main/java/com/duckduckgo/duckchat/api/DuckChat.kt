@@ -30,11 +30,11 @@ interface DuckChat {
 
     /**
      * Checks whether DuckChat should be shown in browser menu based on user settings.
-     * Sets IO dispatcher.
+     * Uses cached values - does not perform disk I/O.
      *
      * @return true if DuckChat should be shown, false otherwise.
      */
-    suspend fun showInBrowserMenu(): Boolean
+    fun showInBrowserMenu(): Boolean
 
     /**
      * Opens the DuckChat WebView.
