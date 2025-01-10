@@ -200,7 +200,7 @@ class BrowserWebViewClient @Inject constructor(
                     false
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
-                    if (isRedirect) {
+                    if (isRedirect && isForMainFrame) {
                         /*
                         This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
                         therefore the Duck Player page is never launched if YouTube comes from a redirect.
@@ -214,8 +214,8 @@ class BrowserWebViewClient @Inject constructor(
                             url,
                             webView,
                             isForMainFrame,
-                            openInNewTab = shouldOpenDuckPlayerInNewTab,
-                            willOpenDuckPlayer = true,
+                            openInNewTab = shouldOpenDuckPlayerInNewTab && isForMainFrame && webView.url != url.toString(),
+                            willOpenDuckPlayer = isForMainFrame,
                         )
                     }
                 }
@@ -352,7 +352,7 @@ class BrowserWebViewClient @Inject constructor(
                             return false
                         }
                     } else if (openInNewTab) {
-                        webViewClientListener?.openLinkInNewTab(url)
+                        listener.openLinkInNewTab(url)
                         return true
                     } else {
                         val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
