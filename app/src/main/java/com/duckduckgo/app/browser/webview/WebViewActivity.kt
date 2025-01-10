@@ -22,6 +22,7 @@ import android.view.MenuItem
 import android.webkit.WebSettings
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.BrowserChromeClient
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
@@ -42,6 +43,9 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
 
+    @Inject
+    lateinit var webChromeClient: BrowserChromeClient
+
     private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
@@ -60,6 +64,7 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
+            it.webChromeClient = webChromeClient
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
