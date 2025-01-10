@@ -528,7 +528,6 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
-        // val mockClientProvider: ClientBrandHintProvider = mock()
         testee.clientProvider = mock()
 
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
@@ -549,7 +548,6 @@ class BrowserWebViewClientTest {
         (webView as TestWebView).webViewUrl = EXAMPLE_URL
 
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        // verify(listener).onShouldOverride()
         verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
     }
 
