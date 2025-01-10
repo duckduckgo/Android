@@ -171,6 +171,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun configureToolbar() {
         if (bookmarksSortingFeature.self().isEnabled()) {
             binding.appBarLayout.gone()
+            binding.appBarLayoutSorting.show()
             binding.browserMenu.setOnClickListener {
                 showPopupMenu(binding.browserMenu)
             }
@@ -182,9 +183,18 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             }
         } else {
             binding.appBarLayoutSorting.gone()
+            binding.appBarLayout.show()
         }
         setupToolbar(toolbar)
-        supportActionBar?.title = getParentFolderName()
+        setToolbarTitle(getParentFolderName())
+    }
+
+    private fun setToolbarTitle(title: String) {
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            binding.toolbarTitle.text = title
+        } else {
+            supportActionBar?.title = title
+        }
     }
 
     private fun getParentFolderName() =
@@ -280,7 +290,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     state.bookmarkItems != null && state.bookmarkItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
-                binding.searchMenu.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
+                binding.searchMenu.isVisible =
+                    viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
                 exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
@@ -423,17 +434,21 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        searchMenuItem = menu.findItem(R.id.action_search)
-        exportMenuItem = menu.findItem(R.id.bookmark_export)
-        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
-            val textColorAttr = commonR.attr.daxColorTextDisabled
-            val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
-            spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
-            exportMenuItem?.title = spannable
-            exportMenuItem?.isEnabled = false
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            return false
+        } else {
+            searchMenuItem = menu.findItem(R.id.action_search)
+            exportMenuItem = menu.findItem(R.id.bookmark_export)
+            if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
+                val textColorAttr = commonR.attr.daxColorTextDisabled
+                val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
+                spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+                exportMenuItem?.title = spannable
+                exportMenuItem?.isEnabled = false
+            }
+            searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
+            return super.onPrepareOptionsMenu(menu)
         }
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initializeSearchBar() {

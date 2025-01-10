@@ -29,9 +29,7 @@
         android:id="@+id/appBarLayoutSorting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -51,6 +49,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginVertical="@dimen/keyline_2">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bookmarksActivityTitle"
+                        app:typography="h2"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <FrameLayout
                         android:id="@+id/searchMenu"

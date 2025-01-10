@@ -26,6 +26,5 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface BookmarksSortingFeature {
     @Toggle.DefaultValue(false)
-    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 }
