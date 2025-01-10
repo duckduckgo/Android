@@ -23,7 +23,6 @@
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">O Duck Player permite-te ver o YouTube sem anúncios segmentados no DuckDuckGo, e o que vês não vai influenciar as tuas recomendações.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Preferências de vídeo</string>
-    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Abrir o Duck Player num novo separador sempre que possível</string>
     <string name="duck_player_settings_unavailable_description">O Duck Player permite-te ver o YouTube sem anúncios segmentados no DuckDuckGo, e o que vês não vai influenciar as tuas recomendações.</string>
     <string name="duck_player_mode_always">Sempre</string>
     <string name="duck_player_mode_never">Nunca</string>

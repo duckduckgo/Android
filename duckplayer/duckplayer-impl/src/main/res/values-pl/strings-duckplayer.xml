@@ -23,7 +23,6 @@
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Preferencje filmów</string>
-    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Otwieraj Duck Player w nowej karcie, gdy tylko jest to możliwe</string>
     <string name="duck_player_settings_unavailable_description">Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje.</string>
     <string name="duck_player_mode_always">Zawsze</string>
     <string name="duck_player_mode_never">Nigdy</string>

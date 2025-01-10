@@ -23,7 +23,6 @@
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.\n<annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Video preferences</string>
-    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Atvērt Duck Player jaunā cilnē, kad iespējams</string>
     <string name="duck_player_settings_unavailable_description">Duck Player ļauj skatīties YouTube bez mērķētām reklāmām DuckDuckGo vidē, un skatītais saturs neietekmē tev sniegtos ieteikumus.</string>
     <string name="duck_player_mode_always">Vienmēr</string>
     <string name="duck_player_mode_never">Nekad</string>

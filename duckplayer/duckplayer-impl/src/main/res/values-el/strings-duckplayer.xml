@@ -23,7 +23,6 @@
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_player_settings_video_preferences_header">Προτιμήσεις βίντεο</string>
-    <string name="duck_player_settings_open_in_a_new_tab_setting_when_possible">Ανοίξτε το Duck Player σε νέα καρτέλα όποτε είναι εφικτό</string>
     <string name="duck_player_settings_unavailable_description">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>
     <string name="duck_player_mode_always">Πάντα</string>
     <string name="duck_player_mode_never">Ποτέ</string>

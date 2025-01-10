@@ -260,7 +260,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_1"
-                    app:primaryText="@string/duck_player_settings_open_in_a_new_tab_setting_when_possible"
+                    app:primaryText="@string/duck_player_open_in_a_new_tab_setting"
                     app:showSwitch="true" />
 
             </LinearLayout>
