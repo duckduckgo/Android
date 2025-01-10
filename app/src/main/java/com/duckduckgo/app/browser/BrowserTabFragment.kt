@@ -627,6 +627,8 @@ class BrowserTabFragment :
         }
     }
 
+    val isInEditMode by lazy { omnibar.isInEditMode }
+
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
@@ -763,8 +765,6 @@ class BrowserTabFragment :
     private var loginDetectionDialog: DaxAlertDialog? = null
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
-
-    private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
     private var webShareRequest =
         registerForActivityResult(WebShareChooser()) {
