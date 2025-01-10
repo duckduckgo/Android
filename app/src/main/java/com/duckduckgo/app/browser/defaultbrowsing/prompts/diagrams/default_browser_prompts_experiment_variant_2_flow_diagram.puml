@@ -10,17 +10,12 @@ if (Feature toggle enabled?) then (true)
       if (Is DDG the default browser app) then (no)
         switch (Number of message dialogs shown)
         case (0)
-        note
-          Is this case for new users truly needed?
-          Let's debate during the mid-mortem.
-        end note
           if (App active use days since enrollment >= 1?) then (yes)
             :Show message dialog;
           else (no)
           endif
         case (1)
           if (App active use days since enrollment >= 20?) then (yes)
-            :Show message dialog;
             :Show overflow menu highlight;
             :Show overflow menu item;
           else (no)
