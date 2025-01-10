@@ -319,6 +319,7 @@ class BrowserWebViewClientTest {
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", EXAMPLE_URL, EXAMPLE_URL)
+        webView.webViewUrl = EXAMPLE_URL
         testee.onReceivedHttpAuthRequest(webView, mockHandler, "example.com", EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
     }
@@ -1133,10 +1134,6 @@ class BrowserWebViewClientTest {
         }
 
         override fun getOriginalUrl(): String {
-            return EXAMPLE_URL
-        }
-
-        override fun getUrl(): String {
             return EXAMPLE_URL
         }
     }
