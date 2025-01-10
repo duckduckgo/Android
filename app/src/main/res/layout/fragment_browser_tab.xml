@@ -37,7 +37,7 @@
         app:omnibarPosition="top" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/slideDownHeaderView"
+        android:id="@+id/trackersBlockedSlidingView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?daxColorSurface"
