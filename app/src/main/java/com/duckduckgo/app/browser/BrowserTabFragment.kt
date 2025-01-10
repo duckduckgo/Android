@@ -918,9 +918,7 @@ class BrowserTabFragment :
                 val elevationInDp = 4
                 binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
                 layoutParams.gravity = Gravity.BOTTOM
-                layoutParams.behavior = TrackersBlockedViewSlideBehavior(requireContext())
-                binding.trackers.text = viewModel.trackersCount().toString()
-                binding.website.text = viewModel.url?.extractDomain()
+                layoutParams.behavior = TrackersBlockedViewSlideBehavior(viewModel.siteLiveData, requireContext())
             }
         }
     }
