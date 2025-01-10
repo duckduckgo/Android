@@ -37,6 +37,11 @@ interface DuckChatInternal : DuckChat {
      * Sets IO dispatcher.
      */
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+
+    /**
+     * Observes whether DuckChat should be shown in browser menu based on user settings and remote config flag
+     */
+    fun observeShowInBrowserMenu(): Flow<Boolean>
 }
 
 data class DuckChatSettingJson(
@@ -72,15 +77,17 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override suspend fun openDuckChat() {
-        val link = withContext(dispatchers.io()) {
-            duckChatFeature.self().getSettings()?.let {
-                runCatching {
-                    val settingsJson = jsonAdapter.fromJson(it)
-                    settingsJson?.aiChatURL
-                }.getOrDefault(DUCK_CHAT_WEB_LINK)
-            } ?: DUCK_CHAT_WEB_LINK
-        }
+    override suspend fun showInBrowserMenu(): Boolean = withContext(dispatchers.io()) {
+        duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
+    }
+
+    override fun openDuckChat() {
+        val link = duckChatFeature.self().getSettings()?.let {
+            runCatching {
+                val settingsJson = jsonAdapter.fromJson(it)
+                settingsJson?.aiChatURL
+            }.getOrDefault(DUCK_CHAT_WEB_LINK)
+        } ?: DUCK_CHAT_WEB_LINK
 
         val intent = globalActivityStarter.startIntent(
             context,

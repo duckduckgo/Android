@@ -33,7 +33,6 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChat
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -48,14 +47,10 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
-    private val duckChat: DuckChat,
 ) : ViewModel() {
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
-        context = viewModelScope.coroutineContext,
-    )
-    val duckChatVisibility = duckChat.observeShowInBrowserMenu().asLiveData(
         context = viewModelScope.coroutineContext,
     )
 
@@ -78,10 +73,6 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
         }
-    }
-
-    suspend fun onDuckChatMenuItemClicked() {
-        duckChat.openDuckChat()
     }
 
     suspend fun onTabSelected(tab: TabEntity) {

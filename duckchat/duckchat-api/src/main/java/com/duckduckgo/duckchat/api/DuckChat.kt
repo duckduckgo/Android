@@ -16,8 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import kotlinx.coroutines.flow.Flow
-
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
  */
@@ -31,12 +29,15 @@ interface DuckChat {
     suspend fun isEnabled(): Boolean
 
     /**
-     * Observes whether DuckChat should be shown in browser menu based on user settings and remote config flag
+     * Checks whether DuckChat should be shown in browser menu based on user settings.
+     * Sets IO dispatcher.
+     *
+     * @return true if DuckChat should be shown, false otherwise.
      */
-    fun observeShowInBrowserMenu(): Flow<Boolean>
+    suspend fun showInBrowserMenu(): Boolean
 
     /**
-     * Opens the DuckChat WebView. Sets IO dispatcher for disk operations.
+     * Opens the DuckChat WebView.
      */
-    suspend fun openDuckChat()
+    fun openDuckChat()
 }
