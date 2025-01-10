@@ -22,19 +22,29 @@ import android.view.Gravity
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extractDomain
 
 /**
  * This is a custom behavior for the trackersBlockedSlidingView and is used only when the omnibar is positioned at the bottom.
  *  We want to slide up the trackersBlockedSlidingView view and make it visible when the omnibar goes down, and slide down
  *  the trackersBlockedSlidingView view and set it to gone when the omnibar goes up.
  */
-class TrackersBlockedViewSlideBehavior(context: Context, attrs: AttributeSet? = null) : CoordinatorLayout.Behavior<View>(context, attrs) {
+class TrackersBlockedViewSlideBehavior(
+    private val siteLiveData: MutableLiveData<Site>,
+    context: Context,
+    attrs: AttributeSet? = null,
+) : CoordinatorLayout.Behavior<View>(context, attrs) {
 
     private var bottomOmnibar: OmnibarLayout? = null
     private var gravity: Int? = null
+    private var trackers: DaxTextView? = null
+    private var website: DaxTextView? = null
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
         if (dependency.id == R.id.newOmnibarBottom) {
@@ -45,6 +55,8 @@ class TrackersBlockedViewSlideBehavior(context: Context, attrs: AttributeSet? = 
             }
             if (bottomOmnibar == null) {
                 bottomOmnibar = dependency as OmnibarLayout
+                trackers = child.findViewById(R.id.trackers)
+                website = child.findViewById(R.id.website)
             }
         }
         return super.layoutDependsOn(parent, child, dependency)
@@ -64,6 +76,9 @@ class TrackersBlockedViewSlideBehavior(context: Context, attrs: AttributeSet? = 
             if (translation == 0f) {
                 child.hide()
             } else {
+                val site = siteLiveData.value
+                trackers?.text = site?.trackerCount.toString()
+                website?.text = site?.url?.extractDomain()
                 child.show()
             }
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
