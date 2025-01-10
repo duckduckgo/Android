@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.securestorage
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,26 +39,34 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
 
-    @Synchronized
     override fun getDatabase(): SecureStorageDatabase? {
         // If we have already the DB instance then let's use it
+        // use double-check locking optimisation
         if (_database != null) {
             return _database
         }
 
-        // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
-        return if (keyProvider.canAccessKeyStore()) {
-            // At this point, we are guaranteed that if l1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
-            _database = Room.databaseBuilder(
-                context,
-                SecureStorageDatabase::class.java,
-                "secure_storage_database_encrypted.db",
-            ).openHelperFactory(SupportOpenHelperFactory(keyProvider.getl1Key()))
-                .addMigrations(*ALL_MIGRATIONS)
-                .build()
-            _database
-        } else {
-            null
+        synchronized(this) {
+            if (_database == null) {
+                // Ensure the library is loaded before database creation
+                try {
+                    LibraryLoader.loadLibrary(context, "sqlcipher")
+                } catch (t: Throwable) {
+                    // error loading the library, return null db
+                    return null
+                }
+
+                if (keyProvider.canAccessKeyStore()) {
+                    _database = Room.databaseBuilder(
+                        context,
+                        SecureStorageDatabase::class.java,
+                        "secure_storage_database_encrypted.db",
+                    ).openHelperFactory(SupportOpenHelperFactory(keyProvider.getl1Key()))
+                        .addMigrations(*ALL_MIGRATIONS)
+                        .build()
+                }
+            }
         }
+        return _database
     }
 }

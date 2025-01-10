@@ -46,6 +46,7 @@ dependencies {
     implementation project(':data-store-api')
     testImplementation project(':feature-toggles-test')
     implementation project(path: ':settings-api') // temporary until we release new settings
+    implementation project(':library-loader-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
