@@ -812,10 +812,11 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboard
         }
 
+        browserViewState.value = currentBrowserViewState().copy(
+            showDuckChatOption = duckChat.showInBrowserMenu(),
+        )
+
         viewModelScope.launch {
-            browserViewState.value = currentBrowserViewState().copy(
-                showDuckChatOption = duckChat.showInBrowserMenu(),
-            )
             refreshOnViewVisible.emit(true)
         }
     }

@@ -18,38 +18,47 @@ package com.duckduckgo.duckchat.impl
 
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface DuckChatInternal : DuckChat {
     /**
-     * Stores setting to determine whether DuckChat should be shown in browser menu.
+     * Set user setting to determine whether DuckChat should be shown in browser menu.
      * Sets IO dispatcher.
      */
-    suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+    suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
 
     /**
-     * Observes whether DuckChat should be shown in browser menu based on user settings and remote config flag
+     * Observes whether DuckChat should be shown in browser menu based on user settings only.
      */
-    fun observeShowInBrowserMenu(): Flow<Boolean>
+    fun observeShowInBrowserMenuUserSetting(): Flow<Boolean>
 }
 
 data class DuckChatSettingJson(
     val aiChatURL: String,
 )
 
+@SingleInstanceIn(AppScope::class)
+
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
@@ -57,42 +66,54 @@ class RealDuckChat @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
-) : DuckChatInternal {
+    @IsMainProcess private val isMainProcess: Boolean,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
+    }
+
+    /** Cached value of whether we should show DuckChat in the menu or not */
+    private var showInBrowserMenu = false
+
+    /** Cached DuckChat web link */
+    private var duckChatLink = DUCK_CHAT_WEB_LINK
+
+    init {
+        if (isMainProcess) {
+            cacheDuckChatLink()
+            cacheShowInBrowser()
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        cacheDuckChatLink()
+        cacheShowInBrowser()
+    }
+
+    override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
+        duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
+        cacheShowInBrowser()
     }
 
     override suspend fun isEnabled(): Boolean = withContext(dispatchers.io()) {
         duckChatFeature.self().isEnabled()
     }
 
-    override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
+    override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
+        return duckChatFeatureRepository.observeShowInBrowserMenu()
     }
 
-    override fun observeShowInBrowserMenu(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeShowInBrowserMenu().map {
-            it && duckChatFeature.self().isEnabled()
-        }
-    }
-
-    override suspend fun showInBrowserMenu(): Boolean = withContext(dispatchers.io()) {
-        duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
+    override fun showInBrowserMenu(): Boolean {
+        return showInBrowserMenu
     }
 
     override fun openDuckChat() {
-        val link = duckChatFeature.self().getSettings()?.let {
-            runCatching {
-                val settingsJson = jsonAdapter.fromJson(it)
-                settingsJson?.aiChatURL
-            }.getOrDefault(DUCK_CHAT_WEB_LINK)
-        } ?: DUCK_CHAT_WEB_LINK
-
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(
-                url = link,
+                url = duckChatLink,
                 screenTitle = context.getString(R.string.duck_chat_title),
             ),
         )
@@ -100,6 +121,23 @@ class RealDuckChat @Inject constructor(
         intent?.let {
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(it)
+        }
+    }
+
+    private fun cacheDuckChatLink() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            duckChatLink = duckChatFeature.self().getSettings()?.let {
+                runCatching {
+                    val settingsJson = jsonAdapter.fromJson(it)
+                    settingsJson?.aiChatURL
+                }.getOrDefault(DUCK_CHAT_WEB_LINK)
+            } ?: DUCK_CHAT_WEB_LINK
+        }
+    }
+
+    private fun cacheShowInBrowser() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
         }
     }
 
