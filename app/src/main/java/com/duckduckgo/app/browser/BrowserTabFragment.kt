@@ -46,6 +46,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.ContextMenu
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -69,6 +70,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -139,7 +141,9 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.TrackersBlockedViewSlideBehavior
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -864,6 +868,7 @@ class BrowserTabFragment :
         createPopupMenu()
 
         configureOmnibar()
+        configureTrackersBlockedSlidingView()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -895,26 +900,46 @@ class BrowserTabFragment :
         configureFindInPage()
         configureOmnibarTextInput()
         configureItemPressedListener()
-        configureVerticalScrollListener()
         configureCustomTab()
     }
 
-    private fun configureVerticalScrollListener() {
+    private fun configureTrackersBlockedSlidingView() {
+        val displayMetrics = resources.displayMetrics
+        val layoutParams = binding.trackersBlockedSlidingView.layoutParams as CoordinatorLayout.LayoutParams
+        when (omnibar.omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                val elevationInDp = 6
+                binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
+                layoutParams.gravity = Gravity.NO_GRAVITY
+                layoutParams.behavior = null
+                configureTopOmnibarOffsetChangedListener()
+            }
+            OmnibarPosition.BOTTOM -> {
+                val elevationInDp = 4
+                binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
+                layoutParams.gravity = Gravity.BOTTOM
+                layoutParams.behavior = TrackersBlockedViewSlideBehavior(requireContext())
+                binding.trackers.text = viewModel.trackersCount().toString()
+                binding.website.text = viewModel.url?.extractDomain()
+            }
+        }
+    }
+
+    private fun configureTopOmnibarOffsetChangedListener() {
         binding.newOmnibar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val totalScrollRange = appBarLayout.totalScrollRange
-            // Calculate the fraction of the AppBarLayout's total scroll range that has been completed.
             val scrollFraction = -verticalOffset / totalScrollRange.toFloat()
             notifyVerticalOffsetChanged(scrollFraction)
         }
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
-        // Move the slideDownHeaderView in sync with the top omnibar.
-        binding.slideDownHeaderView.translationY = -binding.slideDownHeaderView.height * (1 - scrollFraction)
+        // Move the trackersBlockedSlidingView in sync with the top omnibar.
+        binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
-            binding.slideDownHeaderView.gone()
+            binding.trackersBlockedSlidingView.gone()
         } else {
-            binding.slideDownHeaderView.show()
+            binding.trackersBlockedSlidingView.show()
         }
         binding.trackers.text = viewModel.trackersCount().toString()
         binding.website.text = viewModel.url?.extractDomain()
