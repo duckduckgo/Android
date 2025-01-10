@@ -505,12 +505,6 @@ class BrowserTabViewModel @Inject constructor(
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    private val duckChatVisibility = duckChat.observeShowInBrowserMenu().asLiveData(
-        context = viewModelScope.coroutineContext,
-    )
-
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
         context = viewModelScope.coroutineContext,
     )
@@ -549,10 +543,6 @@ class BrowserTabViewModel @Inject constructor(
         if (shouldShowAnimation) {
             registerAndScheduleDismissAction()
         }
-    }
-
-    private val duckChatVisibilityObserver = Observer<Boolean> {
-        browserViewState.value = currentBrowserViewState().copy(showDuckChatOption = it)
     }
 
     private fun registerAndScheduleDismissAction() {
@@ -605,7 +595,6 @@ class BrowserTabViewModel @Inject constructor(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
-        duckChatVisibility.observeForever(duckChatVisibilityObserver)
 
         tabRepository.childClosedTabs.onEach { closedTab ->
             if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
@@ -793,7 +782,6 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
-        duckChatVisibility.removeObserver(duckChatVisibilityObserver)
         super.onCleared()
     }
 
@@ -825,6 +813,9 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            browserViewState.value = currentBrowserViewState().copy(
+                showDuckChatOption = duckChat.showInBrowserMenu(),
+            )
             refreshOnViewVisible.emit(true)
         }
     }
@@ -2431,11 +2422,13 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
+            val showDuckChat = duckChat.showInBrowserMenu()
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
                     addToHomeVisible = addToHomeSupported,
                     showAutofill = showAutofill,
+                    showDuckChatOption = showDuckChat,
                 )
             }
         }
@@ -2564,12 +2557,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         onUserDismissedCta(ctaViewState.value?.cta)
-    }
-
-    fun onDuckChatMenuItemClicked() {
-        viewModelScope.launch {
-            duckChat.openDuckChat()
-        }
     }
 
     fun onCtaShown() {
