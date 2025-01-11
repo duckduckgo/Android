@@ -59,16 +59,17 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         Timber.d("WebLocalStorageManager: Matching regex: $matchingRegex")
 
         databaseProvider.get().use { db ->
-            val iterator = db.iterator()
-            iterator.seekToFirst()
+            db.iterator().use { iterator ->
+                iterator.seekToFirst()
 
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                val key = String(entry.key, StandardCharsets.UTF_8)
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    val key = String(entry.key, StandardCharsets.UTF_8)
 
-                if (!isAllowedKey(key)) {
-                    db.delete(entry.key)
-                    Timber.d("WebLocalStorageManager: Deleted key: $key")
+                    if (!isAllowedKey(key)) {
+                        db.delete(entry.key)
+                        Timber.d("WebLocalStorageManager: Deleted key: $key")
+                    }
                 }
             }
         }

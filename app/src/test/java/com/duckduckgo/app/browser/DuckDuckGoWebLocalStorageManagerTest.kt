@@ -152,13 +152,14 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDBIsClosed() {
+    fun whenClearWebLocalStorageThenDBAndIteratorIsClosed() {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
         whenever(mockIterator.hasNext()).thenReturn(false)
 
         testee.clearWebLocalStorage()
 
         verify(mockDB).close()
+        verify(mockIterator).close()
     }
 
     private fun createMockDBEntry(key: ByteArray): MutableMap.MutableEntry<ByteArray, ByteArray> {
