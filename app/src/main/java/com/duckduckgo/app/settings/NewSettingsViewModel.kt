@@ -50,6 +50,7 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
@@ -68,6 +69,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -101,6 +103,7 @@ class NewSettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
+    private val duckChat: DuckChat,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -115,6 +118,7 @@ class NewSettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
     )
 
@@ -133,6 +137,7 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
+        data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
@@ -177,6 +182,7 @@ class NewSettingsViewModel @Inject constructor(
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                    isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),
             )
@@ -306,6 +312,10 @@ class NewSettingsViewModel @Inject constructor(
     fun onPermissionsSettingClicked() {
         viewModelScope.launch { command.send(LaunchPermissionsScreen) }
         pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
+    }
+
+    fun onDuckChatSettingClicked() {
+        viewModelScope.launch { command.send(LaunchDuckChatScreen) }
     }
 
     fun onAppearanceSettingClicked() {

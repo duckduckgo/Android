@@ -44,6 +44,10 @@
                 app:iconDrawable="@drawable/ic_add_16"
                 app:primaryText="@string/newTabMenuItem" />
 
+            <include
+                android:id="@+id/includeDuckChatMenuItem"
+                layout="@layout/view_menu_item_duck_chat" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
