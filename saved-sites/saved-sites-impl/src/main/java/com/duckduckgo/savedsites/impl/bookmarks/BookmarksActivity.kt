@@ -39,6 +39,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -62,6 +64,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.impl.BookmarksSortingFeature
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
@@ -79,12 +82,13 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
-import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -107,6 +111,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var bookmarksSortingFeature: BookmarksSortingFeature
+
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
 
@@ -120,10 +127,20 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private lateinit var contentBookmarksBinding: ContentBookmarksBinding
 
     private val toolbar
-        get() = binding.toolbar
+        get() =
+            if (bookmarksSortingFeature.self().isEnabled()) {
+                binding.toolbarSorting
+            } else {
+                binding.toolbar
+            }
 
     private val searchBar
-        get() = binding.searchBar
+        get() =
+            if (bookmarksSortingFeature.self().isEnabled()) {
+                binding.searchBarSorting
+            } else {
+                binding.searchBar
+            }
 
     private val startBookmarkFoldersActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -146,13 +163,38 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         setupBookmarksRecycler()
         observeViewModel()
+        initializeSearchBar()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
     }
 
     private fun configureToolbar() {
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            binding.appBarLayout.gone()
+            binding.appBarLayoutSorting.show()
+            binding.browserMenu.setOnClickListener {
+                showPopupMenu(binding.browserMenu)
+            }
+            binding.searchMenu.setOnClickListener {
+                showSearchBar()
+            }
+            binding.addFolderMenu.setOnClickListener {
+                launchAddFolder()
+            }
+        } else {
+            binding.appBarLayoutSorting.gone()
+            binding.appBarLayout.show()
+        }
         setupToolbar(toolbar)
-        supportActionBar?.title = getParentFolderName()
+        setToolbarTitle(getParentFolderName())
+    }
+
+    private fun setToolbarTitle(title: String) {
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            binding.toolbarTitle.text = title
+        } else {
+            supportActionBar?.title = title
+        }
     }
 
     private fun getParentFolderName() =
@@ -248,7 +290,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     state.bookmarkItems != null && state.bookmarkItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
-                setSearchMenuItemVisibility()
+                binding.searchMenu.isVisible =
+                    viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
                 exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
@@ -306,6 +349,24 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         )
     }
 
+    private fun launchBookmarkExport() {
+        val intent = Intent()
+            .setType("text/html")
+            .setAction(Intent.ACTION_CREATE_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
+
+        startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
+    }
+
+    private fun launchAddFolder() {
+        val parentId = getParentFolderId()
+        val parentFolderName = getParentFolderName()
+        val dialog = AddBookmarkFolderDialogFragment.instance(parentId, parentFolderName)
+        dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
+        dialog.listener = viewModel
+    }
+
     private fun showImportedSavedSites(result: ImportSavedSitesResult) {
         when (result) {
             is ImportSavedSitesResult.Error -> {
@@ -347,8 +408,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
-        return true
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            return false
+        } else {
+            menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
+            return true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -358,39 +423,32 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             }
 
             R.id.bookmark_export -> {
-                val intent = Intent()
-                    .setType("text/html")
-                    .setAction(Intent.ACTION_CREATE_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
-
-                startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
+                launchBookmarkExport()
             }
 
             R.id.action_add_folder -> {
-                val parentId = getParentFolderId()
-                val parentFolderName = getParentFolderName()
-                val dialog = AddBookmarkFolderDialogFragment.instance(parentId, parentFolderName)
-                dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
-                dialog.listener = viewModel
+                launchAddFolder()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        searchMenuItem = menu.findItem(R.id.action_search)
-        exportMenuItem = menu.findItem(R.id.bookmark_export)
-        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
-            val textColorAttr = commonR.attr.daxColorTextDisabled
-            val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
-            spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
-            exportMenuItem?.title = spannable
-            exportMenuItem?.isEnabled = false
+        if (bookmarksSortingFeature.self().isEnabled()) {
+            return false
+        } else {
+            searchMenuItem = menu.findItem(R.id.action_search)
+            exportMenuItem = menu.findItem(R.id.bookmark_export)
+            if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
+                val textColorAttr = commonR.attr.daxColorTextDisabled
+                val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
+                spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+                exportMenuItem?.title = spannable
+                exportMenuItem?.isEnabled = false
+            }
+            searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
+            return super.onPrepareOptionsMenu(menu)
         }
-        setSearchMenuItemVisibility()
-        initializeSearchBar()
-        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initializeSearchBar() {
@@ -398,6 +456,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true
+        }
+        binding.searchMenu.setOnClickListener {
+            showSearchBar()
         }
 
         searchBar.onAction {
@@ -425,15 +486,38 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         bookmarksAdapter.isInSearchMode = true
     }
 
+    private fun showPopupMenu(anchor: View) {
+        val popupMenu = PopupMenu(
+            layoutInflater,
+            R.layout.popup_bookmarks_menu,
+            width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
+        )
+        val view = popupMenu.contentView
+        val sortByName = view.findViewById<PopupMenuItemView>(R.id.sortByName)
+        val sortManually = view.findViewById<PopupMenuItemView>(R.id.sortManually)
+        val import = view.findViewById<PopupMenuItemView>(R.id.importBookmarks)
+        val export = view.findViewById<PopupMenuItemView>(R.id.exportBookmarks)
+
+        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
+            export.setDisabled()
+        }
+
+        sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+
+        popupMenu.apply {
+            onMenuItemClicked(sortByName) { }
+            onMenuItemClicked(sortManually) { }
+            onMenuItemClicked(import) { launchBookmarkImport() }
+            onMenuItemClicked(export) { launchBookmarkExport() }
+        }
+        popupMenu.show(binding.root, anchor)
+    }
+
     private fun hideSearchBar() {
         toolbar.show()
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
         searchBar.handle(SearchBar.Event.DismissSearchBar)
         bookmarksAdapter.isInSearchMode = false
-    }
-
-    private fun setSearchMenuItemVisibility() {
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
