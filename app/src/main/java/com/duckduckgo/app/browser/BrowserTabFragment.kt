@@ -83,10 +83,12 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
@@ -309,6 +311,7 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -520,6 +523,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -814,8 +820,19 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
-        webView?.let {
-            if (it.isShown) it.onResume()
+        Timber.d("Resuming webview: $tabId")
+        webView?.let { webView ->
+            if (webView.isShown) {
+                webView.onResume()
+            } else if (swipingTabsFeature.isEnabled) {
+                // Sometimes the tab is brought back from the background but the WebView is not visible yet due to
+                // ViewPager page change delay; this fixes an issue when a tab was blank.
+                webView.post {
+                    if (webView.isShown) {
+                        webView.onResume()
+                    }
+                }
+            }
         }
     }
 
@@ -858,6 +875,22 @@ class BrowserTabFragment :
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
+        }
+
+        if (swipingTabsFeature.isEnabled) {
+            disableSwipingOutsideTheOmnibar()
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun disableSwipingOutsideTheOmnibar() {
+        newBrowserTab.newTabLayout.setOnTouchListener { v, event ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            false
+        }
+        binding.autoCompleteSuggestionsList.setOnTouchListener { v, event ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            false
         }
     }
 
@@ -1102,7 +1135,11 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
-            requireActivity().recreate()
+            if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
+                (requireActivity() as BrowserActivity).clearTabsAndRecreate()
+            } else {
+                requireActivity().recreate()
+            }
             return
         }
 
@@ -1284,7 +1321,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.NewTab)
+        omnibar.setViewMode(ViewMode.NewTab)
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1300,7 +1337,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Browser(viewModel.url))
+        omnibar.setViewMode(ViewMode.Browser(viewModel.url))
     }
 
     private fun showError(
@@ -1311,7 +1348,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        omnibar.setViewMode(Omnibar.ViewMode.Error)
+        omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1332,7 +1369,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabContainerLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.setViewMode(Omnibar.ViewMode.SSLWarning)
+        omnibar.setViewMode(ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
@@ -1443,7 +1480,11 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                if (swipingTabsFeature.isEnabled) {
+                    browserActivity?.launchNewTab(it.query, it.sourceTabId)
+                } else {
+                    browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                }
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -1463,7 +1504,9 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
 
-            is Command.LaunchNewTab -> browserActivity?.launchNewTab()
+            is Command.LaunchNewTab -> {
+                browserActivity?.launchNewTab()
+            }
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
@@ -1710,6 +1753,7 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
+
                 browserActivity?.openExistingTab(it.tabId)
             }
 
@@ -2392,7 +2436,11 @@ class BrowserTabFragment :
             cancelPendingAutofillRequestsToChooseCredentials()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
-            binding.focusDummy.requestFocus()
+
+            // prevent a crash when the view is not initiliazed yet
+            if (view != null) {
+                binding.focusDummy.requestFocus()
+            }
         }
     }
 
@@ -2423,13 +2471,17 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        if (swipingTabsFeature.isEnabled) {
+            binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+        }
+
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
-        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
+        ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
@@ -2897,15 +2949,17 @@ class BrowserTabFragment :
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        runCatching {
-            webView?.safeHitTestResult?.let {
-                val target = getLongPressTarget(it)
-                if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
-                    return true
+        if (this.isResumed) {
+            runCatching {
+                webView?.safeHitTestResult?.let {
+                    val target = getLongPressTarget(it)
+                    if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
+                        return true
+                    }
                 }
+            }.onFailure { exception ->
+                Timber.e(exception, "Failed to get HitTestResult")
             }
-        }.onFailure { exception ->
-            Timber.e(exception, "Failed to get HitTestResult")
         }
         return super.onContextItemSelected(item)
     }
@@ -3182,7 +3236,7 @@ class BrowserTabFragment :
 
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob += lifecycleScope.launch {
-            viewModel.downloadCommands().cancellable().collect {
+            viewModel.downloadCommands().cancellable().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).collectLatest {
                 processFileDownloadedCommand(it)
             }
         }

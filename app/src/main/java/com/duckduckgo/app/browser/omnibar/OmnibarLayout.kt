@@ -260,6 +260,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
         omnibarTextListener = textListener
 
