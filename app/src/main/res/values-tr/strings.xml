@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsHeadingPrivacyProtections">Gizlilik Korumaları</string>
+    <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsHeadingMainSettings">Ana Ayarlar</string>
+    <string name="settingsHeadingMainSettings">Diğer Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Veri Temizleme</string>
     <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
-    <string name="settingsEnableVoiceSearch">Sesli Arama\'yı Etkinleştir</string>
+    <string name="settingsEnableVoiceSearch">Özel Sesli Aramayı Etkinleştir</string>
     <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Web İzleme Engelleyici Etkinleştirildi</string>
+    <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 

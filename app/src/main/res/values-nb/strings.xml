@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
-    <string name="settingsHeadingPrivacyProtections">Personvern</string>
+    <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Tilpass</string>
     <string name="settingsHeadingAbout">Om</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
     <string name="settingsHeadingSettings">Innstillinger</string>
-    <string name="settingsHeadingMainSettings">Hovedinnstillinger</string>
+    <string name="settingsHeadingMainSettings">Andre innstillinger</string>
     <string name="settingsPermissionsSetting">Tillatelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Sletting av data</string>
     <string name="settingsAddWidget">Legg til widgeten på startskjermen</string>
     <string name="settingsAddressBarPosition">Angi plassering av adressefeltet</string>
-    <string name="settingsEnableVoiceSearch">Aktiver talesøk</string>
+    <string name="settingsEnableVoiceSearch">Aktiver privat talesøk</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre plattformer</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
-    <string name="webTrackingProtectionTitle">Nettsporingsbeskyttelse er aktivert</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Nettsporingsbeskyttelse er aktivert</string>
+    <string name="webTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer deg aldri, og vi er opptatt av å beskytte personvernet ditt så godt som mulig. Vi vedlikeholder og utvikler kontinuerlig beskyttelseslag for å holde tritt med nye sporingsmetoder og tilbyr mange beskyttelsestiltak som andre nettlesere ikke har som standard. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkerer automatisk skjulte sporere når du surfer på nettet.\n<a href=\"\">Finn ut mer</a>]]></string>
 

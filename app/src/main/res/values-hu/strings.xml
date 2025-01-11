@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingPrivacyProtections">Adatvédelem</string>
+    <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsHeadingMainSettings">Főbeállítások</string>
+    <string name="settingsHeadingMainSettings">További beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
     <string name="settingsDataClearing">Adattörlés</string>
     <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
-    <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
+    <string name="settingsEnableVoiceSearch">Privát beszédhangalapú keresés engedélyezése</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
+    <string name="webTrackingProtectionIsEnabledTitle">A webes követés elleni védelem engedélyezve van</string>
+    <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 

@@ -33,6 +33,7 @@
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
+    <attr name="trailingIconTint" format="reference|color"/>
     <attr name="showBetaPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
@@ -78,6 +79,7 @@
         <attr name="leadingIconBackground"/>
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
+        <attr name="trailingIconTint"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
     </declare-styleable>

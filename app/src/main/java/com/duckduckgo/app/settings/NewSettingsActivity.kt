@@ -71,6 +71,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -201,6 +202,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         with(viewsOther) {
             aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
+            ddgOnOtherPlatformsSetting.setTrailingIconSize(Small)
             ddgOnOtherPlatformsSetting.setOnClickListener { viewModel.onDdgOnOtherPlatformsClicked() }
         }
     }

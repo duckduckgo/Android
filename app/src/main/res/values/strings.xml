@@ -124,7 +124,7 @@
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Privacy Protections</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Appearance</string>
     <string name="settingsHeadingCustomize">Customize</string>
     <string name="settingsHeadingAbout">About</string>
@@ -157,14 +157,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsHeadingMainSettings">Main Settings</string>
+    <string name="settingsHeadingMainSettings">Other Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Data Clearing</string>
-    <string name="settingsAddWidget">Add Widget to HomeScreen</string>
+    <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
-    <string name="settingsEnableVoiceSearch">Enable Voice Search</string>
+    <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
 
     <!-- Private Search -->
@@ -189,7 +189,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionTitle">Web Tracking Protection is Enabled</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Web Tracking Protection is Enabled</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 

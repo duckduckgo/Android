@@ -150,13 +150,25 @@
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
+        android:id="@+id/oneLineListItemWithTrailingIconTinted"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
+        app:primaryText="Item With Trailing Icon Tinted"
+        app:trailingIconTint="?attr/daxColorSecondaryIcon"
+        app:trailingIcon="@drawable/ic_open_in_16" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIconTinted"
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"

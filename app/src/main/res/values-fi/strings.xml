@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingPrivacyProtections">Yksityisyyden suoja</string>
+    <string name="settingsHeadingProtections">Suojaukset</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
     <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
-    <string name="settingsHeadingMainSettings">Pääasetukset</string>
+    <string name="settingsHeadingMainSettings">Muut asetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
     <string name="settingsDataClearing">Datan tyhjentäminen</string>
     <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
-    <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
+    <string name="settingsEnableVoiceSearch">Ota yksityinen äänihaku käyttöön</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Verkkoseurantasuojaus on käytössä</string>
+    <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 

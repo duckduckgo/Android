@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -179,6 +180,10 @@ abstract class DaxListItem(
     /** Sets the trailing image content description */
     fun setTrailingIconContentDescription(description: String) {
         trailingIcon.contentDescription = description
+    }
+
+    fun setTrailingIconTint(@ColorInt color: Int) {
+        trailingIcon.imageTintList = ColorStateList.valueOf(color)
     }
 
     /** Sets the item overflow menu click listener */
