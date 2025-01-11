@@ -21,6 +21,8 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.Callback
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -34,11 +36,14 @@ import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillStoreFormDataCredentialsRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillStoreFormDataRequest
+import com.duckduckgo.autofill.impl.jsbridge.request.FormSubmissionTriggerType.FORM_SUBMISSION
+import com.duckduckgo.autofill.impl.jsbridge.request.FormSubmissionTriggerType.PARTIAL_SAVE
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -79,6 +84,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val loginDeduplicator: AutofillLoginDeduplicator = NoopDeduplicator()
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val partialCredentialSaveStore: PartialCredentialSaveStore = mock()
+    private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
     private val testCallback = TestCallback()
@@ -107,11 +114,15 @@ class AutofillStoredBackJavascriptInterfaceTest {
             loginDeduplicator = loginDeduplicator,
             systemAutofillServiceSuppressor = systemAutofillServiceSuppressor,
             neverSavedSiteRepository = neverSavedSiteRepository,
+            partialCredentialSaveStore = partialCredentialSaveStore,
+            existingCredentialMatchDetector = existingCredentialMatchDetector,
         )
         testee.callback = testCallback
         testee.webView = testWebView
         testee.autoSavedLoginsMonitor = testSavedLoginsMonitor
 
+        whenever(partialCredentialSaveStore.consumeUsernameFromBackFill(any())).thenReturn(null)
+        whenever(existingCredentialMatchDetector.determine(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(NoMatch)
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
         whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(
             Result.success(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED, null)),
@@ -335,14 +346,37 @@ class AutofillStoredBackJavascriptInterfaceTest {
         assertNull(testCallback.credentialsToSave)
     }
 
+    @Test
+    fun whenPartialFormSubmissionWithUsernameThenPartialSavePersisted() = runTest {
+        val username = "user"
+        val url = "https://example.com"
+        configureRequestParserToReturnPartialSaveRequestType(username = username)
+        whenever(currentUrlProvider.currentUrl(anyOrNull())).thenReturn(url)
+        testee.storeFormData("")
+        verify(partialCredentialSaveStore).saveUsername(url = eq(url), username = eq(username))
+    }
+
+    @Test
+    fun whenPartialFormSubmissionWithNoUsernameThenPartialSaveNotPersisted() = runTest {
+        configureRequestParserToReturnPartialSaveRequestType(username = null)
+        testee.storeFormData("")
+        verifyNoInteractions(partialCredentialSaveStore)
+    }
+
     private suspend fun configureRequestParserToReturnSaveCredentialRequestType(
         username: String?,
         password: String?,
     ) {
         val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = password)
-        val topLevelRequest = AutofillStoreFormDataRequest(credentials)
+        val topLevelRequest = AutofillStoreFormDataRequest(credentials, FORM_SUBMISSION)
         whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(Result.success(topLevelRequest))
-        whenever(passwordEventResolver.decideActions(anyOrNull(), any())).thenReturn(listOf(Actions.PromptToSave))
+        whenever(passwordEventResolver.decideActions(anyOrNull(), any(), eq(NoMatch))).thenReturn(listOf(Actions.PromptToSave))
+    }
+
+    private suspend fun configureRequestParserToReturnPartialSaveRequestType(username: String?) {
+        val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = null)
+        val topLevelRequest = AutofillStoreFormDataRequest(credentials, PARTIAL_SAVE)
+        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(Result.success(topLevelRequest))
     }
 
     private fun assertCredentialsContains(
@@ -435,6 +469,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
     }
 
     private class NoopDeduplicator : AutofillLoginDeduplicator {
-        override fun deduplicate(originalUrl: String, logins: List<LoginCredentials>): List<LoginCredentials> = logins
+        override fun deduplicate(
+            originalUrl: String,
+            logins: List<LoginCredentials>,
+        ): List<LoginCredentials> = logins
     }
 }
