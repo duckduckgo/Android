@@ -17,10 +17,15 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.text.HtmlCompat
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewMaliciousSiteBlockedWarningBinding
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -38,11 +43,15 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
 
     private val binding: ViewMaliciousSiteBlockedWarningBinding by viewBinding()
 
-    fun bind() {
+    fun bind(
+        url: Uri,
+        actionHandler: (Action) -> Unit
+    ) {
         resetViewState()
 
         with(binding) {
-            setListeners()
+            formatCopy()
+            setListeners(url, actionHandler)
         }
     }
 
@@ -53,14 +62,29 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
         }
     }
 
-    private fun setListeners() {
+    private fun formatCopy() {
         with(binding) {
+            expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.sslErrorExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+    }
+
+    private fun setListeners(
+        url: Uri,
+        actionHandler: (Action) -> Unit
+    ) {
+        with(binding) {
+            leaveSiteCTA.setOnClickListener {
+                actionHandler(LeaveSite)
+            }
             advancedCTA.setOnClickListener {
                 advancedCTA.gone()
                 advancedGroup.show()
-                errorLayout.post {
-                    errorLayout.fullScroll(View.FOCUS_DOWN)
+                maliciousSiteLayout.post {
+                    maliciousSiteLayout.fullScroll(View.FOCUS_DOWN)
                 }
+            }
+            expandedCTA.setOnClickListener {
+                actionHandler(VisitSite)
             }
         }
     }

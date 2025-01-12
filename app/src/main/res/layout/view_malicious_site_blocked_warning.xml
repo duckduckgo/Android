@@ -17,8 +17,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/errorLayout"
+    android:id="@+id/maliciousSiteLayout"
     android:background="?attr/daxColorBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -91,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="advancedDivider, expandedHeadline"/>
+            app:constraint_referenced_ids="advancedDivider, expandedHeadline, expandedCTA"/>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/advancedDivider"
@@ -116,31 +115,18 @@
             app:typography="body2"
             android:text="@string/maliciousSiteExpandedHeadline" />
 
-        <!--<com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/sslErrorExpandedMessage"
-            android:layout_width="@dimen/sslWarningTextWidth"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginHorizontal="@dimen/keyline_5"
-            android:gravity="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedHeadline"
-            app:typography="body2"
-            tools:text="@string/sslErrorExpiredMessage" />
-
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/sslErrorAcceptCta"
+            android:id="@+id/expandedCTA"
             android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_5"
             android:layout_marginHorizontal="@dimen/keyline_5"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedMessage"
+            app:layout_constraintTop_toBottomOf="@+id/expandedHeadline"
             app:typography="body2"
-            tools:text="@string/sslErrorExpandedCTA" />-->
+            android:text="@string/sslErrorExpandedCTA" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

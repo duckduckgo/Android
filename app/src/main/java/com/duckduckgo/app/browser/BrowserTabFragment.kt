@@ -160,6 +160,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
@@ -579,7 +580,7 @@ class BrowserTabFragment :
     private val errorView
         get() = binding.includeErrorView
 
-    private val warningView
+    private val maliciousWarningView
         get() = binding.maliciousSiteWarningLayout
 
     private val sslErrorView
@@ -1338,24 +1339,27 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showWarning(url: Uri) {
+    private fun showMaliciousWarning(url: Uri) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
-        // TODO (cbarreiro) we should probably define a new view mode
-        omnibar.setViewMode(Omnibar.ViewMode.Error)
+        errorView.errorLayout.gone()
+        binding.browserLayout.gone()
+        omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
         webView?.onPause()
         webView?.hide()
-        warningView.bind(/*handler, errorResponse*/) /*{ action ->
-            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
-        }*/
-        warningView.show()
-        // warningView.leaveSiteButton.setOnClickListener {
-        //     viewModel.closeCurrentTab()
-        //     // TODO (cbarreiro) Fix, not working
-        //     renderer.showNewTab()
-        // }
+        maliciousWarningView.bind(url) { action ->
+            when (action) {
+                is Action.VisitSite -> webView?.loadUrl(url.toString())
+                is Action.LeaveSite -> {
+                    viewModel.closeCurrentTab()
+                    renderer.showNewTab()
+                }
+            }
+            // viewModel.onMaliciousSiteWarningAction(action, url.toString())
+        }
+        maliciousWarningView.show()
     }
 
     private fun showSSLWarning(
@@ -1700,7 +1704,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.WebViewWarningMaliciousSite -> showWarning(it.url)
+            is Command.WebViewWarningMaliciousSite -> showMaliciousWarning(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
