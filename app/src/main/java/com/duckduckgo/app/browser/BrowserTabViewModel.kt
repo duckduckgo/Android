@@ -201,6 +201,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -3357,6 +3358,13 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
         }
+    }
+
+    fun onMaliciousSiteWarningAction(
+        action: MaliciousSiteBlockedWarningLayout.Action,
+        url: String,
+    ) {
+        TODO()
     }
 
     fun onSSLCertificateWarningAction(
