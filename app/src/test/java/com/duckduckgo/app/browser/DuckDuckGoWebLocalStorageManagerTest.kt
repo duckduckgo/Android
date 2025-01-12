@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle
-import javax.inject.Provider
+import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.DBIterator
@@ -39,7 +39,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
 
     private val mockDB: DB = mock()
     private val mockIterator: DBIterator = mock()
-    private val mockDatabaseProvider: Provider<DB> = mock()
+    private val mockDatabaseProvider: Lazy<DB> = mock()
     private val mockWebLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockToggle: Toggle = mock()
@@ -152,13 +152,12 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDBAndIteratorIsClosed() {
+    fun whenClearWebLocalStorageThenIteratorIsClosed() {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
         whenever(mockIterator.hasNext()).thenReturn(false)
 
         testee.clearWebLocalStorage()
 
-        verify(mockDB).close()
         verify(mockIterator).close()
     }
 

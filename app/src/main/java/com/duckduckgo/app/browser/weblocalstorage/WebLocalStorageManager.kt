@@ -21,13 +21,13 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import java.io.File
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.runBlocking
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
@@ -40,7 +40,7 @@ interface WebLocalStorageManager {
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoWebLocalStorageManager @Inject constructor(
-    private val databaseProvider: Provider<DB>,
+    private val databaseProvider: Lazy<DB>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
 ) : WebLocalStorageManager {
@@ -58,18 +58,17 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         Timber.d("WebLocalStorageManager: Allowed domains: $domains")
         Timber.d("WebLocalStorageManager: Matching regex: $matchingRegex")
 
-        databaseProvider.get().use { db ->
-            db.iterator().use { iterator ->
-                iterator.seekToFirst()
+        val db = databaseProvider.get()
+        db.iterator().use { iterator ->
+            iterator.seekToFirst()
 
-                while (iterator.hasNext()) {
-                    val entry = iterator.next()
-                    val key = String(entry.key, StandardCharsets.UTF_8)
+            while (iterator.hasNext()) {
+                val entry = iterator.next()
+                val key = String(entry.key, StandardCharsets.UTF_8)
 
-                    if (!isAllowedKey(key)) {
-                        db.delete(entry.key)
-                        Timber.d("WebLocalStorageManager: Deleted key: $key")
-                    }
+                if (!isAllowedKey(key)) {
+                    db.delete(entry.key)
+                    Timber.d("WebLocalStorageManager: Deleted key: $key")
                 }
             }
         }
