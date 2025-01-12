@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Denunciar falha no site</string>
-    <string name="brokenSiteHeading">Denunciar site danificado</string>
-    <string name="brokenSiteSubmitted">Obrigado! Comentário enviado</string>
-    <string name="brokenSitesCategoriesTitle">Descrever o que aconteceu</string>
-    <string name="brokenSitesCategoriesHint">Descrever o que aconteceu</string>
-    <string name="brokenSiteSubmitButton">Enviar relatório</string>
-    <string name="brokenSiteDescription">O envio de um relatório anónimo de site com problemas ajuda-nos a melhorar a aplicação.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site bloqueado ou que não foi carregado</string>
-    <string name="brokenSiteCategoryLayout">Disposição do site com problemas</string>
-    <string name="brokenSiteCategoryEmptySpaces">O site contém espaços vazios grandes</string>
-    <string name="brokenSiteCategoryShopping">Não é possível pagar, finalizar a compra ou fazer compras</string>
-    <string name="brokenSiteCategoryPaywall">O site solicitou que desativasse o bloqueador de anúncios</string>
-    <string name="brokenSiteCategoryComments">Os comentários, avaliações ou chats não foram carregados</string>
-    <string name="brokenSiteCategoryVideos">O vídeo não foi reproduzido ou carregado</string>
-    <string name="brokenSiteCategoryLogin">Não consigo iniciar sessão/registar-me</string>
-    <string name="brokenSiteCategoryOther">Outra coisa</string>
-    <string name="brokenSiteDescriptionTextInputHint">Partilhar mais detalhes (opcional)</string>
-    <string name="brokenSiteDescriptionCaption">O que aconteceu? O que deveria ter acontecido? Desativar as proteções ajudou?</string>
 
     <string name="brokenSiteProtectionsOn">As proteções estão <b>ATIVADAS</b> para este site</string>
     <string name="brokenSiteProtectionsOff">As proteções estão <b>DESATIVADAS</b> para este site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">A desativação das proteções pode ajudar.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Desativámos temporariamente as Proteções de Privacidade, pois parecem estar a impedir que o site funcione corretamente.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vê o que foi enviado</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>As informações enviadas nos relatórios não podem ser utilizadas para te identificar:</b><br/><br/>• URL da página (sem informações identificáveis)<br/>• Marca, modelo e fabricante do dispositivo<br/>• Número da versão do sistema operativo<br/>• Número da versão da aplicação<br/>• Grupo de experiência anónimo para testagem de funcionalidades<br/>• Informações sobre que versões das nossas proteções estavam ativas<br/>• Número da versão do motor do navegador web<br/>• Lista das proteções e funcionalidades do navegador que estavam ativas<br/>• Nomes de anfitriões de rastreadores bloqueados, pedidos de substituição, pedidos ignorados e pedidos que não estão na lista de bloqueio de rastreadores<br/>• Erros comunicados pelo navegador<br/>• Códigos de estado de resposta do site (HTTP)<br/>• Que forma de relatório utilizaste (menu, painel, etc.)<br/>• Data do último relatório enviado para este site<br/>• Se optaste ou não por mostrar esta informação do relatório<br/>• Número de vezes que as proteções foram desativadas<br/>• A rapidez com que partes da página foram carregadas<br/>• Como chegaste a esta página: SERP (pesquisa DuckDuckGo), Navegação (link/URL), ou Externa (outros meios)<br/>• Número de atualizações desde o carregamento da página<br/>• Idioma principal e país do teu dispositivo<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>

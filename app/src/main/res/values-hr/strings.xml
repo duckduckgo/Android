@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Prijavi neispravno web-mjesto</string>
-    <string name="brokenSiteHeading">Prijavi neispravno web-mjesto</string>
-    <string name="brokenSiteSubmitted">Hvala! Povratne su informacije su poslane.</string>
-    <string name="brokenSitesCategoriesTitle">Opiši što se dogodilo</string>
-    <string name="brokenSitesCategoriesHint">Opišite što se dogodilo</string>
-    <string name="brokenSiteSubmitButton">Pošalji izvješće</string>
-    <string name="brokenSiteDescription">Podnošenje anonimnog izvješća o neispravnoj web-lokaciji pomaže nam poboljšati aplikaciju.</string>
-
-    <string name="brokenSiteCategoryBlocked">Stranica je blokirana ili se nije učitala</string>
-    <string name="brokenSiteCategoryLayout">Stranica ne izgleda ispravno</string>
-    <string name="brokenSiteCategoryEmptySpaces">Stranica sadrži velike prazne prostore</string>
-    <string name="brokenSiteCategoryShopping">Ne mogu platiti, odjaviti se ili kupovati</string>
-    <string name="brokenSiteCategoryPaywall">Web-lokacija me zamolila da onemogućim blokiranje oglasa</string>
-    <string name="brokenSiteCategoryComments">Komentari, recenzije ili razgovori nisu se učitali</string>
-    <string name="brokenSiteCategoryVideos">Videozapis se nije reproducirao niti učitao</string>
-    <string name="brokenSiteCategoryLogin">Ne mogu se prijaviti/registrirati</string>
-    <string name="brokenSiteCategoryOther">Nešto drugo</string>
-    <string name="brokenSiteDescriptionTextInputHint">Podijelite više pojedinosti (nije obavezno)</string>
-    <string name="brokenSiteDescriptionCaption">Šta se dogodilo? Što se trebalo dogoditi? Je li isključivanje zaštite pomoglo?</string>
 
     <string name="brokenSiteProtectionsOn">Zaštite su <b>UKLJUČENE</b> za ovu web lokaciju</string>
     <string name="brokenSiteProtectionsOff">Zaštite su <b>ISKLJUČENE</b> za ovu web lokaciju</string>
     <string name="brokenSiteProtectionsOnBannerMessage">ISKLJUČIVANJE zaštite može pomoći.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Privremeno smo onemogućili zaštitu privatnosti jer se čini da ona ruši ovu web lokaciju.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Pogledaj što je poslano</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podaci poslani u izvješćima ne mogu se koristiti za tvoju identifikaciju:</b><br/><br/>• URL stranice (bez podataka pomoću kojih se možeš identificirati)<br/>• Marka, model i proizvođač uređaja<br/>• Broj verzije operativnog sustava<br/>• Broj verzije aplikacije<br/>• Anonimna eksperimentalna grupa za testiranje značajki<br/>• Informacije o tome koje su verzije naših zaštita bile aktivne<br/>• Broj verzije motora internetskog preglednika<br/>• Popis aktivnih zaštita i značajki preglednika<br/>• Blokirana imena domaćina alata za praćenje, zamjenski zahtjevi, zanemareni zahtjevi i zahtjevi koji nisu na popisu blokiranih alata za praćenje<br/>• Pogreške koje je prijavio preglednik<br/>• Kodovi statusa odgovora web-mjesta (HTTP)<br/>• Koji je obrazac za izvješćivanje korišten (izbornik, nadzorna ploča itd.)<br/>• Datum posljednjeg izvješća poslanog za ovo web-mjesto<br/>• Je li odabrano prikazivanje ovih podataka o izvješću ili ne<br/>• Koliko je puta zaštita isključena<br/>• Koliko se brzo učitavaju dijelovi stranice<br/>• Kako si došao do ove stranice, ili: SERP (DuckDuckGo pretraživanje), Navigacija (veza/URL) ili Vanjska (drugi način)<br/>• Broj osvježavanja od učitavanja stranice<br/>• Primarni jezik i zemlja tvog uređaja<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>

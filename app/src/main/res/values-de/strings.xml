@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
-    <string name="brokenSiteHeading">Fehlerhafte Website melden</string>
-    <string name="brokenSiteSubmitted">Vielen Dank! Feedback wurde gesendet.</string>
-    <string name="brokenSitesCategoriesTitle">Beschreiben, was passiert ist</string>
-    <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
-    <string name="brokenSiteSubmitButton">Bericht senden</string>
-    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Webseiten hilft uns, die App zu verbessern.</string>
-
-    <string name="brokenSiteCategoryBlocked">Webseite blockiert oder nicht geladen</string>
-    <string name="brokenSiteCategoryLayout">Website-Layout fehlerhaft</string>
-    <string name="brokenSiteCategoryEmptySpaces">Die Webseite enthält große leere Flächen</string>
-    <string name="brokenSiteCategoryShopping">Bezahlen, Auschecken oder Einkaufen nicht möglich</string>
-    <string name="brokenSiteCategoryPaywall">Webseite hat mich aufgefordert, den Werbeblocker zu deaktivieren</string>
-    <string name="brokenSiteCategoryComments">Kommentare, Bewertungen oder Chats konnten nicht geladen werden</string>
-    <string name="brokenSiteCategoryVideos">Video konnte nicht abgespielt oder geladen werden</string>
-    <string name="brokenSiteCategoryLogin">Anmeldung/Registrierung nicht möglich</string>
-    <string name="brokenSiteCategoryOther">Etwas anderes</string>
-    <string name="brokenSiteDescriptionTextInputHint">Weitere Details teilen (optional)</string>
-    <string name="brokenSiteDescriptionCaption">Was ist passiert? Was hätte passieren sollen? Hat das Ausschalten der Schutzfunktionen geholfen?</string>
 
     <string name="brokenSiteProtectionsOn">Der Schutz ist für diese Website ist <b>AKTIVIERT</b></string>
     <string name="brokenSiteProtectionsOff">Der Schutz für diese Website ist <b>DEAKTIVIERT</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Das AUSschalten der Schutzfunktionen könnte helfen.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Wir haben den Datenschutz vorübergehend deaktiviert, da es den Anschein hat, dass die Seite dadurch gestört wird.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Sehen, was gesendet wurde</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Die in den Berichten gesendeten Informationen können nicht dazu verwendet werden, dich zu identifizieren:</b><br/><br/>• Seiten-URL (ohne identifizierbare Informationen)<br/>• Gerätemarke, -modell und -hersteller<br/>• Versionsnummer des Betriebssystems<br/>• Versionsnummer der App<br/>• Anonyme Experimentiergruppe für Funktionstests<br/>• Informationen darüber, welche Versionen unserer Schutzmaßnahmen aktiv waren<br/>• Versionsnummer der Webbrowser-Engine<br/>• Liste der Schutzmaßnahmen und Browserfunktionen, die aktiv waren<br/>• Hostnamen der blockierten Tracker, Ersatzanfragen, ignorierte Anfragen und Anfragen, die nicht in der Tracker-Blockierliste enthalten sind<br/>• Vom Browser gemeldete Fehler<br/>• Codes für den Website-Antwortstatus (HTTP)<br/>• Verwendete Berichtsform (Menü, Dashboard usw.)<br/>• Datum des letzten Berichts für diese Website<br/>• Ob du dich für die Anzeige dieser Berichtsinformationen entschieden hast oder nicht<br/>• Wie oft der Schutz ausgeschaltet wurde<br/>• Wie schnell Teile der Seite geladen wurden<br/>• Wie du auf diese Seite gekommen bist: SERP (DuckDuckGo-Suche), Navigation (Link/URL) oder extern (andere Mittel)<br/>• Anzahl der Aktualisierungen seit dem Laden der Seite<br/>• Hauptsprache und Land deines Geräts<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>

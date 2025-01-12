@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
-    <string name="brokenSiteHeading">Pranešti apie sugadintą svetainę</string>
-    <string name="brokenSiteSubmitted">Dėkojame! Atsiliepimas pateiktas.</string>
-    <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko</string>
-    <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
-    <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
-    <string name="brokenSiteDescription">Anoniminio pranešimo apie neveikiančią svetainę pateikimas padeda mums tobulinti programėlę.</string>
-
-    <string name="brokenSiteCategoryBlocked">Svetainė užblokuota arba neįkelta</string>
-    <string name="brokenSiteCategoryLayout">Svetainės išdėstymas sugadintas</string>
-    <string name="brokenSiteCategoryEmptySpaces">Svetainėje yra didelių tuščių vietų</string>
-    <string name="brokenSiteCategoryShopping">Negalite sumokėti, atsiskaityti ar apsipirkti</string>
-    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti reklamos blokavimo programą</string>
-    <string name="brokenSiteCategoryComments">Nepavyko įkelti komentarų, apžvalgų ar pokalbių</string>
-    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas arba įkeltas</string>
-    <string name="brokenSiteCategoryLogin">Nepavyksta prisijungti / užsiregistruoti</string>
-    <string name="brokenSiteCategoryOther">Kažkas kito</string>
-    <string name="brokenSiteDescriptionTextInputHint">Pasidalinkite daugiau informacijos (neprivaloma)</string>
-    <string name="brokenSiteDescriptionCaption">Kas nutiko? Kas turėjo nutikti? Ar padėjo išjungus apsaugos priemones?</string>
 
     <string name="brokenSiteProtectionsOn">Šios svetainės apsaugos priemonės yra <b>ĮJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOff">Šios svetainės apsaugos priemonės yra <b>IŠJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Žiūrėti, kas išsiųsta</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ataskaitose siunčiama informacija negali būti naudojama jūsų tapatybei nustatyti:</b><br/><br/>• puslapio URL (be identifikuojamos informacijos);<br/>• įrenginio markė, modelis ir gamintojas;<br/>• operacinės sistemos versijos numeris;<br/>• programos versijos numeris;<br/>• anoniminė eksperimentų grupė funkcijų testavimui;<br/>• informacija apie tai, kurios apsaugos versijos buvo aktyvios;<br/>• žiniatinklio naršyklės variklio versijos numeris;<br/>• sąrašas, kurios apsaugos ir naršyklės funkcijos buvo aktyvios;<br/>• užblokuotų stebėjimo priemonių, pakaitinių užklausų, ignoruojamų užklausų ir užklausų, kurios nėra stebėjimo priemonių blokavimo sąraše, prieglobos pavadinimai;<br/>• naršyklės praneštos klaidos;<br/>• svetainės atsako būsenos (HTTP) kodai;<br/>• naudota ataskaitų teikimo forma (meniu, prietaisų skydelis ir kt.);<br/>• paskutinio šios svetainės pranešimo siuntimo data;<br/>• ar pasirinkote rodyti šio pranešimo informaciją, ar ne;<br/>• apsaugos išjungimo kartų skaičius;<br/>• kaip greitai įkeltos puslapio dalys;<br/>• kaip patekote į šį puslapį: naudodami SERP („DuckDuckGo“ paieška), navigaciją (nuoroda / URL) ar išorinę priemonę (kitos priemonės);<br/>• atnaujinimų skaičius nuo puslapio įkėlimo;<br/>• pagrindinė jūsų įrenginio kalba ir šalis.<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>

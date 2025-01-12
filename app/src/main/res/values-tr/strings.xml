@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hatalı Siteyi Bildirin</string>
-    <string name="brokenSiteHeading">Hatalı Siteyi Bildir</string>
-    <string name="brokenSiteSubmitted">Teşekkürler! Geri bildirim gönderildi.</string>
-    <string name="brokenSitesCategoriesTitle">Ne olduğunu açıklayın</string>
-    <string name="brokenSitesCategoriesHint">Ne olduğunu açıklayın</string>
-    <string name="brokenSiteSubmitButton">Rapor gönder</string>
-    <string name="brokenSiteDescription">Anonim bir hatalı site raporunun gönderilmesi uygulamayı geliştirmemize yardımcı olur.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site engellendi veya yüklenmedi</string>
-    <string name="brokenSiteCategoryLayout">Sitede düzen hatalı</string>
-    <string name="brokenSiteCategoryEmptySpaces">Sitede geniş boş alanlar var</string>
-    <string name="brokenSiteCategoryShopping">Ödeme yapamıyorum, çıkış yapamıyorum veya alışveriş yapamıyorum</string>
-    <string name="brokenSiteCategoryPaywall">Site benden reklam engelleyiciyi devre dışı bırakmamı istedi</string>
-    <string name="brokenSiteCategoryComments">Yorumlar, incelemeler veya sohbetler yüklenmedi</string>
-    <string name="brokenSiteCategoryVideos">Video oynatılmadı veya yüklenmedi</string>
-    <string name="brokenSiteCategoryLogin">Oturum açamıyorum/kayıt olamıyorum</string>
-    <string name="brokenSiteCategoryOther">Başka bir şey</string>
-    <string name="brokenSiteDescriptionTextInputHint">Diğer ayrıntıları paylaşın (isteğe bağlı)</string>
-    <string name="brokenSiteDescriptionCaption">Ne oldu? Ne olması gerekiyordu? Korumaları kapatmak yardımcı oldu mu?</string>
 
     <string name="brokenSiteProtectionsOn">Bu site için korumalar <b>AÇIK</b></string>
     <string name="brokenSiteProtectionsOff">Bu site için korumalar <b>KAPALI</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>

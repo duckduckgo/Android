@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Raportează site defect</string>
-    <string name="brokenSiteHeading">Raportează site-ul defect</string>
-    <string name="brokenSiteSubmitted">Mulțumesc! Feedback trimis.</string>
-    <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat</string>
-    <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
-    <string name="brokenSiteSubmitButton">Trimite raportul</string>
-    <string name="brokenSiteDescription">Trimiterea unui raport anonim privind un site nefuncțional ne ajută să îmbunătățim aplicația.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site-ul era blocat sau nu s-a încărcat</string>
-    <string name="brokenSiteCategoryLayout">Aspectul site-ului era defectuos</string>
-    <string name="brokenSiteCategoryEmptySpaces">Site-ul conține spații goale mari</string>
-    <string name="brokenSiteCategoryShopping">Nu pot plăti sau nu pot face cumpărături</string>
-    <string name="brokenSiteCategoryPaywall">Site-ul mi-a solicitat să dezactivez funcția de blocare a reclamelor</string>
-    <string name="brokenSiteCategoryComments">Comentariile, recenziile sau mesajele chat nu s-au încărcat</string>
-    <string name="brokenSiteCategoryVideos">Videoclipul nu a fost redat sau nu s-a încărcat</string>
-    <string name="brokenSiteCategoryLogin">Nu pot să mă conectez/înregistrez</string>
-    <string name="brokenSiteCategoryOther">Altceva</string>
-    <string name="brokenSiteDescriptionTextInputHint">Distribuie mai multe detalii (opțional)</string>
-    <string name="brokenSiteDescriptionCaption">Ce s-a întâmplat? Ce ar fi trebuit să se întâmple? Dezactivarea protecțiilor a fost utilă?</string>
 
     <string name="brokenSiteProtectionsOn">Protecțiile sunt <b>ACTIVATE</b> pentru acest site</string>
     <string name="brokenSiteProtectionsOff">Protecțiile sunt <b>DEZACTIVATE</b> pentru acest site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vezi ce se trimite</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informațiile trimise în rapoarte nu pot fi folosite pentru a te identifica:</b><br/><br/>• Adresa URL a paginii (fără informații identificabile)<br/>• Marca, modelul și producătorul dispozitivului<br/>• Numărul versiunii sistemului de operare<br/>• Numărul versiunii aplicației<br/>• Grup de experimente anonim pentru testarea funcționalităților<br/>• Informații despre ce versiuni ale instrumentelor noastre de protecție au fost active<br/>• Numărul versiunii motorului browserului<br/>• Lista cu protecțiile și funcțiile browserului care erau active<br/>• Numele de gazdă ale tehnologiilor de urmărire blocate, solicitările surogat, solicitările ignorate și solicitările care nu se află în lista de blocare a tehnologiilor de urmărire<br/>• Erori raportate de browser<br/>• Codurile pentru starea răspunsului site-ului (HTTP) <br/>• Ce formular de raportare ai folosit (meniu, tablou de bord etc.)<br/>• Data ultimului raport trimis pentru acest site<br/>• Dacă ai ales sau nu să afișezi informațiile despre acest raport<br/>• Numărul de dezactivări ale instrumentelor de protecție<br/>• Cât de repede au fost încărcate anumite părți ale paginii<br/>• Cum ai ajuns la această pagină, fie: SERP (căutare DuckDuckGo), navigare (link/URL) sau extern (alte mijloace)<br/>• Numărul de reîmprospătări de la încărcarea paginii<br/>• Limba principală și țara dispozitivului tău <br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
