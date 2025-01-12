@@ -379,8 +379,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
         val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
         val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
-        const val MOBILE_SITE = "mobile"
-        const val DESKTOP_SITE = "desktop"
     }
 
     private fun currentViewState(): ViewState {
@@ -426,7 +424,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .map { Uri.parse(it.name).baseHost }
                     .distinct()
                     .joinToString(","),
-                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                siteType = if (site.isDesktopMode) BrokenSite.SITE_TYPE_DESKTOP else BrokenSite.SITE_TYPE_MOBILE,
                 urlParametersRemoved = site.urlParametersRemoved,
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
@@ -513,7 +511,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .map { Uri.parse(it.name).baseHost }
                     .distinct()
                     .joinToString(","),
-                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                siteType = if (site.isDesktopMode) BrokenSite.SITE_TYPE_DESKTOP else BrokenSite.SITE_TYPE_MOBILE,
                 urlParametersRemoved = site.urlParametersRemoved,
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,

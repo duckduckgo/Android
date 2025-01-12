@@ -260,7 +260,7 @@ class BrokenSiteViewModel @Inject constructor(
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
-            siteType = if (isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+            siteType = if (isDesktopMode) BrokenSite.SITE_TYPE_DESKTOP else BrokenSite.SITE_TYPE_MOBILE,
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
@@ -273,11 +273,6 @@ class BrokenSiteViewModel @Inject constructor(
             openerContext = openerContext?.context,
             jsPerformance = jsPerformance?.toList(),
         )
-    }
-
-    companion object {
-        const val MOBILE_SITE = "mobile"
-        const val DESKTOP_SITE = "desktop"
     }
 }
 

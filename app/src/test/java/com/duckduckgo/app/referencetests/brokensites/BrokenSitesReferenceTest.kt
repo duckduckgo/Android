@@ -17,7 +17,6 @@
 package com.duckduckgo.app.referencetests.brokensites
 
 import android.net.Uri
-import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -191,7 +190,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             upgradeHttps = testCase.wasUpgraded,
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
             surrogates = testCase.surrogates.joinToString(","),
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSite.SITE_TYPE_DESKTOP,
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),

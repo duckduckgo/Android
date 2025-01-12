@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.referencetests.brokensites
 
-import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.model.Atb
@@ -204,7 +203,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 upgradeHttps = report.wasUpgraded,
                 blockedTrackers = report.blockedTrackers.joinToString(","),
                 surrogates = report.surrogates.joinToString(","),
-                siteType = BrokenSiteViewModel.DESKTOP_SITE,
+                siteType = BrokenSite.SITE_TYPE_DESKTOP,
                 urlParametersRemoved = report.urlParametersRemoved.toBoolean(),
                 consentManaged = report.consentManaged.toBoolean(),
                 consentOptOutFailed = report.consentOptOutFailed.toBoolean(),
