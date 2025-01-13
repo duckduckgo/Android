@@ -37,6 +37,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintB
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -223,6 +224,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             anchor: View,
             bookmarkFolder: BookmarkFolder,
         ) {
+            Timber.d("Bookmarks: showOverFlowMenu")
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {

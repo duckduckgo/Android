@@ -91,6 +91,7 @@ import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
@@ -408,12 +409,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (bookmarksSortingFeature.self().isEnabled()) {
-            return false
-        } else {
-            menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
-            return true
-        }
+        menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -434,21 +431,18 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        if (bookmarksSortingFeature.self().isEnabled()) {
-            return false
-        } else {
-            searchMenuItem = menu.findItem(R.id.action_search)
-            exportMenuItem = menu.findItem(R.id.bookmark_export)
-            if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
-                val textColorAttr = commonR.attr.daxColorTextDisabled
-                val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
-                spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
-                exportMenuItem?.title = spannable
-                exportMenuItem?.isEnabled = false
-            }
-            searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-            return super.onPrepareOptionsMenu(menu)
+        Timber.d("Bookmarks: onPrepareOptionsMenu")
+        searchMenuItem = menu.findItem(R.id.action_search)
+        exportMenuItem = menu.findItem(R.id.bookmark_export)
+        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
+            val textColorAttr = commonR.attr.daxColorTextDisabled
+            val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
+            spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+            exportMenuItem?.title = spannable
+            exportMenuItem?.isEnabled = false
         }
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initializeSearchBar() {
