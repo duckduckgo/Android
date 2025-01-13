@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -46,6 +47,13 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Google.dagger
     implementation AndroidX.core.ktx
+
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+    testImplementation AndroidX.room.testing
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
