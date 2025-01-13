@@ -45,6 +45,7 @@ class BookmarksAdapter(
     private val onBookmarkClick: (Bookmark) -> Unit,
     private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
     private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
+    private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
@@ -111,10 +112,9 @@ class BookmarksAdapter(
             BOOKMARK_FOLDER_TYPE -> {
                 val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
                 return BookmarkFoldersViewHolder(
-                    layoutInflater,
                     binding,
-                    viewModel,
                     onBookmarkFolderClick,
+                    onBookmarkFolderOverflowClick,
                 )
             }
             EMPTY_STATE_TYPE -> {

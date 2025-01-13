@@ -86,6 +86,7 @@ import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
@@ -244,10 +245,17 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             viewModel,
             this,
             faviconManager,
-            onBookmarkClick = {},
+            onBookmarkClick = { bookmark ->
+                viewModel.onSelected(bookmark)
+            },
             onBookmarkOverflowClick = { anchor, bookmark ->
+                showBookmarkOverFlowMenu(anchor, bookmark)
             },
             onBookmarkFolderClick = { anchor, bookmarkFolder ->
+                viewModel.onBookmarkFolderSelected(bookmarkFolder)
+            },
+            onBookmarkFolderOverflowClick = { anchor, bookmarkFolder ->
+                showFolderOverflowMenu(anchor, bookmarkFolder)
             },
         )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
@@ -585,6 +593,59 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     override fun onPromotionDismissed() {
         viewModel.onPromotionDismissed()
+    }
+
+    private fun showFolderOverflowMenu(
+        anchor: View,
+        bookmarkFolder: BookmarkFolder,
+    ) {
+        Timber.d("Bookmarks: showFolderOverflowMenu")
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            onMenuItemClicked(view.findViewById(R.id.edit)) {
+                viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+            }
+            onMenuItemClicked(view.findViewById(R.id.delete)) {
+                viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
+            }
+        }
+        popupMenu.show(binding.root, anchor)
+    }
+
+    private fun showBookmarkOverFlowMenu(
+        anchor: View,
+        bookmark: SavedSite.Bookmark,
+    ) {
+        Timber.d("Bookmarks: showBookmarkOverFlowMenu")
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            onMenuItemClicked(view.findViewById(R.id.edit)) {
+                viewModel.onEditSavedSiteRequested(bookmark)
+            }
+            onMenuItemClicked(view.findViewById(R.id.delete)) {
+                viewModel.onDeleteSavedSiteRequested(bookmark)
+                viewModel.onBookmarkItemDeletedFromOverflowMenu()
+            }
+            onMenuItemClicked(view.findViewById(R.id.addRemoveFavorite)) {
+                addRemoveFavorite(bookmark)
+            }
+        }
+        if (bookmark.isFavorite) {
+            view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(getString(R.string.removeFromFavorites))
+        } else {
+            view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(getString(R.string.addToFavoritesMenu))
+        }
+        popupMenu.show(contentBookmarksBinding.recycler, anchor)
+    }
+
+    private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {
+        if (bookmark.isFavorite) {
+            viewModel.removeFavorite(bookmark)
+        } else {
+            viewModel.addFavorite(bookmark)
+        }
     }
 
     companion object {
