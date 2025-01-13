@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
@@ -28,6 +29,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
@@ -40,6 +42,9 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val onBookmarkClick: (Bookmark) -> Unit,
+    private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+    private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
@@ -99,6 +104,8 @@ class BookmarksAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
+                    onBookmarkClick,
+                    onBookmarkOverflowClick,
                 )
             }
             BOOKMARK_FOLDER_TYPE -> {
@@ -107,6 +114,7 @@ class BookmarksAdapter(
                     layoutInflater,
                     binding,
                     viewModel,
+                    onBookmarkFolderClick,
                 )
             }
             EMPTY_STATE_TYPE -> {
