@@ -34,7 +34,7 @@ interface TabManager {
         const val MAX_ACTIVE_TABS = 20
     }
 
-    fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean)
+    fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit)
     fun getSelectedTabId(): String?
     fun onSelectedTabChanged(tabId: String)
 
@@ -53,32 +53,20 @@ class DefaultTabManager @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
 ) : TabManager {
     private lateinit var onTabsUpdated: (List<String>) -> Unit
-    private lateinit var shouldKeepSingleTab: () -> Boolean
     private var selectedTabId: String? = null
 
-    override fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit, shouldKeepSingleTab: () -> Boolean) {
+    override fun registerCallbacks(onTabsUpdated: (List<String>) -> Unit) {
         this.onTabsUpdated = onTabsUpdated
-        this.shouldKeepSingleTab = shouldKeepSingleTab
     }
 
     override fun getSelectedTabId(): String? = selectedTabId
 
     override fun onSelectedTabChanged(tabId: String) {
         selectedTabId = tabId
-
-        if (shouldKeepSingleTab()) {
-            onTabsUpdated(listOf(tabId))
-        }
     }
 
     override suspend fun onTabsChanged(updatedTabIds: List<String>) {
-        if (shouldKeepSingleTab()) {
-            updatedTabIds.firstOrNull { it == selectedTabId }?.let {
-                onTabsUpdated(listOf(it))
-            }
-        } else {
-            onTabsUpdated(updatedTabIds)
-        }
+        onTabsUpdated(updatedTabIds)
 
         if (updatedTabIds.isEmpty()) {
             withContext(dispatchers.io()) {

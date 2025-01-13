@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.times
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -44,7 +43,7 @@ class DefaultTabManagerTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
         )
 
-        testee.registerCallbacks({}, { false })
+        testee.registerCallbacks({})
     }
 
     @Test
@@ -56,45 +55,17 @@ class DefaultTabManagerTest {
     }
 
     @Test
-    fun whenOnSelectedTabChangedAndShouldKeepSingleTabThenOnTabsUpdatedCalled() {
-        val tabId = "tabId"
-        val onTabsUpdated: (List<String>) -> Unit = mock()
-        val shouldKeepSingleTab: () -> Boolean = { true }
-
-        testee.registerCallbacks(onTabsUpdated, shouldKeepSingleTab)
-        testee.onSelectedTabChanged(tabId)
-
-        verify(onTabsUpdated).invoke(listOf(tabId))
-    }
-
-    @Test
     fun whenOnTabsChangedThenOnTabsUpdatedCalledWithNewTabs() = runTest {
         val tabId = "tabId"
         val tabId2 = "tabId2"
         val tabs = listOf(tabId, tabId2)
         val onTabsUpdated: (List<String>) -> Unit = mock()
-        val shouldKeepSingleTab: () -> Boolean = { false }
 
-        testee.registerCallbacks(onTabsUpdated, shouldKeepSingleTab)
+        testee.registerCallbacks(onTabsUpdated)
         testee.onSelectedTabChanged(tabId)
         testee.onTabsChanged(tabs)
 
         verify(onTabsUpdated).invoke(tabs)
-    }
-
-    @Test
-    fun whenOnTabsChangedAndShouldKeepSingleTabThenOnTabsUpdatedCalledWithSelectedTab() = runTest {
-        val tabId = "tabId"
-        val tabId2 = "tabId2"
-        val tabs = listOf(tabId, tabId2)
-        val onTabsUpdated: (List<String>) -> Unit = mock()
-        val shouldKeepSingleTab: () -> Boolean = { true }
-
-        testee.registerCallbacks(onTabsUpdated, shouldKeepSingleTab)
-        testee.onSelectedTabChanged(tabId)
-        testee.onTabsChanged(tabs)
-
-        verify(onTabsUpdated, times(2)).invoke(listOf(tabId))
     }
 
     @Test
