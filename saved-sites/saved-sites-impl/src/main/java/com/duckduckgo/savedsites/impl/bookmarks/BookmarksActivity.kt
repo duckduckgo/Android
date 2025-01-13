@@ -239,7 +239,17 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun setupBookmarksRecycler() {
-        bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
+        bookmarksAdapter = BookmarksAdapter(
+            layoutInflater,
+            viewModel,
+            this,
+            faviconManager,
+            onBookmarkClick = {},
+            onBookmarkOverflowClick = { anchor, bookmark ->
+            },
+            onBookmarkFolderClick = { anchor, bookmarkFolder ->
+            },
+        )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
 
         val callback = BookmarkItemTouchHelperCallback(bookmarksAdapter)

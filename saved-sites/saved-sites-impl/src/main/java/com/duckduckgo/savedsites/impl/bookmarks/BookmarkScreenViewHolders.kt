@@ -36,8 +36,8 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -79,6 +79,8 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val onBookmarkClick: (Bookmark) -> Unit,
+        private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -93,7 +95,8 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
                 binding.root.setTrailingIconClickListener { anchor ->
-                    showOverFlowMenu(anchor, bookmark)
+                    onBookmarkOverflowClick(anchor, bookmark)
+                    // showOverFlowMenu(anchor, bookmark)
                 }
             }
         }
@@ -116,10 +119,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
             listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             listItem.setTrailingIconClickListener { anchor ->
-                showOverFlowMenu(anchor, bookmark)
+                onBookmarkOverflowClick(anchor, bookmark)
+                // showOverFlowMenu(anchor, bookmark)
             }
             listItem.setClickListener {
-                viewModel.onSelected(bookmark)
+                onBookmarkClick(bookmark)
+                // viewModel.onSelected(bookmark)
             }
             isFavorite = bookmark.isFavorite
             listItem.setFavoriteStarVisible(isFavorite)
@@ -181,6 +186,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val layoutInflater: LayoutInflater,
         private val binding: RowTwoLineItemBinding,
         private val viewModel: BookmarksViewModel,
+        private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -188,11 +194,13 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
-                binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-                binding.root.setTrailingIconClickListener {
-                    showOverFlowMenu(binding.root, bookmarkFolder)
+            }
+
+            binding.root.setTrailingIconClickListener { anchor ->
+                if (show) {
+                    onBookmarkFolderClick.invoke(anchor, bookmarkFolder)
                 }
             }
         }
@@ -224,7 +232,6 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             anchor: View,
             bookmarkFolder: BookmarkFolder,
         ) {
-            Timber.d("Bookmarks: showOverFlowMenu")
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
