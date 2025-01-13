@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -86,7 +87,6 @@ import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
@@ -599,45 +599,59 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         anchor: View,
         bookmarkFolder: BookmarkFolder,
     ) {
-        Timber.d("Bookmarks: showFolderOverflowMenu")
-        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
-        val view = popupMenu.contentView
-        popupMenu.apply {
-            onMenuItemClicked(view.findViewById(R.id.edit)) {
-                viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
+        val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
+        popup.menuInflater.inflate(R.menu.bookmark_folder_popup_menu, popup.menu)
+
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.bookmark_folder_edit -> {
+                    viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+                }
+                R.id.bookmark_folder_delete -> {
+                    viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
+                }
             }
-            onMenuItemClicked(view.findViewById(R.id.delete)) {
-                viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
-            }
+            true
         }
-        popupMenu.show(binding.root, anchor)
+        popup.setOnDismissListener {
+            // Respond to popup being dismissed.
+        }
+        // Show the popup menu.
+        popup.show()
     }
 
-    private fun showBookmarkOverFlowMenu(
-        anchor: View,
-        bookmark: SavedSite.Bookmark,
-    ) {
-        Timber.d("Bookmarks: showBookmarkOverFlowMenu")
-        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
-        val view = popupMenu.contentView
-        popupMenu.apply {
-            onMenuItemClicked(view.findViewById(R.id.edit)) {
-                viewModel.onEditSavedSiteRequested(bookmark)
-            }
-            onMenuItemClicked(view.findViewById(R.id.delete)) {
-                viewModel.onDeleteSavedSiteRequested(bookmark)
-                viewModel.onBookmarkItemDeletedFromOverflowMenu()
-            }
-            onMenuItemClicked(view.findViewById(R.id.addRemoveFavorite)) {
-                addRemoveFavorite(bookmark)
-            }
-        }
+    private fun showBookmarkOverFlowMenu(anchor: View, bookmark: SavedSite.Bookmark) {
+        val wrapper = ContextThemeWrapper(this, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_PopupMenu)
+        val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
+        popup.menuInflater.inflate(R.menu.bookmark_popup_menu, popup.menu)
+
         if (bookmark.isFavorite) {
-            view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(getString(R.string.removeFromFavorites))
+            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.removeFromFavorites)
         } else {
-            view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(getString(R.string.addToFavoritesMenu))
+            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.addToFavoritesMenu)
         }
-        popupMenu.show(contentBookmarksBinding.recycler, anchor)
+
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.bookmark_edit -> {
+                    viewModel.onEditSavedSiteRequested(bookmark)
+                }
+                R.id.bookmark_add_to_favorites -> {
+                    addRemoveFavorite(bookmark)
+                }
+                R.id.bookmark_delete -> {
+                    viewModel.onDeleteSavedSiteRequested(bookmark)
+                    viewModel.onBookmarkItemDeletedFromOverflowMenu()
+                }
+            }
+            true
+        }
+        popup.setOnDismissListener {
+            // Respond to popup being dismissed.
+        }
+        // Show the popup menu.
+        popup.show()
     }
 
     private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {

@@ -150,13 +150,11 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
+                binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-            }
-
-            binding.root.setTrailingIconClickListener { anchor ->
-                if (show) {
-                    onBookmarkFolderClick(anchor, bookmarkFolder)
+                binding.root.setTrailingIconClickListener { anchor ->
+                    onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
                 }
             }
         }
@@ -175,10 +173,11 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 
-            listItem.showTrailingIcon()
-            listItem.setTrailingIconClickListener {
-                onBookmarkFolderOverflowClick(listItem, bookmarkFolder)
+            listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            listItem.setTrailingIconClickListener { anchor ->
+                onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
             }
+
             listItem.setOnClickListener {
                 onBookmarkFolderClick(listItem, bookmarkFolder)
             }
