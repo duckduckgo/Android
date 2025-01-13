@@ -65,7 +65,6 @@ class ItrSettingViewModelTest {
         verify(subscriptionPixelSender).reportAppSettingsIdtrClick()
     }
 
-
     @Test
     fun `when subscription state is unknown then ItrState is hidden`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
@@ -98,21 +97,20 @@ class ItrSettingViewModelTest {
     }
 
     @Test
-     fun `when subscription state is inactive and itr product available then ItrState is disabled`() = runTest {
-         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-         whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
-         whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.ITR))
+    fun `when subscription state is inactive and itr product available then ItrState is disabled`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.ITR))
 
-         itrSettingViewModel.onCreate(mock())
+        itrSettingViewModel.onCreate(mock())
 
         itrSettingViewModel.viewState.test {
-             assertEquals(
-                 Disabled,
-                 expectMostRecentItem().itrState,
-             )
-         }
-     }
-
+            assertEquals(
+                Disabled,
+                expectMostRecentItem().itrState,
+            )
+        }
+    }
 
     @Test
     fun `when subscription state is inactive and row_itr product available then ItrState is disabled`() = runTest {
@@ -130,21 +128,21 @@ class ItrSettingViewModelTest {
         }
     }
 
-     @Test
-     fun `when subscription state is exitred and no itr product available then ItrState is hidden`() = runTest {
-         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-         whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
-         whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+    @Test
+    fun `when subscription state is exitred and no itr product available then ItrState is hidden`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
-         itrSettingViewModel.onCreate(mock())
+        itrSettingViewModel.onCreate(mock())
 
-         itrSettingViewModel.viewState.test {
-             assertEquals(
-                 Hidden,
-                 expectMostRecentItem().itrState,
-             )
-         }
-     }
+        itrSettingViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().itrState,
+            )
+        }
+    }
 
     @Test
     fun `when subscription state is exitred and itr product available then ItrState is disabled`() = runTest {

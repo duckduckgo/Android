@@ -106,7 +106,8 @@ class ProSettingNetPViewModel(
 
             SubscriptionStatus.INACTIVE,
             SubscriptionStatus.EXPIRED,
-            SubscriptionStatus.WAITING -> {
+            SubscriptionStatus.WAITING,
+            -> {
                 if (hasNetpProduct()) {
                     NetPEntryState.Disabled
                 } else {
@@ -117,7 +118,8 @@ class ProSettingNetPViewModel(
 
             SubscriptionStatus.AUTO_RENEWABLE,
             SubscriptionStatus.NOT_AUTO_RENEWABLE,
-            SubscriptionStatus.GRACE_PERIOD -> {
+            SubscriptionStatus.GRACE_PERIOD,
+            -> {
                 if (netpEntitlementStatus) {
                     NetPEntryState.Enabled(isActive = connectionState.isConnected())
                 } else {

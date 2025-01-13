@@ -93,14 +93,15 @@ class ItrSettingViewModel @Inject constructor(
 
     private suspend fun getItrState(
         hasValidEntitlement: Boolean,
-        subscriptionStatus: SubscriptionStatus
+        subscriptionStatus: SubscriptionStatus,
     ): ItrState {
         return when (subscriptionStatus) {
             SubscriptionStatus.UNKNOWN -> ItrState.Hidden
 
             SubscriptionStatus.INACTIVE,
             SubscriptionStatus.EXPIRED,
-            SubscriptionStatus.WAITING -> {
+            SubscriptionStatus.WAITING,
+            -> {
                 if (isItrAvailable()) {
                     ItrState.Disabled
                 } else {
@@ -110,7 +111,8 @@ class ItrSettingViewModel @Inject constructor(
 
             SubscriptionStatus.AUTO_RENEWABLE,
             SubscriptionStatus.NOT_AUTO_RENEWABLE,
-            SubscriptionStatus.GRACE_PERIOD -> {
+            SubscriptionStatus.GRACE_PERIOD,
+            -> {
                 if (hasValidEntitlement) {
                     ItrState.Enabled
                 } else {

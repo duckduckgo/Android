@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.subscription
 
-import android.util.Log
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus

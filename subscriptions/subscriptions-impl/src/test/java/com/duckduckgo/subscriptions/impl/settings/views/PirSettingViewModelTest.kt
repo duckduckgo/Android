@@ -64,7 +64,6 @@ class PirSettingViewModelTest {
         verify(subscriptionPixelSender).reportAppSettingsPirClick()
     }
 
-
     @Test
     fun `when subscription state is unknown then PirState is hidden`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
@@ -97,36 +96,36 @@ class PirSettingViewModelTest {
     }
 
     @Test
-     fun `when subscription state is inactive and pir product available then PirState is disabled`() = runTest {
-         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-         whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
-         whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
+    fun `when subscription state is inactive and pir product available then PirState is disabled`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.PIR))
 
-         pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onCreate(mock())
 
         pirSettingsViewModel.viewState.test {
-             assertEquals(
-                 Disabled,
-                 expectMostRecentItem().pirState,
-             )
-         }
-     }
+            assertEquals(
+                Disabled,
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
 
-     @Test
-     fun `when subscription state is expired and no pir product available then PirState is hidden`() = runTest {
-         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-         whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
-         whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+    @Test
+    fun `when subscription state is expired and no pir product available then PirState is hidden`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
-         pirSettingsViewModel.onCreate(mock())
+        pirSettingsViewModel.onCreate(mock())
 
-         pirSettingsViewModel.viewState.test {
-             assertEquals(
-                 Hidden,
-                 expectMostRecentItem().pirState,
-             )
-         }
-     }
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
 
     @Test
     fun `when subscription state is expired and pir product available then PirState is disabled`() = runTest {

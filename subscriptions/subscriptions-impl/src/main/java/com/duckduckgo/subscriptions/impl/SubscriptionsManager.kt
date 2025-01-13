@@ -455,7 +455,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getFeatures(): Set<String> {
         val subscription = authRepository.getSubscription()
 
-        return if(subscription != null) {
+        return if (subscription != null) {
             authRepository.getFeatures(subscription.productId)
         } else {
             emptySet()

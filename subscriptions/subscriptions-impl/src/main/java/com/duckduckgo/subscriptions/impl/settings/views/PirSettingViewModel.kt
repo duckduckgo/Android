@@ -90,14 +90,15 @@ class PirSettingViewModel @Inject constructor(
 
     private suspend fun getPirState(
         hasValidEntitlement: Boolean,
-        subscriptionStatus: SubscriptionStatus
+        subscriptionStatus: SubscriptionStatus,
     ): PirState {
         return when (subscriptionStatus) {
             SubscriptionStatus.UNKNOWN -> PirState.Hidden
 
             SubscriptionStatus.INACTIVE,
             SubscriptionStatus.EXPIRED,
-            SubscriptionStatus.WAITING -> {
+            SubscriptionStatus.WAITING,
+            -> {
                 if (isPirAvailable()) {
                     PirState.Disabled
                 } else {
@@ -107,7 +108,8 @@ class PirSettingViewModel @Inject constructor(
 
             SubscriptionStatus.AUTO_RENEWABLE,
             SubscriptionStatus.NOT_AUTO_RENEWABLE,
-            SubscriptionStatus.GRACE_PERIOD -> {
+            SubscriptionStatus.GRACE_PERIOD,
+            -> {
                 if (hasValidEntitlement) {
                     PirState.Enabled
                 } else {
