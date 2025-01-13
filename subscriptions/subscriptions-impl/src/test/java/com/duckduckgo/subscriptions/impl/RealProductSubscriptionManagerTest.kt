@@ -265,6 +265,8 @@ private class FakeSubscriptions(
 
     override suspend fun getSubscriptionStatus(): SubscriptionStatus = subscriptionStatus
 
+    override suspend fun getAvailableProducts(): Set<Product> = emptySet()
+
     override fun shouldLaunchPrivacyProForUrl(url: String): Boolean = false
 
     override fun launchPrivacyPro(
