@@ -26,7 +26,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class NavigatorInterfaceFeaturePluginTest {
-    lateinit var testee: NavigatorInterfaceFeaturePlugin
+    private lateinit var testee: NavigatorInterfaceFeaturePlugin
 
     private val mockNavigatorInterfaceRepository: NavigatorInterfaceRepository = mock()
 

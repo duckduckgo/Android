@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 
 class NavigatorInterfaceContentScopeConfigPluginTest {
 
-    lateinit var testee: NavigatorInterfaceContentScopeConfigPlugin
+    private lateinit var testee: NavigatorInterfaceContentScopeConfigPlugin
 
     private val mockNavigatorInterfaceRepository: NavigatorInterfaceRepository = mock()
 
