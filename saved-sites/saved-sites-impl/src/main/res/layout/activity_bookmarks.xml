@@ -136,37 +136,6 @@
         </FrameLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
-
-            <com.duckduckgo.common.ui.view.SearchBarView
-                android:id="@+id/searchBar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/keyline_2"
-                android:visibility="gone"
-                app:clearActionContentDescription="@string/searchbar_cleartextaction_content_description_default"
-                app:searchHint="@string/searchBookmarks" />
-        </FrameLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <include layout="@layout/content_bookmarks" />
 
 </LinearLayout>
