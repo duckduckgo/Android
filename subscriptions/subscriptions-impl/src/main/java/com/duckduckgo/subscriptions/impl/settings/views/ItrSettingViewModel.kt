@@ -25,13 +25,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Product.ROW_ITR
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.ACTIVE
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.EXPIRED
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INACTIVE
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INELIGIBLE
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.SIGNED_OUT
-import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.WAITING
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
@@ -42,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -50,7 +46,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class ItrSettingViewModel @Inject constructor(
-    private val productSubscriptionManager: ProductSubscriptionManager,
+    private val subscriptions: Subscriptions,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -65,9 +61,8 @@ class ItrSettingViewModel @Inject constructor(
         sealed class ItrState {
 
             data object Hidden : ItrState()
-            data object Subscribed : ItrState()
-            data object Expired : ItrState()
-            data object Activating : ItrState()
+            data object Enabled : ItrState()
+            data object Disabled : ItrState()
         }
     }
 
@@ -82,16 +77,51 @@ class ItrSettingViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
-        productSubscriptionManager.entitlementStatus(ITR, ROW_ITR).onEach { status ->
-            val itrState = when (status) {
-                ACTIVE -> ItrState.Subscribed
-                INACTIVE, EXPIRED -> ItrState.Expired
-                WAITING -> ItrState.Activating
-                SIGNED_OUT, INELIGIBLE -> ItrState.Hidden
+        subscriptions.getEntitlementStatus()
+            .map { entitledProducts ->
+                entitledProducts.any { product -> product == ITR || product == ROW_ITR }
+            }
+            .onEach { hasValidEntitlement ->
+                val subscriptionStatus = subscriptions.getSubscriptionStatus()
+
+                val itrState = getItrState(hasValidEntitlement, subscriptionStatus)
+
+                _viewState.update { it.copy(itrState = itrState) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun getItrState(
+        hasValidEntitlement: Boolean,
+        subscriptionStatus: SubscriptionStatus
+    ): ItrState {
+        return when (subscriptionStatus) {
+            SubscriptionStatus.UNKNOWN -> ItrState.Hidden
+
+            SubscriptionStatus.INACTIVE,
+            SubscriptionStatus.EXPIRED,
+            SubscriptionStatus.WAITING -> {
+                if (isItrAvailable()) {
+                    ItrState.Disabled
+                } else {
+                    ItrState.Hidden
+                }
             }
 
-            _viewState.update { it.copy(itrState = itrState) }
-        }.launchIn(viewModelScope)
+            SubscriptionStatus.AUTO_RENEWABLE,
+            SubscriptionStatus.NOT_AUTO_RENEWABLE,
+            SubscriptionStatus.GRACE_PERIOD -> {
+                if (hasValidEntitlement) {
+                    ItrState.Enabled
+                } else {
+                    ItrState.Hidden
+                }
+            }
+        }
+    }
+
+    private suspend fun isItrAvailable(): Boolean {
+        return subscriptions.getAvailableProducts().any { feature -> feature == ITR || feature == ROW_ITR }
     }
 
     private fun sendCommand(newCommand: Command) {
