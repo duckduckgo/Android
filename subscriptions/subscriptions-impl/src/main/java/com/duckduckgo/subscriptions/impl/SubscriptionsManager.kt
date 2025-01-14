@@ -341,7 +341,15 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun signInV1(authToken: String) {
         exchangeAuthToken(authToken)
-        fetchAndStoreAllData()
+        if (shouldUseAuthV2()) {
+            try {
+                refreshSubscriptionData()
+            } catch (e: Exception) {
+                logcat { "Subs: error when refreshing subscription on v1 sign in" }
+            }
+        } else {
+            fetchAndStoreAllData()
+        }
     }
 
     override suspend fun signOut() {
