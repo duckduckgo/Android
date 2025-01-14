@@ -42,11 +42,9 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOn
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
@@ -485,15 +483,6 @@ class CtaViewModel @Inject constructor(
                     (duckPlayer.getUserPreferences().privatePlayerMode == AlwaysAsk && duckPlayer.isYouTubeUrl(uri)) ||
                         duckPlayer.isDuckPlayerUri(site.url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
                     )
-
-        if (isDuckPlayerUrl) { // temporary pixel
-            val isMayorNetwork = !daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any {
-                site.entity?.displayName?.contains(it) ?: false
-            }
-            if (isMayorNetwork) {
-                pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
-            }
-        }
 
         return isDuckPlayerUrl
     }
