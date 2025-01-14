@@ -167,6 +167,11 @@ interface SubscriptionsManager {
     suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
+     * Returns a [Set<String>] of available features for the subscription or an empty set if subscription is not available
+     */
+    suspend fun getFeatures(): Set<String>
+
+    /**
      * Checks if user is signed in or not (using either auth API v1 or v2)
      */
     suspend fun isSignedIn(): Boolean
@@ -447,6 +452,16 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    override suspend fun getFeatures(): Set<String> {
+        val subscription = authRepository.getSubscription()
+
+        return if (subscription != null) {
+            getFeaturesInternal(subscription.productId)
+        } else {
+            emptySet()
+        }
+    }
+
     @Deprecated("This method will be removed after migrating to auth v2")
     override suspend fun exchangeAuthToken(authToken: String): String {
         val accessToken = authService.accessToken("Bearer $authToken").accessToken
@@ -678,15 +693,7 @@ class RealSubscriptionsManager @Inject constructor(
                         )
                     }
 
-                    val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
-                        authRepository.getFeatures(offer.basePlanId)
-                    } else {
-                        when (offer.basePlanId) {
-                            MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
-                            MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
-                            else -> throw IllegalStateException()
-                        }
-                    }
+                    val features = getFeaturesInternal(offer.basePlanId)
 
                     if (features.isEmpty()) return@let emptyList()
 
@@ -698,6 +705,18 @@ class RealSubscriptionsManager @Inject constructor(
                     )
                 }
             }
+
+    private suspend fun getFeaturesInternal(planId: String): Set<String> {
+        return if (privacyProFeature.get().featuresApi().isEnabled()) {
+            authRepository.getFeatures(planId)
+        } else {
+            when (planId) {
+                MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
+                MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
+                else -> throw IllegalStateException()
+            }
+        }
+    }
 
     override suspend fun purchase(
         activity: Activity,

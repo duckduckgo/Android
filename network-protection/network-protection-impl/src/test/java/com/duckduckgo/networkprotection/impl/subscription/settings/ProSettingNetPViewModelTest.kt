@@ -23,15 +23,21 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Expired
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Disabled
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Enabled
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Subscribed
+import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -50,22 +56,22 @@ class ProSettingNetPViewModelTest {
     private val pixel: Pixel = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
-    private val networkProtectionSettingsState: NetworkProtectionSettingsState = mock()
+    private val subscriptions: Subscriptions = mock()
     private lateinit var proSettingNetPViewModel: ProSettingNetPViewModel
 
     @Before
     fun before() {
         proSettingNetPViewModel = ProSettingNetPViewModel(
-            networkProtectionSettingsState,
             networkProtectionState,
             networkProtectionAccessState,
+            subscriptions,
             coroutineTestRule.testDispatcherProvider,
             pixel,
         )
     }
 
     @Test
-    fun whenNetPSettingClickedThenNetPScreenOpened() = runTest {
+    fun `when netp Setting clicked then netp screen is opened`() = runTest {
         val testScreen = object : ActivityParams {}
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
 
@@ -80,92 +86,367 @@ class ProSettingNetPViewModelTest {
     }
 
     @Test
-    fun whenNetPVisibilityStateIsHiddenThenNetPEntryStateIsHidden() = runTest {
+    fun `when subscription state is unknown then NetpEntryState is hidden`() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Hidden))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(UNKNOWN)
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
                 Hidden,
-                expectMostRecentItem().networkProtectionEntryState,
+                expectMostRecentItem().netPEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPVisibilityStateIsActivatingThenNetPEntryStateIsActivating() = runTest {
+    fun `when subscription state is unknown and vpn is enabled then vpn is stopped`() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Activating))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(UNKNOWN)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is inactive and no netp product available then NetpEntryState is hidden`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Activating,
-                expectMostRecentItem().networkProtectionEntryState,
+                Hidden,
+                expectMostRecentItem().netPEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPVisibilityStateConnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndActive() = runTest {
+    fun `when subscription state is inactive and netp product available then NetpEntryState is disabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP))
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Disabled,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is inactive and vpn is enabled then vpn is stopped`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(INACTIVE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is expired and no netp product available then NetpEntryState is hidden`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is expired and netp product available then NetpEntryState is disabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP))
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Disabled,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is expired and vpn is enabled then vpn is stopped`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is waiting and no netp product available then NetpEntryState is hidden`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is waiting and netp product available then NetpEntryState is disabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP))
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Disabled,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is waiting and vpn is enabled then vpn is stopped`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(WAITING)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(emptySet())
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is auto renewable and entitled then NetpEntryState is enabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Enabled(isActive = false),
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is auto renewable and entitled and connection is active then NetpEntryState is enabled and active`() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Subscribed(isActive = true),
-                expectMostRecentItem().networkProtectionEntryState,
+                Enabled(isActive = true),
+                expectMostRecentItem().netPEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPVisibilityStateDisconnectedAndAccessStateIsSubscribedThenNetPEntryStateIsSubscribedAndInactive() = runTest {
+    fun `when subscription state is auto renewable and not entitled then NetpEntryState is hidden`() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Subscribed(isActive = false),
-                expectMostRecentItem().networkProtectionEntryState,
+                Hidden,
+                expectMostRecentItem().netPEntryState,
             )
         }
     }
 
     @Test
-    fun whenNetPVisibilityStateIsConnectingThenNetPEntryStateIsSubscribedAndNotActive() = runTest {
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Subscribed))
-
-        proSettingNetPViewModel.onStart(mock())
-
-        proSettingNetPViewModel.viewState.test {
-            assertEquals(
-                Subscribed(isActive = false),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPVisibilityStateIsExpiredThenNetPEntryStateIsExpired() = runTest {
+    fun `when subscription state is auto renewable and not entitled then vpn is stopped`() = runTest {
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionSettingsState.getNetPSettingsStateFlow()).thenReturn(flowOf(NetPSettingsState.Visible.Expired))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is not auto renewable and entitled then NetpEntryState is enabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
 
         proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
-                Expired,
-                expectMostRecentItem().networkProtectionEntryState,
+                Enabled(isActive = false),
+                expectMostRecentItem().netPEntryState,
             )
         }
+    }
+
+    @Test
+    fun `when subscription state is not auto renewable and entitled and connection is active then NetpEntryState is enabled and active`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Enabled(isActive = true),
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is not auto renewable and not entitled then NetpEntryState is hidden`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is not auto renewable and not entitled then vpn is stopped`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
+    }
+
+    @Test
+    fun `when subscription state is grace period and entitled then NetpEntryState is enabled`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Enabled(isActive = false),
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is grace period and entitled and connection is active then NetpEntryState is enabled and active`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Enabled(isActive = true),
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is grace period and not entitled then NetpEntryState is hidden`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        proSettingNetPViewModel.viewState.test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().netPEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is grace period and not entitled then vpn is stopped`() = runTest {
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+
+        proSettingNetPViewModel.onStart(mock())
+
+        verify(networkProtectionState).stop()
     }
 }
