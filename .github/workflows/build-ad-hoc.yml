@@ -6,7 +6,6 @@ on:
       ref:
         description: 'Ref to build APK from (branch, tag, commit)'
         required: true
-        default: 'develop'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
