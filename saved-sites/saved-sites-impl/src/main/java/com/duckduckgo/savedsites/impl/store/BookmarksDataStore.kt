@@ -16,20 +16,19 @@
 
 package com.duckduckgo.savedsites.impl.store
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Inject
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.impl.store.SharedPreferencesBookmarksDataStore.Keys.SORTING_MODE
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.SharingStarted.Companion
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -37,11 +36,12 @@ import kotlinx.coroutines.flow.stateIn
 
 interface BookmarksDataStore {
     fun getSortingMode(): SortingMode
+    suspend fun setSortingMode(value: SortingMode)
 }
 
 enum class SortingMode {
     MANUAL,
-    NAME
+    NAME,
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,12 +59,15 @@ class SharedPreferencesBookmarksDataStore @Inject constructor(
         return sortingMode.value
     }
 
+    override suspend fun setSortingMode(value: SortingMode) {
+        store.edit { prefs -> prefs[SORTING_MODE] = value.ordinal }
+    }
+
     private val sortingMode: StateFlow<SortingMode> = store.data
         .map { prefs ->
-            val sortingMode = prefs[Keys.SORTING_MODE] ?: 0
+            val sortingMode = prefs[SORTING_MODE] ?: 0
             SortingMode.entries.getOrNull(sortingMode) ?: MANUAL
         }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, MANUAL)
 }
-

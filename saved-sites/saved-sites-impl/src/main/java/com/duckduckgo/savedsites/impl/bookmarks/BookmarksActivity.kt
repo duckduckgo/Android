@@ -83,6 +83,7 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -518,11 +519,27 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             binding.exportBookmarks.setDisabled()
         }
 
-        binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+        when (viewModel.viewState.value?.sortingMode) {
+            SortingMode.MANUAL -> {
+                binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+            }
+
+            SortingMode.NAME -> {
+                binding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+            }
+
+            else -> {
+                throw IllegalStateException("Unknown sorting mode")
+            }
+        }
 
         popupMenu.apply {
-            onMenuItemClicked(binding.sortByName) { }
-            onMenuItemClicked(binding.sortManually) { }
+            onMenuItemClicked(binding.sortByName) {
+                viewModel.onSortingModeSelected(SortingMode.NAME)
+            }
+            onMenuItemClicked(binding.sortManually) {
+                viewModel.onSortingModeSelected(SortingMode.MANUAL)
+            }
             onMenuItemClicked(binding.importBookmarks) { launchBookmarkImport() }
             onMenuItemClicked(binding.exportBookmarks) { launchBookmarkExport() }
         }

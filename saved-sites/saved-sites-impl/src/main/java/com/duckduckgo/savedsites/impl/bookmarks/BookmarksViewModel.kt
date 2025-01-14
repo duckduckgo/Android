@@ -54,6 +54,8 @@ import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment.Ad
 import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
+import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -73,6 +75,7 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
+    private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
@@ -83,6 +86,7 @@ class BookmarksViewModel @Inject constructor(
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
         val canShowPromo: Boolean = false,
+        val sortingMode: SortingMode = SortingMode.MANUAL,
     )
 
     sealed class Command {
@@ -349,6 +353,7 @@ class BookmarksViewModel @Inject constructor(
                 favorites = favorites,
                 bookmarkItems = bookmarkItems,
                 enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
+                sortingMode = bookmarksDataStore.getSortingMode(),
             )
         }
 
@@ -413,6 +418,7 @@ class BookmarksViewModel @Inject constructor(
             favorites = emptyList(),
             bookmarkItems = emptyList(),
             enableSearch = currentState.enableSearch,
+            sortingMode = bookmarksDataStore.getSortingMode(),
         )
         fetchBookmarksAndFolders(currentFolderId)
     }
@@ -450,6 +456,15 @@ class BookmarksViewModel @Inject constructor(
     fun onPromotionDismissed() {
         viewModelScope.launch(dispatcherProvider.io()) {
             showSyncPromotionIfEligible()
+        }
+    }
+
+    fun onSortingModeSelected(mode: SortingMode) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            bookmarksDataStore.setSortingMode(mode)
+            withContext(dispatcherProvider.main()) {
+                viewState.value = viewState.value?.copy(sortingMode = bookmarksDataStore.getSortingMode())
+            }
         }
     }
 }
