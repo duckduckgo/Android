@@ -21,8 +21,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.malicioussiteprotection.impl.data.Filter
-import kotlin.math.max
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
+import timber.log.Timber
 
 @Dao
 interface MaliciousSiteDao {
@@ -38,11 +39,32 @@ interface MaliciousSiteDao {
     @Query("DELETE FROM filters")
     suspend fun deleteFilters()
 
+    @Query("DELETE FROM hash_prefixes WHERE type = :type")
+    suspend fun deleteHashPrefixes(type: String)
+
+    @Query("DELETE FROM hash_prefixes WHERE hashPrefix = :hashPrefix AND type = :type")
+    suspend fun deleteHashPrefix(
+        hashPrefix: String,
+        type: String,
+    )
+
+    @Query("DELETE FROM filters WHERE hash = :hash AND type = :type")
+    suspend fun deleteFilter(
+        hash: String,
+        type: String,
+    )
+
+    @Query("DELETE FROM filters WHERE type = :type")
+    suspend fun deleteFilters(type: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFilters(items: Set<FilterEntity>)
 
-    @Query("SELECT * FROM revisions LIMIT 1")
-    suspend fun getLatestRevision(): RevisionEntity?
+    @Query("SELECT * FROM revisions")
+    suspend fun getLatestRevision(): List<RevisionEntity>?
+
+    @Query("SELECT * FROM revisions WHERE feed = :feed AND type = :type")
+    suspend fun getLatestRevision(feed: String, type: String): RevisionEntity?
 
     @Query("DELETE FROM revisions")
     suspend fun deleteRevisions()
@@ -54,32 +76,48 @@ interface MaliciousSiteDao {
     suspend fun getFilter(hash: String): List<FilterEntity>?
 
     @Transaction
-    suspend fun insertData(
-        phishingFilterSetRevision: Int?,
-        malwareFilterSetRevision: Int?,
-        phishingHashPrefixesRevision: Int?,
-        malwareHashPrefixesRevision: Int?,
-        phishingHashPrefixes: Set<String>,
-        phishingFilterSet: Set<Filter>,
-        malwareHashPrefixes: Set<String>,
-        malwareFilterSet: Set<Filter>,
+    suspend fun updateHashPrefixes(
+        hashPrefixes: HashPrefixesWithRevision?,
     ) {
-        val lastRevision = getLatestRevision()
-        deleteRevisions()
-        deleteFilters()
-        deleteHashPrefixes()
+        hashPrefixes ?: return
 
-        insertRevision(
-            RevisionEntity(
-                phishingHashPrefixesRevision = max(lastRevision?.phishingHashPrefixesRevision ?: 0, phishingHashPrefixesRevision ?: 0),
-                malwareHashPrefixesRevision = max(lastRevision?.malwareHashPrefixesRevision ?: 0, malwareHashPrefixesRevision ?: 0),
-                phishingFiltersRevision = max(lastRevision?.phishingFiltersRevision ?: 0, phishingFilterSetRevision ?: 0),
-                malwareFiltersRevision = max(lastRevision?.malwareFiltersRevision ?: 0, malwareFilterSetRevision ?: 0),
-            ),
-        )
-        insertHashPrefixes(phishingHashPrefixes.map { HashPrefixEntity(hashPrefix = it, type = "phishing") })
-        insertFilters(phishingFilterSet.map { FilterEntity(it.hash, it.regex, type = "phishing") }.toSet())
-        insertHashPrefixes(malwareHashPrefixes.map { HashPrefixEntity(hashPrefix = it, type = "malware") })
-        insertFilters(malwareFilterSet.map { FilterEntity(it.hash, it.regex, type = "malware") }.toSet())
+        val currentLocalRevision = getLatestRevision(feed = hashPrefixes.feed.name, type = hashPrefixes.type.name)?.revision ?: 0
+        val newRevision = hashPrefixes.takeIf { it.revision > currentLocalRevision }?.apply {
+            Timber.d("Cris. Updating hash prefixes")
+            if (hashPrefixes.replace) {
+                deleteHashPrefixes(hashPrefixes.feed.name)
+            } else {
+                hashPrefixes.delete.forEach {
+                    deleteHashPrefix(it, hashPrefixes.feed.name)
+                }
+            }
+            insertHashPrefixes(hashPrefixes.insert.map { HashPrefixEntity(hashPrefix = it, type = hashPrefixes.feed.name) })
+        }?.revision ?: currentLocalRevision
+        if (currentLocalRevision != newRevision) {
+            insertRevision(RevisionEntity(feed = hashPrefixes.feed.name, type = hashPrefixes.type.name, revision = newRevision))
+        }
+    }
+
+    @Transaction
+    suspend fun updateFilters(
+        filterSet: FilterSetWithRevision?,
+    ) {
+        filterSet ?: return
+
+        val currentLocalRevision = getLatestRevision(feed = filterSet.feed.name, type = filterSet.type.name)?.revision ?: 0
+        val newRevision = filterSet.takeIf { it.revision > currentLocalRevision }?.apply {
+            Timber.d("Cris. Updating filters")
+            if (filterSet.replace) {
+                deleteFilters(filterSet.feed.name)
+            } else {
+                filterSet.delete.forEach {
+                    deleteFilter(it.hash, filterSet.feed.name)
+                }
+            }
+            insertFilters(filterSet.insert.map { FilterEntity(it.hash, it.regex, type = filterSet.feed.name) }.toSet())
+        }?.revision ?: currentLocalRevision
+        if (currentLocalRevision != newRevision) {
+            insertRevision(RevisionEntity(feed = filterSet.feed.name, type = filterSet.type.name, revision = newRevision))
+        }
     }
 }

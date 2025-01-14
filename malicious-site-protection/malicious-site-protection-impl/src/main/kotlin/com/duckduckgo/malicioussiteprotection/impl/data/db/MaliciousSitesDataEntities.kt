@@ -19,13 +19,11 @@ package com.duckduckgo.malicioussiteprotection.impl.data.db
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "revisions")
+@Entity(tableName = "revisions", primaryKeys = ["feed", "type"])
 data class RevisionEntity(
-    @PrimaryKey
-    val phishingHashPrefixesRevision: Int,
-    val malwareHashPrefixesRevision: Int,
-    val phishingFiltersRevision: Int,
-    val malwareFiltersRevision: Int,
+    val feed: String,
+    val type: String,
+    val revision: Int,
 )
 
 @Entity(
