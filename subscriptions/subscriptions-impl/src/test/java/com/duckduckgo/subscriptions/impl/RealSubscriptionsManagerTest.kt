@@ -63,12 +63,14 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeFalse
@@ -1238,6 +1240,31 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             val entitlements = expectMostRecentItem()
             assertTrue(entitlements.isEmpty())
         }
+    }
+
+    @Test
+    fun whenSignInV1ThenExchangesAuthTokenAndLoadsSubscription() = runTest {
+        givenAccessTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenV1AccessTokenExchangeSuccess()
+        givenV2AccessTokenRefreshSucceeds()
+
+        whenever(subscriptionsService.subscription()).thenAnswer {
+            runBlocking { subscriptionsManager.getAccessToken() } // triggers v1 -> v2 migration if necessary
+
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "android",
+                status = "AUTO_RENEWABLE",
+            )
+        }
+
+        subscriptionsManager.signInV1("authToken")
+
+        assertTrue(subscriptionsManager.isSignedIn())
+        assertNotNull(subscriptionsManager.getSubscription())
     }
 
     private suspend fun givenUrlPortalSucceeds() {
