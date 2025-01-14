@@ -2,6 +2,11 @@ name: Release - Production Release to Play Store and Github
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        required: true
+        default: 'develop'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -20,6 +25,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
