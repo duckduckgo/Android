@@ -86,13 +86,18 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearWebStorage(webStorage: WebStorage) {
         suspendCoroutine { continuation ->
-            kotlin.runCatching {
-                webLocalStorageManager.clearWebLocalStorage()
-                continuation.resume(Unit)
-            }.onFailure { e ->
-                Timber.e(e, "WebDataManager: Could not selectively clear web storage")
-                sendCrashPixel(e)
-                // fallback, if we crash we delete everything
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage()
+                    continuation.resume(Unit)
+                }.onFailure { e ->
+                    Timber.e(e, "WebDataManager: Could not selectively clear web storage")
+                    sendCrashPixel(e)
+                    // fallback, if we crash we delete everything
+                    webStorage.deleteAllData()
+                    continuation.resume(Unit)
+                }
+            } else {
                 webStorage.deleteAllData()
                 continuation.resume(Unit)
             }
