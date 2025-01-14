@@ -121,6 +121,7 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",

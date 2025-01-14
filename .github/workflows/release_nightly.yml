@@ -101,7 +101,7 @@ jobs:
 
       - name: Assemble the bundle
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
+        run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ secrets.GT_DAXMOBILE }} -Pbuild-date-time
 
       - name: Generate nightly version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
