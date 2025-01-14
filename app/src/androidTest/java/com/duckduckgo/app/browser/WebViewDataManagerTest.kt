@@ -116,7 +116,7 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDataClearedAndThrowsExceptionThenSendCrashPixelAndDeleteAllData() = runTest {
+    fun whenDataClearedAndThrowsExceptionAndInternalThenSendCrashPixelAndDeleteAllData() = runTest {
         withContext(Dispatchers.Main) {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val exception = RuntimeException("test")
@@ -132,7 +132,7 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDataClearedAndThrowsExceptionAndNotInternalThenDonNotSendCrashPixelAndDeleteAllData() = runTest {
+    fun whenDataClearedAndThrowsExceptionAndNotInternalThenDoNotSendCrashPixelAndDeleteAllData() = runTest {
         withContext(Dispatchers.Main) {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val exception = RuntimeException("test")
