@@ -344,6 +344,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
+                bookmarksAdapter.isReorderingEnabled = state.sortingMode == MANUAL
                 val items = state.sortedItems
                 bookmarksAdapter.setItems(
                     items,
@@ -520,19 +521,19 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             binding.exportBookmarks.setDisabled()
             binding.sortManually.setDisabled()
             binding.sortByName.setDisabled()
-        }
+        } else {
+            when (viewModel.viewState.value?.sortingMode) {
+                SortingMode.MANUAL -> {
+                    binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+                }
 
-        when (viewModel.viewState.value?.sortingMode) {
-            SortingMode.MANUAL -> {
-                binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
-            }
+                SortingMode.NAME -> {
+                    binding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+                }
 
-            SortingMode.NAME -> {
-                binding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
-            }
-
-            else -> {
-                throw IllegalStateException("Unknown sorting mode")
+                else -> {
+                    throw IllegalStateException("Unknown sorting mode")
+                }
             }
         }
 

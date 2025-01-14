@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.content.Context
 import android.net.Uri
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
@@ -72,9 +71,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
     }
 
     class BookmarksViewHolder(
-        private val layoutInflater: LayoutInflater,
         private val binding: RowBookmarkTwoLineItemBinding,
-        private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
         private val onBookmarkClick: (Bookmark) -> Unit,

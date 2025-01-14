@@ -35,6 +35,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.Bookma
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptySearchHint
+import com.google.android.material.snackbar.Snackbar
 import java.util.Collections
 
 class BookmarksAdapter(
@@ -57,7 +58,8 @@ class BookmarksAdapter(
 
     val bookmarkItems = mutableListOf<BookmarksItemTypes>()
     var isInSearchMode = false
-    var isReorderingModeEnabled = false
+    var isReordering = false
+    var isReorderingEnabled = false
 
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
@@ -100,9 +102,7 @@ class BookmarksAdapter(
             BOOKMARK_TYPE -> {
                 val binding = RowBookmarkTwoLineItemBinding.inflate(inflater, parent, false)
                 return BookmarksViewHolder(
-                    layoutInflater,
                     binding,
-                    viewModel,
                     lifecycleOwner,
                     faviconManager,
                     onBookmarkClick,
@@ -137,12 +137,18 @@ class BookmarksAdapter(
             is BookmarksViewHolder -> {
                 val bookmark = (this.bookmarkItems[position] as BookmarkItem).bookmark
                 holder.update(bookmark)
-                holder.showDragHandle(isReorderingModeEnabled, bookmark)
+                holder.showDragHandle(isReordering, bookmark)
+                if (!isReorderingEnabled) {
+                    holder.itemView.setOnLongClickListener {
+                        Snackbar.make(holder.itemView, "Long click to reorder", Snackbar.LENGTH_SHORT).show()
+                        true
+                    }
+                }
             }
             is BookmarkFoldersViewHolder -> {
                 val bookmarkFolder = (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder
                 holder.update(bookmarkFolder)
-                holder.showDragHandle(isReorderingModeEnabled, bookmarkFolder)
+                holder.showDragHandle(isReordering, bookmarkFolder)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()
