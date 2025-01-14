@@ -24,6 +24,7 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -46,6 +47,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.TabMultiSelectionFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -62,12 +64,14 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -117,6 +121,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var duckChat: DuckChat
 
+    @Inject
+    lateinit var tabMultiSelectionFeature: TabMultiSelectionFeature
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager, dispatchers) }
@@ -130,6 +137,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
+    private lateinit var tabsFab: ExtendedFloatingActionButton
 
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
@@ -140,12 +148,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
 
+        tabsFab = findViewById(R.id.tabsFab)
+
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
         configureRecycler()
+        configureFab()
         configureObservers()
         configureOnBackPressedListener()
+    }
+
+    private fun configureFab() {
+        if (tabMultiSelectionFeature.self().isEnabled()) {
+            tabsFab.show()
+            tabsFab.setOnClickListener {
+                viewModel.onFabClicked()
+            }
+        } else {
+            tabsFab.hide()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -184,6 +206,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabItemDecorator = TabItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabItemDecorator)
         tabsRecycler.setHasFixedSize(true)
+
+        if (tabMultiSelectionFeature.self().isEnabled()) {
+            tabsRecycler.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        if (dy > 0 || dy < 0 && tabsFab.isShown()) {
+                            tabsFab.hide()
+                        }
+                    }
+
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            tabsFab.show()
+                        }
+                        super.onScrollStateChanged(recyclerView, newState)
+                    }
+                },
+            )
+        }
     }
 
     private fun configureObservers() {
@@ -209,6 +251,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
                 updateLayoutType(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
+                updateFabType(it.fabType)
             }
         }
 
@@ -250,6 +298,19 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         tabsRecycler.show()
+    }
+
+    private fun updateFabType(fabType: TabSwitcherViewModel.ViewState.FabType) {
+        when (fabType) {
+            TabSwitcherViewModel.ViewState.FabType.NEW_TAB -> {
+                tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_add_24)
+                tabsFab.setText(R.string.tabSwitcherFabNewTab)
+            }
+            TabSwitcherViewModel.ViewState.FabType.CLOSE_TABS -> {
+                tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+                tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
+            }
+        }
     }
 
     private fun scrollToPreviousCenterOffset(centerOffsetPercent: Float) {
