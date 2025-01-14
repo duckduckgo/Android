@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -131,16 +132,16 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDataClearedAndThrowsExceptionAndNotInternalThenSendCrashPixelAndDeleteAllData() = runTest {
+    fun whenDataClearedAndThrowsExceptionAndNotInternalThenDonNotSendCrashPixelAndDeleteAllData() = runTest {
         withContext(Dispatchers.Main) {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val exception = RuntimeException("test")
             val webView = TestWebView(context)
-            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
+            whenever(mockAppBuildConfig.flavor).thenReturn(PLAY)
             whenever(mockWebLocalStorageManager.clearWebLocalStorage()).thenThrow(exception)
             testee.clearData(webView, mockStorage)
             verify(mockWebLocalStorageManager).clearWebLocalStorage()
-            verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
+            verifyNoInteractions(mockCrashLogger)
             verify(mockStorage).deleteAllData()
         }
     }
