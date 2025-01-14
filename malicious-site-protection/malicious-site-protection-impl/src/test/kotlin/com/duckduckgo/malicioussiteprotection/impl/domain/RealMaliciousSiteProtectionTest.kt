@@ -21,9 +21,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
-import com.duckduckgo.malicioussiteprotection.impl.data.Filter
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
-import com.duckduckgo.malicioussiteprotection.impl.data.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import java.security.MessageDigest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

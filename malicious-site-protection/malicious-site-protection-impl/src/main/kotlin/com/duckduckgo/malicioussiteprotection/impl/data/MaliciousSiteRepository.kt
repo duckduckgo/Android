@@ -16,70 +16,112 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.data
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
-import com.duckduckgo.malicioussiteprotection.impl.data.embedded.MaliciousSiteProtectionEmbeddedDataProvider
+import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
+import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
+import com.duckduckgo.malicioussiteprotection.impl.models.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
     suspend fun getFilters(hash: String): List<Filter>?
     suspend fun matches(hashPrefix: String): List<Match>
+    suspend fun loadFilters()
+    suspend fun loadHashPrefixes()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealMaliciousSiteRepository @Inject constructor(
-    private val dataProvider: MaliciousSiteProtectionEmbeddedDataProvider,
     private val maliciousSiteDao: MaliciousSiteDao,
-    @IsMainProcess private val isMainProcess: Boolean,
-    maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,
     private val maliciousSiteService: MaliciousSiteService,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider,
 ) : MaliciousSiteRepository {
 
-    init {
-        if (isMainProcess) {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                if (maliciousSiteProtectionFeature.self().isEnabled()) {
-                    loadEmbeddedData()
+    override suspend fun loadFilters() {
+        try {
+            val networkRevision = maliciousSiteService.getRevision().revision
+
+            (maliciousSiteDao.getLatestRevision()?.filter { it.type == Type.FILTER_SET.name } ?: listOf()).let { latestRevision ->
+                val phishingFilterSetRevision = latestRevision.firstOrNull() { it.feed == PHISHING.name }?.revision ?: 0
+                val phishingFilterSet: FilterSetResponse? = if (networkRevision > phishingFilterSetRevision) {
+                    maliciousSiteService.getPhishingFilterSet(phishingFilterSetRevision)
+                } else {
+                    null
                 }
+                val malwareFilterSetRevision = latestRevision.firstOrNull() { it.feed == MALWARE.name }?.revision ?: 0
+                val malwareFilterSet: FilterSetResponse? = if (networkRevision > malwareFilterSetRevision) {
+                    maliciousSiteService.getMalwareFilterSet(malwareFilterSetRevision)
+                } else {
+                    null
+                }
+
+                maliciousSiteDao.updateFilters(
+                    phishingFilterSet?.let {
+                        PhishingFilterSetWithRevision(
+                            it.insert.map { insert -> Filter(insert.hash, insert.regex) }.toSet(),
+                            it.delete.map { delete -> Filter(delete.hash, delete.regex) }.toSet(),
+                            it.revision,
+                            it.replace,
+                        )
+                    },
+                )
+                maliciousSiteDao.updateFilters(
+                    malwareFilterSet?.let {
+                        MalwareFilterSetWithRevision(
+                            it.insert.map { insert -> Filter(insert.hash, insert.regex) }.toSet(),
+                            it.delete.map { delete -> Filter(delete.hash, delete.regex) }.toSet(),
+                            it.revision,
+                            it.replace,
+                        )
+                    },
+                )
             }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to download malicious site protection list")
         }
     }
 
-    private suspend fun loadEmbeddedData() {
-        val embeddedPhishingHashPrefixes = dataProvider.loadEmbeddedPhishingHashPrefixes()
+    override suspend fun loadHashPrefixes() {
+        try {
+            val networkRevision = maliciousSiteService.getRevision().revision
 
-        val embeddedPhishingFilterSet = dataProvider.loadEmbeddedPhishingFilterSet()
+            (maliciousSiteDao.getLatestRevision()?.filter { it.type == Type.HASH_PREFIXES.name } ?: listOf()).let {
+                val phishingHashPrefixesRevision = it.firstOrNull() { it.feed == PHISHING.name }?.revision ?: 0
+                val phishingHashPrefixes: HashPrefixResponse? = if (networkRevision > phishingHashPrefixesRevision) {
+                    maliciousSiteService.getPhishingHashPrefixes(phishingHashPrefixesRevision)
+                } else {
+                    null
+                }
+                val malwareHashPrefixesRevision = it.firstOrNull() { it.feed == MALWARE.name }?.revision ?: 0
+                val malwareHashPrefixes: HashPrefixResponse? = if (networkRevision > malwareHashPrefixesRevision) {
+                    maliciousSiteService.getMalwareHashPrefixes(malwareHashPrefixesRevision)
+                } else {
+                    null
+                }
 
-        val embeddedMalwareHashPrefixes = dataProvider.loadEmbeddedMalwareHashPrefixes()
-
-        val embeddedMalwareFilterSet = dataProvider.loadEmbeddedMalwareFilterSet()
-
-        // TODO (cbarreiro): Once we have the download scheduler, we should check the revision and update the data accordingly
-
-        maliciousSiteDao.insertData(
-            phishingFilterSetRevision = embeddedPhishingFilterSet?.revision,
-            malwareFilterSetRevision = embeddedMalwareFilterSet?.revision,
-            phishingHashPrefixesRevision = embeddedPhishingHashPrefixes?.revision,
-            malwareHashPrefixesRevision = embeddedMalwareHashPrefixes?.revision,
-            phishingHashPrefixes = embeddedPhishingHashPrefixes?.insert?.toSet() ?: setOf(),
-            phishingFilterSet = embeddedPhishingFilterSet?.insert ?: setOf(),
-            malwareHashPrefixes = embeddedMalwareHashPrefixes?.insert?.toSet() ?: setOf(),
-            malwareFilterSet = embeddedMalwareFilterSet?.insert ?: setOf(),
-        )
+                maliciousSiteDao.updateHashPrefixes(
+                    phishingHashPrefixes?.let { PhishingHashPrefixesWithRevision(it.insert, it.delete, it.revision, it.replace) },
+                )
+                maliciousSiteDao.updateHashPrefixes(
+                    malwareHashPrefixes?.let { MalwareHashPrefixesWithRevision(it.insert, it.delete, it.revision, it.replace) },
+                )
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to download malicious site protection list")
+        }
     }
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
@@ -96,24 +138,11 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
-            maliciousSiteService.getMatches(hashPrefix).matches.also {
-                Timber.d("\uD83D\uDFE2 Cris: Fetched $it matches for hash prefix $hashPrefix")
+            maliciousSiteService.getMatches(hashPrefix).matches.map {
+                Match(it.hostname, it.url, it.regex, it.hash)
             }
         } catch (e: Exception) {
-            Timber.d("\uD83D\uDD34 Cris: Failed to fetch matches for hash prefix $hashPrefix")
             listOf()
         }
     }
 }
-
-data class Match(
-    val hostname: String,
-    val url: String,
-    val regex: String,
-    val hash: String,
-)
-
-data class Filter(
-    val hash: String,
-    val regex: String,
-)

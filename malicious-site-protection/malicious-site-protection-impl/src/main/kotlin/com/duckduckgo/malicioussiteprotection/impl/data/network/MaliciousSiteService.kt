@@ -19,12 +19,10 @@ package com.duckduckgo.malicioussiteprotection.impl.data.network
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.common.utils.AppUrl.Url.API
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.malicioussiteprotection.impl.data.Filter
-import com.duckduckgo.malicioussiteprotection.impl.data.Match
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-private const val BASE_URL = "$API/api/protection"
+private const val BASE_URL = "$API/api/protection/v1/android"
 private const val HASH_PREFIX_PATH = "/hashPrefix"
 private const val FILTER_SET_PATH = "/filterSet"
 private const val CATEGORY = "category"
@@ -47,10 +45,13 @@ interface MaliciousSiteService {
 
     @GET("$BASE_URL/matches")
     suspend fun getMatches(@Query("hashPrefix") hashPrefix: String): MatchesResponse
+
+    @GET("$BASE_URL/revision")
+    suspend fun getRevision(): RevisionResponse
 }
 
 data class MatchesResponse(
-    val matches: List<Match>,
+    val matches: List<MatchResponse>,
 )
 
 data class HashPrefixResponse(
@@ -61,8 +62,24 @@ data class HashPrefixResponse(
 )
 
 data class FilterSetResponse(
-    val insert: Set<Filter>,
-    val delete: Set<Filter>,
+    val insert: Set<FilterResponse>,
+    val delete: Set<FilterResponse>,
     val revision: Int,
     val replace: Boolean,
+)
+
+data class FilterResponse(
+    val hash: String,
+    val regex: String,
+)
+
+data class MatchResponse(
+    val hostname: String,
+    val url: String,
+    val regex: String,
+    val hash: String,
+)
+
+data class RevisionResponse(
+    val revision: Int,
 )
