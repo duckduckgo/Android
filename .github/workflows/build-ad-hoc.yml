@@ -6,7 +6,6 @@ on:
       ref:
         description: 'Ref to build APK from (branch, tag, commit)'
         required: true
-        default: 'develop'
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -24,7 +23,8 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.app-version }}
+          ref: ${{ github.event.inputs.ref }}
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
