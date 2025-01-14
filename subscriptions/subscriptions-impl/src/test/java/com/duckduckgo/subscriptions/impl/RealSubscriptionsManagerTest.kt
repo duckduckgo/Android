@@ -113,7 +113,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val authJwtValidator: AuthJwtValidator = mock()
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
-    private lateinit var subscriptionsManager: SubscriptionsManager
+    private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
     fun before() = runTest {
