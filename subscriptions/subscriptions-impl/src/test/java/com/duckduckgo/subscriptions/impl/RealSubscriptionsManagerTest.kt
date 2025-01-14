@@ -1267,6 +1267,21 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNotNull(subscriptionsManager.getSubscription())
     }
 
+    @Test
+    fun whenSignInV1AndLoadingSubscriptionFailsThenSetsStatusToWaiting() = runTest {
+        assumeTrue(authApiV2Enabled)
+        givenAccessTokenSucceeds()
+        givenV1AccessTokenExchangeSuccess()
+        givenV2AccessTokenRefreshSucceeds()
+        givenSubscriptionFails()
+
+        subscriptionsManager.signInV1("authToken")
+
+        assertTrue(subscriptionsManager.isSignedIn())
+        assertNull(subscriptionsManager.getSubscription())
+        assertEquals(WAITING, subscriptionsManager.subscriptionStatus())
+    }
+
     private suspend fun givenUrlPortalSucceeds() {
         whenever(subscriptionsService.portal()).thenReturn(PortalResponse("example.com"))
     }

@@ -342,6 +342,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun signInV1(authToken: String) {
         exchangeAuthToken(authToken)
         if (shouldUseAuthV2()) {
+            authRepository.purchaseToWaitingStatus()
             try {
                 refreshSubscriptionData()
             } catch (e: Exception) {
