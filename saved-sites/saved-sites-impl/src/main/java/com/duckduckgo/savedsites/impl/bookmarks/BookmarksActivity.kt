@@ -84,6 +84,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditBookmarkFolderDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.savedsites.impl.store.SortingMode
+import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -343,10 +344,10 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
-                val items = state.bookmarkItems ?: emptyList()
+                val items = state.sortedItems
                 bookmarksAdapter.setItems(
                     items,
-                    state.bookmarkItems != null && state.bookmarkItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                    state.sortedItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
                 binding.searchMenu.isVisible =

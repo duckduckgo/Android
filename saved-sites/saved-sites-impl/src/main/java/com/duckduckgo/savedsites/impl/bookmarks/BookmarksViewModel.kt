@@ -83,6 +83,7 @@ class BookmarksViewModel @Inject constructor(
     data class ViewState(
         val enableSearch: Boolean = false,
         val bookmarkItems: List<BookmarksItemTypes>? = null,
+        val sortedItems: List<BookmarksItemTypes> = emptyList(),
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
         val canShowPromo: Boolean = false,
@@ -349,15 +350,34 @@ class BookmarksViewModel @Inject constructor(
         }
 
         withContext(dispatcherProvider.main()) {
+            val sortingMode = bookmarksDataStore.getSortingMode()
             viewState.value = viewState.value?.copy(
                 favorites = favorites,
                 bookmarkItems = bookmarkItems,
+                sortedItems = sortElements(bookmarkItems, sortingMode),
                 enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
-                sortingMode = bookmarksDataStore.getSortingMode(),
+                sortingMode = sortingMode,
             )
         }
 
         showSyncPromotionIfEligible()
+    }
+
+    private fun sortElements(
+        bookmarkItems: List<BookmarksItemTypes>,
+        sortingMode: SortingMode,
+    ): List<BookmarksItemTypes> {
+        return if (sortingMode == SortingMode.MANUAL) {
+            bookmarkItems
+        } else {
+            bookmarkItems.sortedBy { item ->
+                when (item) {
+                    is BookmarkItem -> item.bookmark.title
+                    is BookmarkFolderItem -> item.bookmarkFolder.name
+                    else -> null
+                }
+            }
+        }
     }
 
     fun onBookmarkFoldersActivityResult(savedSiteUrl: String) {
@@ -462,8 +482,13 @@ class BookmarksViewModel @Inject constructor(
     fun onSortingModeSelected(mode: SortingMode) {
         viewModelScope.launch(dispatcherProvider.io()) {
             bookmarksDataStore.setSortingMode(mode)
+            val bookmarkItems = viewState.value?.bookmarkItems
+            val sortedBookmarks = sortElements(bookmarkItems ?: emptyList(), mode)
             withContext(dispatcherProvider.main()) {
-                viewState.value = viewState.value?.copy(sortingMode = bookmarksDataStore.getSortingMode())
+                viewState.value = viewState.value?.copy(
+                    sortingMode = bookmarksDataStore.getSortingMode(),
+                    sortedItems = sortedBookmarks,
+                )
             }
         }
     }
