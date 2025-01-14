@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NewTabButtonOverlay" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/keyline_4</item>
+    </style>
+    <style name="NewTabButtonStyle" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="backgroundTint">@color/blue10_solid</item>
+        <item name="iconTint">@color/blue70</item>
+        <item name="android:textColor">@color/blue70</item>
+    </style>
+</resources>
