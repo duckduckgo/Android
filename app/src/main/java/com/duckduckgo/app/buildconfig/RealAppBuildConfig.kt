@@ -41,7 +41,6 @@ class RealAppBuildConfig @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : AppBuildConfig {
-
     private val preferences by lazy {
         sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.app.buildconfig.cache", false, false)
     }
