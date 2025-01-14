@@ -910,8 +910,6 @@ class RealSubscriptionsManager @Inject constructor(
         privacyProFeature.get().isLaunchedROW().isEnabled()
     }
 
-
-
     private fun parseError(e: HttpException): ResponseError? {
         return try {
             val error = adapter.fromJson(e.response()?.errorBody()?.string().orEmpty())
