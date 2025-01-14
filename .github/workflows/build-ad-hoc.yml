@@ -64,7 +64,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble APK
-        run: ./gradlew assemble${{ format('capitalize', github.event.inputs.build-variant) }} -Pforce-default-variant
+        run: ./gradlew assemble${{github.event.inputs.build-variant}} -Pforce-default-variant
 
       - name: Move APK to new folder
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
