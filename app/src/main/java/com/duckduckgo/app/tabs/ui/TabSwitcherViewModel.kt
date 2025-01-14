@@ -31,14 +31,18 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.FabType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -61,6 +65,9 @@ class TabSwitcherViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    private val _viewState = MutableStateFlow<ViewState>(ViewState())
+    val viewState = _viewState.asStateFlow()
 
     sealed class Command {
         data object Close : Command()
@@ -178,6 +185,23 @@ class TabSwitcherViewModel @Inject constructor(
                 GRID
             }
             tabRepository.setTabLayoutType(newLayoutType)
+        }
+    }
+
+    fun onFabClicked() {
+        if (viewState.value.fabType == FabType.NEW_TAB) {
+            _viewState.update { it.copy(FabType.CLOSE_TABS) }
+        } else {
+            _viewState.update { it.copy(FabType.NEW_TAB) }
+        }
+    }
+
+    data class ViewState(
+        val fabType: FabType = FabType.NEW_TAB,
+    ) {
+        enum class FabType {
+            NEW_TAB,
+            CLOSE_TABS,
         }
     }
 }
