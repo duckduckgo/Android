@@ -518,6 +518,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
             binding.exportBookmarks.setDisabled()
+            binding.sortManually.setDisabled()
+            binding.sortByName.setDisabled()
         }
 
         when (viewModel.viewState.value?.sortingMode) {
