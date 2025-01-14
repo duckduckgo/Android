@@ -7,18 +7,17 @@ on:
         description: 'Ref to build APK from (branch, tag, commit)'
         required: true
         default: 'develop'
-
-    build-variant:
-      description: 'Android build variant'
-      required: true
-      default: 'playRelease'
-      type: choice
-      options:
-        - fdroidRelease
-        - internalDebug
-        - internalRelease
-        - playDebug
-        - playRelease
+      build-variant:
+        description: 'Android build variant'
+        required: true
+        default: 'playRelease'
+        type: choice
+        options:
+          - fdroidRelease
+          - internalDebug
+          - internalRelease
+          - playDebug
+          - playRelease
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
