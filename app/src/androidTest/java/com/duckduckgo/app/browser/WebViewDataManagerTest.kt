@@ -27,6 +27,8 @@ import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -55,6 +57,7 @@ class WebViewDataManagerTest {
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val mockWebLocalStorageManager: WebLocalStorageManager = mock()
     private val mockCrashLogger: CrashLogger = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val testee = WebViewDataManager(
@@ -68,6 +71,7 @@ class WebViewDataManagerTest {
         mockCrashLogger,
         TestScope(),
         CoroutineTestRule().testDispatcherProvider,
+        mockAppBuildConfig,
     )
 
     @Test
@@ -116,6 +120,23 @@ class WebViewDataManagerTest {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val exception = RuntimeException("test")
             val webView = TestWebView(context)
+            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
+            whenever(mockWebLocalStorageManager.clearWebLocalStorage()).thenThrow(exception)
+            testee.clearData(webView, mockStorage)
+            verify(mockWebLocalStorageManager).clearWebLocalStorage()
+            verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
+            verify(mockStorage).deleteAllData()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenDataClearedAndThrowsExceptionAndNotInternalThenSendCrashPixelAndDeleteAllData() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.webLocalStorage().setRawStoredState(State(enable = true))
+            val exception = RuntimeException("test")
+            val webView = TestWebView(context)
+            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
             whenever(mockWebLocalStorageManager.clearWebLocalStorage()).thenThrow(exception)
             testee.clearData(webView, mockStorage)
             verify(mockWebLocalStorageManager).clearWebLocalStorage()
