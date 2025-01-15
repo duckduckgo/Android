@@ -363,20 +363,21 @@ class BookmarksViewModel @Inject constructor(
         showSyncPromotionIfEligible()
     }
 
-    private fun sortElements(
+    fun sortElements(
         bookmarkItems: List<BookmarksItemTypes>,
         sortingMode: SortingMode,
     ): List<BookmarksItemTypes> {
         return if (sortingMode == SortingMode.MANUAL) {
             bookmarkItems
         } else {
-            bookmarkItems.sortedBy { item ->
-                when (item) {
-                    is BookmarkItem -> item.bookmark.title
-                    is BookmarkFolderItem -> item.bookmarkFolder.name
-                    else -> null
+            val bookmarks = bookmarkItems.filterIsInstance<BookmarkItem>()
+            val folders = bookmarkItems.filterIsInstance<BookmarkFolderItem>()
+            val titles = bookmarks.map { it.bookmark.title } + folders.map { it.bookmarkFolder.name }
+            val sortedElements = titles.sortedWith(String.CASE_INSENSITIVE_ORDER)
+                .mapNotNull { title ->
+                    bookmarks.find { it.bookmark.title == title } ?: folders.find { it.bookmarkFolder.name == title }
                 }
-            }
+            return sortedElements
         }
     }
 
