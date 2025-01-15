@@ -107,8 +107,10 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri? = request.url
 
-        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) {
-            handleSiteBlocked(webView)
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+            if (isMalicious) {
+                handleSiteBlocked(webView)
+            }
         }?.let {
             handleSiteBlocked(webView)
             return it
@@ -183,8 +185,10 @@ class WebViewRequestInterceptor(
         if (maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
                 url,
                 isForMainFrame,
-            ) {
-                handleSiteBlocked(webView)
+            ) { isMalicious ->
+                if (isMalicious) {
+                    handleSiteBlocked(webView)
+                }
             }
         ) {
             handleSiteBlocked(webView)
