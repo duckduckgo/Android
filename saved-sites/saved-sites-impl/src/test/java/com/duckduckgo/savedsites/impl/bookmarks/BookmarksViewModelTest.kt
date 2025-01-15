@@ -32,6 +32,8 @@ import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
+import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import kotlinx.coroutines.flow.flowOf
@@ -70,6 +72,7 @@ class BookmarksViewModelTest {
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt = mock()
+    private val bookmarksDataStore: BookmarksDataStore = mock()
 
     private val bookmark =
         Bookmark(
@@ -92,6 +95,7 @@ class BookmarksViewModelTest {
             pixel,
             syncEngine,
             faviconsFetchingPrompt,
+            bookmarksDataStore,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -113,6 +117,7 @@ class BookmarksViewModelTest {
             ),
         )
 
+        whenever(bookmarksDataStore.getSortingMode()).thenReturn(NAME)
         testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
     }
 
@@ -452,5 +457,11 @@ class BookmarksViewModelTest {
         testee.onSavedSiteDeleteRequested()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+    }
+
+    @Test
+    fun whenSortingModeSelectedThenDataStored() = runTest {
+        testee.onSortingModeSelected(NAME)
+        verify(bookmarksDataStore).setSortingMode(NAME)
     }
 }
