@@ -1,0 +1,4 @@
+google-play-scraper==1.2.7
+pyinstaller==6.11.1
+pyinstaller-hooks-contrib==2024.11
+setuptools==75.7.0
