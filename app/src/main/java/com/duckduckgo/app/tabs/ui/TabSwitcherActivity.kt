@@ -212,14 +212,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
-                        if (dy > 0 || dy < 0 && tabsFab.isShown()) {
-                            tabsFab.hide()
+                        if (dy < 0) {
+                            tabsFab.shrink()
                         }
                     }
 
                     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                            tabsFab.show()
+                            tabsFab.extend()
                         }
                         super.onScrollStateChanged(recyclerView, newState)
                     }
