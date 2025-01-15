@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player giver dig mulighed for at se YouTube uden målrettede annoncer i DuckDuckGo, og det, du ser, påvirker ikke dine anbefalinger.<annotation type="learn_more_link">Få mere at vide</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Videopræferencer</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player giver dig mulighed for at se YouTube uden målrettede annoncer i DuckDuckGo, og det, du ser, påvirker ikke dine anbefalinger.</string>
     <string name="duck_player_mode_always">Altid</string>
     <string name="duck_player_mode_never">Aldrig</string>
     <string name="duck_player_mode_always_ask">Spørg hver gang</string>

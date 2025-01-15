@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">С Duck Player на DuckDuckGo можете да гледате YouTube без насочени реклами и вече гледаните видеоклипове няма да повлияят на препоръчаните.\n<annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Предпочитания за видео</string>
+    <string name="duck_player_settings_unavailable_description">С Duck Player на DuckDuckGo можете да гледате YouTube без насочени реклами и вече гледаните видеоклипове няма да повлияят на препоръчаните.</string>
     <string name="duck_player_mode_always">Винаги</string>
     <string name="duck_player_mode_never">Никога</string>
     <string name="duck_player_mode_always_ask">Питай всеки път</string>

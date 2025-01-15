@@ -309,8 +309,6 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
@@ -405,8 +403,6 @@ class BrowserTabViewModel @Inject constructor(
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadStateListener,
-    private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
@@ -592,7 +588,6 @@ class BrowserTabViewModel @Inject constructor(
 
     init {
         initializeViewStates()
-        logVoiceSearchAvailability()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
@@ -750,10 +745,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun logVoiceSearchAvailability() {
-        if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
-    }
-
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
@@ -819,14 +810,6 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboard
         }
 
-        browserViewState.value = currentBrowserViewState().copy(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = currentOmnibarViewState().isEditing,
-                query = currentOmnibarViewState().omnibarText,
-                hasQueryChanged = false,
-                urlLoaded = url ?: "",
-            ),
-        )
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
@@ -1075,8 +1058,6 @@ class BrowserTabViewModel @Inject constructor(
         )
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = true,
-            showClearButton = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
             browserError = OMITTED,
             sslError = NONE,
         )
@@ -1316,7 +1297,6 @@ class BrowserTabViewModel @Inject constructor(
 
         val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
             canGoForward = currentGlobalLayoutState() !is Invalidated,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
         )
         browserViewState.value = browserState
 
@@ -1480,16 +1460,11 @@ class BrowserTabViewModel @Inject constructor(
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionDisabled = false,
-            showSearchIcon = false,
-            showClearButton = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
             canFindInPage = true,
             canChangeBrowsingMode = true,
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
-            showDaxIcon = shouldShowDaxIcon(url, true),
             canPrintPage = domain != null,
-            showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, true),
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -1564,22 +1539,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             clearPreviousAppLink()
         }
-    }
-
-    private fun shouldShowDaxIcon(
-        currentUrl: String?,
-        showPrivacyShield: Boolean,
-    ): Boolean {
-        val url = currentUrl ?: return false
-        return showPrivacyShield && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
-    }
-
-    private fun shouldShowDuckPlayerIcon(
-        currentUrl: String?,
-        showPrivacyShield: Boolean,
-    ): Boolean {
-        val url = currentUrl ?: return false
-        return showPrivacyShield && duckPlayer.isDuckPlayerUri(url)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -1658,12 +1617,6 @@ class BrowserTabViewModel @Inject constructor(
                 forceExpand = false,
             ),
         )
-        browserViewState.postValue(
-            currentBrowserViewState().copy(
-                isFireproofWebsite = isFireproofWebsite(),
-                showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
-            ),
-        )
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
@@ -1708,10 +1661,7 @@ class BrowserTabViewModel @Inject constructor(
             canSharePage = false,
             showPrivacyShield = HighlightableButton.Visible(enabled = false),
             canReportSite = false,
-            showSearchIcon = true,
-            showClearButton = true,
             canFireproofSite = false,
-            showDaxIcon = false,
             canPrintPage = false,
         )
         Timber.d("showPrivacyShield=false, showSearchIcon=true, showClearButton=true")
@@ -1912,8 +1862,6 @@ class BrowserTabViewModel @Inject constructor(
                     currentBrowserViewState().copy(
                         browserShowing = false,
                         showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                        showDaxIcon = false,
-                        showSearchIcon = false,
                         sslError = errorResponse.errorType,
                     )
                 command.postValue(ShowSSLError(handler, errorResponse))
@@ -2029,49 +1977,6 @@ class BrowserTabViewModel @Inject constructor(
         if (hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompleteStateFlow.value = query.trim()
         }
-    }
-
-    fun onOmnibarInputStateChanged(
-        query: String,
-        hasFocus: Boolean,
-        hasQueryChanged: Boolean,
-    ) {
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = !hasFocus || query.isBlank()
-        val showPrivacyShield = !hasFocus
-        val showSearchIcon = hasFocus
-
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            isEditing = hasFocus,
-            forceExpand = true,
-            shouldMoveCaretToStart = !hasFocus,
-        )
-
-        val currentBrowserViewState = currentBrowserViewState()
-        browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
-            showSearchIcon = showSearchIcon,
-            showTabsButton = showControls,
-            fireButton = if (showControls) {
-                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
-            } else {
-                HighlightableButton.Gone
-            },
-            showMenuButton = if (showControls) {
-                HighlightableButton.Visible()
-            } else {
-                HighlightableButton.Gone
-            },
-            showClearButton = showClearButton,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = hasFocus,
-                query = query,
-                hasQueryChanged = hasQueryChanged,
-                urlLoaded = url ?: "",
-            ),
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
-            showDuckPlayerIcon = shouldShowDuckPlayerIcon(url, showPrivacyShield),
-        )
     }
 
     fun onBookmarkMenuClicked() {
@@ -2512,13 +2417,11 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
-            val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
                     addToHomeVisible = addToHomeSupported,
                     showAutofill = showAutofill,
-                    showVoiceSearch = showVoiceSearch,
                 )
             }
         }
@@ -2835,7 +2738,6 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = request.site,
                 forceExpand = true,
             )
-            browserViewState.value = currentBrowserViewState().copy(showVoiceSearch = false)
             command.value = HideWebContent
         }
         command.value = RequiresAuthentication(request)
@@ -3182,8 +3084,6 @@ class BrowserTabViewModel @Inject constructor(
             currentBrowserViewState().copy(
                 browserError = errorType,
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                showDaxIcon = false,
-                showSearchIcon = false,
             )
         if (androidBrowserConfig.errorPagePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
@@ -3279,12 +3179,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             PrintAttributes.MediaSize.ISO_A4
         }
-    }
-
-    fun voiceSearchDisabled() {
-        browserViewState.value = currentBrowserViewState().copy(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
-        )
     }
 
     private fun getDataForPermissionState(
@@ -3488,8 +3382,6 @@ class BrowserTabViewModel @Inject constructor(
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
             browserViewState.value = currentBrowserViewState().copy(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                showSearchIcon = true,
-                showDaxIcon = false,
                 browserShowing = showBrowser,
                 sslError = NONE,
             )

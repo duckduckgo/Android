@@ -59,6 +59,7 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -113,7 +114,7 @@ class BrowserWebViewClientTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: BrowserWebViewClient
-    private lateinit var webView: WebView
+    private lateinit var webView: TestWebView
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val requestRewriter: RequestRewriter = mock()
@@ -152,10 +153,11 @@ class BrowserWebViewClientTest {
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidBrowserConfigFeature, mock())
+    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
 
     @UiThreadTest
     @Before
-    fun setup() {
+    fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
         testee = BrowserWebViewClient(
@@ -196,6 +198,7 @@ class BrowserWebViewClientTest {
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
+        whenever(mockMaliciousSiteProtection.shouldOverrideUrlLoading(any(), any(), any())).thenReturn(false)
     }
 
     @UiThreadTest
@@ -315,8 +318,9 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
-        val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
-        testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", EXAMPLE_URL, EXAMPLE_URL)
+        webView.webViewUrl = EXAMPLE_URL
+        testee.onReceivedHttpAuthRequest(webView, mockHandler, "example.com", EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
     }
 
@@ -432,6 +436,26 @@ class BrowserWebViewClientTest {
         verify(mockDuckPlayer).setDuckPlayerOrigin(SERP_AUTO)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenShouldOverrideWithShouldNavigateToDuckPlayerButNotMainFrameDoNothing() = runTest {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.url).thenReturn("www.youtube.com/watch?v=1234".toUri())
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+        val mockClientProvider: ClientBrandHintProvider = mock()
+        whenever(mockClientProvider.shouldChangeBranding(any())).thenReturn(false)
+        testee.clientProvider = mockClientProvider
+        doNothing().whenever(listener).willOverrideUrl(any())
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("www.duckduckgo.com")
+        openInNewTabFlow.emit(Off)
+
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+    }
+
     @Test
     fun whenShouldOverrideWithWebThenDoNotAddQueryParam() = runTest {
         val urlType = Web("www.youtube.com/watch?v=1234")
@@ -503,11 +527,44 @@ class BrowserWebViewClientTest {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.clientProvider = mock()
 
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).onShouldOverride()
         verify(listener).openLinkInNewTab(EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerInNewTabButSameUrlThenDoNothing() = runTest {
+        openInNewTabFlow.emit(On)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+        testee.clientProvider = mock()
+        (webView as TestWebView).webViewUrl = EXAMPLE_URL
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldLaunchDuckPlayerButNotMainframeThenDoNothing() = runTest {
+        openInNewTabFlow.emit(On)
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).onShouldOverride()
+        verify(listener, never()).openLinkInNewTab(EXAMPLE_URL.toUri())
     }
 
     @UiThreadTest
@@ -765,6 +822,7 @@ class BrowserWebViewClientTest {
     private fun getImmediatelyInvokedMockWebView(): WebView {
         val mockWebView = mock<WebView>()
         whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.post(any())).thenAnswer { invocation ->
             invocation.getArgument(0, Runnable::class.java).run()
             null
@@ -1068,6 +1126,13 @@ class BrowserWebViewClientTest {
     }
 
     private class TestWebView(context: Context) : WebView(context) {
+
+        var webViewUrl: String? = null
+
+        override fun getUrl(): String? {
+            return webViewUrl
+        }
+
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
         }
@@ -1149,6 +1214,6 @@ class BrowserWebViewClientTest {
     }
 
     companion object {
-        const val EXAMPLE_URL = "example.com"
+        const val EXAMPLE_URL = "https://example.com"
     }
 }

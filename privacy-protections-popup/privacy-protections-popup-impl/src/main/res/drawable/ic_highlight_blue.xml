@@ -18,7 +18,7 @@
 
     <stroke
         android:width="2dp"
-        android:color="@color/cornflowerBlue" />
+        android:color="@color/blue50" />
 
-    <solid android:color="@color/cornflowerBlue_10" />
+    <solid android:color="@color/blue70" />
 </shape>

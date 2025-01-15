@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player îți permite să vizionezi YouTube fără reclame țintite în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Preferințe video</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player îți permite să vizionezi YouTube fără reclame țintite în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.</string>
     <string name="duck_player_mode_always">Întotdeauna</string>
     <string name="duck_player_mode_never">Niciodată</string>
     <string name="duck_player_mode_always_ask">Întreabă de fiecare dată</string>

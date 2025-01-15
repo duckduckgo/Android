@@ -34,6 +34,8 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
@@ -213,10 +215,12 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onChangeAddressBarPositionClicked() {
         viewModelScope.launch { command.send(LaunchAppearanceScreen) }
+        pixel.fire(SETTINGS_NEXT_STEPS_ADDRESS_BAR)
     }
 
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
+        pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
     }
 
     fun onDefaultBrowserSettingClicked() {

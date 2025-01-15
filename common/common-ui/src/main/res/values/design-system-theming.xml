@@ -140,7 +140,7 @@
         <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
-        <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
+        <item name="autofillCredentialListSubtitleColor">@color/gray30</item>
 
         <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/black</item>
@@ -229,10 +229,10 @@
         <!-- Autofill -->
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
-        <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
+        <item name="autofillCredentialListSubtitleColor">@color/gray70</item>
 
         <!-- App Tracking Protection -->
-        <item name="appTPHeaderBackground">@color/light_blue</item>
+        <item name="appTPHeaderBackground">@color/white_60</item>
 
         <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
@@ -317,18 +317,18 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
-        <item name="colorPrimary">@color/newBlack</item>
+        <item name="colorPrimary">@color/gray100</item>
         <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="colorAccent">@color/blue50</item>
         <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
     <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Splash">
-        <item name="android:statusBarColor">@color/whiteFive</item>
+        <item name="android:statusBarColor">@color/gray0</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@color/whiteFive</item>
+        <item name="android:navigationBarColor">@color/gray0</item>
 
-        <item name="windowSplashScreenBackground">@color/whiteFive</item>
+        <item name="windowSplashScreenBackground">@color/gray0</item>
         <item name="postSplashScreenTheme">@style/Theme.DuckDuckGo.Light</item>
     </style>
 

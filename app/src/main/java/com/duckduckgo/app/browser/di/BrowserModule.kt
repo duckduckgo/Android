@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -74,7 +75,6 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -159,17 +159,6 @@ class BrowserModule {
     @Provides
     fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun webDataManager(
-        context: Context,
-        webViewSessionStorage: WebViewSessionStorage,
-        cookieManager: DuckDuckGoCookieManager,
-        fileDeleter: FileDeleter,
-        webViewHttpAuthStore: WebViewHttpAuthStore,
-    ): WebDataManager =
-        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
-
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -213,6 +202,7 @@ class BrowserModule {
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
         duckPlayer: DuckPlayer,
+        maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -225,6 +215,7 @@ class BrowserModule {
             cloakedCnameDetector,
             requestFilterer,
             duckPlayer,
+            maliciousSiteBlockerWebViewIntegration,
         )
 
     @Provides

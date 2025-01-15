@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -145,12 +146,6 @@ interface SubscriptionsManager {
     suspend fun getAccount(): Account?
 
     /**
-     * Exchanges the auth token for an access token and stores both tokens
-     */
-    @Deprecated("This method will be removed after migrating to auth v2")
-    suspend fun exchangeAuthToken(authToken: String): String
-
-    /**
      * Returns the auth token and if expired, tries to refresh irt
      */
     @Deprecated("This method will be removed after migrating to auth v2")
@@ -165,6 +160,11 @@ interface SubscriptionsManager {
      * Returns current subscription status
      */
     suspend fun subscriptionStatus(): SubscriptionStatus
+
+    /**
+     * Returns a [Set<String>] of available features for the subscription or an empty set if subscription is not available
+     */
+    suspend fun getFeatures(): Set<String>
 
     /**
      * Checks if user is signed in or not (using either auth API v1 or v2)
@@ -195,6 +195,11 @@ interface SubscriptionsManager {
      * Flow to know the state of the current purchase
      */
     val currentPurchaseState: Flow<CurrentPurchase>
+
+    /**
+     * Signs the user in using the provided v1 auth token
+     */
+    suspend fun signInV1(authToken: String)
 
     /**
      * Signs the user out and deletes all the data from the device
@@ -334,6 +339,20 @@ class RealSubscriptionsManager @Inject constructor(
         return authRepository.getSubscription()
     }
 
+    override suspend fun signInV1(authToken: String) {
+        exchangeAuthToken(authToken)
+        if (shouldUseAuthV2()) {
+            authRepository.purchaseToWaitingStatus()
+            try {
+                refreshSubscriptionData()
+            } catch (e: Exception) {
+                logcat { "Subs: error when refreshing subscription on v1 sign in" }
+            }
+        } else {
+            fetchAndStoreAllData()
+        }
+    }
+
     override suspend fun signOut() {
         authRepository.getAccessTokenV2()?.run {
             coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
@@ -447,8 +466,19 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    override suspend fun getFeatures(): Set<String> {
+        val subscription = authRepository.getSubscription()
+
+        return if (subscription != null) {
+            getFeaturesInternal(subscription.productId)
+        } else {
+            emptySet()
+        }
+    }
+
+    @VisibleForTesting
     @Deprecated("This method will be removed after migrating to auth v2")
-    override suspend fun exchangeAuthToken(authToken: String): String {
+    suspend fun exchangeAuthToken(authToken: String): String {
         val accessToken = authService.accessToken("Bearer $authToken").accessToken
         authRepository.setAccessToken(accessToken)
         authRepository.setAuthToken(authToken)
@@ -678,15 +708,7 @@ class RealSubscriptionsManager @Inject constructor(
                         )
                     }
 
-                    val features = if (privacyProFeature.get().featuresApi().isEnabled()) {
-                        authRepository.getFeatures(offer.basePlanId)
-                    } else {
-                        when (offer.basePlanId) {
-                            MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
-                            MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
-                            else -> throw IllegalStateException()
-                        }
-                    }
+                    val features = getFeaturesInternal(offer.basePlanId)
 
                     if (features.isEmpty()) return@let emptyList()
 
@@ -698,6 +720,18 @@ class RealSubscriptionsManager @Inject constructor(
                     )
                 }
             }
+
+    private suspend fun getFeaturesInternal(planId: String): Set<String> {
+        return if (privacyProFeature.get().featuresApi().isEnabled()) {
+            authRepository.getFeatures(planId)
+        } else {
+            when (planId) {
+                MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
+                MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
+                else -> throw IllegalStateException()
+            }
+        }
+    }
 
     override suspend fun purchase(
         activity: Activity,

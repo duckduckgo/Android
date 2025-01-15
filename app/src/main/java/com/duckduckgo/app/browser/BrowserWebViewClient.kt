@@ -126,6 +126,10 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
+    private val confirmationCallback: (isMalicious: Boolean) -> Unit = {
+        // TODO (cbarreiro): Handle site blocked asynchronously
+    }
+
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
@@ -158,6 +162,10 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
+            if (requestInterceptor.shouldOverrideUrlLoading(url, isForMainFrame)) {
+                return true
+            }
+
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl(ABOUT_BLANK)
                 webViewClientListener?.dosAttackDetected()
@@ -192,7 +200,7 @@ class BrowserWebViewClient @Inject constructor(
                     false
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
-                    if (isRedirect) {
+                    if (isRedirect && isForMainFrame) {
                         /*
                         This forces shouldInterceptRequest to be called with the YouTube URL, otherwise that method is never executed and
                         therefore the Duck Player page is never launched if YouTube comes from a redirect.
@@ -206,8 +214,8 @@ class BrowserWebViewClient @Inject constructor(
                             url,
                             webView,
                             isForMainFrame,
-                            openInNewTab = shouldOpenDuckPlayerInNewTab,
-                            willOpenDuckPlayer = true,
+                            openInNewTab = shouldOpenDuckPlayerInNewTab && isForMainFrame && webView.url != url.toString(),
+                            willOpenDuckPlayer = isForMainFrame,
                         )
                     }
                 }
@@ -344,7 +352,7 @@ class BrowserWebViewClient @Inject constructor(
                             return false
                         }
                     } else if (openInNewTab) {
-                        webViewClientListener?.openLinkInNewTab(url)
+                        listener.openLinkInNewTab(url)
                         return true
                     } else {
                         val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
@@ -407,11 +415,11 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                requestInterceptor.onPageStarted(url)
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
-            requestInterceptor.onPageStarted(url)
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
@@ -509,7 +517,12 @@ class BrowserWebViewClient @Inject constructor(
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
+            requestInterceptor.shouldIntercept(
+                request,
+                webView,
+                documentUrl?.toUri(),
+                webViewClientListener,
+            )
         }
     }
 

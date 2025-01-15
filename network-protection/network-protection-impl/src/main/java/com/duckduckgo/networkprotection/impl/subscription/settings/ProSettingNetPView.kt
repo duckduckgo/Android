@@ -35,10 +35,9 @@ import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNet
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Factory
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Expired
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Disabled
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Enabled
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Subscribed
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -79,7 +78,7 @@ class ProSettingNetPView @JvmOverloads constructor(
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         viewModel.viewState
-            .onEach { updateNetPSettings(it.networkProtectionEntryState) }
+            .onEach { updateNetPSettings(it.netPEntryState) }
             .launchIn(coroutineScope!!)
 
         viewModel.commands()
@@ -91,15 +90,14 @@ class ProSettingNetPView @JvmOverloads constructor(
         with(binding.netpPSetting) {
             when (networkProtectionEntryState) {
                 Hidden -> isGone = true
-                Activating,
-                Expired,
-                -> {
+                is Disabled -> {
                     isVisible = true
                     isClickable = false
+                    setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_vpn_grayscale_color_24)
                     setStatus(isOn = false)
                 }
-                is Subscribed -> {
+                is Enabled -> {
                     isVisible = true
                     isClickable = true
                     setClickListener { viewModel.onNetPSettingClicked() }

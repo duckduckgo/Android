@@ -44,10 +44,8 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -794,7 +792,6 @@ class CtaViewModelTest {
         val site = site(url = privacyProUrl)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-        verify(mockPixel, never()).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
         assertNull(value)
     }
 
@@ -811,36 +808,6 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)
-    }
-
-    @Test
-    fun givenDuckPlayerSiteWhenRefreshCtaWhileBrowsingThenFireSkipMajorNetworkPixel() = runTest {
-        givenDaxOnboardingActive()
-        val site = site(url = "duck://player/12345", entity = TestEntity("Google", "Google", 9.0))
-
-        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(true)
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
-        whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
-
-        testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-        verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
-    }
-
-    @Test
-    fun givenDuckPlayerSiteWhenRefreshCtaWhileBrowsingAndTrackersDialogAlreadyShownThenDontSentSkipMajorNetworkPixel() = runTest {
-        givenDaxOnboardingActive()
-        val site = site(url = "duck://player/12345", entity = TestEntity("Google", "Google", 9.0))
-
-        whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(true)
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
-        whenever(mockDuckPlayer.isYouTubeUrl(any())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
-
-        testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-        verify(mockPixel).fire(eq(ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE), any(), any(), eq(Unique()))
     }
 
     @Test

@@ -49,7 +49,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
-    ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE("m_onboarding_skip_major_network_unique"),
     ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
@@ -130,6 +129,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM("ms_address_bar_position_setting_selected_bottom"),
+    SETTINGS_NEXT_STEPS_ADDRESS_BAR("m_settings_next_steps_set_address_bar"),
+    SETTINGS_NEXT_STEPS_VOICE_SEARCH("m_settings_next_steps_enable_voice_search"),
     SETTINGS_MAC_APP_PRESSED("ms_mac_app_setting_pressed"),
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),

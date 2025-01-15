@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.\n<annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Video seaded</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player võimaldab sul DuckDuckGo-s YouTube\'i vaadata ilma sihitud reklaamideta ja see, mida vaatad, ei mõjuta sinu soovitusi.</string>
     <string name="duck_player_mode_always">Alati</string>
     <string name="duck_player_mode_never">Mitte kunagi</string>
     <string name="duck_player_mode_always_ask">Küsi iga kord</string>

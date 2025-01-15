@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.\n<annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Předvolby videí</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player umožňuje dívat se na YouTube v prohlížeči DuckDuckGo bez cílených reklam. To, co sleduješ, nebude ovlivňovat tvoje doporučení.</string>
     <string name="duck_player_mode_always">Vždy</string>
     <string name="duck_player_mode_never">Nikdy</string>
     <string name="duck_player_mode_always_ask">Vždycky se ptát</string>

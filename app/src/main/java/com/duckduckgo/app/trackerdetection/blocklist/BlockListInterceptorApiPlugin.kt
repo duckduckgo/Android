@@ -20,23 +20,16 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
-)
-class BlockListInterceptorApiPlugin @Inject constructor(
+class BlockListInterceptorApiPlugin constructor(
     private val inventory: FeatureTogglesInventory,
     private val moshi: Moshi,
 ) : Interceptor, ApiInterceptorPlugin {

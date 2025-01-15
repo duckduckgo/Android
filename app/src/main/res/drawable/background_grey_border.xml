@@ -16,7 +16,7 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/grayishBrown">
+    android:color="@color/gray95">
     <item>
         <shape android:shape="oval">
             <padding
