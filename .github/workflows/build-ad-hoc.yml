@@ -67,11 +67,11 @@ jobs:
         run: ./gradlew assemble${{github.event.inputs.build-variant}} -Pforce-default-variant
 
       - name: Move APK to new folder
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+        run: find . -name "*.apk"  -exec mv '{}' apk/release${{github.event.inputs.build-variant}}.apk \;
 
       - name: Upload debug apk
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release
-          path: apk/release.apk
+          path: apk/release${{github.event.inputs.build-variant}}.apk
