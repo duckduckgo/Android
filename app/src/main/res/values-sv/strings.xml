@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsHeadingPrivacyProtections">Integritetsskydd</string>
+    <string name="settingsHeadingProtections">Skydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
-    <string name="settingsHeadingMainSettings">Huvudinställningar</string>
+    <string name="settingsHeadingMainSettings">Andra inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarensning</string>
     <string name="settingsAddWidget">Lägg till widget på startsidan</string>
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
-    <string name="settingsEnableVoiceSearch">Aktivera röstsökning</string>
+    <string name="settingsEnableVoiceSearch">Aktivera privat röstsökning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andra plattformar</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionTitle">Skydd för webbspårning är aktiverat</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Skydd för webbspårning är aktiverat</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
 

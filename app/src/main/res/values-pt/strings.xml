@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Definições</string>
     <string name="settingsMenuItemTitle">Definições</string>
     <string name="settingsHeadingPrivacy">Privacidade</string>
-    <string name="settingsHeadingPrivacyProtections">Proteções de Privacidade</string>
+    <string name="settingsHeadingProtections">Proteções</string>
     <string name="settingsHeadingAppearance">Aparência</string>
     <string name="settingsHeadingCustomize">Personalizar</string>
     <string name="settingsHeadingAbout">Acerca de</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
     <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
     <string name="settingsHeadingSettings">Definições</string>
-    <string name="settingsHeadingMainSettings">Definições Principais</string>
+    <string name="settingsHeadingMainSettings">Outros ajustes</string>
     <string name="settingsPermissionsSetting">Permissões</string>
     <string name="settingsSyncSetting">Sincronização e cópia de segurança</string>
     <string name="settingsFireButton">Botão de proteção</string>
     <string name="settingsDataClearing">Limpeza de Dados</string>
     <string name="settingsAddWidget">Adicionar widget ao ecrã inicial</string>
     <string name="settingsAddressBarPosition">Define a Posição da Barra de Endereços</string>
-    <string name="settingsEnableVoiceSearch">Ativar Pesquisa por Voz</string>
+    <string name="settingsEnableVoiceSearch">Ativar pesquisa por voz privada</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo Noutras Plataformas</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
-    <string name="webTrackingProtectionTitle">A proteção contra rastreamento na Internet está ativada</string>
+    <string name="webTrackingProtectionIsEnabledTitle">A proteção contra rastreamento na Internet está ativada</string>
+    <string name="webTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionDescription"><![CDATA[O DuckDuckGo nunca te rastreia. Queremos proteger a tua privacidade ao máximo. Mantemos e desenvolvemos continuamente camadas de proteção para acompanharmos os novos métodos de rastreamento e oferecermos muitas proteções que outros navegadores não oferecem por predefinição. <u><a href=\"\">Sabe mais</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet.\n<a href=\"\">Sabe mais</a>]]></string>
 

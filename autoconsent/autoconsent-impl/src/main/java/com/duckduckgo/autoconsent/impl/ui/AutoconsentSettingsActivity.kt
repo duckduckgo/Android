@@ -27,7 +27,6 @@ import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -40,6 +39,7 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
@@ -78,7 +78,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
             if (newSettingsFeature.self().isEnabled()) {
-                ds.color = ContextCompat.getColor(applicationContext, CommonR.color.blue50)
+                ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
                 ds.isUnderlineText = false
             }
         }
@@ -124,7 +124,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         if (newSettingsFeature.self().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.setImageResource(
-                    if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_popups_128,
+                    if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
                 )
                 autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
             }

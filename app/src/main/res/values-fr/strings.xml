@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
-    <string name="settingsHeadingPrivacyProtections">Protections de la confidentialité</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Apparence</string>
     <string name="settingsHeadingCustomize">Personnaliser</string>
     <string name="settingsHeadingAbout">À propos</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
-    <string name="settingsHeadingMainSettings">Réglages principaux</string>
+    <string name="settingsHeadingMainSettings">Autres paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
     <string name="settingsAddWidget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
-    <string name="settingsEnableVoiceSearch">Activez la recherche vocale</string>
+    <string name="settingsEnableVoiceSearch">Activer la recherche vocale privée</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo sur d\'autres plateformes</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionTitle">La protection contre le pistage sur le Web est activée</string>
+    <string name="webTrackingProtectionIsEnabledTitle">La protection contre le pistage sur le Web est activée</string>
+    <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ne vous suit jamais et fait de son mieux pour préserver votre vie privée. Nous ne cessons d\'entretenir et de développer des couches de protection pour ne jamais nous laisser dépasser par les nouvelles méthodes de pistage. Nous fournissons aussi de nombreuses protections que les autres navigateurs ne proposent pas par défaut. <u><a href=\"\">En savoir plus</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
 

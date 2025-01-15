@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsHeadingPrivacyProtections">Zaštita privatnosti</string>
+    <string name="settingsHeadingProtections">Zaštite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodba</string>
     <string name="settingsHeadingAbout">O</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsHeadingSettings">Postavke</string>
-    <string name="settingsHeadingMainSettings">Glavne postavke</string>
+    <string name="settingsHeadingMainSettings">Ostale postavke</string>
     <string name="settingsPermissionsSetting">Dozvole</string>
     <string name="settingsSyncSetting">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Brisanje podataka</string>
     <string name="settingsAddWidget">Dodajte widget na početni zaslon</string>
     <string name="settingsAddressBarPosition">Postavi položaj adresne trake</string>
-    <string name="settingsEnableVoiceSearch">Omogući glasovno pretraživanje</string>
+    <string name="settingsEnableVoiceSearch">Omogući privatno glasovno pretraživanje</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugim platformama</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
-    <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu je omogućena</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Zaštita od praćenja na webu je omogućena</string>
+    <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo te nikad ne prati i nastojimo zaštititi tvoju privatnost što je više moguće. Neprestano održavamo i razvijamo slojeve zaštite kako bismo bili u toku s novim metodama praćenja i pružamo mnoge zaštite koje drugi preglednici ne nude prema zadanim postavkama. <u><a href=\"\">Saznaj više</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatski blokira skrivene alate za praćenje dok \"surfaš\" po internetu.\n<a href=\"\">Saznaj više</a>]]></string>
 

@@ -20,7 +20,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity">
+              tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity">
 
     <include
             android:id="@+id/includeToolbar"
@@ -52,7 +52,7 @@
                 android:layout_marginBottom="@dimen/keyline_2"
                 android:text="@string/privacyPro"
                 app:textType="primary"
-                app:typography="h1" />
+                app:typography="h2" />
 
             <LinearLayout
                 android:id="@+id/subscriptionExpiredStatusContainer"

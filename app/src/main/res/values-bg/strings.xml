@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
-    <string name="settingsHeadingPrivacyProtections">Защита на поверителността</string>
+    <string name="settingsHeadingProtections">Защити</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
     <string name="settingsHeadingCustomize">Персонализиране</string>
     <string name="settingsHeadingAbout">За нас</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings">Основни настройки</string>
+    <string name="settingsHeadingMainSettings">Други Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Изчистване на данни</string>
     <string name="settingsAddWidget">Добавяне на приспособлението към началния екран</string>
     <string name="settingsAddressBarPosition">Задайте позицията на адресната лента</string>
-    <string name="settingsEnableVoiceSearch">Активиране на гласово търсене</string>
+    <string name="settingsEnableVoiceSearch">Активиране на поверително гласово търсене</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo на други платформи</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
-    <string name="webTrackingProtectionTitle">Защитата от проследяване в мрежата е активирана</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Защитата от проследяване в мрежата е активирана</string>
+    <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo никога не Ви проследява и се стремим да защитим Вашата поверителност във възможно най-голяма степен. Непрекъснато поддържаме и развиваме слоеве на защита, за да сме в крак с новите методи за проследяване и да осигуряваме много защити, които другите браузъри не предлагат по подразбиране. <u><a href=\"\">Научете повече</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
 

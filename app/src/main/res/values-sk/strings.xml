@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nastavenia</string>
     <string name="settingsMenuItemTitle">Nastavenia</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsHeadingPrivacyProtections">Ochrana súkromia</string>
+    <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhľad</string>
     <string name="settingsHeadingCustomize">Prispôsobiť</string>
     <string name="settingsHeadingAbout">O</string>
@@ -158,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
-    <string name="settingsHeadingMainSettings">Hlavné nastavenia</string>
+    <string name="settingsHeadingMainSettings">Ďalšie nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
     <string name="settingsDataClearing">Vymazanie údajov</string>
     <string name="settingsAddWidget">Pridať miniaplikáciu na domovskú obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
-    <string name="settingsEnableVoiceSearch">Povoliť hlasové vyhľadávanie</string>
+    <string name="settingsEnableVoiceSearch">Povoliť súkromné hlasové vyhľadávanie</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>
 
     <!-- Private Search -->
@@ -190,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
-    <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu je povolená</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Ochrana pred sledovaním webu je povolená</string>
+    <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vás nikdy nesleduje a snažíme sa čo najviac chrániť vaše súkromie. Neustále udržiavame a vyvíjame vrstvy ochrany, aby sme držali krok s novými metódami sledovania a poskytovali mnohé druhy ochrany, ktoré iné prehliadače štandardne neponúkajú. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
 
