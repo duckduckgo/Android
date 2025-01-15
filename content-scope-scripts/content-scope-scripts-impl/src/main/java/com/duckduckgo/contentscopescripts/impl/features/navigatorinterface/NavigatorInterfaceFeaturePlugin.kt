@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface
 
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceEntity
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceRepository
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.NavigatorInterfaceFeatureName.NavigatorInterface
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceEntity
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -38,5 +39,5 @@ class NavigatorInterfaceFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: String = NavigatorInterfaceFeatureName.NavigatorInterface.value
+    override val featureName: String = NavigatorInterface.value
 }

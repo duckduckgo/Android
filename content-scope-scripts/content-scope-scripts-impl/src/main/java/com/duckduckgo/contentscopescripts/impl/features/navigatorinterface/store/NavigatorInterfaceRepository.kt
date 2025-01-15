@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface.store
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface.store
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store
 
 import androidx.room.Dao
 import androidx.room.Insert

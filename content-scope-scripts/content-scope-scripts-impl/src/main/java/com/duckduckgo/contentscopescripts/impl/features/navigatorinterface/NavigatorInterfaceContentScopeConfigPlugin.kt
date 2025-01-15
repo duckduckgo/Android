@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceRepository
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.NavigatorInterfaceFeatureName.NavigatorInterface
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class NavigatorInterfaceContentScopeConfigPlugin @Inject constructor(
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
-        val featureName = NavigatorInterfaceFeatureName.NavigatorInterface.value
+        val featureName = NavigatorInterface.value
         val config = navigatorInterfaceRepository.navigatorInterfaceEntity.json
         return "\"$featureName\":$config"
     }

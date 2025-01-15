@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface
 
 enum class NavigatorInterfaceFeatureName(val value: String) {
     NavigatorInterface("navigatorInterface"),

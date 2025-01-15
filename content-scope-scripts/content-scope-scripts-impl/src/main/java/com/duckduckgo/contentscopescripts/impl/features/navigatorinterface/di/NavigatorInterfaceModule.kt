@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface.di
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.di
 
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.ALL_MIGRATIONS
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceDatabase
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceRepository
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.RealNavigatorInterfaceRepository
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.ALL_MIGRATIONS
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceDatabase
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.RealNavigatorInterfaceRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module

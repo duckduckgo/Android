@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface
 
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceEntity
-import com.duckduckgo.contentscopescripts.impl.navigatorinterface.store.NavigatorInterfaceRepository
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceEntity
+import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

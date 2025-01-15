@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.navigatorinterface.store
+package com.duckduckgo.contentscopescripts.impl.features.navigatorinterface
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        NavigatorInterfaceEntity::class,
-    ],
-)
-abstract class NavigatorInterfaceDatabase : RoomDatabase() {
-    abstract fun navigatorInterfaceDao(): NavigatorInterfaceDao
+/**
+ * Convenience method to get the [NavigatorInterfaceFeatureName] from its [String] value
+ */
+fun navigatorInterfaceFeatureValueOf(value: String): NavigatorInterfaceFeatureName? {
+    return NavigatorInterfaceFeatureName.entries.find { it.value == value }
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()
