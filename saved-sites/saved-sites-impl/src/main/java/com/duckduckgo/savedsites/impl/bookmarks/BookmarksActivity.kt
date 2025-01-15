@@ -85,6 +85,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
+import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -318,7 +319,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     private fun setupBookmarksRecycler() {
         bookmarksAdapter = BookmarksAdapter(
-            layoutInflater,
             viewModel,
             this,
             faviconManager,
@@ -327,6 +327,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             },
             onBookmarkOverflowClick = { anchor, bookmark ->
                 showBookmarkOverFlowMenu(anchor, bookmark)
+            },
+            onLongClick = {
+                if (viewModel.viewState.value?.sortingMode == NAME) {
+                    Snackbar.make(binding.root, R.string.popupBookmarksPreventReordering, Snackbar.LENGTH_LONG).show()
+                }
             },
             onBookmarkFolderClick = { anchor, bookmarkFolder ->
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)

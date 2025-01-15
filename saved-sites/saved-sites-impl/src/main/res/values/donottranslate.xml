@@ -30,5 +30,6 @@
     <!-- Bookmarks -->
     <string name="popupBookmarksSortManually">Sort Manually</string>
     <string name="popupBookmarksSortByName">Sort by Name</string>
+    <string name="popupBookmarksPreventReordering">Switch to manual sorting to rearrange bookmarks</string>
 
 </resources>

@@ -38,12 +38,12 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyS
 import java.util.Collections
 
 class BookmarksAdapter(
-    private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val onBookmarkClick: (Bookmark) -> Unit,
     private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+    private val onLongClick: () -> Unit,
     private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
     private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
@@ -106,6 +106,7 @@ class BookmarksAdapter(
                     faviconManager,
                     onBookmarkClick,
                     onBookmarkOverflowClick,
+                    onLongClick,
                 )
             }
             BOOKMARK_FOLDER_TYPE -> {
@@ -114,6 +115,7 @@ class BookmarksAdapter(
                     binding,
                     onBookmarkFolderClick,
                     onBookmarkFolderOverflowClick,
+                    onLongClick,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -135,7 +137,7 @@ class BookmarksAdapter(
         when (holder) {
             is BookmarksViewHolder -> {
                 val bookmark = (this.bookmarkItems[position] as BookmarkItem).bookmark
-                holder.update(isReorderingEnabled, bookmark)
+                holder.update(bookmark)
                 holder.showDragHandle(isReordering, bookmark)
             }
             is BookmarkFoldersViewHolder -> {

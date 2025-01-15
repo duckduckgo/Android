@@ -34,9 +34,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintB
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -67,6 +65,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private fun updateText(query: String) {
             binding.savedSiteEmptyHint.text = binding.root.context.getString(R.string.noResultsFor, query)
         }
+
         fun bind() {
             viewModel.viewState.value?.let { updateText(it.searchQuery) }
         }
@@ -78,6 +77,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val faviconManager: FaviconManager,
         private val onBookmarkClick: (Bookmark) -> Unit,
         private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -85,7 +85,10 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private var faviconLoaded = false
         private var bookmark: SavedSite.Bookmark? = null
 
-        fun showDragHandle(show: Boolean, bookmark: SavedSite.Bookmark) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmark: SavedSite.Bookmark,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
@@ -98,7 +101,6 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         }
 
         fun update(
-            isReorderingEnabled: Boolean,
             bookmark: Bookmark,
         ) {
             val listItem = binding.root
@@ -124,22 +126,20 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 onBookmarkClick(bookmark)
             }
 
-            if (isReorderingEnabled) {
-                Timber.d("Bookmarks: Reordering enabled")
-                listItem.removeLongClickListener()
-            } else {
-                Timber.d("Bookmarks: Reordering disabled")
-                listItem.setLongClickListener {
-                    Snackbar.make(listItem, "Long click to reorder", Snackbar.LENGTH_SHORT).show()
-                }
+            listItem.setLongClickListener {
+                onLongClick()
             }
+
             isFavorite = bookmark.isFavorite
             listItem.setFavoriteStarVisible(isFavorite)
 
             this.bookmark = bookmark
         }
 
-        private fun loadFavicon(url: String, image: ImageView) {
+        private fun loadFavicon(
+            url: String,
+            image: ImageView,
+        ) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = image)
             }
@@ -155,11 +155,15 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val binding: RowTwoLineItemBinding,
         private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
         private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
 
-        fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmarkFolder: BookmarkFolder,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
@@ -192,6 +196,10 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
             listItem.setOnClickListener {
                 onBookmarkFolderClick(listItem, bookmarkFolder)
+            }
+
+            listItem.setLongClickListener {
+                onLongClick()
             }
         }
     }
