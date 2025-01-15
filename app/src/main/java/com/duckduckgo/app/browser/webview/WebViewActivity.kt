@@ -18,11 +18,14 @@ package com.duckduckgo.app.browser.webview
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Message
 import android.view.MenuItem
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
+import android.webkit.WebView
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.BrowserChromeClient
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
@@ -43,9 +46,6 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
 
-    @Inject
-    lateinit var webChromeClient: BrowserChromeClient
-
     private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
@@ -61,10 +61,29 @@ class WebViewActivity : DuckDuckGoActivity() {
         val params = intent.getActivityParams(WebViewActivityWithParams::class.java)
         val url = params?.url
         title = params?.screenTitle.orEmpty()
+        val supportNewWindows = params?.supportNewWindows ?: false
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
-            it.webChromeClient = webChromeClient
+
+            if (supportNewWindows) {
+                it.webChromeClient = object : WebChromeClient() {
+                    override fun onCreateWindow(
+                        view: WebView?,
+                        isDialog: Boolean,
+                        isUserGesture: Boolean,
+                        resultMsg: Message?,
+                    ): Boolean {
+                        view?.requestFocusNodeHref(resultMsg)
+                        val newWindowUrl = resultMsg?.data?.getString("url")
+                        if (newWindowUrl != null) {
+                            startActivity(BrowserActivity.intent(this@WebViewActivity, newWindowUrl))
+                            return true
+                        }
+                        return false
+                    }
+                }
+            }
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
@@ -75,7 +94,7 @@ class WebViewActivity : DuckDuckGoActivity() {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                setSupportMultipleWindows(true)
+                setSupportMultipleWindows(supportNewWindows)
                 databaseEnabled = false
                 setSupportZoom(true)
             }

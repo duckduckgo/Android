@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl
 
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,8 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -49,10 +51,15 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        binding.duckChatSettingsText.addClickableLink(
-            annotation = "learn_more_link",
+        binding.duckChatSettingsText.addClickableSpan(
             textSequence = getText(R.string.duck_chat_settings_activity_description),
-            onClick = { viewModel.duckChatLearnMoreClicked() },
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.duckChatLearnMoreClicked()
+                    }
+                },
+            ),
         )
 
         setupToolbar(binding.includeToolbar.toolbar)

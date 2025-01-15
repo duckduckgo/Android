@@ -115,6 +115,7 @@ class RealDuckChat @Inject constructor(
             WebViewActivityWithParams(
                 url = duckChatLink,
                 screenTitle = context.getString(R.string.duck_chat_title),
+                supportNewWindows = true,
             ),
         )
 

@@ -26,6 +26,7 @@ sealed class BrowserScreens {
     data class WebViewActivityWithParams(
         val url: String,
         val screenTitle: String,
+        val supportNewWindows: Boolean = false,
     ) : GlobalActivityStarter.ActivityParams
 
     /**
