@@ -41,7 +41,6 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -59,6 +58,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksBinding
 import com.duckduckgo.saved.sites.impl.databinding.ContentBookmarksBinding
+import com.duckduckgo.saved.sites.impl.databinding.PopupBookmarksMenuBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -286,21 +286,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             }
 
             R.id.bookmark_export -> {
-                val intent = Intent()
-                    .setType("text/html")
-                    .setAction(Intent.ACTION_CREATE_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
-
-                startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
+                launchBookmarkExport()
             }
 
             R.id.action_add_folder -> {
-                val parentId = getParentFolderId()
-                val parentFolderName = getParentFolderName()
-                val dialog = AddBookmarkFolderDialogFragment.instance(parentId, parentFolderName)
-                dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
-                dialog.listener = viewModel
+                launchAddFolder()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -521,23 +511,20 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             R.layout.popup_bookmarks_menu,
             width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
         )
-        val view = popupMenu.contentView
-        val sortByName = view.findViewById<PopupMenuItemView>(R.id.sortByName)
-        val sortManually = view.findViewById<PopupMenuItemView>(R.id.sortManually)
-        val import = view.findViewById<PopupMenuItemView>(R.id.importBookmarks)
-        val export = view.findViewById<PopupMenuItemView>(R.id.exportBookmarks)
+
+        val binding = PopupBookmarksMenuBinding.bind(popupMenu.contentView)
 
         if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
-            export.setDisabled()
+            binding.exportBookmarks.setDisabled()
         }
 
-        sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+        binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
 
         popupMenu.apply {
-            onMenuItemClicked(sortByName) { }
-            onMenuItemClicked(sortManually) { }
-            onMenuItemClicked(import) { launchBookmarkImport() }
-            onMenuItemClicked(export) { launchBookmarkExport() }
+            onMenuItemClicked(binding.sortByName) { }
+            onMenuItemClicked(binding.sortManually) { }
+            onMenuItemClicked(binding.importBookmarks) { launchBookmarkImport() }
+            onMenuItemClicked(binding.exportBookmarks) { launchBookmarkExport() }
         }
         popupMenu.show(binding.root, anchor)
     }
