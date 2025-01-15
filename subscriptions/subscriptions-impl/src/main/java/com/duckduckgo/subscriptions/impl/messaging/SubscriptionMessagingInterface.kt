@@ -203,8 +203,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                    subscriptionsManager.exchangeAuthToken(token)
-                    subscriptionsManager.fetchAndStoreAllData()
+                    subscriptionsManager.signInV1(token)
                     subscriptionsChecker.runChecker()
                     pixelSender.reportRestoreUsingEmailSuccess()
                     pixelSender.reportSubscriptionActivated()
