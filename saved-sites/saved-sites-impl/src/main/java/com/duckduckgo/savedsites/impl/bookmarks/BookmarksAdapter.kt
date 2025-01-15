@@ -35,7 +35,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.Bookma
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptySearchHint
-import com.google.android.material.snackbar.Snackbar
 import java.util.Collections
 
 class BookmarksAdapter(
@@ -136,14 +135,8 @@ class BookmarksAdapter(
         when (holder) {
             is BookmarksViewHolder -> {
                 val bookmark = (this.bookmarkItems[position] as BookmarkItem).bookmark
-                holder.update(bookmark)
+                holder.update(isReorderingEnabled, bookmark)
                 holder.showDragHandle(isReordering, bookmark)
-                if (!isReorderingEnabled) {
-                    holder.itemView.setOnLongClickListener {
-                        Snackbar.make(holder.itemView, "Long click to reorder", Snackbar.LENGTH_SHORT).show()
-                        true
-                    }
-                }
             }
             is BookmarkFoldersViewHolder -> {
                 val bookmarkFolder = (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder

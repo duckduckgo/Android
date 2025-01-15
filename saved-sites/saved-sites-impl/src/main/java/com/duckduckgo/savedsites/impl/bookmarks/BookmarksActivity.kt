@@ -120,6 +120,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
 
+    private lateinit var itemTouchHelperCallback: BookmarkItemTouchHelperCallback
+    private lateinit var itemTouchHelper: ItemTouchHelper
+
     private var deleteDialog: AlertDialog? = null
     private var searchMenuItem: MenuItem? = null
     private var exportMenuItem: MenuItem? = null
@@ -334,9 +337,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         )
         contentBookmarksBinding.recycler.adapter = bookmarksAdapter
 
-        val callback = BookmarkItemTouchHelperCallback(bookmarksAdapter)
-        val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
+        itemTouchHelperCallback = BookmarkItemTouchHelperCallback(bookmarksAdapter)
+        itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
 
         (contentBookmarksBinding.recycler.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
@@ -344,8 +346,16 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
-                bookmarksAdapter.isReorderingEnabled = state.sortingMode == MANUAL
                 val items = state.sortedItems
+
+                if (state.sortingMode == MANUAL) {
+                    bookmarksAdapter.isReorderingEnabled = true
+                    itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
+                } else {
+                    bookmarksAdapter.isReorderingEnabled = false
+                    itemTouchHelper.attachToRecyclerView(null)
+                }
+
                 bookmarksAdapter.setItems(
                     items,
                     state.sortedItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,

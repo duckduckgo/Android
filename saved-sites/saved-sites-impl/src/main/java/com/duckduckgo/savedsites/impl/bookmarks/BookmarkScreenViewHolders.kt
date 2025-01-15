@@ -34,7 +34,9 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintB
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -95,7 +97,10 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
         }
 
-        fun update(bookmark: SavedSite.Bookmark) {
+        fun update(
+            isReorderingEnabled: Boolean,
+            bookmark: Bookmark,
+        ) {
             val listItem = binding.root
             listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
             listItem.setLeadingIconContentDescription(
@@ -117,6 +122,16 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
             listItem.setClickListener {
                 onBookmarkClick(bookmark)
+            }
+
+            if (isReorderingEnabled) {
+                Timber.d("Bookmarks: Reordering enabled")
+                listItem.removeLongClickListener()
+            } else {
+                Timber.d("Bookmarks: Reordering disabled")
+                listItem.setLongClickListener {
+                    Snackbar.make(listItem, "Long click to reorder", Snackbar.LENGTH_SHORT).show()
+                }
             }
             isFavorite = bookmark.isFavorite
             listItem.setFavoriteStarVisible(isFavorite)
