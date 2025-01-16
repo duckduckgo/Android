@@ -7285,6 +7285,10 @@
             if (this.getFeatureSettingEnabled('modifyLocalStorage')) {
                 this.modifyLocalStorage();
             }
+
+            if (this.getFeatureSettingEnabled('modifyCookies')) {
+                this.modifyCookies();
+            }
         }
 
         /** Shim Web Share API in Android WebView */
@@ -7742,6 +7746,24 @@
             settings.changes.forEach((change) => {
                 if (change.action === 'delete') {
                     localStorage.removeItem(change.key);
+                }
+            });
+        }
+
+        /**
+         * Support for modifying cookies
+         */
+        modifyCookies() {
+            /** @type {import('@duckduckgo/privacy-configuration/schema/features/webcompat').WebCompatSettings['modifyCookies']} */
+            const settings = this.getFeatureSetting('modifyCookies');
+
+            if (!settings || !settings.changes) return;
+
+            settings.changes.forEach((change) => {
+                if (change.action === 'delete') {
+                    const pathValue = change.path ? `; path=${change.path}` : '';
+                    const domainValue = change.domain ? `; domain=${change.domain}` : '';
+                    document.cookie = `${change.key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT${pathValue}${domainValue}`;
                 }
             });
         }
