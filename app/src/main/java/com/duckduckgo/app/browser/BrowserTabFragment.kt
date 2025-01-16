@@ -186,6 +186,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -981,6 +982,7 @@ class BrowserTabFragment :
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
                 pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+                pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName, type = PixelType.Daily())
             }
             onMenuItemClicked(fireproofWebsiteMenuItem) {
                 viewModel.onFireproofWebsiteMenuClicked()
