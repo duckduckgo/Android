@@ -21,5 +21,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface NewSettingsFeature {
 
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun newSettingsScreen(): Toggle
 }

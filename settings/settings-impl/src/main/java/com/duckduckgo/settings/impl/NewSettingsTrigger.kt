@@ -22,7 +22,7 @@ import com.duckduckgo.settings.api.NewSettingsFeature
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "newSettings",
+    featureName = "settingsPage",
     boundType = NewSettingsFeature::class,
 )
 private interface NewSettingsCodeGenTrigger
