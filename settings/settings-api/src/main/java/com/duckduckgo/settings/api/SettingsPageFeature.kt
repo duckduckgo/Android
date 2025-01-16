@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.impl
+package com.duckduckgo.settings.api
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "settingsPage",
-    boundType = NewSettingsFeature::class,
-)
-private interface NewSettingsCodeGenTrigger
+interface SettingsPageFeature {
+
+    @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun newSettingsScreen(): Toggle
+}

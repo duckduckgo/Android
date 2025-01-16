@@ -45,7 +45,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,7 +57,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var newSettingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val binding: ActivityAutoconsentSettingsBinding by viewBinding()
 
@@ -77,7 +77,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            if (newSettingsFeature.self().isEnabled()) {
+            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
                 ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
                 ds.isUnderlineText = false
             }
@@ -90,7 +90,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.isVisible = true
                 autoconsentTitle.isVisible = true
@@ -121,7 +121,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.setImageResource(
                     if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
@@ -145,7 +145,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlText = getString(
-            if (newSettingsFeature.self().isEnabled()) {
+            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
                 R.string.autoconsentDescriptionNew
             } else {
                 R.string.autoconsentDescription
@@ -155,7 +155,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
             spannableString.apply {
-                if (newSettingsFeature.self().isEnabled()) {
+                if (settingsPageFeature.newSettingsScreen().isEnabled()) {
                     insert(spannableString.getSpanStart(it), "\n")
                 }
                 setSpan(
@@ -168,7 +168,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
             binding.autoconsentDescriptionNew.apply {
                 text = spannableString
                 movementMethod = LinkMovementMethod.getInstance()

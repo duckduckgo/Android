@@ -20,16 +20,16 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(200)
-class ProSettingsNetP @Inject constructor(private val newSettingsFeature: NewSettingsFeature) : ProSettingsPlugin {
+class ProSettingsNetP @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if (newSettingsFeature.self().isEnabled()) {
+        return if (settingsPageFeature.newSettingsScreen().isEnabled()) {
             ProSettingNetPView(context)
         } else {
             return LegacyProSettingNetPView(context)
