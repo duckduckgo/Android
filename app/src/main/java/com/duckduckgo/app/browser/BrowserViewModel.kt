@@ -94,6 +94,7 @@ class BrowserViewModel @Inject constructor(
 
     data class ViewState(
         val hideWebContent: Boolean = true,
+        val isTabSwipingEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -351,6 +352,10 @@ class BrowserViewModel @Inject constructor(
     fun onTabsSwiped() {
         pixel.fire(AppPixelName.SWIPE_TABS_USED)
         pixel.fire(pixel = AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
+    }
+
+    fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
+        viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
     }
 }
 
