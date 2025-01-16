@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
-            android:text="@string/duckChatTitle"
+            android:text="@string/duckChatMenuItem"
             app:layout_constraintStart_toEndOf="@id/icon"
             app:layout_constraintEnd_toStartOf="@id/newPill"
             app:layout_constraintTop_toTopOf="parent"

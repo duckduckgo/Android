@@ -45,7 +45,7 @@
 
     <item
         android:id="@+id/duckChat"
-        android:title="@string/duckChatTitle"
+        android:title="@string/duckChatMenuItem"
         app:showAsAction="never" />
 
     <item

@@ -76,5 +76,6 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">New AI Chat</string>
 
 </resources>

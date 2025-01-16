@@ -15,6 +15,6 @@
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.\n<annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="duck_chat_settings_activity_description">Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party Al chat models. Your chats are not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_chat_visibility_setting">Show Duck.ai in Browser Menu</string>
 </resources>
