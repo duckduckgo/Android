@@ -614,7 +614,6 @@ class OmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
