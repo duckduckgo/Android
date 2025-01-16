@@ -30,11 +30,13 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
+import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -474,8 +476,20 @@ class BookmarksViewModelTest {
         val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
         val bookmarkCnn = Bookmark(id = "bookmarCnn", title = "Cnn", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
-        val bookmarkReddit = Bookmark(id = "bookmarReddit", title = "Reddit", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
-        val bookmarkTheGuardian = Bookmark(id = "bookmarT", title = "The Guardian", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        val bookmarkReddit = Bookmark(
+            id = "bookmarReddit",
+            title = "Reddit",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
+        val bookmarkTheGuardian = Bookmark(
+            id = "bookmarT",
+            title = "The Guardian",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
 
         items.add(BookmarkItem(bookmarkAs))
         items.add(BookmarkItem(bookmarkReddit))
@@ -491,5 +505,43 @@ class BookmarksViewModelTest {
         assertEquals((sortedElements[3] as BookmarkItem).bookmark, bookmarkReddit)
         assertEquals((sortedElements[4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderSports)
         assertEquals((sortedElements[5] as BookmarkItem).bookmark, bookmarkTheGuardian)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndBookmarksEmptyThenCommandSent() {
+        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
+            flowOf(SavedSites(emptyList(), emptyList())),
+        )
+
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NAME, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(true, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenCommandSent() {
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NAME, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(false, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndManualSortingModeThenCommandSent() {
+        whenever(bookmarksDataStore.getSortingMode()).thenReturn(MANUAL)
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(MANUAL, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(false, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
     }
 }

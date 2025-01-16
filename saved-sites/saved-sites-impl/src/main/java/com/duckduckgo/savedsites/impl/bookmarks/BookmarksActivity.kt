@@ -76,6 +76,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Launc
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ReevalutePromotions
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBrowserMenu
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowFaviconsPrompt
@@ -178,7 +179,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun configureToolbar() {
         if (bookmarksSortingFeature.self().isEnabled()) {
             binding.browserMenu.setOnClickListener {
-                showBookmarksPopupMenu(binding.browserMenu)
+                viewModel.onBrowserMenuPressed()
             }
             binding.searchMenu.setOnClickListener {
                 showSearchBar()
@@ -363,7 +364,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
                 bookmarksAdapter.setItems(
                     items,
-                    state.sortedItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                    items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
                 binding.searchMenu.isVisible =
@@ -390,6 +391,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
                 is LaunchSyncSettings -> launchSyncSettings()
                 is ReevalutePromotions -> configurePromotionsContainer()
+                is ShowBrowserMenu -> showBookmarksPopupMenu(it.buttonsDisabled, it.sortingMode)
             }
         }
     }
@@ -523,46 +525,44 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         bookmarksAdapter.isInSearchMode = true
     }
 
-    private fun showBookmarksPopupMenu(anchor: View) {
+    private fun showBookmarksPopupMenu(
+        buttonsDisabled: Boolean,
+        sortingMode: SortingMode,
+    ) {
         val popupMenu = PopupMenu(
             layoutInflater,
             R.layout.popup_bookmarks_menu,
             width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
         )
 
-        val binding = PopupBookmarksMenuBinding.bind(popupMenu.contentView)
+        val popupBinding = PopupBookmarksMenuBinding.bind(popupMenu.contentView)
 
-        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
-            binding.exportBookmarks.setDisabled()
-            binding.sortManually.setDisabled()
-            binding.sortByName.setDisabled()
+        if (buttonsDisabled) {
+            popupBinding.exportBookmarks.setDisabled()
+            popupBinding.sortManually.setDisabled()
+            popupBinding.sortByName.setDisabled()
         } else {
-            when (viewModel.viewState.value?.sortingMode) {
-                SortingMode.MANUAL -> {
-                    binding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+            when (sortingMode) {
+                MANUAL -> {
+                    popupBinding.sortManually.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
                 }
-
-                SortingMode.NAME -> {
-                    binding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
-                }
-
-                else -> {
-                    throw IllegalStateException("Unknown sorting mode")
+                NAME -> {
+                    popupBinding.sortByName.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
                 }
             }
         }
 
         popupMenu.apply {
-            onMenuItemClicked(binding.sortByName) {
-                viewModel.onSortingModeSelected(SortingMode.NAME)
+            onMenuItemClicked(popupBinding.sortByName) {
+                viewModel.onSortingModeSelected(NAME)
             }
-            onMenuItemClicked(binding.sortManually) {
-                viewModel.onSortingModeSelected(SortingMode.MANUAL)
+            onMenuItemClicked(popupBinding.sortManually) {
+                viewModel.onSortingModeSelected(MANUAL)
             }
-            onMenuItemClicked(binding.importBookmarks) { launchBookmarkImport() }
-            onMenuItemClicked(binding.exportBookmarks) { launchBookmarkExport() }
+            onMenuItemClicked(popupBinding.importBookmarks) { launchBookmarkImport() }
+            onMenuItemClicked(popupBinding.exportBookmarks) { launchBookmarkExport() }
         }
-        popupMenu.show(binding.root, anchor)
+        popupMenu.show(binding.root, binding.browserMenu)
     }
 
     private fun hideSearchBar() {

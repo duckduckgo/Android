@@ -39,6 +39,8 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.EmptyHint
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.EmptySearchHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
@@ -47,6 +49,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Impor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBrowserMenu
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowFaviconsPrompt
@@ -56,6 +59,8 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
 import com.duckduckgo.savedsites.impl.store.SortingMode
+import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
+import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -104,6 +109,7 @@ class BookmarksViewModel @Inject constructor(
         data object ShowFaviconsPrompt : Command()
         data object LaunchSyncSettings : Command()
         data object ReevalutePromotions : Command()
+        data class ShowBrowserMenu(val buttonsDisabled: Boolean, val sortingMode: SortingMode) : Command()
     }
 
     companion object {
@@ -367,17 +373,15 @@ class BookmarksViewModel @Inject constructor(
         bookmarkItems: List<BookmarksItemTypes>,
         sortingMode: SortingMode,
     ): List<BookmarksItemTypes> {
-        return if (sortingMode == SortingMode.MANUAL) {
-            bookmarkItems
-        } else {
-            val bookmarks = bookmarkItems.filterIsInstance<BookmarkItem>()
-            val folders = bookmarkItems.filterIsInstance<BookmarkFolderItem>()
-            val titles = bookmarks.map { it.bookmark.title } + folders.map { it.bookmarkFolder.name }
-            val sortedElements = titles.sortedWith(String.CASE_INSENSITIVE_ORDER)
-                .mapNotNull { title ->
-                    bookmarks.find { it.bookmark.title == title } ?: folders.find { it.bookmarkFolder.name == title }
+        return when (sortingMode) {
+            MANUAL -> bookmarkItems
+            NAME -> bookmarkItems.sortedBy {
+                when (it) {
+                    is BookmarkItem -> it.bookmark.title.lowercase()
+                    is BookmarkFolderItem -> it.bookmarkFolder.name.lowercase()
+                    EmptyHint, EmptySearchHint -> null
                 }
-            return sortedElements
+            }
         }
     }
 
@@ -478,6 +482,12 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             showSyncPromotionIfEligible()
         }
+    }
+
+    fun onBrowserMenuPressed() {
+        val buttonsDisabled = viewState.value?.bookmarkItems?.isEmpty() ?: true
+        val sortingMode = viewState.value?.sortingMode ?: MANUAL
+        command.value = ShowBrowserMenu(buttonsDisabled, sortingMode)
     }
 
     fun onSortingModeSelected(mode: SortingMode) {

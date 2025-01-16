@@ -39,9 +39,9 @@ interface BookmarksDataStore {
     suspend fun setSortingMode(value: SortingMode)
 }
 
-enum class SortingMode {
-    MANUAL,
-    NAME,
+enum class SortingMode(val index: Int) {
+    MANUAL(0),
+    NAME(1),
 }
 
 @ContributesBinding(AppScope::class)
@@ -60,7 +60,7 @@ class SharedPreferencesBookmarksDataStore @Inject constructor(
     }
 
     override suspend fun setSortingMode(value: SortingMode) {
-        store.edit { prefs -> prefs[SORTING_MODE] = value.ordinal }
+        store.edit { prefs -> prefs[SORTING_MODE] = value.index }
     }
 
     private val sortingMode: StateFlow<SortingMode> = store.data

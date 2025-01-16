@@ -60,9 +60,9 @@ class BookmarksAdapter(
     var isReordering = false
     var isReorderingEnabled = false
 
-    interface BookmarksItemTypes
-    object EmptyHint : BookmarksItemTypes
-    object EmptySearchHint : BookmarksItemTypes
+    sealed interface BookmarksItemTypes
+    data object EmptyHint : BookmarksItemTypes
+    data object EmptySearchHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
     data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
