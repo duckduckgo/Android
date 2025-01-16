@@ -96,7 +96,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -168,13 +167,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             _currentTab = value
         }
 
-    private val isInEditMode = SwitcherFlow<Boolean>()
-
-    private val isSwipingEnabled by lazy {
-        combine(viewModel.isOnboardingCompleted, isInEditMode) { isOnboardingCompleted, isInEditMode ->
-            isOnboardingCompleted && !isInEditMode
-        }
-    }
+    private val isOmnibarInEditMode = SwitcherFlow<Boolean>()
 
     private val viewModel: BrowserViewModel by bindViewModel()
 
@@ -533,8 +526,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             // enable/disable swiping based on the edit mode and onboarding state
             lifecycleScope.launch {
-                isSwipingEnabled.flowWithLifecycle(lifecycle).collectLatest {
-                    tabPager.isUserInputEnabled = it
+                isOmnibarInEditMode.flowWithLifecycle(lifecycle).collectLatest { isInEditMode ->
+                    tabPager.isUserInputEnabled = !isInEditMode
                 }
             }
         } else {
@@ -557,7 +550,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabPager.postDelayed(TAB_SWIPING_OBSERVER_DELAY) {
             currentTab?.isInEditMode?.let {
                 lifecycleScope.launch {
-                    isInEditMode.switch(it)
+                    isOmnibarInEditMode.switch(it)
                 }
             }
         }
