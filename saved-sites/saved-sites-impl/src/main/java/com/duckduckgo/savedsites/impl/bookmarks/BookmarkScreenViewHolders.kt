@@ -194,7 +194,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
             }
 
-            listItem.setOnClickListener {
+            listItem.setClickListener {
                 onBookmarkFolderClick(listItem, bookmarkFolder)
             }
 
