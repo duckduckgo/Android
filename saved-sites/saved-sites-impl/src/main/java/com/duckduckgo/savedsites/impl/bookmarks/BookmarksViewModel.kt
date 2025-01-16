@@ -39,8 +39,6 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.EmptyHint
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.EmptySearchHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ConfirmDeleteSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
@@ -109,7 +107,10 @@ class BookmarksViewModel @Inject constructor(
         data object ShowFaviconsPrompt : Command()
         data object LaunchSyncSettings : Command()
         data object ReevalutePromotions : Command()
-        data class ShowBrowserMenu(val buttonsDisabled: Boolean, val sortingMode: SortingMode) : Command()
+        data class ShowBrowserMenu(
+            val buttonsDisabled: Boolean,
+            val sortingMode: SortingMode,
+        ) : Command()
     }
 
     companion object {
@@ -375,12 +376,8 @@ class BookmarksViewModel @Inject constructor(
     ): List<BookmarksItemTypes> {
         return when (sortingMode) {
             MANUAL -> bookmarkItems
-            NAME -> bookmarkItems.sortedBy {
-                when (it) {
-                    is BookmarkItem -> it.bookmark.title.lowercase()
-                    is BookmarkFolderItem -> it.bookmarkFolder.name.lowercase()
-                    EmptyHint, EmptySearchHint -> null
-                }
+            NAME -> {
+                bookmarkItems.sortedWith(BookmarksNameSortingComparator())
             }
         }
     }
