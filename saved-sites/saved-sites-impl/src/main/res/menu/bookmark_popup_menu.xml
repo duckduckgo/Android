@@ -14,11 +14,14 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_add_folder"
-        android:icon="@drawable/ic_folder_add_24"
-        android:title="@string/addFolder"
-        app:showAsAction="always" />
+        android:id="@+id/bookmark_edit"
+        android:title="@string/newTabPageMenuEdit" />
+    <item
+        android:id="@+id/bookmark_add_to_favorites"
+        android:title="@string/addToFavorites" />
+    <item
+        android:id="@+id/bookmark_delete"
+        android:title="@string/deleteSavedSiteConfirmationDialogDelete"/>
 </menu>
