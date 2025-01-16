@@ -1,0 +1,46 @@
+name: Play Store Review Analysis
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Runs daily at 9am UTC
+  workflow_dispatch:  # Allow manual triggering of the workflow
+
+jobs:
+  analyze-reviews:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/ps-analysis/requirements.txt
+
+      - name: Run Review Analysis Script
+        id: run-script
+        run: |
+          python scripts/ps-analysis/ps_review_anomaly.py --package_name com.duckduckgo.mobile.android > output.txt
+          echo "script_output<<EOF" >> $GITHUB_ENV
+          cat output.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Get Current Date
+        id: date
+        run: echo "current_date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Sync Output to Asana
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: Google Play Review Analysis -- ${{ env.current_date }}
+          asana-task-description: ${{ env.script_output }}
+          action: 'create-asana-task'
