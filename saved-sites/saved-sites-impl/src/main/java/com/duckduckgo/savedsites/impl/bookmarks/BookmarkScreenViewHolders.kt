@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.content.Context
 import android.net.Uri
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
@@ -66,19 +65,19 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private fun updateText(query: String) {
             binding.savedSiteEmptyHint.text = binding.root.context.getString(R.string.noResultsFor, query)
         }
+
         fun bind() {
             viewModel.viewState.value?.let { updateText(it.searchQuery) }
         }
     }
 
     class BookmarksViewHolder(
-        private val layoutInflater: LayoutInflater,
         private val binding: RowBookmarkTwoLineItemBinding,
-        private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
         private val onBookmarkClick: (Bookmark) -> Unit,
         private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -86,7 +85,10 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private var faviconLoaded = false
         private var bookmark: SavedSite.Bookmark? = null
 
-        fun showDragHandle(show: Boolean, bookmark: SavedSite.Bookmark) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmark: SavedSite.Bookmark,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
@@ -98,7 +100,9 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
         }
 
-        fun update(bookmark: SavedSite.Bookmark) {
+        fun update(
+            bookmark: Bookmark,
+        ) {
             val listItem = binding.root
             listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
             listItem.setLeadingIconContentDescription(
@@ -121,13 +125,21 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             listItem.setClickListener {
                 onBookmarkClick(bookmark)
             }
+
+            listItem.setLongClickListener {
+                onLongClick()
+            }
+
             isFavorite = bookmark.isFavorite
             listItem.setFavoriteStarVisible(isFavorite)
 
             this.bookmark = bookmark
         }
 
-        private fun loadFavicon(url: String, image: ImageView) {
+        private fun loadFavicon(
+            url: String,
+            image: ImageView,
+        ) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = image)
             }
@@ -143,11 +155,15 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val binding: RowTwoLineItemBinding,
         private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
         private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
 
-        fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmarkFolder: BookmarkFolder,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
@@ -178,8 +194,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
             }
 
-            listItem.setOnClickListener {
+            listItem.setClickListener {
                 onBookmarkFolderClick(listItem, bookmarkFolder)
+            }
+
+            listItem.setLongClickListener {
+                onLongClick()
             }
         }
     }

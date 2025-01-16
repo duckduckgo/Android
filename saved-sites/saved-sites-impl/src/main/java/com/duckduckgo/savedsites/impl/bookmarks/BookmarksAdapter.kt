@@ -38,12 +38,12 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyS
 import java.util.Collections
 
 class BookmarksAdapter(
-    private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val onBookmarkClick: (Bookmark) -> Unit,
     private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+    private val onLongClick: () -> Unit,
     private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
     private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
@@ -57,11 +57,12 @@ class BookmarksAdapter(
 
     val bookmarkItems = mutableListOf<BookmarksItemTypes>()
     var isInSearchMode = false
-    var isReorderingModeEnabled = false
+    var isReordering = false
+    var isReorderingEnabled = false
 
-    interface BookmarksItemTypes
-    object EmptyHint : BookmarksItemTypes
-    object EmptySearchHint : BookmarksItemTypes
+    sealed interface BookmarksItemTypes
+    data object EmptyHint : BookmarksItemTypes
+    data object EmptySearchHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
     data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
@@ -100,13 +101,12 @@ class BookmarksAdapter(
             BOOKMARK_TYPE -> {
                 val binding = RowBookmarkTwoLineItemBinding.inflate(inflater, parent, false)
                 return BookmarksViewHolder(
-                    layoutInflater,
                     binding,
-                    viewModel,
                     lifecycleOwner,
                     faviconManager,
                     onBookmarkClick,
                     onBookmarkOverflowClick,
+                    onLongClick,
                 )
             }
             BOOKMARK_FOLDER_TYPE -> {
@@ -115,6 +115,7 @@ class BookmarksAdapter(
                     binding,
                     onBookmarkFolderClick,
                     onBookmarkFolderOverflowClick,
+                    onLongClick,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -137,12 +138,12 @@ class BookmarksAdapter(
             is BookmarksViewHolder -> {
                 val bookmark = (this.bookmarkItems[position] as BookmarkItem).bookmark
                 holder.update(bookmark)
-                holder.showDragHandle(isReorderingModeEnabled, bookmark)
+                holder.showDragHandle(isReordering, bookmark)
             }
             is BookmarkFoldersViewHolder -> {
                 val bookmarkFolder = (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder
                 holder.update(bookmarkFolder)
-                holder.showDragHandle(isReorderingModeEnabled, bookmarkFolder)
+                holder.showDragHandle(isReordering, bookmarkFolder)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()

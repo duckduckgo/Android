@@ -60,6 +60,21 @@ abstract class DaxListItem(
         itemContainer.setOnClickListener { onClick() }
     }
 
+    /** Sets the item long click listener */
+    fun setLongClickListener(onClick: () -> Unit) {
+        itemContainer.setOnLongClickListener {
+            onClick()
+            true
+        }
+    }
+
+    /** Sets the item click listener */
+    fun removeLongClickListener() {
+        itemContainer.setOnLongClickListener {
+            false
+        }
+    }
+
     /** Sets the primary text title */
     fun setPrimaryText(title: CharSequence?) {
         primaryText.text = title
@@ -146,7 +161,10 @@ abstract class DaxListItem(
      * depends on the size of the image
      */
 
-    fun setLeadingIconSize(imageSize: IconSize, type: ImageBackground) {
+    fun setLeadingIconSize(
+        imageSize: IconSize,
+        type: ImageBackground,
+    ) {
         val iconSize = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         val backgroundSize = if (type == ImageBackground.None) {
             iconSize
