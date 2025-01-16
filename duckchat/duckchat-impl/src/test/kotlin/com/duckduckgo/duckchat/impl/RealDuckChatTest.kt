@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -32,6 +33,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -47,6 +50,7 @@ class RealDuckChatTest {
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
+    private val mockPixel: Pixel = mock()
 
     private val testee = RealDuckChat(
         mockDuckPlayerFeatureRepository,
@@ -57,12 +61,26 @@ class RealDuckChatTest {
         mockContext,
         true,
         coroutineRule.testScope,
+        mockPixel,
     )
 
     @Before
     fun setup() = runTest {
         whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
+        whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         setFeatureToggle(true)
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuSetTrue_thenPixelOnIsSent() = runTest {
+        testee.setShowInBrowserMenuUserSetting(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuSetFalse_thenPixelOffIsSent() = runTest {
+        testee.setShowInBrowserMenuUserSetting(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
     }
 
     @Test
@@ -100,6 +118,12 @@ class RealDuckChatTest {
 
         val result = testee.showInBrowserMenu()
         assertFalse(result)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalled_pixelIsSent() {
+        testee.openDuckChat()
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
     }
 
     private fun setFeatureToggle(enabled: Boolean) {
