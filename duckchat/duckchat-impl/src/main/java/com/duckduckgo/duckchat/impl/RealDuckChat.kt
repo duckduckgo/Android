@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -68,6 +69,7 @@ class RealDuckChat @Inject constructor(
     private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pixel: Pixel,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
@@ -93,6 +95,12 @@ class RealDuckChat @Inject constructor(
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
+        if (showDuckChat) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
+        } else {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
+        }
+
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
         cacheShowInBrowser()
     }
@@ -110,6 +118,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChat() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(

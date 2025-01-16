@@ -28,6 +28,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -45,6 +47,9 @@ class WebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private val binding: ActivityWebviewBinding by viewBinding()
 
@@ -74,11 +79,14 @@ class WebViewActivity : DuckDuckGoActivity() {
                         isUserGesture: Boolean,
                         resultMsg: Message?,
                     ): Boolean {
+                        pixel.fire(AppPixelName.DEDICATED_WEBVIEW_NEW_TAB_REQUESTED)
                         view?.requestFocusNodeHref(resultMsg)
                         val newWindowUrl = resultMsg?.data?.getString("url")
                         if (newWindowUrl != null) {
                             startActivity(BrowserActivity.intent(this@WebViewActivity, newWindowUrl))
                             return true
+                        } else {
+                            pixel.fire(AppPixelName.DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED)
                         }
                         return false
                     }
