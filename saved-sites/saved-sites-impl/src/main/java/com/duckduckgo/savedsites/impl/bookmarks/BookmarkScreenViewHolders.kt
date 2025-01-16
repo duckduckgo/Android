@@ -45,7 +45,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun bind() {
             binding.savedSiteEmptyHintTitle.setText(R.string.bookmarksEmptyHint)
             binding.savedSiteEmptyImportButton.setOnClickListener {
-                viewModel.launchBookmarkImport()
+                viewModel.onImportBookmarksClicked()
             }
         }
     }

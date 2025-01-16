@@ -71,6 +71,8 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Confi
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
@@ -185,7 +187,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 showSearchBar()
             }
             binding.addFolderMenu.setOnClickListener {
-                launchAddFolder()
+                viewModel.onAddFolderClicked()
             }
             binding.appBarLayout.gone()
         } else {
@@ -289,15 +291,15 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.bookmark_import -> {
-                launchBookmarkImport()
+                viewModel.onImportBookmarksClicked()
             }
 
             R.id.bookmark_export -> {
-                launchBookmarkExport()
+                viewModel.onExportBookmarksClicked()
             }
 
             R.id.action_add_folder -> {
-                launchAddFolder()
+                viewModel.onAddFolderClicked()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -387,11 +389,13 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
                 is DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
                 is ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
-                is LaunchBookmarkImport -> launchBookmarkImport()
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
                 is LaunchSyncSettings -> launchSyncSettings()
                 is ReevalutePromotions -> configurePromotionsContainer()
                 is ShowBrowserMenu -> showBookmarksPopupMenu(it.buttonsDisabled, it.sortingMode)
+                is LaunchBookmarkImport -> launchBookmarkImport()
+                is LaunchBookmarkExport -> launchBookmarkExport()
+                is LaunchAddFolder -> launchAddFolder()
             }
         }
     }
@@ -559,8 +563,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             onMenuItemClicked(popupBinding.sortManually) {
                 viewModel.onSortingModeSelected(MANUAL)
             }
-            onMenuItemClicked(popupBinding.importBookmarks) { launchBookmarkImport() }
-            onMenuItemClicked(popupBinding.exportBookmarks) { launchBookmarkExport() }
+            onMenuItemClicked(popupBinding.importBookmarks) {
+                viewModel.onImportBookmarksClicked()
+            }
+            onMenuItemClicked(popupBinding.exportBookmarks) {
+                viewModel.onExportBookmarksClicked()
+            }
         }
         popupMenu.show(binding.root, binding.browserMenu)
     }

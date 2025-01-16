@@ -33,6 +33,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.SavedSitesPixelParameters
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
@@ -464,9 +465,23 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenSortingModeSelectedThenDataStored() = runTest {
+    fun whenManualSortingModeSelectedThenDataStored() = runTest {
+        testee.onSortingModeSelected(MANUAL)
+        verify(bookmarksDataStore).setSortingMode(MANUAL)
+        verify(pixel).fire(
+            SavedSitesPixelName.BOOKMARK_MENU_SORT_MANUAL_CLICKED,
+            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to MANUAL.name),
+        )
+    }
+
+    @Test
+    fun whenNameSortingModeSelectedThenDataStored() = runTest {
         testee.onSortingModeSelected(NAME)
         verify(bookmarksDataStore).setSortingMode(NAME)
+        verify(pixel).fire(
+            SavedSitesPixelName.BOOKMARK_MENU_SORT_MANUAL_CLICKED,
+            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to NAME.name),
+        )
     }
 
     @Test
@@ -543,5 +558,32 @@ class BookmarksViewModelTest {
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(MANUAL, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
         assertEquals(false, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenImportBookmarksClickedThenPixelAndCommandSent() {
+        testee.onImportBookmarksClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchBookmarkImport, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenExportBookmarksClickedThenPixelAndCommandSent() {
+        testee.onExportBookmarksClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_EXPORT_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchBookmarkExport, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenAddFolderClickedThenPixelAndCommandSent() {
+        testee.onAddFolderClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FOLDER_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchAddFolder, commandCaptor.lastValue)
     }
 }

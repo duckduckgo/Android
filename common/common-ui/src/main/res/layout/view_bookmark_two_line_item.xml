@@ -122,14 +122,4 @@
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
-    <View
-        android:id="@+id/endTrailingPadding"
-        android:layout_width="@dimen/keyline_0"
-        android:layout_height="0dp"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
