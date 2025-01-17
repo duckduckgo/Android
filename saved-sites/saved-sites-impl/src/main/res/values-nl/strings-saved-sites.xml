@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favorieten</string>
     <string name="bookmarksEmptyHint">Nog geen bladwijzers toegevoegd</string>
     <string name="favoritesEmptyHint">Nog geen favorieten toegevoegd</string>
+    <string name="popupBookmarksSortManually">Handmatig sorteren</string>
+    <string name="popupBookmarksSortByName">Sorteren op naam</string>
+    <string name="popupBookmarksPreventReordering">Schakel over naar handmatig sorteren om bladwijzers opnieuw te rangschikken.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>
