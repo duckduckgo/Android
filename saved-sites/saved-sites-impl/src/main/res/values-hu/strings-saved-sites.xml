@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Kedvencek</string>
     <string name="bookmarksEmptyHint">Még nincsenek könyvjelzők hozzáadva</string>
     <string name="favoritesEmptyHint">Még nincsenek hozzáadva kedvencek.</string>
+    <string name="popupBookmarksSortManually">Rendezés manuálisan</string>
+    <string name="popupBookmarksSortByName">Rendezés név szerint</string>
+    <string name="popupBookmarksPreventReordering">Válts manuális rendezésre a könyvjelzők átrendezéséhez.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
