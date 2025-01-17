@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favoriler</string>
     <string name="bookmarksEmptyHint">Henüz yer işareti eklenmedi</string>
     <string name="favoritesEmptyHint">Henüz hiç favori eklenmedi</string>
+    <string name="popupBookmarksSortManually">Manuel Olarak Sırala</string>
+    <string name="popupBookmarksSortByName">Ada Göre Sırala</string>
+    <string name="popupBookmarksPreventReordering">Yer işaretlerini yeniden düzenlemek için manuel sıralamaya geçin.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Yer İşaretini Düzenle</string>
