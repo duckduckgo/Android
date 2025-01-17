@@ -627,8 +627,6 @@ class BrowserTabFragment :
         }
     }
 
-    val isInEditMode by lazy { omnibar.isInEditMode }
-
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
@@ -899,6 +897,12 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureItemPressedListener()
         configureCustomTab()
+
+        omnibar.isInEditMode.onEach { isInEditMode ->
+            if (isActiveTab) {
+                browserActivity?.onEditModeChanged(isInEditMode)
+            }
+        }.launchIn(lifecycleScope)
     }
 
     private fun onOmnibarTabsButtonPressed() {
