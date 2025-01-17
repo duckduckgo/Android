@@ -805,4 +805,10 @@
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Protect your personal data every time with DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">If you love protecting your data, make us your default browser. All site links will open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
+
 </resources>
