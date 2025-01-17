@@ -29,6 +29,7 @@ interface AutofillPrefsStore {
     var hasEverBeenPromptedToSaveLogin: Boolean
     val autofillStateSetByUser: Boolean
     var timestampUserLastPromptedToDisableAutofill: Long?
+    var domainTargetDatasetVersion: Long
 
     /**
      * Returns if Autofill was enabled by default.
@@ -92,6 +93,14 @@ class RealAutofillPrefsStore(
         }
         set(value) = prefs.edit { putLong(TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL, value ?: -1) }
 
+    override var domainTargetDatasetVersion: Long
+        get() = prefs.getLong(DOMAIN_TARGET_DATASET_VERSION, 0L)
+        set(value) {
+            prefs.edit {
+                putLong(DOMAIN_TARGET_DATASET_VERSION, value)
+            }
+        }
+
     /**
      * Returns if Autofill was enabled by default. Note, this is not necessarily the same as the current state of Autofill.
      */
@@ -144,5 +153,6 @@ class RealAutofillPrefsStore(
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
         const val ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED = "original_autofill_default_state_enabled"
+        const val DOMAIN_TARGET_DATASET_VERSION = "domain_target_dataset_version"
     }
 }
