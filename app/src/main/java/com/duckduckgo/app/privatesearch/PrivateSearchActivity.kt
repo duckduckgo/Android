@@ -65,7 +65,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 privateSearchHeaderImage.isGone = true
                 privateSearchTitle.isGone = true

@@ -37,7 +37,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             startActivity(NewSettingsActivity.intent(this))
         } else {
             startActivity(LegacySettingsActivity.intent(this))

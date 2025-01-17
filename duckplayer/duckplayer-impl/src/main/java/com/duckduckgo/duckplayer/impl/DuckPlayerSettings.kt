@@ -40,7 +40,7 @@ class DuckPlayerSettingsTitle @Inject constructor(
 ) : DuckPlayerSettingsPlugin {
     override fun getView(context: Context): View {
         return OneLineListItem(context).apply {
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
             }
 

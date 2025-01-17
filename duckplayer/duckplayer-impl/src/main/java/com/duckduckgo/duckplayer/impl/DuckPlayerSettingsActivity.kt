@@ -66,7 +66,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        val newSettingsEnabled = settingsPageFeature.newSettingsScreen().isEnabled()
+        val newSettingsEnabled = settingsPageFeature.newSettingsPage().isEnabled()
 
         with(binding) {
             duckPlayerLegacyLayout.isGone = newSettingsEnabled
@@ -191,7 +191,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState) {
             is ViewState.Enabled -> {
-                if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     with(binding) {
                         duckPlayerModeSelector.isEnabled = true
                         duckPlayerDisabledSection.isVisible = false
@@ -210,7 +210,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 }
             }
             is ViewState.DisabledWithHelpLink -> {
-                if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     with(binding) {
                         duckPlayerModeSelector.isEnabled = false
                         duckPlayerDisabledSection.isVisible = true
@@ -241,7 +241,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setDuckPlayerSectionVisibility(isVisible: Boolean) {
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 duckPlayerSettingsTitle.isVisible = isVisible
                 duckPlayerSettingsIcon.isVisible = isVisible

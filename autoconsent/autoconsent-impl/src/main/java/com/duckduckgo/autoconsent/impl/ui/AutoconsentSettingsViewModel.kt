@@ -57,7 +57,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     init {
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             pixel.fire(SETTINGS_AUTOCONSENT_SHOWN)
         }
     }
@@ -68,7 +68,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
 
     fun onUserToggleAutoconsent(enabled: Boolean) {
         viewModelScope.launch {
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 pixel.fire(
                     if (enabled) {
                         SETTINGS_AUTOCONSENT_ON

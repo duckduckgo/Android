@@ -328,7 +328,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun resetToolbar() {
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             setTitle(R.string.autofillManagementScreenTitleNew)
         } else {
             setTitle(R.string.autofillManagementScreenTitle)

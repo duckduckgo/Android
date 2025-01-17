@@ -81,7 +81,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             supportActionBar?.setTitle(R.string.aboutActivityTitleNew)
             binding.includeContent.aboutTextNew.isVisible = true
 
@@ -100,7 +100,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLinks() {
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding.includeContent.aboutTextNew) {
                 text = addClickableLinks()
                 movementMethod = LinkMovementMethod.getInstance()
@@ -115,7 +115,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private fun addClickableLinks(): SpannableString {
         val fullText = getText(
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 R.string.aboutDescriptionNew
             } else {
                 R.string.aboutDescription

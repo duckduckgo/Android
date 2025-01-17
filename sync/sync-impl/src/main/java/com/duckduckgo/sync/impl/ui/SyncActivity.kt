@@ -153,7 +153,7 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
         }
 

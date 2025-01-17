@@ -77,7 +77,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
                 ds.isUnderlineText = false
             }
@@ -90,7 +90,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.isVisible = true
                 autoconsentTitle.isVisible = true
@@ -121,7 +121,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 autoconsentHeaderImage.setImageResource(
                     if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
@@ -145,7 +145,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlText = getString(
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 R.string.autoconsentDescriptionNew
             } else {
                 R.string.autoconsentDescription
@@ -155,7 +155,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
             spannableString.apply {
-                if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     insert(spannableString.getSpanStart(it), "\n")
                 }
                 setSpan(
@@ -168,7 +168,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             binding.autoconsentDescriptionNew.apply {
                 text = spannableString
                 movementMethod = LinkMovementMethod.getInstance()

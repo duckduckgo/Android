@@ -70,7 +70,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             setContentView(binding.root)
             setupToolbar(binding.includeToolbar.toolbar)
             supportActionBar?.setTitle(R.string.dataClearingActivityTitle)

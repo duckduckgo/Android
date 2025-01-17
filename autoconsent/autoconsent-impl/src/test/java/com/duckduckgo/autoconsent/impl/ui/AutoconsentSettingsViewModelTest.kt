@@ -247,7 +247,7 @@ class AutoconsentSettingsViewModelTest {
             }
         }
 
-        override fun newSettingsScreen() = object : Toggle {
+        override fun newSettingsPage() = object : Toggle {
 
             override fun featureName(): FeatureName {
                 return FeatureName(null, "FakeNewSettingsScreen")

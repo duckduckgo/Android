@@ -70,7 +70,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
                 ds.isUnderlineText = false
             }
@@ -83,7 +83,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 webTrackingProtectionHeaderImage.isGone = true
                 webTrackingProtectionTitle.isGone = true
@@ -108,7 +108,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlGPCText = getString(
-            if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 R.string.webTrackingProtectionDescriptionNew
             } else {
                 R.string.webTrackingProtectionDescription
@@ -118,7 +118,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
             gpcSpannableString.apply {
-                if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     insert(getSpanStart(it), "\n")
                 }
                 setSpan(
@@ -131,7 +131,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             binding.webTrackingProtectionDescriptionNew.apply {
                 text = gpcSpannableString
                 movementMethod = LinkMovementMethod.getInstance()
