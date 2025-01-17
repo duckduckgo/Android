@@ -41,6 +41,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     }
 
     @JavascriptInterface
+    fun showBreakageForm() {
+        // FE handles navigation internally, but we must keep this callback for it to work.
+    }
+
+    @JavascriptInterface
     fun openInNewTab(payload: String) {
         onUrlClicked(payload)
     }
