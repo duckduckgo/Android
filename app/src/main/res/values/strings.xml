@@ -32,9 +32,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
-    <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
+    <string name="setAsDefaultBrowser">Set as Default Browser</string>
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
-    <string name="defaultBrowserLetsDoIt">Set as Default Browser</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
@@ -805,5 +804,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Last Opened Tab</string>
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Protect your personal data every time with DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">If you love protecting your data, make us your default browser. All site links will open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
 
 </resources>
