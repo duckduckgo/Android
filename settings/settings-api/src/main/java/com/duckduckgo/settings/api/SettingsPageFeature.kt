@@ -25,8 +25,10 @@ interface SettingsPageFeature {
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun newSettingsPage(): Toggle
 
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun newPrivacyProSection(): Toggle
 }
