@@ -49,6 +49,15 @@ interface DefaultBrowserPromptsExperimentStageEvaluator {
     suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction
 
     @ContributesMultibinding(scope = AppScope::class)
+    class Control @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
+
+        override val targetCohort = AdditionalPromptsCohortName.CONTROL
+
+        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
+            DefaultBrowserPromptsExperimentStageAction.disableAll
+    }
+
+    @ContributesMultibinding(scope = AppScope::class)
     class Variant1 @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
 
         override val targetCohort = AdditionalPromptsCohortName.VARIANT_1
