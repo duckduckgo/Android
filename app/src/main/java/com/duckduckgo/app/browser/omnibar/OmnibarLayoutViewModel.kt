@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -79,6 +80,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -107,6 +109,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
+        val showBrowserMenuHighlight: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -125,6 +128,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         DAX,
         DUCK_PLAYER,
         GLOBE,
+    }
+
+    init {
+        viewModelScope.launch {
+            defaultBrowserPromptsExperiment.highlightPopupMenu.collect { highlightOverflowMenu ->
+                _viewState.update {
+                    it.copy(showBrowserMenuHighlight = highlightOverflowMenu)
+                }
+            }
+        }
     }
 
     fun onAttachedToWindow() {
