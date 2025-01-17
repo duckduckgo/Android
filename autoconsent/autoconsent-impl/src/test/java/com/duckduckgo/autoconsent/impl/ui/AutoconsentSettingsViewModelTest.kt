@@ -273,5 +273,32 @@ class AutoconsentSettingsViewModelTest {
                 return null
             }
         }
+
+        override fun newPrivacyProSection() = object : Toggle {
+
+            override fun featureName(): FeatureName {
+                return FeatureName(null, "FakePrivacyProSection")
+            }
+
+            override fun isEnabled(cohort: CohortName): Boolean {
+                return enabled
+            }
+
+            override fun setRawStoredState(state: State) {
+                // NO OP
+            }
+
+            override fun getRawStoredState(): State? {
+                return null
+            }
+
+            override fun getSettings(): String? {
+                return null
+            }
+
+            override fun getCohort(): Cohort? {
+                return null
+            }
+        }
     }
 }
