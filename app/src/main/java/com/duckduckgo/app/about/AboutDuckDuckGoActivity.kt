@@ -45,7 +45,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -57,7 +57,7 @@ import kotlinx.coroutines.flow.onEach
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var settingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
@@ -81,7 +81,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (settingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             supportActionBar?.setTitle(R.string.aboutActivityTitleNew)
             binding.includeContent.aboutTextNew.isVisible = true
 
@@ -100,7 +100,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLinks() {
-        if (settingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding.includeContent.aboutTextNew) {
                 text = addClickableLinks()
                 movementMethod = LinkMovementMethod.getInstance()
@@ -115,7 +115,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private fun addClickableLinks(): SpannableString {
         val fullText = getText(
-            if (settingsFeature.self().isEnabled()) {
+            if (settingsPageFeature.newSettingsPage().isEnabled()) {
                 R.string.aboutDescriptionNew
             } else {
                 R.string.aboutDescription

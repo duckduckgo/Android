@@ -24,7 +24,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -32,12 +32,12 @@ import javax.inject.Inject
 class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var newSettingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             startActivity(NewSettingsActivity.intent(this))
         } else {
             startActivity(LegacySettingsActivity.intent(this))
