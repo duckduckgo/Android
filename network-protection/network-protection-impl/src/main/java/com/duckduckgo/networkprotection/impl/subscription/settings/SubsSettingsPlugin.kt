@@ -29,7 +29,7 @@ import javax.inject.Inject
 @PriorityKey(200)
 class ProSettingsNetP @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
             ProSettingNetPView(context)
         } else {
             return LegacyProSettingNetPView(context)

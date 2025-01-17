@@ -47,7 +47,7 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 @PriorityKey(500)
 class ProSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
             ProSettingView(context)
         } else {
             LegacyProSettingView(context)
@@ -59,7 +59,7 @@ class ProSettings @Inject constructor(private val settingsPageFeature: SettingsP
 @PriorityKey(300)
 class PIRSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
             PirSettingView(context)
         } else {
             LegacyPirSettingView(context)
@@ -71,7 +71,7 @@ class PIRSettings @Inject constructor(private val settingsPageFeature: SettingsP
 @PriorityKey(400)
 class ITRSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newSettingsScreen().isEnabled()) {
+        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
             ItrSettingView(context)
         } else {
             LegacyItrSettingView(context)
