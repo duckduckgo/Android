@@ -62,7 +62,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -114,9 +113,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     lateinit var duckChat: DuckChat

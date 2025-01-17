@@ -77,6 +77,5 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">New AI Chat</string>
-    <!-- Feedback -> translate along with DuckChat -->
-    <string name="sendFeedback">Send Feedback</string>
+
 </resources>

@@ -778,6 +778,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
+
+        testee.onViewVisible()
+        assertFalse(browserViewState().showDuckChatOption)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
+
+        testee.onViewVisible()
+        assertTrue(browserViewState().showDuckChatOption)
+    }
+
+    @Test
     fun whenInvalidatedGlobalLayoutRestoredThenErrorIsShown() {
         givenInvalidatedGlobalLayout()
         setBrowserShowing(true)
@@ -5239,6 +5255,8 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().isPrinting)
         assertFalse(testee.isPrinting())
     }
+
+    // TODO:
 
     @Test
     fun whenOnFavoriteAddedThePixelFired() {
