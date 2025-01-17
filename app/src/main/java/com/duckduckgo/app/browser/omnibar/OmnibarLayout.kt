@@ -149,6 +149,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
@@ -460,6 +461,7 @@ class OmnibarLayout @JvmOverloads constructor(
         tabsMenu.isVisible = viewState.showTabsMenu
         fireIconMenu.isVisible = viewState.showFireIcon
         browserMenu.isVisible = viewState.showBrowserMenu
+        browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 

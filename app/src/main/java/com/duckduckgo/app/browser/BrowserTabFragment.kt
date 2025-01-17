@@ -1046,6 +1046,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
                 popupMenu.show(binding.rootView, omnibar.toolbar)
+                viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
                 } else {
