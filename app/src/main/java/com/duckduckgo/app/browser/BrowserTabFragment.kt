@@ -897,12 +897,17 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureItemPressedListener()
         configureCustomTab()
+        configureEditModeChangeDetection()
+    }
 
-        omnibar.isInEditMode.onEach { isInEditMode ->
-            if (isActiveTab) {
-                browserActivity?.onEditModeChanged(isInEditMode)
-            }
-        }.launchIn(lifecycleScope)
+    private fun configureEditModeChangeDetection() {
+        if (swipingTabsFeature.isEnabled) {
+            omnibar.isInEditMode.onEach { isInEditMode ->
+                if (isActiveTab) {
+                    browserActivity?.onEditModeChanged(isInEditMode)
+                }
+            }.launchIn(lifecycleScope)
+        }
     }
 
     private fun onOmnibarTabsButtonPressed() {
