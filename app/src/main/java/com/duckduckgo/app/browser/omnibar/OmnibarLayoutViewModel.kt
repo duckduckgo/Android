@@ -44,7 +44,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -99,7 +98,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val updateOmnibarText: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
         val shouldMoveCaretToStart: Boolean = false,
-        val tabs: List<TabEntity> = emptyList(),
+        val tabCount: Int = 0,
+        val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
@@ -126,13 +126,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         GLOBE,
     }
 
-    fun onAttachedToWindow() {
+    init {
         tabRepository.flowTabs
             .onEach { tabs ->
                 _viewState.update {
                     it.copy(
-                        shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
-                        tabs = tabs,
+                        tabCount = tabs.size,
+                        hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
                     )
                 }
             }.flowOn(dispatcherProvider.io())

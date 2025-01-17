@@ -151,6 +151,8 @@ class OmnibarLayout @JvmOverloads constructor(
     private var decoration: Decoration? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
+    private var viewModelSubscribed = false
+
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
@@ -244,19 +246,21 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        lifecycleOwner.lifecycleScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                render(it)
+        if (!viewModelSubscribed) {
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                    render(it)
+                }
             }
-        }
 
-        lifecycleOwner.lifecycleScope.launch {
-            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                processCommand(it)
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                    processCommand(it)
+                }
             }
-        }
 
-        viewModel.onAttachedToWindow()
+            viewModelSubscribed = true
+        }
 
         if (decoration != null) {
             decorateDeferred(decoration!!)
@@ -389,7 +393,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("$$$ Omnibar: render $this")
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -417,10 +420,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderTabIcon(viewState: ViewState) {
-        if (viewState.shouldUpdateTabsCount) {
-            tabsMenu.count = viewState.tabs.count()
-            tabsMenu.hasUnread = viewState.tabs.firstOrNull { !it.viewed } != null
-        }
+        tabsMenu.count = viewState.tabCount
+        tabsMenu.hasUnread = viewState.hasUnreadTabs
     }
 
     private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
