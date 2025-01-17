@@ -248,8 +248,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     // One OmnibarLayout is always removed from the view hierarchy, we should cancel any flow subscriptions
     fun onRemoved() {
-        // viewStateJob?.cancel()
-        // commandJob?.cancel()
+        viewStateJob?.cancel()
+        commandJob?.cancel()
     }
 
     override fun onAttachedToWindow() {
