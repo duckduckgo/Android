@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favoris</string>
     <string name="bookmarksEmptyHint">Aucun signet ajouté pour le moment</string>
     <string name="favoritesEmptyHint">Aucun favori ajouté pour le moment</string>
+    <string name="popupBookmarksSortManually">Trier manuellement</string>
+    <string name="popupBookmarksSortByName">Trier par nom</string>
+    <string name="popupBookmarksPreventReordering">Passez au tri manuel pour réorganiser les favoris.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Modifier le signet</string>
