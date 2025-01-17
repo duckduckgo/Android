@@ -85,6 +85,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -151,7 +152,9 @@ class OmnibarLayout @JvmOverloads constructor(
     private var decoration: Decoration? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
-    private var viewModelSubscribed = false
+    private var isViewModelSubscribed = false
+    private var viewStateJob: Job? = null
+    private var commandJob: Job? = null
 
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
@@ -243,23 +246,29 @@ class OmnibarLayout @JvmOverloads constructor(
         )[OmnibarLayoutViewModel::class.java]
     }
 
+    // One OmnibarLayout is always removed from the view hierarchy, we should cancel any flow subscriptions
+    fun onRemoved() {
+        // viewStateJob?.cancel()
+        // commandJob?.cancel()
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        if (!viewModelSubscribed) {
-            lifecycleOwner.lifecycleScope.launch {
+        if (!isViewModelSubscribed) {
+            viewStateJob = lifecycleOwner.lifecycleScope.launch {
                 viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                     render(it)
                 }
             }
 
-            lifecycleOwner.lifecycleScope.launch {
+            commandJob = lifecycleOwner.lifecycleScope.launch {
                 viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                     processCommand(it)
                 }
             }
 
-            viewModelSubscribed = true
+            isViewModelSubscribed = true
         }
 
         if (decoration != null) {
@@ -420,8 +429,10 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderTabIcon(viewState: ViewState) {
-        tabsMenu.count = viewState.tabCount
-        tabsMenu.hasUnread = viewState.hasUnreadTabs
+        if (viewState.shouldUpdateTabsCount) {
+            tabsMenu.count = viewState.tabCount
+            tabsMenu.hasUnread = viewState.hasUnreadTabs
+        }
     }
 
     private fun renderLeadingIconState(iconState: OmnibarLayoutViewModel.LeadingIconState) {
