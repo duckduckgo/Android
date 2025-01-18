@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
+import android.os.Build
+import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.security.MessageDigest
