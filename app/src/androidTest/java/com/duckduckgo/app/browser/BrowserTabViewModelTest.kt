@@ -780,7 +780,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
         whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
-
+        setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
     }
@@ -788,7 +788,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
         whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
-
+        setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)
     }
@@ -5255,8 +5255,6 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().isPrinting)
         assertFalse(testee.isPrinting())
     }
-
-    // TODO:
 
     @Test
     fun whenOnFavoriteAddedThePixelFired() {
