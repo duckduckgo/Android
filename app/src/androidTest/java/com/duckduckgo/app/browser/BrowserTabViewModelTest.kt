@@ -199,6 +199,7 @@ import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -399,6 +400,8 @@ class BrowserTabViewModelTest {
     private val mockFileChooserCallback: ValueCallback<Array<Uri>> = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
+
+    private val mockDuckChat: DuckChat = mock()
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
@@ -662,6 +665,7 @@ class BrowserTabViewModelTest {
             newTabPixels = { mockNewTabPixels },
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
+            duckChat = mockDuckChat,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
@@ -771,6 +775,22 @@ class BrowserTabViewModelTest {
             testee.ctaViewState.removeObserver(observer)
             assertFalse(observer.hasReceivedValue)
         }
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        assertFalse(browserViewState().showDuckChatOption)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        assertTrue(browserViewState().showDuckChatOption)
     }
 
     @Test

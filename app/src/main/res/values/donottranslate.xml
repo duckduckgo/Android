@@ -74,4 +74,8 @@
     <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">New AI Chat</string>
+
 </resources>

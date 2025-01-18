@@ -94,6 +94,13 @@ class BrowserPopupMenu(
         }
     }
 
+    internal val duckChatMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.includeDuckChatMenuItem.duckChatMenuItem
+            BOTTOM -> bottomBinding.includeDuckChatMenuItem.duckChatMenuItem
+        }
+    }
+
     internal val sharePageMenuItem: View by lazy {
         when (omnibarPosition) {
             TOP -> topBinding.sharePageMenuItem
@@ -245,6 +252,7 @@ class BrowserPopupMenu(
         printPageMenuItem.isEnabled = browserShowing
 
         newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
+        duckChatMenuItem.isVisible = viewState.showDuckChatOption && !displayedInCustomTabScreen
         sharePageMenuItem.isVisible = viewState.canSharePage
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem

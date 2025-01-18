@@ -261,6 +261,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -517,6 +518,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckPlayer: DuckPlayer
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -970,6 +974,9 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(newTabMenuItem) {
                 onOmnibarNewTabRequested()
+            }
+            onMenuItemClicked(duckChatMenuItem) {
+                duckChat.openDuckChat()
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
@@ -3502,8 +3509,6 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
-
-        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
 
         fun newInstance(
             tabId: String,
