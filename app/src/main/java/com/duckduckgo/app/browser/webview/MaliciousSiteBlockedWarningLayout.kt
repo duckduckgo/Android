@@ -24,11 +24,12 @@ import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewMaliciousSiteBlockedWarningBinding
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import timber.log.Timber
 
 class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     context: Context,
@@ -45,7 +46,7 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
 
     fun bind(
         url: Uri,
-        actionHandler: (Action) -> Unit
+        actionHandler: (Action) -> Unit,
     ) {
         resetViewState()
 
@@ -70,7 +71,7 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
 
     private fun setListeners(
         url: Uri,
-        actionHandler: (Action) -> Unit
+        actionHandler: (Action) -> Unit,
     ) {
         with(binding) {
             leaveSiteCTA.setOnClickListener {
