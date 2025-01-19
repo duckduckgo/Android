@@ -201,7 +201,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -440,6 +440,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3360,13 +3361,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onMaliciousSiteWarningAction(
-        action: MaliciousSiteBlockedWarningLayout.Action,
-        url: String,
-    ) {
-        TODO()
-    }
-
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
@@ -3697,6 +3691,12 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    fun addExemptedMaliciousUrlToMemory(url: Uri) {
+        Timber.d("KateMalicious: in addExemptedMaliciousUrl")
+        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url)
+        Timber.d("KateMalicious: tried to add to exemptedUrls, now")
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
