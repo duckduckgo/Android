@@ -152,7 +152,6 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
@@ -4678,21 +4677,6 @@ class BrowserTabViewModelTest {
             false,
         ) { "someUrl" }
         assertCommandNotIssued<Navigate>()
-    }
-
-    @Test
-    fun whenProcessJsCallbackMessageTelemetryEventThenFirePixel() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(
-            DUCK_PLAYER_PAGE_FEATURE_NAME,
-            "telemetryEvent",
-            "id",
-            JSONObject("""{"attributes": {"name": "impression", "value": "landscape-layout"}}"""),
-            false,
-            { "someUrl" },
-        )
-        verify(mockPixel).fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
     }
 
     @Test
