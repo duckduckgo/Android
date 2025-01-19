@@ -1499,17 +1499,24 @@ class BrowserTabFragment :
         omnibar.setViewMode(MaliciousSiteWarning)
         webView?.onPause()
         webView?.hide()
+        maliciousWarningView.show()
         maliciousWarningView.bind(url) { action ->
             when (action) {
-                is Action.VisitSite -> webView?.loadUrl(url.toString())
+                is Action.VisitSite -> {
+                    Timber.tag("KateMalicious").d("in VisitSite")
+                    viewModel.addExemptedMaliciousUrlToMemory(url)
+                    showBrowser()
+                    refresh()
+                    viewModel.onRefreshRequested(false)
+                }
                 is Action.LeaveSite -> {
+                    Timber.tag("KateMalicious").d("in LeaveSite")
                     viewModel.closeCurrentTab()
+                    viewModel.userRequestedOpeningNewTab()
                     renderer.showNewTab()
                 }
             }
-            // viewModel.onMaliciousSiteWarningAction(action, url.toString())
         }
-        maliciousWarningView.show()
     }
 
     private fun showSSLWarning(
