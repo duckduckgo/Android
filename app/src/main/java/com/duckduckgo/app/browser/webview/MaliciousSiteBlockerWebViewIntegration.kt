@@ -211,7 +211,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
         exemptedUrlsHolder.exemptedMaliciousUrls.add(convertedUrl)
         Timber.tag("MaliciousSiteDetector").d(
-            "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}"
+            "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
         )
     }
 
