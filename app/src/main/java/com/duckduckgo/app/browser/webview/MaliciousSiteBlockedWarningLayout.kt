@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import timber.log.Timber
 
 class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     context: Context,
