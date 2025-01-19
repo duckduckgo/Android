@@ -69,6 +69,7 @@ class GeneralSettingsViewModel @Inject constructor(
         val voiceSearchEnabled: Boolean,
         val isShowOnAppLaunchOptionVisible: Boolean,
         val showOnAppLaunchSelectedOption: ShowOnAppLaunchOption,
+        val maliciousSiteProtectionEnabled: Boolean,
     )
 
     sealed class Command {
@@ -95,6 +96,7 @@ class GeneralSettingsViewModel @Inject constructor(
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
+                maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
             )
         }
 
@@ -149,6 +151,21 @@ class GeneralSettingsViewModel @Inject constructor(
     fun onShowOnAppLaunchButtonClick() {
         sendCommand(Command.LaunchShowOnAppLaunchScreen)
         pixel.fire(AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
+    }
+
+    fun onMaliciousSiteProtectionSettingChanged(enabled: Boolean) {
+        Timber.i("User changed malicious site setting, is now enabled: $enabled")
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.maliciousSiteProtectionEnabled = enabled
+            // if (enabled) {
+            //     TODO() fire pixel
+            // } else {
+            //     TODO() fire pixel
+            // }
+            _viewState.value = _viewState.value?.copy(
+                maliciousSiteProtectionEnabled = enabled,
+            )
+        }
     }
 
     private fun observeShowOnAppLaunchOption() {

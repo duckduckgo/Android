@@ -61,6 +61,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
     }
 
+    private val maliciousSiteProtectionToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onMaliciousSiteProtectionSettingChanged(isChecked)
+    }
+
     private val voiceSearchChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onVoiceSearchChanged(isChecked)
     }
@@ -84,6 +88,12 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         binding.autocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
         binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
+        binding.maliciousToggle.setOnCheckedChangeListener(maliciousSiteProtectionToggleListener)
+        // binding.maliciousToggle.addClickableLink(
+        //     annotation = "learn_more_link",
+        //     textSequence = getText(R.string.maliciousSiteProtectionToggleHint),
+        //     onClick = { viewModel.maliciousSitesSettingLearnMoreClicked() },
+        // )
     }
 
     private fun observeViewModel() {
@@ -105,6 +115,10 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     } else {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
+                    binding.maliciousToggle.quietlySetIsChecked(
+                        newCheckedState = it.maliciousSiteProtectionEnabled,
+                        changeListener = maliciousSiteProtectionToggleListener,
+                    )
                     if (it.showVoiceSearch) {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
