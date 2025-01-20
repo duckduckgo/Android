@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
-    <string name="settingsDefaultBrowserEnabled">Määrake vaikebrauseriks</string>
+    <string name="setAsDefaultBrowser">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
-    <string name="defaultBrowserLetsDoIt">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
     <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Viimati avatud vahekaart</string>
     <string name="showOnAppLaunchOptionNewTabPage">Uue vahekaardi leht</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkreetne lehekülg</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Kaitse oma isikuandmeid iga kord DuckDuckGo abil</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Kui te tahate oma andmeid kaitsta, tehke meist oma vaikebrauser. Kõik veebisaidi lingid avanevad DuckDuckGo brauseris.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Määra oma vaikebrauseriks</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Mitte praegu</string>
 
 </resources>
