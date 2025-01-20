@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
-    <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>
+    <string name="setAsDefaultBrowser">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserMaybeLater">Talán később</string>
-    <string name="defaultBrowserLetsDoIt">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Utoljára megnyitott lap</string>
     <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Óvd meg személyes adataidat minden alkalommal a DuckDuckGóval.</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ha szereted védeni az adataidat, legyen a DuckDuckGo az alapértelmezett böngésződ! Az összes weboldal linkje a DuckDuckGóban fog megnyílni.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Állítsd be alapértelmezett böngészőként</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Most nem</string>
 
 </resources>
