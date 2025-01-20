@@ -22,6 +22,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.transition.Scene
 import android.transition.Slide
 import android.transition.Transition
@@ -155,7 +156,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
 
         animateTrackersBlockedView(omnibarViews)
-        animateTrackersBlockedCountView(entities, logos)
+        animateTrackersBlockedCountView(entities, logos, omnibarViews)
     }
 
     private fun animateTrackersBlockedView(omnibarViews: List<View>) {
@@ -176,8 +177,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             addAnimation(slideInAnimation)
         }
 
+        trackersBlockedAnimationView.show()
         trackersBlockedAnimationView.startAnimation(animationSet)
-        trackersBlockedAnimationView.visibility = View.VISIBLE
 
         animationSet.setAnimationListener(
             object : Animation.AnimationListener {
@@ -185,23 +186,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     animateOmnibarOut(omnibarViews).start()
                 }
 
-                override fun onAnimationEnd(animation: Animation?) {
-                    Handler().postDelayed(
-                        {
-                            trackersBlockedAnimationView.gone()
-                            trackersBlockedCountAnimationView.gone()
-                            animateOmnibarIn(omnibarViews).start()
-                        },
-                        1500L,
-                    )
-                }
+                override fun onAnimationEnd(animation: Animation?) {}
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             },
         )
     }
 
-    private fun animateTrackersBlockedCountView(entities: List<Entity>, logos: List<TrackerLogo>) {
+    private fun animateTrackersBlockedCountView(entities: List<Entity>, logos: List<TrackerLogo>, omnibarViews: List<View>) {
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 1000L
             startOffset = 200L
@@ -222,15 +214,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             addAnimation(slideInAnimation)
         }
 
+        trackersBlockedCountAnimationView.show()
         trackersBlockedCountAnimationView.startAnimation(animationSet)
-        trackersBlockedCountAnimationView.visibility = View.VISIBLE
 
         animationSet.setAnimationListener(
             object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    setTextWithDelay(0, entities, logos)
+                    updateTrackersCountWithAnimation(entities, logos, omnibarViews)
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -238,22 +230,33 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         )
     }
 
-    private fun setTextWithDelay(
-        index: Int,
+    private fun updateTrackersCountWithAnimation(
         entities: List<Entity>,
         logos: List<TrackerLogo>,
+        omnibarViews: List<View>,
     ) {
-        if (index < entities.size) {
-            trackersBlockedCountAnimationView.text = index.toString()
-            Handler().postDelayed(
-                {
-                    setTextWithDelay(index + 1, entities, logos)
-                },
-                200L,
-            )
-        } else {
-            listener?.onAnimationFinished(logos)
+        val handler = Handler(Looper.getMainLooper())
+        val trackerCountUpdateDelay = 200L
+        val animationCompletionDelay = 1000L
+
+        fun updateTackersCountText(index: Int) {
+            if (index <= entities.size) {
+                trackersBlockedCountAnimationView.text = index.toString()
+                handler.postDelayed({ updateTackersCountText(index + 1) }, trackerCountUpdateDelay)
+            } else {
+                handler.postDelayed(
+                    {
+                        trackersBlockedAnimationView.gone()
+                        trackersBlockedCountAnimationView.gone()
+                        animateOmnibarIn(omnibarViews).start()
+                        listener?.onAnimationFinished(logos)
+                    },
+                    animationCompletionDelay,
+                )
+            }
         }
+
+        updateTackersCountText(1)
     }
 
     override fun createCookiesAnimation(
