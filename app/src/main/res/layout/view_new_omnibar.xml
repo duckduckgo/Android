@@ -40,7 +40,7 @@
             app:contentInsetStart="0dp"
             android:layout_marginHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
+            app:layout_constraintEnd_toStartOf="@id/aiChatIconMenu"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
@@ -258,6 +258,28 @@
             tools:visibility="visible" />
 
         <FrameLayout
+            android:id="@+id/aiChatIconMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="@dimen/keyline_2"
+            android:layout_marginEnd="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
+            app:layout_constraintStart_toEndOf="@id/toolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/aiChatIconImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_ai_chat_24" />
+        </FrameLayout>
+
+        <FrameLayout
             android:id="@+id/fireIconMenu"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -265,7 +287,7 @@
             android:layout_marginEnd="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tabsMenu"
-            app:layout_constraintStart_toEndOf="@id/toolbar"
+            app:layout_constraintStart_toEndOf="@id/aiChatIconMenu"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
