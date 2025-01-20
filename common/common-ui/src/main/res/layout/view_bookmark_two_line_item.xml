@@ -106,7 +106,7 @@
 
     <FrameLayout
         android:id="@+id/trailingIconContainer"
-        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_width="44dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,15 +121,5 @@
             app:srcCompat="@drawable/ic_menu_vertical_24"
             tools:ignore="ContentDescription" />
     </FrameLayout>
-
-    <View
-        android:id="@+id/endTrailingPadding"
-        android:layout_width="@dimen/keyline_0"
-        android:layout_height="0dp"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

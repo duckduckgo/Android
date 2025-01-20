@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Избранное</string>
     <string name="bookmarksEmptyHint">Закладок пока нет</string>
     <string name="favoritesEmptyHint">В избранное пока ничего не добавлено</string>
+    <string name="popupBookmarksSortManually">Сортировать вручную</string>
+    <string name="popupBookmarksSortByName">Сортировать по названию</string>
+    <string name="popupBookmarksPreventReordering">Чтобы изменить порядок закладок, переключись на ручную сортировку.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Редактировать закладку</string>

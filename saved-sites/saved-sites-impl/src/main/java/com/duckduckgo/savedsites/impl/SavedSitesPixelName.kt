@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName {
     /** Bookmarks Screen **/
+    MENU_ACTION_BOOKMARKS_PRESSED_DAILY("m_navigation_menu_bookmarks_daily"),
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),
@@ -42,6 +43,11 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     BOOKMARK_MENU_EDIT_BOOKMARK_CLICKED("m_bookmark_menu_edit"),
     BOOKMARK_MENU_REMOVE_FAVORITE_CLICKED("m_bookmark_menu_remove_favorite"),
     BOOKMARK_MENU_DELETE_BOOKMARK_CLICKED("m_bookmark_menu_delete"),
+    BOOKMARK_MENU_IMPORT_CLICKED("m_bookmark_menu_import_clicked"),
+    BOOKMARK_MENU_EXPORT_CLICKED("m_bookmark_menu_export_clicked"),
+    BOOKMARK_MENU_ADD_FOLDER_CLICKED("m_bookmark_menu_add_folder_clicked"),
+    BOOKMARK_MENU_SORT_NAME_CLICKED("m_bookmark_menu_sort_name_clicked"),
+    BOOKMARK_MENU_SORT_MANUAL_CLICKED("m_bookmark_menu_sort_manual_clicked"),
 
     /** New Tab Pixels **/
     FAVOURITES_LIST_EXPANDED("m_new_tab_page_favorites_expanded"),
@@ -54,4 +60,8 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY("m_nav_af_p_daily"),
     FAVOURITE_REMOVED("m_favorite_removed"),
     FAVOURITE_DELETED("m_favorite_deleted"),
+}
+
+object SavedSitesPixelParameters {
+    const val SORT_MODE = "sort_mode"
 }

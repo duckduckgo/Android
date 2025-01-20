@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Suosikit</string>
     <string name="bookmarksEmptyHint">Kirjanmerkkejä ei ole vielä lisätty</string>
     <string name="favoritesEmptyHint">Suosikkeja ei ole vielä lisätty</string>
+    <string name="popupBookmarksSortManually">Lajittele manuaalisesti</string>
+    <string name="popupBookmarksSortByName">Lajittele nimen mukaan</string>
+    <string name="popupBookmarksPreventReordering">Vaihda manuaaliseen lajitteluun järjestääksesi kirjanmerkit uudelleen.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Muokkaa kirjanmerkkiä</string>

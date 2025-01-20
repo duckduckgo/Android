@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favoritos</string>
     <string name="bookmarksEmptyHint">Aún no se han añadido marcadores</string>
     <string name="favoritesEmptyHint">Todavía no se han añadido favoritos</string>
+    <string name="popupBookmarksSortManually">Ordenar manualmente</string>
+    <string name="popupBookmarksSortByName">Ordenar por nombre</string>
+    <string name="popupBookmarksPreventReordering">Cambiar a la ordenación manual para reorganizar los marcadores.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Editar marcador</string>

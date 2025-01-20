@@ -36,6 +36,7 @@ import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.SavedSitesPixelParameters
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
@@ -44,6 +45,8 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Confi
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.DeleteBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
@@ -104,6 +107,8 @@ class BookmarksViewModel @Inject constructor(
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
         data object LaunchBookmarkImport : Command()
+        data object LaunchBookmarkExport : Command()
+        data object LaunchAddFolder : Command()
         data object ShowFaviconsPrompt : Command()
         data object LaunchSyncSettings : Command()
         data object ReevalutePromotions : Command()
@@ -128,6 +133,11 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
+        pixel.fire(
+            SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
+            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
+            type = Daily(),
+        )
     }
 
     override fun onFavouriteEdited(favorite: Favorite) {
@@ -209,10 +219,6 @@ class BookmarksViewModel @Inject constructor(
                 ),
             )
         }
-    }
-
-    fun launchBookmarkImport() {
-        command.value = LaunchBookmarkImport
     }
 
     fun importBookmarks(uri: Uri) {
@@ -498,6 +504,25 @@ class BookmarksViewModel @Inject constructor(
                     sortedItems = sortedBookmarks,
                 )
             }
+            when (mode) {
+                NAME -> pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_SORT_NAME_CLICKED)
+                MANUAL -> pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_SORT_MANUAL_CLICKED)
+            }
         }
+    }
+
+    fun onImportBookmarksClicked() {
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
+        command.value = LaunchBookmarkImport
+    }
+
+    fun onExportBookmarksClicked() {
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_EXPORT_CLICKED)
+        command.value = LaunchBookmarkExport
+    }
+
+    fun onAddFolderClicked() {
+        pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FOLDER_CLICKED)
+        command.value = LaunchAddFolder
     }
 }
