@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.store.targets.TargetApp
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 interface AppToDomainMapper {
     suspend fun getAssociatedDomains(appPackage: String): Set<String>
@@ -75,10 +77,12 @@ class RealAppToDomainMapper @Inject constructor(
         appPackage: String,
         fingerprint: String,
     ): List<String> {
-        val domain = appPackage.split('.').asReversed().joinToString(".").extractDomain()
+        val domain = appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
         return domain?.run {
             logcat { "Autofill-mapping: Attempting to get asset links for: $domain" }
-            val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter {
+            val validTargetApp = assetLinksLoader.getValidTargetApps(this).also {
+                logcat { "Autofill-mapping: Valid target apps from assetlinks of $domain: $it" }
+            }.filter {
                 it.key == appPackage && fingerprint.contains(fingerprint)
             }
             if (validTargetApp.isNotEmpty()) {
