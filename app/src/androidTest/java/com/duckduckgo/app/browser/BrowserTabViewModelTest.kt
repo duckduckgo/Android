@@ -666,6 +666,7 @@ class BrowserTabViewModelTest {
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
+            maliciousSiteBlockerWebViewIntegration = mock(),
         )
 
         testee.loadData("abc", null, false, false)
