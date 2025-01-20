@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import logcat.logcat
 import timber.log.Timber
 
 interface AssetLinksLoader {
@@ -34,11 +35,13 @@ class RealAssetLinksLoader @Inject constructor(
 ) : AssetLinksLoader {
     override suspend fun getValidTargetApps(domain: String): Map<String, List<String>> {
         return kotlin.runCatching {
-            assetLinksService.getAssetLinks("${domain.normalizeScheme()}+$ASSET_LINKS_PATH").filter {
-                (it.relation.contains(LOGIN_CREDENTIALS_RELATION) || it.relation.contains(HANDLE_URLS_RELATION)) &&
+            assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
+                logcat { "Autofill-mapping: Assetlinks of $domain: $it" }
+            }.filter {
+                it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
                     !it.target.package_name.isNullOrEmpty() &&
                     !it.target.sha256_cert_fingerprints.isNullOrEmpty() &&
-                    it.target.package_name == APP_NAMESPACE
+                    it.target.namespace == APP_NAMESPACE
             }.associate { it.target.package_name!! to it.target.sha256_cert_fingerprints!! }
         }.getOrElse {
             Timber.e(it, "Autofill-mapping: Failed to obtain assetlinks for: $domain")
@@ -49,7 +52,6 @@ class RealAssetLinksLoader @Inject constructor(
     companion object {
         private const val ASSET_LINKS_PATH = "/.well-known/assetlinks.json"
         private const val LOGIN_CREDENTIALS_RELATION = "delegate_permission/common.get_login_creds"
-        private const val HANDLE_URLS_RELATION = "delegate_permission/common.handle_all_urls"
         private const val APP_NAMESPACE = "android_app"
     }
 }
