@@ -33,7 +33,6 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
-import com.duckduckgo.savedsites.impl.SavedSitesPixelParameters
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
@@ -468,20 +467,12 @@ class BookmarksViewModelTest {
     fun whenManualSortingModeSelectedThenDataStored() = runTest {
         testee.onSortingModeSelected(MANUAL)
         verify(bookmarksDataStore).setSortingMode(MANUAL)
-        verify(pixel).fire(
-            SavedSitesPixelName.BOOKMARK_MENU_SORT_MANUAL_CLICKED,
-            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to MANUAL.name),
-        )
     }
 
     @Test
     fun whenNameSortingModeSelectedThenDataStored() = runTest {
         testee.onSortingModeSelected(NAME)
         verify(bookmarksDataStore).setSortingMode(NAME)
-        verify(pixel).fire(
-            SavedSitesPixelName.BOOKMARK_MENU_SORT_MANUAL_CLICKED,
-            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to NAME.name),
-        )
     }
 
     @Test

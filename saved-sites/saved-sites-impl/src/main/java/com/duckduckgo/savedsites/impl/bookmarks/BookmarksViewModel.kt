@@ -46,6 +46,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Delet
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ExportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
@@ -517,7 +518,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun onExportBookmarksClicked() {
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_EXPORT_CLICKED)
-        command.value = LaunchBookmarkImport
+        command.value = LaunchBookmarkExport
     }
 
     fun onAddFolderClicked() {
