@@ -35,7 +35,7 @@ import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 interface AppToDomainMapper {
-    suspend fun getAssociatedDomains(appPackage: String): Set<String>
+    suspend fun getAssociatedDomains(appPackage: String): List<String>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -48,7 +48,7 @@ class RealAppToDomainMapper @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : AppToDomainMapper {
-    override suspend fun getAssociatedDomains(appPackage: String): Set<String> {
+    override suspend fun getAssociatedDomains(appPackage: String): List<String> {
         return context.packageManager.getSHA256HexadecimalFingerprintCompat(appPackage, appBuildConfig)?.let { fingerprint ->
             logcat { "Autofill-mapping: Getting domains for $appPackage : $fingerprint" }
             attemptToGetFromDataset(appPackage, fingerprint).apply {
@@ -60,7 +60,7 @@ class RealAppToDomainMapper @Inject constructor(
             this.map {
                 it.extractDomain()
             }
-        }?.toSet() ?: emptySet()
+        }?.distinct() ?: emptyList()
     }
 
     private fun attemptToGetFromDataset(

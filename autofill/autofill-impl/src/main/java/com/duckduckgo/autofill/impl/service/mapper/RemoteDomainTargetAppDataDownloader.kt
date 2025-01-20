@@ -44,6 +44,7 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+        // TODO: Add check for killswitch
         appCoroutineScope.launch(dispatcherProvider.io()) {
             Timber.d("Autofill-mapping: Attempting to download")
             download()

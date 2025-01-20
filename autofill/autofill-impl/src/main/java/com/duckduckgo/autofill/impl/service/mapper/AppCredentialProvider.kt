@@ -42,7 +42,7 @@ class RealAppCredentialProvider @Inject constructor(
         Timber.d("Autofill-mapping: Getting credentials for $appPackage")
         return@withContext appToDomainMapper.getAssociatedDomains(appPackage).map {
             getAllCredentialsFromDomain(it)
-        }.flatten().toList().also {
+        }.flatten().distinct().also {
             logcat { "Autofill-mapping: Total credentials for $appPackage : ${it.size}" }
         }
     }
