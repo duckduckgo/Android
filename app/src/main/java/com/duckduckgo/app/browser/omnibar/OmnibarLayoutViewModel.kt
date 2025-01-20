@@ -304,6 +304,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         Error -> GLOBE
                         NewTab -> SEARCH
                         SSLWarning -> GLOBE
+                        MaliciousSiteWarning -> GLOBE
                         else -> SEARCH
                     }
                 }
