@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan het instellingenscherm voor standaard-apps niet openen</string>
-    <string name="settingsDefaultBrowserEnabled">Instellen als standaard browser</string>
+    <string name="setAsDefaultBrowser">Instellen als standaard browser</string>
     <string name="defaultBrowserMaybeLater">Later misschien</string>
-    <string name="defaultBrowserLetsDoIt">Instellen als standaard browser</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links altijd met een gerust hart.</string>
     <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff">Altijd </font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Laatst geopende tabblad</string>
     <string name="showOnAppLaunchOptionNewTabPage">Nieuwe tabbladpagina</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifieke pagina</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Bescherm je persoonlijke gegevens altijd met DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Wil je je gegevens beschermen, maak dan van ons je standaardbrowser. Alle sitelinks worden geopend in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Instellen als standaard browser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Niet nu</string>
 
 </resources>
