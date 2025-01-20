@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">La pantalla de configuración predeterminada de la aplicación no se puede abrir</string>
-    <string name="settingsDefaultBrowserEnabled">Definir como navegador predeterminado</string>
+    <string name="setAsDefaultBrowser">Definir como navegador predeterminado</string>
     <string name="defaultBrowserMaybeLater">Quizá más tarde</string>
-    <string name="defaultBrowserLetsDoIt">Definir como navegador predeterminado</string>
     <string name="defaultBrowserDescriptionNoDefault">Abre los enlaces con tranquilidad, siempre.</string>
     <string name="defaultBrowserInstructions">Selecciona DuckDuckGo y pulsa <font color="#678fff">Siempre</font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Última pestaña abierta</string>
     <string name="showOnAppLaunchOptionNewTabPage">Página de nueva pestaña</string>
     <string name="showOnAppLaunchOptionSpecificPage">Página específica</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Protege tus datos personales en todo momento con DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Si te encanta proteger tus datos, conviértenos en tu navegador predeterminado. Todos los enlaces del sitio se abrirán en DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Establecer como tu navegador predeterminado</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ahora no</string>
 
 </resources>
