@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
-    <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>
+    <string name="setAsDefaultBrowser">Postavi kao zadani preglednik</string>
     <string name="defaultBrowserMaybeLater">Možda kasnije</string>
-    <string name="defaultBrowserLetsDoIt">Postavi kao zadani preglednik</string>
     <string name="defaultBrowserDescriptionNoDefault">Svaki put poveznice otvori spokojno.</string>
     <string name="defaultBrowserInstructions">Odaberi DuckDuckGo i dodirni <font color="#678fff">Uvijek </font>.</string>
 
@@ -810,5 +809,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Posljednja otvorena kartica</string>
     <string name="showOnAppLaunchOptionNewTabPage">Nova stranica kartice</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifična stranica</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Zaštiti svoje osobne podatke svaki puta uz DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ako ti je do zaštite svojih podataka, postavi nas kao zadani preglednik. Sve poveznice na stranice otvorit će se u DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Postavi kao tvoj zadani preglednik</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne sad</string>
 
 </resources>
