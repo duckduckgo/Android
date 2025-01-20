@@ -360,7 +360,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
-    DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS("duckplayer_landscape_layout_impressions"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
