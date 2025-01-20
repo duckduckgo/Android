@@ -3788,7 +3788,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAnimationFinished(logos: List<TrackerLogo>) {
-        command.value = Command.StartTrackersAnimation(logos)
+        command.value = Command.StartTrackersLogosAnimation(logos)
     }
 
     fun trackersCount(): Int = site?.trackerCount ?: 0

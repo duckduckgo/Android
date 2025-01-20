@@ -795,7 +795,7 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private fun shoNewTrackersBlockingAnimation(logos: List<TrackerLogo>) {
+    private fun showNewTrackersBlockingAnimation(logos: List<TrackerLogo>) {
         animatorHelper.startTrackersCircleAnimation(
             context = requireContext(),
             trackersCircleAnimationView = binding.newTrackersBlockingAnimationView,
@@ -1865,7 +1865,7 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
-            is Command.StartTrackersAnimation -> shoNewTrackersBlockingAnimation(it.logos)
+            is Command.StartTrackersLogosAnimation -> showNewTrackersBlockingAnimation(it.logos)
             else -> {
                 // NO OP
             }
