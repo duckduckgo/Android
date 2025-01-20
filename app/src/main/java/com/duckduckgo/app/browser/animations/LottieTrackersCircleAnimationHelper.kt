@@ -52,6 +52,13 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
         this.resources = context.resources
 
+        if (logos.size <= 2) {
+            omnibarShieldAnimationView.setAnimation(R.raw.protected_shield)
+            omnibarShieldAnimationView.setMaxProgress(1f)
+            omnibarShieldAnimationView.playAnimation()
+            return
+        }
+
         val negativeMarginPx = (-72).toPx()
         val gravity = if (omnibarPosition == OmnibarPosition.BOTTOM) Gravity.BOTTOM else Gravity.NO_GRAVITY
         val layoutParams = trackersCircleAnimationView.layoutParams as CoordinatorLayout.LayoutParams
@@ -69,7 +76,7 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
 
         with(trackersCircleAnimationView) {
             this.setCacheComposition(false)
-            this.setAnimation(getNewAnimationRawRes(logos))
+            this.setAnimation(R.raw.shieldburst)
             this.maintainOriginalImageBounds = true
             this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
             this.removeAllAnimatorListeners()
@@ -95,17 +102,6 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
 
             this.setMaxProgress(1f)
             this.playAnimation()
-        }
-    }
-
-    private fun getNewAnimationRawRes(logos: List<TrackerLogo>): Int {
-        val trackers = logos.size
-        // We need 3 different json files for 1, 2 and 3+ trackers.
-        return when {
-            trackers == 1 -> R.raw.shieldburst
-            trackers == 2 -> R.raw.shieldburst
-            trackers >= 3 -> R.raw.shieldburst
-            else -> R.raw.shieldburst
         }
     }
 }
