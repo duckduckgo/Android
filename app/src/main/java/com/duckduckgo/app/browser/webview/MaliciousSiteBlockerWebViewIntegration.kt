@@ -154,9 +154,10 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     ): Boolean {
         val checkId = currentCheckId.incrementAndGet()
         return maliciousSiteProtection.isMalicious(url.toUri()) { isMalicious ->
-            // TODO: Add tests for this
             if (checkId == currentCheckId.get()) {
                 confirmationCallback(isMalicious)
+            } else {
+                confirmationCallback(false)
             }
         } == MALICIOUS
     }

@@ -2,6 +2,7 @@ package com.duckduckgo.app.browser.webview
 
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
+import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -9,7 +10,12 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WAIT_FOR_CONFIRMATION
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -145,6 +151,83 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         testee.processedUrls.add(exampleUri.toString())
         testee.onPageLoadStarted()
         assertTrue(testee.processedUrls.isEmpty())
+    }
+
+    @Test
+    fun `shouldIntercept callback with true received after a new request is intercepted then return false`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+
+        val callbackChannel = Channel<Unit>()
+        val firstCallbackDeferred = CompletableDeferred<Boolean>()
+        val secondCallbackDeferred = CompletableDeferred<Boolean>()
+
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenAnswer { invocation ->
+            val callback = invocation.getArgument<(Boolean) -> Unit>(1)
+
+            launch {
+                callbackChannel.receive()
+                callback(true)
+            }
+            WAIT_FOR_CONFIRMATION
+        }
+
+        testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->
+            firstCallbackDeferred.complete(isMalicious)
+        }
+
+        testee.shouldOverrideUrlLoading(exampleUri, true) { isMalicious ->
+            secondCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+        callbackChannel.send(Unit)
+
+        val firstCallbackResult = firstCallbackDeferred.await()
+        val secondCallbackResult = secondCallbackDeferred.await()
+
+        assertEquals(false, firstCallbackResult)
+        assertEquals(true, secondCallbackResult)
+    }
+
+    @Test
+    fun `shouldIntercept callback with true received before a new request is intercepted then return true`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+
+        val callbackChannel = Channel<Unit>()
+        val firstCallbackDeferred = CompletableDeferred<Boolean>()
+        val secondCallbackDeferred = CompletableDeferred<Boolean>()
+
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenAnswer { invocation ->
+            val callback = invocation.getArgument<(Boolean) -> Unit>(1)
+
+            launch {
+                callbackChannel.receive()
+                callback(true)
+            }
+            WAIT_FOR_CONFIRMATION
+        }
+
+        testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->
+            firstCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+
+        testee.shouldOverrideUrlLoading(exampleUri, true) { isMalicious ->
+            secondCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+
+        val firstCallbackResult = firstCallbackDeferred.await()
+        val secondCallbackResult = secondCallbackDeferred.await()
+
+        assertEquals(true, firstCallbackResult)
+        assertEquals(true, secondCallbackResult)
     }
 
     private fun updateFeatureEnabled(enabled: Boolean) {
