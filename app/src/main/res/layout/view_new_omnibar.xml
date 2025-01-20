@@ -263,6 +263,7 @@
             android:layout_height="match_parent"
             android:padding="@dimen/keyline_2"
             android:layout_marginEnd="6dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
             app:layout_constraintStart_toEndOf="@id/toolbar"
