@@ -575,7 +575,6 @@ class BrowserTabViewModelTest {
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
             extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
-            userBrowserProperties = mockUserBrowserProperties,
         )
 
         val siteFactory = SiteFactoryImpl(
