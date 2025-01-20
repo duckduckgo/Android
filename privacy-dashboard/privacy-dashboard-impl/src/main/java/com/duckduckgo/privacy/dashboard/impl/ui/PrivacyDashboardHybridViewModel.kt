@@ -277,6 +277,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
+    private fun getReportBrokenSitePixelParams(reportFlow: ReportFlow): Map<String, String> {
+        val openerParam = when (reportFlow) {
+            ReportFlow.MENU -> "menu"
+            else -> "dashboard"
+        }
+        return mapOf("opener" to openerParam)
+    }
+
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
             if (!webBrokenSiteFormFeature.isEnabled()) {
@@ -437,6 +445,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             val siteUrl = site.url
             if (siteUrl.isEmpty()) return@launch
 
+            val pixelParams = getReportBrokenSitePixelParams(reportFlow)
+            pixel.fire(
+                pixel = REPORT_BROKEN_SITE_SENT,
+                parameters = pixelParams,
+                type = Count)
+
             val brokenSite = BrokenSite(
                 category = request.category,
                 description = request.description,
@@ -468,6 +482,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
         }
+    }
+
+    fun onReportBrokenSiteShown(reportFlow: ReportFlow) {
+        val pixelParams = getReportBrokenSitePixelParams(reportFlow)
+        pixel.fire(
+            pixel = REPORT_BROKEN_SITE_SHOWN,
+            parameters = pixelParams,
+            type = Count)
     }
 
     fun onGetToggleReportOptions() {
