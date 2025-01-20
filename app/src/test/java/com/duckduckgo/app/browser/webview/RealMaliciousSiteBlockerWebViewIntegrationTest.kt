@@ -38,6 +38,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
         isMainProcess = true,
+        exemptedUrlsHolder = ExemptedUrlsHolder(),
     )
 
     @Before
