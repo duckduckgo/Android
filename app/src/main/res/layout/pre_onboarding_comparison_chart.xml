@@ -75,13 +75,11 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/feature1"
         app:layout_constraintEnd_toStartOf="@id/feature1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/ic_comparison_chart_search"
-        tools:visibility="visible" />
+        app:srcCompat="@drawable/ic_comparison_chart_search" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature1"
@@ -127,13 +125,11 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/feature2"
         app:layout_constraintEnd_toStartOf="@id/feature2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/ic_comparison_chart_shield"
-        tools:visibility="visible" />
+        app:srcCompat="@drawable/ic_comparison_chart_shield" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature2"
@@ -179,13 +175,11 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/feature3"
         app:layout_constraintEnd_toStartOf="@id/feature3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/ic_comparison_chart_cookie"
-        tools:visibility="visible" />
+        app:srcCompat="@drawable/ic_comparison_chart_cookie" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature3"
@@ -231,13 +225,11 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/feature4"
         app:layout_constraintEnd_toStartOf="@id/feature4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_comparison_chart_ads"
-        tools:visibility="visible" />
+        app:srcCompat="@drawable/ic_comparison_chart_ads" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature4"
@@ -283,13 +275,11 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/feature5"
         app:layout_constraintEnd_toStartOf="@id/feature5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/ic_comparison_chart_fire"
-        tools:visibility="visible" />
+        app:srcCompat="@drawable/ic_comparison_chart_fire" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature5"

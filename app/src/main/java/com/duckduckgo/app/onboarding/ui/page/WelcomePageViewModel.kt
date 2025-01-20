@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -38,15 +37,10 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBac
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
@@ -70,7 +64,6 @@ class WelcomePageViewModel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
-    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
@@ -81,11 +74,8 @@ class WelcomePageViewModel @Inject constructor(
 
     sealed interface Command {
         data object ShowInitialDialog : Command
-        data object ShowExperimentInitialDialog : Command
         data object ShowComparisonChart : Command
-        data object ShowExperimentComparisonChart : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
-        data object ShowSuccessDialog : Command
         data object ShowAddressBarPositionDialog : Command
         data object Finish : Command
         data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
@@ -96,11 +86,7 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL -> {
                 viewModelScope.launch {
-                    if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                        _commands.send(ShowExperimentComparisonChart)
-                    } else {
-                        _commands.send(ShowComparisonChart)
-                    }
+                    _commands.send(ShowComparisonChart)
                 }
             }
 
@@ -113,11 +99,7 @@ class WelcomePageViewModel @Inject constructor(
                                 _commands.send(ShowDefaultBrowserDialog(intent))
                             } else {
                                 pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                                    _commands.send(ShowAddressBarPositionDialog)
-                                } else {
-                                    _commands.send(Finish)
-                                }
+                                _commands.send(ShowAddressBarPositionDialog)
                             }
                             false
                         } else {
@@ -140,12 +122,6 @@ class WelcomePageViewModel @Inject constructor(
                     _commands.send(Finish)
                 }
             }
-
-            CELEBRATION -> {
-                viewModelScope.launch {
-                    _commands.send(Finish)
-                }
-            }
         }
     }
 
@@ -155,11 +131,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                _commands.send(ShowAddressBarPositionDialog)
-            } else {
-                _commands.send(ShowSuccessDialog)
-            }
+            _commands.send(ShowAddressBarPositionDialog)
         }
     }
 
@@ -169,11 +141,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
-            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                _commands.send(ShowAddressBarPositionDialog)
-            } else {
-                _commands.send(Finish)
-            }
+            _commands.send(ShowAddressBarPositionDialog)
         }
     }
 
@@ -193,18 +161,14 @@ class WelcomePageViewModel @Inject constructor(
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            CELEBRATION -> pixel.fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = Unique())
         }
     }
 
     fun setBackgroundResource(lightModeEnabled: Boolean) {
-        val backgroundRes = when {
-            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
-                R.drawable.onboarding_experiment_background_bitmap_light
-            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
-                R.drawable.onboarding_experiment_background_bitmap_dark
-            lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
-            else -> R.drawable.onboarding_background_bitmap_dark
+        val backgroundRes = if (lightModeEnabled) {
+            R.drawable.onboarding_experiment_background_bitmap_light
+        } else {
+            R.drawable.onboarding_experiment_background_bitmap_dark
         }
         viewModelScope.launch {
             _commands.send(SetBackgroundResource(backgroundRes))
@@ -220,11 +184,7 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
-            if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
-                _commands.send(ShowExperimentInitialDialog)
-            } else {
-                _commands.send(ShowInitialDialog)
-            }
+            _commands.send(ShowInitialDialog)
         }
     }
 }
