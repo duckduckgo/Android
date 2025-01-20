@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
-    <string name="settingsDefaultBrowserEnabled">Nastavite za privzeti brskalnik</string>
+    <string name="setAsDefaultBrowser">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
-    <string name="defaultBrowserLetsDoIt">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
     <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 
@@ -810,5 +809,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Zadnji odprt zavihek</string>
     <string name="showOnAppLaunchOptionNewTabPage">Stran z novim zavihkom</string>
     <string name="showOnAppLaunchOptionSpecificPage">Določena stran</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Vedno zaščitite svoje osebne podatke z DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Če želite zaščititi svoje podatke, nas izberite za privzeti brskalnik. Vse povezave do spletnih mest bodo odprte v DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Nastavite kot privzeti brskalnik</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne zdaj</string>
 
 </resources>
