@@ -151,6 +151,14 @@ class PrivacyDashboardHybridViewModelTest {
         }
     }
 
+    fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenFireImpressionPixel() = runTest {
+        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
+
+        testee.onReportBrokenSiteSelected()
+
+        verify(pixel).fire(REPORT_BROKEN_SITE_SHOWN, mapOf("opener" to "dashboard"), type = Count)
+    }
+
     @Test
     fun whenSiteChangesThenViewStateUpdates() = runTest {
         testee.onSiteChanged(site())
@@ -306,6 +314,7 @@ class PrivacyDashboardHybridViewModelTest {
         val isToggleReport = false
 
         verify(brokenSiteSender).submitBrokenSiteFeedback(expectedBrokenSite, isToggleReport)
+        verify(pixel).fire(REPORT_BROKEN_SITE_SENT, mapOf("opener" to "dashboard"), type = Count)
     }
 
     @Test

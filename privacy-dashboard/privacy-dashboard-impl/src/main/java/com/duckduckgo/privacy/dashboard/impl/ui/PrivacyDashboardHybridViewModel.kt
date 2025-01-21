@@ -30,7 +30,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
-import com.duckduckgo.brokensite.api.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
@@ -442,7 +441,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             pixel.fire(
                 pixel = REPORT_BROKEN_SITE_SENT,
                 parameters = mapOf("opener" to opener.value),
-                type = Count)
+                type = Count,
+            )
 
             val brokenSite = BrokenSite(
                 category = request.category,
@@ -481,7 +481,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         pixel.fire(
             pixel = REPORT_BROKEN_SITE_SHOWN,
             parameters = mapOf("opener" to opener.value),
-            type = Count)
+            type = Count,
+        )
     }
 
     fun onGetToggleReportOptions() {
