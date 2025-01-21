@@ -301,6 +301,7 @@ internal class GeneralSettingsViewModelTest {
         voiceSearchEnabled = false,
         isShowOnAppLaunchOptionVisible = fakeShowOnAppLaunchFeatureToggle.self().isEnabled(),
         showOnAppLaunchSelectedOption = LastOpenedTab,
+        maliciousSiteProtectionEnabled = true,
     )
 
     private fun initTestee() {
