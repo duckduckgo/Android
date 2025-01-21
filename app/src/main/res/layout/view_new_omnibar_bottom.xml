@@ -277,7 +277,7 @@
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/browserPopupMenu"
-                android:src="@drawable/ic_ai_chat_24" />
+                android:src="@drawable/ic_ai_chat_outline_24" />
         </FrameLayout>
 
         <FrameLayout
