@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -117,12 +119,17 @@ class RealDuckChat @Inject constructor(
         return showInBrowserMenu
     }
 
-    override fun openDuckChat() {
+    override fun openDuckChat(query: String?) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        var url = duckChatLink
+
+        query?.let {
+            url = appendQuery(it, url)
+        }
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(
-                url = duckChatLink,
+                url = url,
                 screenTitle = context.getString(R.string.duck_chat_title),
                 supportNewWindows = true,
             ),
@@ -132,6 +139,33 @@ class RealDuckChat @Inject constructor(
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(it)
         }
+    }
+
+    private fun appendQuery(
+        query: String,
+        url: String
+    ): String {
+        runCatching {
+            val uri = url.toUri()
+            return uri.buildUpon().apply {
+                clearQuery()
+                appendQueryParameter(QUERY_PARAMETER, query)
+                uri.queryParameterNames
+                    .filterNot { it == QUERY_PARAMETER }
+                    .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
+            }.build().toString()
+        }
+        return url
+    }
+
+    override fun shouldNavigateToDuckChat(uri: Uri): Boolean {
+        if (uri.host != DUCKDUCKGO_HOST || !showInBrowserMenu) {
+            return false
+        }
+        return runCatching {
+            val queryParameters = uri.queryParameterNames
+            queryParameters.contains(CHAT_QUERY_NAME) && uri.getQueryParameter(CHAT_QUERY_NAME) == CHAT_QUERY_VALUE
+        }.getOrDefault(false)
     }
 
     private fun cacheDuckChatLink() {
@@ -154,5 +188,9 @@ class RealDuckChat @Inject constructor(
     companion object {
         /** Default link to DuckChat that identifies Android as the source */
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCKDUCKGO_HOST = "duckduckgo.com"
+        private const val CHAT_QUERY_NAME = "ia"
+        private const val CHAT_QUERY_VALUE = "chat"
+        private const val QUERY_PARAMETER = "q"
     }
 }

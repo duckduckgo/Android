@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -117,6 +118,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
+    private val duckChat: DuckChat,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -198,6 +200,11 @@ class BrowserWebViewClient @Inject constructor(
                         return listener.handleAppLink(urlType, isForMainFrame)
                     }
                     false
+                }
+                is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
+                    runCatching {
+                        duckChat.openDuckChat(url.getQueryParameter("q"))
+                    }.isSuccess
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
                     if (isRedirect && isForMainFrame) {

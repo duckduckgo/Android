@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.api
 
+import android.net.Uri
+
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
  */
@@ -37,7 +39,14 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
-     * Opens the DuckChat WebView.
+     * Opens the DuckChat WebView with optional [String] query.
      */
-    fun openDuckChat()
+    fun openDuckChat(query: String? = null)
+
+    /**
+     * Determines whether to navigate to DuckChat for a given [Uri].
+     *
+     * @return true if should navigate to DuckChat, false otherwise.
+     */
+    fun shouldNavigateToDuckChat(uri: Uri): Boolean
 }

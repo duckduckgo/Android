@@ -26,14 +26,13 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
-import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 class SpecialUrlDetectorImpl(
@@ -43,8 +42,7 @@ class SpecialUrlDetectorImpl(
     private val subscriptions: Subscriptions,
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
     private val duckPlayer: DuckPlayer,
-    private val scope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    private val duckChat: DuckChat,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -89,6 +87,10 @@ class SpecialUrlDetectorImpl(
         }
 
         val uri = uriString.toUri()
+
+        if (duckChat.shouldNavigateToDuckChat(uri)) {
+            return UrlType.ShouldLaunchDuckChatLink(url = uri)
+        }
 
         if (duckPlayer.willNavigateToDuckPlayer(uri)) {
             return UrlType.ShouldLaunchDuckPlayerLink(url = uri)
