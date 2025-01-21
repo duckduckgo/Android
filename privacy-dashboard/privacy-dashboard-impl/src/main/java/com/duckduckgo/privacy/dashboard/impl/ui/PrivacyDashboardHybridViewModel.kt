@@ -30,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
+import com.duckduckgo.brokensite.api.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
@@ -277,14 +278,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    private fun getReportBrokenSitePixelParams(reportFlow: ReportFlow): Map<String, String> {
-        val openerParam = when (reportFlow) {
-            ReportFlow.MENU -> "menu"
-            else -> "dashboard"
-        }
-        return mapOf("opener" to openerParam)
-    }
-
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
             if (!webBrokenSiteFormFeature.isEnabled()) {
@@ -437,6 +430,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     fun onSubmitBrokenSiteReport(
         payload: String,
         reportFlow: ReportFlow,
+        opener: DashboardOpener = DashboardOpener.NONE,
     ) {
         viewModelScope.launch(dispatcher.io()) {
             if (!webBrokenSiteFormFeature.isEnabled()) return@launch
@@ -445,10 +439,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             val siteUrl = site.url
             if (siteUrl.isEmpty()) return@launch
 
-            val pixelParams = getReportBrokenSitePixelParams(reportFlow)
             pixel.fire(
                 pixel = REPORT_BROKEN_SITE_SENT,
-                parameters = pixelParams,
+                parameters = mapOf("opener" to opener.value),
                 type = Count)
 
             val brokenSite = BrokenSite(
@@ -484,11 +477,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onReportBrokenSiteShown(reportFlow: ReportFlow) {
-        val pixelParams = getReportBrokenSitePixelParams(reportFlow)
+    fun onReportBrokenSiteShown(opener: DashboardOpener) {
         pixel.fire(
             pixel = REPORT_BROKEN_SITE_SHOWN,
-            parameters = pixelParams,
+            parameters = mapOf("opener" to opener.value),
             type = Count)
     }
 
