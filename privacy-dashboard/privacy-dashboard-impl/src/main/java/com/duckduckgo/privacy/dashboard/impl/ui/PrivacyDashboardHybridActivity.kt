@@ -122,7 +122,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
                     val opener = when (reportFlow) {
                         ReportFlow.MENU -> DashboardOpener.MENU
-                        ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> DashboardOpener.NONE
+                        ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> DashboardOpener.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                         else -> DashboardOpener.DASHBOARD
                     }
 
@@ -146,7 +146,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                             when (params.reportFlow) {
                                 BrokenSiteForm.BrokenSiteFormReportFlow.MENU -> DashboardOpener.MENU
                                 BrokenSiteForm.BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS ->
-                                    DashboardOpener.NONE
+                                    DashboardOpener.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
                             }
                         }
                         else -> DashboardOpener.DASHBOARD
