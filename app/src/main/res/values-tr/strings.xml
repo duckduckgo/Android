@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
+
 </resources>
