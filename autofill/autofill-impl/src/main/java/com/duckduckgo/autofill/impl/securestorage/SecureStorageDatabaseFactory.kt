@@ -17,27 +17,48 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import timber.log.Timber
 
 interface SecureStorageDatabaseFactory {
     fun getDatabase(): SecureStorageDatabase?
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SecureStorageDatabaseFactory::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
-) : SecureStorageDatabaseFactory {
+) : SecureStorageDatabaseFactory, MainProcessLifecycleObserver {
     private var _database: SecureStorageDatabase? = null
+
+    override fun onCreate(owner: LifecycleOwner) {
+        Timber.d("Loading the sqlcipher native library")
+        try {
+            LibraryLoader.loadLibrary(context, "sqlcipher")
+        } catch (t: Throwable) {
+            // error loading the library, return null db
+            Timber.e(t, "Error loading sqlcipher library")
+        }
+    }
 
     override fun getDatabase(): SecureStorageDatabase? {
         // If we have already the DB instance then let's use it
@@ -48,14 +69,6 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
 
         synchronized(this) {
             if (_database == null) {
-                // Ensure the library is loaded before database creation
-                try {
-                    LibraryLoader.loadLibrary(context, "sqlcipher")
-                } catch (t: Throwable) {
-                    // error loading the library, return null db
-                    return null
-                }
-
                 if (keyProvider.canAccessKeyStore()) {
                     _database = Room.databaseBuilder(
                         context,
