@@ -288,6 +288,7 @@ class PrivacyDashboardHybridViewModelTest {
         testee.onSubmitBrokenSiteReport(
             payload = """{"category":"$category","description":"$description"}""",
             reportFlow = DASHBOARD,
+            opener = DashboardOpener.DASHBOARD
         )
 
         val expectedBrokenSite = BrokenSite(
