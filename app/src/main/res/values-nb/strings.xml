@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Spesifikk side</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Ny AI-chat</string>
+
 </resources>
