@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Sovelluksen oletusasetusnäyttöä ei voida käynnistää</string>
-    <string name="settingsDefaultBrowserEnabled">Aseta oletusselaimeksi</string>
+    <string name="setAsDefaultBrowser">Aseta oletusselaimeksi</string>
     <string name="defaultBrowserMaybeLater">Ehkä myöhemmin</string>
-    <string name="defaultBrowserLetsDoIt">Aseta oletusselaimeksi</string>
     <string name="defaultBrowserDescriptionNoDefault">Avaa linkit ilman stressiä, joka kerta.</string>
     <string name="defaultBrowserInstructions">Valitse DuckDuckGo ja napauta <font color="#678fff"> Aina </font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Viimeksi avattu -välilehti</string>
     <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
     <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Suojaa henkilötietosi joka kerta DuckDuckGon avulla</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Jos tietojesi suojaaminen on sinulle tärkeää, tee meistä oletusselaimesi. Kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Aseta oletusselaimeksi</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ei nyt</string>
 
 </resources>
