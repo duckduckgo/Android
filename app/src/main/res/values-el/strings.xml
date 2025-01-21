@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
+    <string name="leaveFeedbackNew">Αποστολή σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
     <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
     <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>

@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
+    <string name="leaveFeedbackNew">Visszajelzés küldése</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
     <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>

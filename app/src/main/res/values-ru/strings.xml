@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
+    <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
     <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>

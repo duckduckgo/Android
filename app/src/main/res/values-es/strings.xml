@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Acerca de DuckDuckGo</string>
     <string name="settingsVersion">Versión</string>
     <string name="leaveFeedback">Compartir opiniones</string>
+    <string name="leaveFeedbackNew">Enviar comentarios</string>
     <string name="settingsEmailProtectionTitle">Protección del correo electrónico</string>
     <string name="settingsEmailProtectionSubtitle">Bloquea los rastreadores de correo electrónico y oculta tu dirección</string>
     <string name="settingsHeadingMore">Más sobre DuckDuckGo</string>

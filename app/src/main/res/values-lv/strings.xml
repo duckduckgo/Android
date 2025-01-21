@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
+    <string name="leaveFeedbackNew">Sūtīt atsauksmi</string>
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
     <string name="settingsEmailProtectionSubtitle">Bloķē e-pasta izsekotājus un paslēp savu adresi</string>
     <string name="settingsHeadingMore">Vairāk no DuckDuckGo</string>

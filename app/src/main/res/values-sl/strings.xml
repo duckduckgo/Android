@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
+    <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
     <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>

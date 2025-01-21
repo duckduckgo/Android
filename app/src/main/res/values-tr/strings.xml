@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
+    <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
     <string name="settingsHeadingMore">DuckDuckGo\'dan Daha Fazlası</string>

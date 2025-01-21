@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
+    <string name="leaveFeedbackNew">Lähetä palautetta</string>
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
     <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
     <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
