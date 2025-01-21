@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
 import android.content.Intent
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -59,4 +60,13 @@ interface DefaultBrowserPromptsExperiment {
         MENU,
         UNKNOWN,
     }
+
+    fun fakeExperimentStatus(): Flow<FakeStatus>
+    fun incrementFakeActiveDaysUsedSinceEnrollment()
+
+    data class FakeStatus(
+        val cohort: String,
+        val stage: ExperimentStage,
+        val activeDaysUsedSinceEnrollment: Long,
+    )
 }

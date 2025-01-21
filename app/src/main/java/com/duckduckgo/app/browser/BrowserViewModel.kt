@@ -65,6 +65,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -387,6 +390,23 @@ class BrowserViewModel @Inject constructor(
             lastSystemDefaultAppsTrigger ?: SetAsDefaultActionTrigger.UNKNOWN,
         )
     }
+
+    val fakeActiveDaysUsedSinceEnrollment = defaultBrowserPromptsExperiment.fakeExperimentStatus()
+        .map {
+            """
+               Cohort: ${it.cohort}
+               Stage: ${it.stage}
+               Active days since enrollment: ${it.activeDaysUsedSinceEnrollment}
+               Click the box to increment.
+            """.trimIndent()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = "Initializing…",
+        )
+
+    fun incrementFakeActiveDaysUsedSinceEnrollment() = defaultBrowserPromptsExperiment.incrementFakeActiveDaysUsedSinceEnrollment()
 }
 
 /**

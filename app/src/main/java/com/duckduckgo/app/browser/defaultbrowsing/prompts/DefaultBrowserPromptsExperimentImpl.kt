@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.FakeStatus
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.DIALOG
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.MENU
@@ -43,7 +44,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -65,6 +65,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -97,7 +98,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val appDaysUsedRepository: FakeAppDaysUsedRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator>,
@@ -446,5 +447,22 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         const val FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS = 500L
         const val PIXEL_PARAM_KEY_VARIANT = "expVar"
         const val PIXEL_PARAM_KEY_STAGE = "expStage"
+    }
+
+    override fun fakeExperimentStatus() = defaultBrowserPromptsDataStore.experimentStage.combine(
+        appDaysUsedRepository.fakeActiveDaysUsedSinceEnrollment(),
+    ) { stage, activeDaysUsedSinceEnrollment ->
+        FakeStatus(
+            cohort = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort()?.name ?: "none",
+            stage = stage,
+            activeDaysUsedSinceEnrollment = activeDaysUsedSinceEnrollment,
+        )
+    }
+
+    override fun incrementFakeActiveDaysUsedSinceEnrollment() {
+        appCoroutineScope.launch {
+            appDaysUsedRepository.incrementFakeActiveDaysUsedSinceEnrollment()
+            evaluate()
+        }
     }
 }

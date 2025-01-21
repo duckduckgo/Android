@@ -88,6 +88,7 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -218,6 +219,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+
+        lifecycleScope.launch {
+            viewModel.fakeActiveDaysUsedSinceEnrollment.collect {
+                binding.fakeActiveDaysUsedSinceEnrollment.text = it
+            }
+        }
+        binding.fakeActiveDaysUsedSinceEnrollment.setOnClickListener {
+            viewModel.incrementFakeActiveDaysUsedSinceEnrollment()
+        }
     }
 
     override fun onStop() {

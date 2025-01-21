@@ -40,4 +40,3 @@ const val PRIVACY_REMOTE_CONFIG_URL = "https://staticcdn.duckduckgo.com/trackerb
 
 // variant 3
 // const val PRIVACY_REMOTE_CONFIG_URL = "https://www.jsonblob.com/api/1329809981419216896"
-
