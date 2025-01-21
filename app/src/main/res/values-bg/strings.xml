@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
-    <string name="settingsDefaultBrowserEnabled">Задаване като браузър по подразбиране</string>
+    <string name="setAsDefaultBrowser">Задаване като браузър по подразбиране</string>
     <string name="defaultBrowserMaybeLater">Може би по-късно</string>
-    <string name="defaultBrowserLetsDoIt">Задаване като браузър по подразбиране</string>
     <string name="defaultBrowserDescriptionNoDefault">Отваряйте връзки без притеснения, всеки път.</string>
     <string name="defaultBrowserInstructions">Изберете DuckDuckGo и докоснете <font color="#678fff">Винаги</font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Последно отворен раздел</string>
     <string name="showOnAppLaunchOptionNewTabPage">Страница с нов раздел</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретна страница</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Защитавайте личните си данни всеки път с DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ако обичате да защитавате данните си, направете ни браузъра си по подразбиране. Всички връзки ще се отварят в DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Задайте като свой браузър по подразбиране</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Не сега</string>
 
 </resources>
