@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Trimite feedback</string>
+    <string name="leaveFeedbackNew">Trimite feedback</string>
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Blochează tehnologiile de urmărire prin e-mail și ascunde-ți adresa</string>
     <string name="settingsHeadingMore">Mai multe de la DuckDuckGo</string>

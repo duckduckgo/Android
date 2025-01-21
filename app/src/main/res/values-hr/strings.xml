@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGou</string>
     <string name="settingsVersion">Verzija</string>
     <string name="leaveFeedback">Podijeli povratne informacije</string>
+    <string name="leaveFeedbackNew">Pošalji povratnu informaciju</string>
     <string name="settingsEmailProtectionTitle">Zaštita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokiraj programe za praćenje e-pošte i sakrij svoju adresu</string>
     <string name="settingsHeadingMore">Više od DuckDuckGoa</string>

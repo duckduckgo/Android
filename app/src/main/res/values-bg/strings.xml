@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Споделяне на отзив</string>
+    <string name="leaveFeedbackNew">Изпратете отзив</string>
     <string name="settingsEmailProtectionTitle">Защита на имейл</string>
     <string name="settingsEmailProtectionSubtitle">Блокирайте имейл тракерите и скрийте своя адрес</string>
     <string name="settingsHeadingMore">Още от DuckDuckGo</string>

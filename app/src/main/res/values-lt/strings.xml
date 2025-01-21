@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
+    <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
     <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
     <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>

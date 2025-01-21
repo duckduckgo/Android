@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
+    <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
     <string name="settingsHeadingMore">Mer från DuckDuckGo</string>

@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
+    <string name="leaveFeedbackNew">Verstuur feedback</string>
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
     <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
     <string name="settingsHeadingMore">Meer over DuckDuckGo</string>

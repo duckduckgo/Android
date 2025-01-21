@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
+    <string name="leaveFeedbackNew">Saada tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
     <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
     <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>

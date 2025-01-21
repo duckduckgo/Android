@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
     <string name="leaveFeedback">Del tilbakemelding</string>
+    <string name="leaveFeedbackNew">Send tilbakemelding</string>
     <string name="settingsEmailProtectionTitle">E-postbeskyttelse</string>
     <string name="settingsEmailProtectionSubtitle">Blokker e-postsporere og skjul adressen din</string>
     <string name="settingsHeadingMore">Mer fra DuckDuckGo</string>
