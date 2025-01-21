@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Új AI-csevegés</string>
+
 </resources>
