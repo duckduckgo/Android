@@ -789,4 +789,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Új AI-csevegés</string>
+
 </resources>
