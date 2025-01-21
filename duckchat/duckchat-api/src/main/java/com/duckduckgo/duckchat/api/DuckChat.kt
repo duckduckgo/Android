@@ -24,11 +24,10 @@ import android.net.Uri
 interface DuckChat {
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
-     * Sets IO dispatcher.
      *
      * @return true if DuckChat is enabled, false otherwise.
      */
-    suspend fun isEnabled(): Boolean
+    fun isEnabled(): Boolean
 
     /**
      * Checks whether DuckChat should be shown in browser menu based on user settings.

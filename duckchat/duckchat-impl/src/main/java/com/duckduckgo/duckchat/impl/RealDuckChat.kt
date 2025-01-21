@@ -79,6 +79,9 @@ class RealDuckChat @Inject constructor(
         moshi.adapter(DuckChatSettingJson::class.java)
     }
 
+    /** Cached DuckChat is enabled flag */
+    private var isDuckChatEnabled = false
+
     /** Cached value of whether we should show DuckChat in the menu or not */
     private var showInBrowserMenu = false
 
@@ -108,8 +111,8 @@ class RealDuckChat @Inject constructor(
         cacheShowInBrowser()
     }
 
-    override suspend fun isEnabled(): Boolean = withContext(dispatchers.io()) {
-        duckChatFeature.self().isEnabled()
+    override fun isEnabled(): Boolean {
+        return isDuckChatEnabled
     }
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
@@ -160,7 +163,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun shouldNavigateToDuckChat(uri: Uri): Boolean {
-        if (uri.host != DUCKDUCKGO_HOST || !showInBrowserMenu) {
+        if (uri.host != DUCKDUCKGO_HOST || !isDuckChatEnabled) {
             return false
         }
         return runCatching {
@@ -182,7 +185,8 @@ class RealDuckChat @Inject constructor(
 
     private fun cacheShowInBrowser() {
         appCoroutineScope.launch(dispatchers.io()) {
-            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
+            isDuckChatEnabled = duckChatFeature.self().isEnabled()
+            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         }
     }
 
