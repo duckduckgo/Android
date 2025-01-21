@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
-    <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
+    <string name="setAsDefaultBrowser">Angiv som standardbrowser</string>
     <string name="defaultBrowserMaybeLater">Måske senere</string>
-    <string name="defaultBrowserLetsDoIt">Angiv som standardbrowser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
     <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Sidst åbnede fane</string>
     <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik side</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Beskyt dine personlige data hver gang med DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Hvis du elsker at beskytte dine data, så gør os til din standardbrowser. Så åbner alle links i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Angiv som standardbrowser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nu</string>
 
 </resources>
