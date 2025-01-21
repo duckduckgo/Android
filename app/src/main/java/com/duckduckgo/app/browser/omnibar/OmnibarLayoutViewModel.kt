@@ -165,7 +165,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    showChatMenu = !showControls,
+                    showChatMenu = showControls,
                     shouldMoveCaretToStart = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
