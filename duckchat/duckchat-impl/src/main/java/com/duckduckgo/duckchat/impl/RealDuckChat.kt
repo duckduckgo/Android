@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -149,9 +150,9 @@ class RealDuckChat @Inject constructor(
             val uri = url.toUri()
             return uri.buildUpon().apply {
                 clearQuery()
-                appendQueryParameter(QUERY_PARAMETER, query)
+                appendQueryParameter(QUERY, query)
                 uri.queryParameterNames
-                    .filterNot { it == QUERY_PARAMETER }
+                    .filterNot { it == QUERY }
                     .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
             }.build().toString()
         }
@@ -191,6 +192,5 @@ class RealDuckChat @Inject constructor(
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
-        private const val QUERY_PARAMETER = "q"
     }
 }
