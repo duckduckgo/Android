@@ -12776,6 +12776,8 @@
   };
   var ShowNativeFeedback = class extends Msg {
   };
+  var ReportBrokenSiteShown = class extends Msg {
+  };
   var TelemetrySpanMsg = class extends Msg {
     /**
      * @param {object} params
@@ -13109,6 +13111,7 @@
     privacyDashboardOpenSettings: () => privacyDashboardOpenSettings,
     privacyDashboardOpenUrlInNewTab: () => privacyDashboardOpenUrlInNewTab,
     privacyDashboardRejectToggleReport: () => privacyDashboardRejectToggleReport,
+    privacyDashboardReportBrokenSiteShown: () => privacyDashboardReportBrokenSiteShown,
     privacyDashboardSeeWhatIsSent: () => privacyDashboardSeeWhatIsSent,
     privacyDashboardSendToggleReport: () => privacyDashboardSendToggleReport,
     privacyDashboardSetPermission: () => privacyDashboardSetPermission,
@@ -14089,6 +14092,10 @@
     invariant(window.webkit?.messageHandlers, "webkit.messageHandlers required");
     window.webkit.messageHandlers.privacyDashboardSetPermission.postMessage(params);
   }
+  function privacyDashboardReportBrokenSiteShown(args) {
+    invariant(window.webkit?.messageHandlers, "webkit.messageHandlers required");
+    window.webkit.messageHandlers.privacyDashboardReportBrokenSiteShown.postMessage(args);
+  }
   function privacyDashboardGetToggleReportOptions() {
     return new Promise((resolve) => {
       invariant(window.webkit?.messageHandlers, "webkit.messageHandlers required");
@@ -14172,6 +14179,10 @@
     }
     if (message instanceof ShowNativeFeedback) {
       privacyDashboardShowNativeFeedback({});
+      return false;
+    }
+    if (message instanceof ReportBrokenSiteShown) {
+      privacyDashboardReportBrokenSiteShown({});
       return false;
     }
   }
@@ -14284,7 +14295,6 @@
   }
   async function fetch3(message) {
     if (message instanceof CheckBrokenSiteReportHandledMessage) {
-      privacyDashboardShowReportBrokenSite({});
       return false;
     }
     if (message instanceof ShowNativeFeedback) {
@@ -14539,6 +14549,14 @@
       invariant(window.PrivacyDashboard?.showNativeFeedback, "showNativeFeedback missing");
       window.PrivacyDashboard.showNativeFeedback();
     }
+    /**
+     * {@inheritDoc common.reportBrokenSiteShown}
+     * @type {import("./common.js").reportBrokenSiteShown}
+     */
+    reportBrokenSiteShown() {
+      invariant(window.PrivacyDashboard?.reportBrokenSiteShown, "reportBrokenSiteShown missing");
+      window.PrivacyDashboard.reportBrokenSiteShown();
+    }
   };
   var privacyDashboardApi;
   async function fetchAndroid(message) {
@@ -14589,6 +14607,9 @@
     }
     if (message instanceof ShowNativeFeedback) {
       return privacyDashboardApi.showNativeFeedback();
+    }
+    if (message instanceof ReportBrokenSiteShown) {
+      return privacyDashboardApi.reportBrokenSiteShown();
     }
     console.warn("unhandled message", message);
   }
@@ -14770,6 +14791,10 @@
       showNativeFeedback();
       return;
     }
+    if (message instanceof ReportBrokenSiteShown) {
+      reportBrokenSiteShown();
+      return;
+    }
     if (message instanceof SendToggleBreakageReport) {
       sendToggleBreakageReport();
       return;
@@ -14934,6 +14959,9 @@
   }
   function showNativeFeedback() {
     windowsPostMessage("ShowNativeFeedback", {});
+  }
+  function reportBrokenSiteShown() {
+    windowsPostMessage("ReportBrokenSiteShown", {});
   }
 
   // shared/js/browser/communication.js
@@ -15403,6 +15431,14 @@
     const nav = useNav();
     return T2(() => {
       const msg = new ShowNativeFeedback();
+      fetcher(msg).catch(console.error);
+    }, [nav]);
+  }
+  function useReportBrokenSiteShown() {
+    const fetcher = useFetcher();
+    const nav = useNav();
+    return T2(() => {
+      const msg = new ReportBrokenSiteShown();
       fetcher(msg).catch(console.error);
     }, [nav]);
   }
@@ -17384,6 +17420,10 @@
     const description = ns.report("selectTheCategoryType.title");
     const { push } = useNav();
     const { tab } = useData();
+    const reportBrokenSiteShown2 = useReportBrokenSiteShown();
+    p2(() => {
+      reportBrokenSiteShown2();
+    }, []);
     const showNativeFeedback2 = useShowNativeFeedback();
     return /* @__PURE__ */ y(BreakageScreenWrapper, { pageId: "choice-problem", className: "breakage-screen--choice" }, /* @__PURE__ */ y("div", { className: "padding-x-double" }, /* @__PURE__ */ y(KeyInsightsMain, { title: tab.domain }, description)), /* @__PURE__ */ y("div", { className: "padding-x" }, /* @__PURE__ */ y(Nav, null, /* @__PURE__ */ y(
       NavItem,
