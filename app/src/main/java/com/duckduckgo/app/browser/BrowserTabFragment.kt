@@ -594,12 +594,6 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogIntroBubbleCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
-
-    private val daxDialogOnboardingCta
-        get() = binding.includeOnboardingDaxDialog
-
     private val daxDialogIntroBubbleCtaExperiment
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCtaExperiment
 
@@ -1871,7 +1865,6 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogOnboardingCta.onboardingDaxDialogBackground.setImageResource(backgroundRes)
         daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
@@ -2715,7 +2708,6 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
-        daxDialogIntroBubbleCta.root.gone()
         daxDialogIntroBubbleCtaExperiment.root.gone()
     }
 
@@ -3956,10 +3948,6 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
-                is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta, is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
-                is DaxBubbleCta.DaxExperimentEndCta, is DaxBubbleCta.DaxExperimentPrivacyProCta,
-                -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
-
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -3967,23 +3955,6 @@ class BrowserTabFragment :
         }
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
-            hideNewTab()
-            configuration.apply {
-                showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
-                    setOnOptionClicked { userEnteredQuery(it.link) }
-                }
-                setOnPrimaryCtaClicked {
-                    viewModel.onUserClickCtaOkButton(configuration)
-                }
-                setOnSecondaryCtaClicked {
-                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                }
-            }
-            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
-        }
-
-        private fun showDaxExperimentOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
                 showCta(daxDialogIntroBubbleCtaExperiment.daxCtaContainer) {
@@ -4003,9 +3974,7 @@ class BrowserTabFragment :
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideNewTab()
-            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
-                configuration is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta
-            ) {
+            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
                 {}
@@ -4017,13 +3986,6 @@ class BrowserTabFragment :
                 onTypingAnimationFinished,
             )
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                configuration.setOnOptionClicked(
-                    daxDialogOnboardingCta,
-                ) {
-                    userEnteredQuery(it.link)
-                }
-            }
-            if (configuration is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogOnboardingCtaExperiment,
                 ) {
@@ -4112,8 +4074,6 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
-            daxDialogOnboardingCta.daxCtaContainer.gone()
             daxDialogOnboardingCtaExperiment.dialogTextCta.cancelAnimation()
             daxDialogOnboardingCtaExperiment.daxCtaContainer.gone()
         }

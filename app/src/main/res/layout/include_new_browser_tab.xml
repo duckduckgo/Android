@@ -48,18 +48,6 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <include
-            android:id="@+id/includeDaxDialogIntroBubbleCta"
-            layout="@layout/include_dax_dialog_intro_bubble_cta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
-
-        <include
             android:id="@+id/includeDaxDialogIntroBubbleCtaExperiment"
             layout="@layout/include_dax_dialog_intro_bubble_cta_experiment"
             android:layout_width="0dp"

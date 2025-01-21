@@ -5570,7 +5570,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenHighlightsExperimentWhenUserClickedSkipInExperimentFireDialogThenSendCancelPixel() {
-        val cta = OnboardingDaxDialogCta.DaxExperimentFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
 
         testee.onUserClickCtaSecondaryButton(cta)

@@ -704,7 +704,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() = runTest {
-        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore, mockSettingsDataStore))
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
@@ -802,7 +802,7 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta)
+        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
     @Test
@@ -813,7 +813,7 @@ class CtaViewModelTest {
 
         val value = testee.getFireDialogCta()
 
-        assertTrue(value is OnboardingDaxDialogCta.DaxExperimentFireButtonCta)
+        assertTrue(value is OnboardingDaxDialogCta.DaxFireButtonCta)
     }
 
     private suspend fun givenDaxOnboardingActive() {
