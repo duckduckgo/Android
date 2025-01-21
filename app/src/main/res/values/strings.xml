@@ -788,4 +788,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">New AI Chat</string>
+
 </resources>
