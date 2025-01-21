@@ -807,4 +807,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">New AI Chat</string>
+
 </resources>
