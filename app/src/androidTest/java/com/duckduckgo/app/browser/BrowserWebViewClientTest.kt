@@ -73,6 +73,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
@@ -154,6 +155,7 @@ class BrowserWebViewClientTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(mockDuckDuckGoUrlDetector, mockAndroidBrowserConfigFeature, mock())
     private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     @UiThreadTest
     @Before
@@ -191,6 +193,7 @@ class BrowserWebViewClientTest {
             mockDuckDuckGoUrlDetector,
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
+            mockDuckChat,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

@@ -143,7 +143,7 @@ class RealDuckChat @Inject constructor(
 
     private fun appendQuery(
         query: String,
-        url: String
+        url: String,
     ): String {
         runCatching {
             val uri = url.toUri()
