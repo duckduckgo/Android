@@ -41,6 +41,10 @@ class FakeSettingsDataStore : SettingsDataStore {
         get() = store["autoCompleteSuggestionsEnabled"] as Boolean? ?: true
         set(value) { store["autoCompleteSuggestionsEnabled"] = value }
 
+    override var maliciousSiteProtectionEnabled: Boolean
+        get() = store["maliciousSiteProtectionEnabled"] as Boolean? ?: true
+        set(value) { store["maliciousSiteProtectionEnabled"] = value }
+
     @Deprecated("Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith("automaticFireproofSetting"))
     override var appLoginDetection: Boolean
         get() = store["appLoginDetection"] as Boolean? ?: true
