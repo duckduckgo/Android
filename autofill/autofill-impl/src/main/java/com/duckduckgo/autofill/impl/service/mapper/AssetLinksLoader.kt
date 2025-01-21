@@ -36,7 +36,7 @@ class RealAssetLinksLoader @Inject constructor(
     override suspend fun getValidTargetApps(domain: String): Map<String, List<String>> {
         return kotlin.runCatching {
             assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
-                logcat { "Autofill-mapping: Assetlinks of $domain: $it" }
+                logcat { "Autofill-mapping: Assetlinks of $domain: ${it.size}" }
             }.filter {
                 it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
                     !it.target.package_name.isNullOrEmpty() &&
