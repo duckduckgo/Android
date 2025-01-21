@@ -113,7 +113,14 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                         }
                         else -> ReportFlow.DASHBOARD
                     }
-                    viewModel.onSubmitBrokenSiteReport(payload, reportFlow)
+
+                    val opener = when (reportFlow) {
+                        ReportFlow.MENU -> DashboardOpener.MENU
+                        ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> DashboardOpener.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+                        else -> DashboardOpener.DASHBOARD
+                    }
+
+                    viewModel.onSubmitBrokenSiteReport(payload, reportFlow, opener)
                     setResult(PrivacyDashboardHybridScreenResult.REPORT_SUBMITTED)
                     finish()
                 },
@@ -127,6 +134,19 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     this@PrivacyDashboardHybridActivity.finish()
                 },
                 onSeeWhatIsSent = {},
+                onReportBrokenSiteShown = {
+                    val opener = when (val params = params) {
+                        is BrokenSiteForm -> {
+                            when (params.reportFlow) {
+                                BrokenSiteForm.BrokenSiteFormReportFlow.MENU -> DashboardOpener.MENU
+                                BrokenSiteForm.BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS ->
+                                    DashboardOpener.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+                            }
+                        }
+                        else -> DashboardOpener.DASHBOARD
+                    }
+                    viewModel.onReportBrokenSiteShown(opener)
+                },
             ),
         )
     }
