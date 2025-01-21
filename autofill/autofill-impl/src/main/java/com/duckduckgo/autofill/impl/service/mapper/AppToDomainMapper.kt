@@ -16,51 +16,48 @@
 
 package com.duckduckgo.autofill.impl.service.mapper
 
-import android.content.Context
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppEntity
 import com.duckduckgo.autofill.store.targets.TargetApp
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 interface AppToDomainMapper {
+    /**
+     * Returns a list of domains whose credentials can be associated to the [appPackage]
+     * You DO NOT need to set any dispatcher to call this suspend function
+     */
     suspend fun getAssociatedDomains(appPackage: String): List<String>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAppToDomainMapper @Inject constructor(
     private val domainTargetAppDao: DomainTargetAppDao,
-    private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
+    private val appFingerprintProvider: AppFingerprintProvider,
     private val assetLinksLoader: AssetLinksLoader,
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : AppToDomainMapper {
     override suspend fun getAssociatedDomains(appPackage: String): List<String> {
-        return context.packageManager.getSHA256HexadecimalFingerprintCompat(appPackage, appBuildConfig)?.let { fingerprint ->
-            logcat { "Autofill-mapping: Getting domains for $appPackage" }
-            attemptToGetFromDataset(appPackage, fingerprint).apply {
-                if (this.isEmpty()) { // TODO: optionally add kill switch for this - in case format for assetlinks breaks/ changes
-                    attemptToGetFromAssetLinks(appPackage, fingerprint)
+        return withContext(dispatcherProvider.io()) {
+            appFingerprintProvider.getSHA256HexadecimalFingerprint(appPackage)?.let { fingerprint ->
+                logcat { "Autofill-mapping: Getting domains for $appPackage" }
+                attemptToGetFromDataset(appPackage, fingerprint).run {
+                    this.ifEmpty { // TODO: optionally add kill switch for this - in case format for assetlinks breaks/ changes
+                        attemptToGetFromAssetLinks(appPackage, fingerprint)
+                    }
                 }
-            }
-        }?.apply {
-            this.map {
-                it.extractDomain()
-            }
-        }?.distinct() ?: emptyList()
+            }?.distinct() ?: emptyList()
+        }
     }
 
     private fun attemptToGetFromDataset(
@@ -77,11 +74,13 @@ class RealAppToDomainMapper @Inject constructor(
         appPackage: String,
         fingerprint: String,
     ): List<String> {
-        val domain = appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
+        val domain = kotlin.runCatching {
+            appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
+        }.getOrNull()
         return domain?.run {
             logcat { "Autofill-mapping: Attempting to get asset links for: $domain" }
             val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter {
-                it.key == appPackage && fingerprint.contains(fingerprint)
+                it.key == appPackage && it.value.contains(fingerprint)
             }
             if (validTargetApp.isNotEmpty()) {
                 logcat { "Autofill-mapping: Valid asset links targets found for $appPackage in $domain" }
@@ -94,30 +93,29 @@ class RealAppToDomainMapper @Inject constructor(
         } ?: emptyList()
     }
 
-    private suspend fun persistMatch(
+    private fun persistMatch(
         domain: String,
         validTargets: Map<String, List<String>>,
-    ) = withContext(dispatcherProvider.io()) {
-        runCatching {
-            val toPersist = mutableListOf<DomainTargetAppEntity>()
-            validTargets.forEach { (packageName, fingerprints) ->
-                fingerprints.forEach { fingerprint ->
-                    toPersist.add(
-                        DomainTargetAppEntity(
-                            domain = domain,
-                            targetApp = TargetApp(
-                                packageName = packageName,
-                                sha256CertFingerprints = fingerprint,
-                            ),
-                            dataExpiryInMillis = currentTimeProvider.currentTimeMillis() + TimeUnit.DAYS.toMillis(EXPIRY_IN_DAYS),
+    ) = runCatching {
+        val toPersist = mutableListOf<DomainTargetAppEntity>()
+        validTargets.forEach { (packageName, fingerprints) ->
+            fingerprints.forEach { fingerprint ->
+                toPersist.add(
+                    DomainTargetAppEntity(
+                        domain = domain,
+                        targetApp = TargetApp(
+                            packageName = packageName,
+                            sha256CertFingerprints = fingerprint,
                         ),
-                    )
-                }
+                        dataExpiryInMillis = currentTimeProvider.currentTimeMillis() + TimeUnit.DAYS.toMillis(EXPIRY_IN_DAYS),
+                    ),
+                )
             }
-            domainTargetAppDao.insertAllMapping(toPersist)
-        }.onFailure {
-            logcat { "Autofill-mapping: Failed to persist data for $domain" }
         }
+        domainTargetAppDao.insertAllMapping(toPersist)
+    }.onFailure {
+        // IF it fails for any reason, caching fails but the app should not.
+        logcat(ERROR) { "Autofill-mapping: Failed to persist data for $domain" }
     }
 
     companion object {
