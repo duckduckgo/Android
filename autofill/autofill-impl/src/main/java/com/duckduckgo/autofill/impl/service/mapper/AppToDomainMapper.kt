@@ -50,9 +50,9 @@ class RealAppToDomainMapper @Inject constructor(
 ) : AppToDomainMapper {
     override suspend fun getAssociatedDomains(appPackage: String): List<String> {
         return context.packageManager.getSHA256HexadecimalFingerprintCompat(appPackage, appBuildConfig)?.let { fingerprint ->
-            logcat { "Autofill-mapping: Getting domains for $appPackage : $fingerprint" }
+            logcat { "Autofill-mapping: Getting domains for $appPackage" }
             attemptToGetFromDataset(appPackage, fingerprint).apply {
-                if (this.isEmpty()) { // TODO: optionally add kill switch for this - in case formats for assetlinks breaks/ changes
+                if (this.isEmpty()) { // TODO: optionally add kill switch for this - in case format for assetlinks breaks/ changes
                     attemptToGetFromAssetLinks(appPackage, fingerprint)
                 }
             }
@@ -68,8 +68,8 @@ class RealAppToDomainMapper @Inject constructor(
         fingerprint: String,
     ): List<String> {
         logcat { "Autofill-mapping: Attempting to get domains from dataset" }
-        return domainTargetAppDao.getDomainsForApp(packageName = appPackage, fingerprint).also {
-            logcat { "Autofill-mapping: domains from dataset for $appPackage: $it" }
+        return domainTargetAppDao.getDomainsForApp(packageName = appPackage, fingerprint = fingerprint).also {
+            logcat { "Autofill-mapping: domains from dataset for $appPackage: ${it.size}" }
         }
     }
 
@@ -80,9 +80,7 @@ class RealAppToDomainMapper @Inject constructor(
         val domain = appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
         return domain?.run {
             logcat { "Autofill-mapping: Attempting to get asset links for: $domain" }
-            val validTargetApp = assetLinksLoader.getValidTargetApps(this).also {
-                logcat { "Autofill-mapping: Valid target apps from assetlinks of $domain: $it" }
-            }.filter {
+            val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter {
                 it.key == appPackage && fingerprint.contains(fingerprint)
             }
             if (validTargetApp.isNotEmpty()) {

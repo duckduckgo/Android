@@ -58,7 +58,6 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
         runCatching {
             remoteDomainTargetAppService.fetchDataset().run {
                 Timber.d("Autofill-mapping: Downloaded targets dataset version: ${this.version}")
-                Timber.d("Autofill-mapping: Downloaded targets dataset $this")
                 if (autofillPrefsStore.domainTargetDatasetVersion != this.version) {
                     persistData(this)
                     autofillPrefsStore.domainTargetDatasetVersion = this.version

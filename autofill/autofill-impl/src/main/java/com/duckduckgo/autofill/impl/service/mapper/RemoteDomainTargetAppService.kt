@@ -22,6 +22,7 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface RemoteDomainTargetAppService {
+    // TODO: replace with real URL
     @GET("https://www.jsonblob.com/api/1329813836072673280")
     suspend fun fetchDataset(): RemoteDomainTargetDataSet
 }
