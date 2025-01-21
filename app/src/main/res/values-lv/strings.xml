@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
-    <string name="settingsDefaultBrowserEnabled">Iestatīt kā noklusējuma pārlūku</string>
+    <string name="setAsDefaultBrowser">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
-    <string name="defaultBrowserLetsDoIt">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atver saites bez raizēm.</string>
     <string name="defaultBrowserInstructions">Atlasi DuckDuckGo un pieskaries <font color="#678fff">Vienmēr</font>.</string>
 
@@ -808,5 +807,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Pēdējā atvērtā cilne</string>
     <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Aizsargā savus personas datus katru reizi, kad izmanto DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ja tev ir svarīgi aizsargāt savus datus, iestati mūs kā savu noklusējuma pārlūku. Visas vietņu saites tiks atvērtas DuckDuckGo platformā.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Iestatīt kā noklusējuma pārlūkprogrammu</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne tagad</string>
 
 </resources>
