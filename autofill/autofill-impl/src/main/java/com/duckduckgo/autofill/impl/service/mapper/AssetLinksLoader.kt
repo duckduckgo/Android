@@ -16,36 +16,45 @@
 
 package com.duckduckgo.autofill.impl.service.mapper
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import timber.log.Timber
 
 interface AssetLinksLoader {
+    /**
+     * Return a map of app packages to associated valid fingerprints from the [domain]'s assetlinks
+     * You DO NOT need to set any dispatcher to call this suspend function
+     */
     suspend fun getValidTargetApps(domain: String): Map<String, List<String>>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAssetLinksLoader @Inject constructor(
     private val assetLinksService: AssetLinksService,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AssetLinksLoader {
     override suspend fun getValidTargetApps(domain: String): Map<String, List<String>> {
-        return kotlin.runCatching {
-            assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
-                logcat { "Autofill-mapping: Assetlinks of $domain: ${it.size}" }
-            }.filter {
-                it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
-                    !it.target.package_name.isNullOrEmpty() &&
-                    !it.target.sha256_cert_fingerprints.isNullOrEmpty() &&
-                    it.target.namespace == APP_NAMESPACE
-            }.associate { it.target.package_name!! to it.target.sha256_cert_fingerprints!! }
-        }.getOrElse {
-            Timber.e(it, "Autofill-mapping: Failed to obtain assetlinks for: $domain")
-            emptyMap()
+        return withContext(dispatcherProvider.io()) {
+            kotlin.runCatching {
+                assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
+                    logcat { "Autofill-mapping: Assetlinks of $domain: ${it.size}" }
+                }.filter {
+                    it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
+                        !it.target.package_name.isNullOrEmpty() &&
+                        !it.target.sha256_cert_fingerprints.isNullOrEmpty() &&
+                        it.target.namespace == APP_NAMESPACE
+                }.associate { it.target.package_name!! to it.target.sha256_cert_fingerprints!! }
+            }.getOrElse {
+                // This can fail for a lot of reasons: invalid url from package name, absence of assetlinks, malformed assetlinks
+                // If it does, we don't want to crash the app. We only want to return empty
+                Timber.e(it, "Autofill-mapping: Failed to obtain assetlinks for: $domain")
+                emptyMap()
+            }
         }
     }
 

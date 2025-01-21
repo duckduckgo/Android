@@ -20,8 +20,6 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
-import android.os.Build
-import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.security.MessageDigest
@@ -32,7 +30,7 @@ internal fun PackageManager.getSHA256HexadecimalFingerprintCompat(
     appBuildConfig: AppBuildConfig,
 ): String? {
     return kotlin.runCatching {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
+        if (appBuildConfig.sdkInt >= 28) {
             getSHA256Fingerprint(packageName, this)
         } else {
             getSHA256FingerprintLegacy(packageName, this)
@@ -40,7 +38,7 @@ internal fun PackageManager.getSHA256HexadecimalFingerprintCompat(
     }.getOrNull()
 }
 
-@RequiresApi(VERSION_CODES.P)
+@RequiresApi(28)
 private fun getSHA256Fingerprint(
     packageName: String,
     packageManager: PackageManager,
