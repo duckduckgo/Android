@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppEntity
 import com.duckduckgo.autofill.store.targets.TargetApp
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,6 +42,7 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
     private val remoteDomainTargetAppService: RemoteDomainTargetAppService,
     private val autofillPrefsStore: AutofillPrefsStore,
     private val domainTargetAppDao: DomainTargetAppDao,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -48,6 +50,7 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             Timber.d("Autofill-mapping: Attempting to download")
             download()
+            removeExpiredCachedData()
         }
     }
 
@@ -88,5 +91,10 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
         Timber.d("Autofill-mapping: Attempting to persist ${toPersist.size} entries")
         domainTargetAppDao.updateRemote(toPersist)
         Timber.d("Autofill-mapping: Persist complete")
+    }
+
+    private fun removeExpiredCachedData() {
+        Timber.d("Autofill-mapping: Removing expired cached data")
+        domainTargetAppDao.deleteAllExpired(currentTimeProvider.currentTimeMillis())
     }
 }

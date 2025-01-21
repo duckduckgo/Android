@@ -48,6 +48,9 @@ abstract class DomainTargetAppDao {
     @Query("delete from autofill_domain_target_apps_mapping WHERE dataExpiryInMillis = 0")
     abstract fun deleteAllRemote()
 
+    @Query("delete from autofill_domain_target_apps_mapping WHERE dataExpiryInMillis < :currentTimeMillis")
+    abstract fun deleteAllExpired(currentTimeMillis: Long)
+
     @Query("select app_package, app_fingerprint from autofill_domain_target_apps_mapping where domain = :domain")
     abstract fun getTargetAppsForDomain(domain: String): List<TargetApp>
 
