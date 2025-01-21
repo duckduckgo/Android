@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Nieuwe tabbladpagina</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifieke pagina</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nieuwe AI Chat</string>
+
 </resources>

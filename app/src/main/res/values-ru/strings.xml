@@ -812,4 +812,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Страница новой вкладки</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретная страница</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Запустить AI Chat</string>
+
 </resources>

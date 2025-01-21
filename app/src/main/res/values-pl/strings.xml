@@ -812,4 +812,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Strona nowej karty</string>
     <string name="showOnAppLaunchOptionSpecificPage">Określona strona</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nowy AI Chat</string>
+
 </resources>

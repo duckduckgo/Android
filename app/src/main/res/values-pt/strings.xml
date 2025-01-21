@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Nova página de separador</string>
     <string name="showOnAppLaunchOptionSpecificPage">Página específica</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Novo AI Chat</string>
+
 </resources>
