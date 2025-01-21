@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.webkit.JavascriptInterface
 
 class PrivacyDashboardJavascriptInterface constructor(
-    val onBrokenSiteClicked: () -> Unit,
     val onPrivacyProtectionsClicked: (String) -> Unit,
     val onUrlClicked: (String) -> Unit,
     val onOpenSettings: (String) -> Unit,
@@ -43,7 +42,7 @@ class PrivacyDashboardJavascriptInterface constructor(
 
     @JavascriptInterface
     fun showBreakageForm() {
-        onBrokenSiteClicked()
+        // FE handles navigation internally, but we must keep this callback for it to work.
     }
 
     @JavascriptInterface

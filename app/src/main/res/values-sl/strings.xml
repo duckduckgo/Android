@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Prijavite poškodovano spletno mesto</string>
-    <string name="brokenSiteHeading">Prijavi nedelujočo stran</string>
-    <string name="brokenSiteSubmitted">Hvala! Povratne informacije so poslane.</string>
-    <string name="brokenSitesCategoriesTitle">Opišite, kaj se je zgodilo</string>
-    <string name="brokenSitesCategoriesHint">Opišite, kaj se je zgodilo</string>
-    <string name="brokenSiteSubmitButton">Pošljite poročilo</string>
-    <string name="brokenSiteDescription">Oddaja anonimnega poročila o nedelujočem mestu nam pomaga izboljšati aplikacijo.</string>
-
-    <string name="brokenSiteCategoryBlocked">Stran je blokirana ali se ni naložila</string>
-    <string name="brokenSiteCategoryLayout">Postavitev spletnega mesta je neuporabna</string>
-    <string name="brokenSiteCategoryEmptySpaces">Spletno mesto vsebuje velike prazne prostore</string>
-    <string name="brokenSiteCategoryShopping">Ne morem plačati, se odjaviti ali nakupovati</string>
-    <string name="brokenSiteCategoryPaywall">Spletno mesto me je pozvalo, naj onemogočim preprečevalec oglasov</string>
-    <string name="brokenSiteCategoryComments">Komentarji, ocene ali klepeti se niso naložili</string>
-    <string name="brokenSiteCategoryVideos">Video se ni predvajal ali naložil</string>
-    <string name="brokenSiteCategoryLogin">Ne morem se prijaviti/registrirati</string>
-    <string name="brokenSiteCategoryOther">Nekaj drugega</string>
-    <string name="brokenSiteDescriptionTextInputHint">Zaupajte nam več podrobnosti (neobvezno)</string>
-    <string name="brokenSiteDescriptionCaption">Kaj se je zgodilo? Kaj bi se moralo zgoditi? Je izklop zaščite odpravil težavo?</string>
 
     <string name="brokenSiteProtectionsOn">Zaščite so <b>VKLOPLJENE</b> za to spletno mesto</string>
     <string name="brokenSiteProtectionsOff">Zaščite so <b>IZKLOPLJENE</b> za to spletno mesto</string>
     <string name="brokenSiteProtectionsOnBannerMessage">IZKLOP zaščit lahko pomaga.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Zaščito zasebnosti smo začasno onemogočili, ker je videti, da zato prihaja do napak na tem spletnem mestu.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Oglejte si, kaj je poslano</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podatkov, poslanih v poročilih, ni mogoče uporabiti za vašo identifikacijo:</b><br/><br/>• URL strani (brez določljivih podatkov),<br/>• znamka naprave, model in proizvajalec,<br/>• številka različice operacijskega sistema,<br/>• številka različice aplikacije,<br/>• anonimna eksperimentalna skupina za testiranje funkcij,<br/>• informacije o aktivnih različicah naših zaščit,<br/>• številka različice pogona spletnega brskalnika,<br/>• seznam aktivnih zaščit in funkcij brskalnika,<br/>• imena gostiteljev blokiranih sledilnikov, nadomestne zahteve, prezrte zahteve in zahteve, ki niso na seznamu blokiranih sledilnikov,<br/>• napake, ki jih je sporočil brskalnik,<br/>• kode statusa odziva spletne strani (HTTP),<br/>• kateri obrazec za poročanje ste uporabili (meni, nadzorna plošča itd.),<br/>• datum zadnjega poslanega poročila za to spletno mesto,<br/>• ali ste se odločili za prikaz informacij o tem poročilu,<br/>• kolikokrat so bile zaščite izklopljene,<br/>• kako hitro so bili naloženi deli strani,<br/>• kako ste prišli do te strani: SERP (iskanje DuckDuckGo), navigacija (povezava/URL) ali zunanje (drugi načini),<br/>• število osvežitev od nalaganja strani,<br/>• primarni jezik in država vaše naprave.<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>

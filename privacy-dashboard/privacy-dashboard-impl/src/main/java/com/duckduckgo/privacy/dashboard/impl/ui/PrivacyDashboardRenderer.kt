@@ -32,7 +32,6 @@ class PrivacyDashboardRenderer(
     private val webView: WebView,
     private val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
     private val moshi: Moshi,
-    private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (String) -> Unit,
     private val onUrlClicked: (String) -> Unit,
     private val onOpenSettings: (String) -> Unit,
@@ -50,7 +49,6 @@ class PrivacyDashboardRenderer(
     fun loadDashboard(webView: WebView, initialScreen: InitialScreen, toggleOpener: DashboardOpener) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
-                onBrokenSiteClicked = { onBrokenSiteClicked() },
                 onPrivacyProtectionsClicked = { payload ->
                     onPrivacyProtectionsClicked(payload)
                 },

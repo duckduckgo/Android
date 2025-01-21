@@ -31,8 +31,6 @@ import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -41,8 +39,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacy.dashboard.impl.WebBrokenSiteFormFeature
-import com.duckduckgo.privacy.dashboard.impl.isEnabled
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
@@ -50,7 +46,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.AppPrivacyDashboardPayloadAdapte
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.FetchToggleData
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchAppFeedback
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchToggleReport
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
@@ -98,7 +93,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val userBrowserProperties: UserBrowserProperties,
-    private val webBrokenSiteFormFeature: WebBrokenSiteFormFeature,
     private val toggleReports: ToggleReports,
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
@@ -108,7 +102,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     sealed class Command {
-        class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
         class LaunchToggleReport(val opener: DashboardOpener) : Command()
         class OpenURL(val url: String) : Command()
         class OpenSettings(val target: String) : Command()
@@ -277,15 +270,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    fun onReportBrokenSiteSelected() {
-        viewModelScope.launch(dispatcher.io()) {
-            if (!webBrokenSiteFormFeature.isEnabled()) {
-                val siteData = BrokenSiteData.fromSite(site.value, reportFlow = DASHBOARD)
-                command.send(LaunchReportBrokenSite(siteData))
-            }
-        }
-    }
-
     fun launchAppFeedbackFlow() {
         viewModelScope.launch(dispatcher.io()) {
             command.send(LaunchAppFeedback)
@@ -311,17 +295,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private suspend fun createRemoteFeatureSettings(): RemoteFeatureSettingsViewState {
-        val webBrokenSiteFormState = withContext(dispatcher.io()) {
-            if (webBrokenSiteFormFeature.isEnabled()) {
-                WebBrokenSiteFormState.ENABLED
-            } else {
-                WebBrokenSiteFormState.DISABLED
-            }
-        }
-
         return RemoteFeatureSettingsViewState(
             primaryScreen = PrimaryScreenSettings(layout = LayoutType.DEFAULT.value),
-            webBreakageForm = WebBrokenSiteFormSettings(state = webBrokenSiteFormState.value),
+            webBreakageForm = WebBrokenSiteFormSettings(state = WebBrokenSiteFormState.ENABLED.value),
         )
     }
 
@@ -403,8 +379,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
         val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
         val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
-        const val MOBILE_SITE = "mobile"
-        const val DESKTOP_SITE = "desktop"
     }
 
     private fun currentViewState(): ViewState {
@@ -432,7 +406,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         reportFlow: ReportFlow,
     ) {
         viewModelScope.launch(dispatcher.io()) {
-            if (!webBrokenSiteFormFeature.isEnabled()) return@launch
             val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
             val site = site.value ?: return@launch
             val siteUrl = site.url
@@ -451,7 +424,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .map { Uri.parse(it.name).baseHost }
                     .distinct()
                     .joinToString(","),
-                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                siteType = if (site.isDesktopMode) BrokenSite.SITE_TYPE_DESKTOP else BrokenSite.SITE_TYPE_MOBILE,
                 urlParametersRemoved = site.urlParametersRemoved,
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
@@ -538,7 +511,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .map { Uri.parse(it.name).baseHost }
                     .distinct()
                     .joinToString(","),
-                siteType = if (site.isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
+                siteType = if (site.isDesktopMode) BrokenSite.SITE_TYPE_DESKTOP else BrokenSite.SITE_TYPE_MOBILE,
                 urlParametersRemoved = site.urlParametersRemoved,
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,

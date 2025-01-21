@@ -39,6 +39,11 @@ data class BrokenSite(
     val userRefreshCount: Int,
     val openerContext: String?,
     val jsPerformance: List<Double>?,
-)
+) {
+    companion object {
+        const val SITE_TYPE_DESKTOP = "desktop"
+        const val SITE_TYPE_MOBILE = "mobile"
+    }
+}
 
 enum class ReportFlow { DASHBOARD, MENU, TOGGLE_DASHBOARD, TOGGLE_MENU, RELOAD_THREE_TIMES_WITHIN_20_SECONDS }

@@ -239,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
-    <string name="brokenSiteHeading">Rapportera bruten webbplats</string>
-    <string name="brokenSiteSubmitted">Tack! Återkopplingen har skickats.</string>
-    <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
-    <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
-    <string name="brokenSiteSubmitButton">Skicka anmälan</string>
-    <string name="brokenSiteDescription">Genom att skicka in en anonym anmälan om att webbplatsen inte fungerar hjälper du oss att förbättra appen.</string>
-
-    <string name="brokenSiteCategoryBlocked">Webbplatsen är blockerad eller lästes inte in</string>
-    <string name="brokenSiteCategoryLayout">Webbplatsens layout är trasig</string>
-    <string name="brokenSiteCategoryEmptySpaces">Webbplatsen innehåller stora tomma fält</string>
-    <string name="brokenSiteCategoryShopping">Det går inte att betala, gå till kassan eller shoppa</string>
-    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att inaktivera annonsblockeraren</string>
-    <string name="brokenSiteCategoryComments">Kommentarer, recensioner eller chattar lästes inte in</string>
-    <string name="brokenSiteCategoryVideos">Videon spelades inte upp eller lästes inte in</string>
-    <string name="brokenSiteCategoryLogin">Det går inte att logga in/registrera sig</string>
-    <string name="brokenSiteCategoryOther">Övrigt</string>
-    <string name="brokenSiteDescriptionTextInputHint">Berätta mer (valfritt)</string>
-    <string name="brokenSiteDescriptionCaption">Vad hände? Vad borde ha hänt? Hjälpte det att stänga av skydd?</string>
 
     <string name="brokenSiteProtectionsOn">Skydd är <b>PÅ</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOff">Skydd är <b>AV</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjälpa att stänga av skyddet.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har tillfälligt stängt av integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se vad som skickats</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Information som skickas i rapporter kan inte användas för att identifiera dig:</b><br/><br/>• Sidans URL (utan identifierbar information)<br/>• Enhetens märke, modell och tillverkare<br/>• Operativsystemets versionsnummer<br/>• Appversionsnummer<br/>• Anonym experimentgrupp för funktionstestning<br/>• Information om vilka versioner av våra skydd som var aktiva<br/>• Versionsnummer för webbläsarens motor<br/>• Lista över vilka skydd och webbläsarfunktioner som var aktiva<br/>• Värdnamn på blockerade spårare, surrogatförfrågningar, ignorerade förfrågningar och förfrågningar som inte finns i listan för spårningsblockering<br/>• Webbläsarrapporterade fel<br/>• HTTP-koder (webbplatsens svarsstatus) <br/>• Vilken rapporteringsform du använde (meny, instrumentpanel osv.)<br/>• Datum för den senaste rapport som skickades för webbplatsen<br/>• Huruvida du valde att visa den här rapportinformationen<br/>• Antal gånger som skydden har kopplats bort<br/>• Hur snabbt delar av sidan lästes in<br/>• Hur du kom till den här sidan, antingen: SERP (DuckDuckGo-sökning), Navigering (länk/URL) eller Externt (på annat sätt)<br/>• Antal uppdateringar sedan sidan lästes in<br/>• Primärt språk och land för din enhet<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
