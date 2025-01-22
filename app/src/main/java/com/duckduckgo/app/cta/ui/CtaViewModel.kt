@@ -35,12 +35,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingPrimaryButtonMetricPixel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -87,7 +82,6 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -150,12 +144,6 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
         }
     }
 
@@ -197,23 +185,6 @@ class CtaViewModel @Inject constructor(
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
-        }
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingPrimaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
-        }
-    }
-
-    suspend fun onUserClickCtaSkipButton(cta: Cta) {
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingSecondaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
         }
     }
 
@@ -293,26 +264,8 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowPrivacyProCta() -> {
-                val titleRes: Int
-                val descriptionRes: Int
-                when {
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.STEP) -> {
-                        titleRes = R.string.onboardingPrivacyProStepDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProStepDaxDialogDescription
-                    }
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> {
-                        titleRes = R.string.onboardingPrivacyProProtectionDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProProtectionDaxDialogDescription
-                    }
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.DEAL) -> {
-                        titleRes = R.string.onboardingPrivacyProDealDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProDealDaxDialogDescription
-                    }
-                    else -> {
-                        titleRes = R.string.onboardingPrivacyProDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProDaxDialogDescription
-                    }
-                }
+                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
+                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
 
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                     DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
@@ -550,17 +503,6 @@ class CtaViewModel @Inject constructor(
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
-
-    fun getCohortOrigin(): String {
-        val cohort = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()
-        return when (cohort?.name) {
-            Cohorts.STEP.cohortName -> "_${Cohorts.STEP.cohortName}"
-            Cohorts.PROTECTION.cohortName -> "_${Cohorts.PROTECTION.cohortName}"
-            Cohorts.DEAL.cohortName -> "_${Cohorts.DEAL.cohortName}"
-            Cohorts.CONTROL.cohortName -> "_${Cohorts.CONTROL.cohortName}"
-            else -> ""
-        }
-    }
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2

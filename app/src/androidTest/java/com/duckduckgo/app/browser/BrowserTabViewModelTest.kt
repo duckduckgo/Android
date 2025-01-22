@@ -148,7 +148,6 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -212,8 +211,6 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -501,9 +498,6 @@ class BrowserTabViewModelTest {
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
-    private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
-        .create(ExtendedOnboardingFeatureToggles::class.java)
-    private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
 
     @Before
     fun before() = runTest {
@@ -530,7 +524,6 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
-        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockDisabledToggle)
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
@@ -573,7 +566,6 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
-            extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
         )
 
         val siteFactory = SiteFactoryImpl(

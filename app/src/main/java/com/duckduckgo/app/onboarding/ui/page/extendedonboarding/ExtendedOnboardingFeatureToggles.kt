@@ -18,14 +18,8 @@ package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.ConversionWindow
-import com.duckduckgo.feature.toggles.api.MetricsPixel
-import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -45,53 +39,4 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(false)
     @Experiment
     fun highlights(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun testPrivacyProOnboardingCopyNov24(): Toggle
-
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        PROTECTION("protection"),
-        DEAL("deal"),
-        STEP("step"),
-    }
-}
-
-internal suspend fun ExtendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel(): MetricsPixel? {
-    return this.getMetrics().firstOrNull { it.metric == "dialogShown" }
-}
-
-internal suspend fun ExtendedOnboardingPixelsPlugin.testPrivacyProOnboardingPrimaryButtonMetricPixel(): MetricsPixel? {
-    return this.getMetrics().firstOrNull { it.metric == "primaryButtonSelected" }
-}
-
-internal suspend fun ExtendedOnboardingPixelsPlugin.testPrivacyProOnboardingSecondaryButtonMetricPixel(): MetricsPixel? {
-    return this.getMetrics().firstOrNull { it.metric == "secondaryButtonSelected" }
-}
-
-@ContributesMultibinding(AppScope::class)
-class ExtendedOnboardingPixelsPlugin @Inject constructor(private val toggle: ExtendedOnboardingFeatureToggles) : MetricsPixelPlugin {
-
-    override suspend fun getMetrics(): List<MetricsPixel> {
-        return listOf(
-            MetricsPixel(
-                metric = "dialogShown",
-                value = "1",
-                toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
-            ),
-            MetricsPixel(
-                metric = "primaryButtonSelected",
-                value = "1",
-                toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
-            ),
-            MetricsPixel(
-                metric = "secondaryButtonSelected",
-                value = "1",
-                toggle = toggle.testPrivacyProOnboardingCopyNov24(),
-                conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 1)),
-            ),
-        )
-    }
 }
