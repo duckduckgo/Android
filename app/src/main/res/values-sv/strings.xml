@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Ny fliksida</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik sida</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Ny AI-chatt</string>
+
 </resources>
