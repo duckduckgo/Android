@@ -791,4 +791,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
+
 </resources>
