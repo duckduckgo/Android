@@ -28,7 +28,9 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_FILTERLIST_OOM
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_CONTROL_OOM
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_FILTERLIST_OTHER
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_CONTROL_OTHER
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -121,17 +123,25 @@ class RealAutoconsent @Inject constructor(
 
     private fun getFunctionsJS(): String {
         if (!this::autoconsentJs.isInitialized) {
-            if (isFilterlistEnabled()) {
-                try {
+            try {
+                if (isEnabled() && isFilterlistEnabled()) {
                     autoconsentJs = JsReader.loadJs("autoconsent-bundle-exp.js")
-                } catch (e: OutOfMemoryError) {
-                    pixel.fire(AUTOCONSENT_FILTERLIST_OOM)
-                    autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
-                } catch (e: Exception) {
-                    pixel.fire(AUTOCONSENT_FILTERLIST_OTHER)
+                } else {
                     autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
                 }
-            } else {
+            } catch (e: OutOfMemoryError) {
+                if (isFilterlistEnabled()) {
+                    pixel.fire(AUTOCONSENT_FILTERLIST_OOM)
+                } else {
+                    pixel.fire(AUTOCONSENT_CONTROL_OOM)
+                }
+                autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
+            } catch (e: Exception) {
+                if (isFilterlistEnabled()) {
+                    pixel.fire(AUTOCONSENT_FILTERLIST_OTHER)
+                } else {
+                    pixel.fire(AUTOCONSENT_CONTROL_OTHER)
+                }
                 autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
             }
         }
