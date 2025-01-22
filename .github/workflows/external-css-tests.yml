@@ -40,10 +40,10 @@ jobs:
         working-directory: node_modules/@duckduckgo/content-scope-scripts
         run: npm run build
 
-      - name: Set up JDK 17
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Decode secret
