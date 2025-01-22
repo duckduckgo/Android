@@ -446,8 +446,8 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenShouldNavigateToDuckChatThenReturnShouldLaunchDuckChatLink() = runTest {
-        whenever(mockDuckChat.shouldNavigateToDuckChat(any())).thenReturn(true)
+    fun whenDuckChatIsEnabledAndIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val type = testee.determineType("https://example.com")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
@@ -458,6 +458,21 @@ class SpecialUrlDetectorImplTest {
             ),
         )
         assertTrue(type is ShouldLaunchDuckChatLink)
+    }
+
+    @Test
+    fun whenDuckChatIsDisabledAndIsDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        val type = testee.determineType("https://example.com")
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        assertTrue(type !is ShouldLaunchDuckChatLink)
     }
 
     private fun randomString(length: Int): String {

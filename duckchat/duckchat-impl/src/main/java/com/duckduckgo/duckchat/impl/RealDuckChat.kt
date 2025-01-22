@@ -123,13 +123,20 @@ class RealDuckChat @Inject constructor(
         return showInBrowserMenu
     }
 
-    override fun openDuckChat(query: String?) {
+    override fun openDuckChat(
+        query: String?,
+        autoPrompt: Boolean,
+    ) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         var url = duckChatLink
 
         query?.let {
-            url = appendQuery(it, url)
+            url = appendParameter(QUERY, it, url)
+            if (autoPrompt) {
+                url = appendParameter(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE, url)
+            }
         }
+
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(
@@ -145,25 +152,26 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    private fun appendQuery(
-        query: String,
+    private fun appendParameter(
+        parameter: String,
+        value: String,
         url: String,
     ): String {
         runCatching {
             val uri = url.toUri()
             return uri.buildUpon().apply {
                 clearQuery()
-                appendQueryParameter(QUERY, query)
+                appendQueryParameter(parameter, value)
                 uri.queryParameterNames
-                    .filterNot { it == QUERY }
+                    .filterNot { it == parameter }
                     .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
             }.build().toString()
         }
         return url
     }
 
-    override fun shouldNavigateToDuckChat(uri: Uri): Boolean {
-        if (uri.host != DUCKDUCKGO_HOST || !isDuckChatEnabled) {
+    override fun isDuckChatUrl(uri: Uri): Boolean {
+        if (uri.host != DUCKDUCKGO_HOST) {
             return false
         }
         return runCatching {
@@ -196,5 +204,7 @@ class RealDuckChat @Inject constructor(
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
+        private const val PROMPT_QUERY_NAME = "prompt"
+        private const val PROMPT_QUERY_VALUE = "1"
     }
 }

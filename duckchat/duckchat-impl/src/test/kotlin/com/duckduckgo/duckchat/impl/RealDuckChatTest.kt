@@ -147,7 +147,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() {
-        testee.openDuckChat("example")
+        testee.openDuckChat(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
@@ -160,24 +160,46 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLink_shouldNavigateToDuckChat() {
-        assertTrue(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?ia=chat".toUri()))
+    fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() {
+        testee.openDuckChat(query = "example", autoPrompt = true)
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            WebViewActivityWithParams(
+                url = "https://duckduckgo.com/?prompt=1&q=example&ia=chat&duckai=5",
+                screenTitle = "Duck.ai",
+                supportNewWindows = true,
+            ),
+        )
+        verify(mockContext).startActivity(any())
     }
 
     @Test
-    fun whenIsDuckDuckGoHostAndDuckChatDisabledAndIsDuckChatLink_shouldNotNavigateToDuckChat() {
-        setFeatureToggle(false)
-        assertFalse(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?ia=chat".toUri()))
+    fun whenOpenDuckChatCalledWithAutoPromptButNoQuery_activityStartedWithoutAutoPrompt() {
+        testee.openDuckChat(autoPrompt = true)
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            WebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                screenTitle = "Duck.ai",
+                supportNewWindows = true,
+            ),
+        )
+        verify(mockContext).startActivity(any())
     }
 
     @Test
-    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsNotDuckChatLink_shouldNotNavigateToDuckChat() {
-        assertFalse(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?q=test".toUri()))
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLink_isDuckChatUrl() {
+        assertTrue(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
     }
 
     @Test
-    fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_shouldNotNavigateToDuckChat() {
-        assertFalse(testee.shouldNavigateToDuckChat("https://example.com/?ia=chat".toUri()))
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsNotDuckChatLink_isNotDuckChatUrl() {
+        assertFalse(testee.isDuckChatUrl("https://duckduckgo.com/?q=test".toUri()))
+    }
+
+    @Test
+    fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_isNotDuckChatUrl() {
+        assertFalse(testee.isDuckChatUrl("https://example.com/?ia=chat".toUri()))
     }
 
     private fun setFeatureToggle(enabled: Boolean) {
