@@ -16,17 +16,19 @@
 
 package com.duckduckgo.duckchat.api
 
+import android.net.Uri
+
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
  */
 interface DuckChat {
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
-     * Sets IO dispatcher.
+     * Uses a cached value - does not perform disk I/O.
      *
      * @return true if DuckChat is enabled, false otherwise.
      */
-    suspend fun isEnabled(): Boolean
+    fun isEnabled(): Boolean
 
     /**
      * Checks whether DuckChat should be shown in browser menu based on user settings.
@@ -37,7 +39,19 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
-     * Opens the DuckChat WebView.
+     * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat()
+    fun openDuckChat(query: String? = null)
+
+    /**
+     * Auto-prompts the DuckChat WebView with the provided [String] query.
+     */
+    fun openDuckChatWithAutoPrompt(query: String)
+
+    /**
+     * Determines whether a given [Uri] is a DuckChat URL.
+     *
+     * @return true if it is a DuckChat URL, false otherwise.
+     */
+    fun isDuckChatUrl(uri: Uri): Boolean
 }

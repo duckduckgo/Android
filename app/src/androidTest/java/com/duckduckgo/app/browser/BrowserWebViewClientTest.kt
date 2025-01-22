@@ -75,6 +75,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
@@ -164,6 +165,7 @@ class BrowserWebViewClientTest {
         mock(),
     )
     private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     @UiThreadTest
     @Before
@@ -201,6 +203,7 @@ class BrowserWebViewClientTest {
             mockDuckDuckGoUrlDetector,
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
+            mockDuckChat,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -423,6 +426,38 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(subscriptions).launchPrivacyPro(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDuckChatLinkDetectedThenLaunchDuckChatAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?q=example&ia=chat&duckai=5".toUri())
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(mockDuckChat).openDuckChat("example")
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDuckChatLinkDetectedWithoutQueryThenLaunchDuckChatWithoutQueryAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?ia=chat".toUri())
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDuckChatLinkDetectedAndExceptionThrownThenDoNotLaunchDuckChatAndReturnFalse() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        val mockUri: Uri = mock()
+        whenever(mockUri.getQueryParameter(anyString())).thenThrow(RuntimeException())
+        whenever(webResourceRequest.url).thenReturn(mockUri)
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verifyNoInteractions(mockDuckChat)
     }
 
     @UiThreadTest

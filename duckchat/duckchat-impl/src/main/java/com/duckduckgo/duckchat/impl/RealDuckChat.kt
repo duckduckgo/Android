@@ -18,10 +18,13 @@ package com.duckduckgo.duckchat.impl
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -76,6 +79,9 @@ class RealDuckChat @Inject constructor(
         moshi.adapter(DuckChatSettingJson::class.java)
     }
 
+    /** Cached DuckChat is enabled flag */
+    private var isDuckChatEnabled = false
+
     /** Cached value of whether we should show DuckChat in the menu or not */
     private var showInBrowserMenu = false
 
@@ -105,8 +111,8 @@ class RealDuckChat @Inject constructor(
         cacheShowInBrowser()
     }
 
-    override suspend fun isEnabled(): Boolean = withContext(dispatchers.io()) {
-        duckChatFeature.self().isEnabled()
+    override fun isEnabled(): Boolean {
+        return isDuckChatEnabled
     }
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
@@ -117,12 +123,32 @@ class RealDuckChat @Inject constructor(
         return showInBrowserMenu
     }
 
-    override fun openDuckChat() {
+    override fun openDuckChat(query: String?) {
+        val parameters = query?.let {
+            mapOf(QUERY to it)
+        } ?: emptyMap()
+        openDuckChat(parameters)
+    }
+
+    override fun openDuckChatWithAutoPrompt(query: String) {
+        val parameters = mapOf(
+            QUERY to query,
+            PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
+        )
+        openDuckChat(parameters)
+    }
+
+    private fun openDuckChat(parameters: Map<String, String>) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        val url = appendParameters(parameters, duckChatLink)
+        startDuckChatActivity(url)
+    }
+
+    private fun startDuckChatActivity(url: String) {
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(
-                url = duckChatLink,
+                url = url,
                 screenTitle = context.getString(R.string.duck_chat_title),
                 supportNewWindows = true,
             ),
@@ -132,6 +158,35 @@ class RealDuckChat @Inject constructor(
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(it)
         }
+    }
+
+    private fun appendParameters(
+        parameters: Map<String, String>,
+        url: String,
+    ): String {
+        if (parameters.isEmpty()) return url
+        return runCatching {
+            val uri = url.toUri()
+            uri.buildUpon().apply {
+                clearQuery()
+                parameters.forEach { (key, value) ->
+                    appendQueryParameter(key, value)
+                }
+                uri.queryParameterNames
+                    .filterNot { it in parameters.keys }
+                    .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
+            }.build().toString()
+        }.getOrElse { url }
+    }
+
+    override fun isDuckChatUrl(uri: Uri): Boolean {
+        if (uri.host != DUCKDUCKGO_HOST) {
+            return false
+        }
+        return runCatching {
+            val queryParameters = uri.queryParameterNames
+            queryParameters.contains(CHAT_QUERY_NAME) && uri.getQueryParameter(CHAT_QUERY_NAME) == CHAT_QUERY_VALUE
+        }.getOrDefault(false)
     }
 
     private fun cacheDuckChatLink() {
@@ -147,12 +202,18 @@ class RealDuckChat @Inject constructor(
 
     private fun cacheShowInBrowser() {
         appCoroutineScope.launch(dispatchers.io()) {
-            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && duckChatFeature.self().isEnabled()
+            isDuckChatEnabled = duckChatFeature.self().isEnabled()
+            showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
         }
     }
 
     companion object {
         /** Default link to DuckChat that identifies Android as the source */
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCKDUCKGO_HOST = "duckduckgo.com"
+        private const val CHAT_QUERY_NAME = "ia"
+        private const val CHAT_QUERY_VALUE = "chat"
+        private const val PROMPT_QUERY_NAME = "prompt"
+        private const val PROMPT_QUERY_VALUE = "1"
     }
 }
