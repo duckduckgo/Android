@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne innstillinger for standardapp</string>
-    <string name="settingsDefaultBrowserEnabled">Gjør til standardnettleser</string>
+    <string name="setAsDefaultBrowser">Gjør til standardnettleser</string>
     <string name="defaultBrowserMaybeLater">Kanskje senere</string>
-    <string name="defaultBrowserLetsDoIt">Gjør til standardnettleser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åpne lenker med ro i sinnet, hver gang.</string>
     <string name="defaultBrowserInstructions">Velg DuckDuckGo og trykk på <font color="#678fff">Alltid</font>.</string>
 
@@ -806,5 +805,11 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Sist åpnet fane</string>
     <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Spesifikk side</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Beskytt dine personlige data hver gang med DuckDuckGo</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Gjør oss til standardnettleseren din hvis du liker personvern. Alle nettstedslenker åpnes i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Angi som standard nettleser</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nå</string>
 
 </resources>
