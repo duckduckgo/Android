@@ -43,6 +43,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     override suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult {
         Timber.tag("MaliciousSiteProtection").d("isMalicious $url")
+
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
             Timber.d("\uD83D\uDFE2 Cris: should not block (feature disabled) $url")
             return IsMaliciousResult.SAFE
