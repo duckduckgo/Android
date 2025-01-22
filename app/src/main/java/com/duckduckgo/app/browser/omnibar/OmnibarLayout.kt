@@ -85,6 +85,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -258,6 +259,11 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             stateBuffer.clear()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        coroutineScope?.cancel()
+        super.onDetachedFromWindow()
     }
 
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
