@@ -793,4 +793,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
+
 </resources>
