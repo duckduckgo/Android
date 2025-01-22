@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Страница с нов раздел</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретна страница</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">AI Chat</string>
+
 </resources>
