@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Uue vahekaardi leht</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkreetne lehekülg</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
+
 </resources>

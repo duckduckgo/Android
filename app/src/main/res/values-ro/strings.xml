@@ -787,4 +787,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Filă nouă</string>
     <string name="showOnAppLaunchOptionSpecificPage">Pagină specifică</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Mulțumim! Sesizarea ta ajută la îmbunătățirea DuckDuckGo pentru toată lumea!</string>
+
 </resources>

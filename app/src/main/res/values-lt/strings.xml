@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Naujas skirtuko puslapis</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
+
 </resources>

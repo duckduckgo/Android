@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Страница с нов раздел</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретна страница</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Благодарим ви! Вашето докладване ни помага да направим DuckDuckGo по-добър за всички!</string>
+
 </resources>

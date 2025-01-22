@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
     <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
+
 </resources>

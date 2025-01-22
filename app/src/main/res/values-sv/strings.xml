@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Ny fliksida</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik sida</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Tack! Din rapport hjälper till att göra DuckDuckGo bättre för alla!</string>
+
 </resources>

@@ -789,4 +789,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Страница новой вкладки</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретная страница</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Спасибо! Ваш отчет поможет улучшить DuckDuckGo для всех.</string>
+
 </resources>

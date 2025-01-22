@@ -377,7 +377,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     private companion object {
         val CLOSE_ON_PROTECTIONS_TOGGLE_DELAY = 300.milliseconds
-        val CLOSE_ON_SUBMIT_REPORT_DELAY = 1500.milliseconds
         val CLOSE_AFTER_TOGGLE_REPORT_PROMPT_DELAY = 200.milliseconds
     }
 
@@ -404,12 +403,19 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     fun onSubmitBrokenSiteReport(
         payload: String,
         reportFlow: ReportFlow,
+        opener: DashboardOpener = DashboardOpener.NONE,
     ) {
         viewModelScope.launch(dispatcher.io()) {
             val request = privacyDashboardPayloadAdapter.onSubmitBrokenSiteReport(payload) ?: return@launch
             val site = site.value ?: return@launch
             val siteUrl = site.url
             if (siteUrl.isEmpty()) return@launch
+
+            pixel.fire(
+                pixel = REPORT_BROKEN_SITE_SENT,
+                parameters = mapOf("opener" to opener.value),
+                type = Count,
+            )
 
             val brokenSite = BrokenSite(
                 category = request.category,
@@ -441,10 +447,15 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
-
-            delay(CLOSE_ON_SUBMIT_REPORT_DELAY)
-            command.send(GoBack)
         }
+    }
+
+    fun onReportBrokenSiteShown(opener: DashboardOpener) {
+        pixel.fire(
+            pixel = REPORT_BROKEN_SITE_SHOWN,
+            parameters = mapOf("opener" to opener.value),
+            type = Count,
+        )
     }
 
     fun onGetToggleReportOptions() {

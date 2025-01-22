@@ -784,4 +784,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
+
 </resources>

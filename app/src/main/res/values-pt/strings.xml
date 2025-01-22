@@ -785,4 +785,7 @@
     <string name="showOnAppLaunchOptionNewTabPage">Nova página de separador</string>
     <string name="showOnAppLaunchOptionSpecificPage">Página específica</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Obrigado! O teu relatório ajuda a melhorar o DuckDuckGo para todos!</string>
+
 </resources>
