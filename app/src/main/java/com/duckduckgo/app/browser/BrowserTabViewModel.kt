@@ -1014,8 +1014,10 @@ class BrowserTabViewModel @Inject constructor(
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
-                duckChat.openDuckChat(urlToNavigate.toUri().getQueryParameter(QUERY))
-                return
+                runCatching {
+                    duckChat.openDuckChat(urlToNavigate.toUri().getQueryParameter(QUERY))
+                    return
+                }
             }
 
             is ShouldLaunchPrivacyProLink -> {

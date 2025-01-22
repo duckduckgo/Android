@@ -5683,6 +5683,15 @@ class BrowserTabViewModelTest {
         mockDuckChat.openDuckChat()
     }
 
+    @Test
+    fun whenSubmittedQueryIsDuckChatLinkAndThrowsExceptionThenDoNotOpenDuckChat() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
+        whenever(mockDuckChat.openDuckChat(anyOrNull())).thenThrow(RuntimeException())
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
