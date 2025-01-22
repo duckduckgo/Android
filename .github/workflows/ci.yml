@@ -1,6 +1,7 @@
 name: CI Checks
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
