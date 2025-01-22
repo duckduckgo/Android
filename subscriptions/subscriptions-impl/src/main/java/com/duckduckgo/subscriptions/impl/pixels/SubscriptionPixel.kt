@@ -171,6 +171,18 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_recovered",
         types = setOf(Count, Daily()),
     ),
+    AUTH_V2_MIGRATION_SUCCESS(
+        baseName = "m_privacy-pro_auth_v2_migration_success",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_MIGRATION_FAILURE_IO(
+        baseName = "m_privacy-pro_auth_v2_migration_failure_io",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_MIGRATION_FAILURE_OTHER(
+        baseName = "m_privacy-pro_auth_v2_migration_failure_other",
+        types = setOf(Count, Daily()),
+    ),
     ;
 
     constructor(

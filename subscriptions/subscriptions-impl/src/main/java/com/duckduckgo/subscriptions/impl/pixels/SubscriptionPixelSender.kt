@@ -28,6 +28,9 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_R
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_IO
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_OTHER
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -96,6 +99,9 @@ interface SubscriptionPixelSender {
     fun reportAuthV2InvalidRefreshTokenDetected()
     fun reportAuthV2InvalidRefreshTokenSignedOut()
     fun reportAuthV2InvalidRefreshTokenRecovered()
+    fun reportAuthV2MigrationSuccess()
+    fun reportAuthV2MigrationFailureIo()
+    fun reportAuthV2MigrationFailureOther()
 }
 
 @ContributesBinding(AppScope::class)
@@ -220,6 +226,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2InvalidRefreshTokenRecovered() {
         fire(AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED)
+    }
+
+    override fun reportAuthV2MigrationSuccess() {
+        fire(AUTH_V2_MIGRATION_SUCCESS)
+    }
+
+    override fun reportAuthV2MigrationFailureIo() {
+        fire(AUTH_V2_MIGRATION_FAILURE_IO)
+    }
+
+    override fun reportAuthV2MigrationFailureOther() {
+        fire(AUTH_V2_MIGRATION_FAILURE_OTHER)
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
