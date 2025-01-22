@@ -16,12 +16,15 @@
 
 package com.duckduckgo.common.test.api
 
+import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 import okhttp3.*
+import retrofit2.Invocation
 
 open class FakeChain(
     private val url: String,
     private val expectedResponseCode: Int? = null,
+    private val serviceMethod: Method? = null,
 ) : Interceptor.Chain {
     override fun call(): Call {
         TODO("Not yet implemented")
@@ -50,7 +53,12 @@ open class FakeChain(
     }
 
     override fun request(): Request {
-        return Request.Builder().url(url).build()
+        return Request.Builder().apply {
+            url(url)
+            serviceMethod?.let {
+                tag(Invocation::class.java, Invocation.of(it, emptyList<Unit>()))
+            }
+        }.build()
     }
 
     override fun withConnectTimeout(

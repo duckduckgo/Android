@@ -100,6 +100,8 @@ jobs:
           gradle clean          
 
       - name: Assemble the bundle
+        env:
+          NETP_DEBUG_SERVER_TOKEN: ${{ secrets.NETP_DEBUG_SERVER_TOKEN }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 

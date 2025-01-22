@@ -111,6 +111,7 @@ object WgVpnControllerServiceModule {
 @ProtectedVpnControllerService
 interface WgVpnControllerService {
     @GET("$NETP_ENVIRONMENT_URL/servers")
+    @AuthRequired
     suspend fun getServers(): List<RegisteredServerInfo>
 
     @GET("$NETP_ENVIRONMENT_URL/servers/{serverName}/status")
@@ -119,12 +120,14 @@ interface WgVpnControllerService {
     ): ServerStatus
 
     @Headers("Content-Type: application/json")
+    @AuthRequired
     @POST("$NETP_ENVIRONMENT_URL/register")
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
 
     @GET("$NETP_ENVIRONMENT_URL/locations")
+    @AuthRequired
     suspend fun getEligibleLocations(): List<EligibleLocation>
 }
 
@@ -171,3 +174,10 @@ data class EligibleLocation(
 data class EligibleCity(
     val name: String,
 )
+
+/**
+ * This annotation is used in interceptors to be able to intercept the annotated service calls
+ */
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AuthRequired
