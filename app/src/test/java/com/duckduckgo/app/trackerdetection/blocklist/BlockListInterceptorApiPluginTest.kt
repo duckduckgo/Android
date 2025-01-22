@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TDS_PATH
+import com.duckduckgo.app.trackerdetection.api.TdsRequired
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -108,8 +109,10 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
+
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
 
         assertEquals(getUrl("treatmentUrl"), result.request.url.toString())
     }
@@ -129,8 +132,9 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
 
         assertEquals(getUrl("anotherTreatmentUrl"), result.request.url.toString())
     }
@@ -150,8 +154,9 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
 
         assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
     }
@@ -167,16 +172,18 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
 
         assertEquals(getUrl("nextUrl"), result.request.url.toString())
     }
 
     @Test
     fun `when no experiments enabled, use default path`() {
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
         assertEquals(getUrl(TDS_PATH), result.request.url.toString())
     }
 
@@ -195,16 +202,27 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
 
         assertEquals(getUrl(TDS_PATH), result.request.url.toString())
     }
 
     @Test
-    fun `when full URL doesn't match, proceed`() {
+    fun `when annotation not present, even if experiment present, ignore and proceed as normal`() {
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                settings = configAdapter.toJson(
+                    Config(nextUrl = "nextUrl"),
+                ),
+            ),
+        )
+        val nonAnnotatedMethod = FakeApiService::class.java.getMethod("endpointNotRequiringTds")
         val url = getUrl("test.json")
-        val result = interceptor.intercept(FakeChain(url))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = nonAnnotatedMethod))
         assertEquals(getUrl("test.json"), result.request.url.toString())
     }
 
@@ -223,8 +241,9 @@ class BlockListInterceptorApiPluginTest {
                 ),
             ),
         )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
         val url = getUrl(TDS_PATH)
-        val result = interceptor.intercept(FakeChain(url, 400))
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod, expectedResponseCode = 400))
 
         assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
         assertEquals(1, fakePixel.firedPixels.size)
@@ -237,6 +256,12 @@ class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureT
     override suspend fun getAll(): List<Toggle> {
         return features
     }
+}
+
+private interface FakeApiService {
+    @TdsRequired
+    fun endpointRequiringTds()
+    fun endpointNotRequiringTds()
 }
 
 abstract class TriggerTestScope private constructor()
