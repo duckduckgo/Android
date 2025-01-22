@@ -808,4 +808,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
     <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Uusi AI Chat</string>
+
 </resources>
