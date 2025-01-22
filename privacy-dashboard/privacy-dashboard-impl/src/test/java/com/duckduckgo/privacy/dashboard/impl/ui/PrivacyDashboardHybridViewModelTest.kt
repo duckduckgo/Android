@@ -121,40 +121,6 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-<<<<<<< HEAD
-=======
-    fun whenUserClicksOnReportBrokenSiteThenCommandEmitted() = runTest {
-        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = false))
-
-        testee.onReportBrokenSiteSelected()
-
-        testee.commands().test {
-            val command = awaitItem()
-            Assert.assertTrue(command is LaunchReportBrokenSite)
-        }
-    }
-
-    @Test
-    fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenCommandIsNotEmitted() = runTest {
-        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
-
-        testee.onReportBrokenSiteSelected()
-
-        testee.commands().test {
-            expectNoEvents()
-        }
-    }
-
-    fun whenUserClicksOnReportBrokenSiteAndWebFormEnabledThenFireImpressionPixel() = runTest {
-        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))
-
-        testee.onReportBrokenSiteSelected()
-
-        verify(pixel).fire(REPORT_BROKEN_SITE_SHOWN, mapOf("opener" to "dashboard"), type = Count)
-    }
-
-    @Test
->>>>>>> 121eeb5c3 (Native handing of ReportBrokenSiteShown message (#5496))
     fun whenSiteChangesThenViewStateUpdates() = runTest {
         testee.onSiteChanged(site())
 
