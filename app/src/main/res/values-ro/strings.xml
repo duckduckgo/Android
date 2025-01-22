@@ -810,4 +810,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Filă nouă</string>
     <string name="showOnAppLaunchOptionSpecificPage">Pagină specifică</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Chat AI nou</string>
+
 </resources>
