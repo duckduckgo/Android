@@ -65,20 +65,25 @@
             app:layout_constraintStart_toEndOf="@id/shield"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:textType="secondary"
-            app:typography="body1_bold"
+            app:textType="primary"
+            app:typography="body2"
             tools:text="3" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/website"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:gravity="center"
             app:textType="secondary"
+            app:typography="body2"
             tools:text="website.com" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
