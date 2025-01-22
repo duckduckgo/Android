@@ -25,6 +25,9 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -90,6 +93,9 @@ interface SubscriptionPixelSender {
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
     fun reportPrivacyProRedirect()
+    fun reportAuthV2InvalidRefreshTokenDetected()
+    fun reportAuthV2InvalidRefreshTokenSignedOut()
+    fun reportAuthV2InvalidRefreshTokenRecovered()
 }
 
 @ContributesBinding(AppScope::class)
@@ -203,6 +209,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportPrivacyProRedirect() =
         fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
+
+    override fun reportAuthV2InvalidRefreshTokenDetected() {
+        fire(AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED)
+    }
+
+    override fun reportAuthV2InvalidRefreshTokenSignedOut() {
+        fire(AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT)
+    }
+
+    override fun reportAuthV2InvalidRefreshTokenRecovered() {
+        fire(AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED)
+    }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->

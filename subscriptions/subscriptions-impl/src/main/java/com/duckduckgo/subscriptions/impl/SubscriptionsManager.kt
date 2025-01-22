@@ -543,14 +543,19 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: HttpException) {
             if (e.code() == 401) {
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
                 when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> storeLoginResult.tokens
+                    is StoreLoginResult.Success -> {
+                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                        storeLoginResult.tokens
+                    }
                     StoreLoginResult.Failure.AccountExternalIdMismatch,
                     StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
                     StoreLoginResult.Failure.AuthenticationError,
                     -> {
+                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
                         signOut()
                         throw e
                     }
