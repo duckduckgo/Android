@@ -33,10 +33,10 @@ jobs:
       - name: Copy files
         run: copy-files-from-to
 
-      - name: Set up JDK 17
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Setup Gradle
@@ -80,10 +80,10 @@ jobs:
       - name: Copy files
         run: copy-files-from-to
 
-      - name: Set up JDK 17
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Decode secret
