@@ -38,6 +38,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble the project
+        env:
+          MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
         run: ./gradlew assembleInternalDebug -Pforce-default-variant
 
       - name: Obtain debug apk
