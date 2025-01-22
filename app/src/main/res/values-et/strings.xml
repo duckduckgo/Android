@@ -789,4 +789,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Uus AI vestlus</string>
+
 </resources>
