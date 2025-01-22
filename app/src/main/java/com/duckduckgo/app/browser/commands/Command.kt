@@ -217,9 +217,13 @@ sealed class Command {
         val url: String,
     ) : Command()
 
-    data class WebViewWarningMaliciousSite(
+    data class ShowWarningMaliciousSite(
         val url: Uri,
     ) : Command()
+
+    data object EscapeMaliciousSite : Command()
+
+    data object BypassMaliciousSiteWarning: Command()
 
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()

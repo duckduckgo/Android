@@ -44,14 +44,13 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     private val binding: ViewMaliciousSiteBlockedWarningBinding by viewBinding()
 
     fun bind(
-        url: Uri,
         actionHandler: (Action) -> Unit,
     ) {
         resetViewState()
 
         with(binding) {
             formatCopy()
-            setListeners(url, actionHandler)
+            setListeners(actionHandler)
         }
     }
 
@@ -69,7 +68,6 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     }
 
     private fun setListeners(
-        url: Uri,
         actionHandler: (Action) -> Unit,
     ) {
         with(binding) {
