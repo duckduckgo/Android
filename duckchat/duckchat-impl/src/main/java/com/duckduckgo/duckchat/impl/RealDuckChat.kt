@@ -123,20 +123,30 @@ class RealDuckChat @Inject constructor(
         return showInBrowserMenu
     }
 
-    override fun openDuckChat(
-        query: String?,
-        autoPrompt: Boolean,
-    ) {
+    override fun openDuckChat(query: String?) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        var url = duckChatLink
+        val url = prepareDuckChatUrl(query, autoPrompt = false)
+        startDuckChatActivity(url)
+    }
 
+    override fun openDuckChatWithAutoPrompt(query: String) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+        val url = prepareDuckChatUrl(query, autoPrompt = true)
+        startDuckChatActivity(url)
+    }
+
+    private fun prepareDuckChatUrl(query: String?, autoPrompt: Boolean): String {
+        var url = duckChatLink
         query?.let {
             url = appendParameter(QUERY, it, url)
             if (autoPrompt) {
                 url = appendParameter(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE, url)
             }
         }
+        return url
+    }
 
+    private fun startDuckChatActivity(url: String) {
         val intent = globalActivityStarter.startIntent(
             context,
             WebViewActivityWithParams(

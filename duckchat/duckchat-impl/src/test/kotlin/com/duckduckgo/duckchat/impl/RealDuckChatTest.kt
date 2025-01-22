@@ -132,6 +132,12 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOpenDuckChatWithAutoPromptCalled_pixelIsSent() {
+        testee.openDuckChatWithAutoPrompt("example")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+    }
+
+    @Test
     fun whenOpenDuckChatCalled_activityStarted() {
         testee.openDuckChat()
         verify(mockGlobalActivityStarter).startIntent(
@@ -161,25 +167,11 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() {
-        testee.openDuckChat(query = "example", autoPrompt = true)
+        testee.openDuckChatWithAutoPrompt(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
                 url = "https://duckduckgo.com/?prompt=1&q=example&ia=chat&duckai=5",
-                screenTitle = "Duck.ai",
-                supportNewWindows = true,
-            ),
-        )
-        verify(mockContext).startActivity(any())
-    }
-
-    @Test
-    fun whenOpenDuckChatCalledWithAutoPromptButNoQuery_activityStartedWithoutAutoPrompt() {
-        testee.openDuckChat(autoPrompt = true)
-        verify(mockGlobalActivityStarter).startIntent(
-            mockContext,
-            WebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
                 screenTitle = "Duck.ai",
                 supportNewWindows = true,
             ),

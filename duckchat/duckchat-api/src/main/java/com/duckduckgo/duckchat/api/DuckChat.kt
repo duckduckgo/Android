@@ -39,10 +39,14 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
-     * Opens the DuckChat WebView with optional [String] query and autoPrompt option [Boolean].
-     * Setting autoPrompt to true will only append the prompt parameter if a query is specified.
+     * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat(query: String? = null, autoPrompt: Boolean = false)
+    fun openDuckChat(query: String? = null)
+
+    /**
+     * Auto-prompts the DuckChat WebView with the provided [String] query.
+     */
+    fun openDuckChatWithAutoPrompt(query: String)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
