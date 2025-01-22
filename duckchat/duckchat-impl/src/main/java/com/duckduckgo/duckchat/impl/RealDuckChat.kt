@@ -124,16 +124,16 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChat(query: String?) {
-        openDuckChat(query = query, false)
+        openDuckChat(query, false)
     }
 
     override fun openDuckChatWithAutoPrompt(query: String) {
-        openDuckChat(query = query, true)
+        openDuckChat(query, true)
     }
 
     private fun openDuckChat(query: String?, autoPrompt: Boolean) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        val url = prepareDuckChatUrl(query = query, autoPrompt = autoPrompt)
+        val url = prepareDuckChatUrl(query, autoPrompt)
         startDuckChatActivity(url)
     }
 
