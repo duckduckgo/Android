@@ -812,4 +812,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Nova stranica kartice</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifična stranica</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nova opcija AI čavrljanja</string>
+
 </resources>
