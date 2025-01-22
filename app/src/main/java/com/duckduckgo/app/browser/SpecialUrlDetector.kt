@@ -89,7 +89,7 @@ class SpecialUrlDetectorImpl(
         val uri = uriString.toUri()
 
         if (duckChat.shouldNavigateToDuckChat(uri)) {
-            return UrlType.ShouldLaunchDuckChatLink(url = uri)
+            return UrlType.ShouldLaunchDuckChatLink
         }
 
         if (duckPlayer.willNavigateToDuckPlayer(uri)) {

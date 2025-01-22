@@ -17,8 +17,11 @@
 package com.duckduckgo.duckchat.impl
 
 import android.content.Context
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -51,6 +54,7 @@ class RealDuckChatTest {
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
+    private val mockIntent: Intent = mock()
 
     private val testee = RealDuckChat(
         mockDuckPlayerFeatureRepository,
@@ -69,6 +73,7 @@ class RealDuckChatTest {
         whenever(mockDuckPlayerFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         setFeatureToggle(true)
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<WebViewActivityWithParams>())).thenReturn(mockIntent)
     }
 
     @Test
@@ -124,6 +129,55 @@ class RealDuckChatTest {
     fun whenOpenDuckChatCalled_pixelIsSent() {
         testee.openDuckChat()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalled_activityStarted() {
+        testee.openDuckChat()
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            WebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                screenTitle = "Duck.ai",
+                supportNewWindows = true,
+            ),
+        )
+        verify(mockContext).startActivity(any())
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() {
+        testee.openDuckChat("example")
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            WebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+                screenTitle = "Duck.ai",
+                supportNewWindows = true,
+            ),
+        )
+        verify(mockContext).startActivity(any())
+    }
+
+    @Test
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLink_shouldNavigateToDuckChat() {
+        assertTrue(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?ia=chat".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckDuckGoHostAndDuckChatDisabledAndIsDuckChatLink_shouldNotNavigateToDuckChat() {
+        setFeatureToggle(false)
+        assertFalse(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?ia=chat".toUri()))
+    }
+
+    @Test
+    fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsNotDuckChatLink_shouldNotNavigateToDuckChat() {
+        assertFalse(testee.shouldNavigateToDuckChat("https://duckduckgo.com/?q=test".toUri()))
+    }
+
+    @Test
+    fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_shouldNotNavigateToDuckChat() {
+        assertFalse(testee.shouldNavigateToDuckChat("https://example.com/?ia=chat".toUri()))
     }
 
     private fun setFeatureToggle(enabled: Boolean) {

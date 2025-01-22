@@ -5665,6 +5665,14 @@ class BrowserTabViewModelTest {
         whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
     }
 
+    @Test
+    fun whenSubmittedQueryIsDuckChatLinkThenOpenDuckChat() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
+        mockDuckChat.openDuckChat()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }

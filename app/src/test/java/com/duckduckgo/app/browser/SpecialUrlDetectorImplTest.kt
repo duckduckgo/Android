@@ -445,6 +445,21 @@ class SpecialUrlDetectorImplTest {
         assertTrue(actual is ShouldLaunchPrivacyProLink)
     }
 
+    @Test
+    fun whenShouldNavigateToDuckChatThenReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.shouldNavigateToDuckChat(any())).thenReturn(true)
+        val type = testee.determineType("https://example.com")
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        assertTrue(type is ShouldLaunchDuckChatLink)
+    }
+
     private fun randomString(length: Int): String {
         val charList: List<Char> = ('a'..'z') + ('0'..'9')
         return List(length) { charList.random() }.joinToString("")

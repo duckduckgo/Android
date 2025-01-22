@@ -49,6 +49,6 @@ interface SpecialUrlDetector {
         data object ShouldLaunchPrivacyProLink : UrlType()
         data class ShouldLaunchDuckPlayerLink(val url: Uri) : UrlType()
         class DuckScheme(val uriString: String) : UrlType()
-        data class ShouldLaunchDuckChatLink(val url: Uri) : UrlType()
+        data object ShouldLaunchDuckChatLink : UrlType()
     }
 }
