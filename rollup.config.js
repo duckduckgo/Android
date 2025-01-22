@@ -16,5 +16,20 @@ export default [
             json(),
             terser(),
         ]
+    },
+    {
+        input: 'autoconsent/autoconsent-impl/libs/userscript-exp.js',
+        output: [
+            {
+                file: 'autoconsent/autoconsent-impl/libs/autoconsent-bundle-exp.js',
+                format: 'iife'
+            }
+        ],
+        plugins: [
+            nodeResolve(),
+            json(),
+            terser(),
+        ]
     }
+
 ]
