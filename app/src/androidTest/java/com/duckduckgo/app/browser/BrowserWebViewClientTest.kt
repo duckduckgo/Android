@@ -430,6 +430,16 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenDuckChatLinkDetectedWithoutQueryThenLaunchDuckChatWithoutQueryAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?ia=chat".toUri())
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @UiThreadTest
+    @Test
     fun whenDuckChatLinkDetectedAndExceptionThrownThenDoNotLaunchDuckChatAndReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)

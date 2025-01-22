@@ -5668,6 +5668,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryIsDuckChatLinkThenOpenDuckChat() {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?q=example&ia=chat&duckai=5", null)).thenReturn(
+            "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+        )
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
+        mockDuckChat.openDuckChat("example")
+    }
+
+    @Test
+    fun whenSubmittedQueryIsDuckChatLinkWithoutQueryThenOpenDuckChatWithoutQuery() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
         testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
         mockDuckChat.openDuckChat()
