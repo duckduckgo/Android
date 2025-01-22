@@ -82,6 +82,7 @@ import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
+import com.duckduckgo.app.browser.commands.Command.BypassMaliciousSiteWarning
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
@@ -95,6 +96,7 @@ import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
 import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
+import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -152,12 +154,12 @@ import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
+import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
-import com.duckduckgo.app.browser.commands.Command.WebViewWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
@@ -203,6 +205,9 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
@@ -1843,6 +1848,30 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentCosmeticHide = isCosmetic
     }
 
+    fun onMaliciousSiteDetected(
+            action: MaliciousSiteBlockedWarningLayout.Action,
+            url: Uri,
+        ) {
+            when (action) {
+                LeaveSite -> {
+                    Timber.tag("KateMalicious").d("in LeaveSite")
+                    command.postValue(EscapeMaliciousSite)
+                }
+
+                VisitSite -> {
+                    Timber.tag("KateMalicious").d("in VisitSite")
+                    command.postValue(BypassMaliciousSiteWarning)
+                    browserViewState.value = currentBrowserViewState().copy(
+                        browserShowing = true,
+                        showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                    )
+                    addExemptedMaliciousUrlToMemory(url)
+                    onRefreshRequested(false)
+                }
+            }
+
+    }
+
     private fun onSiteChanged() {
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
@@ -1893,6 +1922,7 @@ class BrowserTabViewModel @Inject constructor(
             handler.cancel()
         }
     }
+
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -3116,7 +3146,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedMaliciousSiteWarning(url: Uri) {
         // TODO (cbarreiro): Fire pixel
-        command.postValue(WebViewWarningMaliciousSite(url))
+        command.postValue(ShowWarningMaliciousSite(url))
     }
 
     override fun recordErrorCode(

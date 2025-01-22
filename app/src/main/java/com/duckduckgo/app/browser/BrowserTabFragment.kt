@@ -1305,6 +1305,7 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
     }
 
     private fun showBrowser() {
@@ -1316,6 +1317,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
         omnibar.setViewMode(Omnibar.ViewMode.Browser(viewModel.url))
     }
 
@@ -1327,6 +1329,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
         omnibar.setViewMode(Omnibar.ViewMode.Error)
         webView?.onPause()
         webView?.hide()
@@ -1350,23 +1353,22 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         maliciousWarningView.show()
-        maliciousWarningView.bind(url) { action ->
-            when (action) {
-                is Action.VisitSite -> {
-                    Timber.tag("KateMalicious").d("in VisitSite")
-                    viewModel.addExemptedMaliciousUrlToMemory(url)
-                    showBrowser()
-                    refresh()
-                    viewModel.onRefreshRequested(false)
-                }
-                is Action.LeaveSite -> {
-                    Timber.tag("KateMalicious").d("in LeaveSite")
-                    viewModel.closeCurrentTab()
-                    viewModel.userRequestedOpeningNewTab()
-                    renderer.showNewTab()
-                }
-            }
+        maliciousWarningView.bind { action ->
+            viewModel.onMaliciousSiteDetected(action, url)
         }
+    }
+
+    private fun onEscapeMaliciousSite() {
+        maliciousWarningView.gone()
+        viewModel.closeCurrentTab()
+        viewModel.userRequestedOpeningNewTab()
+        renderer.showNewTab()
+    }
+
+    private fun onBypassMaliciousWarning() {
+        maliciousWarningView.gone()
+        showBrowser()
+        refresh()
     }
 
     private fun showSSLWarning(
@@ -1381,6 +1383,7 @@ class BrowserTabFragment :
         omnibar.setViewMode(Omnibar.ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
+        maliciousWarningView.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
@@ -1711,7 +1714,9 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.WebViewWarningMaliciousSite -> showMaliciousWarning(it.url)
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
+            is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning()
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
