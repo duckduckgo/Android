@@ -1352,10 +1352,10 @@ class BrowserTabFragment :
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
         webView?.onPause()
         webView?.hide()
-        maliciousWarningView.show()
         maliciousWarningView.bind { action ->
             viewModel.onMaliciousSiteDetected(action, url)
         }
+        maliciousWarningView.show()
     }
 
     private fun onEscapeMaliciousSite() {
@@ -1366,7 +1366,6 @@ class BrowserTabFragment :
     }
 
     private fun onBypassMaliciousWarning() {
-        maliciousWarningView.gone()
         showBrowser()
         refresh()
     }
