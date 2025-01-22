@@ -77,6 +77,7 @@ import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
@@ -883,16 +884,26 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun migrateToAuthV2() {
-        val accessTokenV1 = checkNotNull(authRepository.getAccessToken())
-        val codeVerifier = pkceGenerator.generateCodeVerifier()
-        val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
-        val jwks = authClient.getJwks()
-        val sessionId = authClient.authorize(codeChallenge)
-        val authorizationCode = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
-        val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-        saveTokens(validateTokens(tokens, jwks))
-        authRepository.setAccessToken(null)
-        authRepository.setAuthToken(null)
+        try {
+            val accessTokenV1 = checkNotNull(authRepository.getAccessToken())
+            val codeVerifier = pkceGenerator.generateCodeVerifier()
+            val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
+            val jwks = authClient.getJwks()
+            val sessionId = authClient.authorize(codeChallenge)
+            val authorizationCode = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
+            val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
+            saveTokens(validateTokens(tokens, jwks))
+            authRepository.setAccessToken(null)
+            authRepository.setAuthToken(null)
+            pixelSender.reportAuthV2MigrationSuccess()
+        } catch (e: Exception) {
+            if (e is IOException) {
+                pixelSender.reportAuthV2MigrationFailureIo()
+            } else {
+                pixelSender.reportAuthV2MigrationFailureOther()
+            }
+            throw e
+        }
     }
 
     private fun isAccessTokenUsable(accessToken: AccessToken): Boolean {

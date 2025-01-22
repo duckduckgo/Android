@@ -805,6 +805,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertEquals(FAKE_REFRESH_TOKEN_V2, authRepository.getRefreshTokenV2()?.jwt)
         assertNull(authRepository.getAccessToken())
         assertNull(authRepository.getAuthToken())
+        verify(pixelSender).reportAuthV2MigrationSuccess()
     }
 
     @Test
