@@ -1,0 +1,55 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M13.018,21.383L13.017,21.384L13.016,21.385L13.016,21.385L13.015,21.385L13.014,21.386L12.859,21.465L12.859,21.465C12.327,21.734 11.673,21.734 11.142,21.465L11.142,21.465L10.986,21.386L10.986,21.386L10.983,21.384L10.983,21.384L10.926,21.355L10.926,21.355L10.827,21.305C8.409,20.08 6.271,18.979 4.837,16.834C3.48,14.805 2.795,11.918 2.835,7.256C2.839,6.812 3.061,6.395 3.44,6.11L2.939,5.444L3.44,6.11C3.817,5.826 4.313,5.701 4.801,5.762C6.134,5.93 7.162,5.873 8.058,5.587C8.956,5.3 9.794,4.76 10.695,3.852C11.024,3.52 11.499,3.332 11.995,3.333C12.492,3.335 12.965,3.525 13.293,3.858C14.205,4.788 15.054,5.326 15.956,5.606C16.852,5.884 17.876,5.93 19.197,5.762C19.685,5.7 20.182,5.826 20.559,6.109C20.938,6.394 21.161,6.811 21.165,7.255C21.205,11.918 20.52,14.805 19.163,16.834C17.729,18.979 15.591,20.08 13.173,21.305L13.074,21.355L13.074,21.355L13.018,21.383Z"
+      android:fillColor="#7DDC6E"/>
+  <path
+      android:pathData="M13.018,21.383L13.017,21.384L13.016,21.385L13.016,21.385L13.015,21.385L13.014,21.386L12.859,21.465L12.859,21.465C12.327,21.734 11.673,21.734 11.142,21.465L11.142,21.465L10.986,21.386L10.986,21.386L10.983,21.384L10.983,21.384L10.926,21.355L10.926,21.355L10.827,21.305C8.409,20.08 6.271,18.979 4.837,16.834C3.48,14.805 2.795,11.918 2.835,7.256C2.839,6.812 3.061,6.395 3.44,6.11L2.939,5.444L3.44,6.11C3.817,5.826 4.313,5.701 4.801,5.762C6.134,5.93 7.162,5.873 8.058,5.587C8.956,5.3 9.794,4.76 10.695,3.852C11.024,3.52 11.499,3.332 11.995,3.333C12.492,3.335 12.965,3.525 13.293,3.858C14.205,4.788 15.054,5.326 15.956,5.606C16.852,5.884 17.876,5.93 19.197,5.762C19.685,5.7 20.182,5.826 20.559,6.109C20.938,6.394 21.161,6.811 21.165,7.255C21.205,11.918 20.52,14.805 19.163,16.834C17.729,18.979 15.591,20.08 13.173,21.305L13.074,21.355L13.074,21.355L13.018,21.383Z">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="23.5"
+          android:startY="1"
+          android:endX="2"
+          android:endY="22"
+          android:type="linear">
+        <item android:offset="0" android:color="#CC7BD66D"/>
+        <item android:offset="0.361" android:color="#CC63C853"/>
+        <item android:offset="1" android:color="#CC288419"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M13.018,21.383L13.017,21.384L13.016,21.385L13.016,21.385L13.015,21.385L13.014,21.386L12.859,21.465L12.859,21.465C12.327,21.734 11.673,21.734 11.142,21.465L11.142,21.465L10.986,21.386L10.986,21.386L10.983,21.384L10.983,21.384L10.926,21.355L10.926,21.355L10.827,21.305C8.409,20.08 6.271,18.979 4.837,16.834C3.48,14.805 2.795,11.918 2.835,7.256C2.839,6.812 3.061,6.395 3.44,6.11L2.939,5.444L3.44,6.11C3.817,5.826 4.313,5.701 4.801,5.762C6.134,5.93 7.162,5.873 8.058,5.587C8.956,5.3 9.794,4.76 10.695,3.852C11.024,3.52 11.499,3.332 11.995,3.333C12.492,3.335 12.965,3.525 13.293,3.858C14.205,4.788 15.054,5.326 15.956,5.606C16.852,5.884 17.876,5.93 19.197,5.762C19.685,5.7 20.182,5.826 20.559,6.109C20.938,6.394 21.161,6.811 21.165,7.255C21.205,11.918 20.52,14.805 19.163,16.834C17.729,18.979 15.591,20.08 13.173,21.305L13.074,21.355L13.074,21.355L13.018,21.383Z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.66667"
+      android:fillColor="#00000000"
+      android:strokeColor="#399F29"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M8.875,11.985L11.123,14.325L15.125,10.158"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.82292"
+      android:fillColor="#00000000"
+      android:strokeColor="#ffffff"
+      android:strokeLineCap="round"/>
+</vector>
