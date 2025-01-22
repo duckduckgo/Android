@@ -812,4 +812,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Naujas skirtuko puslapis</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
+
 </resources>
