@@ -24,6 +24,7 @@ import android.net.Uri
 interface DuckChat {
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
+     * Uses a cached value - does not perform disk I/O.
      *
      * @return true if DuckChat is enabled, false otherwise.
      */
