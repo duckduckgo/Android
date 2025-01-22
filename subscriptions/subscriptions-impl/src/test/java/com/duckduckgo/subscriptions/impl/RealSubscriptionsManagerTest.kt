@@ -504,9 +504,19 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenPurchaseIfSignedInAndSubscriptionRefreshFailsThenLaunchesPurchaseFlow() = runTest {
+    fun whenPurchaseIfSignedInAndSubscriptionRefreshFailsWith400StatusThenLaunchesPurchaseFlow() = runTest {
         givenUserIsSignedIn()
-        givenSubscriptionFails()
+        givenSubscriptionFails(httpResponseCode = 400)
+
+        subscriptionsManager.purchase(mock(), planId = "")
+
+        verify(playBillingManager).launchBillingFlow(any(), any(), any())
+    }
+
+    @Test
+    fun whenPurchaseIfSignedInAndSubscriptionRefreshFailsWith404StatusThenLaunchesPurchaseFlow() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionFails(httpResponseCode = 404)
 
         subscriptionsManager.purchase(mock(), planId = "")
 
