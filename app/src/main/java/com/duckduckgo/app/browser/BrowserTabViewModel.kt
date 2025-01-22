@@ -3142,6 +3142,11 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedMaliciousSiteWarning(url: Uri) {
         // TODO (cbarreiro): Fire pixel
+        browserViewState.value =
+            currentBrowserViewState().copy(
+                browserShowing = false,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+            )
         command.postValue(ShowWarningMaliciousSite(url))
     }
 
