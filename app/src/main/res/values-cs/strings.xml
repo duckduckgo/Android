@@ -812,4 +812,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Stránka Nová karta</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrétní stránka</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nový AI Chat</string>
+
 </resources>

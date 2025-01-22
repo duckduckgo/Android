@@ -810,4 +810,8 @@
     <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
+
 </resources>
