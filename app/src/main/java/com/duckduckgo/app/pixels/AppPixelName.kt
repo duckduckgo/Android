@@ -381,4 +381,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEDICATED_WEBVIEW_NEW_TAB_REQUESTED("m_dedicated_webview_new_tab_requested"),
     DEDICATED_WEBVIEW_NEW_TAB_OPENING("m_dedicated_webview_new_tab_opening"),
     DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
+
+    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 }

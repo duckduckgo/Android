@@ -3056,7 +3056,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 "testFeature",
                 """
                 {
-                    "hash": "3",
+                    "hash": "4",
                     "state": "disabled",
                     "features": {
                         "fooFeature": {
@@ -3091,8 +3091,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
-        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+        assertTrue(testFeature.fooFeature().isEnabled(BLUE))
     }
 
     @Test

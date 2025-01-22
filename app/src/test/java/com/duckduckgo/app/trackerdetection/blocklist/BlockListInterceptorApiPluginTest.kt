@@ -24,6 +24,7 @@ import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -47,6 +48,7 @@ class BlockListInterceptorApiPluginTest {
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var interceptor: BlockListInterceptorApiPlugin
+    private val fakePixel = FakePixel()
     private val moshi = Moshi.Builder().build()
 
     private data class Config(
@@ -75,7 +77,7 @@ class BlockListInterceptorApiPluginTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        interceptor = BlockListInterceptorApiPlugin(inventory, moshi)
+        interceptor = BlockListInterceptorApiPlugin(inventory, moshi, fakePixel)
     }
 
     @Test
@@ -197,6 +199,35 @@ class BlockListInterceptorApiPluginTest {
         val result = interceptor.intercept(FakeChain(url))
 
         assertEquals(getUrl(TDS_PATH), result.request.url.toString())
+    }
+
+    @Test
+    fun `when full URL doesn't match, proceed`() {
+        val url = getUrl("test.json")
+        val result = interceptor.intercept(FakeChain(url))
+        assertEquals(getUrl("test.json"), result.request.url.toString())
+    }
+
+    @Test
+    fun `when experiment request fails, send pixel`() {
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                settings = configAdapter.toJson(
+                    Config(treatmentUrl = "anotherTreatmentUrl", controlUrl = "anotherControlUrl"),
+                ),
+                cohorts = listOf(
+                    State.Cohort(name = CONTROL.cohortName, weight = 1),
+                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
+                ),
+            ),
+        )
+        val url = getUrl(TDS_PATH)
+        val result = interceptor.intercept(FakeChain(url, 400))
+
+        assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
+        assertEquals(1, fakePixel.firedPixels.size)
     }
 
     private fun getUrl(path: String): String = "$TDS_BASE_URL$path"

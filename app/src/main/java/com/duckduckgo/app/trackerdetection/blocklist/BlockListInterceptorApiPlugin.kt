@@ -17,21 +17,32 @@
 package com.duckduckgo.app.trackerdetection.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.app.pixels.AppPixelName.BLOCKLIST_TDS_FAILURE
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
+import com.duckduckgo.app.trackerdetection.api.TDS_URL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 
-class BlockListInterceptorApiPlugin constructor(
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = ApiInterceptorPlugin::class,
+)
+class BlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val moshi: Moshi,
+    private val pixel: Pixel,
 ) : Interceptor, ApiInterceptorPlugin {
 
     private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
@@ -40,7 +51,7 @@ class BlockListInterceptorApiPlugin constructor(
     override fun intercept(chain: Chain): Response {
         val request = chain.request().newBuilder()
         val url = chain.request().url
-        if (!url.toString().contains(TDS_BASE_URL)) {
+        if (url.toString() != TDS_URL) {
             return chain.proceed(request.build())
         }
         val activeExperiment = runBlocking {
@@ -58,7 +69,11 @@ class BlockListInterceptorApiPlugin constructor(
                 activeExperiment.isEnabled(CONTROL) -> config["controlUrl"]
                 else -> config["nextUrl"]
             } ?: return chain.proceed(request.build())
-            chain.proceed(request.url("$TDS_BASE_URL$path").build())
+            chain.proceed(request.url("$TDS_BASE_URL$path").build()).also { response ->
+                if (!response.isSuccessful) {
+                    pixel.fire(BLOCKLIST_TDS_FAILURE, mapOf("code" to response.code.toString()))
+                }
+            }
         } ?: chain.proceed(request.build())
     }
 
