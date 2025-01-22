@@ -124,28 +124,24 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChat(query: String?) {
-        openDuckChat(query, false)
+        val parameters = query?.let {
+            mapOf(QUERY to it)
+        } ?: emptyMap()
+        openDuckChat(parameters)
     }
 
     override fun openDuckChatWithAutoPrompt(query: String) {
-        openDuckChat(query, true)
+        val parameters = mapOf(
+            QUERY to query,
+            PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
+        )
+        openDuckChat(parameters)
     }
 
-    private fun openDuckChat(query: String?, autoPrompt: Boolean) {
+    private fun openDuckChat(parameters: Map<String, String>) {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-        val url = prepareDuckChatUrl(query, autoPrompt)
+        val url = appendParameters(parameters, duckChatLink)
         startDuckChatActivity(url)
-    }
-
-    private fun prepareDuckChatUrl(query: String?, autoPrompt: Boolean): String {
-        var url = duckChatLink
-        query?.let {
-            url = appendParameter(QUERY, it, url)
-            if (autoPrompt) {
-                url = appendParameter(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE, url)
-            }
-        }
-        return url
     }
 
     private fun startDuckChatActivity(url: String) {
@@ -164,22 +160,23 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    private fun appendParameter(
-        parameter: String,
-        value: String,
+    private fun appendParameters(
+        parameters: Map<String, String>,
         url: String,
     ): String {
-        runCatching {
+        if (parameters.isEmpty()) return url
+        return runCatching {
             val uri = url.toUri()
-            return uri.buildUpon().apply {
+            uri.buildUpon().apply {
                 clearQuery()
-                appendQueryParameter(parameter, value)
+                parameters.forEach { (key, value) ->
+                    appendQueryParameter(key, value)
+                }
                 uri.queryParameterNames
-                    .filterNot { it == parameter }
+                    .filterNot { it in parameters.keys }
                     .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
             }.build().toString()
-        }
-        return url
+        }.getOrElse { url }
     }
 
     override fun isDuckChatUrl(uri: Uri): Boolean {

@@ -171,7 +171,7 @@ class RealDuckChatTest {
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
-                url = "https://duckduckgo.com/?prompt=1&q=example&ia=chat&duckai=5",
+                url = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
                 screenTitle = "Duck.ai",
                 supportNewWindows = true,
             ),
