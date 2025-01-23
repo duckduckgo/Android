@@ -763,6 +763,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertTrue(result is AccessTokenResult.Success)
         assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenRecovered()
     }
 
     @Test
@@ -784,6 +786,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getRefreshTokenV2())
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
     }
 
     @Test
@@ -801,6 +805,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertEquals(FAKE_REFRESH_TOKEN_V2, authRepository.getRefreshTokenV2()?.jwt)
         assertNull(authRepository.getAccessToken())
         assertNull(authRepository.getAuthToken())
+        verify(pixelSender).reportAuthV2MigrationSuccess()
     }
 
     @Test

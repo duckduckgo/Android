@@ -77,6 +77,7 @@ import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
@@ -537,14 +538,19 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: HttpException) {
             if (e.code() == 401) {
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
                 when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> storeLoginResult.tokens
+                    is StoreLoginResult.Success -> {
+                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                        storeLoginResult.tokens
+                    }
                     StoreLoginResult.Failure.AccountExternalIdMismatch,
                     StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
                     StoreLoginResult.Failure.AuthenticationError,
                     -> {
+                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
                         signOut()
                         throw e
                     }
@@ -873,15 +879,25 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun migrateToAuthV2() {
-        val accessTokenV1 = checkNotNull(authRepository.getAccessToken())
-        val codeVerifier = pkceGenerator.generateCodeVerifier()
-        val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
-        val sessionId = authClient.authorize(codeChallenge)
-        val authorizationCode = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
-        val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-        saveTokens(validateTokens(tokens))
-        authRepository.setAccessToken(null)
-        authRepository.setAuthToken(null)
+        try {
+            val accessTokenV1 = checkNotNull(authRepository.getAccessToken())
+            val codeVerifier = pkceGenerator.generateCodeVerifier()
+            val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
+            val sessionId = authClient.authorize(codeChallenge)
+            val authorizationCode = authClient.exchangeV1AccessToken(accessTokenV1, sessionId)
+            val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
+            saveTokens(validateTokens(tokens))
+            authRepository.setAccessToken(null)
+            authRepository.setAuthToken(null)
+            pixelSender.reportAuthV2MigrationSuccess()
+        } catch (e: Exception) {
+            if (e is IOException) {
+                pixelSender.reportAuthV2MigrationFailureIo()
+            } else {
+                pixelSender.reportAuthV2MigrationFailureOther()
+            }
+            throw e
+        }
     }
 
     private fun isAccessTokenUsable(accessToken: AccessToken): Boolean {
