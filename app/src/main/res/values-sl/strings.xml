@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
+    <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
     <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>
@@ -791,5 +792,9 @@
 
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
 
 </resources>

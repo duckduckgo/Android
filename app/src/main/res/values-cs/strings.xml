@@ -132,6 +132,7 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
+    <string name="leaveFeedbackNew">Odeslat zpětnou vazbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
     <string name="settingsHeadingMore">Další od DuckDuckGo</string>
@@ -791,5 +792,9 @@
 
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Děkujeme! Podrobnosti od tebe pomůžou zlepšit DuckDuckGo pro všechny!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nový AI Chat</string>
 
 </resources>
