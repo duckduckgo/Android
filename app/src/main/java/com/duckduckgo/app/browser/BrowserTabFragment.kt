@@ -935,7 +935,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarDuckAIPressed(text: String) {
-        duckChat.openDuckChat(text)
+        duckChat.openDuckChatWithAutoPrompt(text)
     }
 
     private fun configureCustomTab() {
