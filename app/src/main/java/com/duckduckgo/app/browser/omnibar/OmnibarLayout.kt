@@ -58,6 +58,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTracker
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
+import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -104,6 +105,7 @@ class OmnibarLayout @JvmOverloads constructor(
         data class Mode(val viewMode: ViewMode) : Decoration()
         data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
         data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
+        data class QueueCookiesAnimation(val isCosmetic: Boolean) : Decoration()
         data object CancelAnimations : Decoration()
         data class ChangeCustomTabTitle(
             val title: String,
@@ -555,6 +557,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 createCookiesAnimation(decoration.isCosmetic)
             }
 
+            is QueueCookiesAnimation -> {
+                createCookiesAnimation(decoration.isCosmetic)
+            }
+
             is ChangeCustomTabTitle -> {
                 updateCustomTabTitle(decoration)
             }
@@ -651,6 +657,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 cookieAnimation,
                 sceneRoot,
                 isCosmetic,
+                true,
             )
         }
     }
