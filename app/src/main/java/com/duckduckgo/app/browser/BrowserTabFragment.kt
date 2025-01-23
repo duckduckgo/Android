@@ -1365,9 +1365,9 @@ class BrowserTabFragment :
         renderer.showNewTab()
     }
 
-    private fun onBypassMaliciousWarning() {
-        refresh()
+    private fun onBypassMaliciousWarning(url: Uri) {
         showBrowser()
+        webView?.loadUrl(url.toString())
     }
 
     private fun showSSLWarning(
@@ -1715,7 +1715,7 @@ class BrowserTabFragment :
             is Command.WebViewError -> showError(it.errorType, it.url)
             is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
-            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning()
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)

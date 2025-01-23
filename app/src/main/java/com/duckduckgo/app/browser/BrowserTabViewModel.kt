@@ -1860,13 +1860,12 @@ class BrowserTabViewModel @Inject constructor(
 
             VisitSite -> {
                 Timber.tag("KateMalicious").d("in VisitSite")
-                command.postValue(BypassMaliciousSiteWarning)
+                command.postValue(BypassMaliciousSiteWarning(url))
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
                 )
                 addExemptedMaliciousUrlToMemory(url)
-                onRefreshRequested(false)
             }
         }
     }
