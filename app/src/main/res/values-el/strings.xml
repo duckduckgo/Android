@@ -789,4 +789,8 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Σε ευχαριστούμε! Η αναφορά σας βοηθάει ώστε να γίνει το DuckDuckGo καλύτερο για όλους!</string>
 
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Νέο AI Chat</string>
+
 </resources>
