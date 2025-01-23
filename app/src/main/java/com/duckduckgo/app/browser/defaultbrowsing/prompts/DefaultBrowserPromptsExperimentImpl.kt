@@ -34,6 +34,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -88,6 +90,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator>,
     moshi: Moshi,
@@ -139,6 +142,14 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
      */
     private var browserSelectionWindowFallbackDeferred: Deferred<Unit>? = null
 
+    init {
+        appCoroutineScope.launch {
+            userStageStore.userAppStageFlow().collect {
+                evaluate()
+            }
+        }
+    }
+
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch {
@@ -154,9 +165,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun evaluate() {
+        val isOnboardingComplete = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
         val isEnrolled = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort() != null
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        val isEligible = isEnrolled || !isDefaultBrowser
+        val isEligible = isOnboardingComplete && (isEnrolled || !isDefaultBrowser)
         if (!isEligible) {
             return
         }
