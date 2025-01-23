@@ -72,6 +72,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.animateVisibility
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -470,11 +471,20 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderButtons(viewState: ViewState) {
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = viewState.showTabsMenu
-        fireIconMenu.isVisible = viewState.showFireIcon
-        browserMenu.isVisible = viewState.showBrowserMenu
-        aiChatMenu.isVisible = viewState.showChatMenu
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+
+        tabsMenu.animateVisibility(viewState.showTabsMenu)
+        fireIconMenu.animateVisibility(viewState.showFireIcon)
+        browserMenu.animateVisibility(viewState.showBrowserMenu)
+        aiChatMenu.animateVisibility(viewState.showChatMenu)
+
+        // clearTextButton.isVisible = viewState.showClearButton
+        // voiceSearchButton.isVisible = viewState.showVoiceSearch
+        // tabsMenu.isVisible = viewState.showTabsMenu
+        // fireIconMenu.isVisible = viewState.showFireIcon
+        // browserMenu.isVisible = viewState.showBrowserMenu
+        // aiChatMenu.isVisible = viewState.showChatMenu
+        // spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
