@@ -28,3 +28,16 @@ enum class PrivacyFeatureName(val value: String) {
 }
 
 const val PRIVACY_REMOTE_CONFIG_URL = "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/android-config.json"
+
+// control
+// const val PRIVACY_REMOTE_CONFIG_URL = "https://www.jsonblob.com/api/1329816455226777600"
+
+// variant 1
+// const val PRIVACY_REMOTE_CONFIG_URL = "https://www.jsonblob.com/api/1329805206535462912"
+
+// variant 2
+// const val PRIVACY_REMOTE_CONFIG_URL = "https://www.jsonblob.com/api/1329040942036082688"
+
+// variant 3
+// const val PRIVACY_REMOTE_CONFIG_URL = "https://www.jsonblob.com/api/1329809981419216896"
+
