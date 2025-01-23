@@ -40,8 +40,11 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTh
     ) {
         val currentAnimation = holder.tag as? Int
         val newAnimation = when (privacyShield) {
-            PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
-            UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
+            // TODO ANA: This is temporary until the flags are set.
+            // PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
+            // UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
+            PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield_experiment else R.raw.protected_shield_experiment
+            UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield_experiment else R.raw.unprotected_shield_experiment
             UNKNOWN -> null
         }
 

@@ -53,7 +53,8 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
         this.resources = context.resources
 
         if (logos.size <= 2) {
-            omnibarShieldAnimationView.setAnimation(R.raw.protected_shield)
+            // TODO ANA: We need to show the protected shield based on flags.
+            omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
             omnibarShieldAnimationView.setMaxProgress(1f)
             omnibarShieldAnimationView.playAnimation()
             return
@@ -72,7 +73,8 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
         }
         trackersCircleAnimationView.setLayoutParams(layoutParams)
 
-        omnibarShieldAnimationView.setAnimation(R.raw.protected_shield)
+        // TODO ANA: We need to show the protected shield based on flags.
+        omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
 
         with(trackersCircleAnimationView) {
             this.setCacheComposition(false)
