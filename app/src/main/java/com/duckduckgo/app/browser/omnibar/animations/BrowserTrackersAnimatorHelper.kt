@@ -70,6 +70,7 @@ interface BrowserTrackersAnimatorHelper {
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     )
 
     /**

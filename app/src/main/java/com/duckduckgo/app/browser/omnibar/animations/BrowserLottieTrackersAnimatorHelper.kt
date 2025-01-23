@@ -253,6 +253,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     },
                     animationCompletionDelay,
                 )
+
+                handler.postDelayed(
+                    {
+                        tryToStartCookiesAnimation(trackersBlockedCountAnimationView.context, omnibarViews)
+                    },
+                    2500L,
+                )
             }
         }
 
@@ -266,16 +273,20 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
         this.cookieCosmeticHide = cookieCosmeticHide
 
-        if (this.trackersAnimation?.isAnimating != true) {
+        // TODO ANA: This is temporary.
+        if (enqueueCookieAnimation) {
+            this.enqueueCookiesAnimation = true
+        } else if (this.trackersAnimation?.isAnimating != true) {
             startCookiesAnimation(context, omnibarViews)
         } else {
-            enqueueCookiesAnimation = true
+            enqueueCookiesAnimation = enqueueCookieAnimation
         }
     }
 
