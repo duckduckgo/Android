@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -419,6 +420,10 @@ class OmnibarLayout @JvmOverloads constructor(
             is StartTrackersAnimation -> {
                 startTrackersAnimation(command.entities)
             }
+
+            is StartExperimentTrackersAnimation -> {
+                startExperimentTrackersAnimation(command.entities)
+            }
         }
     }
 
@@ -561,7 +566,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is QueueCookiesAnimation -> {
-                createCookiesAnimation(decoration.isCosmetic)
+                createCookiesAnimation(isCosmetic = decoration.isCosmetic, enqueueAnimation = true)
             }
 
             is ChangeCustomTabTitle -> {
@@ -651,7 +656,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun createCookiesAnimation(isCosmetic: Boolean) {
+    private fun createCookiesAnimation(isCosmetic: Boolean, enqueueAnimation: Boolean = false) {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.createCookiesAnimation(
                 context,
@@ -660,7 +665,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 cookieAnimation,
                 sceneRoot,
                 isCosmetic,
-                true,
+                enqueueAnimation,
             )
         }
     }
@@ -672,15 +677,16 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun startTrackersAnimation(events: List<Entity>?) {
-        // This is the animation we currently have in Production.
-//        animatorHelper.startTrackersAnimation(
-//            context = context,
-//            shieldAnimationView = shieldIcon,
-//            trackersAnimationView = trackersAnimation,
-//            omnibarViews = omnibarViews(),
-//            entities = events,
-//        )
+        animatorHelper.startTrackersAnimation(
+            context = context,
+            shieldAnimationView = shieldIcon,
+            trackersAnimationView = trackersAnimation,
+            omnibarViews = omnibarViews(),
+            entities = events,
+        )
+    }
 
+    private fun startExperimentTrackersAnimation(events: List<Entity>?) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)

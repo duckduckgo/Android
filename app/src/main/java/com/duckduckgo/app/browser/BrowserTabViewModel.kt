@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
@@ -458,6 +459,7 @@ class BrowserTabViewModel @Inject constructor(
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
+    private val appPersonalityFeature: AppPersonalityFeature,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1896,6 +1898,8 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
+            // TODO ANA: Send command to add / remove sliding view if protected / unprotected
+
             Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
@@ -3788,10 +3792,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAnimationFinished(logos: List<TrackerLogo>) {
-        command.value = Command.StartTrackersLogosAnimation(logos)
+        if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+            command.value = Command.StartTrackersLogosAnimation(logos)
+        }
     }
 
-    fun trackersCount(): Int = site?.trackerCount ?: 0
+    fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     companion object {
         private const val FIXED_PROGRESS = 50

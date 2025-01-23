@@ -280,13 +280,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.cookieView = cookieAnimationView
         this.cookieCosmeticHide = cookieCosmeticHide
 
-        // TODO ANA: This is temporary.
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
         } else if (this.trackersAnimation?.isAnimating != true) {
             startCookiesAnimation(context, omnibarViews)
         } else {
-            enqueueCookiesAnimation = enqueueCookieAnimation
+            enqueueCookiesAnimation = false
         }
     }
 

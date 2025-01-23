@@ -108,6 +108,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
@@ -533,6 +534,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var animatorHelper: TrackersCircleAnimationHelper
 
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -659,7 +663,14 @@ class BrowserTabFragment :
                     delay(COOKIES_ANIMATION_DELAY)
                 }
                 context?.let {
-                    omnibar.createCookiesAnimation(isCosmetic)
+                    if (appPersonalityFeature.self().isEnabled() &&
+                        appPersonalityFeature.trackersBlockedAnimation().isEnabled() &&
+                        viewModel.trackersCount().isNotEmpty()
+                    ) {
+                        omnibar.enqueueCookiesAnimation(isCosmetic)
+                    } else {
+                        omnibar.createCookiesAnimation(isCosmetic)
+                    }
                 }
             }
         }
@@ -904,6 +915,10 @@ class BrowserTabFragment :
     }
 
     private fun configureTrackersBlockedSlidingView() {
+        if (!appPersonalityFeature.self().isEnabled() || !appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+            return
+        }
+
         val displayMetrics = resources.displayMetrics
         val layoutParams = binding.trackersBlockedSlidingView.layoutParams as CoordinatorLayout.LayoutParams
         when (omnibar.omnibarPosition) {
@@ -939,7 +954,7 @@ class BrowserTabFragment :
         } else {
             binding.trackersBlockedSlidingView.show()
         }
-        binding.trackers.text = viewModel.trackersCount().toString()
+        binding.trackers.text = viewModel.trackersCount()
         binding.website.text = viewModel.url?.extractDomain()
     }
 
