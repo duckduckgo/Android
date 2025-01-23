@@ -141,6 +141,7 @@ class DefaultBrowserPromptsExperimentImpl {
   - val defaultBrowserDetector: DefaultBrowserDetector
   - val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
   - val appDaysUsedRepository: AppDaysUsedRepository
+  - val userStageStore: UserStageStore
   - val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore
   - val experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator>
   - val pixelSender: PixelSender
@@ -176,6 +177,10 @@ end note
 
 note left of DefaultBrowserPromptsExperimentImpl::appDaysUsedRepository
   Used to monitor the active use days.
+end note
+
+note left of DefaultBrowserPromptsExperimentImpl::userStageStore
+  Used to check if user is onboarded
 end note
 
 note left of DefaultBrowserPromptsExperimentImpl::defaultBrowserPromptsDataStore
