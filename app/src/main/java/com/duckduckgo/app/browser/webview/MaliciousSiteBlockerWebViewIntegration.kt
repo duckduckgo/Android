@@ -114,8 +114,9 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         if (request.isForMainFrame || (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host)) {
             if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                 return WebResourceResponse(null, null, null)
+            } else {
+                processedUrls.add(decodedUrl)
             }
-            processedUrls.add(decodedUrl)
         }
         return null
     }
@@ -141,8 +142,9 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             if (isForMainFrame) {
                 if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                     return@runBlocking true
+                } else {
+                    processedUrls.add(decodedUrl)
                 }
-                processedUrls.add(decodedUrl)
             }
             false
         }
@@ -153,12 +155,14 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean {
         val checkId = currentCheckId.incrementAndGet()
-        return maliciousSiteProtection.isMalicious(url.toUri()) { isMalicious ->
-            if (checkId == currentCheckId.get()) {
-                confirmationCallback(isMalicious)
+        return maliciousSiteProtection.isMalicious(url.toUri()) {
+            val isMalicious = if (checkId == currentCheckId.get()) {
+                it
             } else {
-                confirmationCallback(false)
+                false
             }
+            processedUrls.clear()
+            confirmationCallback(isMalicious)
         } == MALICIOUS
     }
 
