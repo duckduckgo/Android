@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
-import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
