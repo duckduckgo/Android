@@ -223,7 +223,9 @@ sealed class Command {
 
     data object EscapeMaliciousSite : Command()
 
-    data object BypassMaliciousSiteWarning : Command()
+    data class BypassMaliciousSiteWarning(
+        val url: Uri,
+    ) : Command()
 
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
