@@ -57,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginVertical="@dimen/keyline_2"
+                android:animateLayoutChanges="true"
                 android:background="@drawable/omnibar_field_selector">
 
                 <com.airbnb.lottie.LottieAnimationView
@@ -270,14 +271,17 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
-            <ImageView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/aiChatIconImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:src="@drawable/ic_ai_chat_outline_24" />
+                android:drawableStart="@drawable/ic_ai_chat_outline_24"
+                android:drawablePadding="@dimen/keyline_1"
+                app:typography="body1_bold"
+                android:text="Ask"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
         </FrameLayout>
 
         <FrameLayout
