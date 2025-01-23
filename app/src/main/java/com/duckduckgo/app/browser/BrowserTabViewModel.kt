@@ -3139,6 +3139,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedMaliciousSiteWarning(url: Uri) {
         // TODO (cbarreiro): Fire pixel
+        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, url = url.toString()))
         browserViewState.postValue(
             currentBrowserViewState().copy(
                 browserShowing = false,
