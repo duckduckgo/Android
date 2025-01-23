@@ -1845,27 +1845,26 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onMaliciousSiteDetected(
-            action: MaliciousSiteBlockedWarningLayout.Action,
-            url: Uri,
-        ) {
-            when (action) {
-                LeaveSite -> {
-                    Timber.tag("KateMalicious").d("in LeaveSite")
-                    command.postValue(EscapeMaliciousSite)
-                }
-
-                VisitSite -> {
-                    Timber.tag("KateMalicious").d("in VisitSite")
-                    command.postValue(BypassMaliciousSiteWarning)
-                    browserViewState.value = currentBrowserViewState().copy(
-                        browserShowing = true,
-                        showPrivacyShield = HighlightableButton.Visible(enabled = true),
-                    )
-                    addExemptedMaliciousUrlToMemory(url)
-                    onRefreshRequested(false)
-                }
+        action: MaliciousSiteBlockedWarningLayout.Action,
+        url: Uri,
+    ) {
+        when (action) {
+            LeaveSite -> {
+                Timber.tag("KateMalicious").d("in LeaveSite")
+                command.postValue(EscapeMaliciousSite)
             }
 
+            VisitSite -> {
+                Timber.tag("KateMalicious").d("in VisitSite")
+                command.postValue(BypassMaliciousSiteWarning)
+                browserViewState.value = currentBrowserViewState().copy(
+                    browserShowing = true,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                )
+                addExemptedMaliciousUrlToMemory(url)
+                onRefreshRequested(false)
+            }
+        }
     }
 
     private fun onSiteChanged() {
@@ -1918,7 +1917,6 @@ class BrowserTabViewModel @Inject constructor(
             handler.cancel()
         }
     }
-
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -3146,7 +3144,7 @@ class BrowserTabViewModel @Inject constructor(
             currentBrowserViewState().copy(
                 browserShowing = false,
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
-            )
+            ),
         )
         command.postValue(ShowWarningMaliciousSite(url))
     }

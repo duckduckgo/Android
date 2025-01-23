@@ -160,7 +160,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
@@ -1351,6 +1350,7 @@ class BrowserTabFragment :
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
         webView?.onPause()
         webView?.hide()
+        webView?.stopLoading()
         maliciousWarningView.bind { action ->
             viewModel.onMaliciousSiteDetected(action, url)
         }
@@ -1365,8 +1365,8 @@ class BrowserTabFragment :
     }
 
     private fun onBypassMaliciousWarning() {
-        showBrowser()
         refresh()
+        showBrowser()
     }
 
     private fun showSSLWarning(
