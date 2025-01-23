@@ -61,10 +61,10 @@ fun View.gone(): View {
     return this
 }
 
-fun View.animateVisibility(visible: Boolean) {
+fun View.animateVisibility(visible: Boolean, duration: Long = 350) {
     if (visible) {
         if (!isVisible) {
-            fadeIn()
+            fadeIn(duration)
         }
     } else {
         if (isVisible) {
@@ -73,21 +73,22 @@ fun View.animateVisibility(visible: Boolean) {
     }
 }
 
-fun View.fadeIn() {
+fun View.fadeIn(duration: Long = 350) {
     visibility = View.VISIBLE
     val fadeIn = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f)
-    fadeIn.duration = 350 // Duration in milliseconds
+    fadeIn.duration = duration
     fadeIn.start()
 }
 
-fun View.fadeOut() {
+fun View.fadeOut(duration: Long = 200) {
     val fadeOut = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f)
-    fadeOut.duration = 100 // Duration in milliseconds
+    fadeOut.duration = duration // Duration in milliseconds
     fadeOut.addListener(object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator) {
-            visibility = View.GONE // Set visibility to gone after fade out
+            visibility = View.GONE
         }
-    },)
+    },
+    )
     fadeOut.start()
 }
 

@@ -469,13 +469,15 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
-        clearTextButton.isVisible = viewState.showClearButton
+        // clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
 
         tabsMenu.animateVisibility(viewState.showTabsMenu)
         fireIconMenu.animateVisibility(viewState.showFireIcon)
         browserMenu.animateVisibility(viewState.showBrowserMenu)
+
+        clearTextButton.animateVisibility(viewState.showClearButton, 600)
         aiChatMenu.animateVisibility(viewState.showChatMenu)
 
         // clearTextButton.isVisible = viewState.showClearButton
