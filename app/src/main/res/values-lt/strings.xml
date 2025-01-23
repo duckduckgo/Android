@@ -133,7 +133,6 @@
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
-    <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
     <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
     <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
     <string name="settingsHeadingNextSteps">Tolesni veiksmai</string>
@@ -792,9 +791,5 @@
 
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
-
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
 
 </resources>
