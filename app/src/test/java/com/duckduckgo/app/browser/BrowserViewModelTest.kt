@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
@@ -342,7 +343,8 @@ class BrowserViewModelTest {
     @Test
     fun `when default browser prompts experiment OpenSystemDefaultBrowserDialog command, then propagate it to consumers`() = runTest {
         val intent: Intent = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent))
+        val trigger: SetAsDefaultActionTrigger = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowSystemDefaultBrowserDialog(intent), commandCaptor.lastValue)
@@ -351,7 +353,8 @@ class BrowserViewModelTest {
     @Test
     fun `when default browser prompts experiment OpenSystemDefaultAppsActivity command, then propagate it to consumers`() = runTest {
         val intent: Intent = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent))
+        val trigger: SetAsDefaultActionTrigger = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent, trigger))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowSystemDefaultAppsActivity(intent), commandCaptor.lastValue)
@@ -365,28 +368,28 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when onSetDefaultBrowserDismissed called, then pass that information to the experiment`() {
-        testee.onSetDefaultBrowserDismissed()
+    fun `when onSetDefaultBrowserDialogCanceled called, then pass that information to the experiment`() {
+        testee.onSetDefaultBrowserDialogCanceled()
 
-        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogDismissed()
+        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogCanceled()
     }
 
     @Test
-    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information to the experiment`() {
+    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
         testee.onSetDefaultBrowserConfirmationButtonClicked()
 
         verify(mockDefaultBrowserPromptsExperiment).onMessageDialogConfirmationButtonClicked()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.HideSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+        assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test
-    fun `when onSetDefaultBrowserNotNowButtonClicked called, then pass that information to the experiment`() {
+    fun `when onSetDefaultBrowserNotNowButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
         testee.onSetDefaultBrowserNotNowButtonClicked()
 
         verify(mockDefaultBrowserPromptsExperiment).onMessageDialogNotNowButtonClicked()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.HideSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+        assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test
@@ -397,31 +400,36 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when onSystemDefaultBrowserDialogSuccess called, then pass that information to the experiment`() {
+    fun `when onSystemDefaultBrowserDialogSuccess called, then pass that information to the experiment`() = runTest {
+        val intent: Intent = mock()
+        val trigger: SetAsDefaultActionTrigger = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
+
         testee.onSystemDefaultBrowserDialogSuccess()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogSuccess()
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogSuccess(trigger)
     }
 
     @Test
-    fun `when onSystemDefaultBrowserDialogCanceled called, then pass that information to the experiment`() {
+    fun `when onSystemDefaultBrowserDialogCanceled called, then pass that information to the experiment`() = runTest {
+        val intent: Intent = mock()
+        val trigger: SetAsDefaultActionTrigger = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
+
         testee.onSystemDefaultBrowserDialogCanceled()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogCanceled()
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogCanceled(trigger)
     }
 
     @Test
-    fun `when onSystemDefaultAppsActivityOpened called, then pass that information to the experiment`() {
-        testee.onSystemDefaultAppsActivityOpened()
+    fun `when onSystemDefaultAppsActivityClosed called, then pass that information to the experiment`() = runTest {
+        val intent: Intent = mock()
+        val trigger: SetAsDefaultActionTrigger = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent, trigger))
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityOpened()
-    }
-
-    @Test
-    fun `when onSystemDefaultAppsActivityClosed called, then pass that information to the experiment`() {
         testee.onSystemDefaultAppsActivityClosed()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityClosed()
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityClosed(trigger)
     }
 
     @Test
