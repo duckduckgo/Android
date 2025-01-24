@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -60,6 +61,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -78,6 +80,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -106,6 +109,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
+        val showBrowserMenuHighlight: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -124,6 +128,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         DAX,
         DUCK_PLAYER,
         GLOBE,
+    }
+
+    init {
+        viewModelScope.launch {
+            defaultBrowserPromptsExperiment.highlightOverflowMenu.collect { highlightOverflowMenu ->
+                _viewState.update {
+                    it.copy(showBrowserMenuHighlight = highlightOverflowMenu)
+                }
+            }
+        }
     }
 
     fun onAttachedToWindow() {

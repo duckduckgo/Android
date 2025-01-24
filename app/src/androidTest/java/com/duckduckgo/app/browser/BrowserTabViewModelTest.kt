@@ -86,6 +86,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -499,6 +500,9 @@ class BrowserTabViewModelTest {
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
 
+    private val defaultBrowserPromptsExperimentShowOverflowMenuItemFlow = MutableStateFlow(false)
+    private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -600,6 +604,7 @@ class BrowserTabViewModelTest {
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
+        whenever(mockDefaultBrowserPromptsExperiment.showOverflowMenuItem).thenReturn(defaultBrowserPromptsExperimentShowOverflowMenuItemFlow)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -666,6 +671,7 @@ class BrowserTabViewModelTest {
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
+            defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5624,6 +5630,29 @@ class BrowserTabViewModelTest {
         testee.userLaunchingTabSwitcher()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+    }
+
+    @Test
+    fun whenInitialisedThenDefaultBrowserMenuButtonIsNotShown() {
+        assertFalse(browserViewState().showSelectDefaultBrowserMenuItem)
+    }
+
+    @Test
+    fun whenDefaultBrowserMenuButtonVisibilityChangesThenShowIt() = runTest {
+        defaultBrowserPromptsExperimentShowOverflowMenuItemFlow.value = true
+        assertTrue(browserViewState().showSelectDefaultBrowserMenuItem)
+    }
+
+    @Test
+    fun whenDefaultBrowserMenuButtonClickedThenNotifyExperiment() = runTest {
+        testee.onSetDefaultBrowserSelected()
+        verify(mockDefaultBrowserPromptsExperiment).onOverflowMenuItemClicked()
+    }
+
+    @Test
+    fun whenPopupMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() = runTest {
+        testee.onPopupMenuLaunched()
+        verify(mockDefaultBrowserPromptsExperiment).onOverflowMenuOpened()
     }
 
     private fun givenTabManagerData() = runTest {
