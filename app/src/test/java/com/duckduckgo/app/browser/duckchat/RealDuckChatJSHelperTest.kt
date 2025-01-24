@@ -30,7 +30,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -144,17 +143,6 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenOpenAIChatThenOpenDuckChat() = runTest {
-        val featureName = "aiChat"
-        val method = "openAIChat"
-        val id = "123"
-
-        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
-        verify(mockDuckChat).openDuckChat()
-        verifyNoInteractions(mockPreferencesStore)
-    }
-
-    @Test
     fun whenOpenAIChatAndHasPayloadThenUpdateStoreAndOpenDuckChat() = runTest {
         val featureName = "aiChat"
         val method = "openAIChat"
@@ -166,6 +154,29 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockPreferencesStore).updateUserPreferences(payloadString)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOpenAIChatAndDataIsNullThenUpdateStoreAndOpenDuckChat() = runTest {
+        val featureName = "aiChat"
+        val method = "openAIChat"
+        val id = "123"
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
+        verify(mockPreferencesStore).updateUserPreferences(null)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOpenAIChatAndPayloadIsNullThenUpdateStoreAndOpenDuckChat() = runTest {
+        val featureName = "aiChat"
+        val method = "openAIChat"
+        val id = "123"
+        val data = JSONObject(mapOf("aiChatPayload" to JSONObject.NULL))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+        verify(mockPreferencesStore).updateUserPreferences(null)
         verify(mockDuckChat).openDuckChat()
     }
 }

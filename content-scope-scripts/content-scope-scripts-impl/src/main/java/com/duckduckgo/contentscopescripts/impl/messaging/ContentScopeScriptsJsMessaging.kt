@@ -154,7 +154,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         }
 
         override val allowedDomains: List<String> = listOf(
-            "duckduckgo.com",
+            AppUrl.Url.HOST,
         )
 
         override val featureName: String = "aiChat"

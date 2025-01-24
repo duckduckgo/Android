@@ -58,13 +58,18 @@ class RealDuckChatJSHelper @Inject constructor(
             SendResponseToJs(getUserValues(featureName, method, it))
         }
         METHOD_OPEN_AI_CHAT -> {
-            data?.optString(PAYLOAD).let { payload ->
-                preferencesStore.updateUserPreferences(payload)
-            }
+            val payload = extractPayload(data)
+            preferencesStore.updateUserPreferences(payload)
             duckChat.openDuckChat()
             null
         }
         else -> null
+    }
+
+    private fun extractPayload(data: JSONObject?): String? {
+        return data?.takeIf {
+            it.opt(PAYLOAD) != JSONObject.NULL
+        }?.optString(PAYLOAD)
     }
 
     companion object {
