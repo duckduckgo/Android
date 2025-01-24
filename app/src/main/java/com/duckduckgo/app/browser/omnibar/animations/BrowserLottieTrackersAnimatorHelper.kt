@@ -247,6 +247,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 handler.postDelayed(
                     {
                         trackersBlockedAnimationView.gone()
+                        trackersBlockedCountAnimationView.text = ""
                         trackersBlockedCountAnimationView.gone()
                         animateOmnibarIn(omnibarViews).start()
                         listener?.onAnimationFinished(logos)
