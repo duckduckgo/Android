@@ -43,7 +43,7 @@ class RealAssetLinksLoader @Inject constructor(
                 assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
                     Timber.d("Autofill-mapping: Assetlinks of $domain: ${it.size}")
                 }.filter {
-                    it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
+                    it.relation.any { relation -> relation in supportedRelations } &&
                         !it.target.package_name.isNullOrEmpty() &&
                         !it.target.sha256_cert_fingerprints.isNullOrEmpty() &&
                         it.target.namespace == APP_NAMESPACE
@@ -60,6 +60,8 @@ class RealAssetLinksLoader @Inject constructor(
     companion object {
         private const val ASSET_LINKS_PATH = "/.well-known/assetlinks.json"
         private const val LOGIN_CREDENTIALS_RELATION = "delegate_permission/common.get_login_creds"
+        private const val HANDLE_ALL_RELATION = "delegate_permission/common.handle_all_urls"
+        private val supportedRelations = listOf(HANDLE_ALL_RELATION, LOGIN_CREDENTIALS_RELATION)
         private const val APP_NAMESPACE = "android_app"
     }
 }

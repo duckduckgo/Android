@@ -37,7 +37,7 @@ class RealAssetLinksLoaderTest {
         whenever(service.getAssetLinks("https://supported.com/.well-known/assetlinks.json")).thenReturn(
             listOf(
                 AssetLink(
-                    relation = listOf("delegate_permission/common.handle_all_urls"),
+                    relation = listOf("delegate_permission/invalid"),
                     target = AssetLinkTarget(
                         namespace = "android_app",
                         package_name = "app.no.valid.relation",
@@ -65,6 +65,14 @@ class RealAssetLinksLoaderTest {
                     target = AssetLinkTarget(
                         namespace = "android_app",
                         package_name = "app.valid.2",
+                        sha256_cert_fingerprints = listOf("fingerprint"),
+                    ),
+                ),
+                AssetLink(
+                    relation = listOf("delegate_permission/common.handle_all_urls"),
+                    target = AssetLinkTarget(
+                        namespace = "android_app",
+                        package_name = "app.valid.3",
                         sha256_cert_fingerprints = listOf("fingerprint"),
                     ),
                 ),
@@ -97,9 +105,10 @@ class RealAssetLinksLoaderTest {
 
         toTest.getValidTargetApps("supported.com").let {
             assertTrue(it.isNotEmpty())
-            assertEquals(2, it.size)
+            assertEquals(3, it.size)
             assertEquals(listOf("fingerprint", "fingerprint2"), it["app.valid"])
             assertEquals(listOf("fingerprint"), it["app.valid.2"])
+            assertEquals(listOf("fingerprint"), it["app.valid.3"])
         }
     }
 }
