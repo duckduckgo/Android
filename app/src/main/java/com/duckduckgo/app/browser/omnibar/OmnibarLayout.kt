@@ -684,6 +684,8 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarViews = omnibarViews(),
             entities = events,
         )
+
+        viewModel.onTrackersAnimationStarted()
     }
 
     private fun startExperimentTrackersAnimation(events: List<Entity>?) {
@@ -699,6 +701,8 @@ class OmnibarLayout @JvmOverloads constructor(
                 omnibarViews = omnibarViews(),
                 entities = events,
             )
+
+            viewModel.onExperimentTrackersAnimationStarted()
         }
     }
 
