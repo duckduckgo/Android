@@ -49,7 +49,6 @@ dependencies {
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
-    implementation "com.squareup.logcat:logcat:_"
 
     implementation AndroidX.appCompat
     implementation Google.android.material
