@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autoconsent.impl.ui
 
-import android.R.attr.text
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
@@ -125,7 +124,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlText = getString(
-            R.string.autoconsentDescriptionNew,
+            R.string.autoconsentDescription,
         ).html(this)
         val spannableString = SpannableStringBuilder(htmlText)
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
