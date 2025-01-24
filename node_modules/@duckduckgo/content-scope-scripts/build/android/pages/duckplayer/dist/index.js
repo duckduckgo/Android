@@ -2692,16 +2692,6 @@
     return /* @__PURE__ */ _("div", { class: Wordmark_mobile_default.logo }, /* @__PURE__ */ _("span", { class: Wordmark_mobile_default.logoSvg }, /* @__PURE__ */ _("img", { src: dax_data_default, className: Wordmark_mobile_default.img, alt: "DuckDuckGo logo" })), /* @__PURE__ */ _("span", { class: Wordmark_mobile_default.text }, "Duck Player"));
   }
 
-  // pages/duckplayer/app/components/Background.module.css
-  var Background_default = {
-    bg: "Background_bg"
-  };
-
-  // pages/duckplayer/app/components/Background.jsx
-  function Background() {
-    return /* @__PURE__ */ _("div", { class: Background_default.bg });
-  }
-
   // pages/duckplayer/app/components/Player.jsx
   var import_classnames9 = __toESM(require_classnames(), 1);
 
@@ -3126,7 +3116,7 @@
     let embed = EmbedSettings.fromHref("https://localhost?videoID=123");
     let url = embed?.toEmbedUrl();
     if (!url) throw new Error("unreachable");
-    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _("div", { "data-layout": "mobile" }, /* @__PURE__ */ _(Background, null)), /* @__PURE__ */ _("main", { class: Components_default.main }, /* @__PURE__ */ _("div", { class: Components_default.tube }, /* @__PURE__ */ _(Wordmark, null), /* @__PURE__ */ _("h2", null, "Floating Bar"), /* @__PURE__ */ _("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ _(InfoIcon, { debugStyles: true })), /* @__PURE__ */ _("h2", null, "Info Tooltip"), /* @__PURE__ */ _(FloatingBar, null, /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: info_data_default })), /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: cog_data_default })), /* @__PURE__ */ _(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ _("h2", null, "Info Bar"), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(InfoBar, { embed }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ _("h2", null, "Desktop Switch bar"), /* @__PURE__ */ _("h3", null, "idle"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarDesktop, null))), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=false (desktop)")), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(Player, { src: url, layout: "desktop" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=true (mobile)")), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null)));
+    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _("main", { class: Components_default.main }, /* @__PURE__ */ _("div", { class: Components_default.tube }, /* @__PURE__ */ _(Wordmark, null), /* @__PURE__ */ _("h2", null, "Floating Bar"), /* @__PURE__ */ _("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ _(InfoIcon, { debugStyles: true })), /* @__PURE__ */ _("h2", null, "Info Tooltip"), /* @__PURE__ */ _(FloatingBar, null, /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: info_data_default })), /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: cog_data_default })), /* @__PURE__ */ _(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ _("h2", null, "Info Bar"), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(InfoBar, { embed }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ _("h2", null, "Desktop Switch bar"), /* @__PURE__ */ _("h3", null, "idle"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarDesktop, null))), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=false (desktop)")), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(Player, { src: url, layout: "desktop" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=true (mobile)")), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null)));
   }
 
   // pages/duckplayer/app/components/MobileApp.jsx
@@ -3240,7 +3230,7 @@
     const settings = useSettings();
     const telemetry2 = useTelemetry();
     const features = createAppFeaturesFrom(settings);
-    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _(Background, null), features.focusMode(), /* @__PURE__ */ _(
+    return /* @__PURE__ */ _(b, null, features.focusMode(), /* @__PURE__ */ _(
       OrientationProvider,
       {
         onChange: (orientation) => {
@@ -3280,7 +3270,7 @@
   function DesktopApp({ embed }) {
     const settings = useSettings();
     const features = createAppFeaturesFrom(settings);
-    return /* @__PURE__ */ _(b, null, /* @__PURE__ */ _(Background, null), features.focusMode(), /* @__PURE__ */ _("main", { class: DesktopApp_default.app }, /* @__PURE__ */ _(DesktopLayout, { embed })));
+    return /* @__PURE__ */ _(b, null, features.focusMode(), /* @__PURE__ */ _("main", { class: DesktopApp_default.app }, /* @__PURE__ */ _(DesktopLayout, { embed })));
   }
   function DesktopLayout({ embed }) {
     return /* @__PURE__ */ _("div", { class: DesktopApp_default.desktop }, /* @__PURE__ */ _(PlayerContainer, null, embed === null && /* @__PURE__ */ _(PlayerError, { layout: "desktop", kind: "invalid-id" }), embed !== null && /* @__PURE__ */ _(Player, { src: embed.toEmbedUrl(), layout: "desktop" }), /* @__PURE__ */ _(HideInFocusMode, { style: "slide" }, /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))));
