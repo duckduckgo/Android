@@ -44,9 +44,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                android:visibility="gone"
-                app:srcCompat="@drawable/cookie_popups_check_128"
-                tools:visibility="visible" />
+                app:srcCompat="@drawable/cookie_popups_check_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/autoconsentTitle"
@@ -56,28 +54,14 @@
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
                 android:text="@string/autoconsentTitle"
-                android:visibility="gone"
-                app:typography="h2"
-                tools:visibility="visible" />
+                app:typography="h2" />
 
             <com.duckduckgo.common.ui.view.StatusIndicatorView
                 android:id="@+id/autoconsentStatusIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_1"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/autoconsentDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/keyline_4"
-                android:text="@string/autoconsentDescription"
-                app:textType="secondary"
-                app:typography="body2"
-                tools:visibility="gone" />
+                android:layout_gravity="center" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/autoconsentDescriptionNew"
@@ -88,18 +72,14 @@
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:gravity="center"
                 android:text="@string/autoconsentDescriptionNew"
-                android:visibility="gone"
                 app:textType="secondary"
-                app:typography="body2"
-                tools:visibility="visible" />
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:fullWidth="true"
-                tools:visibility="visible" />
+                app:fullWidth="true" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/autoconsentToggle"

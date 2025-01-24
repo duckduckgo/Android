@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.ui
 
+import android.R.attr.text
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
@@ -27,8 +28,6 @@ import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +44,6 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,9 +53,6 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val binding: ActivityAutoconsentSettingsBinding by viewBinding()
 
@@ -77,10 +72,8 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
-                ds.isUnderlineText = false
-            }
+            ds.color = getColorFromAttr(CommonR.attr.daxColorAccentBlue)
+            ds.isUnderlineText = false
         }
     }
 
@@ -89,17 +82,6 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(toolbar)
-
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            with(binding) {
-                autoconsentHeaderImage.isVisible = true
-                autoconsentTitle.isVisible = true
-                autoconsentStatusIndicator.isVisible = true
-                autoconsentDescription.isGone = true
-                autoconsentDescriptionNew.isVisible = true
-                divider.isVisible = true
-            }
-        }
 
         configureUiEventHandlers()
         configureClickableLink()
@@ -121,15 +103,13 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            with(binding) {
-                autoconsentHeaderImage.setImageResource(
-                    if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
-                )
-                autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
-            }
+        with(binding) {
+            autoconsentHeaderImage.setImageResource(
+                if (viewState.autoconsentEnabled) R.drawable.cookie_popups_check_128 else R.drawable.cookie_block_128,
+            )
+            autoconsentStatusIndicator.setStatus(viewState.autoconsentEnabled)
+            autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
         }
-        binding.autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
     }
 
     private fun processCommand(it: Command) {
@@ -145,19 +125,13 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlText = getString(
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                R.string.autoconsentDescriptionNew
-            } else {
-                R.string.autoconsentDescription
-            },
+            R.string.autoconsentDescriptionNew,
         ).html(this)
         val spannableString = SpannableStringBuilder(htmlText)
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
             spannableString.apply {
-                if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                    insert(spannableString.getSpanStart(it), "\n")
-                }
+                insert(spannableString.getSpanStart(it), "\n")
                 setSpan(
                     clickableSpan,
                     spannableString.getSpanStart(it),
@@ -168,17 +142,9 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 trim()
             }
         }
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            binding.autoconsentDescriptionNew.apply {
-                text = spannableString
-                movementMethod = LinkMovementMethod.getInstance()
-            }
-            return
-        } else {
-            binding.autoconsentDescription.apply {
-                text = spannableString
-                movementMethod = LinkMovementMethod.getInstance()
-            }
+        binding.autoconsentDescriptionNew.apply {
+            text = spannableString
+            movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
