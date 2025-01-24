@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nu, le voi gestiona personal</string>
 
-    <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ascuns</string>
     <string name="autoconsentManagedNoticeAnimationText">Modulele cookie au fost gestionate</string>
 

@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ei, ma haldan neid ise</string>
 
-    <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Hüpikaken on peidetud</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallatavad küpsised</string>
 

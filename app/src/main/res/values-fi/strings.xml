@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ei, hoidan ne itse</string>
 
-    <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Ponnahdusikkuna piilotettu</string>
     <string name="autoconsentManagedNoticeAnimationText">Hallitut evästeet</string>
 

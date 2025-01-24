@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Не, аз ще ги управлявам</string>
 
-    <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Изскачащият прозорец е скрит</string>
     <string name="autoconsentManagedNoticeAnimationText">Бисквитките са настроени</string>
 

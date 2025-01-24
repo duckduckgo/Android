@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Нет, я буду управлять ими самостоятельно</string>
 
-    <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 

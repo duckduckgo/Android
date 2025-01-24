@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Não, prefiro ser eu</string>
 
-    <string name="autoconsentSetting">Gerir pop-ups de cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ocultado</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies geridos</string>
 

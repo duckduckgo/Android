@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, upravljanje prepusti meni</string>
 
-    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pojavno okno je skrito</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravljani piškotki</string>
 

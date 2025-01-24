@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nej, jag hanterar dem själv</string>
 
-    <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 

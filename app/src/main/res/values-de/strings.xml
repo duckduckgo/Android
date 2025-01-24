@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nein, ich verwalte sie selbst</string>
 
-    <string name="autoconsentSetting">Cookie-Pop-ups verwalten</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop-up ausgeblendet</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies verwaltet</string>
 

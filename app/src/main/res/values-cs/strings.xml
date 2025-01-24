@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, já se o ně postarám</string>
 
-    <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skryté vyskakovací okno</string>
     <string name="autoconsentManagedNoticeAnimationText">O cookies je postaráno!</string>
 

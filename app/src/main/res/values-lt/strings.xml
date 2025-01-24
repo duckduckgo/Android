@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, aš juos susitvarkysiu pats</string>
 
-    <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Iškylantysis langas paslėptas</string>
     <string name="autoconsentManagedNoticeAnimationText">Slapukai valdomi</string>
 

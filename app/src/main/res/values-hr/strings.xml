@@ -646,7 +646,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Ne, sam ću njima upravljati</string>
 
-    <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Skočni prozor je sakriven</string>
     <string name="autoconsentManagedNoticeAnimationText">Upravlja se kolačićima</string>
 
