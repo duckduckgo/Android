@@ -103,7 +103,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.TrackersCircleAnimationHelper
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -532,7 +532,7 @@ class BrowserTabFragment :
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     @Inject
-    lateinit var animatorHelper: TrackersCircleAnimationHelper
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
@@ -806,13 +806,19 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private fun showNewTrackersBlockingAnimation(logos: List<TrackerLogo>) {
-        animatorHelper.startTrackersCircleAnimation(
+    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>) {
+        experimentTrackersAnimationHelper.startTrackersBurstAnimation(
             context = requireContext(),
-            trackersCircleAnimationView = binding.newTrackersBlockingAnimationView,
+            trackersBurstAnimationView = binding.trackersBurstAnimationView,
             omnibarShieldAnimationView = omnibar.shieldIcon,
             omnibarPosition = omnibar.omnibarPosition,
             logos = logos,
+        )
+    }
+
+    private fun showExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIcon,
         )
     }
 
@@ -947,11 +953,17 @@ class BrowserTabFragment :
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        if (!viewModel.isSiteProtected()) {
+            return
+        }
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
         binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
             binding.trackersBlockedSlidingView.gone()
         } else {
+            if (binding.trackersBurstAnimationView.isAnimating) {
+                binding.trackersBurstAnimationView.cancelAnimation()
+            }
             binding.trackersBlockedSlidingView.show()
         }
         binding.trackers.text = viewModel.trackersCount()
@@ -1218,6 +1230,7 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -1880,7 +1893,8 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
-            is Command.StartTrackersLogosAnimation -> showNewTrackersBlockingAnimation(it.logos)
+            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos)
+            is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }

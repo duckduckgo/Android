@@ -26,8 +26,6 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
 
-    // TODO ANA: Add the new animation.
-
     /**
      * This method takes [entities] to create an animation in [trackersAnimationView].
      * Then it plays both animations, [shieldAnimationView] and [trackersAnimationView], at the same time.
@@ -46,7 +44,7 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
-    fun startNewTrackersAnimation(
+    fun startExperimentTrackersAnimation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,

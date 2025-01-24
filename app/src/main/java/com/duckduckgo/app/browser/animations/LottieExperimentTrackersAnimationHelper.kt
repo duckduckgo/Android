@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.animations
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.content.Context
-import android.content.res.Resources
 import android.view.Gravity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.airbnb.lottie.LottieAnimationView
@@ -35,50 +34,49 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
-class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircleAnimationHelper {
+class LottieExperimentTrackersAnimationHelper @Inject constructor() : ExperimentTrackersAnimationHelper {
 
-    private lateinit var trackersCircleAnimationView: LottieAnimationView
-    private lateinit var omnibarShieldAnimationView: LottieAnimationView
-    private lateinit var resources: Resources
+    private var trackersBurstAnimationView: LottieAnimationView? = null
+    private var omnibarShieldAnimationView: LottieAnimationView? = null
 
-    override fun startTrackersCircleAnimation(
+    override fun startShieldPopAnimation(
+        omnibarShieldAnimationView: LottieAnimationView,
+    ) {
+        this.omnibarShieldAnimationView = omnibarShieldAnimationView
+
+        omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
+        omnibarShieldAnimationView.setMaxProgress(1f)
+        omnibarShieldAnimationView.playAnimation()
+    }
+
+    override fun startTrackersBurstAnimation(
         context: Context,
-        trackersCircleAnimationView: LottieAnimationView,
+        trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
         omnibarPosition: OmnibarPosition,
         logos: List<TrackerLogo>,
     ) {
-        this.trackersCircleAnimationView = trackersCircleAnimationView
+        this.trackersBurstAnimationView = trackersBurstAnimationView
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
-        this.resources = context.resources
-
-        if (logos.size <= 2) {
-            // TODO ANA: We need to show the protected shield based on flags.
-            omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
-            omnibarShieldAnimationView.setMaxProgress(1f)
-            omnibarShieldAnimationView.playAnimation()
-            return
-        }
 
         val negativeMarginPx = (-72).toPx()
         val gravity = if (omnibarPosition == OmnibarPosition.BOTTOM) Gravity.BOTTOM else Gravity.NO_GRAVITY
-        val layoutParams = trackersCircleAnimationView.layoutParams as CoordinatorLayout.LayoutParams
+        val layoutParams = trackersBurstAnimationView.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.gravity = gravity
         layoutParams.marginStart = negativeMarginPx
         if (gravity == Gravity.BOTTOM) {
-            trackersCircleAnimationView.scaleY = -1f
+            trackersBurstAnimationView.scaleY = -1f
         } else {
             layoutParams.topMargin = negativeMarginPx
-            trackersCircleAnimationView.scaleY = 1f
+            trackersBurstAnimationView.scaleY = 1f
         }
-        trackersCircleAnimationView.setLayoutParams(layoutParams)
+        trackersBurstAnimationView.setLayoutParams(layoutParams)
 
-        // TODO ANA: We need to show the protected shield based on flags.
         omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)
 
-        with(trackersCircleAnimationView) {
+        with(trackersBurstAnimationView) {
             this.setCacheComposition(false)
-            this.setAnimation(R.raw.shieldburst)
+            this.setAnimation(R.raw.trackers_burst)
             this.maintainOriginalImageBounds = true
             this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
             this.removeAllAnimatorListeners()
@@ -87,13 +85,14 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
             this.addAnimatorListener(
                 object : AnimatorListener {
                     override fun onAnimationStart(animation: Animator) {
-                        this@LottieTrackersCircleAnimationHelper.trackersCircleAnimationView.show()
-                        this@LottieTrackersCircleAnimationHelper.omnibarShieldAnimationView.setMaxProgress(1f)
-                        this@LottieTrackersCircleAnimationHelper.omnibarShieldAnimationView.playAnimation()
+                        this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.show()
+                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.speed = 0.4f
+                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.setMaxProgress(1f)
+                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.playAnimation()
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
-                        this@LottieTrackersCircleAnimationHelper.trackersCircleAnimationView.gone()
+                        this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.gone()
                     }
 
                     override fun onAnimationCancel(animation: Animator) {}
@@ -105,5 +104,10 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
             this.setMaxProgress(1f)
             this.playAnimation()
         }
+    }
+
+    override fun cancelAnimations() {
+        this.trackersBurstAnimationView?.cancelAnimation()
+        this.omnibarShieldAnimationView?.cancelAnimation()
     }
 }

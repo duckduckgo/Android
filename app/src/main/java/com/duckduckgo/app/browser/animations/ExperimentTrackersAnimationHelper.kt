@@ -21,13 +21,19 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 
-interface TrackersCircleAnimationHelper {
+interface ExperimentTrackersAnimationHelper {
 
-    fun startTrackersCircleAnimation(
+    fun startShieldPopAnimation(
+        omnibarShieldAnimationView: LottieAnimationView,
+    )
+
+    fun startTrackersBurstAnimation(
         context: Context,
-        trackersCircleAnimationView: LottieAnimationView,
+        trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
         omnibarPosition: OmnibarPosition,
         logos: List<TrackerLogo>,
     )
+
+    fun cancelAnimations()
 }

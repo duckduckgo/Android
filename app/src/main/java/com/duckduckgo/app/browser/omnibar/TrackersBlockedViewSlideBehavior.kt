@@ -23,7 +23,9 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.MutableLiveData
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -45,9 +47,12 @@ class TrackersBlockedViewSlideBehavior(
     private var gravity: Int? = null
     private var trackers: DaxTextView? = null
     private var website: DaxTextView? = null
+    private var trackersBurstAnimationView: LottieAnimationView? = null
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        if (dependency.id == R.id.newOmnibarBottom) {
+        if (dependency.id == R.id.trackersBurstAnimationView) {
+            trackersBurstAnimationView = dependency as LottieAnimationView
+        } else if (dependency.id == R.id.newOmnibarBottom) {
             if (gravity == null) {
                 val layoutParams = child.layoutParams as? CoordinatorLayout.LayoutParams
                 gravity = layoutParams?.gravity
@@ -71,7 +76,7 @@ class TrackersBlockedViewSlideBehavior(
         consumed: IntArray,
         type: Int,
     ) {
-        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true) {
+        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
             if (translation == 0f) {
                 child.hide()
@@ -79,6 +84,9 @@ class TrackersBlockedViewSlideBehavior(
                 val site = siteLiveData.value
                 trackers?.text = site?.trackerCount.toString()
                 website?.text = site?.url?.extractDomain()
+                if (trackersBurstAnimationView?.isAnimating == true) {
+                    trackersBurstAnimationView?.cancelAnimation()
+                }
                 child.show()
             }
             super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
@@ -97,5 +105,11 @@ class TrackersBlockedViewSlideBehavior(
             return false
         }
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+    }
+
+    private fun isSiteProtected(): Boolean {
+        val site = siteLiveData.value
+        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
+        return shield == PrivacyShield.PROTECTED
     }
 }
