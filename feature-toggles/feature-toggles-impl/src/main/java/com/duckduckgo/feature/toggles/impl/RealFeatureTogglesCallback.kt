@@ -29,6 +29,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import okio.ByteString.Companion.encode
 
@@ -43,7 +44,7 @@ class RealFeatureTogglesCallback @Inject constructor(
         cohortName: String,
         enrollmentDate: String,
     ) {
-        val parsedDate = ZonedDateTime.parse(enrollmentDate).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val parsedDate = ZonedDateTime.parse(enrollmentDate).truncatedTo(ChronoUnit.DAYS).format(DateTimeFormatter.ISO_LOCAL_DATE)
         val params = mapOf("enrollmentDate" to parsedDate)
         val pixelName = getPixelName(experimentName, cohortName)
         val tag = "${pixelName}_$params".encode().md5().hex()
