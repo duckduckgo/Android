@@ -39,27 +39,27 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPOnboarding
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppTPTrackersScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAppearanceScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtectionNotSupported
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFeedback
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFeedback
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -90,7 +90,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
-class NewSettingsViewModel @Inject constructor(
+class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
@@ -278,7 +278,7 @@ class NewSettingsViewModel @Inject constructor(
             } else {
                 LaunchEmailProtectionNotSupported
             }
-            this@NewSettingsViewModel.command.send(command)
+            this@SettingsViewModel.command.send(command)
         }
         settingsPixelDispatcher.fireEmailPressed()
     }

@@ -30,7 +30,7 @@
 
         <include
             android:id="@+id/contentSettingsPrivacy"
-            layout="@layout/content_settings_new_privacy"
+            layout="@layout/content_settings_protections"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4" />
@@ -48,7 +48,7 @@
 
         <include
             android:id="@+id/contentSettingsMain"
-            layout="@layout/content_settings_main_settings"
+            layout="@layout/content_settings_other_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -60,7 +60,7 @@
 
         <include
             android:id="@+id/contentSettingsOther"
-            layout="@layout/content_settings_new_other"
+            layout="@layout/content_settings_meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
