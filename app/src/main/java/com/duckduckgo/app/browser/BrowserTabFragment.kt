@@ -1356,6 +1356,7 @@ class BrowserTabFragment :
             viewModel.onMaliciousSiteDetected(action, url)
         }
         maliciousWarningView.show()
+        binding.focusDummy.requestFocus()
     }
 
     private fun onEscapeMaliciousSite() {
