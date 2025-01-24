@@ -4,6 +4,23 @@ on:
   schedule:
     - cron: "0 9 * * *"  # Runs daily at 9am UTC
   workflow_dispatch:  # Allow manual triggering of the workflow
+    inputs:
+      package_name:
+        description: "Package name of the app to analyze"
+        required: true
+        default: "com.duckduckgo.mobile.android"
+      langs:
+        description: "Comma-separated list of languages"
+        required: false
+        default: "en"
+      countries:
+        description: "Comma-separated list of countries"
+        required: false
+        default: "us"
+      count:
+        description: "Number of reviews to fetch per language/country"
+        required: false
+        default: "10000"
 
 jobs:
   analyze-reviews:
@@ -26,7 +43,11 @@ jobs:
       - name: Run Review Analysis Script
         id: run-script
         run: |
-          python scripts/ps-analysis/ps_review_anomaly.py --package_name com.duckduckgo.mobile.android > output.txt
+          python scripts/ps-analysis/ps_review_anomaly.py \
+            --package_name "${{ inputs.package_name }}" \
+            --langs "${{ inputs.langs }}" \
+            --countries "${{ inputs.countries }}" \
+            --count "${{ inputs.count }}" > output.txt
           echo "script_output<<EOF" >> $GITHUB_ENV
           cat output.txt >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
