@@ -22,18 +22,29 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.DIALOG
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.MENU
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_STAGE
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_VARIANT
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.FeatureSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK
+import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK
+import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED
+import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.squareup.moshi.JsonAdapter
@@ -49,6 +60,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -98,6 +110,35 @@ class DefaultBrowserPromptsExperimentImplTest {
 
     @Mock private lateinit var systemDefaultBrowserDialogIntentMock: Intent
 
+    @Mock private lateinit var metricsMock: DefaultBrowserPromptsExperimentMetrics
+
+    @Mock private lateinit var pixelMock: Pixel
+
+    @Mock private lateinit var stageImpressionForStage1MetricMock: MetricsPixel
+    private val stageImpressionForStage1Pixels = listOf(
+        PixelDefinition("stageImpressionForStage1Pixels", mapOf("stageImpressionForStage1PixelsParam" to "set")),
+    )
+
+    @Mock private lateinit var stageImpressionForStage2MetricMock: MetricsPixel
+    private val stageImpressionForStage2Pixels = listOf(
+        PixelDefinition("stageImpressionForStage2Pixels", mapOf("stageImpressionForStage2PixelsParam" to "set")),
+    )
+
+    @Mock private lateinit var defaultSetForEnrolledMetric: MetricsPixel
+    private val defaultSetForEnrolledMetricPixels = listOf(
+        PixelDefinition("defaultSetForEnrolledMetricPixels", mapOf("defaultSetForEnrolledMetricPixelsParam" to "set")),
+    )
+
+    @Mock private lateinit var defaultSetForStage1Metric: MetricsPixel
+    private val defaultSetForStage1MetricPixels = listOf(
+        PixelDefinition("defaultSetForStage1MetricPixels", mapOf("defaultSetForStage1MetricPixelsParam" to "set")),
+    )
+
+    @Mock private lateinit var defaultSetForStage2Metric: MetricsPixel
+    private val defaultSetForStage2MetricPixels = listOf(
+        PixelDefinition("defaultSetForStage2MetricPixels", mapOf("defaultSetForStage2MetricPixelsParam" to "set")),
+    )
+
     private lateinit var dataStoreMock: DefaultBrowserPromptsDataStore
 
     private val fakeEnrollmentDateETString = "2025-01-16T00:00-05:00[America/New_York]"
@@ -115,6 +156,9 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(moshiMock.adapter<FeatureSettings>(any())).thenReturn(featureSettingsJsonAdapterMock)
         fakeUserAppStageFlow = MutableSharedFlow()
         whenever(userStageStoreMock.userAppStageFlow()).thenReturn(fakeUserAppStageFlow)
+        runBlocking {
+            mockMetrics()
+        }
     }
 
     @Test
@@ -157,7 +201,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     fun `when overflow menu item clicked, then launch browser selection system dialog`() = runTest {
         val testee = createTestee()
         val expectedUpdates = listOf<Command>(
-            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock),
+            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock, trigger = MENU),
         )
         val actualUpdates = mutableListOf<Command>()
         coroutinesTestRule.testScope.launch {
@@ -195,7 +239,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     fun `when message dialog confirmation clicked, then launch browser selection system dialog`() = runTest {
         val testee = createTestee()
         val expectedUpdates = listOf<Command>(
-            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock),
+            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock, trigger = DIALOG),
         )
         val actualUpdates = mutableListOf<Command>()
         coroutinesTestRule.testScope.launch {
@@ -247,8 +291,8 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         testee.onSystemDefaultBrowserDialogShown()
         advanceTimeBy(FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS - 1) // canceled before threshold
-        testee.onSystemDefaultBrowserDialogCanceled()
-        testee.onSystemDefaultBrowserDialogCanceled() // verifies that repeated cancellation won't keep opening new screens
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG)
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG) // verifies that repeated cancellation won't keep opening new screens
 
         assertEquals(1, actualUpdates.size)
         assertTrue(actualUpdates[0] is Command.OpenSystemDefaultAppsActivity)
@@ -265,7 +309,7 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         testee.onSystemDefaultBrowserDialogShown()
         advanceTimeBy(FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS + 1) // canceled after threshold
-        testee.onSystemDefaultBrowserDialogCanceled()
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG)
 
         assertTrue(actualUpdates.isEmpty())
     }
@@ -417,6 +461,8 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
         verify(evaluatorMock, never()).evaluate(any())
+        verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+        verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
     }
 
     @Test
@@ -451,6 +497,9 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock).storeExperimentStage(ExperimentStage.STAGE_1)
         verify(evaluatorMock).evaluate(ExperimentStage.STAGE_1)
+        stageImpressionForStage1Pixels.forEach {
+            verify(pixelMock).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -481,6 +530,8 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
         verify(evaluatorMock, never()).evaluate(any())
+        verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+        verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
     }
 
     @Test
@@ -515,6 +566,9 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock).storeExperimentStage(ExperimentStage.STAGE_2)
         verify(evaluatorMock).evaluate(ExperimentStage.STAGE_2)
+        stageImpressionForStage2Pixels.forEach {
+            verify(pixelMock).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -545,6 +599,8 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
         verify(evaluatorMock, never()).evaluate(any())
+        verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+        verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
     }
 
     @Test
@@ -607,6 +663,9 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock).storeExperimentStage(ExperimentStage.CONVERTED)
         verify(evaluatorMock).evaluate(ExperimentStage.CONVERTED)
+        defaultSetForEnrolledMetricPixels.forEach {
+            verify(pixelMock).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -635,6 +694,9 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock).storeExperimentStage(ExperimentStage.CONVERTED)
         verify(evaluatorMock).evaluate(ExperimentStage.CONVERTED)
+        defaultSetForStage1MetricPixels.forEach {
+            verify(pixelMock).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -663,6 +725,9 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         verify(dataStoreMock).storeExperimentStage(ExperimentStage.CONVERTED)
         verify(evaluatorMock).evaluate(ExperimentStage.CONVERTED)
+        defaultSetForStage2MetricPixels.forEach {
+            verify(pixelMock).fire(it.pixelName, it.params)
+        }
     }
 
     @Test
@@ -827,6 +892,111 @@ class DefaultBrowserPromptsExperimentImplTest {
         verify(dataStoreMock).storeHighlightOverflowMenuIconState(highlight = true)
     }
 
+    @Test
+    fun `if message dialog shown, then send a pixel`() = runTest {
+        val expectedParams = mapOf(
+            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_STAGE to "stage_1",
+        )
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        mockActiveCohort(
+            cohortName = AdditionalPromptsCohortName.VARIANT_2,
+        )
+
+        testee.onMessageDialogShown()
+
+        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_IMPRESSION, expectedParams)
+    }
+
+    @Test
+    fun `if message dialog canceled, then send a pixel`() = runTest {
+        val expectedParams = mapOf(
+            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_STAGE to "stage_1",
+        )
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        mockActiveCohort(
+            cohortName = AdditionalPromptsCohortName.VARIANT_2,
+        )
+
+        testee.onMessageDialogCanceled()
+
+        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_DISMISSED, expectedParams)
+    }
+
+    @Test
+    fun `if message dialog not now clicked, then send a pixel`() = runTest {
+        val expectedParams = mapOf(
+            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_STAGE to "stage_1",
+        )
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        mockActiveCohort(
+            cohortName = AdditionalPromptsCohortName.VARIANT_2,
+        )
+
+        testee.onMessageDialogNotNowButtonClicked()
+
+        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_DISMISSED, expectedParams)
+    }
+
+    @Test
+    fun `if message dialog confirmation clicked, then send a pixel`() = runTest {
+        val expectedParams = mapOf(
+            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_STAGE to "stage_1",
+        )
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        mockActiveCohort(
+            cohortName = AdditionalPromptsCohortName.VARIANT_2,
+        )
+
+        testee.onMessageDialogConfirmationButtonClicked()
+
+        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_CLICK, expectedParams)
+    }
+
+    @Test
+    fun `if menu item clicked, then send a pixel`() = runTest {
+        val expectedParams = mapOf(
+            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_STAGE to "stage_1",
+        )
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        mockActiveCohort(
+            cohortName = AdditionalPromptsCohortName.VARIANT_2,
+        )
+
+        testee.onOverflowMenuItemClicked()
+
+        verify(pixelMock).fire(SET_AS_DEFAULT_IN_MENU_CLICK, expectedParams)
+    }
+
     private fun createTestee(
         appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope,
         dispatchers: DispatcherProvider = coroutinesTestRule.testDispatcherProvider,
@@ -838,6 +1008,8 @@ class DefaultBrowserPromptsExperimentImplTest {
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator> = experimentStageEvaluatorPluginPointMock,
+        metrics: DefaultBrowserPromptsExperimentMetrics = metricsMock,
+        pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
     ) = DefaultBrowserPromptsExperimentImpl(
         appCoroutineScope = appCoroutineScope,
@@ -850,6 +1022,8 @@ class DefaultBrowserPromptsExperimentImplTest {
         userStageStore = userStageStore,
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         experimentStageEvaluatorPluginPoint = experimentStageEvaluatorPluginPoint,
+        metrics = metrics,
+        pixel = pixel,
         moshi = moshi,
     )
 
@@ -901,6 +1075,23 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(evaluatorMock.targetCohort).thenReturn(forCohortName)
         whenever(evaluatorMock.evaluate(forNewStage)).thenReturn(returnsAction)
         return evaluatorMock
+    }
+
+    private suspend fun mockMetrics() {
+        whenever(metricsMock.getStageImpressionForStage1()).thenReturn(stageImpressionForStage1MetricMock)
+        whenever(stageImpressionForStage1MetricMock.getPixelDefinitions()).thenReturn(stageImpressionForStage1Pixels)
+
+        whenever(metricsMock.getStageImpressionForStage2()).thenReturn(stageImpressionForStage2MetricMock)
+        whenever(stageImpressionForStage2MetricMock.getPixelDefinitions()).thenReturn(stageImpressionForStage2Pixels)
+
+        whenever(metricsMock.getDefaultSetForEnrolled()).thenReturn(defaultSetForEnrolledMetric)
+        whenever(defaultSetForEnrolledMetric.getPixelDefinitions()).thenReturn(defaultSetForEnrolledMetricPixels)
+
+        whenever(metricsMock.getDefaultSetForStage1()).thenReturn(defaultSetForStage1Metric)
+        whenever(defaultSetForStage1Metric.getPixelDefinitions()).thenReturn(defaultSetForStage1MetricPixels)
+
+        whenever(metricsMock.getDefaultSetForStage2()).thenReturn(defaultSetForStage2Metric)
+        whenever(defaultSetForStage2Metric.getPixelDefinitions()).thenReturn(defaultSetForStage2MetricPixels)
     }
 }
 
