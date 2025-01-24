@@ -27,9 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.LogPriority.ERROR
-import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import timber.log.Timber
 
 interface AppToDomainMapper {
     /**
@@ -50,7 +49,7 @@ class RealAppToDomainMapper @Inject constructor(
     override suspend fun getAssociatedDomains(appPackage: String): List<String> {
         return withContext(dispatcherProvider.io()) {
             appFingerprintProvider.getSHA256HexadecimalFingerprint(appPackage)?.let { fingerprint ->
-                logcat { "Autofill-mapping: Getting domains for $appPackage" }
+                Timber.d("Autofill-mapping: Getting domains for $appPackage")
                 attemptToGetFromDataset(appPackage, fingerprint).run {
                     this.ifEmpty { // TODO: optionally add kill switch for this - in case format for assetlinks breaks/ changes
                         attemptToGetFromAssetLinks(appPackage, fingerprint)
@@ -64,9 +63,9 @@ class RealAppToDomainMapper @Inject constructor(
         appPackage: String,
         fingerprint: String,
     ): List<String> {
-        logcat { "Autofill-mapping: Attempting to get domains from dataset" }
+        Timber.d("Autofill-mapping: Attempting to get domains from dataset")
         return domainTargetAppDao.getDomainsForApp(packageName = appPackage, fingerprint = fingerprint).also {
-            logcat { "Autofill-mapping: domains from dataset for $appPackage: ${it.size}" }
+            Timber.d("Autofill-mapping: domains from dataset for $appPackage: ${it.size}")
         }
     }
 
@@ -78,16 +77,16 @@ class RealAppToDomainMapper @Inject constructor(
             appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
         }.getOrNull()
         return domain?.run {
-            logcat { "Autofill-mapping: Attempting to get asset links for: $domain" }
+            Timber.d("Autofill-mapping: Attempting to get asset links for: $domain")
             val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter {
                 it.key == appPackage && it.value.contains(fingerprint)
             }
             if (validTargetApp.isNotEmpty()) {
-                logcat { "Autofill-mapping: Valid asset links targets found for $appPackage in $domain" }
+                Timber.d("Autofill-mapping: Valid asset links targets found for $appPackage in $domain")
                 persistMatch(domain, validTargetApp)
                 listOf(domain)
             } else {
-                logcat { "Autofill-mapping: No valid asset links target found for $appPackage in $domain" }
+                Timber.d("Autofill-mapping: No valid asset links target found for $appPackage in $domain")
                 emptyList()
             }
         } ?: emptyList()
@@ -115,7 +114,7 @@ class RealAppToDomainMapper @Inject constructor(
         domainTargetAppDao.insertAllMapping(toPersist)
     }.onFailure {
         // IF it fails for any reason, caching fails but the app should not.
-        logcat(ERROR) { "Autofill-mapping: Failed to persist data for $domain" }
+        Timber.e("Autofill-mapping: Failed to persist data for $domain")
     }
 
     companion object {
