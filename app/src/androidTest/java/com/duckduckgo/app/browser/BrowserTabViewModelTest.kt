@@ -86,6 +86,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
+import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -215,6 +217,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -498,6 +501,7 @@ class BrowserTabViewModelTest {
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
+    private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
 
     @Before
     fun before() = runTest {
@@ -657,6 +661,7 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
@@ -5656,6 +5661,37 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
         testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
         mockDuckChat.openDuckChat()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        val sendResponseToJs = Command.SendResponseToJs(JsCallbackData(JSONObject(), "", "", ""))
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(sendResponseToJs)
+        testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            "method",
+            "id",
+            data = null,
+            false,
+        ) { "someUrl" }
+        verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+        testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            "method",
+            "id",
+            data = null,
+            false,
+        ) { "someUrl" }
+        verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+        assertCommandNotIssued<Command.SendResponseToJs>()
     }
 
     private fun aCredential(): LoginCredentials {

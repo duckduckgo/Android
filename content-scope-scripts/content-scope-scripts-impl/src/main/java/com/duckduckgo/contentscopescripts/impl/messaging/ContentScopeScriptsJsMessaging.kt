@@ -22,7 +22,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.YOUTUBE_HOST
 import com.duckduckgo.duckplayer.api.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -43,7 +43,7 @@ import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(ActivityScope::class)
 @Named("ContentScopeScripts")
 class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
@@ -62,7 +62,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), breakageHandler, DuckPlayerHandler())
+    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler(), breakageHandler, DuckPlayerHandler(), DuckChatHandler())
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
@@ -75,7 +75,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
+                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
+                            (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
                     }?.process(jsMessage, secret, jsMessageCallback)
                 }
             }
@@ -144,6 +145,22 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             "initialSetup",
             "reportPageException",
             "reportInitException",
+        )
+    }
+
+    inner class DuckChatHandler : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
+        }
+
+        override val allowedDomains: List<String> = listOf(
+            AppUrl.Url.HOST,
+        )
+
+        override val featureName: String = "aiChat"
+        override val methods: List<String> = listOf(
+            "getUserValues",
+            "openAIChat",
         )
     }
 }
