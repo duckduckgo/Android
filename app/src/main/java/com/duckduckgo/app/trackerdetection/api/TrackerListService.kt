@@ -23,7 +23,7 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface TrackerListService {
-    @GET(TDS_URL)
+    @GET("$TDS_BASE_URL$TDS_PATH")
     @TdsRequired
     fun tds(): Call<TdsJson>
 
@@ -40,4 +40,3 @@ annotation class TdsRequired
 
 const val TDS_BASE_URL = "https://staticcdn.duckduckgo.com/trackerblocking/"
 const val TDS_PATH = "v5/current/android-tds.json"
-const val TDS_URL = "$TDS_BASE_URL$TDS_PATH"
