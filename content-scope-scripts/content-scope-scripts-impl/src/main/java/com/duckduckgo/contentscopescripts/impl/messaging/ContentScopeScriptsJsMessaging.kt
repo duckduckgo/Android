@@ -75,11 +75,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName && (
-                            it.allowedDomains.isEmpty() || it.allowedDomains.contains(
-                                domain,
-                            )
-                            )
+                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
+                            (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
                     }?.process(jsMessage, secret, jsMessageCallback)
                 }
             }
