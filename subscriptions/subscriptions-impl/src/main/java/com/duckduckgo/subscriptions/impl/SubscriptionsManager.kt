@@ -542,7 +542,7 @@ class RealSubscriptionsManager @Inject constructor(
             val tokens = authClient.getTokens(refreshToken.jwt)
             validateTokens(tokens, jwks)
         } catch (e: HttpException) {
-            if (e.code() == 401) {
+            if (e.code() == 400) {
                 // refresh token is invalid / expired -> try to get a new pair of tokens using store login
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
