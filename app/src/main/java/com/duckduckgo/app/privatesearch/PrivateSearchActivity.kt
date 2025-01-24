@@ -18,7 +18,6 @@ package com.duckduckgo.app.privatesearch
 
 import android.os.Bundle
 import android.widget.CompoundButton
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -45,9 +44,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
-
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
 
@@ -64,20 +60,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            with(binding) {
-                privateSearchHeaderImage.isGone = true
-                privateSearchTitle.isGone = true
-                privateSearchDescription.isGone = true
-                privateSearchHeadingSearchSettings.isGone = true
-
-                privateSearchHeaderImageNew.isVisible = true
-                privateSearchTitleNew.isVisible = true
-                statusIndicator.isVisible = true
-                privateSearchDescriptionNew.isVisible = true
-            }
-        }
 
         configureUiEventHandlers()
         observeViewModel()
