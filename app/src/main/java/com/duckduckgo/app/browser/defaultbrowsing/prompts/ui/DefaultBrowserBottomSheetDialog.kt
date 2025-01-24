@@ -47,8 +47,8 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
             setRoundCorners(dialogInterface)
             eventListener?.onShown()
         }
-        setOnDismissListener {
-            eventListener?.onDismissed()
+        setOnCancelListener {
+            eventListener?.onCanceled()
         }
         binding.defaultBrowserBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onSetBrowserButtonClicked()
@@ -77,7 +77,7 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
 
     interface EventListener {
         fun onShown()
-        fun onDismissed()
+        fun onCanceled()
         fun onSetBrowserButtonClicked()
         fun onNotNowButtonClicked()
     }

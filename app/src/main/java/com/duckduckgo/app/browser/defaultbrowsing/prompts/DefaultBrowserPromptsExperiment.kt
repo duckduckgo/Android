@@ -30,20 +30,33 @@ interface DefaultBrowserPromptsExperiment {
     fun onOverflowMenuItemClicked()
 
     fun onMessageDialogShown()
-    fun onMessageDialogDismissed()
+    fun onMessageDialogCanceled()
     fun onMessageDialogConfirmationButtonClicked()
     fun onMessageDialogNotNowButtonClicked()
 
     fun onSystemDefaultBrowserDialogShown()
-    fun onSystemDefaultBrowserDialogSuccess()
-    fun onSystemDefaultBrowserDialogCanceled()
+    fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger)
+    fun onSystemDefaultBrowserDialogCanceled(trigger: SetAsDefaultActionTrigger)
 
     fun onSystemDefaultAppsActivityOpened()
-    fun onSystemDefaultAppsActivityClosed()
+    fun onSystemDefaultAppsActivityClosed(trigger: SetAsDefaultActionTrigger)
 
     sealed class Command {
         data object OpenMessageDialog : Command()
-        data class OpenSystemDefaultBrowserDialog(val intent: Intent) : Command()
-        data class OpenSystemDefaultAppsActivity(val intent: Intent) : Command()
+        data class OpenSystemDefaultBrowserDialog(
+            val intent: Intent,
+            val trigger: SetAsDefaultActionTrigger,
+        ) : Command()
+
+        data class OpenSystemDefaultAppsActivity(
+            val intent: Intent,
+            val trigger: SetAsDefaultActionTrigger,
+        ) : Command()
+    }
+
+    enum class SetAsDefaultActionTrigger {
+        DIALOG,
+        MENU,
+        UNKNOWN,
     }
 }
