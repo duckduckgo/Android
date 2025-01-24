@@ -975,11 +975,13 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentCtaViewState().cta is OnboardingDaxDialogCta) {
-            onDismissOnboardingDaxDialog(currentCtaViewState().cta as OnboardingDaxDialogCta)
+        val cta = currentCtaViewState().cta
+
+        if (cta is OnboardingDaxDialogCta) {
+            onDismissOnboardingDaxDialog(cta)
         }
 
-        when (currentCtaViewState().cta) {
+        when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
             is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta,
             -> {
@@ -997,10 +999,9 @@ class BrowserTabViewModel @Inject constructor(
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
-
             is BrokenSitePromptDialogCta -> {
                 viewModelScope.launch(dispatchers.main()) {
-                    command.value = HideBrokenSitePromptCta(currentCtaViewState().cta as BrokenSitePromptDialogCta)
+                    command.value = HideBrokenSitePromptCta(cta)
                 }
             }
         }
