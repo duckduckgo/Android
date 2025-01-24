@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import timber.log.Timber
 
 interface AssetLinksLoader {
@@ -42,7 +41,7 @@ class RealAssetLinksLoader @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             kotlin.runCatching {
                 assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
-                    logcat { "Autofill-mapping: Assetlinks of $domain: ${it.size}" }
+                    Timber.d("Autofill-mapping: Assetlinks of $domain: ${it.size}")
                 }.filter {
                     it.relation.contains(LOGIN_CREDENTIALS_RELATION) &&
                         !it.target.package_name.isNullOrEmpty() &&

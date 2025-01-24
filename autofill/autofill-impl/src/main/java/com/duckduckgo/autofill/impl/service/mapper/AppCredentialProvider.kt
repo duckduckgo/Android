@@ -21,9 +21,10 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.logcat
+import timber.log.Timber
 
 interface AppCredentialProvider {
     /**
@@ -34,17 +35,18 @@ interface AppCredentialProvider {
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealAppCredentialProvider @Inject constructor(
     private val appToDomainMapper: AppToDomainMapper,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillStore: AutofillStore,
 ) : AppCredentialProvider {
     override suspend fun getCredentials(appPackage: String): List<LoginCredentials> = withContext(dispatcherProvider.io()) {
-        logcat { "Autofill-mapping: Getting credentials for $appPackage" }
+        Timber.d("Autofill-mapping: Getting credentials for $appPackage")
         return@withContext appToDomainMapper.getAssociatedDomains(appPackage).map {
             getAllCredentialsFromDomain(it)
         }.flatten().distinct().also {
-            logcat { "Autofill-mapping: Total credentials for $appPackage : ${it.size}" }
+            Timber.d("Autofill-mapping: Total credentials for $appPackage : ${it.size}")
         }
     }
 
