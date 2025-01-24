@@ -326,15 +326,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.duckduckgo.app.settings.LegacySettingsActivity"
-            android:exported="false"
-            android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.duckduckgo.app.settings.NewSettingsActivity"
             android:exported="true"
             android:label="@string/settingsActivityTitle"
