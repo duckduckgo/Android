@@ -765,7 +765,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(authenticationError = true)
+        givenV2AccessTokenRefreshFails(invalidTokenError = true)
         givenPurchaseStored()
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
@@ -784,7 +784,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(authenticationError = true)
+        givenV2AccessTokenRefreshFails(invalidTokenError = true)
         givenPurchaseStored()
         givenStoreLoginFails()
 
@@ -1545,10 +1545,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateV2TokensSucceeds()
     }
 
-    private suspend fun givenV2AccessTokenRefreshFails(authenticationError: Boolean = false) {
-        val exception = if (authenticationError) {
+    private suspend fun givenV2AccessTokenRefreshFails(invalidTokenError: Boolean = false) {
+        val exception = if (invalidTokenError) {
             val responseBody = "failure".toResponseBody("text/json".toMediaTypeOrNull())
-            HttpException(Response.error<Void>(401, responseBody))
+            HttpException(Response.error<Void>(400, responseBody))
         } else {
             RuntimeException()
         }
