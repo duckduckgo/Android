@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -54,8 +55,13 @@ class RealAppToDomainMapperTest {
 
     @Test
     fun whenAppWithValidCredentialsExistInDatasetThenReturnAllMatchingDomains() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.real.app")).thenReturn("realfingerprint")
-        whenever(dao.getDomainsForApp("com.real.app", "realfingerprint")).thenReturn(listOf("dataset-domain-2.com", "dataset-domain.com"))
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.real.app")).thenReturn(listOf("realfingerprint"))
+        whenever(dao.getDomainsForApp("com.real.app", listOf("realfingerprint"))).thenReturn(
+            listOf(
+                "dataset-domain-2.com",
+                "dataset-domain.com",
+            ),
+        )
 
         val result = toTest.getAssociatedDomains("com.real.app")
 
@@ -67,8 +73,8 @@ class RealAppToDomainMapperTest {
 
     @Test
     fun whenMaliciousAppWithInvalidFingerprintThenReturnNoDomain() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.potentially.malicious.app")).thenReturn("fakefingerprint")
-        whenever(dao.getDomainsForApp("com.potentially.malicious.app", "realfingerprint")).thenReturn(listOf("dataset-domain.com"))
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.potentially.malicious.app")).thenReturn(listOf("fakefingerprint"))
+        whenever(dao.getDomainsForApp("com.potentially.malicious.app", listOf("realfingerprint"))).thenReturn(listOf("dataset-domain.com"))
         whenever(assetLinksLoader.getValidTargetApps("potentially.com")).thenReturn(
             mapOf("com.potentially.malicious.app" to listOf("realfingerprint")),
         )
@@ -81,8 +87,8 @@ class RealAppToDomainMapperTest {
 
     @Test
     fun whenValidAppIsNotInDatasetButHasValidReversedPackageDomainThenReturnAllMatchingDomains() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.website.app")).thenReturn("realfingerprint")
-        whenever(dao.getDomainsForApp("com.website.app", "realfingerprint")).thenReturn(emptyList())
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.website.app")).thenReturn(listOf("realfingerprint"))
+        whenever(dao.getDomainsForApp("com.website.app", listOf("fakefingerprint"))).thenReturn(emptyList())
         whenever(assetLinksLoader.getValidTargetApps("website.com")).thenReturn(
             mapOf(
                 "com.website.app" to listOf(
@@ -122,8 +128,8 @@ class RealAppToDomainMapperTest {
 
     @Test
     fun whenAppIsNotInDatasetAndHasNoAssetlinksThenReturnNoDomain() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.website-invalid.app")).thenReturn("realfingerprint")
-        whenever(dao.getDomainsForApp("com.website-invalid.app", "realfingerprint")).thenReturn(emptyList())
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.website-invalid.app")).thenReturn(listOf("realfingerprint"))
+        whenever(dao.getDomainsForApp("com.website-invalid.app", listOf("fakefingerprint"))).thenReturn(emptyList())
         whenever(assetLinksLoader.getValidTargetApps("website-invalid.com")).thenReturn(emptyMap())
 
         val result = toTest.getAssociatedDomains("com.website-invalid.app")
@@ -134,16 +140,18 @@ class RealAppToDomainMapperTest {
 
     @Test
     fun whenUnableToGetFingerprintThenReturnEmpty() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.no.app")).thenReturn(null)
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com.no.app")).thenReturn(emptyList())
 
         val result = toTest.getAssociatedDomains("com.no.fingerprint")
 
         assertTrue(result.isEmpty())
+        verifyNoInteractions(dao)
+        verifyNoInteractions(assetLinksLoader)
     }
 
     @Test
     fun whenAppPackageYieldsNullDomainWhenReversedThenReturnEmpty() = runTest {
-        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com")).thenReturn("realfingerprint")
+        whenever(fingerprintProvider.getSHA256HexadecimalFingerprint("com")).thenReturn(listOf("realfingerprint"))
 
         val result = toTest.getAssociatedDomains("com")
 

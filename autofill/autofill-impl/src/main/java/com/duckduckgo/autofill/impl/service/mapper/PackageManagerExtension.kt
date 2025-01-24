@@ -28,21 +28,21 @@ import java.security.MessageDigest
 internal fun PackageManager.getSHA256HexadecimalFingerprintCompat(
     packageName: String,
     appBuildConfig: AppBuildConfig,
-): String? {
+): List<String> {
     return kotlin.runCatching {
         if (appBuildConfig.sdkInt >= 28) {
             getSHA256Fingerprint(packageName, this)
         } else {
             getSHA256FingerprintLegacy(packageName, this)
         }
-    }.getOrNull()
+    }.getOrElse { emptyList() }
 }
 
 @RequiresApi(28)
 private fun getSHA256Fingerprint(
     packageName: String,
     packageManager: PackageManager,
-): String? {
+): List<String> {
     return try {
         val packageInfo: PackageInfo = packageManager.getPackageInfo(
             packageName,
@@ -50,12 +50,20 @@ private fun getSHA256Fingerprint(
         )
 
         // Get the signing certificates
-        val signatures = packageInfo.signingInfo.apkContentsSigners
+        val signatures = packageInfo.signingInfo?.let {
+            if (it.hasMultipleSigners()) {
+                it.apkContentsSigners
+            } else {
+                it.signingCertificateHistory
+            }
+        }
 
-        signatures.firstOrNull()?.sha256()
+        signatures?.map {
+            it.sha256()
+        } ?: emptyList()
     } catch (e: Exception) {
         e.printStackTrace()
-        null
+        emptyList()
     }
 }
 
@@ -63,19 +71,21 @@ private fun getSHA256Fingerprint(
 private fun getSHA256FingerprintLegacy(
     packageName: String,
     packageManager: PackageManager,
-): String? {
+): List<String> {
     val packageInfo: PackageInfo = packageManager.getPackageInfo(
         packageName,
         PackageManager.GET_SIGNATURES,
     )
 
-    val signatures = packageInfo.signatures ?: return null
+    val signatures = packageInfo.signatures ?: return emptyList()
 
     if (signatures.size != 1) {
-        return null
+        return emptyList()
     }
 
-    return signatures.firstOrNull()?.sha256()
+    return signatures.map {
+        it.sha256()
+    }
 }
 
 private fun Signature.sha256(): String {

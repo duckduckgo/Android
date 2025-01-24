@@ -59,4 +59,10 @@ abstract class DomainTargetAppDao {
         packageName: String,
         fingerprint: String,
     ): List<String>
+
+    @Query("select domain from autofill_domain_target_apps_mapping where app_package = :packageName AND app_fingerprint IN (:fingerprints)")
+    abstract fun getDomainsForApp(
+        packageName: String,
+        fingerprints: List<String>,
+    ): List<String>
 }

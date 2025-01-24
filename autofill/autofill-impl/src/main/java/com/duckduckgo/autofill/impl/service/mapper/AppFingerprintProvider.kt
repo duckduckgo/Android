@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AppFingerprintProvider {
-    fun getSHA256HexadecimalFingerprint(packageName: String): String?
+    fun getSHA256HexadecimalFingerprint(packageName: String): List<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -31,6 +31,6 @@ class RealAppFingerprintProvider @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val context: Context,
 ) : AppFingerprintProvider {
-    override fun getSHA256HexadecimalFingerprint(packageName: String): String? =
+    override fun getSHA256HexadecimalFingerprint(packageName: String): List<String> =
         context.packageManager.getSHA256HexadecimalFingerprintCompat(packageName, appBuildConfig)
 }

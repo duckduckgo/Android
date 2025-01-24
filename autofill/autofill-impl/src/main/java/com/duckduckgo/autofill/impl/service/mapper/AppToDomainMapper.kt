@@ -48,38 +48,41 @@ class RealAppToDomainMapper @Inject constructor(
 ) : AppToDomainMapper {
     override suspend fun getAssociatedDomains(appPackage: String): List<String> {
         return withContext(dispatcherProvider.io()) {
-            appFingerprintProvider.getSHA256HexadecimalFingerprint(appPackage)?.let { fingerprint ->
-                Timber.d("Autofill-mapping: Getting domains for $appPackage")
-                attemptToGetFromDataset(appPackage, fingerprint).run {
-                    this.ifEmpty { // TODO: optionally add kill switch for this - in case format for assetlinks breaks/ changes
-                        attemptToGetFromAssetLinks(appPackage, fingerprint)
+            Timber.d("Autofill-mapping: Getting domains for $appPackage")
+            val fingerprints = appFingerprintProvider.getSHA256HexadecimalFingerprint(appPackage)
+            if (fingerprints.isNotEmpty()) {
+                attemptToGetFromDataset(appPackage, fingerprints).run {
+                    this.ifEmpty {
+                        attemptToGetFromAssetLinks(appPackage, fingerprints)
                     }
                 }
-            }?.distinct() ?: emptyList()
+            } else {
+                emptyList()
+            }.distinct()
         }
     }
 
     private fun attemptToGetFromDataset(
         appPackage: String,
-        fingerprint: String,
+        fingerprints: List<String>,
     ): List<String> {
         Timber.d("Autofill-mapping: Attempting to get domains from dataset")
-        return domainTargetAppDao.getDomainsForApp(packageName = appPackage, fingerprint = fingerprint).also {
+        return domainTargetAppDao.getDomainsForApp(packageName = appPackage, fingerprints = fingerprints).also {
             Timber.d("Autofill-mapping: domains from dataset for $appPackage: ${it.size}")
         }
     }
 
     private suspend fun attemptToGetFromAssetLinks(
         appPackage: String,
-        fingerprint: String,
+        fingerprints: List<String>,
     ): List<String> {
         val domain = kotlin.runCatching {
             appPackage.split('.').asReversed().joinToString(".").normalizeScheme().toHttpUrl().topPrivateDomain()
         }.getOrNull()
         return domain?.run {
             Timber.d("Autofill-mapping: Attempting to get asset links for: $domain")
-            val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter {
-                it.key == appPackage && it.value.contains(fingerprint)
+            val validTargetApp = assetLinksLoader.getValidTargetApps(this).filter { target ->
+                target.key == appPackage && target.value.any { it in fingerprints }
             }
             if (validTargetApp.isNotEmpty()) {
                 Timber.d("Autofill-mapping: Valid asset links targets found for $appPackage in $domain")
