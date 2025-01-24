@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
-    <string name="settingsAutocompleteEnabled">Automatikus kiegészítési javaslatok megjelenítése</string>
     <string name="autocompleteRemoveItemTitle">Eltávolítod a keresési javaslatot?</string>
     <string name="autocompleteRemoveItemCancel">Mégsem</string>
     <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
-    <string name="settingsHeadingPrivacy">Adatvédelem</string>
     <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
-    <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
     <string name="leaveFeedbackNew">Visszajelzés küldése</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
-    <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
-    <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
     <string name="settingsHeadingNextSteps">Következő lépések</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Letiltva</string>
     <string name="settingsSubtitleNotificationsEnabled">Engedélyezve</string>
     <string name="settingsDefaultBrowserTitle">Alapértelmezett böngésző</string>
-    <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsPrivateSearchTitle">Privát Keresés</string>
     <string name="settingsGeneral" instruction="List item for general settings">Általános</string>
-    <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
-    <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
-    <string name="settingsHeadingSettings">Beállítások</string>
     <string name="settingsHeadingMainSettings">További beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
-    <string name="settingsFireButton">Tűz gomb</string>
     <string name="settingsDataClearing">Adattörlés</string>
     <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
-    <string name="privateSearchTitle">A Private Search engedélyezve van</string>
     <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
-    <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
     <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionIsEnabledTitle">A webes követés elleni védelem engedélyezve van</string>
     <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
-    <string name="cookiePopupProtectionDescription">Szabadulj meg ezektől a felugró ablakoktól és minimalizáld a sütiket</string>
-    <string name="cookiePopupProtectionEnabled">Engedélyezve</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tűz gomb</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearData">Adatok automatikus törlése…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>
-    <string name="settingsAddHomeScreenWidget">Kezdőképernyő-minialkalmazás</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
-    <string name="macos_settings_title">Maces DuckDuckGo böngésző</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
@@ -654,10 +633,6 @@
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Windowsos DuckDuckGo böngésző</string>
-    <string name="windows_settings_description">Privát böngészés windowsos alkalmazásunkkal</string>
-    <string name="windows_settings_description_ready">Letöltés elérhető</string>
-    <string name="windows_settings_description_list">Rajta vagy a listán!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">A teljes képernyőről való kilépéshez végezz felülről lefelé húzást, és koppints a vissza gombra</string>
@@ -750,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Jelszavak</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Jelszavak és automatikus kitöltés</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>

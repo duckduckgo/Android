@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
-    <string name="settingsAutocompleteEnabled">Näytä automaattisen täydennyksen ehdotukset</string>
     <string name="autocompleteRemoveItemTitle">Poistetaanko hakuehdotus?</string>
     <string name="autocompleteRemoveItemCancel">Peruuta</string>
     <string name="autocompleteRemoveItemRemove">Poista</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
-    <string name="settingsHeadingPrivacy">Tietosuoja</string>
     <string name="settingsHeadingProtections">Suojaukset</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
-    <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
     <string name="leaveFeedbackNew">Lähetä palautetta</string>
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
-    <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
-    <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
     <string name="settingsHeadingNextSteps">Seuraavat vaiheet</string>
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Pois käytöstä</string>
     <string name="settingsSubtitleNotificationsEnabled">Käytössä</string>
     <string name="settingsDefaultBrowserTitle">Oletusselain</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on oletusselaimesi</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo:sta oletusselain</string>
     <string name="settingsPrivateSearchTitle">Yksityinen haku</string>
     <string name="settingsGeneral" instruction="List item for general settings">Yleistä</string>
-    <string name="settingsPrivateSearchDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
-    <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
-    <string name="settingsHeadingSettings">Asetukset</string>
     <string name="settingsHeadingMainSettings">Muut asetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
-    <string name="settingsFireButton">Fire-painike</string>
     <string name="settingsDataClearing">Datan tyhjentäminen</string>
     <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Yksityinen haku</string>
-    <string name="privateSearchTitle">Private Search on käytössä</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search on oletushakukoneesi, ja sen avulla voit hakea netistä ilman, että sinua seurataan.</string>
-    <string name="privateSearchHeadingSearchSettings">Hakuasetukset</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
     <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Verkkoseurantasuojaus on käytössä</string>
     <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
-    <string name="cookiePopupProtectionDescription">Karkota ponnahdusikkunat ja minimoi evästeet</string>
-    <string name="cookiePopupProtectionEnabled">Käytössä</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
 
-    <string name="settingsAutomaticallyClearWhat">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearData">Tyhjennä tiedot automaattisesti...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Tyhjennä automaattisesti…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s-widget lisätty aloitusnäyttöön</string>
-    <string name="settingsAddHomeScreenWidget">Aloitusnäytön widget</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Selaa yksityisesti Mac-sovelluksellamme</string>
-    <string name="macos_settings_title">DuckDuckGon Mac-selain</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Lataukset</string>
@@ -654,10 +633,6 @@
     <string name="downloadsNotifyMeSubtitle">Saat ilmoituksen, kun lataukset ovat valmiita.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGon Windows-selain</string>
-    <string name="windows_settings_description">Selaa yksityisesti Windows-sovelluksellamme</string>
-    <string name="windows_settings_description_ready">Lataus saatavilla</string>
-    <string name="windows_settings_description_list">Olet listalla!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vedä yläreunasta alaspäin ja poistu koko näytöstä painamalla takaisin-painiketta</string>
@@ -750,7 +725,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Peruuta</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Salasanat</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Salasanat ja automaattinen täyttö</string>
     <string name="autofillLoginSavedSnackbarMessage">Salasana tallennettu</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Salasana päivitetty</string>

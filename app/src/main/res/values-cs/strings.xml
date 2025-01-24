@@ -84,7 +84,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
-    <string name="settingsAutocompleteEnabled">Zobrazit návrhy automatického doplňování</string>
     <string name="autocompleteRemoveItemTitle">Odebrat návrh vyhledávání?</string>
     <string name="autocompleteRemoveItemCancel">Zrušit</string>
     <string name="autocompleteRemoveItemRemove">Odstranit</string>
@@ -128,18 +127,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
-    <string name="settingsHeadingPrivacy">Soukromí</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
-    <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
     <string name="leaveFeedbackNew">Odeslat zpětnou vazbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
-    <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
-    <string name="settingsHeadingMore">Další od DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Další kroky</string>
     <string name="settingsLightTheme">Světlo</string>
     <string name="settingsTheme">Barevný motiv</string>
@@ -155,18 +150,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Zakázáno</string>
     <string name="settingsSubtitleNotificationsEnabled">Povoleno</string>
     <string name="settingsDefaultBrowserTitle">Výchozí prohlížeč</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvůj výchozí prohlížeč</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nastav si DuckDuckGo jako výchozí prohlížeč</string>
     <string name="settingsPrivateSearchTitle">Soukromé vyhledávání</string>
     <string name="settingsGeneral" instruction="List item for general settings">Obecné</string>
-    <string name="settingsPrivateSearchDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
-    <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
-    <string name="settingsHeadingSettings">Nastavení</string>
     <string name="settingsHeadingMainSettings">Další nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Vymazání dat</string>
     <string name="settingsAddWidget">Přidat widget na domovskou obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
@@ -175,9 +164,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Soukromé vyhledávání</string>
-    <string name="privateSearchTitle">Soukromé vyhledávání je povolené</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search je tvůj výchozí vyhledávač, takže můžeš hledat na webu, aniž by tě někdo sledoval.</string>
-    <string name="privateSearchHeadingSearchSettings">Nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
@@ -195,15 +182,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Ochrana před sledováním na webu je povolená</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
-    <string name="cookiePopupProtectionDescription">Zakaž tato vyskakovací okna a omez soubory cookie na nezbytné minimum</string>
-    <string name="cookiePopupProtectionEnabled">Povoleno</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -218,7 +201,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearData">Automaticky vymazat data…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
@@ -606,11 +588,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Na plochu se přidal widget %1$s</string>
-    <string name="settingsAddHomeScreenWidget">Widget na plochu</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Zajisti si soukromí při prohlížení webu – v naší aplikaci pro Mac</string>
-    <string name="macos_settings_title">Prohlížeč DuckDuckGo pro Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stahování</string>
@@ -654,10 +633,6 @@
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Prohlížeč DuckDuckGo pro Windows</string>
-    <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
-    <string name="windows_settings_description_ready">Ke stažení</string>
-    <string name="windows_settings_description_list">Jsi na seznamu!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Přetažením dolů z horní části a klepnutím na tlačítko zpět ukončíš zobrazení na celou obrazovku</string>
@@ -776,7 +751,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Zrušit</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Hesla</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Hesla a automatické vyplňování</string>
     <string name="autofillLoginSavedSnackbarMessage">Heslo je uložené</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Heslo je aktualizované</string>
