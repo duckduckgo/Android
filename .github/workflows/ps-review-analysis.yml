@@ -40,14 +40,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/ps-analysis/requirements.txt
 
+      - name: Set Default Inputs for Scheduled Runs
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          echo "package_name=com.duckduckgo.mobile.android" >> $GITHUB_ENV
+          echo "langs=en" >> $GITHUB_ENV
+          echo "countries=us" >> $GITHUB_ENV
+          echo "count=10000" >> $GITHUB_ENV
+
+      - name: Override Inputs for Manual Trigger
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "package_name=${{ github.event.inputs.package_name }}" >> $GITHUB_ENV
+          echo "langs=${{ github.event.inputs.langs }}" >> $GITHUB_ENV
+          echo "countries=${{ github.event.inputs.countries }}" >> $GITHUB_ENV
+          echo "count=${{ github.event.inputs.count }}" >> $GITHUB_ENV
+
       - name: Run Review Analysis Script
         id: run-script
         run: |
           python scripts/ps-analysis/ps_review_anomaly.py \
-            --package_name "${{ inputs.package_name }}" \
-            --langs "${{ inputs.langs }}" \
-            --countries "${{ inputs.countries }}" \
-            --count "${{ inputs.count }}" > output.txt
+            --package_name "${{ env.package_name }}" \
+            --langs "${{ env.langs }}" \
+            --countries "${{ env.countries }}" \
+            --count "${{ env.count }}" > output.txt
           echo "script_output<<EOF" >> $GITHUB_ENV
           cat output.txt >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
