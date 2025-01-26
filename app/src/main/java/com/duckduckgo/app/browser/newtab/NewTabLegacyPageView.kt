@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.newtab
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -50,6 +49,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -59,7 +59,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -88,6 +87,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private var coroutineScope: CoroutineScope? = null
 
     private val binding: ViewNewTabLegacyBinding by viewBinding()
@@ -104,8 +106,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState
             .onEach { render(it) }

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.SpannableStringBuilder
 import android.util.AttributeSet
@@ -29,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -40,7 +40,6 @@ import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.ViewSt
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -59,6 +58,9 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private var coroutineScope: CoroutineScope? = null
 
     private var job: ConflatedJob = ConflatedJob()
@@ -75,8 +77,7 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState()
             .onEach { render(it) }

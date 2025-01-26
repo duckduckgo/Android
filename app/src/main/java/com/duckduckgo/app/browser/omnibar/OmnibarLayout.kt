@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -75,6 +74,7 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -83,7 +83,6 @@ import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -136,6 +135,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private lateinit var pulseAnimation: PulseAnimation
 
@@ -235,8 +237,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState
             .onEach { render(it) }

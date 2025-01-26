@@ -51,6 +51,7 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
@@ -60,7 +61,6 @@ import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -75,6 +75,9 @@ class NotifyMeView @JvmOverloads constructor(
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private lateinit var sharedPrefsKeyForDismiss: String
 
@@ -117,8 +120,7 @@ class NotifyMeView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.init(sharedPrefsKeyForDismiss)
 

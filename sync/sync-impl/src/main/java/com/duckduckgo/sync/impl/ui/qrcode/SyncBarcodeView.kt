@@ -35,6 +35,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
@@ -47,7 +48,6 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewSt
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -68,6 +68,12 @@ constructor(
 
     @Inject
     lateinit var viewModelFactory: SquareDecoratedBarcodeViewModel.Factory
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -91,8 +97,7 @@ constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState
             .onEach { render(it) }

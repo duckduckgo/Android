@@ -17,7 +17,6 @@
 package com.duckduckgo.savedsites.impl.newtab
 
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.text.Spanned
@@ -49,6 +48,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.AppScope
@@ -81,7 +81,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -102,6 +101,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     @Inject
     lateinit var browserNav: BrowserNav
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -146,8 +148,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState
             .onEach { render(it) }
