@@ -263,6 +263,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         coroutineScope?.cancel()
+        coroutineScope = null
         super.onDetachedFromWindow()
     }
 

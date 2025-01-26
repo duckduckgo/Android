@@ -90,7 +90,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
-    private lateinit var coroutineScope: CoroutineScope
+    private var coroutineScope: CoroutineScope? = null
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -99,7 +99,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
         job += viewModel.commands()
             .onEach { processCommand(it) }
-            .launchIn(coroutineScope)
+            .launchIn(coroutineScope!!)
 
         configureMessage()
 
@@ -108,7 +108,8 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        coroutineScope.cancel()
+        coroutineScope?.cancel()
+        coroutineScope = null
         job.cancel()
     }
 
