@@ -68,12 +68,10 @@ class Omnibar(
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 binding.rootView.removeView(binding.newOmnibarBottom)
-                binding.newOmnibarBottom.onRemoved()
             }
 
             OmnibarPosition.BOTTOM -> {
                 binding.rootView.removeView(binding.newOmnibar)
-                binding.newOmnibar.onRemoved()
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)

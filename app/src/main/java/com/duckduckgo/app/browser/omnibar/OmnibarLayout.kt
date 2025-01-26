@@ -40,7 +40,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
@@ -85,7 +84,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -142,6 +144,8 @@ class OmnibarLayout @JvmOverloads constructor(
         requireNotNull(findViewTreeLifecycleOwner())
     }
 
+    private lateinit var coroutineScope: CoroutineScope
+
     private val pulseAnimation: PulseAnimation by lazy {
         PulseAnimation(lifecycleOwner)
     }
@@ -151,10 +155,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var decoration: Decoration? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
-
-    private var isViewModelSubscribed = false
-    private var viewStateJob: Job? = null
-    private var commandJob: Job? = null
 
     internal val findInPage by lazy { IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)) }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
@@ -246,29 +246,22 @@ class OmnibarLayout @JvmOverloads constructor(
         )[OmnibarLayoutViewModel::class.java]
     }
 
-    // One OmnibarLayout is always removed from the view hierarchy, we should cancel any flow subscriptions
-    fun onRemoved() {
-        viewStateJob?.cancel()
-        commandJob?.cancel()
-    }
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        if (!isViewModelSubscribed) {
-            viewStateJob = lifecycleOwner.lifecycleScope.launch {
-                viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                    render(it)
-                }
-            }
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
+        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-            commandJob = lifecycleOwner.lifecycleScope.launch {
-                viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                    processCommand(it)
-                }
+        coroutineScope.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                render(it)
             }
+        }
 
-            isViewModelSubscribed = true
+        coroutineScope.launch {
+            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                processCommand(it)
+            }
         }
 
         if (decoration != null) {
@@ -282,6 +275,11 @@ class OmnibarLayout @JvmOverloads constructor(
             }
             stateBuffer.clear()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        coroutineScope.cancel()
     }
 
     @SuppressLint("ClickableViewAccessibility")
