@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protección de privacidad activada para %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Protección de privacidad desactivada para %1$s</string>
     <string name="undoSnackbarAction">Deshacer</string>
+    <string name="trackersBlockedAnimationMessage">Rastreadores bloqueados</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Descargar imagen</string>
