@@ -16,7 +16,6 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet
@@ -34,6 +33,7 @@ import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
@@ -47,8 +47,8 @@ import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -64,6 +64,9 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
@@ -82,14 +85,19 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         configureGrid()
 
         viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
+    }
+
+    override fun onDetachedFromWindow() {
+        coroutineScope?.cancel()
+        coroutineScope = null
+        super.onDetachedFromWindow()
     }
 
     private fun render(viewState: ViewState) {

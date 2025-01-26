@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -26,13 +25,13 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.databinding.ViewSyncDisabledWarningBinding
 import com.duckduckgo.sync.impl.ui.SyncDisabledViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -48,6 +47,9 @@ class SyncDisabledView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: SyncDisabledViewModel.Factory
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private var coroutineScope: CoroutineScope? = null
 
     private val binding: ViewSyncDisabledWarningBinding by viewBinding()
@@ -62,8 +64,7 @@ class SyncDisabledView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
         viewModel.viewState()
             .onEach { render(it) }
