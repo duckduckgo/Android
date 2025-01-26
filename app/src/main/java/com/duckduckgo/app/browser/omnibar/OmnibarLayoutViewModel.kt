@@ -58,11 +58,11 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -80,7 +80,13 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    val viewState = combine(_viewState, tabRepository.flowTabs) { state, tabs ->
+        state.copy(
+            shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
+            tabCount = tabs.size,
+            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+        )
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -127,18 +133,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     init {
-        tabRepository.flowTabs
-            .onEach { tabs ->
-                _viewState.update {
-                    it.copy(
-                        shouldUpdateTabsCount = tabs.size != it.tabCount && tabs.isNotEmpty(),
-                        tabCount = tabs.size,
-                        hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-                    )
-                }
-            }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
-
         logVoiceSearchAvailability()
     }
 
