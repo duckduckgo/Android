@@ -92,7 +92,7 @@ class SurveyInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
-    private lateinit var coroutineScope: CoroutineScope
+    private var coroutineScope: CoroutineScope? = null
     internal lateinit var survey: SurveyDetails
 
     override fun onAttachedToWindow() {
@@ -102,7 +102,7 @@ class SurveyInPasswordsPromotionView @JvmOverloads constructor(
 
         job += viewModel.commands()
             .onEach { processCommand(it) }
-            .launchIn(coroutineScope)
+            .launchIn(coroutineScope!!)
 
         showSurvey(survey)
 
@@ -111,7 +111,8 @@ class SurveyInPasswordsPromotionView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        coroutineScope.cancel()
+        coroutineScope?.cancel()
+        coroutineScope = null
         job.cancel()
     }
 

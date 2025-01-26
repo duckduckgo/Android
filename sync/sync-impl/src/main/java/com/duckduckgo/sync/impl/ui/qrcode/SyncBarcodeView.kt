@@ -49,6 +49,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -68,7 +69,7 @@ constructor(
     @Inject
     lateinit var viewModelFactory: SquareDecoratedBarcodeViewModel.Factory
 
-    private lateinit var coroutineScope: CoroutineScope
+    private var coroutineScope: CoroutineScope? = null
 
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
@@ -95,15 +96,21 @@ constructor(
 
         viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope)
+            .launchIn(coroutineScope!!)
 
         viewModel.commands()
             .onEach { processCommands(it) }
-            .launchIn(coroutineScope)
+            .launchIn(coroutineScope!!)
 
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        coroutineScope?.cancel()
+        coroutineScope = null
+        super.onDetachedFromWindow()
     }
 
     fun resume() {
