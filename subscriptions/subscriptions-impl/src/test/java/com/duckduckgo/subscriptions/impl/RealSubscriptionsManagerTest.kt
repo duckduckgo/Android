@@ -83,6 +83,7 @@ import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -360,7 +361,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.purchase(mock(), planId = "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
+        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
     }
 
     @Test
@@ -373,7 +374,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.purchase(mock(), "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
+        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
     }
 
     @Test
@@ -387,7 +388,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(playBillingManager, never()).launchBillingFlow(any(), any(), any())
+            verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), isNull())
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
             cancelAndConsumeRemainingEvents()
         }
@@ -427,7 +428,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
+            verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"), isNull())
             assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
             cancelAndConsumeRemainingEvents()
         }
@@ -510,7 +511,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.purchase(mock(), planId = "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), any())
+        verify(playBillingManager).launchBillingFlow(any(), any(), any(), isNull())
     }
 
     @Test
@@ -520,7 +521,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.purchase(mock(), planId = "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), any())
+        verify(playBillingManager).launchBillingFlow(any(), any(), any(), isNull())
     }
 
     @Test(expected = Exception::class)

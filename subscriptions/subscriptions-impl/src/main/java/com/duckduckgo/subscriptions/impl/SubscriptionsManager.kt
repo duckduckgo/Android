@@ -105,11 +105,12 @@ interface SubscriptionsManager {
     suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
     /**
-     * Launches the purchase flow for a given plan id
+     * Launches the purchase flow for a given combination of plan id and offer id
      */
     suspend fun purchase(
         activity: Activity,
         planId: String,
+        offerId: String? = null,
     )
 
     /**
@@ -747,6 +748,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun purchase(
         activity: Activity,
         planId: String,
+        offerId: String?,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
