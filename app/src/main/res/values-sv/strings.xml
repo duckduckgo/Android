@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd aktiverat för %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd inaktiverat för %1$s</string>
     <string name="undoSnackbarAction">Återställ</string>
+    <string name="trackersBlockedAnimationMessage">Spårare har blockerats</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Ladda ned bild</string>
