@@ -49,6 +49,8 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     var typingDelayInMs: Long = 20
     private var completeText: Spanned? = null
+    private var shouldRestartAnimation: Boolean = false
+    private var afterAnimation: () -> Unit = {}
 
     fun startTypingAnimation(
         htmlText: String,
@@ -56,6 +58,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
         afterAnimation: () -> Unit = {},
     ) {
         completeText = htmlText.html(context)
+        this.afterAnimation = afterAnimation
 
         if (isCancellable) {
             setOnClickListener {
@@ -69,6 +72,12 @@ class TypeAnimationTextView @JvmOverloads constructor(
         typingAnimationJob?.cancel()
 
         typingAnimationJob = launch {
+            animateTyping()
+        }
+    }
+
+    private suspend fun animateTyping() {
+        if (completeText != null) {
             val transparentSpan = ForegroundColorSpan(Color.TRANSPARENT)
             val partialText = SpannableString(completeText)
             breakSequence(partialText).forEach { index ->
@@ -98,8 +107,20 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     fun cancelAnimation() = typingAnimationJob?.cancel()
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (shouldRestartAnimation) {
+            typingAnimationJob = launch {
+                animateTyping()
+            }
+        }
+    }
+
     override fun onDetachedFromWindow() {
+        shouldRestartAnimation = hasAnimationStarted() && !hasAnimationFinished()
         cancelAnimation()
+
         super.onDetachedFromWindow()
     }
 }
