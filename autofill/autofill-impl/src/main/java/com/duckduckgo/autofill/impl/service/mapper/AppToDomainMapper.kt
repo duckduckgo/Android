@@ -33,7 +33,6 @@ import timber.log.Timber
 interface AppToDomainMapper {
     /**
      * Returns a list of domains whose credentials can be associated to the [appPackage]
-     * You DO NOT need to set any dispatcher to call this suspend function
      */
     suspend fun getAssociatedDomains(appPackage: String): List<String>
 }
