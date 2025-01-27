@@ -383,4 +383,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
 
     BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
+
+    TRACKERS_CIRCLES_ANIMATION_SHOWN("m_trackers_circles_animation_shown"),
+    TRACKERS_BURST_ANIMATION_SHOWN("m_trackers_burst_animation_shown"),
 }
