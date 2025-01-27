@@ -104,6 +104,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/netpDnsBlockMalwareHeader"/>
+
                 <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                         android:id="@+id/block_malware_toggle"
                         android:layout_width="match_parent"

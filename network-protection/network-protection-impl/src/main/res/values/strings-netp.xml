@@ -234,10 +234,6 @@
     <string name="netpCustomDnsWarning">Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn\'t secure or reliable.</string>
     <string name="netpDdgDnsByLine">DuckDuckGo routes DNS queries through our DNS servers so your internet provider can\'t see what websites you visit.</string>
 
-    <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Block Malware</string>
-    <string name="netpDnsBlockMalwareByline">Block malware with a DNS-level blocklist. If a website doesn\'t load, try turning blocking off.</string>
-
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Would you like to exclude apps that are not compatible with VPNs?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">We found %1$s while the VPN is connected.</string>
