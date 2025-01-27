@@ -99,7 +99,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
-    private val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore()
+    private val authDataStore: FakeSubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
     private val emailManager: EmailManager = mock()
@@ -1295,6 +1295,40 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(subscriptionsManager.isSignedIn())
         assertNull(subscriptionsManager.getSubscription())
         assertEquals(WAITING, subscriptionsManager.subscriptionStatus())
+    }
+
+    @Test
+    fun whenValidateTokenFailsThenPixelIsSent() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+
+        whenever(authClient.getTokens(any<String>()))
+            .thenReturn(TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2))
+        whenever(authClient.getJwks()).thenReturn("fake jwks")
+        whenever(authJwtValidator.validateAccessToken(any<String>(), any<String>())).thenThrow(RuntimeException::class.java)
+        whenever(authJwtValidator.validateRefreshToken(any<String>(), any<String>())).thenThrow(RuntimeException::class.java)
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        verify(pixelSender).reportAuthV2TokenValidationError()
+    }
+
+    @Test
+    fun whenStoringTokenFailsThenPixelIsSent() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        authDataStore.simluateAccessTokenV2StoreError = true
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        verify(pixelSender).reportAuthV2TokenStoreError()
     }
 
     private suspend fun givenUrlPortalSucceeds() {

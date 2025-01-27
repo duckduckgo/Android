@@ -31,6 +31,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALI
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_IO
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_FAILURE_OTHER
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_STORE_ERROR
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_VALIDATION_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -102,6 +104,8 @@ interface SubscriptionPixelSender {
     fun reportAuthV2MigrationSuccess()
     fun reportAuthV2MigrationFailureIo()
     fun reportAuthV2MigrationFailureOther()
+    fun reportAuthV2TokenValidationError()
+    fun reportAuthV2TokenStoreError()
 }
 
 @ContributesBinding(AppScope::class)
@@ -238,6 +242,14 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2MigrationFailureOther() {
         fire(AUTH_V2_MIGRATION_FAILURE_OTHER)
+    }
+
+    override fun reportAuthV2TokenValidationError() {
+        fire(AUTH_V2_TOKEN_VALIDATION_ERROR)
+    }
+
+    override fun reportAuthV2TokenStoreError() {
+        fire(AUTH_V2_TOKEN_STORE_ERROR)
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {

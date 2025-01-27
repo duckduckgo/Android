@@ -183,6 +183,14 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_auth_v2_migration_failure_other",
         types = setOf(Count, Daily()),
     ),
+    AUTH_V2_TOKEN_VALIDATION_ERROR(
+        baseName = "m_privacy-pro_auth_v2_token_validation_error",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_TOKEN_STORE_ERROR(
+        baseName = "m_privacy-pro_auth_v2_token_store_error",
+        types = setOf(Count, Daily()),
+    ),
     ;
 
     constructor(
