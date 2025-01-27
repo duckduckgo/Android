@@ -30,9 +30,12 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
+    implementation AndroidX.work.runtimeKtx
     implementation Google.dagger
 
     implementation project(path: ':common-utils')
@@ -43,6 +46,7 @@ dependencies {
     implementation Google.android.material
 
     testImplementation AndroidX.test.ext.junit
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
@@ -54,6 +58,7 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation AndroidX.work.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
