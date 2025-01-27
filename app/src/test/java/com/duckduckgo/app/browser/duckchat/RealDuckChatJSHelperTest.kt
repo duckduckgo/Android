@@ -143,9 +143,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigAndIdIsNullThenReturnNull() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndIdIsNullThenReturnNull() = runTest {
         val featureName = "aiChat"
-        val method = "getAIChatNativeConfig"
+        val method = "getAIChatNativeConfigValues"
 
         val result = testee.processJsCallbackMessage(featureName, method, null, null)
 

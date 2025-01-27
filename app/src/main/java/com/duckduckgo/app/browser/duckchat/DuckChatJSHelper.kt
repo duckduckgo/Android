@@ -49,8 +49,8 @@ class RealDuckChatJSHelper @Inject constructor(
         METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
             SendResponseToJs(getAIChatNativeHandoffData(featureName, method, it))
         }
-        METHOD_GET_AI_CHAT_NATIVE_CONFIG -> id?.let {
-            SendResponseToJs(getAIChatNativeConfig(featureName, method, it))
+        METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES -> id?.let {
+            SendResponseToJs(getAIChatNativeConfigValues(featureName, method, it))
         }
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)
@@ -70,7 +70,7 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getAIChatNativeConfig(featureName: String, method: String, id: String): JsCallbackData {
+    private fun getAIChatNativeConfigValues(featureName: String, method: String, id: String): JsCallbackData {
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
@@ -87,7 +87,7 @@ class RealDuckChatJSHelper @Inject constructor(
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
-        private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG = "getAIChatNativeConfigValues"
+        private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
