@@ -41,21 +41,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/oneLineItemHeight"
-                app:primaryText="Last Opened Tab" />
+                app:primaryText="@string/showOnAppLaunchOptionLastOpenedTab" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/newTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/oneLineItemHeight"
-                app:primaryText="New Tab Page" />
+                app:primaryText="@string/showOnAppLaunchOptionNewTabPage" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/specificPageCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/oneLineItemHeight"
-                app:primaryText="Specific Page" />
+                app:primaryText="@string/showOnAppLaunchOptionSpecificPage" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
                 android:id="@+id/specificPageUrlInput"
