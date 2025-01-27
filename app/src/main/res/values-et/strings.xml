@@ -792,4 +792,5 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Uus AI vestlus</string>
+
 </resources>
