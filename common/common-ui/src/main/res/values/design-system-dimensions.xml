@@ -72,6 +72,9 @@
     <dimen name="gridItemTextWidth">72dp</dimen>
     <dimen name="gridItemPreviewHeight">170dp</dimen>
 
+    <!-- Extended FAB -->
+    <dimen name="fabHeight">56dp</dimen>
+
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">200dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
