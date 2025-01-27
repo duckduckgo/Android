@@ -589,20 +589,30 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private fun validateTokens(tokens: TokenPair, jwks: String): ValidatedTokenPair {
-        return ValidatedTokenPair(
-            accessToken = tokens.accessToken,
-            accessTokenClaims = authJwtValidator.validateAccessToken(tokens.accessToken, jwks),
-            refreshToken = tokens.refreshToken,
-            refreshTokenClaims = authJwtValidator.validateRefreshToken(tokens.refreshToken, jwks),
-        )
+        return try {
+            ValidatedTokenPair(
+                accessToken = tokens.accessToken,
+                accessTokenClaims = authJwtValidator.validateAccessToken(tokens.accessToken, jwks),
+                refreshToken = tokens.refreshToken,
+                refreshTokenClaims = authJwtValidator.validateRefreshToken(tokens.refreshToken, jwks),
+            )
+        } catch (e: Exception) {
+            pixelSender.reportAuthV2TokenValidationError()
+            throw e
+        }
     }
 
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
-        authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
-        authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
-        authRepository.setEntitlements(accessTokenClaims.entitlements)
-        authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
-        backgroundTokenRefresh.schedule()
+        try {
+            authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
+            authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
+            authRepository.setEntitlements(accessTokenClaims.entitlements)
+            authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
+            backgroundTokenRefresh.schedule()
+        } catch (e: Exception) {
+            pixelSender.reportAuthV2TokenStoreError()
+            throw e
+        }
     }
 
     private fun extractError(e: Exception): String {
