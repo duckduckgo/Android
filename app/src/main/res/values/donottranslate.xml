@@ -66,4 +66,7 @@
     <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
 
+    <string name="tabSwitcherFabNewTab">New Tab</string>
+    <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
+
 </resources>
