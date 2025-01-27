@@ -22,12 +22,16 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillNotSupported
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillSupported
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -47,6 +51,7 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autofilledListeners: PluginPoint<DataAutofilledListener>,
+    private val usernameBackFiller: UsernameBackFiller,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -76,7 +81,12 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         originalUrl: String,
         callback: AutofillEventListener,
     ) {
-        val username = result.getString(UseGeneratedPasswordDialog.KEY_USERNAME)
+        val backFillUsernameIfRequired = result
+            .getString(UseGeneratedPasswordDialog.KEY_USERNAME)
+            .backFillUsernameIfSupported(originalUrl)
+
+        val username = backFillUsernameIfRequired.first
+
         val password = result.getString(UseGeneratedPasswordDialog.KEY_PASSWORD) ?: return
         val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
         val matchType = existingCredentialMatchDetector.determine(originalUrl, username, password)
@@ -115,6 +125,13 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     ) {
         when (matchType) {
             ContainsCredentialsResult.ExactMatch -> Timber.v("Already got an exact match; nothing to do here")
+            ContainsCredentialsResult.UsernameMatchMissingPassword -> {
+                Timber.v("Will update existing password(s) which are username matches but missing a password")
+                updateCredentialsIfPasswordMissing(originalUrl, username, password)
+            }
+            ContainsCredentialsResult.UsernameMatchDifferentPassword -> {
+                Timber.v("There's a matching username already with a different password saved. No automatic action taken.")
+            }
             else -> {
                 autofillStore.saveCredentials(
                     originalUrl,
@@ -124,6 +141,21 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
                     autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
                 }
             }
+        }
+    }
+
+    private suspend fun updateCredentialsIfPasswordMissing(
+        originalUrl: String,
+        username: String?,
+        password: String,
+    ) {
+        withContext(dispatchers.io()) {
+            autofillStore.getCredentials(originalUrl)
+                .filter { it.username == username }
+                .filter { it.password.isNullOrEmpty() }
+                .also { list -> Timber.v("Found %d credentials with missing password for username=%s and url=%s", list.size, username, originalUrl) }
+                .map { it.copy(password = password) }
+                .forEach { autofillStore.updateCredentials(originalUrl, it, CredentialUpdateType.Password) }
         }
     }
 
@@ -137,6 +169,15 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         } else {
             Timber.i("Updating existing login with new username and/or password. Login id is: %s", autosavedLogin.id)
             autofillStore.updateCredentials(autosavedLogin.copy(username = username, password = password))
+        }
+    }
+
+    private suspend fun String?.backFillUsernameIfSupported(currentUrl: String): Pair<String?, Boolean> {
+        // determine if we can and should use a partial previous submission's username
+        val result = usernameBackFiller.isBackFillingUsernameSupported(this, currentUrl)
+        return when (result) {
+            is BackFillSupported -> Pair(result.username, true)
+            is BackFillNotSupported -> Pair(this, false)
         }
     }
 

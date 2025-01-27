@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
-import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinkType
@@ -41,7 +41,6 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
@@ -52,9 +51,6 @@ import org.mockito.kotlin.*
 class SpecialUrlDetectorImplTest {
 
     lateinit var testee: SpecialUrlDetector
-
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
 
     val mockPackageManager: PackageManager = mock()
 
@@ -70,6 +66,8 @@ class SpecialUrlDetectorImplTest {
 
     val mockDuckPlayer: DuckPlayer = mock()
 
+    val mockDuckChat: DuckChat = mock()
+
     @Before
     fun setup() = runTest {
         testee = SpecialUrlDetectorImpl(
@@ -79,8 +77,7 @@ class SpecialUrlDetectorImplTest {
             subscriptions = subscriptions,
             externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
             duckPlayer = mockDuckPlayer,
-            scope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            duckChat = mockDuckChat,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
@@ -446,6 +443,38 @@ class SpecialUrlDetectorImplTest {
         val actual =
             testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com".toUri())
         assertTrue(actual is ShouldLaunchPrivacyProLink)
+    }
+
+    @Test
+    fun whenDuckChatIsEnabledAndIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val type = testee.determineType("https://example.com")
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        assertTrue(type is ShouldLaunchDuckChatLink)
+    }
+
+    @Test
+    fun whenDuckChatIsDisabledAndIsDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val type = testee.determineType("https://example.com")
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        assertTrue(type !is ShouldLaunchDuckChatLink)
     }
 
     private fun randomString(length: Int): String {

@@ -1,0 +1,11 @@
+appId: com.duckduckgo.mobile.android
+---
+
+# dismiss any offers to autofill from existing credentials
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/useLoginTitle"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/closeButton"

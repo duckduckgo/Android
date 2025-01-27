@@ -29,6 +29,9 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
@@ -133,6 +136,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var autofillImportPasswordConfigStore: AutofillImportPasswordConfigStore
+
+    @Inject
+    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     private var passwordImportWatcher = ConflatedJob()
 
@@ -289,8 +295,17 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
         binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
-            val intent = globalActivityStarter.startIntent(this, AutofillImportViaGooglePasswordManagerScreen)
-            importGooglePasswordsFlowLauncher.launch(intent)
+            lifecycleScope.launch {
+                val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
+                val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
+                if (webViewDocumentStartJavascript && webViewWebMessageSupport) {
+                    val intent =
+                        globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
+                    importGooglePasswordsFlowLauncher.launch(intent)
+                } else {
+                    Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         binding.importPasswordsImportCsv.setClickListener {

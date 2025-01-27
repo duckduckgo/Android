@@ -26,6 +26,8 @@ import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
@@ -61,6 +63,7 @@ class WebViewDataManager @Inject constructor(
     private val crashLogger: CrashLogger,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WebDataManager {
 
     override suspend fun clearData(
@@ -86,13 +89,20 @@ class WebViewDataManager @Inject constructor(
 
     private suspend fun clearWebStorage(webStorage: WebStorage) {
         suspendCoroutine { continuation ->
-            kotlin.runCatching {
-                webLocalStorageManager.clearWebLocalStorage()
-                continuation.resume(Unit)
-            }.onFailure { e ->
-                Timber.e(e, "WebDataManager: Could not selectively clear web storage")
-                sendCrashPixel(e)
-                // fallback, if we crash we delete everything
+            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+                kotlin.runCatching {
+                    webLocalStorageManager.clearWebLocalStorage()
+                    continuation.resume(Unit)
+                }.onFailure { e ->
+                    Timber.e(e, "WebDataManager: Could not selectively clear web storage")
+                    if (appBuildConfig.isInternalBuild()) {
+                        sendCrashPixel(e)
+                    }
+                    // fallback, if we crash we delete everything
+                    webStorage.deleteAllData()
+                    continuation.resume(Unit)
+                }
+            } else {
                 webStorage.deleteAllData()
                 continuation.resume(Unit)
             }

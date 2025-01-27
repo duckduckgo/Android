@@ -94,42 +94,42 @@ class DefaultTabStatsBucketingTest {
     fun testGetNumberOfOpenTabs81To100() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(90)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("81-100", result)
+        assertEquals("81+", result)
     }
 
     @Test
     fun testGetNumberOfOpenTabs101To125() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(110)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("101-125", result)
+        assertEquals("81+", result)
     }
 
     @Test
     fun testGetNumberOfOpenTabs126To150() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(130)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("126-150", result)
+        assertEquals("81+", result)
     }
 
     @Test
     fun testGetNumberOfOpenTabs151To250() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(200)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("151-250", result)
+        assertEquals("81+", result)
     }
 
     @Test
     fun testGetNumberOfOpenTabs251To500() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(300)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("251-500", result)
+        assertEquals("81+", result)
     }
 
     @Test
     fun testGetNumberOfOpenTabsMaxValue() = runTest {
         whenever(tabRepository.getOpenTabCount()).thenReturn(600)
         val result = defaultTabStatsBucketing.getNumberOfOpenTabs()
-        assertEquals("501+", result)
+        assertEquals("81+", result)
     }
 
     @Test

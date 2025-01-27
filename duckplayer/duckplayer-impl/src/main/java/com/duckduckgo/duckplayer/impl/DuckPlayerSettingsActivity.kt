@@ -43,7 +43,7 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState
 import com.duckduckgo.duckplayer.impl.databinding.ActivityDuckPlayerSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,14 +59,14 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var newSettingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
-        val newSettingsEnabled = newSettingsFeature.self().isEnabled()
+        val newSettingsEnabled = settingsPageFeature.newSettingsPage().isEnabled()
 
         with(binding) {
             duckPlayerLegacyLayout.isGone = newSettingsEnabled
@@ -191,7 +191,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState) {
             is ViewState.Enabled -> {
-                if (newSettingsFeature.self().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     with(binding) {
                         duckPlayerModeSelector.isEnabled = true
                         duckPlayerDisabledSection.isVisible = false
@@ -210,7 +210,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 }
             }
             is ViewState.DisabledWithHelpLink -> {
-                if (newSettingsFeature.self().isEnabled()) {
+                if (settingsPageFeature.newSettingsPage().isEnabled()) {
                     with(binding) {
                         duckPlayerModeSelector.isEnabled = false
                         duckPlayerDisabledSection.isVisible = true
@@ -241,7 +241,7 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setDuckPlayerSectionVisibility(isVisible: Boolean) {
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             with(binding) {
                 duckPlayerSettingsTitle.isVisible = isVisible
                 duckPlayerSettingsIcon.isVisible = isVisible

@@ -40,7 +40,7 @@ class BrowserPopupMenu(
 ) : PopupMenu(
     layoutInflater,
     resourceId = if (omnibarPosition == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
-    width = context.resources.getDimensionPixelSize(dimen.popupMenuWidth),
+    width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
 ) {
     private val topBinding = PopupWindowBrowserMenuBinding.bind(contentView)
     private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
@@ -91,6 +91,13 @@ class BrowserPopupMenu(
         when (omnibarPosition) {
             TOP -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
             BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+        }
+    }
+
+    internal val duckChatMenuItem: View by lazy {
+        when (omnibarPosition) {
+            TOP -> topBinding.includeDuckChatMenuItem.duckChatMenuItem
+            BOTTOM -> bottomBinding.includeDuckChatMenuItem.duckChatMenuItem
         }
     }
 
@@ -245,6 +252,7 @@ class BrowserPopupMenu(
         printPageMenuItem.isEnabled = browserShowing
 
         newTabMenuItem.isVisible = browserShowing && !displayedInCustomTabScreen
+        duckChatMenuItem.isVisible = viewState.showDuckChatOption && !displayedInCustomTabScreen
         sharePageMenuItem.isVisible = viewState.canSharePage
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem

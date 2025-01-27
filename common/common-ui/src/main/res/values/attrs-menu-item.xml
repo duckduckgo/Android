@@ -27,6 +27,7 @@
     <declare-styleable name="PopupMenuItemView">
         <attr name="primaryText" />
         <attr name="primaryTextType" />
+        <attr name="trailingIcon" />
     </declare-styleable>
 
 </resources>

@@ -50,6 +50,7 @@
         <!-- Android Components -->
         <item name="actionOverflowMenuStyle">@style/Widget.DuckDuckGo.PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/Widget.DuckDuckGo.OverflowButton</item>
+        <item name="popupMenuStyle">@style/Widget.DuckDuckGo.PopupMenu</item>
         <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
@@ -157,6 +158,7 @@
         <item name="daxColorSecondaryInvertedText">@color/black60</item>
         <item name="daxColorTertiaryText">@color/white48</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
+        <item name="daxColorSecondaryIcon">@color/white60</item>
         <item name="daxColorDestructive">@color/alertRedOnDarkDefault</item>
         <item name="daxColorIconDisabled">@color/white40</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
@@ -246,6 +248,7 @@
         <item name="daxColorSecondaryInvertedText">@color/white60</item>
         <item name="daxColorTertiaryText">@color/black48</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
+        <item name="daxColorSecondaryIcon">@color/black60</item>
         <item name="daxColorIconDisabled">@color/black40</item>
         <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
         <item name="daxColorContainerDisabled">@color/black6</item>

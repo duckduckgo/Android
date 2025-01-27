@@ -159,6 +159,38 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app_redirect",
         type = Count,
     ),
+    AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED(
+        baseName = "m_privacy-pro_auth_invalid_refresh_token_detected",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT(
+        baseName = "m_privacy-pro_auth_invalid_refresh_token_signed_out",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED(
+        baseName = "m_privacy-pro_auth_invalid_refresh_token_recovered",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_MIGRATION_SUCCESS(
+        baseName = "m_privacy-pro_auth_v2_migration_success",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_MIGRATION_FAILURE_IO(
+        baseName = "m_privacy-pro_auth_v2_migration_failure_io",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_MIGRATION_FAILURE_OTHER(
+        baseName = "m_privacy-pro_auth_v2_migration_failure_other",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_TOKEN_VALIDATION_ERROR(
+        baseName = "m_privacy-pro_auth_v2_token_validation_error",
+        types = setOf(Count, Daily()),
+    ),
+    AUTH_V2_TOKEN_STORE_ERROR(
+        baseName = "m_privacy-pro_auth_v2_token_store_error",
+        types = setOf(Count, Daily()),
+    ),
     ;
 
     constructor(

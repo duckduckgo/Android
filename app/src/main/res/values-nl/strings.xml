@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Privacybescherming</string>
+    <string name="settingsHeadingProtections">Bescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
     <string name="settingsHeadingCustomize">Aanpassen</string>
     <string name="settingsHeadingAbout">Over</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
+    <string name="leaveFeedbackNew">Verstuur feedback</string>
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
     <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
     <string name="settingsHeadingMore">Meer over DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
-    <string name="settingsHeadingMainSettings">Hoofdinstellingen</string>
+    <string name="settingsHeadingMainSettings">Overige Instellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Gegevens wissen</string>
     <string name="settingsAddWidget">Widget toevoegen aan startscherm</string>
     <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
-    <string name="settingsEnableVoiceSearch">Zoeken via spraak inschakelen</string>
+    <string name="settingsEnableVoiceSearch">Privé voice search inschakelen</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo op andere platforms</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
-    <string name="webTrackingProtectionTitle">Bescherming tegen webtracking is ingeschakeld</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Bescherming tegen webtracking is ingeschakeld</string>
+    <string name="webTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Defecte website melden</string>
-    <string name="brokenSiteHeading">Defecte website melden</string>
-    <string name="brokenSiteSubmitted">Dank je wel! Feedback verzonden.</string>
-    <string name="brokenSitesCategoriesTitle">Beschrijf wat er is gebeurd</string>
-    <string name="brokenSitesCategoriesHint">Beschrijf wat er is gebeurd</string>
-    <string name="brokenSiteSubmitButton">Verzend Rapport</string>
-    <string name="brokenSiteDescription">Als je een anoniem rapport over een kapotte site indient, helpt dat ons om de app te verbeteren.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site geblokkeerd of niet geladen</string>
-    <string name="brokenSiteCategoryLayout">Site wordt niet goed vormgegeven</string>
-    <string name="brokenSiteCategoryEmptySpaces">Site bevat grote lege ruimtes</string>
-    <string name="brokenSiteCategoryShopping">Betalen, afrekenen of winkelen niet mogelijk</string>
-    <string name="brokenSiteCategoryPaywall">De site vroeg me om de adblocker uit te schakelen</string>
-    <string name="brokenSiteCategoryComments">Reacties, recensies of chats worden niet geladen</string>
-    <string name="brokenSiteCategoryVideos">Video wordt niet afgespeeld of geladen</string>
-    <string name="brokenSiteCategoryLogin">Aanmelden/registreren niet mogelijk</string>
-    <string name="brokenSiteCategoryOther">Iets anders</string>
-    <string name="brokenSiteDescriptionTextInputHint">Meer details delen (optioneel)</string>
-    <string name="brokenSiteDescriptionCaption">Wat is er gebeurd? Wat had er moeten gebeuren? Hielp het uitschakelen van de beveiliging?</string>
 
     <string name="brokenSiteProtectionsOn">Beveiliging is <b>INGESCHAKELD</b> voor deze website</string>
     <string name="brokenSiteProtectionsOff">Beveiliging is <b>UITGESCHAKELD</b> voor deze website</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Het kan helpen om de beveiliging uit te schakelen.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Bekijk wat er is verzonden</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>De in de rapporten verzonden informatie kan niet worden gebruikt om je te identificeren:</b><br/><br/>• URL van de pagina (zonder identificeerbare info)<br/>• Merk, model en fabrikant van het apparaat<br/>• Versienummer van het besturingssysteem<br/>• Versienummer van de app<br/>• Anonieme experimentgroep voor het testen van functies<br/>• Informatie over welke versies van onze beveiligingen actief waren<br/>• Versienummer van de webbrowser-engine<br/>• Lijst met welke beveiligingen en browserfuncties actief waren<br/>• Hostnamen van geblokkeerde trackers, surrogaatverzoeken, genegeerde verzoeken en verzoeken die niet in de lijst met geblokkeerde trackers staan<br/>• Door de browser gerapporteerde fouten<br/>• Responsstatuscodes van websites (HTTP)<br/>• Welk rapportageformulier je hebt gebruikt (menu, dashboard, enz.)<br/>• Datum van het laatst verzonden rapport voor deze site<br/>• Of je er wel of niet voor hebt gekozen om deze rapportgegevens te tonen<br/>• Aantal keren dat beveiligingen zijn uitgeschakeld<br/>• Hoe snel delen van de pagina zijn geladen<br/>• Hoe je op deze pagina bent gekomen, ofwel: SERP (DuckDuckGo-zoekopdracht), Navigatie (link/URL), of Extern (andere middelen)<br/>• Aantal vernieuwingen sinds het laden van de pagina<br/>• Primaire taal en land van je apparaat<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Zoek in DuckDuckGo</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Laatst geopende tabblad</string>
     <string name="showOnAppLaunchOptionNewTabPage">Nieuwe tabbladpagina</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifieke pagina</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Bedankt! Jouw melding helpt DuckDuckGo beter te maken voor iedereen!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nieuwe AI Chat</string>
 
 </resources>

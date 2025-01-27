@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsHeadingPrivacyProtections">Privaatsuskaitsed</string>
+    <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
+    <string name="leaveFeedbackNew">Saada tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
     <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
     <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
-    <string name="settingsHeadingMainSettings">Peamised seaded</string>
+    <string name="settingsHeadingMainSettings">Teised seaded</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Andmete kustutamine</string>
     <string name="settingsAddWidget">Lisa vidin avakuvale</string>
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
-    <string name="settingsEnableVoiceSearch">Luba häälotsing</string>
+    <string name="settingsEnableVoiceSearch">Luba privaatne häälotsing</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
-    <string name="webTrackingProtectionTitle">Veebijälgimise kaitse on lubatud</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Veebijälgimise kaitse on lubatud</string>
+    <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Teatage katkisest saidist</string>
-    <string name="brokenSiteHeading">Teata mittetoimivast saidist</string>
-    <string name="brokenSiteSubmitted">Aitäh! Tagasiside on esitatud.</string>
-    <string name="brokenSitesCategoriesTitle">Kirjelda toimunut</string>
-    <string name="brokenSitesCategoriesHint">Kirjeldage toimunut</string>
-    <string name="brokenSiteSubmitButton">Saada aruanne</string>
-    <string name="brokenSiteDescription">Anonüümne katkise saidi aruande esitamine aitab meil rakendust täiustada.</string>
-
-    <string name="brokenSiteCategoryBlocked">Sait on blokeeritud või seda ei laaditud</string>
-    <string name="brokenSiteCategoryLayout">Saidi paigutus on katki</string>
-    <string name="brokenSiteCategoryEmptySpaces">Sait sisaldab suuri tühje alasid</string>
-    <string name="brokenSiteCategoryShopping">Ei saa maksta, ostu vormistada või ostelda</string>
-    <string name="brokenSiteCategoryPaywall">Sait palus mul reklaamiblokeerija keelata</string>
-    <string name="brokenSiteCategoryComments">Kommentaare, arvustusi või vestlusi ei laaditud</string>
-    <string name="brokenSiteCategoryVideos">Videot ei esitatud või laaditud</string>
-    <string name="brokenSiteCategoryLogin">Ei saa sisse logida / registreeruda</string>
-    <string name="brokenSiteCategoryOther">Midagi muud</string>
-    <string name="brokenSiteDescriptionTextInputHint">Kirjelda üksikasjalikumalt (soovi korral)</string>
-    <string name="brokenSiteDescriptionCaption">Mis juhtus? Mis oleks pidanud juhtuma? Kas kaitsefunktsioonide väljalülitamine aitas?</string>
 
     <string name="brokenSiteProtectionsOn">Sellel saidil on kaitsefunktsioonid <b>SISSE</b> lülitatud</string>
     <string name="brokenSiteProtectionsOff">Sellel saidil on kaitsefunktsioonid <b>VÄLJA</b> lülitatud</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Abi võib olla kaitsefunktsioonide väljalülitamisest.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Lülitasime privaatsuskaitse ajutiselt välja, sest näib, et see häirib selle saidi tööd.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Vaata, mida saadetakse</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Aruannetes saadetud teavet ei saa kasutada sinu tuvastamiseks:</b><br/><br/>• lehekülje URL (ilma tuvastatava teabeta)<br/>• seadme mark, mudel ja tootja<br/>• operatsioonisüsteemi versiooni number<br/>• rakenduse versiooni number<br/>• anonüümne katserühm funktsioonide testimiseks<br/>• teave selle kohta, millised meie kaitsete versioonid olid aktiivsed<br/>• veebibrauseri versiooni number<br/>• aktiivsete kaitsete ja brauseri funktsioonide loend<br/>• blokeeritud jälgurite hostinimed, asendustaotlused, ignoreeritud taotlused ja päringud, mis pole jälguri blokeerimisloendis<br/>• brauseri poolt teatatud tõrked<br/>• veebilehe vastuse oleku (HTTP) koodid<br/>• millist aruandlusvormi sa kasutasid (menüü, juhtpaneel jne)<br/>• selle saidi kohta saadetud viimase aruande kuupäev<br/>• kas valisid selle aruande teabe kuvamise või mitte<br/>• kaitsete väljalülitamise kordade arv<br/>• kui kiiresti lehe osad laadisid<br/>• mille abil sellele lehele jõudsid, kas: SERP (DuckDuckGo otsing), navigeerimine (link/URL) või väline (muud vahendid)<br/>• värskenduste arv alates lehe laadimisest<br/>• sinu seadme peamine keel ja riik<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
@@ -806,4 +786,10 @@
     <string name="showOnAppLaunchOptionNewTabPage">Uue vahekaardi leht</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkreetne lehekülg</string>
 
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Uus AI vestlus</string>
 </resources>

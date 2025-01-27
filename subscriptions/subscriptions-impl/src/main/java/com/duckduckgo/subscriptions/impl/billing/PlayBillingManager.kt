@@ -75,6 +75,7 @@ interface PlayBillingManager {
         activity: Activity,
         planId: String,
         externalId: String,
+        offerId: String? = null,
     )
 }
 
@@ -173,6 +174,7 @@ class RealPlayBillingManager @Inject constructor(
         activity: Activity,
         planId: String,
         externalId: String,
+        offerId: String?,
     ) = withContext(dispatcherProvider.io()) {
         if (!billingClient.ready) {
             logcat { "Service not ready" }
@@ -183,7 +185,7 @@ class RealPlayBillingManager @Inject constructor(
 
         val offerToken = productDetails
             ?.subscriptionOfferDetails
-            ?.find { it.basePlanId == planId }
+            ?.find { it.basePlanId == planId && it.offerId == offerId }
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {

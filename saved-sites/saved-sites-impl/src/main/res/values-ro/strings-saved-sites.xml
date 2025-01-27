@@ -53,6 +53,9 @@
     <string name="favoritesSectionTitle">Favorite</string>
     <string name="bookmarksEmptyHint">Nu s-a adăugat niciun marcaj</string>
     <string name="favoritesEmptyHint">Nu s-a adăugat niciun favorit</string>
+    <string name="popupBookmarksSortManually">Sortează manual</string>
+    <string name="popupBookmarksSortByName">Sortează după nume</string>
+    <string name="popupBookmarksPreventReordering">Comută la sortarea manuală pentru a rearanja marcajele.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Editare marcaj</string>

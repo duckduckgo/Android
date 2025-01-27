@@ -1,0 +1,83 @@
+name: Play Store Review Analysis
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Runs daily at 9am UTC
+  workflow_dispatch:  # Allow manual triggering of the workflow
+    inputs:
+      package_name:
+        description: "Package name of the app to analyze"
+        required: true
+        default: "com.duckduckgo.mobile.android"
+      langs:
+        description: "Comma-separated list of languages"
+        required: false
+        default: "en"
+      countries:
+        description: "Comma-separated list of countries"
+        required: false
+        default: "us"
+      count:
+        description: "Number of reviews to fetch per language/country"
+        required: false
+        default: "10000"
+
+jobs:
+  analyze-reviews:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/ps-analysis/requirements.txt
+
+      - name: Set Default Inputs for Scheduled Runs
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          echo "package_name=com.duckduckgo.mobile.android" >> $GITHUB_ENV
+          echo "langs=en" >> $GITHUB_ENV
+          echo "countries=us" >> $GITHUB_ENV
+          echo "count=10000" >> $GITHUB_ENV
+
+      - name: Override Inputs for Manual Trigger
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "package_name=${{ github.event.inputs.package_name }}" >> $GITHUB_ENV
+          echo "langs=${{ github.event.inputs.langs }}" >> $GITHUB_ENV
+          echo "countries=${{ github.event.inputs.countries }}" >> $GITHUB_ENV
+          echo "count=${{ github.event.inputs.count }}" >> $GITHUB_ENV
+
+      - name: Run Review Analysis Script
+        id: run-script
+        run: |
+          python scripts/ps-analysis/ps_review_anomaly.py \
+            --package_name "${{ env.package_name }}" \
+            --langs "${{ env.langs }}" \
+            --countries "${{ env.countries }}" \
+            --count "${{ env.count }}" > output.txt
+          echo "script_output<<EOF" >> $GITHUB_ENV
+          cat output.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Get Current Date
+        id: date
+        run: echo "current_date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Sync Output to Asana
+        uses: duckduckgo/native-github-asana-sync@v1.1
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: Google Play Review Analysis -- ${{ env.current_date }}
+          asana-task-description: ${{ env.script_output }}
+          action: 'create-asana-task'

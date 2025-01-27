@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favoriten</string>
     <string name="bookmarksEmptyHint">Noch keine Lesezeichen hinzugefügt</string>
     <string name="favoritesEmptyHint">Noch keine Favoriten hinzugefügt</string>
+    <string name="popupBookmarksSortManually">Manuell sortieren</string>
+    <string name="popupBookmarksSortByName">Nach Namen sortieren</string>
+    <string name="popupBookmarksPreventReordering">Wechsle zur manuellen Sortierung, um die Lesezeichen neu anzuordnen.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Lesezeichen bearbeiten</string>

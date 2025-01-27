@@ -519,6 +519,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = mock()
         val webView: WebView = mock()
+        whenever(request.isForMainFrame).thenReturn(true)
 
         setFeatureToggle(false)
 
@@ -532,6 +533,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.notmatching.com")
         val webView: WebView = mock()
+        whenever(request.isForMainFrame).thenReturn(true)
 
         setFeatureToggle(true)
 
@@ -546,6 +548,7 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -561,6 +564,7 @@ class RealDuckPlayerTest {
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
         testee.setDuckPlayerOrigin(AUTO)
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -575,6 +579,7 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("duck://player/openInYouTube?v=12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -605,6 +610,7 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("duck://player/12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Disabled))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -624,6 +630,7 @@ class RealDuckPlayerTest {
         whenever(context.assets).thenReturn(mockAssets)
         whenever(mockAssets.open(any())).thenReturn(mock())
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -642,6 +649,7 @@ class RealDuckPlayerTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube-nocookie.com?videoID=12345")
         val webView: WebView = mock()
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -654,11 +662,25 @@ class RealDuckPlayerTest {
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
         verify(webView).loadUrl("duck://player/12345")
         assertNotNull(result)
+    }
+
+    @Test
+    fun whenUriIsYoutubeWatchUrlButNotMainframe_interceptDoesNothing() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(request.isForMainFrame).thenReturn(false)
+
+        val result = testee.intercept(request, url, webView)
+
+        assertNull(result)
     }
 
     @Test
@@ -668,6 +690,7 @@ class RealDuckPlayerTest {
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -683,6 +706,7 @@ class RealDuckPlayerTest {
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -696,6 +720,7 @@ class RealDuckPlayerTest {
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
         whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 
@@ -704,11 +729,26 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenUriIsYoutubeWatchUrlAndPreviousUrlIsDuckPlayerWithDifferentIdAndNotMainFrame_interceptDoesNothing() = runTest {
+        val request: WebResourceRequest = mock()
+        val url: Uri = Uri.parse("https://www.youtube.com/watch?v=123456")
+        val webView: WebView = mock()
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, Enabled))
+        whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+        whenever(request.isForMainFrame).thenReturn(false)
+
+        val result = testee.intercept(request, url, webView)
+
+        assertNull(result)
+    }
+
+    @Test
     fun whenUriIsYoutubeWatchUrlAndSettingsAlwaysAsk_interceptProcessesYoutubeWatchUri() = runTest {
         val request: WebResourceRequest = mock()
         val url: Uri = Uri.parse("https://www.youtube.com/watch?v=12345")
         val webView: WebView = mock()
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(request.isForMainFrame).thenReturn(true)
 
         val result = testee.intercept(request, url, webView)
 

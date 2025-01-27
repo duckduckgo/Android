@@ -20,7 +20,6 @@ import android.Manifest
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -99,7 +98,6 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
@@ -216,7 +214,8 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UrlOnlyMatch
-import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchMissingPassword
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
@@ -263,6 +262,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -273,11 +273,11 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
-import com.duckduckgo.privacy.dashboard.api.ui.WebBrokenSiteForm
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResult
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -516,10 +516,10 @@ class BrowserTabFragment :
     lateinit var safeWebViewFeature: SafeWebViewFeature
 
     @Inject
-    lateinit var webBrokenSiteForm: WebBrokenSiteForm
+    lateinit var duckPlayer: DuckPlayer
 
     @Inject
-    lateinit var duckPlayer: DuckPlayer
+    lateinit var duckChat: DuckChat
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -629,6 +629,15 @@ class BrowserTabFragment :
 
     val isInEditMode by lazy { omnibar.isInEditMode }
 
+    private val activityResultPrivacyDashboard = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == PrivacyDashboardHybridScreenResult.REPORT_SUBMITTED) {
+            binding.rootView.makeSnackbarWithNoBottomInset(
+                resId = string.brokenSiteSubmittedReportMessage,
+                duration = Snackbar.LENGTH_LONG,
+            ).show()
+        }
+    }
+
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
@@ -711,7 +720,7 @@ class BrowserTabFragment :
             withContext(dispatchers.main()) {
                 when (matchType) {
                     ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
-                    UsernameMatch -> showAutofillDialogUpdatePassword(currentUrl, credentials)
+                    UsernameMatchMissingPassword, UsernameMatchDifferentPassword -> showAutofillDialogUpdatePassword(currentUrl, credentials)
                     UsernameMissing -> showAutofillDialogUpdateUsername(currentUrl, credentials)
                     NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
                     UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
@@ -929,10 +938,10 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
-        val params = PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen(tabId)
+        val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        intent?.let { startActivity(it) }
+        intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
 
@@ -950,7 +959,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        browserActivity?.launchPrivacyDashboard(toggle = false)
+        launchPrivacyDashboard(toggle = false)
     }
 
     private fun onOmnibarVoiceSearchPressed() {
@@ -1003,6 +1012,9 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(newTabMenuItem) {
                 onOmnibarNewTabRequested()
+            }
+            onMenuItemClicked(duckChatMenuItem) {
+                duckChat.openDuckChat()
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()
@@ -1918,20 +1930,25 @@ class BrowserTabFragment :
         }
     }
 
+    private fun launchPrivacyDashboard(toggle: Boolean) {
+        val params = if (toggle) {
+            PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
+        } else {
+            PrivacyDashboardPrimaryScreen(tabId)
+        }
+        globalActivityStarter.startIntent(requireContext(), params)
+            ?.let { activityResultPrivacyDashboard.launch(it) }
+    }
+
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         val context = context ?: return
 
-        if (webBrokenSiteForm.shouldUseWebBrokenSiteForm()) {
-            val reportFlow = when (data.reportFlow) {
-                RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-                else -> BrokenSiteFormReportFlow.MENU
-            }
-            globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))
-                ?.let { startActivity(it) }
-        } else {
-            val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
-            startActivity(BrokenSiteActivity.intent(context, data), options)
+        val reportFlow = when (data.reportFlow) {
+            RELOAD_THREE_TIMES_WITHIN_20_SECONDS -> BrokenSiteFormReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+            else -> BrokenSiteFormReportFlow.MENU
         }
+        globalActivityStarter.startIntent(context, BrokenSiteForm(tabId = tabId, reportFlow = reportFlow))
+            ?.let { activityResultPrivacyDashboard.launch(it) }
     }
 
     private fun launchToggleReportFeedback(opener: DashboardOpener) {
@@ -2764,10 +2781,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
@@ -2775,10 +2789,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
@@ -2786,10 +2797,7 @@ class BrowserTabFragment :
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(currentUrl, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
@@ -3556,8 +3564,6 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
-
-        private const val TOGGLE_REPORT_TOAST_DELAY = 3000L
 
         fun newInstance(
             tabId: String,

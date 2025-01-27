@@ -50,6 +50,7 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearance
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
@@ -71,11 +72,13 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -190,6 +193,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
+            includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
         with(viewsNextSteps) {
@@ -201,6 +205,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         with(viewsOther) {
             aboutSetting.setOnClickListener { viewModel.onAboutSettingClicked() }
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
+            ddgOnOtherPlatformsSetting.setTrailingIconSize(Small)
             ddgOnOtherPlatformsSetting.setOnClickListener { viewModel.onDdgOnOtherPlatformsClicked() }
         }
     }
@@ -252,6 +257,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                 }
             }.launchIn(lifecycleScope)
@@ -276,6 +282,14 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             viewsMain.settingsSectionDuckPlayer.show()
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
+        }
+    }
+
+    private fun updateDuckChat(isDuckChatEnabled: Boolean) {
+        if (isDuckChatEnabled) {
+            viewsMain.includeDuckChatSetting.duckChatSetting.show()
+        } else {
+            viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
     }
 
@@ -321,6 +335,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
+            is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)

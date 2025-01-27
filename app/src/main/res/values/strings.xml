@@ -124,13 +124,14 @@
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Privacy Protections</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Appearance</string>
     <string name="settingsHeadingCustomize">Customize</string>
     <string name="settingsHeadingAbout">About</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
+    <string name="leaveFeedbackNew">Send Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
     <string name="settingsHeadingMore">More From DuckDuckGo</string>
@@ -157,14 +158,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsHeadingMainSettings">Main Settings</string>
+    <string name="settingsHeadingMainSettings">Other Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Data Clearing</string>
-    <string name="settingsAddWidget">Add Widget to HomeScreen</string>
+    <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
-    <string name="settingsEnableVoiceSearch">Enable Voice Search</string>
+    <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
 
     <!-- Private Search -->
@@ -189,7 +190,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionTitle">Web Tracking Protection is Enabled</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Web Tracking Protection is Enabled</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
 
@@ -237,32 +239,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
-    <string name="brokenSiteHeading">Report Broken Site</string>
-    <string name="brokenSiteSubmitted">Thank you! Feedback submitted.</string>
-    <string name="brokenSitesCategoriesTitle">Describe what happened</string>
-    <string name="brokenSitesCategoriesHint">Describe what happened</string>
-    <string name="brokenSiteSubmitButton">Send Report</string>
-    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us improve the app.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site blocked or didn\'t load</string>
-    <string name="brokenSiteCategoryLayout">Site layout broken</string>
-    <string name="brokenSiteCategoryEmptySpaces">Site contains large empty spaces</string>
-    <string name="brokenSiteCategoryShopping">Can\'t pay, check out, or shop</string>
-    <string name="brokenSiteCategoryPaywall">Site asked me to disable ad blocker</string>
-    <string name="brokenSiteCategoryComments">Comments, reviews, or chats didn\'t load</string>
-    <string name="brokenSiteCategoryVideos">Video didn\'t play or load</string>
-    <string name="brokenSiteCategoryLogin">Can\'t sign in/register</string>
-    <string name="brokenSiteCategoryOther">Something else</string>
-    <string name="brokenSiteDescriptionTextInputHint">Share more details (optional)</string>
-    <string name="brokenSiteDescriptionCaption">What happened? What should have happened? Did turning protections off help?</string>
 
     <string name="brokenSiteProtectionsOn">Protections are <b>ON</b> for this site</string>
     <string name="brokenSiteProtectionsOff">Protections are <b>OFF</b> for this site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We temporarily turned Privacy Protections off as they appear to be breaking this site.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">See what\'s sent</string>
-    <string name="brokenSiteReportDataDisclosure"><![CDATA[<b>Info sent in reports can\'t be used to identify you:</b><br/><br/>&#8226; Page URL (without identifiable info)<br/>&#8226; Device make, model, and manufacturer<br/>&#8226; Operating system version number<br/>&#8226; App version number<br/>&#8226; Anonymous experiment group for feature testing<br/>&#8226; Information about which versions of our protections were active<br/>&#8226; Web browser engine version number<br/>&#8226; List of which protections and browser features were active<br/>&#8226; Hostnames of trackers blocked, surrogate requests, ignored requests, and requests not in tracker blocking list<br/>&#8226; Browser-reported errors<br/>&#8226; Website response status (HTTP) codes<br/>&#8226; Which reporting form you used ("menu", "dashboard", etc.)<br/>&#8226; Date of last report sent for this site<br/>&#8226; Whether or not you opted to show this report info<br/>&#8226; Number of times protections were toggled off<br/>&#8226; How quickly parts of the page loaded<br/>&#8226; How you got to this page, either: "SERP" (DuckDuckGo search), "Navigation" (link/URL), or "External" (other means)<br/>&#8226; Number of refreshes since page load<br/>&#8226; Primary language and country of your device<br/>]]></string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
@@ -804,5 +784,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Last Opened Tab</string>
     <string name="showOnAppLaunchOptionNewTabPage">New Tab Page</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specific Page</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">New AI Chat</string>
 
 </resources>

@@ -13,10 +13,10 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "^12.4.0",
+    "@duckduckgo/autoconsent": "^12.7.0",
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#16.1.0",
-    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#7.1.0",
-    "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#7.3.1",
-    "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1734514764"
+    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#7.10.0",
+    "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#8.1.0",
+    "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1737732449"
   }
 }

@@ -32,7 +32,6 @@ sealed class RendererViewHolder {
     data class WebviewRenderer(
         val holder: WebView,
         val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
-        val onBrokenSiteClicked: () -> Unit,
         val onPrivacyProtectionsClicked: (String) -> Unit,
         val onUrlClicked: (String) -> Unit,
         val onOpenSettings: (String) -> Unit,
@@ -43,6 +42,7 @@ sealed class RendererViewHolder {
         val onRejectToggleReport: () -> Unit,
         val onSeeWhatIsSent: () -> Unit,
         val onShowNativeFeedback: () -> Unit,
+        val onReportBrokenSiteShown: () -> Unit,
     ) : RendererViewHolder()
 }
 
@@ -57,7 +57,6 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.holder,
                 renderer.onPrivacyProtectionSettingChanged,
                 moshi,
-                renderer.onBrokenSiteClicked,
                 renderer.onPrivacyProtectionsClicked,
                 renderer.onUrlClicked,
                 renderer.onOpenSettings,
@@ -68,6 +67,7 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 renderer.onRejectToggleReport,
                 renderer.onSeeWhatIsSent,
                 renderer.onShowNativeFeedback,
+                renderer.onReportBrokenSiteShown,
             )
         }
     }

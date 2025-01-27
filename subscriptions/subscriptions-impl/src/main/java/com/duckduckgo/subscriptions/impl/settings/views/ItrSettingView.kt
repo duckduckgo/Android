@@ -100,17 +100,18 @@ class ItrSettingView @JvmOverloads constructor(
     private fun renderView(viewState: ViewState) {
         with(binding.itrSettings) {
             when (viewState.itrState) {
-                is ItrState.Subscribed -> {
+                is ItrState.Enabled -> {
                     isVisible = true
                     setStatus(isOn = true)
                     setLeadingIconResource(R.drawable.ic_identity_theft_restoration_color_24)
                     isClickable = true
                     setClickListener { viewModel.onItr() }
                 }
-                ItrState.Expired, ItrState.Activating -> {
+                ItrState.Disabled -> {
                     isVisible = true
                     isClickable = false
                     setStatus(isOn = false)
+                    setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_theft_restoration_grayscale_color_24)
                 }
                 ItrState.Hidden -> isGone = true

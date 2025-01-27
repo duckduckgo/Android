@@ -38,4 +38,10 @@
         app:primaryText="Destructive Type"
         app:primaryTextType="destructive" />
 
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="With trailing icon"
+        app:trailingIcon="@drawable/ic_bookmark_16"/>
+
 </LinearLayout>

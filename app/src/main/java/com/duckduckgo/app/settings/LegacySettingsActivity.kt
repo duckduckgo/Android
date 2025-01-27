@@ -63,8 +63,8 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
-import com.duckduckgo.settings.api.NewSettingsFeature
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -107,7 +107,7 @@ class LegacySettingsActivity : DuckDuckGoActivity() {
     }
 
     @Inject
-    lateinit var newSettingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy

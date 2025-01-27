@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Oblíbené</string>
     <string name="bookmarksEmptyHint">Zatím nebyly přidány žádné záložky.</string>
     <string name="favoritesEmptyHint">Zatím nebyly přidány žádné oblíbené položky</string>
+    <string name="popupBookmarksSortManually">Seřadit ručně</string>
+    <string name="popupBookmarksSortByName">Seřadit podle názvu</string>
+    <string name="popupBookmarksPreventReordering">Pokud chceš změnit uspořádání záložek, přepni na ruční řazení.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Upravit záložku</string>
