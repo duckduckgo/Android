@@ -1,0 +1,7 @@
+{
+  "credentials": {
+    "username": "dax@duck.com",
+    "password": "123456"
+  },
+  "trigger": "partialSave"
+}

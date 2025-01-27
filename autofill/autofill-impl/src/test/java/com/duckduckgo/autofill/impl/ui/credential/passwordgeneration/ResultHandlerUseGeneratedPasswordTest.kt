@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_ACCEPTED
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_PASSWORD
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
@@ -30,6 +31,9 @@ import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_USER
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillNotSupported
+import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillSupported
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -51,6 +55,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private val callback: AutofillEventListener = mock()
+    private val usernameBackFiller: UsernameBackFiller = mock()
 
     private val testee = ResultHandlerUseGeneratedPassword(
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -59,6 +64,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         autoSavedLoginsMonitor = autoSavedLoginsMonitor,
         existingCredentialMatchDetector = existingCredentialMatchDetector,
         autofilledListeners = FakePluginPoint(),
+        usernameBackFiller = usernameBackFiller,
     )
 
     @Before
@@ -70,6 +76,8 @@ class ResultHandlerUseGeneratedPasswordTest {
                 anyOrNull(),
             ),
         ).thenReturn(NoMatch)
+
+        whenever(usernameBackFiller.isBackFillingUsernameSupported(anyOrNull(), any())).thenReturn(BackFillNotSupported)
     }
 
     @Test
@@ -103,6 +111,30 @@ class ResultHandlerUseGeneratedPasswordTest {
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(autoSavedLoginsMonitor).setAutoSavedLoginId(any(), any())
+    }
+
+    @Test
+    fun whenUserAcceptedToUsePasswordNoAutoLoginNoUsernameProvidedButUsernameBackFilledThenBackFilledUsernameUsed() = runTest {
+        whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
+        "from-backfill".useBackFilledUsername()
+        val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-backfill", password = "pw")))
+    }
+
+    @Test
+    fun whenUserAcceptedToUsePasswordAutoLoginButNothingToUpdateThenCredentialIsSaved() = runTest {
+        whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
+        val bundle = bundle("example.com", acceptedGeneratedPassword = true, username = "from-js", password = "pw")
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-js", password = "pw")))
+    }
+
+    fun whenUserAcceptedToUsePasswordNoAutoLoginUsernameProvidedThenBackFilledUsernameNotUsed() = runTest {
+        whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
+        val bundle = bundle("example.com", acceptedGeneratedPassword = true, username = "from-js", password = "pw")
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-js", password = "pw")))
     }
 
     @Test
@@ -174,6 +206,16 @@ class ResultHandlerUseGeneratedPasswordTest {
     }
 
     @Test
+    fun whenUserAcceptedToUsePasswordWhenAlreadyAMatchingUsernameDifferentPasswordSavedThenNoAction() = runTest {
+        val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
+        whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
+        whenever(existingCredentialMatchDetector.determine(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(UsernameMatchDifferentPassword)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(autofillStore, never()).saveCredentials(any(), any())
+        verify(autofillStore, never()).updateCredentials(any(), any())
+    }
+
+    @Test
     fun whenBundleMissingUrlThenCallbackNotInvoked() = runTest {
         val bundle = bundle(url = null, acceptedGeneratedPassword = true)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
@@ -192,6 +234,10 @@ class ResultHandlerUseGeneratedPasswordTest {
             it.putString(KEY_USERNAME, username)
             it.putString(KEY_PASSWORD, password)
         }
+    }
+
+    private suspend fun String.useBackFilledUsername() {
+        whenever(usernameBackFiller.isBackFillingUsernameSupported(anyOrNull(), anyOrNull())).thenReturn(BackFillSupported(this))
     }
 
     private fun aLogin(id: Long = 0): LoginCredentials {
