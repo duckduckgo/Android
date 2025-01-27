@@ -18,10 +18,12 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.WARNING
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -29,12 +31,14 @@ import org.mockito.kotlin.whenever
 
 class LottiePrivacyShieldAnimationHelperTest {
 
+    private val feature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+
     @Test
     fun whenLightModeAndPrivacyShieldProtectedThenSetLightShieldAnimation() {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, PROTECTED)
 
@@ -46,7 +50,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, PROTECTED)
 
@@ -58,7 +62,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, UNPROTECTED)
 
@@ -71,7 +75,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, UNPROTECTED)
 
@@ -84,7 +88,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, WARNING)
 
@@ -97,7 +101,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, feature)
 
         testee.setAnimationView(holder, WARNING)
 

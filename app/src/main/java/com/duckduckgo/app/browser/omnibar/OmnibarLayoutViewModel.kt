@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -78,6 +79,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val appPersonalityFeature: AppPersonalityFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -116,6 +118,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelTrackersAnimation : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartExperimentTrackersAnimation(val entities: List<Entity>?) : Command()
     }
 
     enum class LeadingIconState {
@@ -586,7 +589,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                     )
                 }
                 viewModelScope.launch {
-                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                    if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+                        command.send(Command.StartExperimentTrackersAnimation(decoration.entities))
+                    } else {
+                        command.send(Command.StartTrackersAnimation(decoration.entities))
+                    }
                 }
             }
         }

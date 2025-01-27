@@ -313,8 +313,10 @@ class Omnibar(
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
-        // TODO ANA: Flag needed.
-        // newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+        newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+    }
+
+    fun enqueueCookiesAnimation(isCosmetic: Boolean) {
         newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 

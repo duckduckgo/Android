@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -32,19 +33,35 @@ import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTheme) : PrivacyShieldAnimationHelper {
+class LottiePrivacyShieldAnimationHelper @Inject constructor(
+    private val appTheme: AppTheme,
+    private val appPersonalityFeature: AppPersonalityFeature,
+) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
         holder: LottieAnimationView,
         privacyShield: PrivacyShield,
     ) {
+        val protectedShield: Int
+        val protectedShieldDark: Int
+        val unprotectedShield: Int
+        val unprotectedShieldDark: Int
+        if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+            protectedShield = R.raw.protected_shield_experiment
+            protectedShieldDark = R.raw.protected_shield_experiment
+            unprotectedShield = R.raw.unprotected_shield_experiment
+            unprotectedShieldDark = R.raw.unprotected_shield_experiment
+        } else {
+            protectedShield = R.raw.protected_shield
+            protectedShieldDark = R.raw.dark_protected_shield
+            unprotectedShield = R.raw.unprotected_shield
+            unprotectedShieldDark = R.raw.dark_unprotected_shield
+        }
+
         val currentAnimation = holder.tag as? Int
         val newAnimation = when (privacyShield) {
-            // TODO ANA: This is temporary until the flags are set.
-            // PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
-            // UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
-            PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield_experiment else R.raw.protected_shield_experiment
-            UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield_experiment else R.raw.unprotected_shield_experiment
+            PROTECTED -> if (appTheme.isLightModeEnabled()) protectedShield else protectedShieldDark
+            UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) unprotectedShield else unprotectedShieldDark
             UNKNOWN -> null
         }
 
