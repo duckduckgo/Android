@@ -30,8 +30,6 @@ import com.duckduckgo.saved.sites.impl.databinding.*
 import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState
 import dagger.android.support.*
 import javax.inject.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -48,8 +46,6 @@ class DisplayModeSyncSetting @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
-
-    private var coroutineScope: CoroutineScope? = null
 
     private var job: ConflatedJob = ConflatedJob()
 
@@ -71,18 +67,14 @@ class DisplayModeSyncSetting @JvmOverloads constructor(
             },
         )
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
-
         job += viewModel.viewState()
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
     }
 
     private fun render(it: ViewState) {

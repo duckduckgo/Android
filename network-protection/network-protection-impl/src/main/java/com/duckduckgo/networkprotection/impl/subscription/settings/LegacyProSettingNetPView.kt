@@ -22,10 +22,12 @@ import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R as CommonR
@@ -40,8 +42,6 @@ import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSett
 import com.duckduckgo.networkprotection.impl.subscription.settings.LegacyProSettingNetPViewModel.NetPEntryState.ShowState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -62,13 +62,14 @@ class LegacyProSettingNetPView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val binding: LegacyViewSettingsNetpBinding by viewBinding()
 
     private val viewModel: LegacyProSettingNetPViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[LegacyProSettingNetPViewModel::class.java]
     }
+
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -80,13 +81,13 @@ class LegacyProSettingNetPView @JvmOverloads constructor(
             viewModel.onNetPSettingClicked()
         }
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { updateNetPSettings(it.networkProtectionEntryState) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
     }
@@ -110,8 +111,8 @@ class LegacyProSettingNetPView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
     }
 
     private fun processCommands(command: Command) {

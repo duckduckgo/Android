@@ -30,8 +30,6 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.saved.sites.impl.databinding.*
 import dagger.android.support.*
 import javax.inject.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -49,8 +47,6 @@ class FaviconFetchingSyncSetting @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private var job: ConflatedJob = ConflatedJob()
 
     private val binding: ViewSyncFaviconsFetchingBinding by viewBinding()
@@ -67,18 +63,14 @@ class FaviconFetchingSyncSetting @JvmOverloads constructor(
             viewModel.onFaviconFetchingSettingChanged(isChecked)
         }
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
-
         job += viewModel.viewState()
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
     }
 
     private fun render(it: ViewState) {

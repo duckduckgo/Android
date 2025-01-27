@@ -29,12 +29,14 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
@@ -60,8 +62,6 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -88,11 +88,12 @@ class RemoteMessageView @JvmOverloads constructor(
 
     private val binding: ViewRemoteMessageBinding by viewBinding()
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val viewModel: RemoteMessageViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[RemoteMessageViewModel::class.java]
     }
+
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -100,20 +101,20 @@ class RemoteMessageView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
         super.onDetachedFromWindow()
     }
 
