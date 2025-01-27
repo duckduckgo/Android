@@ -159,7 +159,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
         override val featureName: String = "aiChat"
         override val methods: List<String> = listOf(
-            "getUserValues",
+            "getAIChatNativeHandoffData",
+            "getAIChatNativeConfigValues",
             "openAIChat",
         )
     }

@@ -58,9 +58,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetUserValuesAndIdIsNullThenReturnNull() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndIdIsNullThenReturnNull() = runTest {
         val featureName = "aiChat"
-        val method = "getUserValues"
+        val method = "getAIChatNativeHandoffData"
 
         val result = testee.processJsCallbackMessage(featureName, method, null, null)
 
@@ -68,9 +68,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetUserValuesAndDuckChatEnabledThenReturnSendResponseToJsWithDuckChatEnabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatEnabledThenReturnSendResponseToJsWithDuckChatEnabled() = runTest {
         val featureName = "aiChat"
-        val method = "getUserValues"
+        val method = "getAIChatNativeHandoffData"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
@@ -93,9 +93,9 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetUserValuesAndDuckChatDisabledThenReturnSendResponseToJsWithDuckChatDisabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatDisabledThenReturnSendResponseToJsWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
-        val method = "getUserValues"
+        val method = "getAIChatNativeHandoffData"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
@@ -118,9 +118,92 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetUserValuesAndPreferencesNullThenReturnSendResponseToJsWithPreferencesNull() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndPreferencesNullThenReturnSendResponseToJsWithPreferencesNull() = runTest {
         val featureName = "aiChat"
-        val method = "getUserValues"
+        val method = "getAIChatNativeHandoffData"
+        val id = "123"
+
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn(null)
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("aiChatPayload", null)
+        }
+
+        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+
+        assertEquals(expected.data.id, result.data.id)
+        assertEquals(expected.data.method, result.data.method)
+        assertEquals(expected.data.featureName, result.data.featureName)
+        assertEquals(expected.data.params.toString(), result.data.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndIdIsNullThenReturnNull() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+
+        val result = testee.processJsCallbackMessage(featureName, method, null, null)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndDuckChatEnabledThenReturnSendResponseToJsWithDuckChatEnabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+        }
+
+        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+
+        assertEquals(expected.data.id, result.data.id)
+        assertEquals(expected.data.method, result.data.method)
+        assertEquals(expected.data.featureName, result.data.featureName)
+        assertEquals(expected.data.params.toString(), result.data.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndDuckChatDisabledThenReturnSendResponseToJsWithDuckChatDisabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        whenever(mockPreferencesStore.fetchAndClearUserPreferences()).thenReturn("preferences")
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null) as SendResponseToJs
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", false)
+        }
+
+        val expected = SendResponseToJs(JsCallbackData(jsonPayload, featureName, method, id))
+
+        assertEquals(expected.data.id, result.data.id)
+        assertEquals(expected.data.method, result.data.method)
+        assertEquals(expected.data.featureName, result.data.featureName)
+        assertEquals(expected.data.params.toString(), result.data.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPreferencesNullThenReturnSendResponseToJsWithPreferencesNull() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
         val id = "123"
 
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
