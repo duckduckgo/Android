@@ -21,7 +21,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -46,8 +48,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -90,16 +90,14 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
-    private lateinit var coroutineScope: CoroutineScope
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
         super.onAttachedToWindow()
 
         job += viewModel.commands()
             .onEach { processCommand(it) }
-            .launchIn(coroutineScope)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         configureMessage()
 
@@ -108,7 +106,6 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        coroutineScope.cancel()
         job.cancel()
     }
 

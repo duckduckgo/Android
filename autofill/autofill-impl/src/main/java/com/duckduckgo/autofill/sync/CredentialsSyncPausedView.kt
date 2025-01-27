@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.sync
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -24,6 +23,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
@@ -33,14 +33,12 @@ import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command.Navig
 import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.ViewState
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -58,9 +56,11 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    private var coroutineScope: CoroutineScope? = null
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var job: ConflatedJob = ConflatedJob()
+    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     private val binding: ViewCredentialsSyncPausedWarningBinding by viewBinding()
 
@@ -74,10 +74,9 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState()
+        conflatedStateJob += viewModel.viewState()
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
@@ -89,9 +88,8 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
     }
 
     private fun processCommands(command: Command) {

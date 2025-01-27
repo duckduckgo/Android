@@ -16,7 +16,6 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.SpannableStringBuilder
 import android.util.AttributeSet
@@ -25,10 +24,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -39,9 +40,6 @@ import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Comman
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,9 +57,11 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    private var coroutineScope: CoroutineScope? = null
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var job: ConflatedJob = ConflatedJob()
+    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     private val binding: ViewSaveSiteSyncInvalidItemsWarningBinding by viewBinding()
 
@@ -75,10 +75,9 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState()
+        conflatedStateJob += viewModel.viewState()
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
@@ -90,9 +89,8 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
     }
 
     private fun processCommands(command: Command) {
