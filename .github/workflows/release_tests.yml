@@ -27,10 +27,10 @@ jobs:
           submodules: recursive
           ref: ${{ github.event.inputs.app-version }}
 
-      - name: Set up JDK 17
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Create folder
@@ -61,6 +61,16 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
+      - name: Notify Mattermost of Maestro tests
+        id: send-mm-tests-started
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: Starting to run Release tests for version ${{ github.event.inputs.app-version }} successfully created. See https://app.asana.com/0/1184843898389381/1205105962934096
+          action: 'send-mattermost-message'
+
       - name: Release tests flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
         with:
@@ -82,5 +92,16 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Tag Android Release (Robin)
-          asana-task-description: Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: Run Release Tests in Maestro has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+      - name: Notify Mattermost when workflow failed
+        if: ${{ failure() }}
+        id: send-mm-message-error
+        uses: duckduckgo/native-github-asana-sync@v1.5
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          asana-task-description: Run Release Tests in Maestro has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'send-mattermost-message'

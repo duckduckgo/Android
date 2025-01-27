@@ -21,6 +21,8 @@ import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Cre
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchMissingPassword
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
@@ -214,7 +216,10 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return savedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun updateCredentials(credentials: LoginCredentials, refreshLastUpdatedTimestamp: Boolean): LoginCredentials? {
+    override suspend fun updateCredentials(
+        credentials: LoginCredentials,
+        refreshLastUpdatedTimestamp: Boolean,
+    ): LoginCredentials? {
         val cleanedDomain: String? = credentials.domain?.let {
             autofillUrlMatcher.cleanRawUrl(it)
         }
@@ -238,6 +243,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         var exactMatchFound = false
         var usernameMatchFound = false
+        var usernameMatchDifferentPasswordFound = false
         var urlMatch = false
         var missingUsername = false
 
@@ -250,6 +256,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
                 usernameMatchFound = true
                 if (it.password == password) {
                     exactMatchFound = true
+                } else if (!it.password.isNullOrEmpty()) {
+                    usernameMatchDifferentPasswordFound = true
                 }
             }
         }
@@ -257,7 +265,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         val matchType = if (exactMatchFound) {
             ContainsCredentialsResult.ExactMatch
         } else if (usernameMatchFound) {
-            ContainsCredentialsResult.UsernameMatch
+            if (usernameMatchDifferentPasswordFound) UsernameMatchDifferentPassword else UsernameMatchMissingPassword
         } else if (missingUsername) {
             ContainsCredentialsResult.UsernameMissing
         } else if (urlMatch) {

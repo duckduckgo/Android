@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.menu
 
+import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,7 @@ open class PopupMenu(
     layoutInflater: LayoutInflater,
     resourceId: Int,
     view: View = inflate(layoutInflater, resourceId),
-    width: Int = WRAP_CONTENT,
+    width: Int = getPopupWidth(view.context),
     height: Int = WRAP_CONTENT,
 ) : PopupWindow(view, width, height, true) {
 
@@ -123,5 +124,7 @@ open class PopupMenu(
         ): View {
             return layoutInflater.inflate(resourceId, null)
         }
+
+        fun getPopupWidth(context: Context): Int = context.resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
     }
 }

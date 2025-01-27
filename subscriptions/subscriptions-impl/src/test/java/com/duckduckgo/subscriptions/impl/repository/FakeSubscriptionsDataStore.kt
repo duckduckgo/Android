@@ -17,12 +17,21 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import java.io.IOException
 import java.time.Instant
 
-class FakeSubscriptionsDataStore(private val supportEncryption: Boolean = true) : SubscriptionsDataStore {
+class FakeSubscriptionsDataStore(
+    private val supportEncryption: Boolean = true,
+    var simluateAccessTokenV2StoreError: Boolean = false,
+) : SubscriptionsDataStore {
 
     // Auth
     override var accessTokenV2: String? = null
+        set(value) {
+            if (simluateAccessTokenV2StoreError) throw IOException()
+            field = value
+        }
+
     override var accessTokenV2ExpiresAt: Instant? = null
     override var refreshTokenV2: String? = null
     override var refreshTokenV2ExpiresAt: Instant? = null

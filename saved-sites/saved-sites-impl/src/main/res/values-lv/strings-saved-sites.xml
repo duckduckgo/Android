@@ -53,6 +53,9 @@
     <string name="favoritesSectionTitle">Izlase</string>
     <string name="bookmarksEmptyHint">Vēl nav pievienota neviena grāmatzīme</string>
     <string name="favoritesEmptyHint">Vēl nav pievienota neviena izlase</string>
+    <string name="popupBookmarksSortManually">Kārtot manuāli</string>
+    <string name="popupBookmarksSortByName">Kārtot pēc nosaukuma</string>
+    <string name="popupBookmarksPreventReordering">Pārslēdzies uz manuālu kārtošanu, lai pārkārtotu grāmatzīmes.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediģēt grāmatzīmi</string>

@@ -125,7 +125,7 @@
     <string name="settingsActivityTitle">Nustatymai</string>
     <string name="settingsMenuItemTitle">Nustatymai</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
-    <string name="settingsHeadingPrivacyProtections">Privatumo apsaugos priemonės</string>
+    <string name="settingsHeadingProtections">Apsaugos</string>
     <string name="settingsHeadingAppearance">Išvaizda</string>
     <string name="settingsHeadingCustomize">Tinkinti</string>
     <string name="settingsHeadingAbout">Apie</string>
@@ -133,6 +133,7 @@
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
+    <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
     <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
     <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
     <string name="settingsHeadingNextSteps">Tolesni veiksmai</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsHeadingSettings">Nustatymai</string>
-    <string name="settingsHeadingMainSettings">Pagrindiniai nustatymai</string>
+    <string name="settingsHeadingMainSettings">Kiti parametrai</string>
     <string name="settingsPermissionsSetting">Leidimai</string>
     <string name="settingsSyncSetting">Sinchronizuoti ir kurti atsarginę kopiją</string>
     <string name="settingsFireButton">Mygtukas „Fire“</string>
     <string name="settingsDataClearing">Duomenų valymas</string>
     <string name="settingsAddWidget">Įtraukti valdiklį į pagrindinį ekraną</string>
     <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
-    <string name="settingsEnableVoiceSearch">Įgalinti paiešką balsu</string>
+    <string name="settingsEnableVoiceSearch">Įjungti privačią paiešką balsu</string>
     <string name="settingsDDGOnOtherPlatforms">„DuckDuckGo“ kitose platformose</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionTitle">Žiniatinklio sekimo apsauga įjungta</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Žiniatinklio sekimo apsauga įjungta</string>
+    <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionDescription"><![CDATA[„DuckDuckGo“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
-    <string name="brokenSiteHeading">Pranešti apie sugadintą svetainę</string>
-    <string name="brokenSiteSubmitted">Dėkojame! Atsiliepimas pateiktas.</string>
-    <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko</string>
-    <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
-    <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
-    <string name="brokenSiteDescription">Anoniminio pranešimo apie neveikiančią svetainę pateikimas padeda mums tobulinti programėlę.</string>
-
-    <string name="brokenSiteCategoryBlocked">Svetainė užblokuota arba neįkelta</string>
-    <string name="brokenSiteCategoryLayout">Svetainės išdėstymas sugadintas</string>
-    <string name="brokenSiteCategoryEmptySpaces">Svetainėje yra didelių tuščių vietų</string>
-    <string name="brokenSiteCategoryShopping">Negalite sumokėti, atsiskaityti ar apsipirkti</string>
-    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti reklamos blokavimo programą</string>
-    <string name="brokenSiteCategoryComments">Nepavyko įkelti komentarų, apžvalgų ar pokalbių</string>
-    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas arba įkeltas</string>
-    <string name="brokenSiteCategoryLogin">Nepavyksta prisijungti / užsiregistruoti</string>
-    <string name="brokenSiteCategoryOther">Kažkas kito</string>
-    <string name="brokenSiteDescriptionTextInputHint">Pasidalinkite daugiau informacijos (neprivaloma)</string>
-    <string name="brokenSiteDescriptionCaption">Kas nutiko? Kas turėjo nutikti? Ar padėjo išjungus apsaugos priemones?</string>
 
     <string name="brokenSiteProtectionsOn">Šios svetainės apsaugos priemonės yra <b>ĮJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOff">Šios svetainės apsaugos priemonės yra <b>IŠJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Žiūrėti, kas išsiųsta</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ataskaitose siunčiama informacija negali būti naudojama jūsų tapatybei nustatyti:</b><br/><br/>• puslapio URL (be identifikuojamos informacijos);<br/>• įrenginio markė, modelis ir gamintojas;<br/>• operacinės sistemos versijos numeris;<br/>• programos versijos numeris;<br/>• anoniminė eksperimentų grupė funkcijų testavimui;<br/>• informacija apie tai, kurios apsaugos versijos buvo aktyvios;<br/>• žiniatinklio naršyklės variklio versijos numeris;<br/>• sąrašas, kurios apsaugos ir naršyklės funkcijos buvo aktyvios;<br/>• užblokuotų stebėjimo priemonių, pakaitinių užklausų, ignoruojamų užklausų ir užklausų, kurios nėra stebėjimo priemonių blokavimo sąraše, prieglobos pavadinimai;<br/>• naršyklės praneštos klaidos;<br/>• svetainės atsako būsenos (HTTP) kodai;<br/>• naudota ataskaitų teikimo forma (meniu, prietaisų skydelis ir kt.);<br/>• paskutinio šios svetainės pranešimo siuntimo data;<br/>• ar pasirinkote rodyti šio pranešimo informaciją, ar ne;<br/>• apsaugos išjungimo kartų skaičius;<br/>• kaip greitai įkeltos puslapio dalys;<br/>• kaip patekote į šį puslapį: naudodami SERP („DuckDuckGo“ paieška), navigaciją (nuoroda / URL) ar išorinę priemonę (kitos priemonės);<br/>• atnaujinimų skaičius nuo puslapio įkėlimo;<br/>• pagrindinė jūsų įrenginio kalba ir šalis.<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
@@ -809,5 +789,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Paskutinį kartą atidarytas skirtukas</string>
     <string name="showOnAppLaunchOptionNewTabPage">Naujas skirtuko puslapis</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
 
 </resources>

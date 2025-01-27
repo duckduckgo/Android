@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Ulubione</string>
     <string name="bookmarksEmptyHint">Nie dodano jeszcze żadnych zakładek</string>
     <string name="favoritesEmptyHint">Nie dodano jeszcze ulubionych</string>
+    <string name="popupBookmarksSortManually">Sortuj ręcznie</string>
+    <string name="popupBookmarksSortByName">Sortuj według nazwy</string>
+    <string name="popupBookmarksPreventReordering">Aby zmienić kolejność zakładek, przejdź na sortowanie ręczne.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Edytuj zakładkę</string>

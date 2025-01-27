@@ -2,7 +2,6 @@ package com.duckduckgo.app.brokensite.api
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
 import com.duckduckgo.app.pixels.AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT
@@ -643,7 +642,7 @@ class BrokenSiteSubmitterTest {
             upgradeHttps = true,
             blockedTrackers = "",
             surrogates = "",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSite.SITE_TYPE_DESKTOP,
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,

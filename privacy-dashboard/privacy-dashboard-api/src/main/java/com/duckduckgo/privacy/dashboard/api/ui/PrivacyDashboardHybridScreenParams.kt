@@ -22,6 +22,7 @@ import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener.NONE
 enum class DashboardOpener(val value: String) {
     MENU("menu"),
     DASHBOARD("dashboard"),
+    RELOAD_THREE_TIMES_WITHIN_20_SECONDS("reload-three-times-within-20-seconds"),
     NONE(""),
 }
 
@@ -62,4 +63,8 @@ sealed class PrivacyDashboardHybridScreenParams : GlobalActivityStarter.Activity
         override val tabId: String,
         override val opener: DashboardOpener = NONE,
     ) : PrivacyDashboardHybridScreenParams()
+}
+
+object PrivacyDashboardHybridScreenResult {
+    const val REPORT_SUBMITTED = 1
 }

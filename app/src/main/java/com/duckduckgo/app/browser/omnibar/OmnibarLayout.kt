@@ -144,8 +144,6 @@ class OmnibarLayout @JvmOverloads constructor(
         requireNotNull(findViewTreeLifecycleOwner())
     }
 
-    private lateinit var coroutineScope: CoroutineScope
-
     private val pulseAnimation: PulseAnimation by lazy {
         PulseAnimation(lifecycleOwner)
     }
@@ -237,6 +235,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private var coroutineScope: CoroutineScope? = null
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     private val viewModel: OmnibarLayoutViewModel by lazy {
@@ -252,13 +252,13 @@ class OmnibarLayout @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        coroutineScope.launch {
+        coroutineScope?.launch {
             viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 render(it)
             }
         }
 
-        coroutineScope.launch {
+        coroutineScope?.launch {
             viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 processCommand(it)
             }
@@ -278,8 +278,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
+        coroutineScope?.cancel()
         super.onDetachedFromWindow()
-        coroutineScope.cancel()
     }
 
     @SuppressLint("ClickableViewAccessibility")

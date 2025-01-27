@@ -26,6 +26,117 @@
     tools:context="com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayoutSorting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?daxColorSurface">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbarSorting"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/daxColorSurface"
+                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/toolbarItemsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="@dimen/keyline_2">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bookmarksActivityTitle"
+                        app:typography="h2"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <FrameLayout
+                        android:id="@+id/searchMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/keyline_2"
+                        android:layout_marginEnd="6dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/addFolderMenu"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/searchMenuView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_search_24" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/addFolderMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/keyline_2"
+                        android:layout_marginEnd="6dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/browserMenu"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/addFolderMenuView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_folder_add_24" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/browserMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/keyline_2"
+                        android:layout_marginEnd="@dimen/keyline_0"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/browserMenuImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_menu_vertical_24" />
+
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+            <com.duckduckgo.common.ui.view.SearchBarView
+                android:id="@+id/searchBarSorting"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/keyline_2"
+                android:visibility="gone"
+                app:clearActionContentDescription="@string/searchbar_cleartextaction_content_description_default"
+                app:searchHint="@string/searchBookmarks" />
+        </FrameLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

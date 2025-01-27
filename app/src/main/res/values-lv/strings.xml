@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
-    <string name="settingsHeadingPrivacyProtections">Privātuma aizsardzība</string>
+    <string name="settingsHeadingProtections">Aizsardzība</string>
     <string name="settingsHeadingAppearance">Izskats</string>
     <string name="settingsHeadingCustomize">Pielāgošana</string>
     <string name="settingsHeadingAbout">Par</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
+    <string name="leaveFeedbackNew">Sūtīt atsauksmi</string>
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
     <string name="settingsEmailProtectionSubtitle">Bloķē e-pasta izsekotājus un paslēp savu adresi</string>
     <string name="settingsHeadingMore">Vairāk no DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
-    <string name="settingsHeadingMainSettings">Galvenie iestatījumi</string>
+    <string name="settingsHeadingMainSettings">Citi iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datu notīrīšana</string>
     <string name="settingsAddWidget">Pievienot logrīku sākuma ekrānam</string>
     <string name="settingsAddressBarPosition">Iestati adreses joslas pozīciju</string>
-    <string name="settingsEnableVoiceSearch">Iespējot balss meklēšanu</string>
+    <string name="settingsEnableVoiceSearch">Iespējo privātu balss meklēšanu</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo citās platformās</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionTitle">Ir iespējota tīmekļa izsekošanas aizsardzība</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Ir iespējota tīmekļa izsekošanas aizsardzība</string>
+    <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nekad tevi neizseko, un mēs cenšamies pēc iespējas labāk aizsargāt tavu konfidencialitāti. Mēs nepārtraukti uzturam un uzlabojam aizsardzības slāņus, lai pasargātu no jaunākajām izsekošanas metodēm un nodrošinātu dažādu veidu aizsardzību, ko citas pārlūkprogrammas pēc noklusējuma nepiedāvā. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Ziņot par bojātu vietni</string>
-    <string name="brokenSiteHeading">Ziņot par bojātu vietni</string>
-    <string name="brokenSiteSubmitted">Paldies! Atsauksme ir iesniegta.</string>
-    <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo</string>
-    <string name="brokenSitesCategoriesHint">Apraksti notikušo</string>
-    <string name="brokenSiteSubmitButton">Nosūtīt ziņojumu</string>
-    <string name="brokenSiteDescription">Anonīma ziņošana par vietni, kurā ir darbības traucējumi, palīdz mums uzlabot lietotni.</string>
-
-    <string name="brokenSiteCategoryBlocked">Vietne ir bloķēta vai netika ielādēta</string>
-    <string name="brokenSiteCategoryLayout">Vietnes izkārtojums ir bojāts</string>
-    <string name="brokenSiteCategoryEmptySpaces">Vietnē ir lielas tukšas vietas</string>
-    <string name="brokenSiteCategoryShopping">Nevar norēķināties vai iepirkties</string>
-    <string name="brokenSiteCategoryPaywall">Vietne man lūdza atspējot reklāmu bloķētāju</string>
-    <string name="brokenSiteCategoryComments">Komentāri, atsauksmes vai tērzēšana netika ielādēta</string>
-    <string name="brokenSiteCategoryVideos">Video netika atskaņots vai ielādēts</string>
-    <string name="brokenSiteCategoryLogin">Nevar pierakstīties/reģistrēties</string>
-    <string name="brokenSiteCategoryOther">Kaut kas cits</string>
-    <string name="brokenSiteDescriptionTextInputHint">Sniedz sīkāku informāciju (neobligāti)</string>
-    <string name="brokenSiteDescriptionCaption">Kas notika? Kam bija jānotiek? Vai aizsardzības izslēgšana palīdzēja?</string>
 
     <string name="brokenSiteProtectionsOn">Aizsardzība šai vietnei ir <b>IESLĒGTA</b></string>
     <string name="brokenSiteProtectionsOff">Aizsardzība šai vietnei ir <b>IZSLĒGTA</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Aizsardzības IZSLĒGŠANA var palīdzēt.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Mēs uz laiku esam izslēguši privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Skatīt, kas tiek nosūtīts</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Ziņojumos nosūtīto informāciju nevar izmantot, lai tevi identificētu:</b><br/><br/>• Lapas URL (bez identificējamas informācijas)<br/>• Ierīces marka, modelis un ražotājs<br/>• Operētājsistēmas versijas numurs<br/>• Lietotnes versijas numurs<br/>• Anonīma eksperimentālā grupa funkciju testēšanai<br/>• Informācija par to, kuras mūsu aizsardzības versijas bija aktīvas<br/>• Tīmekļa pārlūkprogrammas meklētājsistēmas versijas numurs<br/>• Saraksts ar aizsardzības un pārlūkprogrammas funkcijām, kas bija aktīvas<br/>• Bloķēto izsekotāju resursdatoru nosaukumi, surogātu pieprasījumi, ignorētie pieprasījumi un pieprasījumi, kas nav iekļauti izsekotāju bloķēšanas sarakstā<br/>• Pārlūkprogrammas ziņotās kļūdas<br/>• Tīmekļa vietnes atbildes statusa (HTTP) kodi<br/>• Kuru ziņojuma veidlapu izmantoji (“izvēlne”, “informācijas panelis” utt.)<br/>• Datums, kurā tika nosūtīts pēdējais ziņojums par šo vietni<br/>• Vai izvēlējies rādīt šo ziņojuma informāciju<br/>• Aizsardzības izslēgšanas reižu skaits<br/>• Cik ātri tika ielādētas lapas daļas<br/>• Kā tu nonāci šajā lapā: SERP (DuckDuckGo meklēšana), Navigācija (saite/URL) vai Ārēji (citos veidos)<br/>• Atsvaidzināšanas reižu skaits kopš lapas ielādes<br/>• Tavas ierīces galvenā valoda un valsts<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>
@@ -807,5 +787,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Pēdējā atvērtā cilne</string>
     <string name="showOnAppLaunchOptionNewTabPage">Jaunas cilnes lapa</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrēta lapa</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
 
 </resources>

@@ -55,6 +55,14 @@ interface Subscriptions {
     suspend fun getSubscriptionStatus(): SubscriptionStatus
 
     /**
+     * This is a suspend function because we access disk IO
+     * You DO NOT need to set any dispatcher to call this suspend function
+     *
+     * @return a [Set<Product>] of available products for the subscription or an empty set if subscription is not available
+     */
+    suspend fun getAvailableProducts(): Set<Product>
+
+    /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
     fun shouldLaunchPrivacyProForUrl(url: String): Boolean

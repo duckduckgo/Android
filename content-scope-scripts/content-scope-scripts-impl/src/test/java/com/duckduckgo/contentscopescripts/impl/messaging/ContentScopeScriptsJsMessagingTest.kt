@@ -166,6 +166,90 @@ class ContentScopeScriptsJsMessagingTest {
         assertEquals(0, callback.counter)
     }
 
+    @Test
+    fun whenProcessDuckChatMessageWithGetAIChatNativeHandoffDataThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeHandoffData","params":{"key":"value"}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithGetAIChatNativeConfigValuesThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeConfigValues","params":{"key":"value"}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithOpenAIChatThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"openAIChat","params":{"key":"value"}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithUnknownMethodThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"unknownMethod","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithInvalidFeatureNameThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://duckduckgo.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"invalidFeature","id":"myId","method":"getAIChatNativeHandoffData","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessDuckChatMessageWithInvalidDomainThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        whenever(mockWebView.url).thenReturn("https://invalid-domain.com")
+
+        val message = """
+        {"context":"contentScopeScripts","featureName":"aiChat","id":"myId","method":"getAIChatNativeHandoffData","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
     private val callback = object : JsMessageCallback() {
         var counter = 0
         override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {

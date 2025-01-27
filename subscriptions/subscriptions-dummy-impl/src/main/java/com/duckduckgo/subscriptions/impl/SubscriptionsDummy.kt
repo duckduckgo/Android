@@ -40,6 +40,8 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
 
     override suspend fun getSubscriptionStatus(): SubscriptionStatus = UNKNOWN
 
+    override suspend fun getAvailableProducts(): Set<Product> = emptySet()
+
     override fun shouldLaunchPrivacyProForUrl(url: String): Boolean = false
 
     override fun launchPrivacyPro(

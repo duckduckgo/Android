@@ -34,6 +34,7 @@
         daxColorSecondaryText - Secondary text color
         daxColorSecondaryText - Secondary text color inverted
         daxColorPrimaryIcon - Primary color for icons
+        daxColorSecondaryIcon - Secondary color for icons
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
@@ -53,6 +54,7 @@
     <attr name="daxColorSecondaryInvertedText" format="color"/>
     <attr name="daxColorTertiaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
+    <attr name="daxColorSecondaryIcon" format="color"/>
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>

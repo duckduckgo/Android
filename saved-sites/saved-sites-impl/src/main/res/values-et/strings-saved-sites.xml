@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Lemmikud</string>
     <string name="bookmarksEmptyHint">Järjehoidjaid pole veel lisatud</string>
     <string name="favoritesEmptyHint">Lemmikuid pole veel lisatud</string>
+    <string name="popupBookmarksSortManually">Sorteeri käsitsi</string>
+    <string name="popupBookmarksSortByName">Sorteeri nime järgi</string>
+    <string name="popupBookmarksPreventReordering">Järjehoidjate ümberkorraldamiseks lülitage käsitsi sorteerimisele.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redigeeri järjehoidjat</string>

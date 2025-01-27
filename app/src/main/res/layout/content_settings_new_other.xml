@@ -37,7 +37,7 @@
         android:id="@+id/shareFeedbackSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/leaveFeedback"
+        app:primaryText="@string/leaveFeedbackNew"
         app:leadingIcon="@drawable/ic_heart_gray_color_24" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -46,6 +46,7 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_color_24"
         app:primaryText="@string/settingsDDGOnOtherPlatforms"
-        app:trailingIcon="@drawable/ic_open_in_24" />
+        app:trailingIcon="@drawable/ic_open_in_16"
+        app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
 
 </LinearLayout>

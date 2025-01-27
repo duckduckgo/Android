@@ -378,7 +378,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).exchangeAuthToken("authToken")
+        verify(subscriptionsManager).signInV1("authToken")
         verify(pixelSender).reportRestoreUsingEmailSuccess()
         verify(pixelSender).reportSubscriptionActivated()
         assertEquals(0, callback.counter)

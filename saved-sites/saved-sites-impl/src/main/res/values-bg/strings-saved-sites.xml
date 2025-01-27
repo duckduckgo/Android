@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Любими</string>
     <string name="bookmarksEmptyHint">Все още няма добавени отметки</string>
     <string name="favoritesEmptyHint">Все още няма добавени любими</string>
+    <string name="popupBookmarksSortManually">Сортиране ръчно</string>
+    <string name="popupBookmarksSortByName">Сортиране по име</string>
+    <string name="popupBookmarksPreventReordering">Превключете към ръчно сортиране, за да пренаредите отметките.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Редактиране на отметка</string>

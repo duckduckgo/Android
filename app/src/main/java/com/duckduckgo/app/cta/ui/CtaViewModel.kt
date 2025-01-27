@@ -35,22 +35,13 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingPrimaryButtonMetricPixel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingSecondaryButtonMetricPixel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.testPrivacyProOnboardingShownMetricPixel
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -91,8 +82,6 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val extendedOnboardingPixelsPlugin: ExtendedOnboardingPixelsPlugin,
-    private val userBrowserProperties: UserBrowserProperties,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -155,26 +144,6 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingShownMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
-
-            // Temporary pixel
-            val isVisitSiteSuggestionsCta =
-                cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta ||
-                    cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta || cta is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta
-            if (isVisitSiteSuggestionsCta) {
-                if (userBrowserProperties.daysSinceInstalled() <= MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN) {
-                    val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
-                    pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
-                    onboardingStore.visitSiteCtaDisplayCount = count + 1
-                } else {
-                    onboardingStore.clearVisitSiteCtaDisplayCount()
-                }
-            }
         }
     }
 
@@ -216,23 +185,6 @@ class CtaViewModel @Inject constructor(
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
-        }
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingPrimaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
-        }
-    }
-
-    suspend fun onUserClickCtaSkipButton(cta: Cta) {
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
-                extendedOnboardingPixelsPlugin.testPrivacyProOnboardingSecondaryButtonMetricPixel()?.getPixelDefinitions()?.forEach {
-                    pixel.fire(it.pixelName, it.params)
-                }
-            }
         }
     }
 
@@ -312,26 +264,8 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowPrivacyProCta() -> {
-                val titleRes: Int
-                val descriptionRes: Int
-                when {
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.STEP) -> {
-                        titleRes = R.string.onboardingPrivacyProStepDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProStepDaxDialogDescription
-                    }
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.PROTECTION) -> {
-                        titleRes = R.string.onboardingPrivacyProProtectionDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProProtectionDaxDialogDescription
-                    }
-                    extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().isEnabled(Cohorts.DEAL) -> {
-                        titleRes = R.string.onboardingPrivacyProDealDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProDealDaxDialogDescription
-                    }
-                    else -> {
-                        titleRes = R.string.onboardingPrivacyProDaxDialogTitle
-                        descriptionRes = R.string.onboardingPrivacyProDaxDialogDescription
-                    }
-                }
+                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
+                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
 
                 if (highlightsOnboardingExperimentManager.isHighlightsEnabled()) {
                     DaxBubbleCta.DaxExperimentPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
@@ -486,15 +420,6 @@ class CtaViewModel @Inject constructor(
                         duckPlayer.isDuckPlayerUri(site.url) || duckPlayer.isSimulatedYoutubeNoCookie(uri)
                     )
 
-        if (isDuckPlayerUrl) { // temporary pixel
-            val isMayorNetwork = !daxDialogNetworkShown() && !daxDialogTrackersFoundShown() && OnboardingDaxDialogCta.mainTrackerNetworks.any {
-                site.entity?.displayName?.contains(it) ?: false
-            }
-            if (isMayorNetwork) {
-                pixel.fire(pixel = ONBOARDING_SKIP_MAJOR_NETWORK_UNIQUE, type = Unique())
-            }
-        }
-
         return isDuckPlayerUrl
     }
 
@@ -579,19 +504,7 @@ class CtaViewModel @Inject constructor(
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
-    fun getCohortOrigin(): String {
-        val cohort = extendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24().getCohort()
-        return when (cohort?.name) {
-            Cohorts.STEP.cohortName -> "_${Cohorts.STEP.cohortName}"
-            Cohorts.PROTECTION.cohortName -> "_${Cohorts.PROTECTION.cohortName}"
-            Cohorts.DEAL.cohortName -> "_${Cohorts.DEAL.cohortName}"
-            Cohorts.CONTROL.cohortName -> "_${Cohorts.CONTROL.cohortName}"
-            else -> ""
-        }
-    }
-
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private const val MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN = 3
     }
 }

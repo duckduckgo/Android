@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi.\n<annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Preferenze video</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi.</string>
     <string name="duck_player_mode_always">Sempre</string>
     <string name="duck_player_mode_never">Mai</string>
     <string name="duck_player_mode_always_ask">Chiedi ogni volta</string>

@@ -37,10 +37,9 @@ import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWith
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Activating
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Expired
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Subscribed
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -102,17 +101,18 @@ class PirSettingView @JvmOverloads constructor(
     private fun renderView(viewState: ViewState) {
         with(binding.pirSettings) {
             when (viewState.pirState) {
-                is Subscribed -> {
+                is Enabled -> {
                     isVisible = true
                     setStatus(isOn = true)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
                     isClickable = true
                     binding.pirSettings.setClickListener { viewModel.onPir() }
                 }
-                Expired, Activating -> {
+                is Disabled -> {
                     isVisible = true
                     isClickable = false
                     setStatus(isOn = false)
+                    binding.pirSettings.setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
                 }
                 Hidden -> isGone = true

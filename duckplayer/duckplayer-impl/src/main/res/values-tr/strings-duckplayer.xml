@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Player, DuckDuckGo\'da hedefli reklamlar olmadan YouTube\'u izlemenizi sağlar ve izlediğiniz şeyler önerilerinizi etkilemez.\n<annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Video Tercihleri</string>
+    <string name="duck_player_settings_unavailable_description">Duck Player, DuckDuckGo\'da hedefli reklamlar olmadan YouTube\'u izlemenizi sağlar ve izlediğiniz şeyler önerilerinizi etkilemez.</string>
     <string name="duck_player_mode_always">Her zaman</string>
     <string name="duck_player_mode_never">Hiçbir zaman</string>
     <string name="duck_player_mode_always_ask">Her seferinde sor</string>

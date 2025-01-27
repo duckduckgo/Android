@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResu
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePrivateAliasAddress
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -48,12 +49,14 @@ class ResultHandlerEmailProtectionChooseEmailTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val callback: AutofillEventListener = mock()
-
     private val appBuildConfig: AppBuildConfig = mock()
+
     private val emailManager: EmailManager = mock()
     private val pixel: Pixel = mock()
+    private val partialCredentialSaveStore: PartialCredentialSaveStore = mock()
 
     private val testee = ResultHandlerEmailProtectionChooseEmail(
         appBuildConfig = appBuildConfig,
@@ -62,6 +65,7 @@ class ResultHandlerEmailProtectionChooseEmailTest {
         appCoroutineScope = coroutineTestRule.testScope,
         pixel = pixel,
         autofilledListeners = FakePluginPoint(),
+        partialCredentialSaveStore = partialCredentialSaveStore,
     )
 
     @Before
@@ -80,10 +84,24 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     }
 
     @Test
+    fun whenUserSelectedToUsePersonalAddressThenPartialUsernameSaveMade() = runTest {
+        val bundle = bundle(result = UsePersonalEmailAddress)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(partialCredentialSaveStore).saveUsername(url = any(), username = eq("personal-example@duck.com"))
+    }
+
+    @Test
     fun whenUserSelectedToUsePrivateAliasAddressThenCorrectCallbackInvoked() = runTest {
         val bundle = bundle(result = UsePrivateAliasAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(callback).onUseEmailProtectionPrivateAlias(any(), any())
+    }
+
+    @Test
+    fun whenUserSelectedToUsePrivateAliasAddressThenPartialUsernameSaveMade() = runTest {
+        val bundle = bundle(result = UsePrivateAliasAddress)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(partialCredentialSaveStore).saveUsername(url = any(), username = eq("private-example@duck.com"))
     }
 
     @Test

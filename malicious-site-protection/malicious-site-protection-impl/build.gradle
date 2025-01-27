@@ -42,11 +42,13 @@ dependencies {
 
     implementation Google.android.material
 
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
+    testImplementation project(':feature-toggles-test')
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
