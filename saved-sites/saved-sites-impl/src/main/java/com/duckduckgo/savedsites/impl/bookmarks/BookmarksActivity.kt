@@ -536,7 +536,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         val popupMenu = PopupMenu(
             layoutInflater,
             R.layout.popup_bookmarks_menu,
-            width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
         )
 
         val popupBinding = PopupBookmarksMenuBinding.bind(popupMenu.contentView)

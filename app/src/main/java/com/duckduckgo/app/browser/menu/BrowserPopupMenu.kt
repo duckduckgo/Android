@@ -40,7 +40,7 @@ class BrowserPopupMenu(
 ) : PopupMenu(
     layoutInflater,
     resourceId = if (omnibarPosition == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
-    width = context.resources.getDimensionPixelSize(dimen.popupMenuWidth),
+    width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
 ) {
     private val topBinding = PopupWindowBrowserMenuBinding.bind(contentView)
     private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
