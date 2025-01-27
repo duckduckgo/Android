@@ -38,28 +38,23 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTh
         holder: LottieAnimationView,
         privacyShield: PrivacyShield,
     ) {
-        when (privacyShield) {
-            PROTECTED -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
-                holder.setAnimation(res)
-                holder.progress = 0.0f
-                Timber.i("Shield: PROTECTED")
-            }
-            UNPROTECTED -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
-                holder.setAnimation(res)
-                holder.progress = 1.0f
-                Timber.i("Shield: UNPROTECTED")
-            }
-            UNKNOWN -> {
-                Timber.i("Shield: UNKNOWN")
-            }
-            WARNING -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
-                holder.setAnimation(res)
-                holder.progress = 1.0f
-                Timber.i("Shield: WARNING")
-            }
+        val currentAnimation = holder.tag as? Int
+        val newAnimation = when (privacyShield) {
+            // TODO ANA: This is temporary until the flags are set.
+            // PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
+            // UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
+            PROTECTED -> if (appTheme.isLightModeEnabled()) R.raw.protected_shield_experiment else R.raw.protected_shield_experiment
+            UNPROTECTED, WARNING -> if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield_experiment else R.raw.unprotected_shield_experiment
+            UNKNOWN -> null
+        }
+
+        if (newAnimation != null && newAnimation != currentAnimation) {
+            holder.setAnimation(newAnimation)
+            holder.tag = newAnimation
+            holder.progress = if (privacyShield == PROTECTED) 0.0f else 1.0f
+            Timber.d("Shield: $privacyShield")
+        } else {
+            Timber.d("Shield: $privacyShield - no change")
         }
     }
 }
