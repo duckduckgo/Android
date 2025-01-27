@@ -19,10 +19,15 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_CONTROL_OOM
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_CONTROL_OTHER
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_FILTERLIST_OOM
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.AUTOCONSENT_FILTERLIST_OTHER
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
@@ -47,6 +52,7 @@ class RealAutoconsent @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val autoconsentExceptionsRepository: AutoconsentExceptionsRepository,
     private val autoconsent: AutoconsentFeature,
+    private val pixel: Pixel,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : Autoconsent, PrivacyConfigCallbackPlugin {
@@ -103,6 +109,10 @@ class RealAutoconsent @Inject constructor(
         return autoconsent.self().isEnabled()
     }
 
+    private fun isFilterlistEnabled(): Boolean {
+        return autoconsent.filterlist().isEnabled()
+    }
+
     private fun isAnException(url: String): Boolean {
         return matches(url) || unprotectedTemporary.isAnException(url)
     }
@@ -113,7 +123,27 @@ class RealAutoconsent @Inject constructor(
 
     private fun getFunctionsJS(): String {
         if (!this::autoconsentJs.isInitialized) {
-            autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
+            try {
+                if (isEnabled() && isFilterlistEnabled()) {
+                    autoconsentJs = JsReader.loadJs("autoconsent-bundle-exp.js")
+                } else {
+                    autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
+                }
+            } catch (e: OutOfMemoryError) {
+                if (isFilterlistEnabled()) {
+                    pixel.fire(AUTOCONSENT_FILTERLIST_OOM)
+                } else {
+                    pixel.fire(AUTOCONSENT_CONTROL_OOM)
+                }
+                autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
+            } catch (e: Exception) {
+                if (isFilterlistEnabled()) {
+                    pixel.fire(AUTOCONSENT_FILTERLIST_OTHER)
+                } else {
+                    pixel.fire(AUTOCONSENT_CONTROL_OTHER)
+                }
+                autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
+            }
         }
         return autoconsentJs
     }
