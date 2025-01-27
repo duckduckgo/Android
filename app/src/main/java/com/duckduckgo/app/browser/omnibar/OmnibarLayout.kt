@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -142,6 +143,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
 
     private lateinit var pulseAnimation: PulseAnimation
 
@@ -628,13 +632,16 @@ class OmnibarLayout @JvmOverloads constructor(
 
         // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
+            // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
+            val isPrivacyShieldAnimation = targetView == placeholder
+            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()
             if (this::pulseAnimation.isInitialized) {
                 if (pulseAnimation.isActive) {
                     pulseAnimation.stop()
                 }
                 doOnLayout {
                     if (this::pulseAnimation.isInitialized) {
-                        pulseAnimation.playOn(targetView)
+                        pulseAnimation.playOn(targetView, isPrivacyShieldAnimation && isExperimentEnabled)
                     }
                 }
             }

@@ -52,9 +52,9 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         }
     }
 
-    fun playOn(targetView: View) {
+    fun playOn(targetView: View, isExperimentAndShieldView: Boolean) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView)
+            highlightImageView = addHighlightView(targetView, isExperimentAndShieldView)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
                 startPulseAnimation(it)
@@ -109,12 +109,16 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         }
     }
 
-    private fun addHighlightView(targetView: View): View {
+    private fun addHighlightView(targetView: View, isExperimentAndShieldView: Boolean): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
-        highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+        if (isExperimentAndShieldView) {
+            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
+        } else {
+            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+        }
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
