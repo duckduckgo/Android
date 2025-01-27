@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je omogočena za spletno mesto %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je onemogočena za spletno mesto %1$s</string>
     <string name="undoSnackbarAction">Prekliči spremembe</string>
+    <string name="trackersBlockedAnimationMessage">Blokirani sledilniki</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Prenesi sliko</string>
