@@ -46,6 +46,8 @@ import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as E
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
+import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
+import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -148,6 +150,24 @@ class AutofillModule {
         return Room.databaseBuilder(context, AutofillEngagementDatabase::class.java, "autofill_engagement.db")
             .addMigrations(*AutofillEngagementDatabase.ALL_MIGRATIONS)
             .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesDomainTargetAppsDatabase(
+        context: Context,
+    ): DomainTargetAppsDatabase {
+        return Room.databaseBuilder(context, DomainTargetAppsDatabase::class.java, "autofill_domain_target_apps.db")
+            .addMigrations(*DomainTargetAppsDatabase.ALL_MIGRATIONS)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesDomainTargetAppsDao(
+        database: DomainTargetAppsDatabase,
+    ): DomainTargetAppDao {
+        return database.domainTargetAppDao()
     }
 }
 

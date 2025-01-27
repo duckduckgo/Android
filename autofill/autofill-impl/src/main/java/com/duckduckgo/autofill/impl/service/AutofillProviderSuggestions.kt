@@ -40,6 +40,7 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
+import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -61,6 +62,7 @@ interface AutofillProviderSuggestions {
 class RealAutofillProviderSuggestions @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val autofillStore: AutofillStore,
+    private val appCredentialProvider: AppCredentialProvider,
 ) : AutofillProviderSuggestions {
 
     companion object {
@@ -234,7 +236,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
         }
         if (crendentials == null) {
             crendentials = node.packageId.takeUnless { it.isNullOrBlank() }?.let {
-                autofillStore.getCredentials(it)
+                appCredentialProvider.getCredentials(it)
             }
         }
         return crendentials
