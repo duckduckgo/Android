@@ -39,14 +39,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChat,
     private val preferencesStore: DuckChatPreferencesStore,
 ) : DuckChatJSHelper {
-    private fun getUserValues(featureName: String, method: String, id: String): JsCallbackData {
-        val jsonPayload = JSONObject().apply {
-            put(PLATFORM, ANDROID)
-            put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
-            put(PAYLOAD, preferencesStore.fetchAndClearUserPreferences())
-        }
-        return JsCallbackData(jsonPayload, featureName, method, id)
-    }
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -54,8 +46,11 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
     ): Command? = when (method) {
-        METHOD_GET_USER_VALUES -> id?.let {
-            SendResponseToJs(getUserValues(featureName, method, it))
+        METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
+            SendResponseToJs(getAIChatNativeHandoffData(featureName, method, it))
+        }
+        METHOD_GET_AI_CHAT_NATIVE_CONFIG -> id?.let {
+            SendResponseToJs(getAIChatNativeConfig(featureName, method, it))
         }
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)
@@ -66,6 +61,23 @@ class RealDuckChatJSHelper @Inject constructor(
         else -> null
     }
 
+    private fun getAIChatNativeHandoffData(featureName: String, method: String, id: String): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
+            put(PAYLOAD, preferencesStore.fetchAndClearUserPreferences())
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getAIChatNativeConfig(featureName: String, method: String, id: String): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     private fun extractPayload(data: JSONObject?): String? {
         return data?.takeIf {
             it.opt(PAYLOAD) != JSONObject.NULL
@@ -74,7 +86,8 @@ class RealDuckChatJSHelper @Inject constructor(
 
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
-        private const val METHOD_GET_USER_VALUES = "getUserValues"
+        private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
+        private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
