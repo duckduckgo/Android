@@ -379,4 +379,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
+
+    SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
+    SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
+    SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
+    SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
 }

@@ -24,12 +24,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.HideSetAsDefaultBrowserDialog
+import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
@@ -100,7 +101,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
         data class OpenSavedSite(val url: String) : Command()
         data object ShowSetAsDefaultBrowserDialog : Command()
-        data object HideSetAsDefaultBrowserDialog : Command()
+        data object DismissSetAsDefaultBrowserDialog : Command()
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
     }
@@ -148,6 +149,9 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
+    private var lastSystemDefaultAppsTrigger: SetAsDefaultActionTrigger? = null
+    private var lastSystemDefaultBrowserDialogTrigger: SetAsDefaultActionTrigger? = null
+
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
         viewModelScope.launch {
@@ -158,10 +162,12 @@ class BrowserViewModel @Inject constructor(
                     }
 
                     is OpenSystemDefaultAppsActivity -> {
+                        lastSystemDefaultAppsTrigger = it.trigger
                         command.value = Command.ShowSystemDefaultAppsActivity(it.intent)
                     }
 
                     is OpenSystemDefaultBrowserDialog -> {
+                        lastSystemDefaultBrowserDialogTrigger = it.trigger
                         command.value = Command.ShowSystemDefaultBrowserDialog(it.intent)
                     }
                 }
@@ -342,17 +348,17 @@ class BrowserViewModel @Inject constructor(
         defaultBrowserPromptsExperiment.onMessageDialogShown()
     }
 
-    fun onSetDefaultBrowserDismissed() {
-        defaultBrowserPromptsExperiment.onMessageDialogDismissed()
+    fun onSetDefaultBrowserDialogCanceled() {
+        defaultBrowserPromptsExperiment.onMessageDialogCanceled()
     }
 
     fun onSetDefaultBrowserConfirmationButtonClicked() {
-        command.value = HideSetAsDefaultBrowserDialog
+        command.value = DismissSetAsDefaultBrowserDialog
         defaultBrowserPromptsExperiment.onMessageDialogConfirmationButtonClicked()
     }
 
     fun onSetDefaultBrowserNotNowButtonClicked() {
-        command.value = HideSetAsDefaultBrowserDialog
+        command.value = DismissSetAsDefaultBrowserDialog
         defaultBrowserPromptsExperiment.onMessageDialogNotNowButtonClicked()
     }
 
@@ -361,11 +367,15 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onSystemDefaultBrowserDialogSuccess() {
-        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogSuccess()
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogSuccess(
+            lastSystemDefaultBrowserDialogTrigger ?: SetAsDefaultActionTrigger.UNKNOWN,
+        )
     }
 
     fun onSystemDefaultBrowserDialogCanceled() {
-        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogCanceled()
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogCanceled(
+            lastSystemDefaultBrowserDialogTrigger ?: SetAsDefaultActionTrigger.UNKNOWN,
+        )
     }
 
     fun onSystemDefaultAppsActivityOpened() {
@@ -373,7 +383,9 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onSystemDefaultAppsActivityClosed() {
-        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityClosed()
+        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityClosed(
+            lastSystemDefaultAppsTrigger ?: SetAsDefaultActionTrigger.UNKNOWN,
+        )
     }
 }
 
