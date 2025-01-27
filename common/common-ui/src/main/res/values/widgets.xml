@@ -207,6 +207,20 @@
         <item name="android:paddingStart">@dimen/keyline_2</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.ExtensibleFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="backgroundTint">@color/fabBackgroundTint</item>
+        <item name="iconTint">@color/fabIconTint</item>
+        <item name="android:textColor">@color/fabTextColor</item>
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtensibleFloatingActionButton.Overlay</item>
+        <item name="fabSize">normal</item>
+        <item name="android:height">@dimen/fabHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ExtensibleFloatingActionButton.Overlay">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/keyline_4</item>
+    </style>
+
     <!-- List Items -->
     <style name="Widget.DuckDuckGo.OneLineListItem">
         <item name="android:layout_width">match_parent</item>

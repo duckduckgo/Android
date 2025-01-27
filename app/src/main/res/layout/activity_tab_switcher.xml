@@ -52,10 +52,6 @@
         android:layout_margin="@dimen/keyline_4"
         android:contentDescription="New Tab"
         android:text="New tab"
-        android:height="56dp"
-        app:shapeAppearanceOverlay="@style/NewTabButtonOverlay"
-        style="@style/NewTabButtonStyle"
-        app:icon="@drawable/ic_add_24"
-        app:fabSize="normal" />
+        app:icon="@drawable/ic_add_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
