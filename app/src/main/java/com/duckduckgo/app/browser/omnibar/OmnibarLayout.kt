@@ -72,6 +72,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.animateVisibility
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -149,6 +150,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val aiChatMenu: FrameLayout by lazy { findViewById(R.id.aiChatIconMenu) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
@@ -366,6 +368,9 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
         }
+        aiChatMenu.setOnClickListener {
+            omnibarItemPressedListener?.onDuckAIButtonPressed()
+        }
         shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onPrivacyShieldButtonPressed()
@@ -461,12 +466,24 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
-        clearTextButton.isVisible = viewState.showClearButton
+        // clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
-        tabsMenu.isVisible = viewState.showTabsMenu
-        fireIconMenu.isVisible = viewState.showFireIcon
-        browserMenu.isVisible = viewState.showBrowserMenu
         spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
+
+        tabsMenu.animateVisibility(viewState.showTabsMenu)
+        fireIconMenu.animateVisibility(viewState.showFireIcon)
+        browserMenu.animateVisibility(viewState.showBrowserMenu)
+
+        clearTextButton.animateVisibility(viewState.showClearButton, 600)
+        aiChatMenu.animateVisibility(viewState.showChatMenu)
+
+        // clearTextButton.isVisible = viewState.showClearButton
+        // voiceSearchButton.isVisible = viewState.showVoiceSearch
+        // tabsMenu.isVisible = viewState.showTabsMenu
+        // fireIconMenu.isVisible = viewState.showFireIcon
+        // browserMenu.isVisible = viewState.showBrowserMenu
+        // aiChatMenu.isVisible = viewState.showChatMenu
+        // spacer.isVisible = viewState.showVoiceSearch && viewState.showClearButton
     }
 
     private fun renderBrowserMode(viewState: ViewState) {

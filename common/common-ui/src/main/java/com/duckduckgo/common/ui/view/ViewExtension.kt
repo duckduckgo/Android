@@ -16,6 +16,9 @@
 
 package com.duckduckgo.common.ui.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.Resources
 import android.view.View
@@ -24,6 +27,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
 import com.google.android.material.snackbar.Snackbar
@@ -55,6 +59,37 @@ fun View.gone(): View {
         visibility = View.GONE
     }
     return this
+}
+
+fun View.animateVisibility(visible: Boolean, duration: Long = 350) {
+    if (visible) {
+        if (!isVisible) {
+            fadeIn(duration)
+        }
+    } else {
+        if (isVisible) {
+            isVisible = false
+        }
+    }
+}
+
+fun View.fadeIn(duration: Long = 350) {
+    visibility = View.VISIBLE
+    val fadeIn = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f)
+    fadeIn.duration = duration
+    fadeIn.start()
+}
+
+fun View.fadeOut(duration: Long = 200) {
+    val fadeOut = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f)
+    fadeOut.duration = duration // Duration in milliseconds
+    fadeOut.addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator) {
+            visibility = View.GONE
+        }
+    },
+    )
+    fadeOut.start()
 }
 
 /** Extension method to show a keyboard for View. */

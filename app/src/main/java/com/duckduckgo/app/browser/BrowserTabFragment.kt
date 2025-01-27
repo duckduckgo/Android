@@ -934,6 +934,10 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
+    private fun onOmnibarDuckAIPressed(text: String) {
+        duckChat.openDuckChatWithAutoPrompt(text)
+    }
+
     private fun configureCustomTab() {
         if (tabDisplayedInCustomTabScreen) {
             omnibar.configureCustomTab(
@@ -2358,6 +2362,10 @@ class BrowserTabFragment :
 
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
+                }
+
+                override fun onDuckAIButtonPressed() {
+                    onOmnibarDuckAIPressed(omnibar.getText())
                 }
             },
         )
