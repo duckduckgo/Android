@@ -24,6 +24,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -71,7 +72,7 @@ class TrackersBlockedViewSlideBehavior(
         consumed: IntArray,
         type: Int,
     ) {
-        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true) {
+        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
             if (translation == 0f) {
                 child.hide()
@@ -97,5 +98,11 @@ class TrackersBlockedViewSlideBehavior(
             return false
         }
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+    }
+
+    private fun isSiteProtected(): Boolean {
+        val site = siteLiveData.value
+        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
+        return shield == PrivacyShield.PROTECTED
     }
 }
