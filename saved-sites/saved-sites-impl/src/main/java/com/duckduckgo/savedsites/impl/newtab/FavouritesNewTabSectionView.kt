@@ -150,6 +150,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
 
+        configureViews()
+
         viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
@@ -157,8 +159,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
-
-        configureViews()
     }
 
     override fun onDetachedFromWindow() {
