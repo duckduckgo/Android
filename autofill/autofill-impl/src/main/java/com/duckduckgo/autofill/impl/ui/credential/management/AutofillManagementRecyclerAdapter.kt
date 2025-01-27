@@ -18,10 +18,8 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -192,20 +190,11 @@ class AutofillManagementRecyclerAdapter(
         context: Context,
         loginCredentials: LoginCredentials,
     ): PopupMenu {
-        return PopupMenu(LayoutInflater.from(context), R.layout.overflow_menu_list_item, width = getPopupMenuWidth(context)).apply {
+        return PopupMenu(LayoutInflater.from(context), R.layout.overflow_menu_list_item).apply {
             onMenuItemClicked(contentView.findViewById(R.id.item_overflow_edit)) { onContextMenuItemClicked(Edit(loginCredentials)) }
             onMenuItemClicked(contentView.findViewById(R.id.item_overflow_delete)) { onContextMenuItemClicked(Delete(loginCredentials)) }
             onMenuItemClicked(contentView.findViewById(R.id.item_copy_username)) { onContextMenuItemClicked(CopyUsername(loginCredentials)) }
             onMenuItemClicked(contentView.findViewById(R.id.item_copy_password)) { onContextMenuItemClicked(CopyPassword(loginCredentials)) }
-        }
-    }
-
-    private fun getPopupMenuWidth(context: Context): Int {
-        val orientation = context.resources.configuration.orientation
-        return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            LayoutParams.WRAP_CONTENT
-        } else {
-            context.resources.getDimensionPixelSize(R.dimen.credentialManagementListItemPopupMenuWidth)
         }
     }
 
