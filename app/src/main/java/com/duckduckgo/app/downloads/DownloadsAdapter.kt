@@ -162,9 +162,6 @@ class DownloadsAdapter @Inject constructor(
             val popupMenu = PopupMenu(
                 layoutInflater,
                 layout.popup_window_download_item_menu,
-                width = context.resources.getDimensionPixelSize(
-                    com.duckduckgo.autofill.impl.R.dimen.credentialManagementListItemPopupMenuWidth,
-                ),
             )
             val view = popupMenu.contentView
             val shareItemView = view.findViewById<View>(R.id.share)
