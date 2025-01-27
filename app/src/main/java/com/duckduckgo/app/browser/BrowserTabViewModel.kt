@@ -362,6 +362,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -2568,13 +2569,13 @@ class BrowserTabViewModel @Inject constructor(
         command.value = GenerateWebViewPreviewImage
 
         if (swipingTabsFeature.isEnabled) {
-            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
-            if (emptyTab != null) {
-                viewModelScope.launch {
+            viewModelScope.launch {
+                val emptyTab = tabRepository.flowTabs.first().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
+                } else {
+                    command.value = LaunchNewTab
                 }
-            } else {
-                command.value = LaunchNewTab
             }
         } else {
             command.value = LaunchNewTab

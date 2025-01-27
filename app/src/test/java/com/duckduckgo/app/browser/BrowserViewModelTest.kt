@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -39,7 +38,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.tabs.model.TabDataRepositoryTest.Companion.TAB_ID
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -84,8 +82,6 @@ class BrowserViewModelTest {
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
     @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
-
-    @Mock private lateinit var userStageStore: UserStageStore
 
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
@@ -324,6 +320,24 @@ class BrowserViewModelTest {
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
+    @Test
+    fun whenOmnibarIsInEditModeTabSwipingIsDisabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isInEditMode = true
+        testee.onOmnibarEditModeChanged(isInEditMode)
+        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
+    @Test
+    fun whenOmnibarIsInNotEditModeTabSwipingIsEnabled() {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+
+        val isInEditMode = false
+        testee.onOmnibarEditModeChanged(isInEditMode)
+        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -337,7 +351,6 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
-            userStageStore = userStageStore,
             swipingTabsFeature = swipingTabsFeatureProvider,
         )
     }

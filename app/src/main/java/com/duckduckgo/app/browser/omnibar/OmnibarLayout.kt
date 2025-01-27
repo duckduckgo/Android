@@ -32,14 +32,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.ViewCompat.isAttachedToWindow
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.flowWithLifecycle
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
@@ -88,10 +88,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -141,7 +140,13 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var pixel: Pixel
 
-    private lateinit var pulseAnimation: PulseAnimation
+    private val lifecycleOwner: LifecycleOwner by lazy {
+        requireNotNull(findViewTreeLifecycleOwner())
+    }
+
+    private val pulseAnimation: PulseAnimation by lazy {
+        PulseAnimation(lifecycleOwner)
+    }
 
     private var omnibarTextListener: Omnibar.TextListener? = null
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
@@ -191,6 +196,8 @@ class OmnibarLayout @JvmOverloads constructor(
             R.layout.view_new_omnibar
         }
         inflate(context, layout, this)
+
+        AndroidSupportInjection.inject(this)
     }
 
     private fun omnibarViews(): List<View> = listOf(
@@ -240,23 +247,22 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        viewModel.viewState
-            .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+        coroutineScope?.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                render(it)
+            }
+        }
 
-        viewModel.commands()
-            .onEach { processCommand(it) }
-            .launchIn(coroutineScope!!)
-
-        viewModel.onAttachedToWindow()
+        coroutineScope?.launch {
+            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                processCommand(it)
+            }
+        }
 
         if (decoration != null) {
             decorateDeferred(decoration!!)
@@ -422,8 +428,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderTabIcon(viewState: ViewState) {
         if (viewState.shouldUpdateTabsCount) {
-            tabsMenu.count = viewState.tabs.count()
-            tabsMenu.hasUnread = viewState.tabs.firstOrNull { !it.viewed } != null
+            tabsMenu.count = viewState.tabCount
+            tabsMenu.hasUnread = viewState.hasUnreadTabs
         }
     }
 
@@ -618,32 +624,19 @@ class OmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
-            if (this::pulseAnimation.isInitialized) {
-                if (pulseAnimation.isActive) {
-                    pulseAnimation.stop()
-                }
-                doOnLayout {
-                    if (this::pulseAnimation.isInitialized) {
-                        pulseAnimation.playOn(targetView)
-                    }
-                }
-            }
-        } else {
-            if (this::pulseAnimation.isInitialized) {
+            if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
+            doOnLayout {
+                pulseAnimation.playOn(targetView)
+            }
+        } else {
+            pulseAnimation.stop()
         }
     }
 
-    fun isPulseAnimationPlaying(): Boolean {
-        return if (this::pulseAnimation.isInitialized) {
-            pulseAnimation.isActive
-        } else {
-            false
-        }
-    }
+    fun isPulseAnimationPlaying() = pulseAnimation.isActive
 
     private fun createCookiesAnimation(isCosmetic: Boolean) {
         if (this::animatorHelper.isInitialized) {
