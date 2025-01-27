@@ -46,12 +46,7 @@ interface TabStatsBucketing {
             21..40,
             41..60,
             61..80,
-            81..100,
-            101..125,
-            126..150,
-            151..250,
-            251..500,
-            501..Int.MAX_VALUE,
+            81..Int.MAX_VALUE,
         )
 
         val ACTIVITY_BUCKETS = listOf(

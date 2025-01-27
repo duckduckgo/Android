@@ -18,15 +18,12 @@ package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.content.Context
 import android.net.Uri
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
@@ -36,6 +33,7 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.launch
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -47,7 +45,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun bind() {
             binding.savedSiteEmptyHintTitle.setText(R.string.bookmarksEmptyHint)
             binding.savedSiteEmptyImportButton.setOnClickListener {
-                viewModel.launchBookmarkImport()
+                viewModel.onImportBookmarksClicked()
             }
         }
     }
@@ -67,17 +65,19 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private fun updateText(query: String) {
             binding.savedSiteEmptyHint.text = binding.root.context.getString(R.string.noResultsFor, query)
         }
+
         fun bind() {
             viewModel.viewState.value?.let { updateText(it.searchQuery) }
         }
     }
 
     class BookmarksViewHolder(
-        private val layoutInflater: LayoutInflater,
         private val binding: RowBookmarkTwoLineItemBinding,
-        private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val onBookmarkClick: (Bookmark) -> Unit,
+        private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -85,19 +85,24 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private var faviconLoaded = false
         private var bookmark: SavedSite.Bookmark? = null
 
-        fun showDragHandle(show: Boolean, bookmark: SavedSite.Bookmark) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmark: SavedSite.Bookmark,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
                 binding.root.setTrailingIconClickListener { anchor ->
-                    showOverFlowMenu(anchor, bookmark)
+                    onBookmarkOverflowClick(anchor, bookmark)
                 }
             }
         }
 
-        fun update(bookmark: SavedSite.Bookmark) {
+        fun update(
+            bookmark: Bookmark,
+        ) {
             val listItem = binding.root
             listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
             listItem.setLeadingIconContentDescription(
@@ -115,18 +120,26 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
             listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             listItem.setTrailingIconClickListener { anchor ->
-                showOverFlowMenu(anchor, bookmark)
+                onBookmarkOverflowClick(anchor, bookmark)
             }
             listItem.setClickListener {
-                viewModel.onSelected(bookmark)
+                onBookmarkClick(bookmark)
             }
+
+            listItem.setLongClickListener {
+                onLongClick()
+            }
+
             isFavorite = bookmark.isFavorite
             listItem.setFavoriteStarVisible(isFavorite)
 
             this.bookmark = bookmark
         }
 
-        private fun loadFavicon(url: String, image: ImageView) {
+        private fun loadFavicon(
+            url: String,
+            image: ImageView,
+        ) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = image)
             }
@@ -136,62 +149,28 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             val uri = Uri.parse(urlString)
             return uri.baseHost ?: return urlString
         }
-
-        private fun showOverFlowMenu(
-            anchor: View,
-            bookmark: SavedSite.Bookmark,
-        ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmark(bookmark) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmark(bookmark) }
-                onMenuItemClicked(view.findViewById(R.id.addRemoveFavorite)) {
-                    addRemoveFavorite(bookmark)
-                }
-            }
-            if (isFavorite) {
-                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(context.getString(R.string.removeFromFavorites))
-            } else {
-                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).setPrimaryText(context.getString(R.string.addToFavoritesMenu))
-            }
-            popupMenu.show(binding.root, anchor)
-        }
-
-        private fun editBookmark(bookmark: SavedSite.Bookmark) {
-            viewModel.onEditSavedSiteRequested(bookmark)
-        }
-
-        private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
-            viewModel.onDeleteSavedSiteRequested(bookmark)
-            viewModel.onBookmarkItemDeletedFromOverflowMenu()
-        }
-
-        private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {
-            if (bookmark.isFavorite) {
-                viewModel.removeFavorite(bookmark)
-            } else {
-                viewModel.addFavorite(bookmark)
-            }
-        }
     }
 
     class BookmarkFoldersViewHolder(
-        private val layoutInflater: LayoutInflater,
         private val binding: RowTwoLineItemBinding,
-        private val viewModel: BookmarksViewModel,
+        private val onBookmarkFolderClick: (View, BookmarkFolder) -> Unit,
+        private val onBookmarkFolderOverflowClick: (View, BookmarkFolder) -> Unit,
+        private val onLongClick: () -> Unit,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
 
-        fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
+        fun showDragHandle(
+            show: Boolean,
+            bookmarkFolder: BookmarkFolder,
+        ) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
                 binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-                binding.root.setTrailingIconClickListener {
-                    showOverFlowMenu(binding.root, bookmarkFolder)
+                binding.root.setTrailingIconClickListener { anchor ->
+                    onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
                 }
             }
         }
@@ -210,34 +189,18 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
             listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 
-            listItem.showTrailingIcon()
-            listItem.setTrailingIconClickListener {
-                showOverFlowMenu(listItem, bookmarkFolder)
+            listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            listItem.setTrailingIconClickListener { anchor ->
+                onBookmarkFolderOverflowClick(anchor, bookmarkFolder)
             }
-            listItem.setOnClickListener {
-                viewModel.onBookmarkFolderSelected(bookmarkFolder)
+
+            listItem.setClickListener {
+                onBookmarkFolderClick(listItem, bookmarkFolder)
             }
-        }
 
-        private fun showOverFlowMenu(
-            anchor: View,
-            bookmarkFolder: BookmarkFolder,
-        ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmarkFolder(bookmarkFolder) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmarkFolder(bookmarkFolder) }
+            listItem.setLongClickListener {
+                onLongClick()
             }
-            popupMenu.show(binding.root, anchor)
-        }
-
-        private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
-            viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
-        }
-
-        private fun deleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
-            viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
         }
     }
 }

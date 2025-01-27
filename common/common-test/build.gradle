@@ -20,6 +20,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.okHttp3.okHttp
     implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.retrofit
     // api because TestDispatcher is in the CoroutineTestRule public API
     api (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

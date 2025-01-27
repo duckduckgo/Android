@@ -23,10 +23,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up JDK 17
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Set up Go

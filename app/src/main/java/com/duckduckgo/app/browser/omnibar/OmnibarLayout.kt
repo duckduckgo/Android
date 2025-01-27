@@ -87,8 +87,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -143,8 +145,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
     }
-
-    private lateinit var coroutineScope: CoroutineScope
 
     private val pulseAnimation: PulseAnimation by lazy {
         PulseAnimation(lifecycleOwner)
@@ -237,6 +237,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private var coroutineScope: CoroutineScope? = null
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     private val viewModel: OmnibarLayoutViewModel by lazy {
@@ -252,13 +254,13 @@ class OmnibarLayout @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        coroutineScope.launch {
+        coroutineScope?.launch {
             viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 render(it)
             }
         }
 
-        coroutineScope.launch {
+        coroutineScope?.launch {
             viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 processCommand(it)
             }
@@ -278,8 +280,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
+        coroutineScope?.cancel()
         super.onDetachedFromWindow()
-        coroutineScope.cancel()
     }
 
     @SuppressLint("ClickableViewAccessibility")

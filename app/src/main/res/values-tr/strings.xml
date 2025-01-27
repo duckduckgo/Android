@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsHeadingPrivacyProtections">Gizlilik Korumaları</string>
+    <string name="settingsHeadingProtections">Korumalar</string>
     <string name="settingsHeadingAppearance">Görünüm</string>
     <string name="settingsHeadingCustomize">Özelleştir</string>
     <string name="settingsHeadingAbout">Hakkında</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
+    <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
     <string name="settingsHeadingMore">DuckDuckGo\'dan Daha Fazlası</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsHeadingMainSettings">Ana Ayarlar</string>
+    <string name="settingsHeadingMainSettings">Diğer Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Veri Temizleme</string>
     <string name="settingsAddWidget">Widget\'ı Ana Ekrana Ekle</string>
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
-    <string name="settingsEnableVoiceSearch">Sesli Arama\'yı Etkinleştir</string>
+    <string name="settingsEnableVoiceSearch">Özel Sesli Aramayı Etkinleştir</string>
     <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Web İzleme Engelleyici Etkinleştirildi</string>
+    <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hatalı Siteyi Bildirin</string>
-    <string name="brokenSiteHeading">Hatalı Siteyi Bildir</string>
-    <string name="brokenSiteSubmitted">Teşekkürler! Geri bildirim gönderildi.</string>
-    <string name="brokenSitesCategoriesTitle">Ne olduğunu açıklayın</string>
-    <string name="brokenSitesCategoriesHint">Ne olduğunu açıklayın</string>
-    <string name="brokenSiteSubmitButton">Rapor gönder</string>
-    <string name="brokenSiteDescription">Anonim bir hatalı site raporunun gönderilmesi uygulamayı geliştirmemize yardımcı olur.</string>
-
-    <string name="brokenSiteCategoryBlocked">Site engellendi veya yüklenmedi</string>
-    <string name="brokenSiteCategoryLayout">Sitede düzen hatalı</string>
-    <string name="brokenSiteCategoryEmptySpaces">Sitede geniş boş alanlar var</string>
-    <string name="brokenSiteCategoryShopping">Ödeme yapamıyorum, çıkış yapamıyorum veya alışveriş yapamıyorum</string>
-    <string name="brokenSiteCategoryPaywall">Site benden reklam engelleyiciyi devre dışı bırakmamı istedi</string>
-    <string name="brokenSiteCategoryComments">Yorumlar, incelemeler veya sohbetler yüklenmedi</string>
-    <string name="brokenSiteCategoryVideos">Video oynatılmadı veya yüklenmedi</string>
-    <string name="brokenSiteCategoryLogin">Oturum açamıyorum/kayıt olamıyorum</string>
-    <string name="brokenSiteCategoryOther">Başka bir şey</string>
-    <string name="brokenSiteDescriptionTextInputHint">Diğer ayrıntıları paylaşın (isteğe bağlı)</string>
-    <string name="brokenSiteDescriptionCaption">Ne oldu? Ne olması gerekiyordu? Korumaları kapatmak yardımcı oldu mu?</string>
 
     <string name="brokenSiteProtectionsOn">Bu site için korumalar <b>AÇIK</b></string>
     <string name="brokenSiteProtectionsOff">Bu site için korumalar <b>KAPALI</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Ne gönderildiğini gör</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporlarda gönderilen bilgiler sizi tanımlamak için kullanılamaz:</b><br/><br/>• Sayfa URL'si (tanımlanabilir bilgiler olmadan)<br/>• Cihaz markası, modeli ve üreticisi<br/>• İşletim sistemi sürüm numarası<br/>• Uygulama sürüm numarası<br/>• Özellik testi için anonim deney grubu<br/>• Korumalarımızın hangi sürümlerinin etkin olduğu hakkında bilgiler<br/>• Web tarayıcı motoru sürüm numarası<br/>• Hangi korumaların ve tarayıcı özelliklerinin etkin olduğunun listesi<br/>• Engellenen izleyicilerin ana bilgisayar adları, yedek istekler, yok sayılan istekler ve izleyici engelleme listesinde olmayan istekler<br/>• Tarayıcı tarafından bildirilen hatalar<br/>• Web sitesi yanıt durumu (HTTP) kodları<br/>• Hangi raporlama formunu kullandığınız (menü, kontrol paneli vb.)<br/>• Bu site için gönderilen son raporun tarihi<br/>• Bu rapor bilgisini göstermeyi seçip seçmediğiniz<br/>• Korumaların kaç kez kapatıldığı<br/>• Sayfanın bölümlerinin ne kadar hızlı yüklendiği<br/>• Bu sayfaya nasıl ulaştığınız: SERP (DuckDuckGo araması), Gezinme (bağlantı/URL) veya Harici (diğer araçlar)<br/>• Sayfanın yüklenmesinden bu yana yapılan yenileme sayısı<br/>• Cihazınızın birincil dili ve ülkesi<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Son Açılan Sekme</string>
     <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
 
 </resources>

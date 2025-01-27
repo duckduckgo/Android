@@ -44,7 +44,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.NewSettingsFeature
+import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -61,7 +61,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
-    lateinit var newSettingsFeature: NewSettingsFeature
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val viewModel: FireButtonViewModel by bindViewModel()
     private val legacyBinding: ActivityFireButtonBinding by viewBinding() // TODO remove
@@ -70,7 +70,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (newSettingsFeature.self().isEnabled()) {
+        if (settingsPageFeature.newSettingsPage().isEnabled()) {
             setContentView(binding.root)
             setupToolbar(binding.includeToolbar.toolbar)
             supportActionBar?.setTitle(R.string.dataClearingActivityTitle)

@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Impostazioni</string>
     <string name="settingsMenuItemTitle">Impostazioni</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingPrivacyProtections">Protezioni della Privacy</string>
+    <string name="settingsHeadingProtections">Protezioni</string>
     <string name="settingsHeadingAppearance">Aspetto</string>
     <string name="settingsHeadingCustomize">Personalizza</string>
     <string name="settingsHeadingAbout">Informazioni</string>
     <string name="settingsAboutDuckduckgo">Informazioni su DuckDuckGo</string>
     <string name="settingsVersion">Versione</string>
     <string name="leaveFeedback">Condividi feedback</string>
+    <string name="leaveFeedbackNew">Invia feedback</string>
     <string name="settingsEmailProtectionTitle">Protezione email</string>
     <string name="settingsEmailProtectionSubtitle">Blocca i sistemi di tracciamento delle email e nascondi il tuo indirizzo</string>
     <string name="settingsHeadingMore">Ulteriori informazioni su DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
-    <string name="settingsHeadingMainSettings">Impostazioni principali</string>
+    <string name="settingsHeadingMainSettings">Altre impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Cancellazione dati</string>
     <string name="settingsAddWidget">Aggiungi widget alla schermata iniziale</string>
     <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
-    <string name="settingsEnableVoiceSearch">Abilita ricerca vocale</string>
+    <string name="settingsEnableVoiceSearch">Attiva la ricerca vocale privata</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo su altre piattaforme</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
-    <string name="webTrackingProtectionTitle">La protezione dal tracciamento Web è abilitata</string>
+    <string name="webTrackingProtectionIsEnabledTitle">La protezione dal tracciamento Web è abilitata</string>
+    <string name="webTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Segnala sito danneggiato</string>
-    <string name="brokenSiteHeading">Segnala sito danneggiato</string>
-    <string name="brokenSiteSubmitted">Grazie! Il feedback è stato inviato.</string>
-    <string name="brokenSitesCategoriesTitle">Descrivi cosa è successo</string>
-    <string name="brokenSitesCategoriesHint">Descrivi cosa è successo</string>
-    <string name="brokenSiteSubmitButton">Invia il rapporto</string>
-    <string name="brokenSiteDescription">L\'invio di una segnalazione anonima su un sito non funzionante ci aiuta a migliorare l\'app.</string>
-
-    <string name="brokenSiteCategoryBlocked">Sito bloccato o non caricato</string>
-    <string name="brokenSiteCategoryLayout">Layout del sito interrotto</string>
-    <string name="brokenSiteCategoryEmptySpaces">Il sito contiene grandi spazi vuoti</string>
-    <string name="brokenSiteCategoryShopping">Non riesco a pagare, effettuare il check-out o fare acquisti</string>
-    <string name="brokenSiteCategoryPaywall">Il sito mi ha chiesto di disabilitare il blocco degli annunci</string>
-    <string name="brokenSiteCategoryComments">Commenti, recensioni o chat non sono stati caricati</string>
-    <string name="brokenSiteCategoryVideos">Il video non è stato riprodotto o caricato</string>
-    <string name="brokenSiteCategoryLogin">Impossibile accedere/registrarsi</string>
-    <string name="brokenSiteCategoryOther">Qualcos\'altro</string>
-    <string name="brokenSiteDescriptionTextInputHint">Condividi maggiori dettagli (facoltativo)</string>
-    <string name="brokenSiteDescriptionCaption">Cos\'è successo? Cosa sarebbe dovuto succedere? Disattivare le protezioni è stato utile?</string>
 
     <string name="brokenSiteProtectionsOn">Le protezioni sono <b>ATTIVE</b> per questo sito</string>
     <string name="brokenSiteProtectionsOff">Le protezioni sono <b>DISATTIVATE</b> per questo sito</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Disattivare le protezioni potrebbe essere utile.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Abbiamo temporaneamente disabilitato le Protezioni della Privacy perché sembra che stiano interrompendo il funzionamento del sito.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Controlla cosa è stato inviato</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Le informazioni inviate nei rapporti non possono essere utilizzate per identificarti:</b><br/><br/>• URL della pagina (senza informazioni identificabili)<br/>• Marca, modello e produttore del dispositivo<br/>• Numero di versione del sistema operativo<br/>• Numero di versione dell'app<br/>• Gruppo di sperimentazione anonimo per il test delle funzionalità<br/>• Informazioni sulle versioni delle nostre protezioni che erano attive<br/>• Numero di versione del motore del browser web<br/>• Elenco di protezioni e funzionalità del browser che erano attive<br/>• Nomi di host dei sistemi di tracciamento bloccati, richieste surrogate, richieste ignorate e richieste non presenti nell'elenco di blocco dei sistemi di tracciamento<br/>• Errori segnalati dal browser<br/>• Codici di stato della risposta del sito web (HTTP)<br/>• Modulo di segnalazione utilizzato (menu, dashboard, ecc.)<br/>• Data dell'ultimo rapporto inviato per questo sito<br/>• Se hai scelto di mostrare le informazioni del report<br/>• Numero di volte in cui le protezioni sono state disattivate<br/>• Velocità di caricamento delle parti della pagina<br/>• Come hai raggiunto questa pagina: SERP (ricerca DuckDuckGo), Navigazione (link/URL) o Esterno (altri mezzi)<br/>• Numero di aggiornamenti dal caricamento della pagina<br/>• Lingua principale e paese del tuo dispositivo<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Cerca con DuckDuckGo</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Ultima scheda aperta</string>
     <string name="showOnAppLaunchOptionNewTabPage">Pagina Nuova scheda</string>
     <string name="showOnAppLaunchOptionSpecificPage">Pagina specifica</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Grazie. Il tuo rapporto aiuta a rendere DuckDuckGo migliore per tutti.</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nuova AI Chat</string>
 
 </resources>

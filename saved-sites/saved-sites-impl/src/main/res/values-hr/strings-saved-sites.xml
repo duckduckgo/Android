@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Omiljeno</string>
     <string name="bookmarksEmptyHint">Još nema dodanih knjižnih oznaka</string>
     <string name="favoritesEmptyHint">Još uvijek nema omiljenih stavki</string>
+    <string name="popupBookmarksSortManually">Sortiraj ručno</string>
+    <string name="popupBookmarksSortByName">Sortiraj po imenu</string>
+    <string name="popupBookmarksPreventReordering">U svrhu preuređivanja oznaka, prebaci se na ručno sortiranje.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>

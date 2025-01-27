@@ -141,6 +141,7 @@ class ProSettingView @JvmOverloads constructor(
 
                     subscribedSubscriptionSetting.isVisible = true
                     subscriptionSettingContainer.isVisible = true
+                    subscribedSubscriptionSetting.isVisible = true
                 }
             }
             WAITING -> {
@@ -150,6 +151,7 @@ class ProSettingView @JvmOverloads constructor(
                     subscribedSubscriptionSetting.isGone = true
 
                     subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.isVisible = true
                     subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingActivating))
                 }
             }
@@ -160,6 +162,7 @@ class ProSettingView @JvmOverloads constructor(
                     subscribedSubscriptionSetting.isGone = true
 
                     subscriptionSettingContainer.isVisible = true
+                    subscriptionSetting.isVisible = true
                     subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
                     subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_red_16)
                 }

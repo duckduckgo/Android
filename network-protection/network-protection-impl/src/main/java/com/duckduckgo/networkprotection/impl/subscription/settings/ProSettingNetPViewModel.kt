@@ -29,12 +29,10 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Hidden
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Activating
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Expired
-import com.duckduckgo.networkprotection.impl.subscription.settings.NetworkProtectionSettingsState.NetPSettingsState.Visible.Subscribed
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -44,30 +42,32 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
-    private val networkProtectionSettingsState: NetworkProtectionSettingsState,
     private val networkProtectionState: NetworkProtectionState,
     private val networkProtectionAccessState: NetworkProtectionAccessState,
+    private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val networkProtectionEntryState: NetPEntryState = NetPEntryState.Hidden)
+    data class ViewState(val netPEntryState: NetPEntryState = NetPEntryState.Hidden)
 
     sealed class Command {
         data class OpenNetPScreen(val params: ActivityParams) : Command()
     }
 
     sealed class NetPEntryState {
+
         data object Hidden : NetPEntryState()
-        data class Subscribed(val isActive: Boolean) : NetPEntryState()
-        data object Expired : NetPEntryState()
-        data object Activating : NetPEntryState()
+        data class Enabled(val isActive: Boolean) : NetPEntryState()
+        data object Disabled : NetPEntryState()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -78,17 +78,56 @@ class ProSettingNetPViewModel(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewModelScope.launch {
-            combine(
-                networkProtectionSettingsState.getNetPSettingsStateFlow(),
-                networkProtectionState.getConnectionStateFlow(),
-            ) { accessState, connectionState ->
-                _viewState.emit(
-                    viewState.value.copy(
-                        networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
-                    ),
-                )
-            }.flowOn(dispatcherProvider.main()).launchIn(viewModelScope)
+        combine(
+            subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.contains(NetP) },
+            networkProtectionState.getConnectionStateFlow(),
+        ) { netpEntitlementStatus, connectionState ->
+
+            val subscriptionStatus = subscriptions.getSubscriptionStatus()
+
+            val netPEntryState = getNetpEntryState(netpEntitlementStatus, connectionState, subscriptionStatus)
+
+            _viewState.update { it.copy(netPEntryState = netPEntryState) }
+        }
+            .flowOn(dispatcherProvider.main())
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun getNetpEntryState(
+        netpEntitlementStatus: Boolean,
+        connectionState: ConnectionState,
+        subscriptionStatus: SubscriptionStatus,
+    ): NetPEntryState {
+        return when (subscriptionStatus) {
+            SubscriptionStatus.UNKNOWN -> {
+                handleRevokedVPNState()
+                NetPEntryState.Hidden
+            }
+
+            SubscriptionStatus.INACTIVE,
+            SubscriptionStatus.EXPIRED,
+            SubscriptionStatus.WAITING,
+            -> {
+                if (hasNetpProduct()) {
+                    NetPEntryState.Disabled
+                } else {
+                    handleRevokedVPNState()
+                    NetPEntryState.Hidden
+                }
+            }
+
+            SubscriptionStatus.AUTO_RENEWABLE,
+            SubscriptionStatus.NOT_AUTO_RENEWABLE,
+            SubscriptionStatus.GRACE_PERIOD,
+            -> {
+                if (netpEntitlementStatus) {
+                    NetPEntryState.Enabled(isActive = connectionState.isConnected())
+                } else {
+                    // ensure VPN is stopped in case entitlement is revoked
+                    handleRevokedVPNState()
+                    NetPEntryState.Hidden
+                }
+            }
         }
     }
 
@@ -102,22 +141,22 @@ class ProSettingNetPViewModel(
         }
     }
 
-    private fun getNetworkProtectionEntryState(
-        settingsState: NetPSettingsState,
-        networkProtectionConnectionState: ConnectionState,
-    ): NetPEntryState =
-        when (settingsState) {
-            Hidden -> NetPEntryState.Hidden
-            Subscribed -> NetPEntryState.Subscribed(isActive = networkProtectionConnectionState.isConnected())
-            Activating -> NetPEntryState.Activating
-            Expired -> NetPEntryState.Expired
+    private suspend fun hasNetpProduct(): Boolean {
+        val products = subscriptions.getAvailableProducts()
+        return products.contains(NetP)
+    }
+
+    private suspend fun handleRevokedVPNState() {
+        if (networkProtectionState.isEnabled()) {
+            networkProtectionState.stop()
         }
+    }
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val networkProtectionSettingsState: NetworkProtectionSettingsState,
         private val networkProtectionState: NetworkProtectionState,
         private val networkProtectionAccessState: NetworkProtectionAccessState,
+        private val subscriptions: Subscriptions,
         private val dispatcherProvider: DispatcherProvider,
         private val pixel: Pixel,
     ) : ViewModelProvider.NewInstanceFactory() {
@@ -125,9 +164,9 @@ class ProSettingNetPViewModel(
             return with(modelClass) {
                 when {
                     isAssignableFrom(ProSettingNetPViewModel::class.java) -> ProSettingNetPViewModel(
-                        networkProtectionSettingsState,
                         networkProtectionState,
                         networkProtectionAccessState,
+                        subscriptions,
                         dispatcherProvider,
                         pixel,
                     )

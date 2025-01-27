@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">Duck Playerin avulla voit katsella YouTubea ilman kohdennettuja mainoksia DuckDuckGossa, eivätkä katsomasi videot vaikuta suosituksiisi.<annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Videoasetukset</string>
+    <string name="duck_player_settings_unavailable_description">Duck Playerin avulla voit katsella YouTubea ilman kohdennettuja mainoksia DuckDuckGossa, eivätkä katsomasi videot vaikuta suosituksiisi.</string>
     <string name="duck_player_mode_always">Aina</string>
     <string name="duck_player_mode_never">Ei koskaan</string>
     <string name="duck_player_mode_always_ask">Kysy joka kerta</string>

@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
+import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -54,6 +55,7 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autofilledListeners: PluginPoint<DataAutofilledListener>,
+    private val partialCredentialSaveStore: PartialCredentialSaveStore,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -93,6 +95,7 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
             }
 
             emailManager.setNewLastUsedDate()
+            partialCredentialSaveStore.saveUsername(originalUrl, duckAddress)
         }
     }
 
@@ -107,6 +110,7 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
             }
 
             emailManager.setNewLastUsedDate()
+            partialCredentialSaveStore.saveUsername(originalUrl, privateAlias)
         }
     }
 

@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Priljubljeni</string>
     <string name="bookmarksEmptyHint">Zaznamki še niso dodani</string>
     <string name="favoritesEmptyHint">Priljubljeni še niso dodani</string>
+    <string name="popupBookmarksSortManually">Razvrsti ročno</string>
+    <string name="popupBookmarksSortByName">Razvrsti po imenu</string>
+    <string name="popupBookmarksPreventReordering">Preklopite na ročno razvrščanje, če želite preurediti zaznamke.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi zaznamek</string>

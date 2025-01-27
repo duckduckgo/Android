@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Favoriter</string>
     <string name="bookmarksEmptyHint">Inga bokmärken har lagts till ännu</string>
     <string name="favoritesEmptyHint">Inga favoriter har lagts till ännu</string>
+    <string name="popupBookmarksSortManually">Sortera manuellt</string>
+    <string name="popupBookmarksSortByName">Sortera efter namn</string>
+    <string name="popupBookmarksPreventReordering">Byt till manuell sortering för att ordna om bokmärken.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redigera bokmärke</string>

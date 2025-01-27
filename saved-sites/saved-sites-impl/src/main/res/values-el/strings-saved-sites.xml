@@ -52,6 +52,9 @@
     <string name="favoritesSectionTitle">Αγαπημένα</string>
     <string name="bookmarksEmptyHint">Δεν προστέθηκαν σελιδοδείκτες ακόμα</string>
     <string name="favoritesEmptyHint">Δεν έχουν προστεθεί ακόμα αγαπημένα</string>
+    <string name="popupBookmarksSortManually">Μη αυτόματη ταξινόμηση</string>
+    <string name="popupBookmarksSortByName">Ταξινόμηση κατά όνομα</string>
+    <string name="popupBookmarksPreventReordering">Αλλάξτε σε μη αυτόματη ταξινόμηση για να αναδιατάξετε τους σελιδοδείκτες.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Επεξεργασία σελιδοδείκτη</string>

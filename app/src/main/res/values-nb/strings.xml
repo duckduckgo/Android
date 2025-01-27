@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
-    <string name="settingsHeadingPrivacyProtections">Personvern</string>
+    <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Tilpass</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
     <string name="leaveFeedback">Del tilbakemelding</string>
+    <string name="leaveFeedbackNew">Send tilbakemelding</string>
     <string name="settingsEmailProtectionTitle">E-postbeskyttelse</string>
     <string name="settingsEmailProtectionSubtitle">Blokker e-postsporere og skjul adressen din</string>
     <string name="settingsHeadingMore">Mer fra DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
     <string name="settingsHeadingSettings">Innstillinger</string>
-    <string name="settingsHeadingMainSettings">Hovedinnstillinger</string>
+    <string name="settingsHeadingMainSettings">Andre innstillinger</string>
     <string name="settingsPermissionsSetting">Tillatelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Sletting av data</string>
     <string name="settingsAddWidget">Legg til widgeten på startskjermen</string>
     <string name="settingsAddressBarPosition">Angi plassering av adressefeltet</string>
-    <string name="settingsEnableVoiceSearch">Aktiver talesøk</string>
+    <string name="settingsEnableVoiceSearch">Aktiver privat talesøk</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre plattformer</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
-    <string name="webTrackingProtectionTitle">Nettsporingsbeskyttelse er aktivert</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Nettsporingsbeskyttelse er aktivert</string>
+    <string name="webTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer deg aldri, og vi er opptatt av å beskytte personvernet ditt så godt som mulig. Vi vedlikeholder og utvikler kontinuerlig beskyttelseslag for å holde tritt med nye sporingsmetoder og tilbyr mange beskyttelsestiltak som andre nettlesere ikke har som standard. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkerer automatisk skjulte sporere når du surfer på nettet.\n<a href=\"\">Finn ut mer</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter nettstedfeil</string>
-    <string name="brokenSiteHeading">Rapporter nettstedfeil</string>
-    <string name="brokenSiteSubmitted">Takk! Tilbakemeldingen er sendt.</string>
-    <string name="brokenSitesCategoriesTitle">Beskriv hva som skjedde</string>
-    <string name="brokenSitesCategoriesHint">Beskriv hva som skjedde</string>
-    <string name="brokenSiteSubmitButton">Send rapport</string>
-    <string name="brokenSiteDescription">Du kan hjelpe oss med å forbedre appen ved å sende inn en rapport om et defekt nettsted.</string>
-
-    <string name="brokenSiteCategoryBlocked">Nettstedet er blokkert eller ble ikke lastet</string>
-    <string name="brokenSiteCategoryLayout">Nettstedets layout er ødelagt</string>
-    <string name="brokenSiteCategoryEmptySpaces">Nettstedet inneholder store tomme områder</string>
-    <string name="brokenSiteCategoryShopping">Kan ikke betale, gå til kassen eller kjøpe</string>
-    <string name="brokenSiteCategoryPaywall">Nettstedet ba meg om å deaktivere annonseblokkering</string>
-    <string name="brokenSiteCategoryComments">Kommentarer, anmeldelser eller chatter ble ikke lastet</string>
-    <string name="brokenSiteCategoryVideos">Videoen ble ikke spilt av eller lastet</string>
-    <string name="brokenSiteCategoryLogin">Kan ikke logge på / registrere meg</string>
-    <string name="brokenSiteCategoryOther">Noe annet</string>
-    <string name="brokenSiteDescriptionTextInputHint">Del mer informasjon (valgfritt)</string>
-    <string name="brokenSiteDescriptionCaption">Hva skjedde? Hva skulle ha skjedd? Hjalp det å slå av beskyttelse?</string>
 
     <string name="brokenSiteProtectionsOn">Beskyttelse er <b>PÅ</b> for dette nettstedet</string>
     <string name="brokenSiteProtectionsOff">Beskyttelse er <b>AV</b> for dette nettstedet</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjelpe å slå beskyttelsen AV.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har midlertidig deaktivert personvernbeskyttelsene, da de ser ut til å få nettstedet til å slutte å fungere.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se hva som er sendt</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informasjon som sendes i rapporter, kan ikke brukes til å identifisere deg:</b><br/><br/>• Side-URL (uten identifiserbar informasjon)<br/>• Enhetens merke, modell og produsent<br/>• Operativsystemets versjonsnummer<br/>• Appens versjonsnummer<br/>• Anonym eksperimentgruppe for funksjonstesting<br/>• Informasjon om hvilke versjoner av beskyttelsene våre som var aktive<br/>• Nettlesermotorens versjonsnummer<br/>• Liste over hvilke beskyttelser og nettleserfunksjoner som var aktive<br/>• Vertsnavn på blokkerte sporere, surrogatforespørsler, ignorerte forespørsler og forespørsler som ikke er på listen over sporingsblokkering<br/>• Feil rapportert av nettleseren<br/>• Nettstedets responsstatuskoder (HTTP) <br/>• Hvilket rapportskjema du brukte (meny, dashbord osv.)<br/>• Dato for siste rapport sendt for dette nettstedet<br/>• Hvorvidt du valgte å vise denne rapportinformasjonen<br/>• Antall ganger beskyttelse ble slått av<br/>• Hvor raskt deler av siden ble lastet<br/>• Hvordan du kom til denne siden, enten: SERP (DuckDuckGo-søk), navigasjon (lenke/URL) eller eksternt (på annen måte)<br/>• Antall oppfriskninger siden siden ble lastet<br/>• Enhetens hovedspråk og land<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søk med DuckDuckGo</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Sist åpnet fane</string>
     <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
     <string name="showOnAppLaunchOptionSpecificPage">Spesifikk side</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Takk! Rapporten din bidrar til å gjøre DuckDuckGo bedre for alle!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Ny AI-chat</string>
 
 </resources>

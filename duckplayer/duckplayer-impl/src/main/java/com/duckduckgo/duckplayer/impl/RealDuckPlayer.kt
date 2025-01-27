@@ -362,6 +362,8 @@ class RealDuckPlayer @Inject constructor(
         url: Uri,
         webView: WebView,
     ): WebResourceResponse? {
+        if (!request.isForMainFrame) return null
+
         val currentUrl = withContext(dispatchers.main()) { webView.url }
 
         val videoIdQueryParam = duckPlayerFeatureRepository.getVideoIDQueryParam()

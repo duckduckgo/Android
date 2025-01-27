@@ -22,7 +22,8 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight"
-    android:paddingHorizontal="16dp">
+    android:paddingHorizontal="@dimen/keyline_4"
+    android:paddingVertical="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/leadingIcon"

@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsHeadingPrivacyProtections">Ochrana osobních údajů</string>
+    <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
     <string name="settingsHeadingCustomize">Přizpůsobit</string>
     <string name="settingsHeadingAbout">Informace</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
+    <string name="leaveFeedbackNew">Odeslat zpětnou vazbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
     <string name="settingsHeadingMore">Další od DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
-    <string name="settingsHeadingMainSettings">Hlavní nastavení</string>
+    <string name="settingsHeadingMainSettings">Další nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Vymazání dat</string>
     <string name="settingsAddWidget">Přidat widget na domovskou obrazovku</string>
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
-    <string name="settingsEnableVoiceSearch">Povolit hlasové vyhledávání</string>
+    <string name="settingsEnableVoiceSearch">Povolit soukromé hlasové vyhledávání</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na jiných platformách</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu je povolená</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Ochrana před sledováním na webu je povolená</string>
+    <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
-    <string name="brokenSiteHeading">Nahlásit nefunkční webové stránky</string>
-    <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána.</string>
-    <string name="brokenSitesCategoriesTitle">Popište, co se stalo</string>
-    <string name="brokenSitesCategoriesHint">Popište, co se stalo</string>
-    <string name="brokenSiteSubmitButton">Poslat zprávu</string>
-    <string name="brokenSiteDescription">Anonymní nahlášení nefunkčního webu nám pomáhá aplikaci vylepšovat.</string>
-
-    <string name="brokenSiteCategoryBlocked">Stránka je zablokovaná nebo se nenačetla</string>
-    <string name="brokenSiteCategoryLayout">Stránka má rozbité rozvržení</string>
-    <string name="brokenSiteCategoryEmptySpaces">Na stránce jsou velké prázdné oblasti</string>
-    <string name="brokenSiteCategoryShopping">Nemůžu zaplatit nebo dokončit nákup</string>
-    <string name="brokenSiteCategoryPaywall">Stránka mě požádala, ať přestanu blokovat reklamy</string>
-    <string name="brokenSiteCategoryComments">Komentáře, recenze nebo chaty se nenačetly</string>
-    <string name="brokenSiteCategoryVideos">Video se nepřehrálo nebo nenačetlo</string>
-    <string name="brokenSiteCategoryLogin">Nemůžu se přihlásit nebo zaregistrovat</string>
-    <string name="brokenSiteCategoryOther">Něco jiného</string>
-    <string name="brokenSiteDescriptionTextInputHint">Poděl se o další podrobnosti (volitelné)</string>
-    <string name="brokenSiteDescriptionCaption">Co se stalo? Co se mělo stát? Pomohlo vypnutí ochrany?</string>
 
     <string name="brokenSiteProtectionsOn">Na tomhle webu je ochrana <b>ZAPNUTÁ</b></string>
     <string name="brokenSiteProtectionsOff">Na tomhle webu je ochrana <b>VYPNUTÁ</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Možná zabere vypnutí ochrany.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasně jsme vypnuli ochranu osobních údajů, protože se zdá, že při načítání stránky způsobuje chyby.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Podívej se, co se odesílá</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Informace odeslané v přehledech se nedají použít k tvé identifikaci:</b><br/><br/>• Adresa URL stránky (bez údajů umožňujících zjištění totožnosti)<br/>• Značka, model a výrobce zařízení<br/>• Číslo verze operačního systému<br/>• Číslo verze aplikace<br/>• Anonymní experimentální skupina pro testování funkcí<br/>• Informace o tom, které verze našich ochranných funkcí byly aktivní<br/>• Číslo verze webového prohlížeče<br/>• Seznam aktivních ochranných funkcí a funkcí prohlížeče<br/>• Názvy hostitelů blokovaných trackerů, náhradních požadavků, ignorovaných požadavků a požadavků, které v seznamu blokovaných trackerů nejsou<br/>• Chyby hlášené prohlížečem<br/>• Kódy stavu odezvy webových stránek (HTTP)<br/>• Jaký formulář pro hlášení byl použitý (nabídka, hlavní panel atd.)<br/>• Datum posledního hlášení poslaného pro tento web<br/>• Jestli jsi vyjádřil(a) souhlas se zobrazováním těchto informací o hlášeních<br/>• Kolikrát byly ochranné funkce vypnuté<br/>• Jak rychle se jednotlivé části stránky načetly<br/>• Jak ses na tuhle stránku dostal(a), a to buď: přes SERP (vyhledávání DuckDuckGo), navigací (z odkazu/URL), nebo externě (jiným způsobem)<br/>• Počet obnovení od načtení stránky<br/>• Primární jazyk a země tvého zařízení<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hledat DuckDuckGo</string>
@@ -809,5 +789,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy otevřená karta</string>
     <string name="showOnAppLaunchOptionNewTabPage">Stránka Nová karta</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrétní stránka</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Děkujeme! Podrobnosti od tebe pomůžou zlepšit DuckDuckGo pro všechny!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nový AI Chat</string>
 
 </resources>

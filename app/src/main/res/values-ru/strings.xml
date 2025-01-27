@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
-    <string name="settingsHeadingPrivacyProtections">Защита конфиденциальности</string>
+    <string name="settingsHeadingProtections">Средства защиты</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
     <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
+    <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
     <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsHeadingMainSettings">Основные настройки</string>
+    <string name="settingsHeadingMainSettings">Прочие настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>
     <string name="settingsDataClearing">Очистка данных</string>
     <string name="settingsAddWidget">Добавьте виджет на домашний экран</string>
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
-    <string name="settingsEnableVoiceSearch">Включить голосовой поиск</string>
+    <string name="settingsEnableVoiceSearch">Включить конфиденциальный голосовой поиск</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo для других платформ</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionTitle">Включена защита от отслеживания онлайн</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Включена защита от отслеживания онлайн</string>
+    <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о неработающем сайте</string>
-    <string name="brokenSiteHeading">Сообщить о неработающем сайте</string>
-    <string name="brokenSiteSubmitted">Спасибо! Ваш отзыв отправлен.</string>
-    <string name="brokenSitesCategoriesTitle">Опишите, что случилось</string>
-    <string name="brokenSitesCategoriesHint">Опишите, что случилось</string>
-    <string name="brokenSiteSubmitButton">Отправить жалобу</string>
-    <string name="brokenSiteDescription">Ваша анонимная жалоба на проблемы с сайтом поможет нам улучшить приложение.</string>
-
-    <string name="brokenSiteCategoryBlocked">Сайт блокируется или не грузится</string>
-    <string name="brokenSiteCategoryLayout">Нарушена структура сайта</string>
-    <string name="brokenSiteCategoryEmptySpaces">Крупные пустые пространства</string>
-    <string name="brokenSiteCategoryShopping">Не получается провести оплату или оформить заказ/покупку</string>
-    <string name="brokenSiteCategoryPaywall">Сайт просит отключить блокировку рекламы</string>
-    <string name="brokenSiteCategoryComments">Не грузятся комментарии, отзывы или чат</string>
-    <string name="brokenSiteCategoryVideos">Не воспроизводится или не грузится видео</string>
-    <string name="brokenSiteCategoryLogin">Невозможно войти/зарегистрироваться</string>
-    <string name="brokenSiteCategoryOther">Что-то другое</string>
-    <string name="brokenSiteDescriptionTextInputHint">Предоставьте дополнительную информацию (необязательно)</string>
-    <string name="brokenSiteDescriptionCaption">Что случилось? Что должно было произойти? Помогло ли отключение защиты?</string>
 
     <string name="brokenSiteProtectionsOn">На этом сайте <b>ВКЛЮЧЕНЫ</b> функции защиты</string>
     <string name="brokenSiteProtectionsOff">На этом сайте <b>ВЫКЛЮЧЕНЫ</b> функции защиты</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Попробуйте отключить защиту.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Мы временно отключили защиту конфиденциальности, так как она нарушала работу этого сайта.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Что было отправлено</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>В отчет включаются следующие сведения (по которым невозможно установить вашу личность):</b><br/><br/>• адрес веб-страницы (без идентифицирующих данных);<br/>• марка, модель и изготовитель устройства;<br/>• номер операционной системы;<br/>• номер версии приложения;<br/>• анонимная экспериментальная группа для тестирования функций;<br/>• версии задействованных функций защиты;<br/>• номер версии движка браузера;<br/>• список активных средств защиты и функций браузера;<br/>• имена хостов заблокированных трекеров, суррогатные и проигнорированные запросы, а также запросы, не входящие в список блокировки трекеров;<br/>• ошибки, зафиксированные браузером;<br/>• коды состояния ответа сайта (HTTP);<br/>• способ отправки отчета (через меню, панель управления и так далее);<br/>• дата отправки последнего отчета по этому сайту;<br/>• отметка о том, готовы ли вы раскрыть содержимое отчета;<br/>• количество отключений функций защиты;<br/>• скорость загрузки разных частей страницы;<br/>• информация о том, как вы попали на данную страницу — через результаты поиска (в DuckDuckGo), путем навигации (по ссылке/URL-адресу) или иным (внешним) способом;<br/>• количество обновлений страницы с момента ее загрузки;<br/>• основной язык и регион вашего устройства.<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Поиск в DuckDuckGo</string>
@@ -809,5 +789,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Последняя открытая вкладка</string>
     <string name="showOnAppLaunchOptionNewTabPage">Страница новой вкладки</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретная страница</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Спасибо! Ваш отчет поможет улучшить DuckDuckGo для всех.</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Запустить AI Chat</string>
 
 </resources>

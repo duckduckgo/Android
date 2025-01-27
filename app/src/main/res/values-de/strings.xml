@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Einstellungen</string>
     <string name="settingsMenuItemTitle">Einstellungen</string>
     <string name="settingsHeadingPrivacy">Privatsphäre</string>
-    <string name="settingsHeadingPrivacyProtections">Datenschutz</string>
+    <string name="settingsHeadingProtections">Schutz</string>
     <string name="settingsHeadingAppearance">Aussehen</string>
     <string name="settingsHeadingCustomize">Anpassen</string>
     <string name="settingsHeadingAbout">Über</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback teilen</string>
+    <string name="leaveFeedbackNew">Rückmeldung senden</string>
     <string name="settingsEmailProtectionTitle">E-Mail-Schutz</string>
     <string name="settingsEmailProtectionSubtitle">E-Mail-Tracker blockieren und deine Adresse verbergen</string>
     <string name="settingsHeadingMore">Mehr von DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
-    <string name="settingsHeadingMainSettings">Haupteinstellungen</string>
+    <string name="settingsHeadingMainSettings">Andere Einstellungen</string>
     <string name="settingsPermissionsSetting">Berechtigungen</string>
     <string name="settingsSyncSetting">Synchronisieren und sichern</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datenlöschung</string>
     <string name="settingsAddWidget">Widget zum Startbildschirm hinzufügen</string>
     <string name="settingsAddressBarPosition">Position deiner Adressleiste festlegen</string>
-    <string name="settingsEnableVoiceSearch">Sprachsuche aktivieren</string>
+    <string name="settingsEnableVoiceSearch">Private Sprachsuche aktivieren</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo auf anderen Plattformen</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionTitle">Web Tracking Protection ist aktiviert</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Web Tracking Protection ist aktiviert</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo trackt dich niemals und wir versuchen, deine Privatsphäre so weit wie möglich zu schützen. Wir pflegen und entwickeln kontinuierlich Schutzmechanismen, um mit neuen Tracking-Methoden Schritt zu halten und viele Schutzfunktionen bereitzustellen, die andere Browser standardmäßig nicht bieten. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockiert automatisch versteckte Tracker, während du browst.\n<a href=\"\">Mehr erfahren</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
-    <string name="brokenSiteHeading">Fehlerhafte Website melden</string>
-    <string name="brokenSiteSubmitted">Vielen Dank! Feedback wurde gesendet.</string>
-    <string name="brokenSitesCategoriesTitle">Beschreiben, was passiert ist</string>
-    <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
-    <string name="brokenSiteSubmitButton">Bericht senden</string>
-    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Webseiten hilft uns, die App zu verbessern.</string>
-
-    <string name="brokenSiteCategoryBlocked">Webseite blockiert oder nicht geladen</string>
-    <string name="brokenSiteCategoryLayout">Website-Layout fehlerhaft</string>
-    <string name="brokenSiteCategoryEmptySpaces">Die Webseite enthält große leere Flächen</string>
-    <string name="brokenSiteCategoryShopping">Bezahlen, Auschecken oder Einkaufen nicht möglich</string>
-    <string name="brokenSiteCategoryPaywall">Webseite hat mich aufgefordert, den Werbeblocker zu deaktivieren</string>
-    <string name="brokenSiteCategoryComments">Kommentare, Bewertungen oder Chats konnten nicht geladen werden</string>
-    <string name="brokenSiteCategoryVideos">Video konnte nicht abgespielt oder geladen werden</string>
-    <string name="brokenSiteCategoryLogin">Anmeldung/Registrierung nicht möglich</string>
-    <string name="brokenSiteCategoryOther">Etwas anderes</string>
-    <string name="brokenSiteDescriptionTextInputHint">Weitere Details teilen (optional)</string>
-    <string name="brokenSiteDescriptionCaption">Was ist passiert? Was hätte passieren sollen? Hat das Ausschalten der Schutzfunktionen geholfen?</string>
 
     <string name="brokenSiteProtectionsOn">Der Schutz ist für diese Website ist <b>AKTIVIERT</b></string>
     <string name="brokenSiteProtectionsOff">Der Schutz für diese Website ist <b>DEAKTIVIERT</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Das AUSschalten der Schutzfunktionen könnte helfen.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Wir haben den Datenschutz vorübergehend deaktiviert, da es den Anschein hat, dass die Seite dadurch gestört wird.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Sehen, was gesendet wurde</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Die in den Berichten gesendeten Informationen können nicht dazu verwendet werden, dich zu identifizieren:</b><br/><br/>• Seiten-URL (ohne identifizierbare Informationen)<br/>• Gerätemarke, -modell und -hersteller<br/>• Versionsnummer des Betriebssystems<br/>• Versionsnummer der App<br/>• Anonyme Experimentiergruppe für Funktionstests<br/>• Informationen darüber, welche Versionen unserer Schutzmaßnahmen aktiv waren<br/>• Versionsnummer der Webbrowser-Engine<br/>• Liste der Schutzmaßnahmen und Browserfunktionen, die aktiv waren<br/>• Hostnamen der blockierten Tracker, Ersatzanfragen, ignorierte Anfragen und Anfragen, die nicht in der Tracker-Blockierliste enthalten sind<br/>• Vom Browser gemeldete Fehler<br/>• Codes für den Website-Antwortstatus (HTTP)<br/>• Verwendete Berichtsform (Menü, Dashboard usw.)<br/>• Datum des letzten Berichts für diese Website<br/>• Ob du dich für die Anzeige dieser Berichtsinformationen entschieden hast oder nicht<br/>• Wie oft der Schutz ausgeschaltet wurde<br/>• Wie schnell Teile der Seite geladen wurden<br/>• Wie du auf diese Seite gekommen bist: SERP (DuckDuckGo-Suche), Navigation (Link/URL) oder extern (andere Mittel)<br/>• Anzahl der Aktualisierungen seit dem Laden der Seite<br/>• Hauptsprache und Land deines Geräts<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Zuletzt geöffneter Tab</string>
     <string name="showOnAppLaunchOptionNewTabPage">Neue Tab-Seite</string>
     <string name="showOnAppLaunchOptionSpecificPage">Bestimmte Seite</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Vielen Dank! Dein Bericht hilft, DuckDuckGo für alle zu verbessern!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Neuer AI Chat</string>
 
 </resources>

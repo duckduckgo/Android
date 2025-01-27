@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingPrivacyProtections">Yksityisyyden suoja</string>
+    <string name="settingsHeadingProtections">Suojaukset</string>
     <string name="settingsHeadingAppearance">Ulkoasu</string>
     <string name="settingsHeadingCustomize">Mukauta</string>
     <string name="settingsHeadingAbout">Tietoa meistä</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
+    <string name="leaveFeedbackNew">Lähetä palautetta</string>
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
     <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
     <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
-    <string name="settingsHeadingMainSettings">Pääasetukset</string>
+    <string name="settingsHeadingMainSettings">Muut asetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
     <string name="settingsDataClearing">Datan tyhjentäminen</string>
     <string name="settingsAddWidget">Lisää widget aloitusnäyttöön</string>
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
-    <string name="settingsEnableVoiceSearch">Ota käyttöön äänihaku</string>
+    <string name="settingsEnableVoiceSearch">Ota yksityinen äänihaku käyttöön</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Verkkoseurantasuojaus on käytössä</string>
+    <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Ilmoita viallisesta sivustosta</string>
-    <string name="brokenSiteHeading">Ilmoita viallisesta sivustosta</string>
-    <string name="brokenSiteSubmitted">Kiitos! Palaute lähetetty.</string>
-    <string name="brokenSitesCategoriesTitle">Kuvaile mitä tapahtui</string>
-    <string name="brokenSitesCategoriesHint">Kuvaile mitä tapahtui</string>
-    <string name="brokenSiteSubmitButton">Lähetä raportti</string>
-    <string name="brokenSiteDescription">Anonyymin raportin lähettäminen toimimattomasta sivustosta auttaa meitä parantamaan sovellusta.</string>
-
-    <string name="brokenSiteCategoryBlocked">Sivusto estetty tai ei latautunut</string>
-    <string name="brokenSiteCategoryLayout">Sivuston asettelu rikki</string>
-    <string name="brokenSiteCategoryEmptySpaces">Sivustolla on suuria tyhjiä tiloja</string>
-    <string name="brokenSiteCategoryShopping">Ei voi maksaa, siirtyä kassalle tai ostaa</string>
-    <string name="brokenSiteCategoryPaywall">Sivusto pyysi minua poistamaan mainosten eston</string>
-    <string name="brokenSiteCategoryComments">Kommentit, arvostelut tai chatit eivät latautuneet</string>
-    <string name="brokenSiteCategoryVideos">Videota ei toistettu se ei latautunut</string>
-    <string name="brokenSiteCategoryLogin">Ei voi kirjautua sisään/rekisteröityä</string>
-    <string name="brokenSiteCategoryOther">Jotain muuta</string>
-    <string name="brokenSiteDescriptionTextInputHint">Jaa lisää tietoja (valinnainen)</string>
-    <string name="brokenSiteDescriptionCaption">Mitä tapahtui? Mitä olisi pitänyt tapahtua? Auttoiko estojen poistaminen käytöstä?</string>
 
     <string name="brokenSiteProtectionsOn">Tämän sivuston suojaukset ovat <b>KÄYTÖSSÄ</b></string>
     <string name="brokenSiteProtectionsOff">Tämän sivuston suojaukset ovat <b>POIS KÄYTÖSTÄ</b></string>
     <string name="brokenSiteProtectionsOnBannerMessage">Suojausten kytkeminen pois päältä voi auttaa.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Yksityisyyden suojaukset on väliaikaisesti poistettu käytöstä, koska ne näyttäisivät rikkovan tämän sivun.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Katso, mitä on lähetetty</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Raporteissa lähetetyistä tiedoista ei voi tunnistaa sinua:</b><br/><br/>• Sivun URL-osoite (ilman tunnistettavia tietoja)<br/>• Laitteen merkki, malli ja valmistaja<br/>• Käyttöjärjestelmän versionumero<br/>• Sovelluksen versionumero<br/>• Nimetön kokeiluryhmä ominaisuuksien testaamista varten<br/>• Tietoa suojauksiemme aktiivisista versioista<br/>• Verkkoselainhakukoneen versionumero<br/>• Luettelo aktiivisista suojauksista ja selaimen ominaisuuksista<br/>• Estettyjen seurantatoimintojen isäntänimet, korvaavat pyynnöt, huomiotta jätetyt pyynnöt ja pyynnöt, jotka eivät ole seurannan estoluettelossa<br/>• Selaimen ilmoittamat virheet<br/>• Web-sivuston vastaustilan (HTTP) koodit<br/>• Mitä ilmoituslomaketta käytit (valikko, hallintapaneeli jne.)<br/>• Tämän sivuston viimeisen raportin lähetyspäivämäärä<br/>• Oletko valinnut tämän raportin tietojen näyttämisen vai et<br/>• Suojausten poiskytkeytymiskerrat<br/>• Kuinka nopeasti osat sivusta latautuivat<br/>• Miten pääsit tälle sivulle, joko: SERP (DuckDuckGo-haku), navigointi (linkki/URL) tai ulkoinen (muu keino)<br/>• Päivitysten määrä sivun latauksen jälkeen<br/>• Laitteesi ensisijainen kieli ja maa<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Viimeksi avattu -välilehti</string>
     <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
     <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Uusi AI Chat</string>
 
 </resources>

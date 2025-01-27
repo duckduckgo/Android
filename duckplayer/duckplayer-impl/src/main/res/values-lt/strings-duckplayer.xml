@@ -22,6 +22,8 @@
     <string name="duck_player_setting_title">Duck Player</string>
     <string name="duck_player_settings_activity_title">Duck Player</string>
     <string name="duck_player_settings_activity_description">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="duck_player_settings_video_preferences_header">Vaizdo nuostatos</string>
+    <string name="duck_player_settings_unavailable_description">„Duck Player“ leidžia sistemoje „DuckDuckGo“ žiūrėti „YouTube“ be taikomų reklamų, o tai, ką žiūrite, neturės įtakos jūsų rekomendacijoms.</string>
     <string name="duck_player_mode_always">Visada</string>
     <string name="duck_player_mode_never">Niekada</string>
     <string name="duck_player_mode_always_ask">Klausti kiekvieną kartą</string>

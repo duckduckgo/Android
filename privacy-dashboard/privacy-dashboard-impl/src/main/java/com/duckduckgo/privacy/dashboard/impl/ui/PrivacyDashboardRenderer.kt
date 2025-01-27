@@ -32,7 +32,6 @@ class PrivacyDashboardRenderer(
     private val webView: WebView,
     private val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
     private val moshi: Moshi,
-    private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (String) -> Unit,
     private val onUrlClicked: (String) -> Unit,
     private val onOpenSettings: (String) -> Unit,
@@ -43,6 +42,7 @@ class PrivacyDashboardRenderer(
     private val onRejectToggleReport: () -> Unit,
     private val onSeeWhatIsSent: () -> Unit,
     private val onShowNativeFeedback: () -> Unit,
+    private val onReportBrokenSiteShown: () -> Unit,
 ) {
 
     private var lastSeenPrivacyDashboardViewState: ViewState? = null
@@ -50,7 +50,6 @@ class PrivacyDashboardRenderer(
     fun loadDashboard(webView: WebView, initialScreen: InitialScreen, toggleOpener: DashboardOpener) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
-                onBrokenSiteClicked = { onBrokenSiteClicked() },
                 onPrivacyProtectionsClicked = { payload ->
                     onPrivacyProtectionsClicked(payload)
                 },
@@ -67,6 +66,7 @@ class PrivacyDashboardRenderer(
                 onRejectToggleReport = onRejectToggleReport,
                 onSeeWhatIsSent = onSeeWhatIsSent,
                 onShowNativeFeedback = onShowNativeFeedback,
+                onReportBrokenSiteShown = onReportBrokenSiteShown,
             ),
             PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME,
         )
