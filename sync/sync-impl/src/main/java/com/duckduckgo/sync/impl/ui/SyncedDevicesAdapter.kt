@@ -49,6 +49,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
                 ItemSyncDeviceBinding.inflate(inflater, parent, false),
                 listener,
             )
+
             LOADING_ITEM -> LoadingViewHolder(ItemSyncDeviceLoadingBinding.inflate(inflater, parent, false))
             else -> throw IllegalArgumentException("Unknown view type")
         }
@@ -63,6 +64,7 @@ class SyncedDevicesAdapter constructor(private val listener: ConnectedDeviceClic
                     CONNECTED_DEVICE
                 }
             }
+
             is SyncDeviceListItem.LoadingItem -> LOADING_ITEM
         }
     }
@@ -159,7 +161,10 @@ class SyncedDeviceViewHolder(
         anchor: View,
         syncDevice: SyncedDevice,
     ) {
-        val popupMenu = PopupMenu(layoutInflater, layout.popup_windows_edit_device_menu)
+        val popupMenu = PopupMenu(
+            layoutInflater,
+            layout.popup_windows_edit_device_menu,
+        )
         val view = popupMenu.contentView
         popupMenu.apply {
             onMenuItemClicked(view.findViewById(R.id.edit)) { listener.onEditDeviceClicked(syncDevice.device) }
@@ -187,7 +192,11 @@ class LoadingViewHolder(val binding: ItemSyncDeviceLoadingBinding) : ViewHolder(
 }
 
 sealed class SyncDeviceListItem {
-    data class SyncedDevice(val device: ConnectedDevice, val loading: Boolean = false) : SyncDeviceListItem()
+    data class SyncedDevice(
+        val device: ConnectedDevice,
+        val loading: Boolean = false,
+    ) : SyncDeviceListItem()
+
     object LoadingItem : SyncDeviceListItem()
 }
 

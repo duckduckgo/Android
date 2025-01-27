@@ -73,7 +73,7 @@
     <dimen name="gridItemPreviewHeight">170dp</dimen>
 
     <!-- PopupMenu -->
-    <dimen name="popupMenuWidth">280dp</dimen>
+    <dimen name="popupMenuWidth">200dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
     <dimen name="popupMenuItemWidth">198dp</dimen>

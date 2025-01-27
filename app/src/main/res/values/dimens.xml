@@ -16,4 +16,5 @@
 
 <resources>
     <dimen name="sslWarningTextWidth">0dp</dimen>
+    <dimen name="browserPopupMenuWidth">280dp</dimen>
 </resources>

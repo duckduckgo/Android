@@ -61,6 +61,7 @@ class DownloadsAdapter @Inject constructor(
                 listener = downloadsItemListener,
                 formatter = dataSizeFormatter,
             )
+
             VIEW_TYPE_NOTIFY_ME -> NotifyMeViewHolder(
                 binding = ViewItemDownloadsNotifyMeBinding.inflate(inflater, parent, false),
                 listener = downloadsItemListener,
@@ -158,7 +159,13 @@ class DownloadsAdapter @Inject constructor(
             anchor: View,
             item: Item,
         ) {
-            val popupMenu = PopupMenu(layoutInflater, layout.popup_window_download_item_menu)
+            val popupMenu = PopupMenu(
+                layoutInflater,
+                layout.popup_window_download_item_menu,
+                width = context.resources.getDimensionPixelSize(
+                    com.duckduckgo.autofill.impl.R.dimen.credentialManagementListItemPopupMenuWidth,
+                ),
+            )
             val view = popupMenu.contentView
             val shareItemView = view.findViewById<View>(R.id.share)
             val deleteItemView = view.findViewById<View>(R.id.delete)
@@ -187,7 +194,10 @@ class DownloadsAdapter @Inject constructor(
         init {
             binding.root.setOnVisibilityChange(
                 object : NotifyMeView.OnVisibilityChangedListener {
-                    override fun onVisibilityChange(v: View?, isVisible: Boolean) {
+                    override fun onVisibilityChange(
+                        v: View?,
+                        isVisible: Boolean,
+                    ) {
                         listener.onItemVisibilityChanged(isVisible)
                     }
                 },
