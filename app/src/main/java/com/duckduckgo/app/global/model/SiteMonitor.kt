@@ -184,6 +184,10 @@ class SiteMonitor(
         return PROTECTED
     }
 
+    override fun resetTrackingEvents() {
+        trackingEvents.clear()
+    }
+
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
         return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)

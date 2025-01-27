@@ -3044,6 +3044,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onWebViewRefreshed() {
+        site?.resetTrackingEvents()
         refreshBrowserError()
         resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
@@ -3729,6 +3730,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
+
+    fun isSiteProtected(): Boolean {
+        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
+        return shield == PrivacyShield.PROTECTED
+    }
 
     companion object {
         private const val FIXED_PROGRESS = 50

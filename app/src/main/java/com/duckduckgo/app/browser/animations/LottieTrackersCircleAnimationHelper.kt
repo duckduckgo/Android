@@ -52,6 +52,10 @@ class LottieTrackersCircleAnimationHelper @Inject constructor() : TrackersCircle
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
         this.resources = context.resources
 
+        if (logos.isEmpty()) {
+            return
+        }
+
         if (logos.size <= 2) {
             // TODO ANA: We need to show the protected shield based on flags.
             omnibarShieldAnimationView.setAnimation(R.raw.protected_shield_experiment)

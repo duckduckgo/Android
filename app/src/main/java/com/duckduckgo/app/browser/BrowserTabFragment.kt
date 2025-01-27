@@ -941,6 +941,9 @@ class BrowserTabFragment :
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        if (!viewModel.isSiteProtected()) {
+            return
+        }
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
         binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
