@@ -26,7 +26,7 @@ class RealFeatureTogglesCallbackTest {
         callback.onCohortAssigned(
             experimentName = "experimentName",
             cohortName = "cohortName",
-            enrollmentDate = "2024-10-15T00:00-04:00[America/New_York]",
+            enrollmentDate = "2024-10-15T08:50:17.467-05:00[America/New_York]",
         )
         verify(pixel).fire(pixelName = pixelName, parameters = params, type = Unique(tag))
     }

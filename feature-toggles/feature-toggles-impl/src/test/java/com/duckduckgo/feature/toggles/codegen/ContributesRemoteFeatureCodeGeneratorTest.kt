@@ -3321,14 +3321,11 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         // call isEnabled(cohort) to force cohort assignment
         testFeature.fooFeature().isEnabled(CONTROL)
-        assertEquals(
-            Cohort(
-                name = "control",
-                weight = 1,
-                enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
-            ),
-            testFeature.fooFeature().getRawStoredState()!!.assignedCohort,
-        )
+
+        val date = testFeature.fooFeature().getRawStoredState()!!.assignedCohort?.enrollmentDateET
+        val parsedDate = ZonedDateTime.parse(date).truncatedTo(ChronoUnit.DAYS)
+        val now = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS)
+        assertEquals(now, parsedDate)
     }
 
     @Test

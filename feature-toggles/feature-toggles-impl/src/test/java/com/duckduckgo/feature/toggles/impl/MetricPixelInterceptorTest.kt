@@ -15,7 +15,6 @@ import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -43,7 +42,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test metric exist but is not in conversion window drops pixel`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -69,7 +68,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test metric exist and is in conversion window sends pixel`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -95,7 +94,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test metric allows conversion window of one day`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -121,7 +120,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test metric exist and is in conversion window from previous days sends pixel`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(4).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(4).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -147,7 +146,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test pixel metric cannot be sent twice`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -177,7 +176,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test metric doesnt exist drops pixels`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -203,7 +202,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test value doesnt exist drops pixels`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -229,7 +228,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test cohort name doesnt exist drops pixels`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
@@ -255,7 +254,7 @@ class MetricPixelInterceptorTest {
 
     @Test
     fun `test experiment name doesnt exist drops pixels`() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val enrollmentDateParsedET: String = ZonedDateTime.parse(enrollmentDateET).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(

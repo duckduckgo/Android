@@ -28,7 +28,6 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
@@ -506,7 +505,7 @@ internal class ToggleImpl constructor(
         }
 
         return getRandomCohort(cohorts)?.copy(
-            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
+            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString(),
         )
     }
 
