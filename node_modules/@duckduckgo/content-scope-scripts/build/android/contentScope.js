@@ -10297,6 +10297,7 @@
      * @property {string} [injectName]
      * @property {object} trackerLookup - provided currently only by the extension
      * @property {import('@duckduckgo/messaging').MessagingConfig} [messagingConfig]
+     * @property {string} [messageSecret] - optional, used in the messageBridge creation
      */
 
     /**
@@ -10413,6 +10414,7 @@
             site: processedConfig.site,
             bundledConfig: processedConfig.bundledConfig,
             messagingConfig: processedConfig.messagingConfig,
+            messageSecret: processedConfig.messageSecret,
         });
 
         init(processedConfig);
