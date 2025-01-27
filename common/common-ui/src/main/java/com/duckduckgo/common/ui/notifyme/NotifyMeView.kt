@@ -38,6 +38,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.notifyme.NotifyMeView.Orientation.Center
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
@@ -51,6 +52,7 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -60,8 +62,6 @@ import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -84,7 +84,6 @@ class NotifyMeView @JvmOverloads constructor(
     private var onNotifyMeButtonClicked: () -> Unit = {}
     private var onNotifyMeCloseButtonClicked: () -> Unit = {}
 
-    private var coroutineScope: CoroutineScope? = null
     private var vtoGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var visibilityChangedListener: OnVisibilityChangedListener? = null
 
@@ -93,6 +92,9 @@ class NotifyMeView @JvmOverloads constructor(
     private val viewModel: NotifyMeViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NotifyMeViewModel::class.java]
     }
+
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
 
     init {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.NotifyMeView)
@@ -120,15 +122,15 @@ class NotifyMeView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         viewModel.init(sharedPrefsKeyForDismiss)
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
 
@@ -142,8 +144,8 @@ class NotifyMeView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
 
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
     }
 
     fun setOnVisibilityChange(visibilityChangedListener: OnVisibilityChangedListener) {

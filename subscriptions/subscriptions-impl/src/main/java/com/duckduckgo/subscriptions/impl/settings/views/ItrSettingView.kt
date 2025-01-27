@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -41,8 +42,6 @@ import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -63,8 +62,6 @@ class ItrSettingView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val binding: ViewItrSettingsBinding by viewBinding()
 
     private val viewModel: ItrSettingViewModel by lazy {
@@ -72,20 +69,20 @@ class ItrSettingView @JvmOverloads constructor(
     }
 
     private var job: ConflatedJob = ConflatedJob()
+    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         job += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { renderView(it) }
             .launchIn(coroutineScope!!)
     }
@@ -93,9 +90,8 @@ class ItrSettingView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
     }
 
     private fun renderView(viewState: ViewState) {

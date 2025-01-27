@@ -33,8 +33,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
@@ -47,8 +49,6 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -72,11 +72,6 @@ constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    @Inject
-    lateinit var dispatchers: DispatcherProvider
-
-    private var coroutineScope: CoroutineScope? = null
-
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
     }
@@ -91,21 +86,24 @@ constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
     }
 
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope!!
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(scope)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(scope)
 
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
@@ -113,8 +111,8 @@ constructor(
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
         super.onDetachedFromWindow()
     }
 

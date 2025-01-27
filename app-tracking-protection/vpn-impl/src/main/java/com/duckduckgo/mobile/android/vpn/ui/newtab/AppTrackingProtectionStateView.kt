@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
@@ -46,8 +47,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -76,7 +75,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PrivacyReportViewModel::class.java]
     }
 
-    private var coroutineScope: CoroutineScope? = null
+    private val conflatedJob = ConflatedJob()
 
     private val binding: FragmentDeviceShieldCtaBinding by viewBinding()
 
@@ -84,11 +83,9 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
-
-        viewModel.viewStateFlow
+        conflatedJob += viewModel.viewStateFlow
             .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         deviceShieldPixels.didShowNewTabSummary()
 
@@ -96,8 +93,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedJob.cancel()
         super.onDetachedFromWindow()
     }
 

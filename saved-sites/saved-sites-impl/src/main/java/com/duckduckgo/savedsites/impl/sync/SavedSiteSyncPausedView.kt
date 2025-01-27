@@ -23,6 +23,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -37,8 +38,6 @@ import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.Command.
 import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,9 +58,8 @@ class SavedSiteSyncPausedView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private var job: ConflatedJob = ConflatedJob()
+    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     private val binding: ViewSaveSiteSyncPausedWarningBinding by viewBinding()
 
@@ -75,9 +73,9 @@ class SavedSiteSyncPausedView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState()
+        conflatedStateJob += viewModel.viewState()
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
@@ -89,9 +87,8 @@ class SavedSiteSyncPausedView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        coroutineScope?.cancel()
         job.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
     }
 
     private fun processCommands(command: Command) {

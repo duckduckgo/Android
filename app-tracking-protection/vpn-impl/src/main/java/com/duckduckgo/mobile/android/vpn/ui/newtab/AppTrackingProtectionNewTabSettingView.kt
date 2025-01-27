@@ -23,10 +23,12 @@ import android.widget.LinearLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
@@ -42,8 +44,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -63,7 +63,7 @@ class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
 
     private val binding: ViewApptpSettingsItemBinding by viewBinding()
 
-    private var coroutineScope: CoroutineScope? = null
+    private val conflatedJob = ConflatedJob()
 
     private val viewModel: AppTrackingProtectionNewTabSettingsViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AppTrackingProtectionNewTabSettingsViewModel::class.java]
@@ -74,16 +74,13 @@ class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
         super.onAttachedToWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
-
-        viewModel.viewState
+        conflatedJob += viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedJob.cancel()
         super.onDetachedFromWindow()
     }
 

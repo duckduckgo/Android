@@ -31,6 +31,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +49,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -80,8 +82,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -105,8 +105,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private var isExpandable = true
     private var showPlaceholders = false
     private var placement = Placement.NEW_TAB_PAGE
@@ -128,6 +126,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         }
     }
 
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
+
     init {
         context.obtainStyledAttributes(
             attrs,
@@ -148,7 +149,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        coroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         configureViews()
 
@@ -156,14 +157,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
-        coroutineScope = null
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
         super.onDetachedFromWindow()
     }
 
