@@ -27,7 +27,6 @@ import timber.log.Timber
 interface AssetLinksLoader {
     /**
      * Return a map of app packages to associated valid fingerprints from the [domain]'s assetlinks
-     * You DO NOT need to set any dispatcher to call this suspend function
      */
     suspend fun getValidTargetApps(domain: String): Map<String, List<String>>
 }

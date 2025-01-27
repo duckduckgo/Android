@@ -29,7 +29,6 @@ import timber.log.Timber
 interface AppCredentialProvider {
     /**
      * Provide a list of unique credentials that can be associated with the given [appPackage]
-     * You DO NOT need to set any dispatcher to call this suspend function
      */
     suspend fun getCredentials(appPackage: String): List<LoginCredentials>
 }

@@ -22,7 +22,7 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface RemoteDomainTargetAppService {
-    @GET("https://ddg-staticcdn.s3.amazonaws.com/android/domain-app-mapping.json")
+    @GET("https://staticcdn.duckduckgo.com/android/domain-app-mapping.json")
     suspend fun fetchDataset(): RemoteDomainTargetDataSet
 }
 
