@@ -56,11 +56,12 @@ jobs:
 
       - name: Autofill Critical Path E2E Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           name: autofill_${{ github.sha }}
-          timeout: 120
+          timeout: 180
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
