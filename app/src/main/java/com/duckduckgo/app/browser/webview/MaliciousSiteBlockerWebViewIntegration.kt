@@ -31,6 +31,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.net.URLDecoder
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -54,6 +55,13 @@ interface MaliciousSiteBlockerWebViewIntegration {
     ): Boolean
 
     fun onPageLoadStarted()
+
+    fun onSiteExempted(url: Uri)
+}
+
+@SingleInstanceIn(AppScope::class)
+class ExemptedUrlsHolder @Inject constructor() {
+    val exemptedMaliciousUrls = mutableSetOf<String>()
 }
 
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
@@ -63,11 +71,13 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val exemptedUrlsHolder: ExemptedUrlsHolder,
     @IsMainProcess private val isMainProcess: Boolean,
 ) : MaliciousSiteBlockerWebViewIntegration, PrivacyConfigCallbackPlugin {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val processedUrls = mutableListOf<String>()
+
     private var isFeatureEnabled = false
     private var currentCheckId = AtomicInteger(0)
 
@@ -111,6 +121,11 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return null
         }
 
+        if (exemptedUrlsHolder.exemptedMaliciousUrls.contains(decodedUrl)) {
+            Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl")
+            return null
+        }
+
         if (request.isForMainFrame || (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host)) {
             if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                 return WebResourceResponse(null, null, null)
@@ -135,6 +150,11 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             if (processedUrls.contains(decodedUrl)) {
                 processedUrls.remove(decodedUrl)
                 Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
+                return@runBlocking false
+            }
+
+            if (exemptedUrlsHolder.exemptedMaliciousUrls.contains(decodedUrl)) {
+                Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl")
                 return@runBlocking false
             }
 
@@ -173,5 +193,13 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
     override fun onPageLoadStarted() {
         processedUrls.clear()
+    }
+
+    override fun onSiteExempted(url: Uri) {
+        val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        exemptedUrlsHolder.exemptedMaliciousUrls.add(convertedUrl)
+        Timber.tag("MaliciousSiteDetector").d(
+            "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
+        )
     }
 }

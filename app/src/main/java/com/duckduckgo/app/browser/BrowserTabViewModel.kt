@@ -82,6 +82,7 @@ import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
+import com.duckduckgo.app.browser.commands.Command.BypassMaliciousSiteWarning
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
@@ -95,6 +96,7 @@ import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
 import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
+import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -152,6 +154,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
+import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
@@ -200,6 +203,10 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -438,6 +445,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1836,6 +1844,26 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentCosmeticHide = isCosmetic
     }
 
+    fun onMaliciousSiteUserAction(
+        action: MaliciousSiteBlockedWarningLayout.Action,
+        url: Uri,
+    ) {
+        when (action) {
+            LeaveSite -> {
+                command.postValue(EscapeMaliciousSite)
+            }
+
+            VisitSite -> {
+                command.postValue(BypassMaliciousSiteWarning(url))
+                browserViewState.value = currentBrowserViewState().copy(
+                    browserShowing = true,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                )
+                addExemptedMaliciousUrlToMemory(url)
+            }
+        }
+    }
+
     private fun onSiteChanged() {
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
@@ -3107,6 +3135,18 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
+    override fun onReceivedMaliciousSiteWarning(url: Uri) {
+        // TODO (cbarreiro): Fire pixel
+        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, url = url.toString()))
+        browserViewState.postValue(
+            currentBrowserViewState().copy(
+                browserShowing = false,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+            ),
+        )
+        command.postValue(ShowWarningMaliciousSite(url))
+    }
+
     override fun recordErrorCode(
         error: String,
         url: String,
@@ -3683,6 +3723,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    fun addExemptedMaliciousUrlToMemory(url: Uri) {
+        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url)
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {

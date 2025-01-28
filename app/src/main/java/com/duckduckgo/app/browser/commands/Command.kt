@@ -217,6 +217,16 @@ sealed class Command {
         val url: String,
     ) : Command()
 
+    data class ShowWarningMaliciousSite(
+        val url: Uri,
+    ) : Command()
+
+    data object EscapeMaliciousSite : Command()
+
+    data class BypassMaliciousSiteWarning(
+        val url: Uri,
+    ) : Command()
+
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
     data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()

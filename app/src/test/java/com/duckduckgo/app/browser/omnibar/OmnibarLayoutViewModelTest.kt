@@ -295,6 +295,17 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenViewModeChangedToMaliciousSiteWarningThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.scrollingEnabled)
+        }
+    }
+
+    @Test
     fun whenViewModeChangedToNewTabThenViewStateCorrect() = runTest {
         testee.onViewModeChanged(ViewMode.NewTab)
 
@@ -331,6 +342,17 @@ class OmnibarLayoutViewModelTest {
     fun whenViewModeChangedToSSLWarningAndFocusThenViewStateCorrect() = runTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
         testee.onViewModeChanged(ViewMode.SSLWarning)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToMaliciousSiteWarningAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
