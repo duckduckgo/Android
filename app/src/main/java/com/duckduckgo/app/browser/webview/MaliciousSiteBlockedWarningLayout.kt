@@ -62,7 +62,7 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
 
     private fun formatCopy() {
         with(binding) {
-            expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.sslErrorExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
+            expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
     }
 

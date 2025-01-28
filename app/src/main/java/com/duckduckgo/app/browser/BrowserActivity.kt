@@ -481,7 +481,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         )
         dialog.clearStarted = {
             removeObservers()
-            maliciousSiteBlockerWebViewIntegration.onFireButtonPressed()
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {

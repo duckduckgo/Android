@@ -1844,18 +1844,16 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentCosmeticHide = isCosmetic
     }
 
-    fun onMaliciousSiteDetected(
+    fun onMaliciousSiteUserAction(
         action: MaliciousSiteBlockedWarningLayout.Action,
         url: Uri,
     ) {
         when (action) {
             LeaveSite -> {
-                Timber.tag("KateMalicious").d("in LeaveSite")
                 command.postValue(EscapeMaliciousSite)
             }
 
             VisitSite -> {
-                Timber.tag("KateMalicious").d("in VisitSite")
                 command.postValue(BypassMaliciousSiteWarning(url))
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
@@ -3728,9 +3726,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun addExemptedMaliciousUrlToMemory(url: Uri) {
-        Timber.d("KateMalicious: in addExemptedMaliciousUrl")
         maliciousSiteBlockerWebViewIntegration.onSiteExempted(url)
-        Timber.d("KateMalicious: tried to add to exemptedUrls, now")
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {

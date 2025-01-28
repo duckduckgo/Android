@@ -232,10 +232,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error -> GLOBE
+            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
             NewTab -> SEARCH
-            SSLWarning -> GLOBE
-            MaliciousSiteWarning -> GLOBE
             else -> {
                 if (hasFocus) {
                     SEARCH
@@ -301,10 +299,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     LeadingIconState.SEARCH
                 } else {
                     when (viewMode) {
-                        Error -> GLOBE
+                        Error, SSLWarning, MaliciousSiteWarning -> GLOBE
                         NewTab -> SEARCH
-                        SSLWarning -> GLOBE
-                        MaliciousSiteWarning -> GLOBE
                         else -> SEARCH
                     }
                 }

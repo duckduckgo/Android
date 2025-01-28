@@ -34,6 +34,14 @@
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
 
+    <!-- Malicious Site -->
+    <string name="maliciousSiteTitle">Warning: This site may put your personal information at risk</string>
+    <string name="maliciousSiteHeadline">DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information. Learn more</string>
+    <string name="maliciousSiteLeaveCTA">Leave This Site</string>
+    <string name="maliciousSiteAdvancedCTA">Advanced</string>
+    <string name="maliciousSiteExpandedHeadline">If you believe this website is safe, you can report an error. You can still visit the website at your own risk.</string>
+    <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
+
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
     <string name="brokenSitesLoginSmallHint">Site name (required)</string>
