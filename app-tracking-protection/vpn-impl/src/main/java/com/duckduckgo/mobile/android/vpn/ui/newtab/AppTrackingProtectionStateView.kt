@@ -19,8 +19,10 @@ package com.duckduckgo.mobile.android.vpn.ui.newtab
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -47,7 +49,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -79,22 +80,45 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
     private val binding: FragmentDeviceShieldCtaBinding by viewBinding()
 
+    private var isViewVisible = false
+
+    private val preDrawListener = ViewTreeObserver.OnPreDrawListener {
+        val isCurrentlyVisible = isVisible && isShown
+        if (isCurrentlyVisible != isViewVisible) {
+            isViewVisible = isCurrentlyVisible
+            if (isViewVisible) {
+                startCollecting()
+            } else {
+                stopCollecting()
+            }
+        }
+        true
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        conflatedJob += viewModel.viewStateFlow
-            .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
+        viewTreeObserver.addOnPreDrawListener(preDrawListener)
         deviceShieldPixels.didShowNewTabSummary()
 
         configureViewReferences()
     }
 
     override fun onDetachedFromWindow() {
+        viewTreeObserver.removeOnPreDrawListener(preDrawListener)
         conflatedJob.cancel()
         super.onDetachedFromWindow()
+    }
+
+    private fun startCollecting() {
+        conflatedJob += viewModel.viewStateFlow
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+    }
+
+    private fun stopCollecting() {
+        conflatedJob.cancel()
     }
 
     private fun configureViewReferences() {
