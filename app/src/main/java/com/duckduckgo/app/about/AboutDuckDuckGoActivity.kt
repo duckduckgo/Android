@@ -34,6 +34,14 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithLearnMoreUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithPrivacyProtectionsUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchFeedback
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchPproUnifiedFeedback
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithComparisonChartUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPPROUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithVPNUrl
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
@@ -116,38 +124,43 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     private fun addClickableLinks(): SpannableString {
         val fullText = getText(
             if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                R.string.aboutDescriptionNew
+                R.string.aboutDescriptionBrandUpdate2025
             } else {
-                R.string.aboutDescription
+                R.string.aboutDescriptionBrandUpdate2025
             },
         ) as SpannedString
+
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
 
+        annotations?.find { it.value == COMPARISON_CHART_ANNOTATION }?.let {
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onComparisonChartLinkClicked()
+            }
+        }
+
+        annotations?.find { it.value == PPRO_ANNOTATION }?.let {
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onPProHelpPageLinkClicked()
+            }
+        }
+
+        annotations?.find { it.value == VPN_ANNOTATION }?.let {
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onVPNHelpPageLinkClicked()
+            }
+        }
+
         annotations?.find { it.value == PRIVACY_PROTECTION_ANNOTATION }?.let {
-            addSpannable(
-                spannableString,
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onPrivacyProtectionsLinkClicked()
-                    }
-                },
-                fullText,
-                it,
-            )
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onPrivacyProtectionsLinkClicked()
+            }
         }
 
         annotations?.find { it.value == LEARN_MORE_ANNOTATION }?.let {
-            addSpannable(
-                spannableString,
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onLearnMoreLinkClicked()
-                    }
-                },
-                fullText,
-                it,
-            )
+            addSpannable(spannableString, fullText, it) {
+                viewModel.onLearnMoreLinkClicked()
+            }
         }
 
         return spannableString
@@ -155,13 +168,17 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private fun addSpannable(
         spannableString: SpannableString,
-        clickableSpan: ClickableSpan,
         fullText: SpannedString,
         it: Annotation,
+        onClick: (widget: View) -> Unit,
     ) {
         spannableString.apply {
             setSpan(
-                clickableSpan,
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        onClick(widget)
+                    }
+                },
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
@@ -214,11 +231,14 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is Command.LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
-            is Command.LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen()
-            is Command.LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
-            is Command.LaunchFeedback -> launchFeedback()
-            is Command.LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
+            LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
+            LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen(PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo))
+            LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
+            LaunchFeedback -> launchFeedback()
+            LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
+            LaunchWebViewWithComparisonChartUrl -> launchWebViewScreen(COMPARISON_CHART_URL, getString(R.string.settingsAboutDuckduckgo))
+            LaunchWebViewWithPPROUrl -> launchWebViewScreen(PPRO_URL, getString(R.string.settingsAboutDuckduckgo))
+            LaunchWebViewWithVPNUrl -> launchWebViewScreen(VPN_URL, getString(R.string.settingsAboutDuckduckgo))
         }
     }
 
@@ -227,12 +247,12 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun launchWebViewScreen() {
+    private fun launchWebViewScreen(url: String, screenTitle: String) {
         globalActivityStarter.start(
             this,
             WebViewActivityWithParams(
-                url = PRIVACY_POLICY_WEB_LINK,
-                screenTitle = getString(R.string.settingsPrivacyPolicyDuckduckgo),
+                url = url,
+                screenTitle = screenTitle,
             ),
         )
     }
@@ -263,5 +283,11 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         private const val LEARN_MORE_ANNOTATION = "learn_more_link"
         private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
         private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
+        private const val COMPARISON_CHART_ANNOTATION = "chart_comparison"
+        private const val COMPARISON_CHART_URL = "https://duckduckgo.com/compare-privacy"
+        private const val PPRO_ANNOTATION = "ppro_help_page"
+        private const val PPRO_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
+        private const val VPN_ANNOTATION = "vpn_help_page"
+        private const val VPN_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"
     }
 }
