@@ -82,6 +82,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
@@ -177,8 +178,7 @@ class BrowserModule {
         subscriptions: Subscriptions,
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
+        duckChat: DuckChat,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -186,8 +186,7 @@ class BrowserModule {
         subscriptions,
         externalAppIntentFlagsFeature,
         duckPlayer,
-        appCoroutineScope,
-        dispatcherProvider = dispatcherProvider,
+        duckChat,
     )
 
     @Provides

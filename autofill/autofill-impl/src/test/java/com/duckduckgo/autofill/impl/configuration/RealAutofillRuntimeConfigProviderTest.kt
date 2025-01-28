@@ -84,6 +84,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 showInlineKeyIcon = any(),
                 showInContextEmailProtectionSignup = any(),
                 unknownUsernameCategorization = any(),
+                partialFormSaves = any(),
             ),
         ).thenReturn("")
     }
@@ -394,6 +395,7 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            partialFormSaves = any(),
         )
     }
 
@@ -405,6 +407,7 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            partialFormSaves = any(),
         )
     }
 
@@ -420,6 +423,7 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = eq(true),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            partialFormSaves = any(),
         )
     }
 

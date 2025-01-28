@@ -63,6 +63,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             showInlineKeyIcon = true,
             showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
             unknownUsernameCategorization = canCategorizeUnknownUsername(),
+            partialFormSaves = partialFormSaves(),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -139,6 +140,10 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
 
     private fun canCategorizeUnknownUsername(): Boolean {
         return autofillFeature.canCategorizeUnknownUsername().isEnabled()
+    }
+
+    private fun partialFormSaves(): Boolean {
+        return autofillFeature.partialFormSaves().isEnabled()
     }
 
     private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {

@@ -49,7 +49,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
-    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -240,7 +239,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_FIRE_PRESSED("m_nav_f_p"),
     MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
     MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p"),
-    MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p"),
+    MENU_ACTION_BOOKMARKS_PRESSED("m_navigation_menu_bookmarks"),
     MENU_ACTION_NAVIGATE_FORWARD_PRESSED("m_nav_nf_p"),
     MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
     MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
@@ -361,7 +360,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE("duckplayer_setting_never_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
-    DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS("duckplayer_landscape_layout_impressions"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
@@ -379,4 +377,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ERROR_PAGE_SHOWN("m_errorpageshown"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
+
+    DEDICATED_WEBVIEW_NEW_TAB_REQUESTED("m_dedicated_webview_new_tab_requested"),
+    DEDICATED_WEBVIEW_NEW_TAB_OPENING("m_dedicated_webview_new_tab_opening"),
+    DEDICATED_WEBVIEW_URL_EXTRACTION_FAILED("m_dedicated_webview_url_extraction_failed"),
+
+    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 }

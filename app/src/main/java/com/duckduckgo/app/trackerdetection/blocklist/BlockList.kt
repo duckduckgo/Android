@@ -31,9 +31,12 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -126,8 +129,11 @@ class BlockListPrivacyConfigCallbackPlugin @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         coroutineScope.launch(dispatcherProvider.io()) {
             experimentAA.experimentTestAA().isEnabled(CONTROL)
-            inventory.activeTdsFlag()?.let {
+            if (inventory.activeTdsFlag() != null) {
                 trackerDataDownloader.downloadTds()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({}, { Timber.w("Failed to download from blocklist experiment") })
             }
         }
     }

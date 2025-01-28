@@ -54,6 +54,9 @@
     <string name="favoritesSectionTitle">Mėgstami</string>
     <string name="bookmarksEmptyHint">Žymių dar nepridėta</string>
     <string name="favoritesEmptyHint">Mėgstamų dar nepridėta</string>
+    <string name="popupBookmarksSortManually">Rūšiuoti rankiniu būdu</string>
+    <string name="popupBookmarksSortByName">Rūšiuoti pagal vardą</string>
+    <string name="popupBookmarksPreventReordering">Norėdami pertvarkyti žymes, perjunkite į rankinį rūšiavimą.</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redaguoti žymę</string>

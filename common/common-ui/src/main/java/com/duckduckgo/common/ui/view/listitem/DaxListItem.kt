@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -57,6 +58,21 @@ abstract class DaxListItem(
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         itemContainer.setOnClickListener { onClick() }
+    }
+
+    /** Sets the item long click listener */
+    fun setLongClickListener(onClick: () -> Unit) {
+        itemContainer.setOnLongClickListener {
+            onClick()
+            true
+        }
+    }
+
+    /** Sets the item click listener */
+    fun removeLongClickListener() {
+        itemContainer.setOnLongClickListener {
+            false
+        }
     }
 
     /** Sets the primary text title */
@@ -145,7 +161,10 @@ abstract class DaxListItem(
      * depends on the size of the image
      */
 
-    fun setLeadingIconSize(imageSize: IconSize, type: ImageBackground) {
+    fun setLeadingIconSize(
+        imageSize: IconSize,
+        type: ImageBackground,
+    ) {
         val iconSize = resources.getDimensionPixelSize(IconSize.dimension(imageSize))
         val backgroundSize = if (type == ImageBackground.None) {
             iconSize
@@ -179,6 +198,10 @@ abstract class DaxListItem(
     /** Sets the trailing image content description */
     fun setTrailingIconContentDescription(description: String) {
         trailingIcon.contentDescription = description
+    }
+
+    fun setTrailingIconTint(@ColorInt color: Int) {
+        trailingIcon.imageTintList = ColorStateList.valueOf(color)
     }
 
     /** Sets the item overflow menu click listener */

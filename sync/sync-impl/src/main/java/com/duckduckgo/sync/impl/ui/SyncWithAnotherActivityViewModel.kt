@@ -41,7 +41,6 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
@@ -136,15 +135,17 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val userSignedIn = syncAccountRepository.isSignedIn()
+            val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
             when (val result = syncAccountRepository.processCode(qrCode)) {
                 is Error -> {
                     emitError(result, qrCode)
                 }
 
                 is Success -> {
+                    val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
                     syncPixels.fireLoginPixel()
-                    val commandSuccess = if (userSignedIn) {
+                    val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
+                    val commandSuccess = if (userSwitchedAccount) {
                         syncPixels.fireUserSwitchedAccount()
                         SwitchAccountSuccess
                     } else {

@@ -6,6 +6,18 @@ on:
       ref:
         description: 'Ref to build APK from (branch, tag, commit)'
         required: true
+        default: 'develop'
+      build-variant:
+        description: 'Android build variant'
+        required: true
+        default: 'playRelease'
+        type: choice
+        options:
+          - fdroidRelease
+          - internalDebug
+          - internalRelease
+          - playDebug
+          - playRelease
 
 env:
   ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
@@ -23,12 +35,11 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
-
-      - name: Set up JDK 17
+          ref: ${{ github.event.inputs.app-version }}
+      - name: Set up JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Create folder
@@ -52,15 +63,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Assemble release APK
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant
+      - name: Assemble APK
+        run: ./gradlew assemble${{github.event.inputs.build-variant}} -Pforce-default-variant
 
       - name: Move APK to new folder
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+        run: find . -name "*.apk"  -exec mv '{}' apk/release${{github.event.inputs.build-variant}}.apk \;
 
       - name: Upload debug apk
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release
-          path: apk/release.apk
+          path: apk/release${{github.event.inputs.build-variant}}.apk

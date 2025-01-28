@@ -21,6 +21,9 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.SyncAccountFixtures.accountA
+import com.duckduckgo.sync.SyncAccountFixtures.accountB
+import com.duckduckgo.sync.SyncAccountFixtures.noAccount
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
@@ -133,6 +136,7 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
         syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
@@ -145,6 +149,7 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsAskToSwitchAccount() = runTest {
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
@@ -157,7 +162,11 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserAcceptsToSwitchAccountThenPerformAction() = runTest {
-        whenever(syncRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        whenever(syncRepository.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded)).thenAnswer {
+            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+            Success(true)
+        }
 
         testee.onUserAcceptedJoiningNewAccount(jsonRecoveryKeyEncoded)
 
@@ -170,8 +179,11 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenSignedInUserScansRecoveryCodeAndLoginSucceedsThenReturnSwitchAccount() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
-        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
+            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+            Success(true)
+        }
 
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
@@ -184,8 +196,11 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
-        whenever(syncRepository.isSignedIn()).thenReturn(false)
-        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
+        whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenAnswer {
+            whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
+            Success(true)
+        }
 
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
@@ -198,6 +213,7 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenUserScansRecoveryQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
+        whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(syncRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Result.Error(code = LOGIN_FAILED.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)

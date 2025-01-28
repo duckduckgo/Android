@@ -42,7 +42,7 @@ html:has(body[data-display=app]) {
 }
 body[data-display=app] {
   color: rgba(242, 242, 242, 1);
-  background: #101010;
+  background: #000;
   height: 100vh;
   overflow: hidden;
   padding: 16px;
@@ -106,10 +106,13 @@ body[data-display=app] {
   padding: 0 20px;
   flex-shrink: 0;
   box-shadow: none;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: var(--inner-radius);
   color: rgba(255, 255, 255, 1);
   text-decoration: none;
+}
+[data-layout=mobile] .Button_button {
+  background-color: #2f2f2f;
 }
 .Button_button:hover,
 .Button_button:focus-visible {
@@ -185,7 +188,7 @@ body[data-display=app] {
 .SwitchBarMobile_switchBar {
   display: grid;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #2f2f2f;
   padding-inline: 16px;
   height: 100%;
   line-height: 1.1;
@@ -289,7 +292,7 @@ body[data-display=app] {
 }
 .InfoBar_container {
   padding: 12px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.12);
   position: relative;
   z-index: 1;
   border-bottom-left-radius: 14px;
@@ -526,70 +529,6 @@ body[data-display=app] {
   font-weight: 600;
 }
 
-/* pages/duckplayer/app/components/Background.module.css */
-.Background_bg {
-  background: url("./player-bg-F7QLKTXS.jpg");
-  background-size: cover;
-}
-[data-layout=mobile] .Background_bg {
-  background: url("./mobile-bg-GCRU67TC.jpg");
-  background-size: cover;
-}
-.Background_bg {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-}
-.Background_bg::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 100%;
-  background:
-    linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.00) 0%,
-      rgba(0, 0, 0, 0.48) 32.23%,
-      #000 93.87%);
-  transition: all .3s ease-in-out;
-}
-.Background_bg::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 100%;
-  background:
-    linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.48) 0%,
-      rgba(0, 0, 0, 0.90) 34.34%,
-      #000 100%);
-  opacity: 0;
-  visibility: hidden;
-  transition: all .3s ease-in-out;
-}
-[data-focus-mode=on] .Background_bg::before {
-  transition-delay: .1s;
-  opacity: 0;
-}
-[data-focus-mode=off] .Background_bg::after {
-  transition-delay: .1s;
-}
-[data-focus-mode=on] .Background_bg::after {
-  opacity: 1;
-  visibility: visible;
-}
-
 /* pages/duckplayer/app/components/Player.module.css */
 .Player_root.Player_desktop {
   z-index: 1;
@@ -680,7 +619,7 @@ html[data-focus-mode=on] .MobileApp_hideInFocus {
   display: none;
 }
 .MobileApp_main {
-  --bg-color: rgba(0, 0, 0, 0.3);
+  --bg-color: #222;
   --logo-spacing: 185px;
   --gutter-width: 8px;
   --outer-radius: 16px;
@@ -722,6 +661,10 @@ body:has([data-state=completed] [aria-checked=true]) .MobileApp_switch {
   padding-bottom: 0;
   border-top-left-radius: var(--outer-radius);
   border-top-right-radius: var(--outer-radius);
+  transition: background-color .3s;
+}
+html[data-focus-mode=on] .MobileApp_embed {
+  transition: none;
 }
 .MobileApp_logo {
   justify-self: center;

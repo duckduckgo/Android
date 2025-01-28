@@ -30,8 +30,14 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
+import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
+import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
+import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import kotlinx.coroutines.flow.flowOf
@@ -70,6 +76,7 @@ class BookmarksViewModelTest {
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt = mock()
+    private val bookmarksDataStore: BookmarksDataStore = mock()
 
     private val bookmark =
         Bookmark(
@@ -92,6 +99,7 @@ class BookmarksViewModelTest {
             pixel,
             syncEngine,
             faviconsFetchingPrompt,
+            bookmarksDataStore,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )
@@ -113,6 +121,7 @@ class BookmarksViewModelTest {
             ),
         )
 
+        whenever(bookmarksDataStore.getSortingMode()).thenReturn(NAME)
         testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
     }
 
@@ -452,5 +461,120 @@ class BookmarksViewModelTest {
         testee.onSavedSiteDeleteRequested()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
+    }
+
+    @Test
+    fun whenManualSortingModeSelectedThenDataStored() = runTest {
+        testee.onSortingModeSelected(MANUAL)
+        verify(bookmarksDataStore).setSortingMode(MANUAL)
+    }
+
+    @Test
+    fun whenNameSortingModeSelectedThenDataStored() = runTest {
+        testee.onSortingModeSelected(NAME)
+        verify(bookmarksDataStore).setSortingMode(NAME)
+    }
+
+    @Test
+    fun whenSortingByNameSelectedThenListIsSorted() {
+        val items = mutableListOf<BookmarksItemTypes>()
+        val folderNews = BookmarkFolder(id = "folderA", name = "News", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        val bookmarkCnn = Bookmark(id = "bookmarCnn", title = "Cnn", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        val bookmarkReddit = Bookmark(
+            id = "bookmarReddit",
+            title = "Reddit",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
+        val bookmarkTheGuardian = Bookmark(
+            id = "bookmarT",
+            title = "The Guardian",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
+
+        items.add(BookmarkItem(bookmarkAs))
+        items.add(BookmarkItem(bookmarkReddit))
+        items.add(BookmarkItem(bookmarkCnn))
+        items.add(BookmarkItem(bookmarkTheGuardian))
+        items.add(BookmarksAdapter.BookmarkFolderItem(folderSports))
+        items.add(BookmarksAdapter.BookmarkFolderItem(folderNews))
+
+        val sortedElements = testee.sortElements(items, NAME)
+        assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
+        assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkCnn)
+        assertEquals((sortedElements[2] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderNews)
+        assertEquals((sortedElements[3] as BookmarkItem).bookmark, bookmarkReddit)
+        assertEquals((sortedElements[4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderSports)
+        assertEquals((sortedElements[5] as BookmarkItem).bookmark, bookmarkTheGuardian)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndBookmarksEmptyThenCommandSent() {
+        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
+            flowOf(SavedSites(emptyList(), emptyList())),
+        )
+
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NAME, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(true, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenCommandSent() {
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NAME, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(false, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenBrowserMenuPressedAndManualSortingModeThenCommandSent() {
+        whenever(bookmarksDataStore.getSortingMode()).thenReturn(MANUAL)
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onBrowserMenuPressed()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(MANUAL, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).sortingMode)
+        assertEquals(false, (commandCaptor.lastValue as BookmarksViewModel.Command.ShowBrowserMenu).buttonsDisabled)
+    }
+
+    @Test
+    fun whenImportBookmarksClickedThenPixelAndCommandSent() {
+        testee.onImportBookmarksClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchBookmarkImport, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenExportBookmarksClickedThenPixelAndCommandSent() {
+        testee.onExportBookmarksClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_EXPORT_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchBookmarkExport, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenAddFolderClickedThenPixelAndCommandSent() {
+        testee.onAddFolderClicked()
+
+        verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FOLDER_CLICKED)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchAddFolder, commandCaptor.lastValue)
     }
 }

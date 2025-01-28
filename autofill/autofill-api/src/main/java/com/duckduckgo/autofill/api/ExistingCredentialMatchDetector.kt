@@ -35,7 +35,8 @@ interface ExistingCredentialMatchDetector {
      */
     sealed interface ContainsCredentialsResult {
         data object ExactMatch : ContainsCredentialsResult
-        data object UsernameMatch : ContainsCredentialsResult
+        data object UsernameMatchDifferentPassword : ContainsCredentialsResult
+        data object UsernameMatchMissingPassword : ContainsCredentialsResult
         data object UrlOnlyMatch : ContainsCredentialsResult
         data object UsernameMissing : ContainsCredentialsResult
         data object NoMatch : ContainsCredentialsResult

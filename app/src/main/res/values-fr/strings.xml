@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
-    <string name="settingsHeadingPrivacyProtections">Protections de la confidentialité</string>
+    <string name="settingsHeadingProtections">Protections</string>
     <string name="settingsHeadingAppearance">Apparence</string>
     <string name="settingsHeadingCustomize">Personnaliser</string>
     <string name="settingsHeadingAbout">À propos</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Partagez vos commentaires</string>
+    <string name="leaveFeedbackNew">Envoyer vos remarques</string>
     <string name="settingsEmailProtectionTitle">Protection des e-mails</string>
     <string name="settingsEmailProtectionSubtitle">Bloquez les traqueurs d\'e-mails et masquez votre adresse</string>
     <string name="settingsHeadingMore">Plus de la part de DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
-    <string name="settingsHeadingMainSettings">Réglages principaux</string>
+    <string name="settingsHeadingMainSettings">Autres paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Effacement des données</string>
     <string name="settingsAddWidget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="settingsAddressBarPosition">Définissez la position de votre barre d\'adresse</string>
-    <string name="settingsEnableVoiceSearch">Activez la recherche vocale</string>
+    <string name="settingsEnableVoiceSearch">Activer la recherche vocale privée</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo sur d\'autres plateformes</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionTitle">La protection contre le pistage sur le Web est activée</string>
+    <string name="webTrackingProtectionIsEnabledTitle">La protection contre le pistage sur le Web est activée</string>
+    <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ne vous suit jamais et fait de son mieux pour préserver votre vie privée. Nous ne cessons d\'entretenir et de développer des couches de protection pour ne jamais nous laisser dépasser par les nouvelles méthodes de pistage. Nous fournissons aussi de nombreuses protections que les autres navigateurs ne proposent pas par défaut. <u><a href=\"\">En savoir plus</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Signaler un problème de site</string>
-    <string name="brokenSiteHeading">Signaler un site cassé</string>
-    <string name="brokenSiteSubmitted">Merci ! Commentaire envoyé.</string>
-    <string name="brokenSitesCategoriesTitle">Décrivez ce qui s\'est passé</string>
-    <string name="brokenSitesCategoriesHint">Décrivez ce qui s\'est passé</string>
-    <string name="brokenSiteSubmitButton">Envoyer un rapport</string>
-    <string name="brokenSiteDescription">La soumission d\'un rapport anonyme pour signaler le mauvais fonctionnement du site nous aide à améliorer l\'application.</string>
-
-    <string name="brokenSiteCategoryBlocked">Le site est bloqué ou le chargement de la page a échoué</string>
-    <string name="brokenSiteCategoryLayout">Problème de mise en page du site</string>
-    <string name="brokenSiteCategoryEmptySpaces">Le site contient de grands espaces vides</string>
-    <string name="brokenSiteCategoryShopping">Impossible de payer, de passer au paiement ou d\'acheter</string>
-    <string name="brokenSiteCategoryPaywall">Le site m\'a demandé de désactiver le bloqueur de publicités</string>
-    <string name="brokenSiteCategoryComments">Les commentaires, les avis ou les chats n\'ont pas été chargés</string>
-    <string name="brokenSiteCategoryVideos">La vidéo n\'a pas été lue ou chargée</string>
-    <string name="brokenSiteCategoryLogin">Impossible de se connecter/s\'inscrire</string>
-    <string name="brokenSiteCategoryOther">Autre</string>
-    <string name="brokenSiteDescriptionTextInputHint">Fournir plus de détails (facultatif)</string>
-    <string name="brokenSiteDescriptionCaption">Que s\'est-il passé ? Qu\'aurait-il dû se passer ?Est-ce que la désactivation des protections a aidé ?</string>
 
     <string name="brokenSiteProtectionsOn">Les protections sont <b>ACTIVÉES</b> sur ce site</string>
     <string name="brokenSiteProtectionsOff">Les protections sont <b>DÉSACTIVÉES</b> sur ce site</string>
     <string name="brokenSiteProtectionsOnBannerMessage">La désactivation des protections pourrait aider.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Nous avons temporairement désactivé les protections de confidentialité car elles semblent perturber ce site.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Voir ce qui est envoyé</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Les informations envoyées dans les rapports ne peuvent pas être utilisées pour vous identifier :</b><br/><br/>• URL de la page (sans informations d'identification)<br/>• Marque, modèle et fabricant de l'appareil<br/>• Numéro de version du système d'exploitation<br/>• Numéro de version de l'application<br/>• Groupe d'expérimentation anonyme pour les tests de fonctionnalités<br/>• Informations sur les versions de nos protections qui étaient actives<br/>• Numéro de version du moteur du navigateur Web<br/>• Liste des protections et des fonctionnalités du navigateur qui étaient actives<br/>• Noms d'hôte des traqueurs bloqués, demandes de substitution, demandes ignorées et demandes ne figurant pas dans la liste des blocages de traqueurs<br/>• Erreurs signalées par le navigateur<br/>• Codes HTTP (Website Response Status)<br/>• Le formulaire de signalement que vous avez utilisé (menu, tableau de bord, etc.)<br/>• Date du dernier rapport envoyé pour ce site<br/>• Si vous avez choisi ou non d'afficher ces informations de signalement<br/>• Nombre de fois où les protections ont été désactivées<br/>• Vitesse de chargement de différentes parties de la page<br/>• Comment vous avez accédé à cette page, soit : SERP (recherche DuckDuckGo), Navigation (lien/URL) ou Externe (autres moyens)<br/>• Nombre d'actualisations depuis le chargement de la page<br/>• Langue principale et pays de votre appareil<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Rechercher avec DuckDuckGo</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Dernier onglet ouvert</string>
     <string name="showOnAppLaunchOptionNewTabPage">Nouvelle page d\'onglet</string>
     <string name="showOnAppLaunchOptionSpecificPage">Page spécifique</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Merci ! Votre signalement contribue à améliorer DuckDuckGo pour tous.</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Nouvel AI Chat</string>
 
 </resources>

@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingPrivacyProtections">Adatvédelem</string>
+    <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
+    <string name="leaveFeedbackNew">Visszajelzés küldése</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
     <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsHeadingMainSettings">Főbeállítások</string>
+    <string name="settingsHeadingMainSettings">További beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
     <string name="settingsDataClearing">Adattörlés</string>
     <string name="settingsAddWidget">Minialkalmazás hozzáadása a kezdőképernyőhöz</string>
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
-    <string name="settingsEnableVoiceSearch">Beszédhangalapú keresés engedélyezése</string>
+    <string name="settingsEnableVoiceSearch">Privát beszédhangalapú keresés engedélyezése</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
+    <string name="webTrackingProtectionIsEnabledTitle">A webes követés elleni védelem engedélyezve van</string>
+    <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
-    <string name="brokenSiteHeading">Hibás weboldal jelentése</string>
-    <string name="brokenSiteSubmitted">Köszönjük! Visszajelzés elküldve.</string>
-    <string name="brokenSitesCategoriesTitle">Az esemény leírása</string>
-    <string name="brokenSitesCategoriesHint">Az esemény leírása</string>
-    <string name="brokenSiteSubmitButton">Jelentés küldése</string>
-    <string name="brokenSiteDescription">Egy hibás webhelyről szóló névtelen bejelentés segít bennünket az alkalmazás fejlesztésében.</string>
-
-    <string name="brokenSiteCategoryBlocked">A webhely blokkolva van vagy nem töltődött be</string>
-    <string name="brokenSiteCategoryLayout">A webhely megjelenítési elrendezése hibás</string>
-    <string name="brokenSiteCategoryEmptySpaces">A webhelyen nagy üres területek jelennek meg</string>
-    <string name="brokenSiteCategoryShopping">Nem lehet fizetni vagy vásárolni</string>
-    <string name="brokenSiteCategoryPaywall">A webhely a reklámblokkoló kikapcsolását kérte</string>
-    <string name="brokenSiteCategoryComments">A megjegyzések, vélemények vagy csevegések nem töltődtek be</string>
-    <string name="brokenSiteCategoryVideos">A videó nem játszódott le vagy nem töltődött be</string>
-    <string name="brokenSiteCategoryLogin">Nem lehet bejelentkezni/regisztrálni</string>
-    <string name="brokenSiteCategoryOther">Valami más</string>
-    <string name="brokenSiteDescriptionTextInputHint">További részletek megosztása (nem kötelező)</string>
-    <string name="brokenSiteDescriptionCaption">Mi történt? Minek kellett volna történnie? A védelem kikapcsolása segített?</string>
 
     <string name="brokenSiteProtectionsOn">A védelmek <b>BE</b> vannak kapcsolva ezen a webhelyen</string>
     <string name="brokenSiteProtectionsOff">A védelmek <b>KI</b> vannak kapcsolva ezen a webhelyen</string>
     <string name="brokenSiteProtectionsOnBannerMessage">A védelem kikapcsolása segíthet.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Ideiglenesen kikapcsoltuk az adatvédelmi funkciókat, mert úgy tűnik, hogy a webhely helytelen működését eredményezik.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Elküldött adatok megtekintése</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>A jelentésekben elküldött adatok nem használhatók az azonosításodra:</b><br/><br/>• Oldal URL-címe (azonosítható adatok nélkül)<br/>• Eszköz gyártmánya, típusa és gyártója<br/>• Operációs rendszer verziószáma<br/>• Alkalmazás verziószáma<br/>• Funkciókat tesztelő névtelen kísérleti csoport<br/>• Aktív védelmeink verziójával kapcsolatos információ<br/>• Webböngészőmotor verziószáma<br/>• Azon védelmek és böngészőfunkciók listája, melyek aktívak voltak<br/>• A blokkolt nyomkövetők, helyettesítő kérések, figyelmen kívül hagyott kérések és a nyomkövetők blokkolási listáján nem szereplő kérések állomásnevei<br/>• Böngésző által jelentett hibák<br/>• Webhely válaszállapotának (HTTP) kódjai <br/>• Általad használt jelentési űrlap („menü”, „vezérlőpult” stb.)<br/>• A jelen webhelyről küldött utolsó jelentés időpontja<br/>• Kérted-e vagy sem e jelentésben szereplő információk megjelenítését<br/>• A védelmek kikapcsolásának száma<br/>• Milyen gyorsan töltődtek be az oldal részei<br/>• Miként jutottál el erre az oldalra, ami lehet: SERP (DuckDuckGo-keresés), Navigáció (link/URL-cím) vagy Külső (egyéb mód)<br/>• Frissítések száma az oldal betöltése óta<br/>• Az eszköz elsődleges nyelve és országa<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Utoljára megnyitott lap</string>
     <string name="showOnAppLaunchOptionNewTabPage">„Új lap” oldal</string>
     <string name="showOnAppLaunchOptionSpecificPage">Speciális oldal</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Új AI-csevegés</string>
 
 </resources>

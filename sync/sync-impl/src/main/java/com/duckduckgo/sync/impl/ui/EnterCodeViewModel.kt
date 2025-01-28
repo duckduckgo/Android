@@ -91,10 +91,12 @@ class EnterCodeViewModel @Inject constructor(
     private suspend fun authFlow(
         pastedCode: String,
     ) {
-        val userSignedIn = syncAccountRepository.isSignedIn()
+        val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
         when (val result = syncAccountRepository.processCode(pastedCode)) {
             is Result.Success -> {
-                val commandSuccess = if (userSignedIn) {
+                val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
+                val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
+                val commandSuccess = if (userSwitchedAccount) {
                     syncPixels.fireUserSwitchedAccount()
                     SwitchAccountSuccess
                 } else {

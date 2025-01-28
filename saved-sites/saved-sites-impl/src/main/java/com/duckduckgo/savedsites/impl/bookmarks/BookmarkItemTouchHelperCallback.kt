@@ -51,10 +51,10 @@ class BookmarkItemTouchHelperCallback(
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         super.onSelectedChanged(viewHolder, actionState)
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-            adapter.isReorderingModeEnabled = true
+            adapter.isReordering = true
             updateDragHandle(viewHolder, true)
         } else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-            adapter.isReorderingModeEnabled = false
+            adapter.isReordering = false
         }
     }
 

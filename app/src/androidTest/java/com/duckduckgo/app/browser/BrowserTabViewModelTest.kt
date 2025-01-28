@@ -86,6 +86,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
+import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -148,11 +150,9 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingPixelsPlugin
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
@@ -199,6 +199,7 @@ import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -212,12 +213,11 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -400,6 +400,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckPlayer: DuckPlayer = mock()
 
+    private val mockDuckChat: DuckChat = mock()
+
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
@@ -499,9 +501,7 @@ class BrowserTabViewModelTest {
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
-    private val extendedOnboardingFeatureToggles = FeatureToggles.Builder(FakeToggleStore(), featureName = "extendedOnboarding").build()
-        .create(ExtendedOnboardingFeatureToggles::class.java)
-    private val extendedOnboardingPixelsPlugin = ExtendedOnboardingPixelsPlugin(extendedOnboardingFeatureToggles)
+    private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
 
     @Before
     fun before() = runTest {
@@ -528,7 +528,6 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
-        whenever(mockExtendedOnboardingFeatureToggles.testPrivacyProOnboardingCopyNov24()).thenReturn(mockDisabledToggle)
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
@@ -571,8 +570,6 @@ class BrowserTabViewModelTest {
             duckPlayer = mockDuckPlayer,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
-            extendedOnboardingPixelsPlugin = extendedOnboardingPixelsPlugin,
-            userBrowserProperties = mockUserBrowserProperties,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -662,7 +659,9 @@ class BrowserTabViewModelTest {
             newTabPixels = { mockNewTabPixels },
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
+            duckChat = mockDuckChat,
             duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector),
+            duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
@@ -771,6 +770,22 @@ class BrowserTabViewModelTest {
             testee.ctaViewState.removeObserver(observer)
             assertFalse(observer.hasReceivedValue)
         }
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(false)
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        assertFalse(browserViewState().showDuckChatOption)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
+        whenever(mockDuckChat.showInBrowserMenu()).thenReturn(true)
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        assertTrue(browserViewState().showDuckChatOption)
     }
 
     @Test
@@ -4661,21 +4676,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageTelemetryEventThenFirePixel() = runTest {
-        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
-        testee.processJsCallbackMessage(
-            DUCK_PLAYER_PAGE_FEATURE_NAME,
-            "telemetryEvent",
-            "id",
-            JSONObject("""{"attributes": {"name": "impression", "value": "landscape-layout"}}"""),
-            false,
-            { "someUrl" },
-        )
-        verify(mockPixel).fire(DUCK_PLAYER_LANDSCAPE_LAYOUT_IMPRESSIONS)
-    }
-
-    @Test
     fun whenJsCallbackMessageInitialSetupFromOverlayThenSendResponseToJs() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(overlayInteracted = true, privatePlayerMode = AlwaysAsk))
@@ -5643,6 +5643,55 @@ class BrowserTabViewModelTest {
         whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
         whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
         whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+    }
+
+    @Test
+    fun whenSubmittedQueryIsDuckChatLinkThenOpenDuckChat() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?q=example&ia=chat&duckai=5", null)).thenReturn(
+            "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+        )
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
+        mockDuckChat.openDuckChat("example")
+    }
+
+    @Test
+    fun whenSubmittedQueryIsDuckChatLinkWithoutQueryThenOpenDuckChatWithoutQuery() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
+        mockDuckChat.openDuckChat()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        val sendResponseToJs = Command.SendResponseToJs(JsCallbackData(JSONObject(), "", "", ""))
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(sendResponseToJs)
+        testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            "method",
+            "id",
+            data = null,
+            false,
+        ) { "someUrl" }
+        verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+        assertCommandIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() = runTest {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChatJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(null)
+        testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            "method",
+            "id",
+            data = null,
+            false,
+        ) { "someUrl" }
+        verify(mockDuckChatJSHelper).processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "method", "id", null)
+        assertCommandNotIssued<Command.SendResponseToJs>()
     }
 
     private fun aCredential(): LoginCredentials {

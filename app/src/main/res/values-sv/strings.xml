@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsHeadingPrivacyProtections">Integritetsskydd</string>
+    <string name="settingsHeadingProtections">Skydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
+    <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
     <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
-    <string name="settingsHeadingMainSettings">Huvudinställningar</string>
+    <string name="settingsHeadingMainSettings">Andra inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarensning</string>
     <string name="settingsAddWidget">Lägg till widget på startsidan</string>
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
-    <string name="settingsEnableVoiceSearch">Aktivera röstsökning</string>
+    <string name="settingsEnableVoiceSearch">Aktivera privat röstsökning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andra plattformar</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionTitle">Skydd för webbspårning är aktiverat</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Skydd för webbspårning är aktiverat</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
-    <string name="brokenSiteHeading">Rapportera bruten webbplats</string>
-    <string name="brokenSiteSubmitted">Tack! Återkopplingen har skickats.</string>
-    <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
-    <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
-    <string name="brokenSiteSubmitButton">Skicka anmälan</string>
-    <string name="brokenSiteDescription">Genom att skicka in en anonym anmälan om att webbplatsen inte fungerar hjälper du oss att förbättra appen.</string>
-
-    <string name="brokenSiteCategoryBlocked">Webbplatsen är blockerad eller lästes inte in</string>
-    <string name="brokenSiteCategoryLayout">Webbplatsens layout är trasig</string>
-    <string name="brokenSiteCategoryEmptySpaces">Webbplatsen innehåller stora tomma fält</string>
-    <string name="brokenSiteCategoryShopping">Det går inte att betala, gå till kassan eller shoppa</string>
-    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att inaktivera annonsblockeraren</string>
-    <string name="brokenSiteCategoryComments">Kommentarer, recensioner eller chattar lästes inte in</string>
-    <string name="brokenSiteCategoryVideos">Videon spelades inte upp eller lästes inte in</string>
-    <string name="brokenSiteCategoryLogin">Det går inte att logga in/registrera sig</string>
-    <string name="brokenSiteCategoryOther">Övrigt</string>
-    <string name="brokenSiteDescriptionTextInputHint">Berätta mer (valfritt)</string>
-    <string name="brokenSiteDescriptionCaption">Vad hände? Vad borde ha hänt? Hjälpte det att stänga av skydd?</string>
 
     <string name="brokenSiteProtectionsOn">Skydd är <b>PÅ</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOff">Skydd är <b>AV</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjälpa att stänga av skyddet.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har tillfälligt stängt av integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Se vad som skickats</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Information som skickas i rapporter kan inte användas för att identifiera dig:</b><br/><br/>• Sidans URL (utan identifierbar information)<br/>• Enhetens märke, modell och tillverkare<br/>• Operativsystemets versionsnummer<br/>• Appversionsnummer<br/>• Anonym experimentgrupp för funktionstestning<br/>• Information om vilka versioner av våra skydd som var aktiva<br/>• Versionsnummer för webbläsarens motor<br/>• Lista över vilka skydd och webbläsarfunktioner som var aktiva<br/>• Värdnamn på blockerade spårare, surrogatförfrågningar, ignorerade förfrågningar och förfrågningar som inte finns i listan för spårningsblockering<br/>• Webbläsarrapporterade fel<br/>• HTTP-koder (webbplatsens svarsstatus) <br/>• Vilken rapporteringsform du använde (meny, instrumentpanel osv.)<br/>• Datum för den senaste rapport som skickades för webbplatsen<br/>• Huruvida du valde att visa den här rapportinformationen<br/>• Antal gånger som skydden har kopplats bort<br/>• Hur snabbt delar av sidan lästes in<br/>• Hur du kom till den här sidan, antingen: SERP (DuckDuckGo-sökning), Navigering (länk/URL) eller Externt (på annat sätt)<br/>• Antal uppdateringar sedan sidan lästes in<br/>• Primärt språk och land för din enhet<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
@@ -805,5 +785,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Senast öppnade flik</string>
     <string name="showOnAppLaunchOptionNewTabPage">Ny fliksida</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik sida</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Tack! Din rapport hjälper till att göra DuckDuckGo bättre för alla!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Ny AI-chatt</string>
 
 </resources>

@@ -125,13 +125,14 @@
     <string name="settingsActivityTitle">Nastavitve</string>
     <string name="settingsMenuItemTitle">Nastavitve</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
-    <string name="settingsHeadingPrivacyProtections">Zaščita zasebnosti</string>
+    <string name="settingsHeadingProtections">Zaščite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodi</string>
     <string name="settingsHeadingAbout">O nas</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
+    <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
     <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>
@@ -158,14 +159,14 @@
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
     <string name="settingsWebTrackingProtectionDescription">Privzeto omogočeno</string>
     <string name="settingsHeadingSettings">Nastavitve</string>
-    <string name="settingsHeadingMainSettings">Glavne nastavitve</string>
+    <string name="settingsHeadingMainSettings">Druge nastavitve</string>
     <string name="settingsPermissionsSetting">Dovoljenja</string>
     <string name="settingsSyncSetting">Sinhronizacija in varnostno kopiranje</string>
     <string name="settingsFireButton">Gumb Fire Button</string>
     <string name="settingsDataClearing">Počiščenje podatkov</string>
     <string name="settingsAddWidget">Dodajte pripomoček na domači zaslon</string>
     <string name="settingsAddressBarPosition">Nastavitev položaja naslovne vrstice</string>
-    <string name="settingsEnableVoiceSearch">Omogočanje glasovnega iskanja</string>
+    <string name="settingsEnableVoiceSearch">Omogoči zasebno glasovno iskanje</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na drugih platformah</string>
 
     <!-- Private Search -->
@@ -190,7 +191,8 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionTitle">Zaščita spletnega sledenja je omogočena</string>
+    <string name="webTrackingProtectionIsEnabledTitle">Zaščita spletnega sledenja je omogočena</string>
+    <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
 
@@ -238,32 +240,10 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Prijavite poškodovano spletno mesto</string>
-    <string name="brokenSiteHeading">Prijavi nedelujočo stran</string>
-    <string name="brokenSiteSubmitted">Hvala! Povratne informacije so poslane.</string>
-    <string name="brokenSitesCategoriesTitle">Opišite, kaj se je zgodilo</string>
-    <string name="brokenSitesCategoriesHint">Opišite, kaj se je zgodilo</string>
-    <string name="brokenSiteSubmitButton">Pošljite poročilo</string>
-    <string name="brokenSiteDescription">Oddaja anonimnega poročila o nedelujočem mestu nam pomaga izboljšati aplikacijo.</string>
-
-    <string name="brokenSiteCategoryBlocked">Stran je blokirana ali se ni naložila</string>
-    <string name="brokenSiteCategoryLayout">Postavitev spletnega mesta je neuporabna</string>
-    <string name="brokenSiteCategoryEmptySpaces">Spletno mesto vsebuje velike prazne prostore</string>
-    <string name="brokenSiteCategoryShopping">Ne morem plačati, se odjaviti ali nakupovati</string>
-    <string name="brokenSiteCategoryPaywall">Spletno mesto me je pozvalo, naj onemogočim preprečevalec oglasov</string>
-    <string name="brokenSiteCategoryComments">Komentarji, ocene ali klepeti se niso naložili</string>
-    <string name="brokenSiteCategoryVideos">Video se ni predvajal ali naložil</string>
-    <string name="brokenSiteCategoryLogin">Ne morem se prijaviti/registrirati</string>
-    <string name="brokenSiteCategoryOther">Nekaj drugega</string>
-    <string name="brokenSiteDescriptionTextInputHint">Zaupajte nam več podrobnosti (neobvezno)</string>
-    <string name="brokenSiteDescriptionCaption">Kaj se je zgodilo? Kaj bi se moralo zgoditi? Je izklop zaščite odpravil težavo?</string>
 
     <string name="brokenSiteProtectionsOn">Zaščite so <b>VKLOPLJENE</b> za to spletno mesto</string>
     <string name="brokenSiteProtectionsOff">Zaščite so <b>IZKLOPLJENE</b> za to spletno mesto</string>
     <string name="brokenSiteProtectionsOnBannerMessage">IZKLOP zaščit lahko pomaga.</string>
-    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Zaščito zasebnosti smo začasno onemogočili, ker je videti, da zato prihaja do napak na tem spletnem mestu.</string>
-
-    <string name="brokenSiteReportDataShowDetailsButton" instruction="This is on a button that allows users to view details on what kind of data is collected with their feedback report">Oglejte si, kaj je poslano</string>
-    <string name="brokenSiteReportDataDisclosure">"<![CDATA[<b>Podatkov, poslanih v poročilih, ni mogoče uporabiti za vašo identifikacijo:</b><br/><br/>• URL strani (brez določljivih podatkov),<br/>• znamka naprave, model in proizvajalec,<br/>• številka različice operacijskega sistema,<br/>• številka različice aplikacije,<br/>• anonimna eksperimentalna skupina za testiranje funkcij,<br/>• informacije o aktivnih različicah naših zaščit,<br/>• številka različice pogona spletnega brskalnika,<br/>• seznam aktivnih zaščit in funkcij brskalnika,<br/>• imena gostiteljev blokiranih sledilnikov, nadomestne zahteve, prezrte zahteve in zahteve, ki niso na seznamu blokiranih sledilnikov,<br/>• napake, ki jih je sporočil brskalnik,<br/>• kode statusa odziva spletne strani (HTTP),<br/>• kateri obrazec za poročanje ste uporabili (meni, nadzorna plošča itd.),<br/>• datum zadnjega poslanega poročila za to spletno mesto,<br/>• ali ste se odločili za prikaz informacij o tem poročilu,<br/>• kolikokrat so bile zaščite izklopljene,<br/>• kako hitro so bili naloženi deli strani,<br/>• kako ste prišli do te strani: SERP (iskanje DuckDuckGo), navigacija (povezava/URL) ali zunanje (drugi načini),<br/>• število osvežitev od nalaganja strani,<br/>• primarni jezik in država vaše naprave.<br/>]]>"</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>
@@ -809,5 +789,12 @@
     <string name="showOnAppLaunchOptionLastOpenedTab">Zadnji odprt zavihek</string>
     <string name="showOnAppLaunchOptionNewTabPage">Stran z novim zavihkom</string>
     <string name="showOnAppLaunchOptionSpecificPage">Določena stran</string>
+
+    <!-- Privacy Dashboard -->
+    <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatTitle">Duck.ai</string>
+    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
 
 </resources>

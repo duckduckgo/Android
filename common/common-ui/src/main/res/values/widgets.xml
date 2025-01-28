@@ -77,7 +77,12 @@
     </style>
 
     <style name="Widget.DuckDuckGo.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:background">@drawable/popup_menu_bg</item>
+        <item name="android:textColor">?daxColorPrimaryText</item>
+        <item name="android:itemBackground">?attr/selectableItemBackground</item>
+        <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+        <item name="popupMenuBackground">@drawable/popup_menu_bg</item>
+        <item name="textAppearanceLargePopupMenu">?attr/textAppearanceBody1</item>
+        <item name="textAppearanceSmallPopupMenu">?attr/textAppearanceBody1</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopupMenuItem" parent="Typography.DuckDuckGo.Body1">

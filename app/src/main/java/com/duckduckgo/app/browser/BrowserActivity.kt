@@ -74,9 +74,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardPrimaryScreen
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.PrivacyDashboardToggleReportScreen
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
@@ -391,6 +388,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             Timber.i("shared text empty, defaulting to show on app launch option")
             if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
+                if (intent.getBooleanExtra(LAUNCH_FROM_DEDICATED_WEBVIEW, false)) {
+                    pixel.fire(AppPixelName.DEDICATED_WEBVIEW_NEW_TAB_OPENING)
+                }
                 viewModel.handleShowOnAppLaunchOption()
             }
         }
@@ -460,20 +460,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchNewSearch(intent: Intent): Boolean {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
-    }
-
-    fun launchPrivacyDashboard(toggle: Boolean) {
-        currentTab?.tabId?.let { tabId ->
-            val params = if (toggle) {
-                PrivacyDashboardToggleReportScreen(tabId, opener = DashboardOpener.DASHBOARD)
-            } else {
-                PrivacyDashboardPrimaryScreen(
-                    tabId,
-                )
-            }
-            val intent = globalActivityStarter.startIntent(this, params)
-            intent?.let { startActivity(it) }
-        }
     }
 
     fun launchFire() {
@@ -593,6 +579,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
             isLaunchFromClearDataAction: Boolean = false,
+            isLaunchFromDedicatedWebView: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -604,6 +591,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
+            intent.putExtra(LAUNCH_FROM_DEDICATED_WEBVIEW, isLaunchFromDedicatedWebView)
             return intent
         }
 
@@ -620,6 +608,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
+        private const val LAUNCH_FROM_DEDICATED_WEBVIEW = "LAUNCH_FROM_DEDICATED_WEBVIEW"
 
         private const val MAX_ACTIVE_TABS = 40
     }

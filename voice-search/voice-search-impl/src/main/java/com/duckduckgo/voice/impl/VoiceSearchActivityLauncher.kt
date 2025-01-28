@@ -62,7 +62,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         private const val SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES = 3
     }
 
-    private lateinit var _source: Source
+    private var _source: Source? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -78,7 +78,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     if (data.isNotEmpty()) {
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
-                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
                         )
                         voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
@@ -132,7 +132,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         }
         pixel.fire(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
-            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
         )
         activityResultLauncherWrapper.launch(LaunchVoiceSearch)
     }

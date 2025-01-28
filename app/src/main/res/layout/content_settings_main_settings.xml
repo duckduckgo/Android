@@ -80,6 +80,10 @@
         app:primaryText="@string/settingsDataClearing"
         app:leadingIcon="@drawable/ic_fire_color_24"/>
 
+    <include
+        android:id="@+id/includeDuckChatSetting"
+        layout="@layout/view_settings_item_duck_chat" />
+
     <LinearLayout
         android:id="@+id/settingsSectionDuckPlayer"
         android:layout_width="match_parent"
