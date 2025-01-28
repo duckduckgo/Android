@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Comprend notre VPN et Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Obtenir Privacy Pro</string>
     <string name="subscriptionSettingRestore">J\'ai un abonnement</string>
-    <string name="subscriptionSettingWaiting">Votre abonnement est en cours d’activation</string>
-    <string name="subscriptionSettingWaitingSubtitle">Cela prend plus de temps que la normale ; veuillez revenir plus tard.</string>
     <string name="subscriptionSettingExpired">Votre abonnement Privacy Pro a expiré</string>
-    <string name="subscriptionSettingExpiredSubtitle">Abonnez-vous à nouveau pour continuer à utiliser Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Voir les forfaits</string>
     <string name="subscriptionSettingSectionSubscription">Abonnement</string>
     <string name="subscriptionSettingRemoveFromDevice">Supprimer de cet appareil</string>

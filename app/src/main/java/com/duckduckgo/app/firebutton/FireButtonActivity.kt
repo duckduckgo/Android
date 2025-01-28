@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDataClearingBinding
-import com.duckduckgo.app.browser.databinding.ActivityFireButtonBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
@@ -44,7 +43,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -60,39 +58,27 @@ class FireButtonActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
-
     private val viewModel: FireButtonViewModel by bindViewModel()
-    private val legacyBinding: ActivityFireButtonBinding by viewBinding() // TODO remove
     private val binding: ActivityDataClearingBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            setContentView(binding.root)
-            setupToolbar(binding.includeToolbar.toolbar)
-            supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
-        } else {
-            setContentView(legacyBinding.root)
-            setupToolbar(legacyBinding.includeToolbar.toolbar)
-        }
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
+        supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
 
         configureUiEventHandlers()
         observeViewModel()
     }
 
     private fun configureUiEventHandlers() {
-        legacyBinding.fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
-        legacyBinding.automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-        legacyBinding.automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-        legacyBinding.selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
-
-        binding.fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
-        binding.automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-        binding.automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-        binding.selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+        with(binding) {
+            fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
+            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+        }
     }
 
     private fun observeViewModel() {
@@ -113,21 +99,17 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
         val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
-        legacyBinding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
         binding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        legacyBinding.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
         binding.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
-        legacyBinding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
         binding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        legacyBinding.selectedFireAnimationSetting.setSecondaryText(subtitle)
         binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 

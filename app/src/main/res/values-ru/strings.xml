@@ -85,7 +85,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактировать запрос перед поиском</string>
-    <string name="settingsAutocompleteEnabled">Показать предложения автозаполнения</string>
     <string name="autocompleteRemoveItemTitle">Удалить поисковую рекомендацию?</string>
     <string name="autocompleteRemoveItemCancel">Отменить</string>
     <string name="autocompleteRemoveItemRemove">Удалить</string>
@@ -124,18 +123,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
-    <string name="settingsHeadingPrivacy">Конфиденциальность</string>
     <string name="settingsHeadingProtections">Средства защиты</string>
     <string name="settingsHeadingAppearance">Внешний вид</string>
-    <string name="settingsHeadingCustomize">Собственная настройка</string>
     <string name="settingsHeadingAbout">О нас</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
     <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
-    <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
-    <string name="settingsHeadingMore">DuckDuckGo также предлагает...</string>
     <string name="settingsHeadingNextSteps">Дальнейшие шаги</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
@@ -151,18 +146,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Отключено</string>
     <string name="settingsSubtitleNotificationsEnabled">Включено</string>
     <string name="settingsDefaultBrowserTitle">Браузер по умолчанию</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
     <string name="settingsPrivateSearchTitle">Частный поиск</string>
     <string name="settingsGeneral" instruction="List item for general settings">Общие настройки</string>
-    <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
-    <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsHeadingMainSettings">Прочие настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
-    <string name="settingsFireButton">Кнопка «Тревога»</string>
     <string name="settingsDataClearing">Очистка данных</string>
     <string name="settingsAddWidget">Добавьте виджет на домашний экран</string>
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
@@ -171,9 +160,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
-    <string name="privateSearchTitle">Включена система Private Search</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки.</string>
-    <string name="privateSearchHeadingSearchSettings">Настройки поиска</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
     <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
@@ -191,15 +178,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Включена защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
-    <string name="cookiePopupProtectionDescription">Избавьтесь от надоедливых окон и принимайте только минимум куки-файлов</string>
-    <string name="cookiePopupProtectionEnabled">Включено</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
@@ -214,7 +197,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
 
-    <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearData">Автоудаление данных...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматически сбрасывать…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
@@ -234,9 +216,7 @@
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
     <string name="aboutActivityTitleNew">О нас</string>
     <string name="aboutHeader">Добро пожаловать на Утиную сторону!</string>
-    <string name="aboutDescription">DuckDuckGo — основанная в 2008 году независимая компания, специализирующаяся на защите личных данных в Интернете. Мы предлагаем простое решение тем, кто хочет, чтобы за ними перестали следить онлайн. DuckDuckGo своим примером показывает, что защита конфиденциальности онлайн возможна без всяких компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли и многое другое, а также <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей . Такой исчерпывающий набор инструментов может скрыть от посторонних глаз всю сетевую активность, включая поиск, навигацию и почту.\n\nСредства защиты конфиденциальности не требуют от пользователей знания технических особенностей или понимания сложных настроек .Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность станет вашим режимом по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на страницах <annotation type="learn_more_link">справки</annotation>.</string>
     <string name="aboutDescriptionNew">DuckDuckGo — независимая компания, которая c 2008 года предоставляет услуги защиты личных данных в интернете. Мы предлагаем простое решение для тех, кому надоело отслеживание онлайн. Своим примером DuckDuckGo показывает, что защита конфиденциальности в Сети не требует компромиссов.\n\nВ универсальном браузере DuckDuckGo вы найдете все те же привычные функции — вкладки, закладки, пароли — плюс <annotation type="privacy_protection_link">более десятка мощных средств защиты личной информации</annotation>, которых нет в стандартных настройках других популярных веб-обозревателей. Наш всесторонний набор инструментов скроет от посторонних глаз всю вашу онлайн-активность, включая поиск, просмотр сайтов и чтение почты.\n\nСервисы DuckDuckGo не требуют особых технических познаний или работы со сложными настройками. Достаточно сменить свой браузер на DuckDuckGo на всех устройствах, и конфиденциальность онлайн станет вашим спутником по умолчанию.\n\nЕсли же вас интересует «подноготная», подробную информацию об особенностях защиты DuckDuckGo можно найти на наших <annotation type="learn_more_link">справочных страницах</annotation>.</string>
-    <string name="no_suggestions">Нет предложений</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о неработающем сайте</string>
@@ -603,11 +583,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Виджет %1$s добавлен на главный экран</string>
-    <string name="settingsAddHomeScreenWidget">Виджет для главного экрана</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Mac</string>
-    <string name="macos_settings_title">Браузер DuckDuckGo для Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Загрузки</string>
@@ -643,7 +620,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Нет, я буду управлять ими самостоятельно</string>
 
-    <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Всплывающее окно скрыто</string>
     <string name="autoconsentManagedNoticeAnimationText">Kуки-файлы выбраны</string>
 
@@ -652,10 +628,6 @@
     <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Браузер DuckDuckGo для Windows</string>
-    <string name="windows_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Windows</string>
-    <string name="windows_settings_description_ready">Готово к загрузке</string>
-    <string name="windows_settings_description_list">Теперь вы в списке!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
@@ -681,7 +653,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отменить</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автозаполнение</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>

@@ -18,7 +18,6 @@ package com.duckduckgo.duckplayer.impl
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -28,7 +27,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -58,19 +56,12 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
-        val newSettingsEnabled = settingsPageFeature.newSettingsPage().isEnabled()
-
         with(binding) {
-            duckPlayerLegacyLayout.isGone = newSettingsEnabled
-            duckPlayerLayout.isVisible = newSettingsEnabled
             duckPlayerSettingsText.addClickableSpan(
                 textSequence = getText(R.string.duck_player_settings_activity_description),
                 spans = listOf(
@@ -82,12 +73,6 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 ),
             )
         }
-
-        binding.legacyDuckPlayerSettingsText.addClickableLink(
-            annotation = "learn_more_link",
-            textSequence = getText(R.string.duck_player_settings_activity_description),
-            onClick = { viewModel.duckPlayerLearnMoreClicked() },
-        )
 
         setupToolbar(binding.includeToolbar.toolbar)
 
@@ -106,16 +91,6 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             openDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.onOpenDuckPlayerInNewTabToggled(isChecked)
             }
-        }
-
-        binding.legacyDuckPlayerModeSelector.setClickListener {
-            viewModel.duckPlayerModeSelectorClicked()
-        }
-        binding.legacyDuckPlayerDisabledLearnMoreButton.setOnClickListener {
-            viewModel.onContingencyLearnMoreClicked()
-        }
-        binding.legacyOpenDuckPlayerInNewTabToggle.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onOpenDuckPlayerInNewTabToggled(isChecked)
         }
     }
 
@@ -191,34 +166,19 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState) {
             is ViewState.Enabled -> {
-                if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                    with(binding) {
-                        duckPlayerModeSelector.isEnabled = true
-                        duckPlayerDisabledSection.isVisible = false
-                        openDuckPlayerInNewTabToggle.isVisible =
-                            viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
-                        openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
-                        setDuckPlayerSectionVisibility(true)
-                    }
-                } else {
-                    binding.legacyDuckPlayerModeSelector.isEnabled = true
-                    binding.legacyDuckPlayerDisabledSection.isVisible = false
-                    binding.legacyOpenDuckPlayerInNewTabToggle.isVisible =
+                with(binding) {
+                    duckPlayerModeSelector.isEnabled = true
+                    duckPlayerDisabledSection.isVisible = false
+                    openDuckPlayerInNewTabToggle.isVisible =
                         viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
-                    binding.legacyOpenDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
+                    openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
                     setDuckPlayerSectionVisibility(true)
                 }
             }
             is ViewState.DisabledWithHelpLink -> {
-                if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                    with(binding) {
-                        duckPlayerModeSelector.isEnabled = false
-                        duckPlayerDisabledSection.isVisible = true
-                        setDuckPlayerSectionVisibility(false)
-                    }
-                } else {
-                    binding.legacyDuckPlayerModeSelector.isEnabled = false
-                    binding.legacyDuckPlayerDisabledSection.isVisible = true
+                with(binding) {
+                    duckPlayerModeSelector.isEnabled = false
+                    duckPlayerDisabledSection.isVisible = true
                     setDuckPlayerSectionVisibility(false)
                 }
             }
@@ -230,27 +190,13 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 else -> getString(R.string.duck_player_mode_always_ask)
             },
         )
-
-        binding.legacyDuckPlayerModeSelector.setSecondaryText(
-            when (viewState.privatePlayerMode) {
-                Enabled -> getString(R.string.duck_player_mode_always)
-                Disabled -> getString(R.string.duck_player_mode_never)
-                else -> getString(R.string.duck_player_mode_always_ask)
-            },
-        )
     }
 
     private fun setDuckPlayerSectionVisibility(isVisible: Boolean) {
-        if (settingsPageFeature.newSettingsPage().isEnabled()) {
-            with(binding) {
-                duckPlayerSettingsTitle.isVisible = isVisible
-                duckPlayerSettingsIcon.isVisible = isVisible
-                duckPlayerSettingsText.isVisible = isVisible
-            }
-        } else {
-            binding.legacyDuckPlayerSettingsTitle.isVisible = isVisible
-            binding.legacyDuckPlayerSettingsIcon.isVisible = isVisible
-            binding.legacyDuckPlayerSettingsText.isVisible = isVisible
+        with(binding) {
+            duckPlayerSettingsTitle.isVisible = isVisible
+            duckPlayerSettingsIcon.isVisible = isVisible
+            duckPlayerSettingsText.isVisible = isVisible
         }
     }
 }

@@ -70,28 +70,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:paddingStart="@dimen/keyline_6"
-            android:paddingEnd="@dimen/keyline_6"
-            android:paddingBottom="@dimen/keyline_4"
-            android:text="@string/aboutDescription"
-            app:textType="secondary"
-            app:typography="body1"
-            tools:text="Long description would go here\n\nLots and lots of words"
-            tools:visibility="gone" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/aboutTextNew"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
             android:paddingHorizontal="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_4"
             android:text="@string/aboutDescriptionNew"
-            android:visibility="gone"
             app:textType="secondary"
             app:typography="body1"
-            tools:text="Long description would go here\n\nLots and lots of words"
-            tools:visibility="visible" />
+            tools:text="Long description would go here\n\nLots and lots of words" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -110,12 +94,6 @@
             android:layout_height="wrap_content"
             app:primaryText="@string/settingsVersion"
             tools:secondaryText="123.43.5456" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/aboutProvideFeedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/leaveFeedback" />
 
     </LinearLayout>
 

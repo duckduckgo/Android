@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Το Duck Player σάς επιτρέπει να παρακολουθείτε YouTube χωρίς στοχευμένες διαφημίσεις στο DuckDuckGo, ενώ το περιεχόμενο που παρακολουθείτε δεν θα επηρεάσει τις συστάσεις που θα λαμβάνετε.</string>
     <string name="duck_player_info_modal_button">Το κατάλαβα!</string>
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>
-    <string name="duck_player_unavailable_description">Η λειτουργία του Duck Player έχει επηρεαστεί από τις πρόσφατες αλλαγές στο YouTube. Προσπαθούμε να διορθώσουμε αυτά τα προβλήματα και εκτιμούμε την κατανόησή σας.</string>
     <string name="duck_player_unavailable_learn_more">Μάθετε περισσότερα</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Ανοίξτε τα βίντεο του YouTube στο Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ανοίξτε το Duck Player σε νέα καρτέλα</string>

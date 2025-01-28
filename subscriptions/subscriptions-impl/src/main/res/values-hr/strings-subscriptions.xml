@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">Uključuje naš VPN i Identity Theft Restoration (oporavak od krađe identiteta).</string>
     <string name="subscriptionSettingGet">Nabavi Privacy Pro</string>
     <string name="subscriptionSettingRestore">Imam pretplatu</string>
-    <string name="subscriptionSettingWaiting">Tvoja se pretplata aktivira</string>
-    <string name="subscriptionSettingWaitingSubtitle">Ovo traje dulje nego inače, pokušaj kasnije.</string>
     <string name="subscriptionSettingExpired">Tvoja pretplata na Privacy Pro je istekla</string>
-    <string name="subscriptionSettingExpiredSubtitle">Pretplati se ponovno za nastavak korištenja Privacy Pro</string>
     <string name="subscriptionSettingExpiredViewPlans">Pregledaj planove</string>
     <string name="subscriptionSettingSectionSubscription">Pretplata</string>
     <string name="subscriptionSettingRemoveFromDevice">Ukloni s ovog uređaja</string>

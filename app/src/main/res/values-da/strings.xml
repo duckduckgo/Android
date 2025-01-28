@@ -85,7 +85,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigér forespørgsel før søgning</string>
-    <string name="settingsAutocompleteEnabled">Vis forslag til Autoudfyld</string>
     <string name="autocompleteRemoveItemTitle">Fjern søgeforslag?</string>
     <string name="autocompleteRemoveItemCancel">Annuller</string>
     <string name="autocompleteRemoveItemRemove">Fjern</string>
@@ -124,18 +123,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Indstillinger</string>
     <string name="settingsMenuItemTitle">Indstillinger</string>
-    <string name="settingsHeadingPrivacy">Privatliv</string>
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">udseende</string>
-    <string name="settingsHeadingCustomize">Tilpas</string>
     <string name="settingsHeadingAbout">Omkring</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>
     <string name="leaveFeedbackNew">Send tilbagemelding</string>
     <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
-    <string name="settingsEmailProtectionSubtitle">Bloker e-mailtrackere, og skjul din adresse</string>
-    <string name="settingsHeadingMore">Mere fra DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Næste trin</string>
     <string name="settingsLightTheme">Let</string>
     <string name="settingsTheme">Tema</string>
@@ -151,18 +146,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Deaktiveret</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiveret</string>
     <string name="settingsDefaultBrowserTitle">Standardbrowser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er din standardbrowser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Gør DuckDuckGo til din standardbrowser</string>
     <string name="settingsPrivateSearchTitle">Privat søgning</string>
     <string name="settingsGeneral" instruction="List item for general settings">Generelt</string>
-    <string name="settingsPrivateSearchDescription">Aktiveret som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
-    <string name="settingsHeadingSettings">Indstillinger</string>
     <string name="settingsHeadingMainSettings">Andre indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarydning</string>
     <string name="settingsAddWidget">Tilføj widget til startskærmen</string>
     <string name="settingsAddressBarPosition">Angiv placeringen af adresselinjen</string>
@@ -171,9 +160,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søgning</string>
-    <string name="privateSearchTitle">Private Search er aktiveret</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search er din standardsøgemaskine, så du kan søge på nettet uden at blive sporet.</string>
-    <string name="privateSearchHeadingSearchSettings">Indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
     <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
@@ -191,15 +178,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Beskyttelse mod sporing på nettet er aktiveret</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer dig aldrig, og vi bestræber os på at beskytte dit privatliv så meget som muligt. Vi vedligeholder og udvikler løbende beskyttelseslagene for at holde trit med nye sporingsmetoder og beskytter mod mange ting, som andre browsere ikke tilbyder som standard. <u><a href=\"\">Lær mere</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
-    <string name="cookiePopupProtectionDescription">Fjern disse pop op-beskeder og minimer cookies</string>
-    <string name="cookiePopupProtectionEnabled">Aktiveret</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -214,7 +197,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
 
-    <string name="settingsAutomaticallyClearWhat">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearData">Ryd data automatisk…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
@@ -234,9 +216,7 @@
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Omkring</string>
     <string name="aboutHeader">Velkommen til Duck siden</string>
-    <string name="aboutDescription">DuckDuckGo er en uafhængig virksomhed, grundlagt i 2008, der beskytter privatlivet på internettet for alle, der er trætte af at blive sporet online og ønsker en nem løsning. Vi er bevis på, at du kan få ægte beskyttelse af privatlivet online uden at gå på kompromis.\n\nDuckDuckGo-browseren kommer med de funktioner, du forventer af en standardbrowser, som bogmærker, faner, adgangskoder og meget mere, plus over <annotation type="privacy_protection_link">et dusin kraftfulde beskyttelser af privatlivet</annotation>, som ikke tilbydes i de fleste populære browsere som standard. Dette unikke og omfattende sæt af beskyttelsesfunktioner hjælper med at beskytte dine onlineaktiviteter, fra søgning til browsing, e-mailing og meget mere.\n\nVores beskyttelse af privatlivet fungerer, uden at du behøver at vide noget om de tekniske detaljer eller håndtere komplicerede indstillinger. Det eneste, du skal gøre, er at skifte din browser til DuckDuckGo på alle dine enheder, så får du privatliv som standard.\n\nMen hvis du gerne vil have et kig under motorhjelmen, kan du finde flere oplysninger om, hvordan DuckDuckGos beskyttelse af privatlivet fungerer, på vores <annotation type="learn_more_link">hjælpesider</annotation></string>
     <string name="aboutDescriptionNew">DuckDuckGo er det uafhængige internetprivatlivsfirma, grundlagt i 2008, for alle, der er trætte af at blive sporet online og ønsker en nem løsning. Vi er bevis på, at du kan få ægte beskyttelse af privatlivet online uden at gå på kompromis.\n\nDuckDuckGo-browseren kommer med de funktioner, du forventer af en standardbrowser, som bogmærker, faner, adgangskoder og meget mere, plus over <annotation type="privacy_protection_link">et dusin kraftfulde beskyttelser af privatlivet</annotation>, som ikke tilbydes i de fleste populære browsere som standard. Dette unikke og omfattende sæt af beskyttelsesfunktioner hjælper med at beskytte dine onlineaktiviteter, fra søgning til browsing, e-mailing og meget mere.\n\nVores beskyttelse af privatlivet fungerer, uden at du behøver at vide noget om de tekniske detaljer eller håndtere komplicerede indstillinger. Det eneste, du skal gøre, er at skifte din browser til DuckDuckGo på alle dine enheder, så får du privatliv som standard.\n\nMen hvis du gerne vil have et kig under motorhjelmen, kan du finde flere oplysninger om, hvordan DuckDuckGos beskyttelse af privatlivet fungerer, på vores <annotation type="learn_more_link">hjælpesider</annotation></string>
-    <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt websted</string>
@@ -603,11 +583,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget tilføjet til startskærmen</string>
-    <string name="settingsAddHomeScreenWidget">Startskærmswidget</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Browse privat med vores app til Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Mac-browser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -643,7 +620,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nej, jeg klarer dem selv</string>
 
-    <string name="autoconsentSetting">Administrer cookie pop op-vinduer</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Pop op-vindue skjult</string>
     <string name="autoconsentManagedNoticeAnimationText">Administrerede cookies</string>
 
@@ -652,10 +628,6 @@
     <string name="downloadsNotifyMeSubtitle">Få en meddelelse, når downloads er gennemført.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows-browser</string>
-    <string name="windows_settings_description">Browse privat med vores app til Windows</string>
-    <string name="windows_settings_description_ready">Download tilgængelig</string>
-    <string name="windows_settings_description_list">Du er på listen!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Træk ned fra toppen og tryk på tilbage-knappen for at forlade fuld skærm</string>
@@ -681,7 +653,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuller</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Adgangskoder og automatisk udfyldning</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>

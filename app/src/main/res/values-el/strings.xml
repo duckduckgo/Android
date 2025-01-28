@@ -85,7 +85,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
-    <string name="settingsAutocompleteEnabled">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
     <string name="autocompleteRemoveItemTitle">Αφαίρεση πρότασης αναζήτησης;</string>
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
@@ -124,18 +123,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
-    <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
     <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
-    <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
     <string name="leaveFeedbackNew">Αποστολή σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
-    <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
-    <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Επόμενα βήματα</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
@@ -151,18 +146,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Απενεργοποιήθηκε</string>
     <string name="settingsSubtitleNotificationsEnabled">Ενεργοποιήθηκε</string>
     <string name="settingsDefaultBrowserTitle">Προεπιλεγμένο πρόγραμμα περιήγησης</string>
-    <string name="settingsDefaultBrowserSetDescription">Το DuckDuckGo αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsPrivateSearchTitle">ιδιωτική αναζήτηση</string>
     <string name="settingsGeneral" instruction="List item for general settings">Γενικά</string>
-    <string name="settingsPrivateSearchDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
-    <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsHeadingMainSettings">Άλλες Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
-    <string name="settingsFireButton">Κουμπί Φωτιά</string>
     <string name="settingsDataClearing">Διαγραφή δεδομένων</string>
     <string name="settingsAddWidget">Προσθήκη μικροεφαρμογής στην Αρχική οθόνη</string>
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
@@ -171,9 +160,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
-    <string name="privateSearchTitle">Η λειτουργία Private Search είναι ενεργοποιημένη</string>
     <string name="privateSearchDescription">Το DuckDuckGo Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
-    <string name="privateSearchHeadingSearchSettings">Ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Προσαρμόστε τη γλώσσα αναζήτησης, την περιοχή και πολλά άλλα</string>
     <string name="privateSearchMoreSearchSettingsTitle">Περισσότερες ρυθμίσεις αναζήτησης</string>
@@ -191,15 +178,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Η προστασία παρακολούθησης ιστού είναι ενεργοποιημένη</string>
     <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[Το DuckDuckGo δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
-    <string name="cookiePopupProtectionDescription">Εξαλείψτε αυτά τα αναδυόμενα παράθυρα και ελαχιστοποιήστε τα cookies</string>
-    <string name="cookiePopupProtectionEnabled">Ενεργοποιήθηκε</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
@@ -214,7 +197,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
 
-    <string name="settingsAutomaticallyClearWhat">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearData">Αυτόματη απαλοιφή δεδομένων...</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
@@ -234,9 +216,7 @@
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Σχετικά</string>
     <string name="aboutHeader">Καλωσορίσατε στην πλευρά της Πάπιας!</string>
-    <string name="aboutDescription">Το DuckDuckGo αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης DuckDuckGo διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε DuckDuckGo σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του DuckDuckGo στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
     <string name="aboutDescriptionNew">Το DuckDuckGo αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης DuckDuckGo διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε DuckDuckGo σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του DuckDuckGo στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
-    <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
@@ -603,11 +583,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
-    <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
@@ -643,7 +620,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Όχι, θα τα διαχειρίζομαι εγώ προσωπικά</string>
 
-    <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Κρυφό αναδυόμενο παράθυρο</string>
     <string name="autoconsentManagedNoticeAnimationText">Διαχειριζόμενα cookies</string>
 
@@ -652,10 +628,6 @@
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Πρόγραμμα περιήγησης DuckDuckGo για Windows</string>
-    <string name="windows_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Windows</string>
-    <string name="windows_settings_description_ready">Διαθέσιμη λήψη</string>
-    <string name="windows_settings_description_list">Είστε στη λίστα!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
@@ -681,7 +653,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Κωδικοί πρόσβασης</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
