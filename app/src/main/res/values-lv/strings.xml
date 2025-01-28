@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Iespējota %1$s privātuma aizsardzība</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Atspējota %1$s privātuma aizsardzība</string>
     <string name="undoSnackbarAction">Atsaukt</string>
+    <string name="trackersBlockedAnimationMessage">Izsekotāji ir bloķēti</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lejupielādēt attēlu</string>

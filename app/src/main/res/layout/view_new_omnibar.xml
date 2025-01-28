@@ -215,7 +215,7 @@
                         android:layout_gravity="center_vertical"
                         android:paddingStart="2dp"
                         android:paddingEnd="2dp"
-                        android:text="Trackers Blocked"
+                        android:text="@string/trackersBlockedAnimationMessage"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"

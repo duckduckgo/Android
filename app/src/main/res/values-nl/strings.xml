@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacybescherming ingeschakeld voor %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privacybescherming uitgeschakeld voor %1$s</string>
     <string name="undoSnackbarAction">Ongedaan maken</string>
+    <string name="trackersBlockedAnimationMessage">Trackers geblokkeerd</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Afbeelding downloaden</string>
