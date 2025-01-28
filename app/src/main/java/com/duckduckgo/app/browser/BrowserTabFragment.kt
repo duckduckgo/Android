@@ -1353,7 +1353,7 @@ class BrowserTabFragment :
         webView?.hide()
         webView?.stopLoading()
         maliciousWarningView.bind { action ->
-            viewModel.onMaliciousSiteDetected(action, url)
+            viewModel.onMaliciousSiteUserAction(action, url)
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()

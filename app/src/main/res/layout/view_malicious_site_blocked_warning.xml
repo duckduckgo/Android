@@ -126,7 +126,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/expandedHeadline"
             app:typography="body2"
-            android:text="@string/sslErrorExpandedCTA" />
+            android:text="@string/maliciousSiteExpandedCTA" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

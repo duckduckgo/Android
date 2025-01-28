@@ -57,8 +57,6 @@ interface MaliciousSiteBlockerWebViewIntegration {
     fun onPageLoadStarted()
 
     fun onSiteExempted(url: Uri)
-
-    fun onFireButtonPressed()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -87,14 +85,6 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         if (isMainProcess) {
             loadToMemory()
         }
-        val stackTrace = Thread.currentThread().stackTrace
-        val callerClassName = stackTrace[3].className
-        val callerMethodName = stackTrace[3].methodName
-        val callerLineNumber = stackTrace[3].lineNumber
-        Timber.tag("KateMalicious").d(
-            "RealMaliciousSiteBlockerWebViewIntegration instantiated by " +
-                "$callerClassName.$callerMethodName at line $callerLineNumber",
-        )
     }
 
     private fun loadToMemory() {
@@ -213,10 +203,5 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         Timber.tag("MaliciousSiteDetector").d(
             "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
         )
-    }
-
-    override fun onFireButtonPressed() {
-        exemptedUrlsHolder.exemptedMaliciousUrls.clear()
-        Timber.tag("MaliciousSiteDetector").d("Exempted url list cleared")
     }
 }
