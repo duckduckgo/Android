@@ -48,11 +48,14 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchBrowserWithLearnMoreUrl : Command()
-        object LaunchBrowserWithPrivacyProtectionsUrl : Command()
-        object LaunchWebViewWithPrivacyPolicyUrl : Command()
-        object LaunchFeedback : Command()
-        object LaunchPproUnifiedFeedback : Command()
+        data object LaunchBrowserWithLearnMoreUrl : Command()
+        data object LaunchBrowserWithPrivacyProtectionsUrl : Command()
+        data object LaunchWebViewWithPrivacyPolicyUrl : Command()
+        data object LaunchFeedback : Command()
+        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchWebViewWithComparisonChartUrl : Command()
+        data object LaunchWebViewWithPPROUrl : Command()
+        data object LaunchWebViewWithVPNUrl : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -72,6 +75,18 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    fun onComparisonChartLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithComparisonChartUrl) }
+    }
+
+    fun onPProHelpPageLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithPPROUrl) }
+    }
+
+    fun onVPNHelpPageLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithVPNUrl) }
     }
 
     fun onLearnMoreLinkClicked() {
