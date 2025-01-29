@@ -65,7 +65,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
     @Test
     fun doWork_returnsRetryWhenLoadFiltersFails() = runTest {
         whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
-        whenever(maliciousSiteRepository.loadFilters()).thenThrow(RuntimeException::class.java)
+        whenever(maliciousSiteRepository.loadFilters()).thenReturn(Result.failure(Exception()))
 
         val result = worker.doWork()
 

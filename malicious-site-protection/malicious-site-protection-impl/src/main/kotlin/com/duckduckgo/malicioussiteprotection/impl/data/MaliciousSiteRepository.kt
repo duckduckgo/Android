@@ -16,31 +16,39 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.data
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
+import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
+import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
+import com.duckduckgo.malicioussiteprotection.impl.models.Feed
 import com.duckduckgo.malicioussiteprotection.impl.models.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
+import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
+import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
+import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
     suspend fun getFilters(hash: String): List<Filter>?
     suspend fun matches(hashPrefix: String): List<Match>
-    suspend fun loadFilters()
-    suspend fun loadHashPrefixes()
+    suspend fun loadFilters(): Result<Unit>
+    suspend fun loadHashPrefixes(): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,81 +56,8 @@ interface MaliciousSiteRepository {
 class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDao: MaliciousSiteDao,
     private val maliciousSiteService: MaliciousSiteService,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MaliciousSiteRepository {
-
-    override suspend fun loadFilters() {
-        try {
-            val networkRevision = maliciousSiteService.getRevision().revision
-
-            (maliciousSiteDao.getLatestRevision()?.filter { it.type == Type.FILTER_SET.name } ?: listOf()).let { latestRevision ->
-                val phishingFilterSetRevision = latestRevision.firstOrNull() { it.feed == PHISHING.name }?.revision ?: 0
-                val phishingFilterSet: FilterSetResponse? = if (networkRevision > phishingFilterSetRevision) {
-                    maliciousSiteService.getPhishingFilterSet(phishingFilterSetRevision)
-                } else {
-                    null
-                }
-                val malwareFilterSetRevision = latestRevision.firstOrNull() { it.feed == MALWARE.name }?.revision ?: 0
-                val malwareFilterSet: FilterSetResponse? = if (networkRevision > malwareFilterSetRevision) {
-                    maliciousSiteService.getMalwareFilterSet(malwareFilterSetRevision)
-                } else {
-                    null
-                }
-
-                maliciousSiteDao.updateFilters(
-                    phishingFilterSet?.let {
-                        PhishingFilterSetWithRevision(
-                            it.insert.map { insert -> Filter(insert.hash, insert.regex) }.toSet(),
-                            it.delete.map { delete -> Filter(delete.hash, delete.regex) }.toSet(),
-                            it.revision,
-                            it.replace,
-                        )
-                    },
-                )
-                maliciousSiteDao.updateFilters(
-                    malwareFilterSet?.let {
-                        MalwareFilterSetWithRevision(
-                            it.insert.map { insert -> Filter(insert.hash, insert.regex) }.toSet(),
-                            it.delete.map { delete -> Filter(delete.hash, delete.regex) }.toSet(),
-                            it.revision,
-                            it.replace,
-                        )
-                    },
-                )
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to download malicious site protection list")
-        }
-    }
-
-    override suspend fun loadHashPrefixes() {
-        try {
-            val networkRevision = maliciousSiteService.getRevision().revision
-
-            (maliciousSiteDao.getLatestRevision()?.filter { it.type == Type.HASH_PREFIXES.name } ?: listOf()).let {
-                val phishingHashPrefixesRevision = it.firstOrNull() { it.feed == PHISHING.name }?.revision ?: 0
-                val phishingHashPrefixes: HashPrefixResponse? = if (networkRevision > phishingHashPrefixesRevision) {
-                    maliciousSiteService.getPhishingHashPrefixes(phishingHashPrefixesRevision)
-                } else {
-                    null
-                }
-                val malwareHashPrefixesRevision = it.firstOrNull() { it.feed == MALWARE.name }?.revision ?: 0
-                val malwareHashPrefixes: HashPrefixResponse? = if (networkRevision > malwareHashPrefixesRevision) {
-                    maliciousSiteService.getMalwareHashPrefixes(malwareHashPrefixesRevision)
-                } else {
-                    null
-                }
-
-                maliciousSiteDao.updateHashPrefixes(
-                    phishingHashPrefixes?.let { PhishingHashPrefixesWithRevision(it.insert, it.delete, it.revision, it.replace) },
-                )
-                maliciousSiteDao.updateHashPrefixes(
-                    malwareHashPrefixes?.let { MalwareHashPrefixesWithRevision(it.insert, it.delete, it.revision, it.replace) },
-                )
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to download malicious site protection list")
-        }
-    }
 
     override suspend fun containsHashPrefix(hashPrefix: String): Boolean {
         return maliciousSiteDao.getHashPrefix(hashPrefix) != null
@@ -144,5 +79,109 @@ class RealMaliciousSiteRepository @Inject constructor(
         } catch (e: Exception) {
             listOf()
         }
+    }
+
+    override suspend fun loadFilters(): Result<Unit> {
+        return loadDataOfType(FILTER_SET) { latestRevision, networkRevision, feed -> loadFilters(latestRevision, networkRevision, feed) }
+    }
+
+    override suspend fun loadHashPrefixes(): Result<Unit> {
+        return loadDataOfType(HASH_PREFIXES) { latestRevision, networkRevision, feed -> loadHashPrefixes(latestRevision, networkRevision, feed) }
+    }
+
+    private suspend fun loadDataOfType(
+        type: Type,
+        loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int, feed: Feed) -> Unit,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io()) {
+            val networkRevision = maliciousSiteService.getRevision().revision
+
+            val localRevisions = getLocalRevisions(type)
+
+            val result = Feed.entries.fold(Result.success(Unit)) { acc, feed ->
+                try {
+                    loadData(localRevisions, networkRevision, feed)
+                    acc
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            }
+            result
+        }
+    }
+
+    private suspend fun <T> loadAndUpdateData(
+        latestRevision: List<RevisionEntity>,
+        networkRevision: Int,
+        feed: Feed,
+        getFunction: suspend (Int) -> T?,
+        updateFunction: suspend (T?) -> Unit,
+    ) {
+        val revision = latestRevision.getRevisionForFeed(feed)
+        val data: T? = if (networkRevision > revision) {
+            getFunction(revision)
+        } else {
+            null
+        }
+
+        updateFunction(data)
+    }
+
+    private suspend fun loadFilters(
+        latestRevision: List<RevisionEntity>,
+        networkRevision: Int,
+        feed: Feed,
+    ) {
+        loadAndUpdateData(
+            latestRevision,
+            networkRevision,
+            feed,
+            when (feed) {
+                PHISHING -> maliciousSiteService::getPhishingFilterSet
+                MALWARE -> maliciousSiteService::getMalwareFilterSet
+            },
+        ) { maliciousSiteDao.updateFilters(it?.toFilterSetWithRevision(feed)) }
+    }
+
+    private suspend fun loadHashPrefixes(
+        latestRevision: List<RevisionEntity>,
+        networkRevision: Int,
+        feed: Feed,
+    ) {
+        loadAndUpdateData(
+            latestRevision,
+            networkRevision,
+            feed,
+            when (feed) {
+                PHISHING -> maliciousSiteService::getPhishingHashPrefixes
+                MALWARE -> maliciousSiteService::getMalwareHashPrefixes
+            },
+        ) { maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed)) }
+    }
+
+    private fun FilterSetResponse.toFilterSetWithRevision(feed: Feed): FilterSetWithRevision {
+        val insert = insert.toFilterSet()
+        val delete = delete.toFilterSet()
+        return when (feed) {
+            PHISHING -> PhishingFilterSetWithRevision(insert, delete, revision, replace)
+            MALWARE -> MalwareFilterSetWithRevision(insert, delete, revision, replace)
+        }
+    }
+
+    private fun HashPrefixResponse.toHashPrefixesWithRevision(feed: Feed): HashPrefixesWithRevision {
+        return when (feed) {
+            PHISHING -> PhishingHashPrefixesWithRevision(insert, delete, revision, replace)
+            MALWARE -> MalwareHashPrefixesWithRevision(insert, delete, revision, replace)
+        }
+    }
+
+    private suspend fun getLocalRevisions(type: Type) = (maliciousSiteDao.getLatestRevision()?.filter { it.type == type.name } ?: listOf())
+
+    private fun Set<FilterResponse>.toFilterSet(): Set<Filter> {
+        return map { Filter(it.hash, it.regex) }.toSet()
+    }
+
+    private fun List<RevisionEntity>.getRevisionForFeed(feed: Feed): Int {
+        return firstOrNull { it.feed == feed.name }?.revision ?: 0
     }
 }

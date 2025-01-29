@@ -154,7 +154,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldIntercept callback with true received after a new request is intercepted then return false`() = runTest {
+    fun `if a new page load triggering is malicious is started, isMalicious callback result should be ignored for the first page`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(true)
@@ -192,7 +192,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldIntercept callback with true received before a new request is intercepted then return true`() = runTest {
+    fun `isMalicious callback result should be processed if no new page loads triggering isMalicious have started`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(true)

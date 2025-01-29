@@ -111,7 +111,8 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return null
         }
 
-        if (request.isForMainFrame || (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host)) {
+        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+        if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
             if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                 return WebResourceResponse(null, null, null)
             } else {
@@ -156,6 +157,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     ): Boolean {
         val checkId = currentCheckId.incrementAndGet()
         return maliciousSiteProtection.isMalicious(url.toUri()) {
+            // if another load has started, we should ignore the result
             val isMalicious = if (checkId == currentCheckId.get()) {
                 it
             } else {

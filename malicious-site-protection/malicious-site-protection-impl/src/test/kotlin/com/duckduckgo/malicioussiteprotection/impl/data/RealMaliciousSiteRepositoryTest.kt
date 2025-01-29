@@ -27,9 +27,13 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 
 class RealMaliciousSiteRepositoryTest {
+
+    @get:org.junit.Rule
+    var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
+
     private val maliciousSiteDao: MaliciousSiteDao = mock()
     private val maliciousSiteService: MaliciousSiteService = mock()
-    private val repository = RealMaliciousSiteRepository(maliciousSiteDao, maliciousSiteService)
+    private val repository = RealMaliciousSiteRepository(maliciousSiteDao, maliciousSiteService, coroutineRule.testDispatcherProvider)
 
     @Test
     fun loadFilters_updatesFiltersWhenNetworkRevisionIsHigher() = runTest {

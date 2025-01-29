@@ -21,9 +21,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.malicioussiteprotection.impl.models.Feed
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
-import timber.log.Timber
+import com.duckduckgo.malicioussiteprotection.impl.models.Type
 
 @Dao
 interface MaliciousSiteDao {
@@ -81,21 +82,11 @@ interface MaliciousSiteDao {
     ) {
         hashPrefixes ?: return
 
-        val currentLocalRevision = getLatestRevision(feed = hashPrefixes.feed.name, type = hashPrefixes.type.name)?.revision ?: 0
-        val newRevision = hashPrefixes.takeIf { it.revision > currentLocalRevision }?.apply {
-            Timber.d("Cris. Updating hash prefixes")
-            if (hashPrefixes.replace) {
-                deleteHashPrefixes(hashPrefixes.feed.name)
-            } else {
-                hashPrefixes.delete.forEach {
-                    deleteHashPrefix(it, hashPrefixes.feed.name)
-                }
-            }
-            insertHashPrefixes(hashPrefixes.insert.map { HashPrefixEntity(hashPrefix = it, type = hashPrefixes.feed.name) })
-        }?.revision ?: currentLocalRevision
-        if (currentLocalRevision != newRevision) {
-            insertRevision(RevisionEntity(feed = hashPrefixes.feed.name, type = hashPrefixes.type.name, revision = newRevision))
-        }
+        updateData(
+            type = hashPrefixes.type,
+            feed = hashPrefixes.feed,
+            updateWithRevision = { localRevision: Int -> updateHashPrefixes(hashPrefixes, localRevision) },
+        )
     }
 
     @Transaction
@@ -104,20 +95,70 @@ interface MaliciousSiteDao {
     ) {
         filterSet ?: return
 
-        val currentLocalRevision = getLatestRevision(feed = filterSet.feed.name, type = filterSet.type.name)?.revision ?: 0
-        val newRevision = filterSet.takeIf { it.revision > currentLocalRevision }?.apply {
-            Timber.d("Cris. Updating filters")
-            if (filterSet.replace) {
-                deleteFilters(filterSet.feed.name)
-            } else {
-                filterSet.delete.forEach {
-                    deleteFilter(it.hash, filterSet.feed.name)
-                }
-            }
-            insertFilters(filterSet.insert.map { FilterEntity(it.hash, it.regex, type = filterSet.feed.name) }.toSet())
+        updateData(
+            type = filterSet.type,
+            feed = filterSet.feed,
+            updateWithRevision = { localRevision: Int -> updateFilters(filterSet, localRevision) },
+        )
+    }
+
+    private suspend fun updateFilters(filterSet: FilterSetWithRevision, currentLocalRevision: Int): Int {
+        return filterSet.takeIf { isNewRevisionNewerThanLocal(it.revision, currentLocalRevision) }?.apply {
+            updateData(
+                replace = filterSet.replace,
+                deleteAll = { deleteFilters(filterSet.feed.name) },
+                deleteItem = { deleteFilter(it.hash, filterSet.feed.name) },
+                insertItems = { insertFilters(filterSet.insert.map { FilterEntity(it.hash, it.regex, type = filterSet.feed.name) }.toSet()) },
+                itemsToDelete = filterSet.delete,
+            )
         }?.revision ?: currentLocalRevision
+    }
+
+    private suspend fun updateHashPrefixes(hashPrefixes: HashPrefixesWithRevision, currentLocalRevision: Int): Int {
+        return hashPrefixes.takeIf { isNewRevisionNewerThanLocal(it.revision, currentLocalRevision) }?.apply {
+            updateData(
+                replace = hashPrefixes.replace,
+                deleteAll = { deleteHashPrefixes(hashPrefixes.feed.name) },
+                deleteItem = { deleteHashPrefix(it, hashPrefixes.feed.name) },
+                insertItems = { insertHashPrefixes(hashPrefixes.insert.map { HashPrefixEntity(hashPrefix = it, type = hashPrefixes.feed.name) }) },
+                itemsToDelete = hashPrefixes.delete,
+            )
+        }?.revision ?: currentLocalRevision
+    }
+
+    private suspend fun updateData(
+        type: Type,
+        feed: Feed,
+        updateWithRevision: suspend (Int) -> Int,
+    ) {
+        val currentLocalRevision = getLatestRevision(feed = feed, type = type)
+        val newRevision = updateWithRevision(currentLocalRevision)
         if (currentLocalRevision != newRevision) {
-            insertRevision(RevisionEntity(feed = filterSet.feed.name, type = filterSet.type.name, revision = newRevision))
+            insertRevision(RevisionEntity(feed = feed.name, type = type.name, revision = newRevision))
         }
+    }
+
+    fun isNewRevisionNewerThanLocal(
+        newRevision: Int,
+        currentLocalRevision: Int,
+    ) = newRevision > currentLocalRevision
+
+    private suspend fun <T> updateData(
+        replace: Boolean,
+        deleteAll: suspend () -> Unit,
+        deleteItem: suspend (T) -> Unit,
+        insertItems: suspend () -> Unit,
+        itemsToDelete: Set<T>,
+    ) {
+        if (replace) {
+            deleteAll()
+        } else {
+            itemsToDelete.forEach { deleteItem(it) }
+        }
+        insertItems()
+    }
+
+    private suspend fun getLatestRevision(feed: Feed, type: Type): Int {
+        return getLatestRevision(feed = feed.name, type = type.name)?.revision ?: 0
     }
 }

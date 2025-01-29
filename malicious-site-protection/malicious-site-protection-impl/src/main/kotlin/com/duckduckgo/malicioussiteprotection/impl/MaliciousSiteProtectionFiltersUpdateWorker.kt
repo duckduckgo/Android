@@ -54,11 +54,10 @@ class MaliciousSiteProtectionFiltersUpdateWorker(
             if (maliciousSiteProtectionFeature.isFeatureEnabled().not()) {
                 return@withContext Result.success()
             }
-            try {
-                maliciousSiteRepository.loadFilters()
-                return@withContext Result.success()
-            } catch (e: Exception) {
-                return@withContext Result.retry()
+            return@withContext if (maliciousSiteRepository.loadFilters().isSuccess) {
+                Result.success()
+            } else {
+                Result.retry()
             }
         }
     }

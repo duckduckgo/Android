@@ -51,7 +51,7 @@ class RealMaliciousSiteProtection @Inject constructor(
 
         val hostname = url.host ?: return IsMaliciousResult.SAFE
         val hash = messageDigest
-            .digest(hostname.toByteArray())
+            .digest(hostname.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }
         val hashPrefix = hash.substring(0, 8)
 

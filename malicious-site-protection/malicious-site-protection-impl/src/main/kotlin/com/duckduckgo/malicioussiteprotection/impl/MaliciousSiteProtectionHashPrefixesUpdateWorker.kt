@@ -54,11 +54,10 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorker(
             if (maliciousSiteProtectionFeature.isFeatureEnabled().not()) {
                 return@withContext Result.success()
             }
-            try {
-                maliciousSiteRepository.loadHashPrefixes()
-                return@withContext Result.success()
-            } catch (e: Exception) {
-                return@withContext Result.retry()
+            return@withContext if (maliciousSiteRepository.loadHashPrefixes().isSuccess) {
+                Result.success()
+            } else {
+                Result.retry()
             }
         }
     }

@@ -65,7 +65,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerTest {
     @Test
     fun doWork_returnsRetryWhenLoadHashPrefixesFails() = runTest {
         whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
-        whenever(maliciousSiteRepository.loadHashPrefixes()).thenThrow(RuntimeException::class.java)
+        whenever(maliciousSiteRepository.loadHashPrefixes()).thenReturn(Result.failure(Exception()))
 
         val result = worker.doWork()
 
