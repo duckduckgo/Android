@@ -105,7 +105,6 @@ import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -151,7 +150,6 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
@@ -493,7 +491,6 @@ class BrowserTabViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
-    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -537,7 +534,6 @@ class BrowserTabViewModelTest {
             lazyFaviconManager,
         )
 
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, Disabled)))
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -577,7 +573,6 @@ class BrowserTabViewModelTest {
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             subscriptions = mock(),
             duckPlayer = mockDuckPlayer,
-            highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             brokenSitePrompt = mockBrokenSitePrompt,
         )
 
@@ -612,7 +607,6 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
@@ -676,7 +670,6 @@ class BrowserTabViewModelTest {
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,
-            highlightsOnboardingExperimentManager = mockHighlightsOnboardingExperimentManager,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
@@ -709,9 +702,9 @@ class BrowserTabViewModelTest {
         loadUrl("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
         testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+        assertTrue(commandCaptor.lastValue is ShareLink)
 
-        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        val shareLink = commandCaptor.lastValue as ShareLink
         assertEquals("https://duckduckgo.com/?q=test", shareLink.url)
     }
 
@@ -721,9 +714,9 @@ class BrowserTabViewModelTest {
         loadUrl(url)
         testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+        assertTrue(commandCaptor.lastValue is ShareLink)
 
-        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        val shareLink = commandCaptor.lastValue as ShareLink
         assertEquals(url, shareLink.url)
     }
 
@@ -1989,7 +1982,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
         loadUrl("foo.com")
         testee.onShareSelected()
-        val command = captureCommands().lastValue as Command.ShareLink
+        val command = captureCommands().lastValue as ShareLink
         assertEquals("foo.com", command.url)
     }
 
@@ -1997,7 +1990,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         loadUrl(null)
         testee.onShareSelected()
-        assertCommandNotIssued<Command.ShareLink>()
+        assertCommandNotIssued<ShareLink>()
     }
 
     @Test
@@ -3371,7 +3364,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
+            mapOf(PixelParameter.COHORT to "cohort", PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3692,7 +3685,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRemoveFavoriteUndoThenViewStateUpdated() = runTest {
         val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
-        val quickAccessFavorites = listOf(FavoritesQuickAccessAdapter.QuickAccessFavorite(favoriteSite))
+        val quickAccessFavorites = listOf(QuickAccessFavorite(favoriteSite))
 
         whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
@@ -4789,7 +4782,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPageIsChangedWithWebViewErrorResponseThenPrivacyProtectionsPopupManagerIsNotified() = runTest {
-        testee.onReceivedError(WebViewErrorResponse.BAD_URL, "example2.com")
+        testee.onReceivedError(BAD_URL, "example2.com")
 
         updateUrl(
             originalUrl = "example.com",
@@ -5781,7 +5774,7 @@ class BrowserTabViewModelTest {
     private suspend fun givenFireButtonPulsing() {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(DAX_DIALOG_TRACKERS_FOUND)))
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
