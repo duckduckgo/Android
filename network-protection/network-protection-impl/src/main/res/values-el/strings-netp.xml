@@ -216,9 +216,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Ενεργοποιήθηκε</string>
-    <string name="netpSubscriptionSettingsConnecting">Σύνδεση...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Απενεργοποιήθηκε</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

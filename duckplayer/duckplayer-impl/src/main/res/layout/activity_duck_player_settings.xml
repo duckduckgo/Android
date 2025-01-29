@@ -30,123 +30,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/duckPlayerLegacyLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/keyline_5"
-                tools:visibility="gone">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/legacyDuckPlayerDisabledSection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/keyline_3"
-                    app:cardCornerRadius="@dimen/keyline_3">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/keyline_3"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/legacyYoutubeDisabledIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="24dp"
-                            android:importantForAccessibility="no"
-                            android:src="@drawable/youtube_warning_96" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/duck_player_unavailable"
-                            app:typography="h2" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/duck_player_unavailable_description"
-                            app:typography="body2" />
-
-                        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                            android:id="@+id/legacyDuckPlayerDisabledLearnMoreButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/keyline_4"
-                            android:text="@string/duck_player_unavailable_learn_more" />
-
-                    </LinearLayout>
-
-
-                </androidx.cardview.widget.CardView>
-
-                <ImageView
-                    android:id="@+id/legacyDuckPlayerSettingsIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="24dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/clean_tube_128" />
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/legacyDuckPlayerSettingsTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:gravity="center"
-                    android:text="@string/duck_player_settings_activity_title"
-                    app:typography="h2" />
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/legacyDuckPlayerSettingsText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
-                    android:gravity="center"
-                    android:text="@string/duck_player_settings_activity_description"
-                    app:typography="body2" />
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/legacyDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_4" />
-
-                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/legacyDuckPlayerModeSelector"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/duck_player_open_videos_setting" />
-
-                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                    android:id="@+id/legacyOpenDuckPlayerInNewTabToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/duck_player_open_in_a_new_tab_setting"
-                    app:showSwitch="true" />
-
-            </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/duckPlayerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/keyline_5"
-                android:visibility="gone"
-                tools:visibility="visible">
+                android:paddingBottom="@dimen/keyline_5">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/duckPlayerDisabledSection"
@@ -264,8 +153,6 @@
                     app:showSwitch="true" />
 
             </LinearLayout>
-
-        </FrameLayout>
 
     </ScrollView>
 

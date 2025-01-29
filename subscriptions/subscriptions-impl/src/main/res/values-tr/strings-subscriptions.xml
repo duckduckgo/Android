@@ -69,10 +69,7 @@
     <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
     <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>
-    <string name="subscriptionSettingWaiting">Aboneliğiniz etkinleştiriliyor</string>
-    <string name="subscriptionSettingWaitingSubtitle">Bu işlem normalden daha uzun sürüyor. Lütfen daha sonra tekrar kontrol edin.</string>
     <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
-    <string name="subscriptionSettingExpiredSubtitle">Privacy Pro\'yu kullanmaya devam etmek için tekrar abone olun</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>
     <string name="subscriptionSettingSectionSubscription">Abonelik</string>
     <string name="subscriptionSettingRemoveFromDevice">Bu Cihazdan Kaldır</string>

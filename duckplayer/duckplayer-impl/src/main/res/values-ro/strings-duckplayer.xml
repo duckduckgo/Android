@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">Duck Player îți permite să vizionezi YouTube fără reclame țintite în DuckDuckGo, iar ceea ce vizionezi nu îți va influența recomandările.</string>
     <string name="duck_player_info_modal_button">Am înțeles!</string>
     <string name="duck_player_unavailable">Duck Player indisponibil</string>
-    <string name="duck_player_unavailable_description">Funcționalitatea Duck Player a fost afectată de modificările recente ale YouTube. Lucrăm pentru a remedia aceste probleme și apreciem înțelegerea ta.</string>
     <string name="duck_player_unavailable_learn_more">Află mai multe</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Deschide videoclipurile YouTube în Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Deschide Duck Player într-o filă nouă</string>

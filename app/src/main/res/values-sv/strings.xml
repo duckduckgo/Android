@@ -85,7 +85,6 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
-    <string name="settingsAutocompleteEnabled">Visa Autoslutför förslag</string>
     <string name="autocompleteRemoveItemTitle">Ta bort sökförslag?</string>
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Ta bort</string>
@@ -124,18 +123,14 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
-    <string name="settingsHeadingPrivacy">Sekretess</string>
     <string name="settingsHeadingProtections">Skydd</string>
     <string name="settingsHeadingAppearance">Utseende</string>
-    <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
     <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
-    <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
-    <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
     <string name="settingsHeadingNextSteps">Nästa steg</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
@@ -151,18 +146,12 @@
     <string name="settingsSubtitleNotificationsDisabled">Inaktiverad</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiverad</string>
     <string name="settingsDefaultBrowserTitle">Standardwebbläsare</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo är din standardwebbläsare</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Gör DuckDuckGo till din standardwebbläsare</string>
     <string name="settingsPrivateSearchTitle">Privatsökning</string>
     <string name="settingsGeneral" instruction="List item for general settings">Allmänt</string>
-    <string name="settingsPrivateSearchDescription">Aktiverat som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
-    <string name="settingsHeadingSettings">Inställningar</string>
     <string name="settingsHeadingMainSettings">Andra inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
-    <string name="settingsFireButton">Fire Button</string>
     <string name="settingsDataClearing">Datarensning</string>
     <string name="settingsAddWidget">Lägg till widget på startsidan</string>
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
@@ -171,9 +160,7 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
-    <string name="privateSearchTitle">Private Search är aktiverad</string>
     <string name="privateSearchDescription">DuckDuckGo Private Search är din standardsökmotor, så att du kan söka på webben utan att bli spårad.</string>
-    <string name="privateSearchHeadingSearchSettings">Sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Anpassa ditt sökspråk, din region och annat</string>
     <string name="privateSearchMoreSearchSettingsTitle">Fler sökinställningar</string>
@@ -191,15 +178,11 @@
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionIsEnabledTitle">Skydd för webbspårning är aktiverat</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
-    <string name="cookiePopupProtectionDescription">Blockera dessa popup-fönster och minimera cookies</string>
-    <string name="cookiePopupProtectionEnabled">Aktiverad</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
@@ -214,7 +197,6 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
 
-    <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
     <string name="settingsAutomaticallyClearData">Rensa data automatiskt …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
@@ -234,9 +216,7 @@
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Om</string>
     <string name="aboutHeader">Välkommen till Duck-sidan!</string>
-    <string name="aboutDescription">DuckDuckGo är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren DuckDuckGo har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till DuckDuckGo på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos DuckDuckGo fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
     <string name="aboutDescriptionNew">DuckDuckGo är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren DuckDuckGo har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till DuckDuckGo på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos DuckDuckGo fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
-    <string name="no_suggestions">Inga förslag</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
@@ -603,11 +583,8 @@
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Widgeten %1$s har lagts till på startsidan</string>
-    <string name="settingsAddHomeScreenWidget">Widget på startsidan</string>
 
     <!-- MacOs Settings -->
-    <string name="macos_settings_description">Surfa privat med vår app för Mac</string>
-    <string name="macos_settings_title">DuckDuckGo webbläsare för Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Nerladdningar</string>
@@ -643,7 +620,6 @@
     <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nej, jag hanterar dem själv</string>
 
-    <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentCosmeticNoticeAnimationText">Popup-fönster dolt</string>
     <string name="autoconsentManagedNoticeAnimationText">Cookies hanteras</string>
 
@@ -652,10 +628,6 @@
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo webbläsare för Windows</string>
-    <string name="windows_settings_description">Surfa privat med vår app för Windows</string>
-    <string name="windows_settings_description_ready">Nedladdning tillgänglig</string>
-    <string name="windows_settings_description_list">Du står på listan!</string>
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra nedåt från toppen och tryck på bakåtknappen för att lämna helskärmsläget</string>
@@ -681,7 +653,6 @@
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
 
     <!-- Autofill -->
-    <string name="settingsAutofillLoginsSetting">Lösenord</string>
     <string name="settingsPasswordsAndAutofillLoginsSetting">Lösenord och automatisk ifyllning</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>

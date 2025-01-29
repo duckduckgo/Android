@@ -218,9 +218,6 @@
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle" translatable="false">VPN</string>
-    <string name="netpSubscriptionSettingsConnected">Povolené</string>
-    <string name="netpSubscriptionSettingsConnecting">Pripája sa...</string>
-    <string name="netpSubscriptionSettingsDisconnected">Zakázané</string>
 
     <!-- Custom DNS -->
     <string name="netpSetttingDnsHeader" translatable="false">DNS</string>

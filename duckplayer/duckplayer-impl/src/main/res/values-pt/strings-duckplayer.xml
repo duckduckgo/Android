@@ -34,7 +34,6 @@
     <string name="duck_player_info_modal_text">O Duck Player permite-te ver o YouTube sem anúncios segmentados no DuckDuckGo, e o que vês não vai influenciar as tuas recomendações.</string>
     <string name="duck_player_info_modal_button">Entendi!</string>
     <string name="duck_player_unavailable">Duck Player indisponível</string>
-    <string name="duck_player_unavailable_description">A funcionalidade do Duck Player foi afetada por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão.</string>
     <string name="duck_player_unavailable_learn_more">Saiba mais</string>
     <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Abrir vídeos do YouTube no Duck Player</string>
     <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Abrir Duck Player num novo separador</string>

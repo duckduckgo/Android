@@ -86,9 +86,6 @@
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
 
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
-
-        <!-- CheckListItem Component -->
-        <item name="checkListItemStyle">@style/Widget.DuckDuckGo.CheckListItem</item>
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
