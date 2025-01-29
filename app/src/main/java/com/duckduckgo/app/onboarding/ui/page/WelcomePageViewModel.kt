@@ -166,9 +166,9 @@ class WelcomePageViewModel @Inject constructor(
 
     fun setBackgroundResource(lightModeEnabled: Boolean) {
         val backgroundRes = if (lightModeEnabled) {
-            R.drawable.onboarding_experiment_background_bitmap_light
+            R.drawable.onboarding_background_bitmap_light
         } else {
-            R.drawable.onboarding_experiment_background_bitmap_dark
+            R.drawable.onboarding_background_bitmap_dark
         }
         viewModelScope.launch {
             _commands.send(SetBackgroundResource(backgroundRes))

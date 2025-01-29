@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/welcomeContent"
-        app:srcCompat="@drawable/onboarding_experiment_foreground" />
+        app:srcCompat="@drawable/onboarding_hike_foreground" />
 
     <LinearLayout
         android:id="@+id/welcomeContent"

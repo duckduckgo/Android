@@ -63,7 +63,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.common.ui.view.shape.DaxBubbleCardViewExperiment
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,6 +143,6 @@
 
             </LinearLayout>
         </ScrollView>
-    </com.duckduckgo.common.ui.view.shape.DaxBubbleCardViewExperiment>
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
 </LinearLayout>

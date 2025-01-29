@@ -73,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/welcomeContent"
-        app:srcCompat="@drawable/onboarding_experiment_foreground" />
+        app:srcCompat="@drawable/onboarding_hike_foreground" />
 
     <include
         android:id="@+id/daxDialogCta"

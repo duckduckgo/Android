@@ -3792,9 +3792,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
         if (lightModeEnabled) {
-            R.drawable.onboarding_experiment_background_bitmap_light
+            R.drawable.onboarding_background_bitmap_light
         } else {
-            R.drawable.onboarding_experiment_background_bitmap_dark
+            R.drawable.onboarding_background_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {

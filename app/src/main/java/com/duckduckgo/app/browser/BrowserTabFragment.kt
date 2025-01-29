@@ -594,11 +594,11 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogIntroBubbleCtaExperiment
-        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCtaExperiment
+    private val daxDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
-    private val daxDialogOnboardingCtaExperiment
-        get() = binding.includeOnboardingDaxDialogExperiment
+    private val daxDialogInContext
+        get() = binding.includeOnboardingInContextDaxDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -1865,7 +1865,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2708,7 +2708,7 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
-        daxDialogIntroBubbleCtaExperiment.root.gone()
+        daxDialogIntroBubble.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -3957,7 +3957,7 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                showCta(daxDialogIntroBubbleCtaExperiment.daxCtaContainer) {
+                showCta(daxDialogIntroBubble.daxCtaContainer) {
                     setOnOptionClicked { userEnteredQuery(it.link) }
                 }
                 setOnPrimaryCtaClicked {
@@ -3987,7 +3987,7 @@ class BrowserTabFragment :
             )
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
-                    daxDialogOnboardingCtaExperiment,
+                    daxDialogInContext,
                 ) {
                     userEnteredQuery(it.link)
                 }
@@ -4074,8 +4074,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogOnboardingCtaExperiment.dialogTextCta.cancelAnimation()
-            daxDialogOnboardingCtaExperiment.daxCtaContainer.gone()
+            daxDialogInContext.dialogTextCta.cancelAnimation()
+            daxDialogInContext.daxCtaContainer.gone()
         }
 
         fun renderHomeCta() {

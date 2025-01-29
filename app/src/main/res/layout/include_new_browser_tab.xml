@@ -48,8 +48,8 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <include
-            android:id="@+id/includeDaxDialogIntroBubbleCtaExperiment"
-            layout="@layout/include_dax_dialog_intro_bubble_cta_experiment"
+            android:id="@+id/includeOnboardingDaxDialogBubble"
+            layout="@layout/include_onboarding_bubble_dax_dialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
