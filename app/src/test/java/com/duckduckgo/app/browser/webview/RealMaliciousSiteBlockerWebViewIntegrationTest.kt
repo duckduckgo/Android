@@ -2,6 +2,7 @@ package com.duckduckgo.app.browser.webview
 
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
+import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -9,7 +10,12 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WAIT_FOR_CONFIRMATION
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -130,10 +136,98 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
+    fun `shouldIntercept returns null when feature is enabled, is malicious, and is mainframe but webView has different host`() = runTest {
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(MALICIOUS)
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(false)
+
+        val result = testee.shouldIntercept(request, exampleUri) {}
+        assertNull(result)
+    }
+
+    @Test
     fun `onPageLoadStarted clears processedUrls`() = runTest {
         testee.processedUrls.add(exampleUri.toString())
         testee.onPageLoadStarted()
         assertTrue(testee.processedUrls.isEmpty())
+    }
+
+    @Test
+    fun `if a new page load triggering is malicious is started, isMalicious callback result should be ignored for the first page`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+
+        val callbackChannel = Channel<Unit>()
+        val firstCallbackDeferred = CompletableDeferred<Boolean>()
+        val secondCallbackDeferred = CompletableDeferred<Boolean>()
+
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenAnswer { invocation ->
+            val callback = invocation.getArgument<(Boolean) -> Unit>(1)
+
+            launch {
+                callbackChannel.receive()
+                callback(true)
+            }
+            WAIT_FOR_CONFIRMATION
+        }
+
+        testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->
+            firstCallbackDeferred.complete(isMalicious)
+        }
+
+        testee.shouldOverrideUrlLoading(exampleUri, true) { isMalicious ->
+            secondCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+        callbackChannel.send(Unit)
+
+        val firstCallbackResult = firstCallbackDeferred.await()
+        val secondCallbackResult = secondCallbackDeferred.await()
+
+        assertEquals(false, firstCallbackResult)
+        assertEquals(true, secondCallbackResult)
+    }
+
+    @Test
+    fun `isMalicious callback result should be processed if no new page loads triggering isMalicious have started`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+
+        val callbackChannel = Channel<Unit>()
+        val firstCallbackDeferred = CompletableDeferred<Boolean>()
+        val secondCallbackDeferred = CompletableDeferred<Boolean>()
+
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenAnswer { invocation ->
+            val callback = invocation.getArgument<(Boolean) -> Unit>(1)
+
+            launch {
+                callbackChannel.receive()
+                callback(true)
+            }
+            WAIT_FOR_CONFIRMATION
+        }
+
+        testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->
+            firstCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+
+        testee.shouldOverrideUrlLoading(exampleUri, true) { isMalicious ->
+            secondCallbackDeferred.complete(isMalicious)
+        }
+
+        callbackChannel.send(Unit)
+
+        val firstCallbackResult = firstCallbackDeferred.await()
+        val secondCallbackResult = secondCallbackDeferred.await()
+
+        assertEquals(true, firstCallbackResult)
+        assertEquals(true, secondCallbackResult)
     }
 
     private fun updateFeatureEnabled(enabled: Boolean) {
