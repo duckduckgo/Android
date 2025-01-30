@@ -226,6 +226,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
@@ -504,6 +505,7 @@ class BrowserTabViewModelTest {
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     @Before
     fun before() = runTest {
@@ -675,6 +677,8 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             maliciousSiteBlockerWebViewIntegration = mock(),
             appPersonalityFeature = fakeAppPersonalityFeature,
+            userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         testee.loadData("abc", null, false, false)

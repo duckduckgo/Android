@@ -32,6 +32,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -64,6 +65,7 @@ class OmnibarLayoutViewModelTest {
     private val userBrowserProperties: UserBrowserProperties = mock()
     private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
     private val mockUserStageStore: UserStageStore = mock()
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -86,6 +88,7 @@ class OmnibarLayoutViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appPersonalityFeature = fakeAppPersonalityFeature,
             userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -956,30 +959,6 @@ class OmnibarLayoutViewModelTest {
 
         verify(pixel).fire(
             AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
-            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "true"),
-        )
-    }
-
-    @Test
-    fun whenOnExperimentTrackersAnimationStartedCalledAfterOnboardingThenPixelSentWithParamFalse() = runTest {
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-
-        testee.onExperimentTrackersAnimationStarted()
-
-        verify(pixel).fire(
-            AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
-            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "false"),
-        )
-    }
-
-    @Test
-    fun whenOnExperimentTrackersAnimationStartedCalledDuringOnboardingThenPixelSentWithParamTrue() = runTest {
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-
-        testee.onExperimentTrackersAnimationStarted()
-
-        verify(pixel).fire(
-            AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
             mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "true"),
         )
     }

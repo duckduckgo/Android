@@ -47,6 +47,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.AFTER_CIRCLES_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -56,6 +57,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -85,6 +87,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appPersonalityFeature: AppPersonalityFeature,
     private val userStageStore: UserStageStore,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -646,15 +649,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
                 mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
             )
-        }
-    }
-
-    fun onExperimentTrackersAnimationStarted() {
-        viewModelScope.launch {
-            pixel.fire(
-                AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
-                mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
-            )
+            privacyDashboardExternalPixelParams.setPixelParams(AFTER_CIRCLES_ANIMATION, "true")
         }
     }
 }
