@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION_CODES
 import android.service.autofill.Dataset
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
@@ -85,9 +84,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             )
             credentials?.forEach { credential ->
                 val datasetBuilder = Dataset.Builder()
-                Timber.i("DDGAutofillService suggesting credentials for: $fieldsToAutofill")
                 val suggestionUISpecs = suggestionsFormatter.getSuggestionSpecs(credential)
-
                 // >= android 11 inline presentations are supported
                 if (appBuildConfig.sdkInt >= 30 && inlineSuggestionsToShow > 0) {
                     datasetBuilder.addInlinePresentationsIfSupported(

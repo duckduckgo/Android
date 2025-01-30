@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.service
 
-import android.os.Build.VERSION_CODES
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
