@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.service
 import android.annotation.SuppressLint
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
-import android.os.Build
 import android.view.autofill.AutofillId
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
@@ -130,16 +129,14 @@ class RealAutofillParser @Inject constructor(
 
     @SuppressLint("NewApi")
     private fun ViewNode.website(): String? {
-        return this.webDomain
-            .takeUnless { it?.isBlank() == true }
-            ?.let { webDomain ->
-                val webScheme = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
-                    this.webScheme.takeUnless { it.isNullOrBlank() }
+        return this.webDomain?.takeUnless { it.isBlank() }
+            ?.let { nonEmptyDomain ->
+                val scheme = if (appBuildConfig.sdkInt >= 28) {
+                    this.webScheme.takeUnless { it.isNullOrBlank() } ?: "http"
                 } else {
-                    null
-                } ?: "http"
-
-                "$webScheme://$webDomain"
+                    "http"
+                }
+                "$scheme://$nonEmptyDomain"
             }
     }
 

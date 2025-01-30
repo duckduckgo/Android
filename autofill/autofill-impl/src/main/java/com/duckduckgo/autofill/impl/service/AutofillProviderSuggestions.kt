@@ -81,7 +81,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
                 val suggestionUISpecs = suggestionsFormatter.getSuggestionSpecs(credential)
 
                 // >= android 11 inline presentations are supported
-                if (appBuildConfig.sdkInt >= VERSION_CODES.R && inlineSuggestionsToShow > 0) {
+                if (appBuildConfig.sdkInt >= 30 && inlineSuggestionsToShow > 0) {
                     datasetBuilder.addInlinePresentationsIfSupported(
                         context,
                         request,
@@ -125,7 +125,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
         val ddgAppDataSet = Dataset.Builder()
         val specs = suggestionsFormatter.getOpenDuckDuckGoSuggestionSpecs()
         val pendingIntent = createAutofillSelectionIntent(context)
-        if (appBuildConfig.sdkInt >= VERSION_CODES.R) {
+        if (appBuildConfig.sdkInt >= 30) {
             ddgAppDataSet.addInlinePresentationsIfSupported(context, request, specs.title, specs.subtitle, specs.icon)
         }
         val formPresentation = viewProvider.createFormPresentation(context, specs.title, specs.subtitle, specs.icon)
@@ -175,7 +175,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
     private fun getMaxInlinedSuggestions(
         request: FillRequest,
     ): Int {
-        if (appBuildConfig.sdkInt >= VERSION_CODES.R) {
+        if (appBuildConfig.sdkInt >= 30) {
             return request.inlineSuggestionsRequest?.maxSuggestionCount ?: 0
         }
         return 0

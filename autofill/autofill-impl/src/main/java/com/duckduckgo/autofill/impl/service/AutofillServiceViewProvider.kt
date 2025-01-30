@@ -92,7 +92,7 @@ class RealAutofillServiceViewProvider @Inject constructor(
     @RequiresApi(VERSION_CODES.R)
     private fun isInlineSuggestionSupported(inlinePresentationSpec: InlinePresentationSpec?): Boolean {
         // requires >= android 11
-        return if (appBuildConfig.sdkInt >= VERSION_CODES.R && inlinePresentationSpec != null) {
+        return if (appBuildConfig.sdkInt >= 30 && inlinePresentationSpec != null) {
             UiVersions.getVersions(inlinePresentationSpec.style).contains(UiVersions.INLINE_UI_VERSION_1)
         } else {
             false

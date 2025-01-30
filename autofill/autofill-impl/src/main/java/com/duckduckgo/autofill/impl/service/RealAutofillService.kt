@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.service
 
-import android.os.Build.VERSION_CODES
 import android.os.CancellationSignal
 import android.service.autofill.AutofillService
 import android.service.autofill.FillCallback
@@ -24,7 +23,6 @@ import android.service.autofill.FillRequest
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveRequest
 import android.service.autofill.SavedDatasetsInfoCallback
-import androidx.annotation.RequiresApi
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -61,7 +59,6 @@ class RealAutofillService : AutofillService() {
         AndroidInjection.inject(this)
     }
 
-    @RequiresApi(VERSION_CODES.R)
     override fun onFillRequest(
         request: FillRequest,
         cancellationSignal: CancellationSignal,
