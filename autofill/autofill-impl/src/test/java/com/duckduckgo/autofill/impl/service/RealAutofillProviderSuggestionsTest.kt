@@ -78,7 +78,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -104,7 +103,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -135,7 +133,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -166,7 +163,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -270,7 +266,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -294,7 +289,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -321,7 +315,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(
@@ -350,7 +343,6 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
                 "example.com",
                 listOf(

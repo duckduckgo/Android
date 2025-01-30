@@ -338,7 +338,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun getCurrentSiteUrl() = arguments?.getString(ARG_CURRENT_URL, null)
     private fun getPrivacyProtectionEnabled() = arguments?.getBoolean(ARG_PRIVACY_PROTECTION_STATUS)
-    private fun isLaunchedFromAutofill() = arguments?.getBoolean(ARG_AUTOFILL_MODE_LAUNCH, false)
     private fun getAutofillSettingsLaunchSource(): AutofillSettingsLaunchSource? =
         arguments?.getSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE) as AutofillSettingsLaunchSource?
 
@@ -655,7 +654,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             currentUrl: String? = null,
             privacyProtectionEnabled: Boolean?,
             source: AutofillSettingsLaunchSource? = null,
-            autofillMode: Boolean = true,
         ) =
             AutofillManagementListMode().apply {
                 arguments = Bundle().apply {
@@ -668,15 +666,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     if (source != null) {
                         putSerializable(ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE, source)
                     }
-
-                    putBoolean(ARG_AUTOFILL_MODE_LAUNCH, autofillMode)
                 }
             }
 
         private const val ARG_CURRENT_URL = "ARG_CURRENT_URL"
         private const val ARG_PRIVACY_PROTECTION_STATUS = "ARG_PRIVACY_PROTECTION_STATUS"
         private const val ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE = "ARG_AUTOFILL_SETTINGS_LAUNCH_SOURCE"
-        private const val ARG_AUTOFILL_MODE_LAUNCH = "ARG_AUTOFILL_MODE_LAUNCH"
         private const val LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/"
         private const val IMPORT_FROM_GPM_DIALOG_TAG = "IMPORT_FROM_GPM_DIALOG_TAG"
     }
