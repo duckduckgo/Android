@@ -105,6 +105,7 @@ import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
+import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
@@ -1196,6 +1197,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
+    }
+
     fun closeAndReturnToSourceIfBlankTab() {
         if (url == null) {
             closeAndSelectSourceTab()
@@ -1288,6 +1294,11 @@ class BrowserTabViewModel @Inject constructor(
 
         if (currentBrowserViewState().sslError != NONE) {
             command.postValue(HideSSLError)
+            return true
+        }
+
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            command.postValue(HideWarningMaliciousSite)
             return true
         }
 
@@ -3064,6 +3075,9 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+        }
     }
 
     fun onWebViewRefreshed() {
@@ -3141,11 +3155,12 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedMaliciousSiteWarning(url: Uri) {
         // TODO (cbarreiro): Fire pixel
-        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, url = url.toString()))
+        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()))
         browserViewState.postValue(
             currentBrowserViewState().copy(
                 browserShowing = false,
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                maliciousSiteDetected = true,
             ),
         )
         command.postValue(ShowWarningMaliciousSite(url))
@@ -3441,9 +3456,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun recoverFromSSLWarningPage(showBrowser: Boolean) {
+    fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3455,6 +3470,7 @@ class BrowserTabViewModel @Inject constructor(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 browserShowing = showBrowser,
                 sslError = NONE,
+                maliciousSiteDetected = false,
             )
         }
     }

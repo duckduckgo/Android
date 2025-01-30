@@ -62,6 +62,8 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
 
     private fun formatCopy() {
         with(binding) {
+            errorHeadline.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteMalwareHeadline), HtmlCompat.FROM_HTML_MODE_LEGACY)
+            expandedHeadline.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedHeadline), HtmlCompat.FROM_HTML_MODE_LEGACY)
             expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
     }

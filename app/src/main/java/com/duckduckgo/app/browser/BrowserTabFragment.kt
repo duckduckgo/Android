@@ -1359,11 +1359,26 @@ class BrowserTabFragment :
         binding.focusDummy.requestFocus()
     }
 
+    private fun hideMaliciousWarning() {
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        if (currentIndex >= 0) {
+            Timber.d("MaliciousSite: hiding warning page and triggering a reload of the previous")
+            viewModel.recoverFromWarningPage(true)
+            refresh()
+        } else {
+            Timber.d("MaliciousSite: no previous page to load, showing home")
+            viewModel.recoverFromWarningPage(false)
+            renderer.showNewTab()
+            maliciousWarningView.gone()
+        }
+    }
+
     private fun onEscapeMaliciousSite() {
         maliciousWarningView.gone()
+        viewModel.openNewTab()
         viewModel.closeCurrentTab()
-        viewModel.userRequestedOpeningNewTab()
-        renderer.showNewTab()
     }
 
     private fun onBypassMaliciousWarning(url: Uri) {
@@ -1396,11 +1411,11 @@ class BrowserTabFragment :
 
         if (currentIndex >= 0) {
             Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
-            viewModel.recoverFromSSLWarningPage(true)
+            viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
             Timber.d("SSLError: no previous page to load, showing home")
-            viewModel.recoverFromSSLWarningPage(false)
+            viewModel.recoverFromWarningPage(false)
         }
     }
 
@@ -1715,6 +1730,7 @@ class BrowserTabFragment :
 
             is Command.WebViewError -> showError(it.errorType, it.url)
             is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
+            is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)

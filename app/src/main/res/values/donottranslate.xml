@@ -36,10 +36,11 @@
 
     <!-- Malicious Site -->
     <string name="maliciousSiteTitle">Warning: This site may put your personal information at risk</string>
-    <string name="maliciousSiteHeadline">DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information. Learn more</string>
+    <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Leave This Site</string>
     <string name="maliciousSiteAdvancedCTA">Advanced</string>
-    <string name="maliciousSiteExpandedHeadline">If you believe this website is safe, you can report an error. You can still visit the website at your own risk.</string>
+    <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
     <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
 
     <!-- Broken Sites-->

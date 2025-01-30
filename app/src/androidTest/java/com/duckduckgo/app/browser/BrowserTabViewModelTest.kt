@@ -5089,16 +5089,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRecoveringFromSSLWarningPageAndBrowserShouldShowThenViewStatesUpdated() {
-        testee.recoverFromSSLWarningPage(true)
+    fun whenRecoveringFromWarningPageAndBrowserShouldShowThenViewStatesUpdated() {
+        testee.recoverFromWarningPage(true)
 
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(true, browserViewState().browserShowing)
     }
 
     @Test
-    fun whenRecoveringFromSSLWarningPageAndBrowserShouldNotShowThenViewStatesUpdated() = runTest {
-        testee.recoverFromSSLWarningPage(false)
+    fun whenRecoveringFromWarningPageAndBrowserShouldNotShowThenViewStatesUpdated() = runTest {
+        testee.recoverFromWarningPage(false)
 
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(false, browserViewState().browserShowing)

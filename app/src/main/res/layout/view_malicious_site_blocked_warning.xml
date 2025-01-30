@@ -60,7 +60,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/errorTitle"
             app:typography="body1"
-            android:text="@string/maliciousSiteHeadline" />
+            android:text="@string/maliciousSiteMalwareHeadline" />
+
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/leaveSiteCTA"

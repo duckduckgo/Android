@@ -221,6 +221,8 @@ sealed class Command {
         val url: Uri,
     ) : Command()
 
+    data object HideWarningMaliciousSite : Command()
+
     data object EscapeMaliciousSite : Command()
 
     data class BypassMaliciousSiteWarning(
