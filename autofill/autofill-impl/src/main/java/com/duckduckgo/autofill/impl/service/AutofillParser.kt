@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.service
 import android.annotation.SuppressLint
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
-import android.os.Build
 import android.view.autofill.AutofillId
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
