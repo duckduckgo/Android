@@ -78,6 +78,7 @@ data class MatchResponse(
     val url: String,
     val regex: String,
     val hash: String,
+    val category: String,
 )
 
 data class RevisionResponse(

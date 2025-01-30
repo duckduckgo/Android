@@ -209,6 +209,8 @@ class SiteMonitor(
 
     override val realBrokenSiteContext: BrokenSiteContext = brokenSiteContext
 
+    override var maliciousSiteStatus: MaliciousSiteStatus? = null
+
     companion object {
         private val specialDomainTypes = setOf(
             TrackerStatus.AD_ALLOWED,

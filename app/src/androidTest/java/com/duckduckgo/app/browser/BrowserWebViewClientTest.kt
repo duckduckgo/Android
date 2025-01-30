@@ -61,7 +61,6 @@ import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -164,7 +163,6 @@ class BrowserWebViewClientTest {
         mockFeaturesHeaderProvider,
         mock(),
     )
-    private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = mock()
     private val mockDuckChat: DuckChat = mock()
 
     @UiThreadTest
@@ -211,7 +209,6 @@ class BrowserWebViewClientTest {
         whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
-        whenever(mockMaliciousSiteProtection.shouldOverrideUrlLoading(any(), any(), any())).thenReturn(false)
     }
 
     @UiThreadTest

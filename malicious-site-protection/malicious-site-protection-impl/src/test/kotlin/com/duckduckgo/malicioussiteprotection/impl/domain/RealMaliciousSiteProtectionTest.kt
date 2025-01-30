@@ -20,9 +20,13 @@ import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Phishing
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import java.security.MessageDigest
 import kotlinx.coroutines.test.runTest
@@ -69,7 +73,7 @@ class RealMaliciousSiteProtectionTest {
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.SAFE, result)
+        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Safe), result)
     }
 
     @Test
@@ -81,11 +85,11 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*malicious.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.MALICIOUS, result)
+        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Phishing), result)
     }
 
     @Test
@@ -97,12 +101,12 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*malicious.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(false)
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.SAFE, result)
+        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Safe), result)
     }
 
     @Test
@@ -114,11 +118,11 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*unsafe.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.WAIT_FOR_CONFIRMATION, result)
+        assertEquals(MaliciousSiteProtection.IsMaliciousResult.WaitForConfirmation, result)
     }
 
     @Test
@@ -131,9 +135,9 @@ class RealMaliciousSiteProtectionTest {
         var onSiteBlockedAsyncCalled = false
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(filter))
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
         whenever(maliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
-            .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash)))
+            .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash, PHISHING)))
 
         realMaliciousSiteProtection.isMalicious(url) {
             onSiteBlockedAsyncCalled = true

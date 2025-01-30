@@ -18,16 +18,22 @@ package com.duckduckgo.app.browser.webview
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
-import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WaitForConfirmation
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -45,23 +51,28 @@ interface MaliciousSiteBlockerWebViewIntegration {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
-        confirmationCallback: (isMalicious: Boolean) -> Unit,
-    ): WebResourceResponse?
+        confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
+    ): IsMaliciousViewData
 
     fun shouldOverrideUrlLoading(
         url: Uri,
         isForMainFrame: Boolean,
-        confirmationCallback: (isMalicious: Boolean) -> Unit,
-    ): Boolean
+        confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
+    ): IsMaliciousViewData
 
     fun onPageLoadStarted()
 
-    fun onSiteExempted(url: Uri)
+    fun onSiteExempted(
+        url: Uri,
+        feed: Feed,
+    )
 }
+
+data class ExemptedUrl(val url: Uri, val feed: Feed)
 
 @SingleInstanceIn(AppScope::class)
 class ExemptedUrlsHolder @Inject constructor() {
-    val exemptedMaliciousUrls = mutableSetOf<String>()
+    val exemptedMaliciousUrls = mutableSetOf<ExemptedUrl>()
 }
 
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
@@ -97,13 +108,19 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         loadToMemory()
     }
 
+    sealed class IsMaliciousViewData {
+        data object Safe : IsMaliciousViewData()
+        data object WaitForConfirmation : IsMaliciousViewData()
+        data class MaliciousSite(val url: Uri, val feed: Feed, val exempted: Boolean) : IsMaliciousViewData()
+    }
+
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         documentUri: Uri?,
-        confirmationCallback: (isMalicious: Boolean) -> Unit,
-    ): WebResourceResponse? {
+        confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
+    ): IsMaliciousViewData {
         if (!isFeatureEnabled) {
-            return null
+            return IsMaliciousViewData.Safe
         }
         val url = request.url.let {
             if (it.fragment != null) {
@@ -118,74 +135,102 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         if (processedUrls.contains(decodedUrl)) {
             processedUrls.remove(decodedUrl)
             Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-            return null
+            return IsMaliciousViewData.Safe
         }
 
-        if (exemptedUrlsHolder.exemptedMaliciousUrls.contains(decodedUrl)) {
-            Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl")
-            return null
+        val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
+
+        if (exemptedUrl != null) {
+            Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl as ${exemptedUrl.feed}")
+            return IsMaliciousViewData.MaliciousSite(url, exemptedUrl.feed, true)
         }
 
         val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
         if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
-            if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
-                return WebResourceResponse(null, null, null)
-            } else {
-                processedUrls.add(decodedUrl)
+            when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
+                is ConfirmedResult -> {
+                    when (val status = result.status) {
+                        is Malicious -> {
+                            return IsMaliciousViewData.MaliciousSite(url, status.feed, false)
+                        }
+                        is Safe -> {
+                            processedUrls.add(decodedUrl)
+                            return IsMaliciousViewData.Safe
+                        }
+                    }
+                }
+                is WaitForConfirmation -> {
+                    processedUrls.add(decodedUrl)
+                    return IsMaliciousViewData.WaitForConfirmation
+                }
             }
         }
-        return null
+        return IsMaliciousViewData.Safe
     }
 
     override fun shouldOverrideUrlLoading(
         url: Uri,
         isForMainFrame: Boolean,
-        confirmationCallback: (isMalicious: Boolean) -> Unit,
-    ): Boolean {
+        confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
+    ): IsMaliciousViewData {
         return runBlocking {
             if (!isFeatureEnabled) {
-                return@runBlocking false
+                return@runBlocking IsMaliciousViewData.Safe
             }
             val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
 
             if (processedUrls.contains(decodedUrl)) {
                 processedUrls.remove(decodedUrl)
                 Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-                return@runBlocking false
+                return@runBlocking IsMaliciousViewData.Safe
             }
 
-            if (exemptedUrlsHolder.exemptedMaliciousUrls.contains(decodedUrl)) {
+            val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
+
+            if (exemptedUrl != null) {
                 Timber.tag("MaliciousSiteDetector").d("Previously exempted, skipping $decodedUrl")
-                return@runBlocking false
+                return@runBlocking IsMaliciousViewData.MaliciousSite(url, exemptedUrl.feed, true)
             }
 
             // iframes always go through the shouldIntercept method, so we only need to check the main frame here
             if (isForMainFrame) {
-                if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
-                    return@runBlocking true
-                } else {
-                    processedUrls.add(decodedUrl)
+                when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
+                    is ConfirmedResult -> {
+                        when (val status = result.status) {
+                            is Malicious -> {
+                                return@runBlocking IsMaliciousViewData.MaliciousSite(url, status.feed, false)
+                            }
+                            is Safe -> {
+                                processedUrls.add(decodedUrl)
+                                return@runBlocking IsMaliciousViewData.Safe
+                            }
+                        }
+                    }
+                    is WaitForConfirmation -> {
+                        processedUrls.add(decodedUrl)
+                        return@runBlocking IsMaliciousViewData.WaitForConfirmation
+                    }
                 }
             }
-            false
+            IsMaliciousViewData.Safe
         }
     }
 
     private suspend fun checkMaliciousUrl(
         url: String,
-        confirmationCallback: (isMalicious: Boolean) -> Unit,
-    ): Boolean {
+        confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
+    ): IsMaliciousResult {
         val checkId = currentCheckId.incrementAndGet()
         return maliciousSiteProtection.isMalicious(url.toUri()) {
             // if another load has started, we should ignore the result
             val isMalicious = if (checkId == currentCheckId.get()) {
                 it
             } else {
-                false
+                Safe
             }
             processedUrls.clear()
             confirmationCallback(isMalicious)
-        } == MALICIOUS
+        }
     }
 
     private fun isForIframe(request: WebResourceRequest) = request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||
@@ -197,9 +242,12 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         processedUrls.clear()
     }
 
-    override fun onSiteExempted(url: Uri) {
+    override fun onSiteExempted(
+        url: Uri,
+        feed: Feed,
+    ) {
         val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
-        exemptedUrlsHolder.exemptedMaliciousUrls.add(convertedUrl)
+        exemptedUrlsHolder.exemptedMaliciousUrls.add(ExemptedUrl(convertedUrl.toUri(), feed))
         Timber.tag("MaliciousSiteDetector").d(
             "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
         )

@@ -12,6 +12,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchesResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.RevisionResponse
 import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
@@ -109,24 +110,30 @@ class RealMaliciousSiteRepositoryTest {
     @Test
     fun getFilters_returnsFiltersWhenHashExists() = runTest {
         val hash = "testHash"
-        val filters = listOf(FilterEntity(hash, "regex", Type.FILTER_SET.name))
+        val filters = listOf(FilterEntity(hash, "regex", PHISHING.name))
 
         whenever(maliciousSiteDao.getFilter(hash)).thenReturn(filters)
 
         val result = repository.getFilters(hash)
+        val expected = FilterSet(filters.map { Filter(it.hash, it.regex) }, PHISHING)
 
-        assertEquals(filters.map { Filter(it.hash, it.regex) }, result)
+        assertTrue(result?.all { it.feed == expected.feed }!!)
+        assertEquals(result.firstOrNull()?.filters, expected.filters)
     }
 
     @Test
     fun matches_returnsMatchesWhenHashPrefixExists() = runTest {
         val hashPrefix = "testPrefix"
-        val matchesResponse = MatchesResponse(listOf(MatchResponse("hostname", "url", "regex", "hash")))
+        val matchesResponse = MatchesResponse(
+            listOf(
+                MatchResponse("hostname", "url", "regex", "hash", PHISHING.name),
+            ),
+        )
 
         whenever(maliciousSiteService.getMatches(hashPrefix)).thenReturn(matchesResponse)
 
         val result = repository.matches(hashPrefix)
 
-        assertEquals(matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash) }, result)
+        assertEquals(matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }, result)
     }
 }

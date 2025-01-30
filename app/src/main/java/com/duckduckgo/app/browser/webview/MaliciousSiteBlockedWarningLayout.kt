@@ -36,6 +36,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.common.utils.extensions.html
 
 class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
@@ -54,11 +57,12 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     private val binding: ViewMaliciousSiteBlockedWarningBinding by viewBinding()
 
     fun bind(
+        feed: Feed,
         actionHandler: (Action) -> Unit,
     ) {
         resetViewState()
 
-        formatCopy(actionHandler)
+        formatCopy(feed, actionHandler)
         setListeners(actionHandler)
     }
 
@@ -70,10 +74,19 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     }
 
     private fun formatCopy(
+        feed: Feed,
         actionHandler: (Action) -> Unit,
     ) {
         with(binding) {
-            errorHeadline.setSpannable(R.string.maliciousSiteMalwareHeadline) { actionHandler(LearnMore) }
+            val errorResource = when (feed) {
+                MALWARE -> {
+                    R.string.maliciousSiteMalwareHeadline
+                }
+                PHISHING -> {
+                    R.string.maliciousSitePhishingHeadline
+                }
+            }
+            errorHeadline.setSpannable(errorResource) { actionHandler(LearnMore) }
             expandedHeadline.setSpannable(R.string.maliciousSiteExpandedHeadline) { actionHandler(ReportError) }
             expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
         }

@@ -79,6 +79,12 @@ interface Site {
     var nextUrl: String
 
     val realBrokenSiteContext: BrokenSiteContext
+
+    var maliciousSiteStatus: MaliciousSiteStatus?
+}
+
+enum class MaliciousSiteStatus {
+    PHISHING, MALWARE
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

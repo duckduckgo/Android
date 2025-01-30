@@ -2,7 +2,6 @@ package com.duckduckgo.app.browser.webview
 
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
-import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -10,7 +9,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.MALICIOUS
-import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WAIT_FOR_CONFIRMATION
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WaitForConfirmation
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CompletableDeferred
@@ -171,7 +170,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
                 callbackChannel.receive()
                 callback(true)
             }
-            WAIT_FOR_CONFIRMATION
+            WaitForConfirmation
         }
 
         testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->
@@ -209,7 +208,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
                 callbackChannel.receive()
                 callback(true)
             }
-            WAIT_FOR_CONFIRMATION
+            WaitForConfirmation
         }
 
         testee.shouldOverrideUrlLoading(maliciousUri, true) { isMalicious ->

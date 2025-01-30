@@ -20,11 +20,20 @@ import android.net.Uri
 
 interface MaliciousSiteProtection {
 
-    suspend fun isMalicious(url: Uri, confirmationCallback: (isMalicious: Boolean) -> Unit): IsMaliciousResult
+    suspend fun isMalicious(url: Uri, confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit): IsMaliciousResult
 
-    enum class IsMaliciousResult {
-        MALICIOUS,
-        SAFE,
-        WAIT_FOR_CONFIRMATION,
+    sealed class MaliciousStatus {
+        data class Malicious(val feed: Feed) : MaliciousStatus()
+        data object Safe : MaliciousStatus()
+    }
+
+    enum class Feed {
+        PHISHING,
+        MALWARE,
+    }
+
+    sealed class IsMaliciousResult {
+        data class ConfirmedResult(val status: MaliciousStatus) : IsMaliciousResult()
+        data object WaitForConfirmation : IsMaliciousResult()
     }
 }
