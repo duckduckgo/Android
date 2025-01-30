@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.service
 
-import android.os.Build.VERSION_CODES
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -44,7 +43,7 @@ class RealAutofillProviderSuggestionsTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val appBuildConfig = mock<AppBuildConfig>().apply {
-        whenever(sdkInt).thenReturn(VERSION_CODES.R)
+        whenever(sdkInt).thenReturn(30)
     }
 
     private val autofillStore = mock<AutofillStore>()
@@ -68,7 +67,7 @@ class RealAutofillProviderSuggestionsTest {
         val credentials = listOf(
             LoginCredentials(1L, "username", "password", "example.com"),
         )
-        whenever(appBuildConfig.sdkInt).thenReturn(VERSION_CODES.Q)
+        whenever(appBuildConfig.sdkInt).thenReturn(29)
         whenever(autofillStore.getCredentials(any())).thenReturn(credentials)
         whenever(mockViewProvider.createFormPresentation(any(), any(), any(), any())).thenReturn(mock())
         whenever(mockViewProvider.createInlinePresentation(any(), any(), any(), any(), any(), any())).thenReturn(null)

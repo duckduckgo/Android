@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.app.slice.Slice
 import android.content.Context
 import android.graphics.drawable.Icon
-import android.os.Build.VERSION_CODES
 import android.service.autofill.InlinePresentation
 import android.widget.RemoteViews
 import android.widget.inline.InlinePresentationSpec
@@ -72,7 +71,7 @@ class RealAutofillServiceViewProvider @Inject constructor(
         iconRes = icon,
     )
 
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     override fun createInlinePresentation(
         context: Context,
         pendingIntent: PendingIntent,
@@ -89,7 +88,7 @@ class RealAutofillServiceViewProvider @Inject constructor(
         return null
     }
 
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     private fun isInlineSuggestionSupported(inlinePresentationSpec: InlinePresentationSpec?): Boolean {
         // requires >= android 11
         return if (appBuildConfig.sdkInt >= 30 && inlinePresentationSpec != null) {
@@ -100,7 +99,7 @@ class RealAutofillServiceViewProvider @Inject constructor(
     }
 
     @SuppressLint("RestrictedApi") // because getSlice, but docs clearly indicate you need to use that method.
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     private fun createSlice(
         context: Context,
         pendingIntent: PendingIntent,

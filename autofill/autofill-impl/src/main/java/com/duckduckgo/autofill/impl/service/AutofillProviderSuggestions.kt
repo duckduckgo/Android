@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION_CODES
 import android.service.autofill.Dataset
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
@@ -66,20 +65,24 @@ class RealAutofillProviderSuggestions @Inject constructor(
         nodeToAutofill: AutofillRootNode,
         request: FillRequest,
     ): FillResponse {
-        Timber.i("DDGAutofillService Fillable Request for rootNode: $nodeToAutofill")
         val fillableFields = nodeToAutofill.parsedAutofillFields.filter { it.type != UNKNOWN }
-        Timber.i("DDGAutofillService Fillable Request for fields: $fillableFields")
+        Timber.i(
+            "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n" +
+                fillableFields.joinToString(separator = "\n"),
+        )
 
         val response = FillResponse.Builder()
         // We add credential suggestions
         fillableFields.forEach { fieldsToAutofill ->
             var inlineSuggestionsToShow = getMaxInlinedSuggestions(request) - RESERVED_SUGGESTIONS_SIZE
             val credentials = loginCredentials(nodeToAutofill)
+            Timber.i(
+                "DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}" +
+                    "credentials: ${credentials?.joinToString(separator = "\n")}",
+            )
             credentials?.forEach { credential ->
                 val datasetBuilder = Dataset.Builder()
-                Timber.i("DDGAutofillService suggesting credentials for: $fieldsToAutofill")
                 val suggestionUISpecs = suggestionsFormatter.getSuggestionSpecs(credential)
-
                 // >= android 11 inline presentations are supported
                 if (appBuildConfig.sdkInt >= 30 && inlineSuggestionsToShow > 0) {
                     datasetBuilder.addInlinePresentationsIfSupported(
@@ -97,6 +100,10 @@ class RealAutofillProviderSuggestions @Inject constructor(
                     suggestionUISpecs.subtitle,
                     suggestionUISpecs.icon,
                 )
+                Timber.i(
+                    "DDGAutofillService adding suggestion: " +
+                        "${fieldsToAutofill.autofillId}-${fieldsToAutofill.type} with ${suggestionUISpecs.title}",
+                )
                 datasetBuilder.setValue(
                     fieldsToAutofill.autofillId,
                     autofillValue(credential, fieldsToAutofill.type),
@@ -109,6 +116,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
 
         // Last suggestion to open DDG App and manually choose a credential
         val ddgAppDataSetBuild = createAccessDDGDataSet(context, request, fillableFields)
+        Timber.i("DDGAutofillService adding suggestion DuckDuckGo Search")
         response.addDataset(ddgAppDataSetBuild)
 
         // TODO: add ignoredAutofillIds https://app.asana.com/0/1200156640058969/1209226370597334/f
@@ -142,7 +150,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
         return ddgAppDataSetBuild
     }
 
-    @RequiresApi(VERSION_CODES.R)
+    @RequiresApi(30)
     private fun Dataset.Builder.addInlinePresentationsIfSupported(
         context: Context,
         request: FillRequest,
@@ -167,6 +175,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             icon,
             inlinePresentationSpec,
         )?.let { inlinePresentation ->
+            Timber.i("DDGAutofillService adding inlinePresentation for suggestion: $suggestionTitle")
             this.setInlinePresentation(inlinePresentation)
         }
     }
@@ -199,8 +208,8 @@ class RealAutofillProviderSuggestions @Inject constructor(
             autofillStore.getCredentials(it)
         } ?: emptyList()
 
-        Timber.i("DDGAutofillService credentials for domain: $crendentialsForDomain")
-        Timber.i("DDGAutofillService credentials for package: $crendentialsForPackage")
+        Timber.v("DDGAutofillService credentials for domain: $crendentialsForDomain")
+        Timber.v("DDGAutofillService credentials for package: $crendentialsForPackage")
         return crendentialsForDomain.plus(crendentialsForPackage).distinct()
     }
 
@@ -209,7 +218,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
         return PendingIntent
             .getActivity(
                 context,
-                Random.nextInt(),
+                Random.nextInt(), // Different request code avoids overriding previous intents.
                 intent,
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE,
             )

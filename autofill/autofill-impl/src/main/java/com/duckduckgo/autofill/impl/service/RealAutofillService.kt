@@ -55,7 +55,7 @@ class RealAutofillService : AutofillService() {
 
     override fun onCreate() {
         super.onCreate()
-        Timber.i("DDGAutofillService created")
+        Timber.v("DDGAutofillService created")
         AndroidInjection.inject(this)
     }
 
@@ -64,7 +64,7 @@ class RealAutofillService : AutofillService() {
         cancellationSignal: CancellationSignal,
         callback: FillCallback,
     ) {
-        Timber.i("DDGAutofillService onFillRequest: $request")
+        Timber.v("DDGAutofillService onFillRequest: $request")
         cancellationSignal.setOnCancelListener { autofillJob.cancel() }
 
         autofillJob += coroutineScope.launch(dispatcherProvider.io()) {
@@ -126,22 +126,22 @@ class RealAutofillService : AutofillService() {
         request: SaveRequest,
         callback: SaveCallback,
     ) {
-        Timber.i("DDGAutofillService onSaveRequest")
+        Timber.v("DDGAutofillService onSaveRequest")
     }
 
     override fun onConnected() {
         super.onConnected()
-        Timber.i("DDGAutofillService onConnected")
+        Timber.v("DDGAutofillService onConnected")
     }
 
     override fun onSavedDatasetsInfoRequest(callback: SavedDatasetsInfoCallback) {
         super.onSavedDatasetsInfoRequest(callback)
-        Timber.i("DDGAutofillService onSavedDatasetsInfoRequest")
+        Timber.v("DDGAutofillService onSavedDatasetsInfoRequest")
     }
 
     override fun onDisconnected() {
         super.onDisconnected()
-        Timber.i("DDGAutofillService onDisconnected")
+        Timber.v("DDGAutofillService onDisconnected")
     }
 
     companion object {

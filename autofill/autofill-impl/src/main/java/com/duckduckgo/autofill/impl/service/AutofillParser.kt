@@ -68,7 +68,6 @@ class RealAutofillParser @Inject constructor(
     override fun parseStructure(structure: AssistStructure): MutableList<AutofillRootNode> {
         val autofillRootNodes = mutableListOf<AutofillRootNode>()
         val windowNodeCount = structure.windowNodeCount
-        Timber.i("DDGAutofillService windowNodeCount: $windowNodeCount")
         for (i in 0 until windowNodeCount) {
             val windowNode = structure.getWindowNodeAt(i)
             windowNode.rootViewNode?.let { viewNode ->
@@ -77,10 +76,6 @@ class RealAutofillParser @Inject constructor(
                 )
             }
         }
-        Timber.i("DDGAutofillService convertedNodes: $autofillRootNodes")
-        autofillRootNodes.forEach { node ->
-            Timber.i("DDGAutofillService Detected Fields: ${node.parsedAutofillFields.filter { it.type != UNKNOWN }}")
-        }
         return autofillRootNodes
     }
 
@@ -88,7 +83,7 @@ class RealAutofillParser @Inject constructor(
         viewNode: ViewNode,
     ): MutableList<ParsedAutofillField> {
         val autofillId = viewNode.autofillId ?: return mutableListOf()
-        Timber.i("DDGAutofillService Parsing NODE: $autofillId")
+        Timber.v("DDGAutofillService Parsing NODE: $autofillId")
         val traversalDataList = mutableListOf<ParsedAutofillField>()
         val packageId = viewNode.validPackageId()
         val website = viewNode.website()
@@ -102,7 +97,7 @@ class RealAutofillParser @Inject constructor(
             type = autofillType,
             originalNode = viewNode,
         )
-        Timber.i("DDGAutofillService Parsed as: $parsedAutofillField")
+        Timber.v("DDGAutofillService Parsed as: $parsedAutofillField")
         traversalDataList.add(parsedAutofillField)
 
         for (i in 0 until viewNode.childCount) {

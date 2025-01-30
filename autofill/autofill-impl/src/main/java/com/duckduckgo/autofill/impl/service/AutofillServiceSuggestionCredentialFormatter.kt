@@ -46,7 +46,7 @@ class RealAutofillCredentialFormatter @Inject constructor(
         val domain = credential.nonEmptyDomain()
         val domainTitle = credential.nonEmptyDomainTitle()
 
-        val title = listOfNotNull(userName, domainTitle, domain).first()
+        val title = listOfNotNull(userName, domainTitle, domain).firstOrNull() ?: ""
         val subtitle = if (userName != null) {
             domainTitle ?: domain.orEmpty() // domain should exist, otherwise we wouldn't be here
         } else {

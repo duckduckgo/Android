@@ -34,14 +34,14 @@ interface ViewNodeClassifier {
 class AutofillServiceViewNodeClassifier @Inject constructor() : ViewNodeClassifier {
     override fun classify(viewNode: ViewNode): AutofillFieldType {
         val autofillId = viewNode.autofillId
-        Timber.i("DDGAutofillService node $autofillId has autofillHints ${viewNode.autofillHints?.joinToString()}")
-        Timber.i("DDGAutofillService node $autofillId has options ${viewNode.autofillOptions?.joinToString()}")
-        Timber.i("DDGAutofillService node $autofillId has idEntry ${viewNode.idEntry}")
-        Timber.i("DDGAutofillService node $autofillId has hints ${viewNode.hint}")
-        Timber.i("DDGAutofillService node $autofillId is inputType ${viewNode.inputType and InputType.TYPE_CLASS_TEXT > 0}")
-        Timber.i("DDGAutofillService node $autofillId has inputType ${viewNode.inputType}")
-        Timber.i("DDGAutofillService node $autofillId has className ${viewNode.className}")
-        Timber.i("DDGAutofillService node $autofillId has htmlInfo.attributes ${viewNode.htmlInfo?.attributes?.joinToString()}")
+        Timber.v("DDGAutofillService node $autofillId has autofillHints ${viewNode.autofillHints?.joinToString()}")
+        Timber.v("DDGAutofillService node $autofillId has options ${viewNode.autofillOptions?.joinToString()}")
+        Timber.v("DDGAutofillService node $autofillId has idEntry ${viewNode.idEntry}")
+        Timber.v("DDGAutofillService node $autofillId has hints ${viewNode.hint}")
+        Timber.v("DDGAutofillService node $autofillId is inputType ${viewNode.inputType and InputType.TYPE_CLASS_TEXT > 0}")
+        Timber.v("DDGAutofillService node $autofillId has inputType ${viewNode.inputType}")
+        Timber.v("DDGAutofillService node $autofillId has className ${viewNode.className}")
+        Timber.v("DDGAutofillService node $autofillId has htmlInfo.attributes ${viewNode.htmlInfo?.attributes?.joinToString()}")
 
         var autofillType = getType(viewNode.autofillHints)
         if (autofillType == AutofillFieldType.UNKNOWN) {
