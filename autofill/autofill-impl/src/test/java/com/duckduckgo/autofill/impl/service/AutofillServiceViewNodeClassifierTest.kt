@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.impl.service
 
+import android.text.InputType.TYPE_CLASS_TEXT
+import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 import android.util.Pair
 import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -85,7 +87,7 @@ class AutofillServiceViewNodeClassifierTest {
             assertEquals(
                 "$usernameCombination failed",
                 USERNAME,
-                testee.classify(viewNode().hint(usernameCombination)),
+                testee.classify(viewNode().inputType(TYPE_CLASS_TEXT).hint(usernameCombination)),
             )
         }
 
@@ -100,7 +102,7 @@ class AutofillServiceViewNodeClassifierTest {
             assertEquals(
                 "$usernameCombination failed",
                 USERNAME,
-                testee.classify(viewNode().idEntry(usernameCombination)),
+                testee.classify(viewNode().inputType(TYPE_CLASS_TEXT).idEntry(usernameCombination)),
             )
         }
 
@@ -116,7 +118,7 @@ class AutofillServiceViewNodeClassifierTest {
             assertEquals(
                 "$passwordCombination failed",
                 PASSWORD,
-                testee.classify(viewNode().hint(passwordCombination)),
+                testee.classify(viewNode().inputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD).hint(passwordCombination)),
             )
         }
 
@@ -132,7 +134,7 @@ class AutofillServiceViewNodeClassifierTest {
             assertEquals(
                 "$passwordCombination failed",
                 PASSWORD,
-                testee.classify(viewNode().idEntry(passwordCombination)),
+                testee.classify(viewNode().inputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD).idEntry(passwordCombination)),
             )
         }
 

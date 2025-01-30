@@ -90,7 +90,11 @@ class AutofillServiceViewNodeClassifier @Inject constructor() : ViewNodeClassifi
 
     private fun isTextPasswordField(inputType: Int): Boolean {
         return (inputType and InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT &&
-            (inputType and InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_PASSWORD
+            (
+                (inputType and InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
+                    (inputType and InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
+                    (inputType and InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+                )
     }
 
     private fun getType(autofillHints: Array<String>?): AutofillFieldType {

@@ -72,6 +72,11 @@ fun viewNode(): ViewNode {
     return mock()
 }
 
+fun ViewNode.inputType(inputType: Int): ViewNode {
+    whenever(this.inputType).thenReturn(inputType)
+    return this
+}
+
 fun ViewNode.webDomain(domain: String): ViewNode {
     whenever(this.webDomain).thenReturn(domain)
     return this
