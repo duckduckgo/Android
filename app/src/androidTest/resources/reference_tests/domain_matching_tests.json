@@ -39,7 +39,8 @@
                 "siteURL": "https://bad.etld-plus-two.site/",
                 "requestURL": "https://bad.etld-plus-two.site/script.js",
                 "requestType": "script",
-                "expectAction": "ignore"
+                "expectAction": "ignore",
+                "exceptPlatforms": ["ios-browser"]
             },
             {
                 "name": "tracker loads ignore",
