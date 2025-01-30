@@ -215,7 +215,6 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -231,6 +230,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.model.MaliciousSiteStatus
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -299,6 +299,9 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -457,7 +460,6 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
-    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
@@ -1875,6 +1877,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onMaliciousSiteUserAction(
         action: MaliciousSiteBlockedWarningLayout.Action,
         url: Uri,
+        feed: Feed,
         activeCustomTab: Boolean,
     ) {
         when (action) {
@@ -1889,12 +1892,11 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             VisitSite -> {
-                command.postValue(BypassMaliciousSiteWarning(url))
+                command.postValue(BypassMaliciousSiteWarning(url, feed))
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
                 )
-                addExemptedMaliciousUrlToMemory(url)
             }
             LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
             ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
@@ -3195,17 +3197,25 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
-    override fun onReceivedMaliciousSiteWarning(url: Uri) {
+    override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean) {
         // TODO (cbarreiro): Fire pixel
-        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()))
-        browserViewState.postValue(
-            currentBrowserViewState().copy(
-                browserShowing = false,
-                showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                maliciousSiteDetected = true,
-            ),
-        )
-        command.postValue(ShowWarningMaliciousSite(url))
+        site?.maliciousSiteStatus = when (feed) {
+            MALWARE -> MaliciousSiteStatus.MALWARE
+            PHISHING -> MaliciousSiteStatus.PHISHING
+        }
+        if (!exempted) {
+            loadingViewState.postValue(
+                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
+            )
+            browserViewState.postValue(
+                currentBrowserViewState().copy(
+                    browserShowing = false,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                    maliciousSiteDetected = true,
+                ),
+            )
+            command.postValue(ShowWarningMaliciousSite(url, feed))
+        }
     }
 
     override fun recordErrorCode(
@@ -3786,10 +3796,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
-    }
-
-    fun addExemptedMaliciousUrlToMemory(url: Uri) {
-        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url)
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
