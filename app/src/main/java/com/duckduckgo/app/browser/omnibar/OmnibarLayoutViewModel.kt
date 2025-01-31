@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
@@ -231,9 +232,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error -> GLOBE
+            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
             NewTab -> SEARCH
-            SSLWarning -> GLOBE
             else -> {
                 if (hasFocus) {
                     SEARCH
@@ -299,9 +299,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     LeadingIconState.SEARCH
                 } else {
                     when (viewMode) {
-                        Error -> GLOBE
+                        Error, SSLWarning, MaliciousSiteWarning -> GLOBE
                         NewTab -> SEARCH
-                        SSLWarning -> GLOBE
                         else -> SEARCH
                     }
                 }

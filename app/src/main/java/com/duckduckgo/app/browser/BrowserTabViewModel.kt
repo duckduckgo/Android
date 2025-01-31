@@ -82,6 +82,7 @@ import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
+import com.duckduckgo.app.browser.commands.Command.BypassMaliciousSiteWarning
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
@@ -95,6 +96,7 @@ import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
 import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
+import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -103,6 +105,7 @@ import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
+import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
@@ -113,6 +116,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
+import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
@@ -120,6 +124,7 @@ import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
+import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
 import com.duckduckgo.app.browser.commands.Command.ResetHistory
@@ -152,6 +157,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
+import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
@@ -202,6 +208,12 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -374,6 +386,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
 
+private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
+private const val MALICIOUS_SITE_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
+
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
@@ -441,6 +456,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1188,6 +1204,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
+    }
+
     fun closeAndReturnToSourceIfBlankTab() {
         if (url == null) {
             closeAndSelectSourceTab()
@@ -1280,6 +1301,11 @@ class BrowserTabViewModel @Inject constructor(
 
         if (currentBrowserViewState().sslError != NONE) {
             command.postValue(HideSSLError)
+            return true
+        }
+
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            command.postValue(HideWarningMaliciousSite)
             return true
         }
 
@@ -1838,6 +1864,28 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
         site?.consentCosmeticHide = isCosmetic
+    }
+
+    fun onMaliciousSiteUserAction(
+        action: MaliciousSiteBlockedWarningLayout.Action,
+        url: Uri,
+    ) {
+        when (action) {
+            LeaveSite -> {
+                command.postValue(EscapeMaliciousSite)
+            }
+
+            VisitSite -> {
+                command.postValue(BypassMaliciousSiteWarning(url))
+                browserViewState.value = currentBrowserViewState().copy(
+                    browserShowing = true,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                )
+                addExemptedMaliciousUrlToMemory(url)
+            }
+            LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
+            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
+        }
     }
 
     private fun onSiteChanged() {
@@ -3036,6 +3084,9 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+        }
     }
 
     fun onWebViewRefreshed() {
@@ -3109,6 +3160,19 @@ class BrowserTabViewModel @Inject constructor(
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         command.postValue(WebViewError(errorType, url))
+    }
+
+    override fun onReceivedMaliciousSiteWarning(url: Uri) {
+        // TODO (cbarreiro): Fire pixel
+        loadingViewState.postValue(currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()))
+        browserViewState.postValue(
+            currentBrowserViewState().copy(
+                browserShowing = false,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                maliciousSiteDetected = true,
+            ),
+        )
+        command.postValue(ShowWarningMaliciousSite(url))
     }
 
     override fun recordErrorCode(
@@ -3401,9 +3465,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun recoverFromSSLWarningPage(showBrowser: Boolean) {
+    fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3415,6 +3479,7 @@ class BrowserTabViewModel @Inject constructor(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 browserShowing = showBrowser,
                 sslError = NONE,
+                maliciousSiteDetected = false,
             )
         }
     }
@@ -3698,6 +3763,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+    }
+
+    fun addExemptedMaliciousUrlToMemory(url: Uri) {
+        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url)
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
