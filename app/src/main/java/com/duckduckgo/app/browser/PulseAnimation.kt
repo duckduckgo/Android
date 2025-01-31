@@ -114,12 +114,15 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
+        val gravity: Int
         if (isExperimentAndShieldView) {
             highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
+            gravity = Gravity.START
         } else {
             highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+            gravity = Gravity.CENTER
         }
-        val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
+        val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, gravity)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
     }
