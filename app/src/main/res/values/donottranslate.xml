@@ -42,6 +42,8 @@
     <string name="maliciousSiteAdvancedCTA">Advanced</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
     <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
+    <string name="maliciousSiteReportErrorTitle">Report a site incorrectly flagged as malicious</string>
+    <string name="maliciousSiteLearnMoreTitle">Learn more</string>
 
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>

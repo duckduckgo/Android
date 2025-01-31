@@ -17,17 +17,26 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
+import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewMaliciousSiteBlockedWarningBinding
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.html
 
 class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     context: Context,
@@ -38,6 +47,8 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     sealed class Action {
         data object VisitSite : Action()
         data object LeaveSite : Action()
+        data object LearnMore : Action()
+        data object ReportError : Action()
     }
 
     private val binding: ViewMaliciousSiteBlockedWarningBinding by viewBinding()
@@ -47,10 +58,8 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
     ) {
         resetViewState()
 
-        with(binding) {
-            formatCopy()
-            setListeners(actionHandler)
-        }
+        formatCopy(actionHandler)
+        setListeners(actionHandler)
     }
 
     private fun resetViewState() {
@@ -60,12 +69,42 @@ class MaliciousSiteBlockedWarningLayout @JvmOverloads constructor(
         }
     }
 
-    private fun formatCopy() {
+    private fun formatCopy(
+        actionHandler: (Action) -> Unit,
+    ) {
         with(binding) {
-            errorHeadline.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteMalwareHeadline), HtmlCompat.FROM_HTML_MODE_LEGACY)
-            expandedHeadline.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedHeadline), HtmlCompat.FROM_HTML_MODE_LEGACY)
+            errorHeadline.setSpannable(R.string.maliciousSiteMalwareHeadline) { actionHandler(LearnMore) }
+            expandedHeadline.setSpannable(R.string.maliciousSiteExpandedHeadline) { actionHandler(ReportError) }
             expandedCTA.text = HtmlCompat.fromHtml(context.getString(R.string.maliciousSiteExpandedCTA), HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
+    }
+
+    private fun DaxTextView.setSpannable(
+        @StringRes errorResource: Int,
+        actionHandler: () -> Unit,
+    ) {
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                actionHandler()
+            }
+        }
+        val htmlContent = context.getString(errorResource).html(context)
+        val spannableString = SpannableStringBuilder(htmlContent)
+        val urlSpans = htmlContent.getSpans(0, htmlContent.length, URLSpan::class.java)
+        urlSpans?.forEach {
+            spannableString.apply {
+                setSpan(
+                    clickableSpan,
+                    spannableString.getSpanStart(it),
+                    spannableString.getSpanEnd(it),
+                    spannableString.getSpanFlags(it),
+                )
+                removeSpan(it)
+                trim()
+            }
+        }
+        text = spannableString
+        movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun setListeners(

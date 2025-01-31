@@ -229,6 +229,9 @@ sealed class Command {
         val url: Uri,
     ) : Command()
 
+    data class OpenBrokenSiteLearnMore(val url: String) : Command()
+    data class ReportBrokenSiteError(val url: String) : Command()
+
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
     data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()

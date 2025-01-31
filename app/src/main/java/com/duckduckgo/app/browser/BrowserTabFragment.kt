@@ -108,6 +108,8 @@ import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
+import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -223,6 +225,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -1386,6 +1389,26 @@ class BrowserTabFragment :
         webView?.loadUrl(url.toString())
     }
 
+    private fun openBrokenSiteLearnMore(url: String) {
+        globalActivityStarter.start(
+            this.requireContext(),
+            WebViewActivityWithParams(
+                url = url,
+                getString(R.string.maliciousSiteLearnMoreTitle),
+            ),
+        )
+    }
+
+    private fun openBrokenSiteReportError(url: String) {
+        globalActivityStarter.start(
+            this.requireContext(),
+            WebViewActivityWithParams(
+                url = url,
+                getString(R.string.maliciousSiteReportErrorTitle),
+            ),
+        )
+    }
+
     private fun showSSLWarning(
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
@@ -1733,6 +1756,8 @@ class BrowserTabFragment :
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
+            is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
+            is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
