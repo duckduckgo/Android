@@ -32,6 +32,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.URLDecoder
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -68,6 +69,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val processedUrls = mutableListOf<String>()
     private var isFeatureEnabled = false
+    private var currentCheckId = AtomicInteger(0)
 
     init {
         if (isMainProcess) {
@@ -109,16 +111,13 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return null
         }
 
-        if (request.isForMainFrame) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
+        val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+        if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
+            if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                 return WebResourceResponse(null, null, null)
+            } else {
+                processedUrls.add(decodedUrl)
             }
-            processedUrls.add(decodedUrl)
-        } else if (isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host) {
-            if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
-                return WebResourceResponse(null, null, null)
-            }
-            processedUrls.add(decodedUrl)
         }
         return null
     }
@@ -142,13 +141,31 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
             // iframes always go through the shouldIntercept method, so we only need to check the main frame here
             if (isForMainFrame) {
-                if (maliciousSiteProtection.isMalicious(decodedUrl.toUri(), confirmationCallback) == MALICIOUS) {
+                if (checkMaliciousUrl(decodedUrl, confirmationCallback)) {
                     return@runBlocking true
+                } else {
+                    processedUrls.add(decodedUrl)
                 }
-                processedUrls.add(decodedUrl)
             }
             false
         }
+    }
+
+    private suspend fun checkMaliciousUrl(
+        url: String,
+        confirmationCallback: (isMalicious: Boolean) -> Unit,
+    ): Boolean {
+        val checkId = currentCheckId.incrementAndGet()
+        return maliciousSiteProtection.isMalicious(url.toUri()) {
+            // if another load has started, we should ignore the result
+            val isMalicious = if (checkId == currentCheckId.get()) {
+                it
+            } else {
+                false
+            }
+            processedUrls.clear()
+            confirmationCallback(isMalicious)
+        } == MALICIOUS
     }
 
     private fun isForIframe(request: WebResourceRequest) = request.requestHeaders["Sec-Fetch-Dest"] == "iframe" ||

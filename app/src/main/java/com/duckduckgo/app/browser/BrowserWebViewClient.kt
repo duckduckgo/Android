@@ -129,10 +129,6 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
-    private val confirmationCallback: (isMalicious: Boolean) -> Unit = {
-        // TODO (cbarreiro): Handle site blocked asynchronously
-    }
-
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
@@ -165,7 +161,7 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-            if (requestInterceptor.shouldOverrideUrlLoading(url, isForMainFrame)) {
+            if (requestInterceptor.shouldOverrideUrlLoading(webView, url, isForMainFrame)) {
                 return true
             }
 
