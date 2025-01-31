@@ -79,13 +79,17 @@ class RealMaliciousSiteRepository @Inject constructor(
 
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
-            maliciousSiteService.getMatches(hashPrefix).matches.map {
+            maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
                 val feed = when (it.category.uppercase()) {
                     PHISHING.name -> PHISHING
                     MALWARE.name -> MALWARE
-                    else -> throw IllegalArgumentException("Unknown category ${it.category}")
+                    else -> null
                 }
-                Match(it.hostname, it.url, it.regex, it.hash, feed)
+                if (feed != null) {
+                    Match(it.hostname, it.url, it.regex, it.hash, feed)
+                } else {
+                    null
+                }
             }
         } catch (e: Exception) {
             listOf()
