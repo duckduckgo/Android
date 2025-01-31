@@ -78,7 +78,8 @@ class TrackersBlockedViewSlideBehavior(
     ) {
         if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
-            if (translation == 0f) {
+            val bottomOmnibarHeight = bottomOmnibar?.height ?: 0
+            if (translation == 0f || translation < bottomOmnibarHeight) {
                 child.hide()
             } else {
                 val site = siteLiveData.value
