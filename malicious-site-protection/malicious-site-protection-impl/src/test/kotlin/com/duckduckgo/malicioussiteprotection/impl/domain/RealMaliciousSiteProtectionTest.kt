@@ -20,11 +20,12 @@ import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
-import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Phishing
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
@@ -73,7 +74,7 @@ class RealMaliciousSiteProtectionTest {
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Safe), result)
+        assertEquals(ConfirmedResult(Safe), result)
     }
 
     @Test
@@ -85,11 +86,18 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*malicious.*")
 
         whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
+        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(
+            listOf(
+                FilterSet(
+                    listOf(filter),
+                    PHISHING,
+                ),
+            ),
+        )
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Phishing), result)
+        assertEquals(ConfirmedResult(Malicious(PHISHING)), result)
     }
 
     @Test
@@ -106,7 +114,7 @@ class RealMaliciousSiteProtectionTest {
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
-        assertEquals(MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult(Safe), result)
+        assertEquals(ConfirmedResult(Safe), result)
     }
 
     @Test

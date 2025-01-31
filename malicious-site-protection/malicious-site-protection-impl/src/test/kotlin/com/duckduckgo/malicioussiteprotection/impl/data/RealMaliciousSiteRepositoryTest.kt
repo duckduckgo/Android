@@ -1,5 +1,6 @@
 package com.duckduckgo.malicioussiteprotection.impl.data
 
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
@@ -10,7 +11,6 @@ import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteSer
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MatchesResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.RevisionResponse
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
