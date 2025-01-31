@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -39,6 +38,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -77,6 +77,8 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -84,9 +86,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -140,6 +139,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private lateinit var pulseAnimation: PulseAnimation
 
@@ -228,8 +230,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     private val viewModel: OmnibarLayoutViewModel by lazy {
@@ -239,20 +239,22 @@ class OmnibarLayout @JvmOverloads constructor(
         )[OmnibarLayoutViewModel::class.java]
     }
 
+    private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
-        viewModel.viewState
+        conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
 
-        viewModel.commands()
+        conflatedCommandJob += viewModel.commands()
             .onEach { processCommand(it) }
             .launchIn(coroutineScope!!)
 
@@ -272,7 +274,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        coroutineScope?.cancel()
+        conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
         super.onDetachedFromWindow()
     }
 

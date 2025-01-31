@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.indonesiamessage
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -24,6 +23,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -33,6 +33,8 @@ import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
@@ -40,9 +42,7 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -56,7 +56,8 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    private var coroutineScope: CoroutineScope? = null
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val binding: ViewIndonesiaNewTabSectionBinding by viewBinding()
 
@@ -64,18 +65,22 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[IndonesiaNewTabSectionViewModel::class.java]
     }
 
+    private val conflatedJob = ConflatedJob()
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-        viewModel.viewState
+        conflatedJob += viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+    }
+
+    override fun onDetachedFromWindow() {
+        conflatedJob.cancel()
+        super.onDetachedFromWindow()
     }
 
     private fun render(viewState: ViewState) {
