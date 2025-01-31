@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
@@ -37,6 +39,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -49,6 +53,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -81,6 +86,10 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
 
+    private val defaultBrowserPromptsExperimentCommandsFlow = Channel<DefaultBrowserPromptsExperiment.Command>(capacity = Channel.CONFLATED)
+
+    @Mock private lateinit var mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment
+
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
     private lateinit var testee: BrowserViewModel
@@ -94,6 +103,8 @@ class BrowserViewModelTest {
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
 
         configureSkipUrlConversionInNewTabState(enabled = true)
+
+        whenever(mockDefaultBrowserPromptsExperiment.commands).thenReturn(defaultBrowserPromptsExperimentCommandsFlow.receiveAsFlow())
 
         initTestee()
 
@@ -286,6 +297,99 @@ class BrowserViewModelTest {
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
+    @Test
+    fun `when default browser prompts experiment OpenMessageDialog command, then propagate it to consumers`() = runTest {
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenMessageDialog)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when default browser prompts experiment OpenSystemDefaultBrowserDialog command, then propagate it to consumers`() = runTest {
+        val intent: Intent = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent))
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowSystemDefaultBrowserDialog(intent), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when default browser prompts experiment OpenSystemDefaultAppsActivity command, then propagate it to consumers`() = runTest {
+        val intent: Intent = mock()
+        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent))
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowSystemDefaultAppsActivity(intent), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when onSetDefaultBrowserDialogShown called, then pass that information to the experiment`() {
+        testee.onSetDefaultBrowserDialogShown()
+
+        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogShown()
+    }
+
+    @Test
+    fun `when onSetDefaultBrowserDismissed called, then pass that information to the experiment`() {
+        testee.onSetDefaultBrowserDismissed()
+
+        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogDismissed()
+    }
+
+    @Test
+    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information to the experiment`() {
+        testee.onSetDefaultBrowserConfirmationButtonClicked()
+
+        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogConfirmationButtonClicked()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.HideSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when onSetDefaultBrowserNotNowButtonClicked called, then pass that information to the experiment`() {
+        testee.onSetDefaultBrowserNotNowButtonClicked()
+
+        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogNotNowButtonClicked()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.HideSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when onSystemDefaultBrowserDialogShown called, then pass that information to the experiment`() {
+        testee.onSystemDefaultBrowserDialogShown()
+
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogShown()
+    }
+
+    @Test
+    fun `when onSystemDefaultBrowserDialogSuccess called, then pass that information to the experiment`() {
+        testee.onSystemDefaultBrowserDialogSuccess()
+
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogSuccess()
+    }
+
+    @Test
+    fun `when onSystemDefaultBrowserDialogCanceled called, then pass that information to the experiment`() {
+        testee.onSystemDefaultBrowserDialogCanceled()
+
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogCanceled()
+    }
+
+    @Test
+    fun `when onSystemDefaultAppsActivityOpened called, then pass that information to the experiment`() {
+        testee.onSystemDefaultAppsActivityOpened()
+
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityOpened()
+    }
+
+    @Test
+    fun `when onSystemDefaultAppsActivityClosed called, then pass that information to the experiment`() {
+        testee.onSystemDefaultAppsActivityClosed()
+
+        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityClosed()
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -299,6 +403,7 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
         )
     }
 

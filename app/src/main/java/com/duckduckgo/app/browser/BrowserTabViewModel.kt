@@ -165,6 +165,7 @@ import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
 import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
@@ -457,6 +458,7 @@ class BrowserTabViewModel @Inject constructor(
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -691,6 +693,12 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
             }
             .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
+
+        defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
+            .onEach {
+                browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
+            }
             .launchIn(viewModelScope)
     }
 
@@ -2497,7 +2505,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserSelected() {
-        // no-op, to be implemented
+        defaultBrowserPromptsExperiment.onSetAsDefaultPopupMenuItemSelected()
     }
 
     fun onShareSelected() {
@@ -2607,6 +2615,10 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
+    }
+
+    fun onPopupMenuLaunched() {
+        defaultBrowserPromptsExperiment.onPopupMenuLaunched()
     }
 
     fun userRequestedOpeningNewTab(
