@@ -4,64 +4,67 @@ note
   Flow run each time when user opens or comes back to the app.
 end note
 :App process resumed or remote config loaded;
-if (Is enrolled OR does not have DDG set as default browser) then (yes)
-  if (Has user converted already?) then (no)
-    if (Is user in the `variant_2` cohort?) then (yes)
-      note
-         Also enrolls and assigns the cohort, if needed.
-      end note
-      if (Is DDG the default browser app) then (no)
-        switch (Experiment stage)
-        case (NOT_ENROLLED)
-          :Enroll and assign a cohort;
-          :Move stage to ENROLLED;
-        case (ENROLLED)
-          if (App active use days since enrollment >= 1?) then (yes)
-            :Move stage to STAGE_1;
-            :Show message dialog;
+if (Is onboarded?) then (yes)
+  if (Is enrolled OR does not have DDG set as default browser?) then (yes)
+    if (Has user converted already?) then (no)
+      if (Is user in the `variant_2` cohort?) then (yes)
+        note
+           Also enrolls and assigns the cohort, if needed.
+        end note
+        if (Is DDG the default browser app) then (no)
+          switch (Experiment stage)
+          case (NOT_ENROLLED)
+            :Enroll and assign a cohort;
+            :Move stage to ENROLLED;
+          case (ENROLLED)
+            if (App active use days since enrollment >= 1?) then (yes)
+              :Move stage to STAGE_1;
+              :Show message dialog;
+            else (no)
+            endif
+          case (STAGE_1)
+            if (App active use days since enrollment >= 20?) then (yes)
+              :Move stage to STAGE_2;
+              :Show popup menu highlight;
+                :Show popup menu item;
+            else (no)
+            endif
+          case (STAGE_2)
+            if (App active use days since enrollment >= 30?) then (yes)
+              :Move stage to STOPPED;
+              :Remove popup menu highlight;
+              :Remove popup menu item;
+            else (no)
+            endif
+          case (STOPPED)
+            :noop;
+          case (CONVERTED)
+            :noop;
+          endswitch
+          stop
+        else (yes)
+          if (Is STOPPED) is (yes) then
           else (no)
+            :Move stage to CONVERTED;
+            :Send conversion pixel;
           endif
-        case (STAGE_1)
-          if (App active use days since enrollment >= 20?) then (yes)
-            :Move stage to STAGE_2;
-            :Show popup menu highlight;
-              :Show popup menu item;
-          else (no)
-          endif
-        case (STAGE_2)
-          if (App active use days since enrollment >= 30?) then (yes)
-            :Move stage to STOPPED;
-            :Remove popup menu highlight;
-            :Remove popup menu item;
-          else (no)
-          endif
-        case (STOPPED)
-          :noop;
-        case (CONVERTED)
-          :noop;
-        endswitch
-        stop
-      else (yes)
-        if (Is STOPPED) is (yes) then
+        endif
+      else (no)
+        note right
+          If experiment was underway but we lost the cohort name,
+          it means that the experiment was remotely disabled.
+        end note
+        if (Was enrolled already?) is (yes) then
+          :Move stage to STOPPED;
+          :Remove popup menu highlight;
+          :Remove popup menu item;
         else (no)
-          :Move stage to CONVERTED;
-          :Send conversion pixel;
         endif
       endif
-    else (no)
-      note right
-        If experiment was underway but we lost the cohort name,
-        it means that the experiment was remotely disabled.
-      end note
-      if (Was enrolled already?) is (yes) then
-        :Move stage to STOPPED;
-        :Remove popup menu highlight;
-        :Remove popup menu item;
-      else (no)
+    else (yes)
       endif
-    endif
-  else (yes)
-    endif
+  else (false)
+  endif
 else (false)
 endif
 stop
