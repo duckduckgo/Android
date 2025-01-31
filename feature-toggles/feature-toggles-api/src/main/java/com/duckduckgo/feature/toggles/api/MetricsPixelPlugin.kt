@@ -18,6 +18,7 @@ package com.duckduckgo.feature.toggles.api
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 /**
  * Experiment pixels that want to be fired should implement this plugin. The associated plugin point
@@ -45,7 +46,7 @@ data class MetricsPixel(
     fun getPixelDefinitions(): List<PixelDefinition> {
         val cohort = toggle.getRawStoredState()?.assignedCohort?.name.orEmpty()
         val enrollmentDateET = toggle.getRawStoredState()?.assignedCohort?.enrollmentDateET?.let {
-            ZonedDateTime.parse(it).format(DateTimeFormatter.ISO_LOCAL_DATE)
+            ZonedDateTime.parse(it).truncatedTo(ChronoUnit.DAYS).format(DateTimeFormatter.ISO_LOCAL_DATE)
         }.orEmpty()
         if (cohort.isEmpty() || enrollmentDateET.isEmpty()) {
             return emptyList()

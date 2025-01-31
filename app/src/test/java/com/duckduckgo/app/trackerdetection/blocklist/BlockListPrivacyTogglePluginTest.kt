@@ -15,7 +15,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.MENU
 import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -91,7 +90,7 @@ class BlockListPrivacyTogglePluginTest {
     }
 
     private fun assignToExperiment() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
             State(
                 remoteEnableState = true,
