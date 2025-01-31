@@ -105,4 +105,33 @@ interface DefaultBrowserPromptsExperimentStageEvaluator {
                 CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
             }
     }
+
+    @ContributesMultibinding(scope = AppScope::class)
+    class Variant3 @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
+
+        override val targetCohort = AdditionalPromptsCohortName.VARIANT_3
+
+        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
+            when (newStage) {
+                NOT_ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+
+                ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+
+                STAGE_1 -> DefaultBrowserPromptsExperimentStageAction(
+                    showMessageDialog = true,
+                    showSetAsDefaultPopupMenuItem = true,
+                    highlightPopupMenu = true,
+                )
+
+                STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
+                    showMessageDialog = true,
+                    showSetAsDefaultPopupMenuItem = true,
+                    highlightPopupMenu = true,
+                )
+
+                STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+
+                CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            }
+    }
 }
