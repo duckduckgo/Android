@@ -435,6 +435,14 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun areInContextDaxDialogsCompleted(): Boolean {
+        return withContext(dispatchers.io()) {
+            val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+            val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
+            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+        }
+    }
+
     private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
 
     private fun daxDialogOtherShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)

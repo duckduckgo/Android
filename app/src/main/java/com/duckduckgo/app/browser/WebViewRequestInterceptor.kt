@@ -39,6 +39,7 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -62,6 +63,7 @@ interface RequestInterceptor {
 
     @WorkerThread
     fun shouldOverrideUrlLoading(
+        webView: WebView,
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean
@@ -105,10 +107,12 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri? = request.url
 
-        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) {
-            handleSiteBlocked()
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+            if (isMalicious) {
+                handleSiteBlocked(webView)
+            }
         }?.let {
-            handleSiteBlocked()
+            handleSiteBlocked(webView)
             return it
         }
 
@@ -177,22 +181,24 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, null)
     }
 
-    override fun shouldOverrideUrlLoading(url: Uri, isForMainFrame: Boolean): Boolean {
+    override fun shouldOverrideUrlLoading(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
         if (maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
                 url,
                 isForMainFrame,
-            ) {
-                handleSiteBlocked()
+            ) { isMalicious ->
+                if (isMalicious) {
+                    handleSiteBlocked(webView)
+                }
             }
         ) {
-            handleSiteBlocked()
+            handleSiteBlocked(webView)
             return true
         }
         return false
     }
 
-    private fun handleSiteBlocked() {
-        // TODO (cbarreiro): Handle site blocked
+    private fun handleSiteBlocked(webView: WebView) {
+        Snackbar.make(webView, "Site blocked", Snackbar.LENGTH_SHORT).show()
     }
 
     private fun getWebResourceResponse(

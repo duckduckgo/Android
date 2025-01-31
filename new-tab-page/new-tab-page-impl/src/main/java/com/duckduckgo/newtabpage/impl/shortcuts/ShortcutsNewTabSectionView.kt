@@ -16,7 +16,6 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet
@@ -25,6 +24,7 @@ import android.widget.LinearLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +34,8 @@ import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
@@ -46,9 +48,6 @@ import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORT
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -65,16 +64,19 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
     private lateinit var adapter: ShortcutsAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val viewModel: ShortcutsViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ShortcutsViewModel::class.java]
     }
+
+    private val conflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -82,14 +84,16 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
         configureGrid()
 
-        viewModel.viewState
+        conflatedJob += viewModel.viewState
             .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+    }
+
+    override fun onDetachedFromWindow() {
+        conflatedJob.cancel()
+        super.onDetachedFromWindow()
     }
 
     private fun render(viewState: ViewState) {
