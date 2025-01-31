@@ -3776,11 +3776,11 @@ class BrowserTabViewModel @Inject constructor(
         refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
-    fun setBrowserExperimentBackground(lightModeEnabled: Boolean) {
+    fun setBrowserBackground(lightModeEnabled: Boolean) {
         command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
+    fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 

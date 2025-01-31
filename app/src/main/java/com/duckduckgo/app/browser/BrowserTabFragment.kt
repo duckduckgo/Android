@@ -3967,7 +3967,7 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
             }
-            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
@@ -3992,7 +3992,7 @@ class BrowserTabFragment :
                     userEnteredQuery(it.link)
                 }
             }
-            viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
