@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.service.mapper
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppEntity
@@ -43,10 +44,11 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
     private val autofillPrefsStore: AutofillPrefsStore,
     private val domainTargetAppDao: DomainTargetAppDao,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val autofillServiceFeature: AutofillServiceFeature,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        // TODO: Add check for killswitch
+        if (autofillServiceFeature.canUpdateAppToDomainDataset().isEnabled().not()) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
             Timber.d("Autofill-mapping: Attempting to download")
             download()

@@ -1,12 +1,16 @@
 package com.duckduckgo.autofill.impl.service.mapper
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppEntity
 import com.duckduckgo.autofill.store.targets.TargetApp
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -17,6 +21,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RemoteDomainTargetAppDataDownloaderTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -35,6 +40,8 @@ class RemoteDomainTargetAppDataDownloaderTest {
 
     @Mock
     private lateinit var mockOwner: LifecycleOwner
+
+    private val autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
     private lateinit var toTest: RemoteDomainTargetAppDataDownloader
     private val dataset = RemoteDomainTargetDataSet(
         version = 1,
@@ -78,6 +85,9 @@ class RemoteDomainTargetAppDataDownloaderTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
+        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        autofillServiceFeature.canUpdateAppToDomainDataset().setRawStoredState(State(enable = true))
+
         toTest = RemoteDomainTargetAppDataDownloader(
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
@@ -85,9 +95,21 @@ class RemoteDomainTargetAppDataDownloaderTest {
             autofillPrefsStore,
             domainTargetAppDao,
             currentTimeProvider,
+            autofillServiceFeature,
         )
 
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1737548373455)
+    }
+
+    @Test
+    fun whenFeatureFlagDisabledThenNoUpdates() = runTest {
+        autofillServiceFeature.canUpdateAppToDomainDataset().setRawStoredState(State(enable = false))
+
+        toTest.onCreate(mockOwner)
+
+        verifyNoMoreInteractions(remoteDomainTargetAppService)
+        verifyNoMoreInteractions(autofillPrefsStore)
+        verifyNoMoreInteractions(domainTargetAppDao)
     }
 
     @Test

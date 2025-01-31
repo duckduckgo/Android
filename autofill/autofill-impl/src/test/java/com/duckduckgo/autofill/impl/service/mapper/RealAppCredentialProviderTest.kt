@@ -1,8 +1,12 @@
 package com.duckduckgo.autofill.impl.service.mapper
 
+import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.impl.service.mapper.fakes.FakeAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -14,12 +18,16 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RealAppCredentialProviderTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mapper: AppToDomainMapper
+
+    private val autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
+
     private lateinit var toTest: RealAppCredentialProvider
 
     private val store = FakeAutofillStore(
@@ -39,12 +47,25 @@ class RealAppCredentialProviderTest {
 
     @Before
     fun setUp() {
+        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        autofillServiceFeature.canMapAppToDomain().setRawStoredState(State(enable = true))
         MockitoAnnotations.openMocks(this)
         toTest = RealAppCredentialProvider(
             mapper,
             coroutineTestRule.testDispatcherProvider,
             store,
+            autofillServiceFeature,
         )
+    }
+
+    @Test
+    fun whenFeatureFlagDisabledThenReturnEmtpyList() = runTest {
+        autofillServiceFeature.canMapAppToDomain().setRawStoredState(State(enable = false))
+        whenever(mapper.getAssociatedDomains("com.duplicate.domains")).thenReturn(listOf("package1.com", "package2.com", "package2.com"))
+
+        val result = toTest.getCredentials("com.duplicate.domains")
+
+        assertTrue(result.isEmpty())
     }
 
     @Test
