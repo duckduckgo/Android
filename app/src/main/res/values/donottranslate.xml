@@ -72,9 +72,12 @@
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Protect your personal data every time with DuckDuckGo</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">If you love protecting your data, make us your default browser. All site links will open in DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Your Default Browser</string>
+    <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogPrimaryButton">Set As Default Browser</string>
     <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
+
+    <!--    Default Browser Popup Menu Item-->
+    <string name="defaultBrowserPopupMenuItem">Set As Default Browser</string>
 
 </resources>
