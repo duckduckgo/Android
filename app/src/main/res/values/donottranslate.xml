@@ -60,9 +60,4 @@
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
-    <!--    Default Browser Bottom Sheet Dialog -->
-    <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
-
 </resources>
