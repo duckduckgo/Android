@@ -25,7 +25,9 @@ import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -64,6 +66,8 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
             }
             DARK -> renderDarkButtons()
             LIGHT -> renderLightButtons()
+            DARK_EXPERIMENT -> renderDarkButtons()
+            LIGHT_EXPERIMENT -> renderLightButtons()
         }
     }
 

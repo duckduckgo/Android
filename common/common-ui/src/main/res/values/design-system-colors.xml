@@ -190,6 +190,9 @@
     <color name="white">#FFFFFF</color>
     <color name="white_60">#F2F5F9</color>
 
+    <color name="pink100">#9232E2</color>
+    <color name="pink90">#A060D9</color>
+
     <color name="magenta">#A64FD1</color>
     <color name="purple">#D4A1EE</color>
     <color name="green">#6FBF5C</color>
