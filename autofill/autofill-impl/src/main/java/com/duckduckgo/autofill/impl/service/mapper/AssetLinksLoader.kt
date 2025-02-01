@@ -20,7 +20,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -32,7 +31,6 @@ interface AssetLinksLoader {
     suspend fun getValidTargetApps(domain: String): Map<String, List<String>>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAssetLinksLoader @Inject constructor(
     private val assetLinksService: AssetLinksService,

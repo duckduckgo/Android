@@ -59,7 +59,7 @@ class AutofillManagementRecyclerAdapter(
     private val initialExtractor: InitialExtractor,
     private val suggestionListBuilder: SuggestionListBuilder,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
-    private val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
+    private val onContextMenuItemClicked: ((ContextMenuAction) -> Unit)?,
     private val onReportBreakageClicked: () -> Unit,
 ) : Adapter<RecyclerView.ViewHolder>() {
 
@@ -155,9 +155,13 @@ class AutofillManagementRecyclerAdapter(
         with(viewHolder.binding) {
             title.setPrimaryText(loginCredentials.extractTitle() ?: "")
             title.setSecondaryText(loginCredentials.username ?: "")
-            title.setTrailingIconClickListener { anchor ->
-                val overflowMenu = initializePopupMenu(root.context, loginCredentials)
-                overflowMenu.show(root, anchor)
+            if (onContextMenuItemClicked != null) {
+                title.setTrailingIconClickListener { anchor ->
+                    val overflowMenu = initializePopupMenu(root.context, loginCredentials, onContextMenuItemClicked)
+                    overflowMenu.show(root, anchor)
+                }
+            } else {
+                title.hideTrailingItems()
             }
             root.setOnClickListener { onCredentialSelected(loginCredentials) }
 
@@ -189,6 +193,7 @@ class AutofillManagementRecyclerAdapter(
     private fun initializePopupMenu(
         context: Context,
         loginCredentials: LoginCredentials,
+        onContextMenuItemClicked: (ContextMenuAction) -> Unit,
     ): PopupMenu {
         return PopupMenu(LayoutInflater.from(context), R.layout.overflow_menu_list_item).apply {
             onMenuItemClicked(contentView.findViewById(R.id.item_overflow_edit)) { onContextMenuItemClicked(Edit(loginCredentials)) }

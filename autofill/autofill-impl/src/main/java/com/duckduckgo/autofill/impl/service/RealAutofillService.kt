@@ -26,7 +26,6 @@ import android.service.autofill.SavedDatasetsInfoCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ServiceScope
@@ -81,8 +80,7 @@ class RealAutofillService : AutofillService() {
                     return@launch
                 }
                 val parsedRootNodes = autofillParser.parseStructure(structure)
-                val nodeToAutofill = findBestFillableNode(parsedRootNodes)
-
+                val nodeToAutofill = parsedRootNodes.findBestFillableNode()
                 if (nodeToAutofill == null || shouldSkipAutofillSuggestions(nodeToAutofill)) {
                     callback.onSuccess(null)
                     return@launch
@@ -113,24 +111,6 @@ class RealAutofillService : AutofillService() {
         if (nodeToAutofill.packageId in PACKAGES_TO_EXCLUDE) return true
 
         return false
-    }
-
-    private fun findBestFillableNode(rootNodes: List<AutofillRootNode>): AutofillRootNode? {
-        return rootNodes.firstNotNullOfOrNull { rootNode ->
-            val focusedDetectedField = rootNode.parsedAutofillFields
-                .firstOrNull { field ->
-                    field.originalNode.isFocused && field.type != UNKNOWN
-                }
-            if (focusedDetectedField != null) {
-                return@firstNotNullOfOrNull rootNode
-            }
-
-            val firstDetectedField = rootNode.parsedAutofillFields.firstOrNull { field -> field.type != UNKNOWN }
-            if (firstDetectedField != null) {
-                return@firstNotNullOfOrNull rootNode
-            }
-            return@firstNotNullOfOrNull null
-        }
     }
 
     override fun onSaveRequest(

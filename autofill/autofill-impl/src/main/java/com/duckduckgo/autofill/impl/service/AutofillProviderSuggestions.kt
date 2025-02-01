@@ -23,6 +23,7 @@ import android.content.Intent
 import android.service.autofill.Dataset
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
+import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -30,8 +31,11 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
+import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_AUTOFILL_CREDENTIAL_ID_EXTRAS
+import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_AUTOFILL_ID_EXTRAS
+import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_PACKAGE_ID_EXTRAS
+import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_URL_EXTRAS
 import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -85,6 +89,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             credentials?.forEach { credential ->
                 val datasetBuilder = Dataset.Builder()
                 val suggestionUISpecs = suggestionsFormatter.getSuggestionSpecs(credential)
+                val pendingIntent = createNewAutofillSelectionIntent(context, fieldsToAutofill.autofillId, credential.id)
                 // >= android 11 inline presentations are supported
                 if (appBuildConfig.sdkInt >= 30 && inlineSuggestionsToShow > 0) {
                     datasetBuilder.addInlinePresentationsIfSupported(
@@ -93,6 +98,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
                         suggestionUISpecs.title,
                         suggestionUISpecs.subtitle,
                         suggestionUISpecs.icon,
+                        pendingIntent,
                     )
                     inlineSuggestionsToShow -= 1
                 }
@@ -111,13 +117,21 @@ class RealAutofillProviderSuggestions @Inject constructor(
                     autofillValue(credential, fieldsToAutofill.type),
                     formPresentation,
                 )
-                val dataset = datasetBuilder.build()
+                val dataset = datasetBuilder
+                    .setAuthentication(pendingIntent.intentSender)
+                    .build()
                 response.addDataset(dataset)
             }
         }
 
         // Last suggestion to open DDG App and manually choose a credential
-        val ddgAppDataSetBuild = createAccessDDGDataSet(context, request, fillableFields)
+        val ddgAppDataSetBuild = createAccessDDGDataSet(
+            context,
+            request,
+            fillableFields,
+            nodeToAutofill.website.orEmpty(),
+            nodeToAutofill.packageId.orEmpty(),
+        )
         Timber.i("DDGAutofillService adding suggestion DuckDuckGo Search")
         response.addDataset(ddgAppDataSetBuild)
 
@@ -130,13 +144,15 @@ class RealAutofillProviderSuggestions @Inject constructor(
         context: Context,
         request: FillRequest,
         fillableFields: List<ParsedAutofillField>,
+        url: String,
+        packageId: String,
     ): Dataset {
         // add access passwords
         val ddgAppDataSet = Dataset.Builder()
         val specs = suggestionsFormatter.getOpenDuckDuckGoSuggestionSpecs()
-        val pendingIntent = createAutofillSelectionIntent(context)
+        val pendingIntent = createAutofillSelectionIntent(context, url, packageId)
         if (appBuildConfig.sdkInt >= 30) {
-            ddgAppDataSet.addInlinePresentationsIfSupported(context, request, specs.title, specs.subtitle, specs.icon)
+            ddgAppDataSet.addInlinePresentationsIfSupported(context, request, specs.title, specs.subtitle, specs.icon, pendingIntent)
         }
         val formPresentation = viewProvider.createFormPresentation(context, specs.title, specs.subtitle, specs.icon)
         fillableFields.forEach { fieldsToAutofill ->
@@ -159,19 +175,12 @@ class RealAutofillProviderSuggestions @Inject constructor(
         suggestionTitle: String,
         suggestionSubtitle: String,
         icon: Int,
+        attribution: PendingIntent,
     ) {
         val inlinePresentationSpec = request.inlineSuggestionsRequest?.inlinePresentationSpecs?.firstOrNull() ?: return
-        val pendingIntent = PendingIntent.getService(
-            context,
-            0,
-            Intent(),
-            PendingIntent.FLAG_ONE_SHOT or
-                PendingIntent.FLAG_UPDATE_CURRENT or
-                PendingIntent.FLAG_IMMUTABLE,
-        )
         viewProvider.createInlinePresentation(
             context,
-            pendingIntent,
+            attribution,
             suggestionTitle,
             suggestionSubtitle,
             icon,
@@ -215,8 +224,27 @@ class RealAutofillProviderSuggestions @Inject constructor(
         return crendentialsForDomain.plus(crendentialsForPackage).distinct()
     }
 
-    private fun createAutofillSelectionIntent(context: Context): PendingIntent {
-        val intent = Intent(context, AutofillManagementActivity::class.java)
+    private fun createAutofillSelectionIntent(context: Context, url: String, packageId: String): PendingIntent {
+        val intent = Intent(context, AutofillProviderChooseActivity::class.java)
+        intent.putExtra(FILL_REQUEST_URL_EXTRAS, url)
+        intent.putExtra(FILL_REQUEST_PACKAGE_ID_EXTRAS, packageId)
+        return PendingIntent
+            .getActivity(
+                context,
+                Random.nextInt(),
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE,
+            )
+    }
+
+    private fun createNewAutofillSelectionIntent(
+        context: Context,
+        autofillId: AutofillId,
+        credentialId: Long?,
+    ): PendingIntent {
+        val intent = Intent(context, AutofillProviderFillSuggestionActivity::class.java)
+        intent.putExtra(FILL_REQUEST_AUTOFILL_ID_EXTRAS, autofillId)
+        intent.putExtra(FILL_REQUEST_AUTOFILL_CREDENTIAL_ID_EXTRAS, credentialId)
         return PendingIntent
             .getActivity(
                 context,

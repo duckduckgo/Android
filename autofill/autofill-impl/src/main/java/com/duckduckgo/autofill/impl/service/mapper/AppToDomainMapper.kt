@@ -16,8 +16,6 @@
 
 package com.duckduckgo.autofill.impl.service.mapper
 
-import android.content.Context
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppEntity
 import com.duckduckgo.autofill.store.targets.TargetApp
@@ -26,7 +24,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -40,7 +37,6 @@ interface AppToDomainMapper {
     suspend fun getAssociatedDomains(appPackage: String): List<String>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAppToDomainMapper @Inject constructor(
     private val domainTargetAppDao: DomainTargetAppDao,

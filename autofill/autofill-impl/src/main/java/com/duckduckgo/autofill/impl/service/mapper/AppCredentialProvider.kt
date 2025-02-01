@@ -25,7 +25,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import timber.log.Timber
 
 interface AppCredentialProvider {
@@ -35,7 +34,6 @@ interface AppCredentialProvider {
     suspend fun getCredentials(appPackage: String): List<LoginCredentials>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealAppCredentialProvider @Inject constructor(
