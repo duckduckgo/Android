@@ -953,7 +953,7 @@ class BrowserTabFragment :
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
-        if (!viewModel.isSiteProtected()) {
+        if (!viewModel.isSiteProtected() || scrollFraction == 1.0f) {
             return
         }
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
@@ -964,10 +964,13 @@ class BrowserTabFragment :
             if (binding.trackersBurstAnimationView.isAnimating) {
                 binding.trackersBurstAnimationView.cancelAnimation()
             }
+            binding.trackers.text = viewModel.trackersCount()
+            binding.website.text = viewModel.url?.extractDomain()
             binding.trackersBlockedSlidingView.show()
         }
-        binding.trackers.text = viewModel.trackersCount()
-        binding.website.text = viewModel.url?.extractDomain()
+        binding.trackersBlockedSlidingView.postOnAnimation {
+            binding.trackersBlockedSlidingView.requestLayout()
+        }
     }
 
     private fun onOmnibarTabsButtonPressed() {

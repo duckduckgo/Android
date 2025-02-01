@@ -90,7 +90,9 @@ class TrackersBlockedViewSlideBehavior(
                 }
                 child.show()
             }
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+            child.postOnAnimation {
+                super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+            }
         }
     }
 
