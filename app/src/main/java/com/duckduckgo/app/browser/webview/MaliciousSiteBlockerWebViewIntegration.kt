@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -69,6 +70,7 @@ class ExemptedUrlsHolder @Inject constructor() {
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val maliciousSiteProtection: MaliciousSiteProtection,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val exemptedUrlsHolder: ExemptedUrlsHolder,
@@ -89,7 +91,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled()
+            isFeatureEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && settingsDataStore.maliciousSiteProtectionEnabled
         }
     }
 
