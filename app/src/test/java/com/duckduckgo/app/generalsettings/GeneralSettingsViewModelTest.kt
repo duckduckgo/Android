@@ -20,11 +20,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.OpenMaliciousLearnMore
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -290,6 +292,57 @@ internal class GeneralSettingsViewModelTest {
             val state = awaitItem()
 
             assertTrue(state!!.isShowOnAppLaunchOptionVisible)
+        }
+    }
+
+    @Test
+    fun whenMaliciousSiteProtectionEnabledThenViewStateEmittedSettingOnAndPixelFired() = runTest {
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        val viewState = defaultViewState()
+
+        initTestee()
+
+        testee.onMaliciousSiteProtectionSettingChanged(true)
+
+        testee.viewState.test {
+            assertEquals(viewState.copy(maliciousSiteProtectionEnabled = true), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+        assertTrue(fakeAppSettingsDataStore.maliciousSiteProtectionEnabled)
+        verify(mockPixel).fire(AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED)
+    }
+
+    @Test
+    fun whenMaliciousSiteProtectionDisabledThenViewStateEmittedSettingOffAndPixelFired() = runTest {
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        val viewState = defaultViewState()
+
+        initTestee()
+
+        testee.onMaliciousSiteProtectionSettingChanged(false)
+
+        testee.viewState.test {
+            assertEquals(viewState.copy(maliciousSiteProtectionEnabled = false), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+        assertFalse(fakeAppSettingsDataStore.maliciousSiteProtectionEnabled)
+        verify(mockPixel).fire(AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED)
+    }
+
+    @Test
+    fun whenMaliciousSiteLearnMoreClickedThenOpenMaliciousLearnMoreCommandEmitted() = runTest {
+        initTestee()
+
+        testee.maliciousSiteLearnMoreClicked()
+
+        testee.commands.test {
+            assertEquals(OpenMaliciousLearnMore, awaitItem())
         }
     }
 

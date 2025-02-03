@@ -158,11 +158,10 @@ class GeneralSettingsViewModel @Inject constructor(
         Timber.i("User changed malicious site setting, is now enabled: $enabled")
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.maliciousSiteProtectionEnabled = enabled
-            // if (enabled) {
-            //     TODO() fire pixel
-            // } else {
-            //     TODO() fire pixel
-            // }
+            pixel.fire(
+                AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED,
+                mapOf(NEW_STATE to enabled.toString()),
+            )
             _viewState.value = _viewState.value?.copy(
                 maliciousSiteProtectionEnabled = enabled,
             )
@@ -184,5 +183,9 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _commands.send(newCommand)
         }
+    }
+
+    companion object {
+        private const val NEW_STATE = "newState"
     }
 }
