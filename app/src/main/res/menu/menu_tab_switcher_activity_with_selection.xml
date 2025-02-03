@@ -20,49 +20,34 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/layoutType"
+        android:id="@+id/layoutTypeMenuItem"
         android:icon="@drawable/ic_list_view_24"
         android:title="@string/tabSwitcherListViewMenu"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/fire"
+        android:id="@+id/fireMenuItem"
         android:icon="@drawable/ic_fire"
         android:title="@string/fireMenu"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/newTab"
-        android:title="@string/newTabMenuItem"
-        app:showAsAction="never" />
-
-    <group android:id="@+id/selectionGroup">
-        <item
-            android:id="@+id/shareSelectedLinks"
-            android:title=""
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/bookmarkSelectedTabs"
-            android:title=""
-            app:showAsAction="never" />
-    </group>
+        android:id="@+id/bookmarkMenuItem"
+        android:icon="@drawable/ic_add_bookmark_24"
+        android:title=""
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/bookmarkAllTabs"
-        android:title="@string/bookmarkAllTabsMenuItem"
-        app:showAsAction="never" />
-
-    <group android:id="@+id/selectTabsGroup">
-        <item
-            android:id="@+id/selectTabs"
-            android:title="@string/selectTabsMenuItem"
-            app:showAsAction="never" />
-    </group>
+        android:id="@+id/shareLinkMenuItem"
+        android:icon="@drawable/ic_share"
+        android:title=""
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/closeAllTabs"
-        android:title="@string/closeAllTabsMenuItem"
-        app:showAsAction="never" />
+        android:id="@+id/popupMenuItem"
+        android:icon="@drawable/ic_menu_vertical_24"
+        android:title="@string/browserPopupMenu"
+        app:showAsAction="always" />
 
 </menu>
