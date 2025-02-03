@@ -1432,8 +1432,9 @@ class BrowserTabFragment :
         viewModel.closeCurrentTab()
     }
 
-    private fun onBypassMaliciousWarning(url: Uri) {
+    private fun onBypassMaliciousWarning(url: Uri, feed: Feed) {
         showBrowser()
+        webViewClient.addExemptedMaliciousSite(url, feed)
         webView?.loadUrl(url.toString())
     }
 
@@ -1809,7 +1810,7 @@ class BrowserTabFragment :
             is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed)
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
-            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)

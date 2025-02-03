@@ -214,7 +214,6 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Acti
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
-import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -462,7 +461,6 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
-    private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
@@ -1891,12 +1889,11 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             VisitSite -> {
-                command.postValue(BypassMaliciousSiteWarning(url))
+                command.postValue(BypassMaliciousSiteWarning(url, feed))
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
                 )
-                addExemptedMaliciousUrlToMemory(url, feed)
             }
             LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
             ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
@@ -3801,10 +3798,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
-    }
-
-    fun addExemptedMaliciousUrlToMemory(url: Uri, feed: Feed) {
-        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int {

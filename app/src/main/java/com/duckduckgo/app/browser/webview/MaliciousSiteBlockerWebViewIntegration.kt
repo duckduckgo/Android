@@ -37,7 +37,6 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import java.net.URLDecoder
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
@@ -70,9 +69,14 @@ interface MaliciousSiteBlockerWebViewIntegration {
 
 data class ExemptedUrl(val url: Uri, val feed: Feed)
 
-@SingleInstanceIn(AppScope::class)
 class ExemptedUrlsHolder @Inject constructor() {
-    val exemptedMaliciousUrls = mutableSetOf<ExemptedUrl>()
+    val exemptedMaliciousUrls: Set<ExemptedUrl>
+        get() = _exemptedMaliciousUrls
+    private val _exemptedMaliciousUrls = mutableSetOf<ExemptedUrl>()
+
+    fun addExemptedMaliciousUrl(url: ExemptedUrl) {
+        _exemptedMaliciousUrls.add(url)
+    }
 }
 
 @ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
@@ -247,7 +251,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         feed: Feed,
     ) {
         val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
-        exemptedUrlsHolder.exemptedMaliciousUrls.add(ExemptedUrl(convertedUrl.toUri(), feed))
+        exemptedUrlsHolder.addExemptedMaliciousUrl(ExemptedUrl(convertedUrl.toUri(), feed))
         Timber.tag("MaliciousSiteDetector").d(
             "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
         )

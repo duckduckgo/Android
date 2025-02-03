@@ -229,6 +229,7 @@ sealed class Command {
 
     data class BypassMaliciousSiteWarning(
         val url: Uri,
+        val feed: Feed,
     ) : Command()
 
     data class OpenBrokenSiteLearnMore(val url: String) : Command()

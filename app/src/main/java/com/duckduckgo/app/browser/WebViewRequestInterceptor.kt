@@ -73,6 +73,8 @@ interface RequestInterceptor {
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean
+
+    fun addExemptedMaliciousSite(url: Uri, feed: Feed)
 }
 
 class WebViewRequestInterceptor(
@@ -221,6 +223,10 @@ class WebViewRequestInterceptor(
 
     private fun handleSiteBlocked(webViewClientListener: WebViewClientListener?, url: Uri?, feed: Feed, exempted: Boolean) {
         url?.let { webViewClientListener?.onReceivedMaliciousSiteWarning(it, feed, exempted) }
+    }
+
+    override fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
+        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
     private fun getWebResourceResponse(
