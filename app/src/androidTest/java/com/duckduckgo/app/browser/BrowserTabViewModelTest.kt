@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -5066,6 +5067,42 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
         assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    fun whenSslCertificateActionLeaveSiteAndCustomTabThenClose() {
+        val url = "http://example.com"
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, url, true)
+
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
+    }
+
+    @Test
+    fun whenSslCertificateActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
+        val url = "http://example.com"
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, url, false)
+
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.HideSSLError })
+    }
+
+    @Test
+    fun whenMaliciousSiteActionLeaveSiteAndCustomTabThenClose() {
+        val url = "http://example.com".toUri()
+        testee.onMaliciousSiteUserAction(LeaveSite, url, true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
+    }
+
+    @Test
+    fun whenMaliciousSiteActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
+        val url = "http://example.com".toUri()
+        testee.onMaliciousSiteUserAction(LeaveSite, url, false)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.EscapeMaliciousSite })
     }
 
     @Test

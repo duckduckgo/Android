@@ -85,6 +85,7 @@ import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
 import com.duckduckgo.app.browser.commands.Command.BypassMaliciousSiteWarning
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
+import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
 import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
 import com.duckduckgo.app.browser.commands.Command.CopyLink
@@ -1879,10 +1880,17 @@ class BrowserTabViewModel @Inject constructor(
     fun onMaliciousSiteUserAction(
         action: MaliciousSiteBlockedWarningLayout.Action,
         url: Uri,
+        activeCustomTab: Boolean,
     ) {
         when (action) {
             LeaveSite -> {
-                command.postValue(EscapeMaliciousSite)
+                if (activeCustomTab) {
+                    command.postValue(CloseCustomTab)
+                } else {
+                    command.postValue(EscapeMaliciousSite)
+                    openNewTab()
+                    closeCurrentTab()
+                }
             }
 
             VisitSite -> {
@@ -3462,6 +3470,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
+        activeCustomTab: Boolean = false,
     ) {
         when (action) {
             is Action.Shown -> {
@@ -3479,8 +3488,12 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             Action.LeaveSite -> {
-                command.postValue(HideSSLError)
                 pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+                if (activeCustomTab) {
+                    command.postValue(CloseCustomTab)
+                } else {
+                    command.postValue(HideSSLError)
+                }
             }
 
             Action.Proceed -> {
