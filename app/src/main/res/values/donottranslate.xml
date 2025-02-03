@@ -84,15 +84,18 @@
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Share Link</item>
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %d Links</item>
     </plurals>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Bookmark This Page</item>
         <item quantity="one">Bookmark This Page</item>
         <item quantity="other">Bookmark %d Tabs</item>
     </plurals>
     <string name="bookmarkAllTabsMenuItem">Bookmark All Tabs…</string>
     <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Close Tab</item>
         <item quantity="one">Close Tab</item>
         <item quantity="other">Close %d Tabs</item>
     </plurals>
