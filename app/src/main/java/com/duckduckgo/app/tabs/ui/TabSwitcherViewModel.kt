@@ -131,6 +131,27 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED)
     }
 
+    fun onSelectAllTabs() {
+    }
+
+    fun onShareSelectedTabs() {
+    }
+
+    fun onBookmarkSelectedTabs() {
+    }
+
+    fun onBookmarkAllTabs() {
+    }
+
+    fun onSelectionModeRequested() {
+    }
+
+    fun onCloseSelectedTabs() {
+    }
+
+    fun onCloseOtherTabs() {
+    }
+
     fun onCloseAllTabsConfirmed() {
         viewModelScope.launch(dispatcherProvider.io()) {
             tabs.value?.forEach {
