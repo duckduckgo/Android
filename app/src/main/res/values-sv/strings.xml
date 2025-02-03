@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
-    <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>
+    <string name="setAsDefaultBrowser">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
-    <string name="defaultBrowserLetsDoIt">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserDescriptionNoDefault">Sluta oroa dig varje gång du öppnar länkar.</string>
     <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Lämna denna webbplats</string>
     <string name="sslErrorAdvancedCTA">Avancerat</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo varnar dig när en webbplats har ett ogiltigt certifikat.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptera risken och besök webbplatsen<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptera risken och besök webbplatsen</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s har löpt ut. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s matchar inte *.%2$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Din enhets operativsystem litar inte på säkerhetscertifikatet för %1$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
@@ -792,5 +791,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Ny AI-chatt</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Inte nu</string>
 
 </resources>
