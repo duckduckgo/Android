@@ -627,8 +627,6 @@ class BrowserTabFragment :
         }
     }
 
-    val isInEditMode by lazy { omnibar.isInEditMode }
-
     private val activityResultPrivacyDashboard = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == PrivacyDashboardHybridScreenResult.REPORT_SUBMITTED) {
             binding.rootView.makeSnackbarWithNoBottomInset(
@@ -908,6 +906,17 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureItemPressedListener()
         configureCustomTab()
+        configureEditModeChangeDetection()
+    }
+
+    private fun configureEditModeChangeDetection() {
+        if (swipingTabsFeature.isEnabled) {
+            omnibar.isInEditMode.onEach { isInEditMode ->
+                if (isActiveTab) {
+                    browserActivity?.onEditModeChanged(isInEditMode)
+                }
+            }.launchIn(lifecycleScope)
+        }
     }
 
     private fun onOmnibarTabsButtonPressed() {

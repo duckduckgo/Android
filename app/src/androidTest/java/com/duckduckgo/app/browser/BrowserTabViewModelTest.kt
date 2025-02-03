@@ -2334,7 +2334,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabAndEmptyTabExistsThenSelectTheEmptyTab() = runTest {
         val emptyTabId = "EMPTY_TAB"
-        tabsLiveData.value = listOf(TabEntity(emptyTabId))
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(emptyTabId))))
         testee.userRequestedOpeningNewTab()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())

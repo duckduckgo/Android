@@ -33,8 +33,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.APP_ENJOYMENT_DIALOG_USER_CANCELLED
@@ -88,7 +86,6 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    userStageStore: UserStageStore,
 ) : ViewModel(),
     CoroutineScope {
 
@@ -97,6 +94,7 @@ class BrowserViewModel @Inject constructor(
 
     data class ViewState(
         val hideWebContent: Boolean = true,
+        val isTabSwipingEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -135,10 +133,6 @@ class BrowserViewModel @Inject constructor(
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOf(selectedTab)
     }.filterNot { it == -1 }
-
-    val isOnboardingCompleted: Flow<Boolean> = userStageStore.currentAppStage
-        .distinctUntilChanged()
-        .map { it != AppStage.DAX_ONBOARDING }
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -358,6 +352,10 @@ class BrowserViewModel @Inject constructor(
     fun onTabsSwiped() {
         pixel.fire(AppPixelName.SWIPE_TABS_USED)
         pixel.fire(pixel = AppPixelName.SWIPE_TABS_USED_DAILY, type = Daily())
+    }
+
+    fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
+        viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
     }
 }
 

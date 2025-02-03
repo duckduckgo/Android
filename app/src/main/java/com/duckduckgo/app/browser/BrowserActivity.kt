@@ -83,7 +83,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SwitcherFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -93,7 +92,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -164,14 +162,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         set(value) {
             _currentTab = value
         }
-
-    private val isInEditMode = SwitcherFlow<Boolean>()
-
-    private val isSwipingEnabled by lazy {
-        combine(viewModel.isOnboardingCompleted, isInEditMode) { isOnboardingCompleted, isInEditMode ->
-            isOnboardingCompleted && !isInEditMode
-        }
-    }
 
     private val viewModel: BrowserViewModel by bindViewModel()
 
@@ -519,22 +509,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
                     tabManager.onSelectedTabChanged(it)
-
-                    // update the observed edit mode flow observer to the current tab
-                    switchEditModeObserver()
                 }
             }
 
             lifecycleScope.launch {
                 viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
                     onMoveToTabRequested(it)
-                }
-            }
-
-            // enable/disable swiping based on the edit mode and onboarding state
-            lifecycleScope.launch {
-                isSwipingEnabled.flowWithLifecycle(lifecycle).collectLatest {
-                    tabPager.isUserInputEnabled = it
                 }
             }
         } else {
@@ -548,17 +528,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 clearStaleTabs(it)
                 removeOldTabs()
                 lifecycleScope.launch { viewModel.onTabsUpdated(it) }
-            }
-        }
-    }
-
-    private fun switchEditModeObserver() {
-        // switch the edit mode flow to the current tab
-        tabPager.postDelayed(TAB_SWIPING_OBSERVER_DELAY) {
-            currentTab?.isInEditMode?.let {
-                lifecycleScope.launch {
-                    isInEditMode.switch(it)
-                }
             }
         }
     }
@@ -742,8 +711,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_DEDICATED_WEBVIEW = "LAUNCH_FROM_DEDICATED_WEBVIEW"
 
         private const val MAX_ACTIVE_TABS = 40
-
-        private const val TAB_SWIPING_OBSERVER_DELAY = 500L
     }
 
     inner class BrowserStateRenderer {
@@ -759,6 +726,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     hideWebContent()
                 } else {
                     showWebContent()
+                }
+
+                if (swipingTabsFeature.isEnabled) {
+                    tabPager.isUserInputEnabled = viewState.isTabSwipingEnabled
                 }
             }
         }
@@ -963,6 +934,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             viewModel.onTabSelected(tabId)
         }
+    }
+
+    fun onEditModeChanged(isInEditMode: Boolean) {
+        viewModel.onOmnibarEditModeChanged(isInEditMode)
     }
 
     private data class CombinedInstanceState(
