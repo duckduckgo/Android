@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е активирана за %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е деактивирана за %1$s</string>
     <string name="undoSnackbarAction">Отмяна</string>
+    <string name="trackersBlockedAnimationMessage">Блокирани тракери</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Изтегляне на изображение</string>

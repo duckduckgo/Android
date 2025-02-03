@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -41,8 +42,12 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.AFTER_CIRCLES_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -52,6 +57,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -79,6 +85,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val appPersonalityFeature: AppPersonalityFeature,
+    private val userStageStore: UserStageStore,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -117,6 +126,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelTrackersAnimation : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartExperimentTrackersAnimation(val entities: List<Entity>?) : Command()
     }
 
     enum class LeadingIconState {
@@ -585,7 +595,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                     )
                 }
                 viewModelScope.launch {
-                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                    if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+                        command.send(Command.StartExperimentTrackersAnimation(decoration.entities))
+                    } else {
+                        command.send(Command.StartTrackersAnimation(decoration.entities))
+                    }
                 }
             }
         }
@@ -626,6 +640,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                     urlLoaded = url,
                 ),
             )
+        }
+    }
+
+    fun onTrackersAnimationStarted() {
+        viewModelScope.launch {
+            pixel.fire(
+                AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
+                mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
+            )
+            privacyDashboardExternalPixelParams.setPixelParams(AFTER_CIRCLES_ANIMATION, "true")
         }
     }
 }

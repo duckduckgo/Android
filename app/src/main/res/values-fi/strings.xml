@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja käytössä: %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja ei käytössä: %1$s</string>
     <string name="undoSnackbarAction">Kumoa</string>
+    <string name="trackersBlockedAnimationMessage">Seuranta estetty</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Lataa kuva</string>

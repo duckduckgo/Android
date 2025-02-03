@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks lubatud</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks keelatud</string>
     <string name="undoSnackbarAction">Võta tagasi</string>
+    <string name="trackersBlockedAnimationMessage">Jälgijad blokeeritud</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Laadi pilt alla</string>
@@ -792,4 +793,5 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Uus AI vestlus</string>
+
 </resources>

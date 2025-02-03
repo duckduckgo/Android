@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s включена</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s выключена</string>
     <string name="undoSnackbarAction">Отменить</string>
+    <string name="trackersBlockedAnimationMessage">Заблокировано трекеров</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Загрузить изображение</string>

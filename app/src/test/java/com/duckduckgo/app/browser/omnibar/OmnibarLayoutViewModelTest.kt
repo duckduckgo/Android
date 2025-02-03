@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
@@ -16,9 +17,12 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -27,6 +31,8 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -57,6 +63,9 @@ class OmnibarLayoutViewModelTest {
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
+    private val fakeAppPersonalityFeature = FakeFeatureToggleFactory.create(AppPersonalityFeature::class.java)
+    private val mockUserStageStore: UserStageStore = mock()
+    private val mockPrivacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -77,6 +86,9 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appPersonalityFeature = fakeAppPersonalityFeature,
+            userStageStore = mockUserStageStore,
+            privacyDashboardExternalPixelParams = mockPrivacyDashboardExternalPixelParams,
         )
 
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -925,6 +937,30 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.omnibarText == RANDOM_URL)
         }
+    }
+
+    @Test
+    fun whenOnTrackersAnimationStartedCalledAfterOnboardingThenPixelSentWithParamFalse() = runTest {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+
+        testee.onTrackersAnimationStarted()
+
+        verify(pixel).fire(
+            AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
+            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "false"),
+        )
+    }
+
+    @Test
+    fun whenOnTrackersAnimationStartedCalledDuringOnboardingThenPixelSentWithParamTrue() = runTest {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+
+        testee.onTrackersAnimationStarted()
+
+        verify(pixel).fire(
+            AppPixelName.TRACKERS_CIRCLES_ANIMATION_SHOWN,
+            mapOf(PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "true"),
+        )
     }
 
     private fun givenSiteLoaded(loadedUrl: String) {

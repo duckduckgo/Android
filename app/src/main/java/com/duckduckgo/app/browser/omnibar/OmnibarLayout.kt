@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.TabSwitcherButton
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -60,6 +61,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Outline
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CancelTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -88,7 +90,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -144,6 +145,9 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
+
     private lateinit var pulseAnimation: PulseAnimation
 
     private var omnibarTextListener: Omnibar.TextListener? = null
@@ -181,9 +185,6 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-
-    // internal val trackersBlockedAnimation: DaxTextView by lazy { findViewById(R.id.trackersBlockedTextView) }
-    // internal val trackersBlockedCountAnimation: DaxTextView by lazy { findViewById(R.id.trackersBlockedCountView) }
 
     init {
         val attr =
@@ -419,6 +420,10 @@ class OmnibarLayout @JvmOverloads constructor(
             is StartTrackersAnimation -> {
                 startTrackersAnimation(command.entities)
             }
+
+            is StartExperimentTrackersAnimation -> {
+                startExperimentTrackersAnimation(command.entities)
+            }
         }
     }
 
@@ -561,7 +566,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is QueueCookiesAnimation -> {
-                createCookiesAnimation(decoration.isCosmetic)
+                createCookiesAnimation(isCosmetic = decoration.isCosmetic, enqueueAnimation = true)
             }
 
             is ChangeCustomTabTitle -> {
@@ -626,13 +631,16 @@ class OmnibarLayout @JvmOverloads constructor(
 
         // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
+            // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
+            val isPrivacyShieldAnimation = targetView == placeholder
+            val isExperimentEnabled = appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()
             if (this::pulseAnimation.isInitialized) {
                 if (pulseAnimation.isActive) {
                     pulseAnimation.stop()
                 }
                 doOnLayout {
                     if (this::pulseAnimation.isInitialized) {
-                        pulseAnimation.playOn(targetView)
+                        pulseAnimation.playOn(targetView, isPrivacyShieldAnimation && isExperimentEnabled)
                     }
                 }
             }
@@ -651,7 +659,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun createCookiesAnimation(isCosmetic: Boolean) {
+    private fun createCookiesAnimation(isCosmetic: Boolean, enqueueAnimation: Boolean = false) {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.createCookiesAnimation(
                 context,
@@ -660,7 +668,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 cookieAnimation,
                 sceneRoot,
                 isCosmetic,
-                true,
+                enqueueAnimation,
             )
         }
     }
@@ -672,20 +680,23 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun startTrackersAnimation(events: List<Entity>?) {
-        // This is the animation we currently have in Production.
-//        animatorHelper.startTrackersAnimation(
-//            context = context,
-//            shieldAnimationView = shieldIcon,
-//            trackersAnimationView = trackersAnimation,
-//            omnibarViews = omnibarViews(),
-//            entities = events,
-//        )
+        animatorHelper.startTrackersAnimation(
+            context = context,
+            shieldAnimationView = shieldIcon,
+            trackersAnimationView = trackersAnimation,
+            omnibarViews = omnibarViews(),
+            entities = events,
+        )
 
+        viewModel.onTrackersAnimationStarted()
+    }
+
+    private fun startExperimentTrackersAnimation(events: List<Entity>?) {
         if (this::animatorHelper.isInitialized) {
             val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
             val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
 
-            animatorHelper.startNewTrackersAnimation(
+            animatorHelper.startExperimentTrackersAnimation(
                 context = context,
                 shieldAnimationView = shieldIcon,
                 trackersBlockedAnimationView = trackersBlockedAnimation,

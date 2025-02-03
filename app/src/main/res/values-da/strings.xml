@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet aktiveret for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet deaktiveret for %1$s</string>
     <string name="undoSnackbarAction">Fortryd</string>
+    <string name="trackersBlockedAnimationMessage">Trackere blokeret</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download billede</string>

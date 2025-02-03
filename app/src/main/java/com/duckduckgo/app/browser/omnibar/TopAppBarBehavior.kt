@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.appbar.AppBarLayout
 
@@ -58,11 +57,15 @@ class TopAppBarBehavior(
     }
 
     private fun offsetBottomByToolbar(view: View?) {
-        if (view?.layoutParams is MarginLayoutParams) {
-            view.updateLayoutParams<MarginLayoutParams> {
-                this.bottomMargin = omnibar.measuredHeight()
+        val omnibarHeight = omnibar.measuredHeight()
+        if (omnibarHeight > 0 && view is View && view.layoutParams is MarginLayoutParams) {
+            val layoutParams = view.layoutParams as MarginLayoutParams
+            if (layoutParams.bottomMargin != omnibarHeight) {
+                layoutParams.bottomMargin = omnibarHeight
+                view.postOnAnimation {
+                    view.requestLayout()
+                }
             }
-            view.requestLayout()
         }
     }
 }

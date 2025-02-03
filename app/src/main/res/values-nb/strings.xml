@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Personvern aktivert for %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Personvern deaktivert for %1$s</string>
     <string name="undoSnackbarAction">Angre</string>
+    <string name="trackersBlockedAnimationMessage">Blokkerte sporere</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Last ned bilde</string>
