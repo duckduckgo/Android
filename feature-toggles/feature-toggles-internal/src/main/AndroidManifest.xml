@@ -5,7 +5,7 @@
         <activity
             android:name="com.duckduckgo.examplefeature.internal.ui.FeatureToggleInventoryActivity"
             android:label="Feature Flag Inventory"
-            android:exported="false"
+            android:exported="true"
         />
 
     </application>
