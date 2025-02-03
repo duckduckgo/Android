@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -32,34 +33,46 @@ import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTheme) : PrivacyShieldAnimationHelper {
+class LottiePrivacyShieldAnimationHelper @Inject constructor(
+    private val appTheme: AppTheme,
+    private val appPersonalityFeature: AppPersonalityFeature,
+) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
         holder: LottieAnimationView,
         privacyShield: PrivacyShield,
     ) {
-        when (privacyShield) {
-            PROTECTED -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
-                holder.setAnimation(res)
-                holder.progress = 0.0f
-                Timber.i("Shield: PROTECTED")
-            }
-            UNPROTECTED -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.unprotected_shield else R.raw.dark_unprotected_shield
-                holder.setAnimation(res)
-                holder.progress = 1.0f
-                Timber.i("Shield: UNPROTECTED")
-            }
-            UNKNOWN -> {
-                Timber.i("Shield: UNKNOWN")
-            }
-            MALICIOUS -> {
-                val res = if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
-                holder.setAnimation(res)
-                holder.progress = 0.0f
-                Timber.i("Shield: WARNING")
-            }
+        val protectedShield: Int
+        val protectedShieldDark: Int
+        val unprotectedShield: Int
+        val unprotectedShieldDark: Int
+        if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+            protectedShield = R.raw.protected_shield_experiment
+            protectedShieldDark = R.raw.protected_shield_experiment
+            unprotectedShield = R.raw.unprotected_shield_experiment
+            unprotectedShieldDark = R.raw.unprotected_shield_experiment
+        } else {
+            protectedShield = R.raw.protected_shield
+            protectedShieldDark = R.raw.dark_protected_shield
+            unprotectedShield = R.raw.unprotected_shield
+            unprotectedShieldDark = R.raw.dark_unprotected_shield
+        }
+
+        val currentAnimation = holder.tag as? Int
+        val newAnimation = when (privacyShield) {
+            PROTECTED -> if (appTheme.isLightModeEnabled()) protectedShield else protectedShieldDark
+            UNPROTECTED -> if (appTheme.isLightModeEnabled()) unprotectedShield else unprotectedShieldDark
+            UNKNOWN -> null
+            MALICIOUS -> if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
+        }
+
+        if (newAnimation != null && newAnimation != currentAnimation) {
+            holder.setAnimation(newAnimation)
+            holder.tag = newAnimation
+            holder.progress = if (privacyShield == UNPROTECTED) 1.0f else 0.0f
+            Timber.d("Shield: $privacyShield")
+        } else {
+            Timber.d("Shield: $privacyShield - no change")
         }
     }
 }

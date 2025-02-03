@@ -63,6 +63,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga įjungta dėl %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga išjungta dėl %1$s</string>
     <string name="undoSnackbarAction">Anuliuoti</string>
+    <string name="trackersBlockedAnimationMessage">Sekimo priemonės užblokuotos</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>

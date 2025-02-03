@@ -21,11 +21,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
-
-    // TODO ANA: Add the new animation.
 
     /**
      * This method takes [entities] to create an animation in [trackersAnimationView].
@@ -45,6 +44,15 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
+    fun startExperimentTrackersAnimation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        entities: List<Entity>?,
+    )
+
     /**
      * This method creates or enqueues cookie consent animation.
      *
@@ -60,6 +68,7 @@ interface BrowserTrackersAnimatorHelper {
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     )
 
     /**
@@ -92,5 +101,5 @@ interface TrackersAnimatorListener {
      * Notifies the end of the animation.
      * The callback is not be invoked when a partial animation is paused.
      */
-    fun onAnimationFinished()
+    fun onAnimationFinished(logos: List<TrackerLogo>)
 }

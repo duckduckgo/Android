@@ -46,6 +46,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.ContextMenu
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -69,11 +70,13 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -103,10 +106,13 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
+import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
+import com.duckduckgo.app.browser.apppersonality.AppPersonalityFeature
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
@@ -140,6 +146,9 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.TrackersBlockedViewSlideBehavior
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
@@ -243,6 +252,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.isFullyWithinScreenBounds
+import com.duckduckgo.common.ui.view.isPartiallyWithinScreenBounds
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -303,6 +314,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -537,6 +549,15 @@ class BrowserTabFragment :
     @Inject
     lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
 
+    @Inject
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
+
+    @Inject
+    lateinit var appPersonalityFeature: AppPersonalityFeature
+
+    @Inject
+    lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -615,6 +636,8 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
+    private lateinit var offsetChangedListener: AppBarLayout.OnOffsetChangedListener
+
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -657,7 +680,14 @@ class BrowserTabFragment :
                     delay(COOKIES_ANIMATION_DELAY)
                 }
                 context?.let {
-                    omnibar.createCookiesAnimation(isCosmetic)
+                    if (appPersonalityFeature.self().isEnabled() &&
+                        appPersonalityFeature.trackersBlockedAnimation().isEnabled() &&
+                        viewModel.trackersCount().isNotEmpty()
+                    ) {
+                        omnibar.enqueueCookiesAnimation(isCosmetic)
+                    } else {
+                        omnibar.createCookiesAnimation(isCosmetic)
+                    }
                 }
             }
         }
@@ -791,6 +821,27 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
+    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>) {
+        experimentTrackersAnimationHelper.startTrackersBurstAnimation(
+            context = requireContext(),
+            trackersBurstAnimationView = binding.trackersBurstAnimationView,
+            omnibarShieldAnimationView = omnibar.shieldIcon,
+            omnibarPosition = omnibar.omnibarPosition,
+            omnibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar
+            } else {
+                binding.newOmnibarBottom
+            },
+            logos = logos,
+        )
+    }
+
+    private fun showExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIcon,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -865,6 +916,7 @@ class BrowserTabFragment :
         createPopupMenu()
 
         configureOmnibar()
+        configureTrackersBlockedSlidingView()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -925,6 +977,98 @@ class BrowserTabFragment :
                     browserActivity?.onEditModeChanged(isInEditMode)
                 }
             }.launchIn(lifecycleScope)
+        }
+    }
+
+    private fun configureTrackersBlockedSlidingView() {
+        if (!appPersonalityFeature.self().isEnabled() || !appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
+            return
+        }
+
+        removeTopOmnibarOffsetChangedListener()
+        val displayMetrics = resources.displayMetrics
+        val layoutParams = binding.trackersBlockedSlidingView.layoutParams as CoordinatorLayout.LayoutParams
+        when (omnibar.omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                val elevationInDp = 6
+                binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
+                layoutParams.gravity = Gravity.NO_GRAVITY
+                layoutParams.behavior = null
+                configureTopOmnibarOffsetChangedListener()
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                val elevationInDp = 4
+                binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
+                layoutParams.gravity = Gravity.BOTTOM
+                layoutParams.behavior =
+                    TrackersBlockedViewSlideBehavior(viewModel.siteLiveData, experimentTrackersCountAnimationHelper, requireContext())
+            }
+        }
+    }
+
+    private fun configureTopOmnibarOffsetChangedListener() {
+        offsetChangedListener = AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            val scrollFraction = -verticalOffset / totalScrollRange.toFloat()
+            notifyVerticalOffsetChanged(scrollFraction)
+        }
+
+        binding.newOmnibar.addOnOffsetChangedListener(offsetChangedListener)
+    }
+
+    private fun removeTopOmnibarOffsetChangedListener() {
+        if (::offsetChangedListener.isInitialized) {
+            binding.newOmnibar.removeOnOffsetChangedListener(offsetChangedListener)
+        }
+    }
+
+    private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        // Ensure the trackersBlockedSlidingView is hidden on new tab or when scrolling is disabled.
+        if (binding.trackersBlockedSlidingView.isVisible && (binding.browserLayout.isGone || !binding.newOmnibar.isOmnibarScrollingEnabled())) {
+            binding.trackersBlockedSlidingView.hide()
+            return
+        }
+
+        if (!viewModel.isSiteProtected() || scrollFraction == 1.0f) {
+            return
+        }
+
+        // Move the trackersBlockedSlidingView in sync with the top omnibar.
+        binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
+        if (scrollFraction == 0.0f) {
+            binding.trackersBlockedSlidingView.post {
+                binding.trackersBlockedSlidingView.gone()
+            }
+            offsetTopBySlidingView(binding.browserLayout, scrollFraction)
+        } else {
+            if (binding.trackersBurstAnimationView.isAnimating) {
+                binding.trackersBurstAnimationView.cancelAnimation()
+            }
+            experimentTrackersCountAnimationHelper.animate(binding.trackers, viewModel.siteLiveData)
+            binding.website.text = viewModel.url?.extractDomain()
+            binding.trackersBlockedSlidingView.post {
+                binding.trackersBlockedSlidingView.x = 0f
+                binding.trackersBlockedSlidingView.y = 0f
+                binding.trackersBlockedSlidingView.show()
+            }
+            offsetTopBySlidingView(binding.browserLayout, scrollFraction)
+        }
+    }
+
+    private fun offsetTopBySlidingView(
+        view: View?,
+        scrollFraction: Float,
+    ) {
+        (view?.layoutParams as? CoordinatorLayout.LayoutParams)?.let { layoutParams ->
+            val newTopMargin =
+                binding.trackersBlockedSlidingView.measuredHeight - binding.trackersBlockedSlidingView.height * (1 - scrollFraction).toInt()
+            if (layoutParams.topMargin != newTopMargin) {
+                layoutParams.topMargin = newTopMargin
+                view.postOnAnimation {
+                    view.requestLayout()
+                }
+            }
         }
     }
 
@@ -1167,6 +1311,7 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            removeTopOmnibarOffsetChangedListener()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
@@ -1194,6 +1339,8 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
+        experimentTrackersCountAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -1879,7 +2026,8 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
-
+            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos)
+            is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }
@@ -2549,6 +2697,10 @@ class BrowserTabFragment :
                         state.hasFocus,
                         true,
                     )
+                }
+
+                override fun onTrackersCountFinished(logos: List<TrackerLogo>) {
+                    viewModel.onAnimationFinished(logos)
                 }
             },
         )
@@ -3822,7 +3974,7 @@ class BrowserTabFragment :
                 }
                 val privacyProtectionsPopupVisible = lastSeenBrowserViewState
                     ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
-                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible && isOmnibarOnScreen()) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
@@ -3830,6 +3982,11 @@ class BrowserTabFragment :
                     }
                 }
             }
+        }
+
+        private fun isOmnibarOnScreen(): Boolean {
+            return (omnibar.omnibarPosition == OmnibarPosition.TOP && binding.newOmnibar.isFullyWithinScreenBounds()) ||
+                (omnibar.omnibarPosition == OmnibarPosition.BOTTOM && binding.newOmnibarBottom.isPartiallyWithinScreenBounds())
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {

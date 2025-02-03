@@ -69,6 +69,7 @@ interface Site {
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun privacyProtection(): PrivacyShield
+    fun resetTrackingEvents()
 
     var urlParametersRemoved: Boolean
     var consentManaged: Boolean
@@ -81,6 +82,8 @@ interface Site {
     val realBrokenSiteContext: BrokenSiteContext
 
     var maliciousSiteStatus: MaliciousSiteStatus?
+
+    var previousNumberOfBlockedTrackers: Int?
 }
 
 enum class MaliciousSiteStatus {
@@ -88,10 +91,13 @@ enum class MaliciousSiteStatus {
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents
+    .asSequence()
     .filter { it.status == TrackerStatus.BLOCKED }
     .mapNotNull { it.entity }
     .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }
+    .toList()
+    .also { previousNumberOfBlockedTrackers = it.size }
 
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
