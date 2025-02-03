@@ -603,6 +603,29 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenFireButtonItemHighlightedRemovedThenViewStateCorrect() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightPrivacyShield == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+
+            assertFalse(viewState.scrollingEnabled)
+        }
+    }
+
+    @Test
     fun whenFireIconPressedAndFireIconHighlightedThenViewStateCorrectAndPixelSent() = runTest {
         val animationPlaying = true
         testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
