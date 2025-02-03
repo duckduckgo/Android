@@ -302,19 +302,6 @@ class CtaViewModel @Inject constructor(
         !hideTips() &&
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
-    private suspend fun canShowOnboardingDaxDialogCta(): Boolean {
-        return when {
-            !daxOnboardingActive() || hideTips() -> false
-            extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                settingsDataStore.hideTips = true
-                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-                false
-            }
-
-            else -> true
-        }
-    }
-
     private suspend fun canShowPrivacyProCta(): Boolean {
         return daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() &&
             subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
@@ -334,7 +321,7 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (!canShowOnboardingDaxDialogCta()) {
+            if (areInContextDaxDialogsCompleted()) {
                 return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)) {
                     BrokenSitePromptDialogCta()
                 } else {
