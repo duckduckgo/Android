@@ -2727,6 +2727,9 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)
             }
+            if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+            }
         }
     }
 
@@ -3539,9 +3542,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
-                if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
-                    browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-                }
                 viewModelScope.launch {
                     val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
@@ -3579,10 +3579,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
-        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-        }
-
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
@@ -3592,11 +3588,6 @@ class BrowserTabViewModel @Inject constructor(
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
-        }
-        if (currentBrowserViewState().fireButton.isHighlighted()) {
-            viewModelScope.launch {
-                ctaViewModel.dismissPulseAnimation()
-            }
         }
     }
 
