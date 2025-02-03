@@ -80,6 +80,7 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         lifecycleOwner.lifecycle.removeObserver(this)
     }
 
+    @SuppressLint("NoHardcodedCoroutineDispatcher")
     private fun startPulseAnimation(view: View, isExperimentAndShieldView: Boolean) {
         if (!pulseAnimation.isRunning) {
             val pulse = getPulseObjectAnimator(view)
