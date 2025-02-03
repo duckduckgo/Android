@@ -964,12 +964,12 @@ class BrowserTabFragment :
             if (binding.trackersBurstAnimationView.isAnimating) {
                 binding.trackersBurstAnimationView.cancelAnimation()
             }
-            binding.trackers.text = viewModel.trackersCount()
+            val count = viewModel.trackersCount()
+            if (count != binding.trackers.text) {
+                binding.trackers.text = count
+            }
             binding.website.text = viewModel.url?.extractDomain()
             binding.trackersBlockedSlidingView.show()
-        }
-        binding.trackersBlockedSlidingView.postOnAnimation {
-            binding.trackersBlockedSlidingView.requestLayout()
         }
     }
 
