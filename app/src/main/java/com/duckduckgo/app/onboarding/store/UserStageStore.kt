@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface UserStageStore {
+    fun userAppStageFlow(): Flow<AppStage>
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
     suspend fun moveToStage(appStage: AppStage)
@@ -33,6 +34,10 @@ class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
     private val dispatcher: DispatcherProvider,
 ) : UserStageStore {
+
+    override fun userAppStageFlow(): Flow<AppStage> {
+        return userStageDao.currentUserAppStageFlow().map { it?.appStage ?: AppStage.NEW }
+    }
 
     override suspend fun getUserAppStage(): AppStage {
         return withContext(dispatcher.io()) {

@@ -45,13 +45,18 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultAppsActivity
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -141,6 +146,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var maliciousSiteBlockerWebViewIntegration: RealMaliciousSiteBlockerWebViewIntegration
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
@@ -238,6 +246,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
+    private val startDefaultBrowserSystemDialogForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.onSystemDefaultBrowserDialogSuccess()
+            } else {
+                viewModel.onSystemDefaultBrowserDialogCanceled()
+            }
+        }
+
+    private val startDefaultAppsSystemActivityForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            viewModel.onSystemDefaultAppsActivityClosed()
+        }
+
+    private var setAsDefaultBrowserDialog: DefaultBrowserBottomSheetDialog? = null
+
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
@@ -255,6 +279,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar
             }
+
             BOTTOM -> {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar
@@ -386,7 +411,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.commit()
     }
 
-    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onKeyLongPress(
+        keyCode: Int,
+        event: KeyEvent?,
+    ): Boolean {
         return if (keyCode == KeyEvent.KEYCODE_BACK) {
             currentTab?.onLongPressBackButton()
             true
@@ -580,6 +608,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.SwitchToTab -> openExistingTab(command.tabId)
             is Command.OpenInNewTab -> launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
+            is Command.HideSetAsDefaultBrowserDialog -> hideSetAsDefaultBrowserDialog()
+            is ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
+            is ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
         }
     }
 
@@ -821,6 +853,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     override fun onDialogShown() {
                         viewModel.onAppRatingDialogShown(promptCount)
                     }
+
                     override fun onDialogCancelled() {
                         viewModel.onUserCancelledRateAppDialog(promptCount)
                     }
@@ -944,6 +977,52 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,
     )
+
+    private fun showSetAsDefaultBrowserDialog() {
+        val dialog = DefaultBrowserBottomSheetDialog(context = this)
+        dialog.eventListener = object : EventListener {
+            override fun onShown() {
+                viewModel.onSetDefaultBrowserDialogShown()
+            }
+
+            override fun onDismissed() {
+                viewModel.onSetDefaultBrowserDismissed()
+            }
+
+            override fun onSetBrowserButtonClicked() {
+                viewModel.onSetDefaultBrowserConfirmationButtonClicked()
+            }
+
+            override fun onNotNowButtonClicked() {
+                viewModel.onSetDefaultBrowserNotNowButtonClicked()
+            }
+        }
+        dialog.show()
+        setAsDefaultBrowserDialog = dialog
+    }
+
+    private fun hideSetAsDefaultBrowserDialog() {
+        setAsDefaultBrowserDialog?.dismiss()
+        setAsDefaultBrowserDialog = null
+    }
+
+    private fun showSystemDefaultAppsActivity(intent: Intent) {
+        try {
+            startDefaultAppsSystemActivityForResult.launch(intent)
+            viewModel.onSystemDefaultAppsActivityOpened()
+        } catch (ex: Exception) {
+            Timber.e(ex)
+        }
+    }
+
+    private fun showSystemDefaultBrowserDialog(intent: Intent) {
+        try {
+            startDefaultBrowserSystemDialogForResult.launch(intent)
+            viewModel.onSystemDefaultBrowserDialogShown()
+        } catch (ex: Exception) {
+            Timber.e(ex)
+        }
+    }
 }
 
 // Temporary class to keep track of latest visited tabs, keeping unique ids.

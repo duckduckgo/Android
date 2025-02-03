@@ -68,7 +68,13 @@ class RealMaliciousSiteProtection @Inject constructor(
             }
         }
         appCoroutineScope.launch(dispatchers.io()) {
-            confirmationCallback(matches(hashPrefix, url, hostname, hash))
+            try {
+                val matches = matches(hashPrefix, url, hostname, hash)
+                confirmationCallback(matches)
+            } catch (e: Exception) {
+                Timber.e(e, "\uD83D\uDD34 Cris: shouldBlock $url")
+                confirmationCallback(false)
+            }
         }
         return IsMaliciousResult.WAIT_FOR_CONFIRMATION
     }

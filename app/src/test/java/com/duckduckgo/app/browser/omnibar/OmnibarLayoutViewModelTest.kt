@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
@@ -31,6 +32,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -58,6 +60,9 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
+    private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -68,6 +73,7 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
+        whenever(defaultBrowserPromptsExperiment.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -106,6 +112,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
         )
     }
 
@@ -295,6 +302,17 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenViewModeChangedToMaliciousSiteWarningThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.scrollingEnabled)
+        }
+    }
+
+    @Test
     fun whenViewModeChangedToNewTabThenViewStateCorrect() = runTest {
         testee.onViewModeChanged(ViewMode.NewTab)
 
@@ -331,6 +349,17 @@ class OmnibarLayoutViewModelTest {
     fun whenViewModeChangedToSSLWarningAndFocusThenViewStateCorrect() = runTest {
         testee.onOmnibarFocusChanged(true, RANDOM_URL)
         testee.onViewModeChanged(ViewMode.SSLWarning)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToMaliciousSiteWarningAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -902,6 +931,16 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun `when default browser experiment updates browser menu highlight, then update the view state`() = runTest {
+        defaultBrowserPromptsExperimentHighlightOverflowMenuFlow.value = true
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showBrowserMenuHighlight)
         }
     }
 

@@ -86,6 +86,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
 import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
@@ -505,6 +506,9 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
+    private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
+    private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -609,6 +613,9 @@ class BrowserTabViewModelTest {
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(false)
+        whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
+            defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
+        )
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -676,6 +683,8 @@ class BrowserTabViewModelTest {
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
+            maliciousSiteBlockerWebViewIntegration = mock(),
+            defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
         )
 
@@ -5109,16 +5118,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRecoveringFromSSLWarningPageAndBrowserShouldShowThenViewStatesUpdated() {
-        testee.recoverFromSSLWarningPage(true)
+    fun whenRecoveringFromWarningPageAndBrowserShouldShowThenViewStatesUpdated() {
+        testee.recoverFromWarningPage(true)
 
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(true, browserViewState().browserShowing)
     }
 
     @Test
-    fun whenRecoveringFromSSLWarningPageAndBrowserShouldNotShowThenViewStatesUpdated() = runTest {
-        testee.recoverFromSSLWarningPage(false)
+    fun whenRecoveringFromWarningPageAndBrowserShouldNotShowThenViewStatesUpdated() = runTest {
+        testee.recoverFromWarningPage(false)
 
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(false, browserViewState().browserShowing)
@@ -5650,6 +5659,29 @@ class BrowserTabViewModelTest {
         testee.userLaunchingTabSwitcher()
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
+    }
+
+    @Test
+    fun whenInitialisedThenDefaultBrowserMenuButtonIsNotShown() {
+        assertFalse(browserViewState().showSelectDefaultBrowserMenuItem)
+    }
+
+    @Test
+    fun whenDefaultBrowserMenuButtonVisibilityChangesThenShowIt() = runTest {
+        defaultBrowserPromptsExperimentShowPopupMenuItemFlow.value = true
+        assertTrue(browserViewState().showSelectDefaultBrowserMenuItem)
+    }
+
+    @Test
+    fun whenDefaultBrowserMenuButtonClickedThenNotifyExperiment() = runTest {
+        testee.onSetDefaultBrowserSelected()
+        verify(mockDefaultBrowserPromptsExperiment).onSetAsDefaultPopupMenuItemSelected()
+    }
+
+    @Test
+    fun whenPopupMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() = runTest {
+        testee.onPopupMenuLaunched()
+        verify(mockDefaultBrowserPromptsExperiment).onPopupMenuLaunched()
     }
 
     private fun givenTabManagerData() = runTest {

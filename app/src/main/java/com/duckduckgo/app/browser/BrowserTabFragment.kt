@@ -110,6 +110,8 @@ import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
+import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -225,6 +227,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -584,6 +587,9 @@ class BrowserTabFragment :
 
     private val errorView
         get() = binding.includeErrorView
+
+    private val maliciousWarningView
+        get() = binding.maliciousSiteWarningLayout
 
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
@@ -1100,6 +1106,7 @@ class BrowserTabFragment :
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
                 popupMenu.show(binding.rootView, omnibar.toolbar)
+                viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
                 } else {
@@ -1347,6 +1354,7 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
     }
 
     private fun showBrowser() {
@@ -1358,6 +1366,7 @@ class BrowserTabFragment :
         webView?.onResume()
         errorView.errorLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
     }
 
@@ -1369,6 +1378,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         sslErrorView.gone()
+        maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
@@ -1379,6 +1389,71 @@ class BrowserTabFragment :
             errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+    }
+
+    private fun showMaliciousWarning(url: Uri) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabContainerLayout.gone()
+        sslErrorView.gone()
+        errorView.errorLayout.gone()
+        binding.browserLayout.gone()
+        omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
+        webView?.onPause()
+        webView?.hide()
+        webView?.stopLoading()
+        maliciousWarningView.bind { action ->
+            viewModel.onMaliciousSiteUserAction(action, url)
+        }
+        maliciousWarningView.show()
+        binding.focusDummy.requestFocus()
+    }
+
+    private fun hideMaliciousWarning() {
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        if (currentIndex >= 0) {
+            Timber.d("MaliciousSite: hiding warning page and triggering a reload of the previous")
+            viewModel.recoverFromWarningPage(true)
+            refresh()
+        } else {
+            Timber.d("MaliciousSite: no previous page to load, showing home")
+            viewModel.recoverFromWarningPage(false)
+            renderer.showNewTab()
+            maliciousWarningView.gone()
+        }
+    }
+
+    private fun onEscapeMaliciousSite() {
+        maliciousWarningView.gone()
+        viewModel.openNewTab()
+        viewModel.closeCurrentTab()
+    }
+
+    private fun onBypassMaliciousWarning(url: Uri) {
+        showBrowser()
+        webView?.loadUrl(url.toString())
+    }
+
+    private fun openBrokenSiteLearnMore(url: String) {
+        globalActivityStarter.start(
+            this.requireContext(),
+            WebViewActivityWithParams(
+                url = url,
+                getString(R.string.maliciousSiteLearnMoreTitle),
+            ),
+        )
+    }
+
+    private fun openBrokenSiteReportError(url: String) {
+        globalActivityStarter.start(
+            this.requireContext(),
+            WebViewActivityWithParams(
+                url = url,
+                getString(R.string.maliciousSiteReportErrorTitle),
+            ),
+        )
     }
 
     private fun showSSLWarning(
@@ -1393,6 +1468,7 @@ class BrowserTabFragment :
         omnibar.setViewMode(ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
+        maliciousWarningView.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
@@ -1405,11 +1481,11 @@ class BrowserTabFragment :
 
         if (currentIndex >= 0) {
             Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
-            viewModel.recoverFromSSLWarningPage(true)
+            viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
             Timber.d("SSLError: no previous page to load, showing home")
-            viewModel.recoverFromSSLWarningPage(false)
+            viewModel.recoverFromWarningPage(false)
         }
     }
 
@@ -1729,6 +1805,12 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
+            is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
+            is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
+            is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
+            is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
@@ -4003,7 +4085,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showNewTab() {
+        fun showNewTab() {
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
                 if (newBrowserTab.newTabContainerLayout.childCount == 0) {
                     newBrowserTab.newTabContainerLayout.addView(

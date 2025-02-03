@@ -131,7 +131,11 @@ class SpecialUrlDetectorImpl(
 
     @Throws(URISyntaxException::class)
     private fun queryActivities(intent: Intent): List<ResolveInfo> {
-        return packageManager.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
+        return try {
+            packageManager.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
+        } catch (t: Throwable) {
+            emptyList()
+        }
     }
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {

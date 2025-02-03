@@ -44,7 +44,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -623,7 +622,7 @@ class BrokenSiteSubmitterTest {
     }
 
     private fun assignToExperiment() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
             State(
                 remoteEnableState = true,

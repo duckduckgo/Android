@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -23,7 +24,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.BrowserViewModel.Command.HideSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
@@ -85,6 +91,7 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : ViewModel(),
     CoroutineScope {
@@ -107,6 +114,10 @@ class BrowserViewModel @Inject constructor(
         data class SwitchToTab(val tabId: String) : Command()
         data class OpenInNewTab(val url: String) : Command()
         data class OpenSavedSite(val url: String) : Command()
+        data object ShowSetAsDefaultBrowserDialog : Command()
+        data object HideSetAsDefaultBrowserDialog : Command()
+        data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
+        data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -164,6 +175,23 @@ class BrowserViewModel @Inject constructor(
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+        viewModelScope.launch {
+            defaultBrowserPromptsExperiment.commands.collect {
+                when (it) {
+                    OpenMessageDialog -> {
+                        command.value = Command.ShowSetAsDefaultBrowserDialog
+                    }
+
+                    is OpenSystemDefaultAppsActivity -> {
+                        command.value = Command.ShowSystemDefaultAppsActivity(it.intent)
+                    }
+
+                    is OpenSystemDefaultBrowserDialog -> {
+                        command.value = Command.ShowSystemDefaultBrowserDialog(it.intent)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
@@ -347,6 +375,44 @@ class BrowserViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             tabRepository.updateTabLastAccess(tabId)
         }
+    }
+
+    fun onSetDefaultBrowserDialogShown() {
+        defaultBrowserPromptsExperiment.onMessageDialogShown()
+    }
+
+    fun onSetDefaultBrowserDismissed() {
+        defaultBrowserPromptsExperiment.onMessageDialogDismissed()
+    }
+
+    fun onSetDefaultBrowserConfirmationButtonClicked() {
+        command.value = HideSetAsDefaultBrowserDialog
+        defaultBrowserPromptsExperiment.onMessageDialogConfirmationButtonClicked()
+    }
+
+    fun onSetDefaultBrowserNotNowButtonClicked() {
+        command.value = HideSetAsDefaultBrowserDialog
+        defaultBrowserPromptsExperiment.onMessageDialogNotNowButtonClicked()
+    }
+
+    fun onSystemDefaultBrowserDialogShown() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogShown()
+    }
+
+    fun onSystemDefaultBrowserDialogSuccess() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogSuccess()
+    }
+
+    fun onSystemDefaultBrowserDialogCanceled() {
+        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogCanceled()
+    }
+
+    fun onSystemDefaultAppsActivityOpened() {
+        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityOpened()
+    }
+
+    fun onSystemDefaultAppsActivityClosed() {
+        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityClosed()
     }
 
     fun onTabsSwiped() {

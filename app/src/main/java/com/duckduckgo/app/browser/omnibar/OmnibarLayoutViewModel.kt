@@ -22,10 +22,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
@@ -77,14 +79,20 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = combine(_viewState, tabRepository.flowTabs) { state, tabs ->
+    val viewState = combine(
+        _viewState,
+        tabRepository.flowTabs,
+        defaultBrowserPromptsExperiment.highlightPopupMenu,
+    ) { state, tabs, highlightOverflowMenu ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+            showBrowserMenuHighlight = highlightOverflowMenu,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -112,6 +120,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
+        val showBrowserMenuHighlight: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -226,9 +235,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error -> GLOBE
+            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
             NewTab -> SEARCH
-            SSLWarning -> GLOBE
             else -> {
                 if (hasFocus) {
                     SEARCH
@@ -294,9 +302,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     LeadingIconState.SEARCH
                 } else {
                     when (viewMode) {
-                        Error -> GLOBE
+                        Error, SSLWarning, MaliciousSiteWarning -> GLOBE
                         NewTab -> SEARCH
-                        SSLWarning -> GLOBE
                         else -> SEARCH
                     }
                 }
