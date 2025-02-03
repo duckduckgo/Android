@@ -91,8 +91,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -216,6 +214,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureFab()
         configureObservers()
         configureOnBackPressedListener()
+
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            initMenuClickListeners()
+        }
     }
 
     private fun configureFab() {
@@ -593,6 +595,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         popupBinding.bookmarkSelectedTabsMenuItem.apply {
             setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, 1))
         }
+    }
+
+    private fun initMenuClickListeners() {
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkSelectedTabsMenuItem)) { viewModel.onBookmarkSelectedTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.bookmarkAllTabsMenuItem)) { viewModel.onBookmarkAllTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectTabsMenuItem)) { viewModel.onSelectionModeRequested() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeSelectedTabsMenuItem)) { viewModel.onCloseSelectedTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeOtherTabsMenuItem)) { viewModel.onCloseOtherTabs() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.closeAllTabsMenuItem)) { viewModel.onCloseAllTabsRequested() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
