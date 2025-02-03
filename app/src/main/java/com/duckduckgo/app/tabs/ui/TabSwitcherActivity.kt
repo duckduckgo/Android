@@ -18,7 +18,10 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -26,6 +29,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -253,6 +257,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
+                invalidateOptionsMenu()
+
                 updateFabType(it.fabType)
             }
         }
@@ -370,7 +376,62 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            val mode = viewModel.viewState.value.mode
+            when (mode) {
+                TabSwitcherViewModel.ViewState.Mode.Normal -> {
+                    createNormalModeMenu(menu)
+                }
+                is TabSwitcherViewModel.ViewState.Mode.Selection -> {
+                    if (mode.selectedTabs.isNotEmpty()) {
+                        createSelectionModeMenu(menu, mode.selectedTabs.size)
+                    } else {
+                        createEmptySelectionModeMenu(menu)
+                    }
+                }
+            }
+
+            MenuCompat.setGroupDividerEnabled(menu, true)
+        } else {
+            menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
+            layoutTypeMenuItem = menu.findItem(R.id.layoutType)
+
+            when (layoutType) {
+                LayoutType.GRID -> showListLayoutButton()
+                LayoutType.LIST -> showGridLayoutButton()
+                null -> layoutTypeMenuItem?.isVisible = false
+            }
+        }
+
+        return true
+    }
+
+    private fun createSelectionModeMenu(menu: Menu, numSelectedTabs: Int) {
+        menuInflater.inflate(R.menu.menu_tab_switcher_selection_mode, menu)
+        menu.findItem(R.id.shareSelectedLinks).title = resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs)
+        menu.findItem(R.id.shareSelectedLinksIcon).title = resources.getQuantityString(
+            R.plurals.shareLinksMenuItem,
+            numSelectedTabs,
+            numSelectedTabs,
+        )
+        menu.findItem(R.id.bookmarkSelectedTabs).title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs)
+        menu.findItem(R.id.bookmarkSelectedTabsIcon).title = resources.getQuantityString(
+            R.plurals.bookmarkTabsMenuItem,
+            numSelectedTabs,
+            numSelectedTabs,
+        )
+        menu.findItem(R.id.closeSelectedTabs).title = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
+        menu.findItem(R.id.closeSelectedTabs).colorRed()
+        menu.findItem(R.id.closeOtherTabs).colorRed()
+    }
+
+    private fun createEmptySelectionModeMenu(menu: Menu) {
+        menuInflater.inflate(R.menu.menu_tab_switcher_selection_mode_no_selection, menu)
+        menu.findItem(R.id.closeAllTabs).colorRed()
+    }
+
+    private fun createNormalModeMenu(menu: Menu) {
+        menuInflater.inflate(R.menu.menu_tab_switcher_normal_mode, menu)
         layoutTypeMenuItem = menu.findItem(R.id.layoutType)
 
         when (layoutType) {
@@ -379,7 +440,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             null -> layoutTypeMenuItem?.isVisible = false
         }
 
-        return true
+        menu.findItem(R.id.shareSelectedLinks).title = resources.getQuantityString(R.plurals.shareLinksMenuItem, 1)
+        menu.findItem(R.id.bookmarkSelectedTabs).title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, 1)
+        menu.findItem(R.id.closeAllTabs).colorRed()
+    }
+
+    private fun MenuItem.colorRed() {
+        val text = SpannableString(title)
+        text.setSpan(ForegroundColorSpan(Color.RED), 0, text.length, 0)
+        title = text
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
