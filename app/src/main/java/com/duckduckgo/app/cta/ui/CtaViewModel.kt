@@ -334,7 +334,7 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (!canShowOnboardingDaxDialogCta()) {
+            if (areInContextDaxDialogsCompleted()) {
                 return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)) {
                     BrokenSitePromptDialogCta()
                 } else {
