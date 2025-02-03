@@ -237,6 +237,8 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -258,6 +260,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.AFTER_BURST_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -305,6 +309,7 @@ import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -460,6 +465,8 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val appPersonalityFeature: AppPersonalityFeature,
+    private val userStageStore: UserStageStore,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1482,6 +1489,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         cleanupBlobDownloadReplyProxyMaps()
+        privacyDashboardExternalPixelParams.clearPixelParams()
 
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
@@ -1898,7 +1906,6 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-            // TODO ANA: Send command to add / remove sliding view if protected / unprotected
 
             Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
@@ -3095,6 +3102,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onWebViewRefreshed() {
+        site?.resetTrackingEvents()
         refreshBrowserError()
         resetAutoConsent()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
@@ -3792,12 +3800,32 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAnimationFinished(logos: List<TrackerLogo>) {
+        if (logos.isEmpty()) {
+            return
+        }
+
         if (appPersonalityFeature.self().isEnabled() && appPersonalityFeature.trackersBlockedAnimation().isEnabled()) {
-            command.value = Command.StartTrackersLogosAnimation(logos)
+            if (logos.size > TRACKER_LOGO_ANIMATION_THRESHOLD) {
+                command.value = Command.StartExperimentTrackersBurstAnimation(logos)
+                viewModelScope.launch {
+                    pixel.fire(
+                        AppPixelName.TRACKERS_BURST_ANIMATION_SHOWN,
+                        mapOf(TRACKERS_ANIMATION_SHOWN_DURING_ONBOARDING to "${userStageStore.getUserAppStage() != AppStage.ESTABLISHED}"),
+                    )
+                    privacyDashboardExternalPixelParams.setPixelParams(AFTER_BURST_ANIMATION, "true")
+                }
+            } else {
+                command.value = Command.StartExperimentShieldPopAnimation
+            }
         }
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
+
+    fun isSiteProtected(): Boolean {
+        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
+        return shield == PrivacyShield.PROTECTED
+    }
 
     companion object {
         private const val FIXED_PROGRESS = 50
@@ -3811,6 +3839,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
         private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix
         private const val HTTP_STATUS_CODE_SERVER_ERROR_PREFIX = 5 // 5xx, server error status code prefix
+
+        private const val TRACKER_LOGO_ANIMATION_THRESHOLD = 2
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(

@@ -76,6 +76,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -103,7 +104,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.TrackersCircleAnimationHelper
+import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -532,7 +533,7 @@ class BrowserTabFragment :
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     @Inject
-    lateinit var animatorHelper: TrackersCircleAnimationHelper
+    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
@@ -806,13 +807,24 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private fun showNewTrackersBlockingAnimation(logos: List<TrackerLogo>) {
-        animatorHelper.startTrackersCircleAnimation(
+    private fun showExperimentTrackersBurstAnimation(logos: List<TrackerLogo>) {
+        experimentTrackersAnimationHelper.startTrackersBurstAnimation(
             context = requireContext(),
-            trackersCircleAnimationView = binding.newTrackersBlockingAnimationView,
+            trackersBurstAnimationView = binding.trackersBurstAnimationView,
             omnibarShieldAnimationView = omnibar.shieldIcon,
             omnibarPosition = omnibar.omnibarPosition,
+            omnibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar
+            } else {
+                binding.newOmnibarBottom
+            },
             logos = logos,
+        )
+    }
+
+    private fun showExperimentShieldPopAnimation() {
+        experimentTrackersAnimationHelper.startShieldPopAnimation(
+            omnibarShieldAnimationView = omnibar.shieldIcon,
         )
     }
 
@@ -947,15 +959,31 @@ class BrowserTabFragment :
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        // Ensure the trackersBlockedSlidingView is hidden on new tab or when scrolling is disabled.
+        if (binding.trackersBlockedSlidingView.isVisible && (binding.browserLayout.isGone || !binding.newOmnibar.isOmnibarScrollingEnabled())) {
+            binding.trackersBlockedSlidingView.hide()
+            return
+        }
+
+        if (!viewModel.isSiteProtected() || scrollFraction == 1.0f) {
+            return
+        }
+
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
         binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
             binding.trackersBlockedSlidingView.gone()
         } else {
+            if (binding.trackersBurstAnimationView.isAnimating) {
+                binding.trackersBurstAnimationView.cancelAnimation()
+            }
+            val count = viewModel.trackersCount()
+            if (count != binding.trackers.text) {
+                binding.trackers.text = count
+            }
+            binding.website.text = viewModel.url?.extractDomain()
             binding.trackersBlockedSlidingView.show()
         }
-        binding.trackers.text = viewModel.trackersCount()
-        binding.website.text = viewModel.url?.extractDomain()
     }
 
     private fun onOmnibarTabsButtonPressed() {
@@ -1218,6 +1246,7 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
+        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -1880,7 +1909,8 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
                 browserActivity?.openExistingTab(it.tabId)
             }
-            is Command.StartTrackersLogosAnimation -> showNewTrackersBlockingAnimation(it.logos)
+            is Command.StartExperimentTrackersBurstAnimation -> showExperimentTrackersBurstAnimation(it.logos)
+            is Command.StartExperimentShieldPopAnimation -> showExperimentShieldPopAnimation()
             else -> {
                 // NO OP
             }

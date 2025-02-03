@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -97,6 +98,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
+    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -232,7 +234,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
+            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams() + privacyDashboardExternalPixelParams.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = Count)
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
