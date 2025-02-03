@@ -22,8 +22,12 @@ import android.view.Gravity
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -45,9 +49,21 @@ class TrackersBlockedViewSlideBehavior(
     private var gravity: Int? = null
     private var trackers: DaxTextView? = null
     private var website: DaxTextView? = null
+    private var trackersBurstAnimationView: LottieAnimationView? = null
+    private var browserLayout: View? = null
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: View, dependency: View): Boolean {
-        if (dependency.id == R.id.newOmnibarBottom) {
+        // Avoid any unnecessary operations. Hide the child if it's visible on new tab (the browser layout is gone or scrolling is disabled).
+        if (child.isVisible && (browserLayout?.isGone == true || bottomOmnibar?.isOmnibarScrollingEnabled() == false)) {
+            child.hide()
+            return false
+        }
+
+        if (dependency.id == R.id.browserLayout) {
+            browserLayout = dependency
+        } else if (dependency.id == R.id.trackersBurstAnimationView) {
+            trackersBurstAnimationView = dependency as LottieAnimationView
+        } else if (dependency.id == R.id.newOmnibarBottom) {
             if (gravity == null) {
                 val layoutParams = child.layoutParams as? CoordinatorLayout.LayoutParams
                 gravity = layoutParams?.gravity
@@ -71,17 +87,23 @@ class TrackersBlockedViewSlideBehavior(
         consumed: IntArray,
         type: Int,
     ) {
-        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true) {
+        if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
-            if (translation == 0f) {
+            val bottomOmnibarHeight = bottomOmnibar?.height ?: 0
+            if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true) {
                 child.hide()
             } else {
                 val site = siteLiveData.value
                 trackers?.text = site?.trackerCount.toString()
                 website?.text = site?.url?.extractDomain()
+                if (trackersBurstAnimationView?.isAnimating == true) {
+                    trackersBurstAnimationView?.cancelAnimation()
+                }
                 child.show()
             }
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+            child.postOnAnimation {
+                super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+            }
         }
     }
 
@@ -97,5 +119,11 @@ class TrackersBlockedViewSlideBehavior(
             return false
         }
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+    }
+
+    private fun isSiteProtected(): Boolean {
+        val site = siteLiveData.value
+        val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
+        return shield == PrivacyShield.PROTECTED
     }
 }

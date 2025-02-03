@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου απενεργοποιήθηκε για %1$s</string>
     <string name="undoSnackbarAction">Αναίρεση</string>
+    <string name="trackersBlockedAnimationMessage">Αποκλεισμένες εφαρμογές παρακολούθησης</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Λήψη εικόνας</string>

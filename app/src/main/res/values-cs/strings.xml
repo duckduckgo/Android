@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí vypnutá pro %1$s</string>
     <string name="undoSnackbarAction">Vrátit</string>
+    <string name="trackersBlockedAnimationMessage">Trackery jsou zablokované</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>

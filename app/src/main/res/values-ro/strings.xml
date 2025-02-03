@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protecția confidențialității activată pentru %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Protecția confidențialității dezactivată pentru %1$s</string>
     <string name="undoSnackbarAction">Anulează</string>
+    <string name="trackersBlockedAnimationMessage">Instrumente de urmărire blocate</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Descarcă imaginea</string>

@@ -64,6 +64,7 @@
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrona prywatności włączona dla %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrona prywatności wyłączona dla %1$s</string>
     <string name="undoSnackbarAction">Cofnij</string>
+    <string name="trackersBlockedAnimationMessage">Trackers Blocked</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Pobierz obraz</string>
