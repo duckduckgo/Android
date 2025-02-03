@@ -81,6 +81,8 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     val processedUrls = mutableListOf<String>()
 
     private var isFeatureEnabled = false
+    private val isSettingEnabled: Boolean
+        get() = settingsDataStore.maliciousSiteProtectionEnabled
     private var currentCheckId = AtomicInteger(0)
 
     init {
@@ -91,7 +93,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && settingsDataStore.maliciousSiteProtectionEnabled
+            isFeatureEnabled = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled()
         }
     }
 
@@ -104,7 +106,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         documentUri: Uri?,
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): WebResourceResponse? {
-        if (!isFeatureEnabled) {
+        if (!isFeatureEnabled || !isSettingEnabled) {
             return null
         }
         val url = request.url.let {
@@ -145,7 +147,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean {
         return runBlocking {
-            if (!isFeatureEnabled) {
+            if (!isFeatureEnabled || !isSettingEnabled) {
                 return@runBlocking false
             }
             val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
