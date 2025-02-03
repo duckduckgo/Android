@@ -74,6 +74,7 @@ class GeneralSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchShowOnAppLaunchScreen : Command()
+        data object OpenMaliciousLearnMore : Command()
     }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -166,6 +167,10 @@ class GeneralSettingsViewModel @Inject constructor(
                 maliciousSiteProtectionEnabled = enabled,
             )
         }
+    }
+
+    fun maliciousSiteLearnMoreClicked() {
+        sendCommand(Command.OpenMaliciousLearnMore)
     }
 
     private fun observeShowOnAppLaunchOption() {

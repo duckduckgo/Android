@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings
 
 import android.os.Bundle
+import android.view.View
 import android.view.View.OnClickListener
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
@@ -29,13 +30,18 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.OpenMaliciousLearnMore
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.global.view.fadeTransitionConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -79,6 +85,18 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        binding.maliciousLearnMore.addClickableSpan(
+            textSequence = getText(R.string.maliciousSiteSettingLearnMore),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.maliciousSiteLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+        binding.maliciousDisabledMessage.setTextColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDestructive))
+
         configureUiEventHandlers()
         observeViewModel()
     }
@@ -89,11 +107,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
         binding.voiceSearchToggle.setOnCheckedChangeListener(voiceSearchChangeListener)
         binding.showOnAppLaunchButton.setOnClickListener(showOnAppLaunchClickListener)
         binding.maliciousToggle.setOnCheckedChangeListener(maliciousSiteProtectionToggleListener)
-        // binding.maliciousToggle.addClickableLink(
-        //     annotation = "learn_more_link",
-        //     textSequence = getText(R.string.maliciousSiteProtectionToggleHint),
-        //     onClick = { viewModel.maliciousSitesSettingLearnMoreClicked() },
-        // )
     }
 
     private fun observeViewModel() {
@@ -115,6 +128,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     } else {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
+                    binding.maliciousDisabledMessage.visibility = if (it.maliciousSiteProtectionEnabled) View.GONE else View.VISIBLE
                     binding.maliciousToggle.quietlySetIsChecked(
                         newCheckedState = it.maliciousSiteProtectionEnabled,
                         changeListener = maliciousSiteProtectionToggleListener,
@@ -149,6 +163,19 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
             LaunchShowOnAppLaunchScreen -> {
                 globalActivityStarter.start(this, ShowOnAppLaunchScreenNoParams, fadeTransitionConfig())
             }
+            OpenMaliciousLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = MALICIOUS_SITE_LEARN_MORE_URL,
+                        screenTitle = getString(R.string.maliciousSiteLearnMoreTitle),
+                    ),
+                )
+            }
         }
+    }
+
+    companion object {
+        private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
     }
 }

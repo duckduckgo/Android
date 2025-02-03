@@ -186,8 +186,6 @@
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
-    <string name="maliciousSiteProtectionSettingTitle">Malicious Site Protection</string>
-    <string name="maliciousSiteProtectionToggleHint" instruction="Description of what protection the toggle enables">Warn me on sites flagged for phishing or malware\n<annotation type="learn_more_link">Learn More</annotation></string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>

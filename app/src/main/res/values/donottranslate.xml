@@ -44,6 +44,11 @@
     <string name="maliciousSiteExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
     <string name="maliciousSiteReportErrorTitle">Report a site incorrectly flagged as malicious</string>
     <string name="maliciousSiteLearnMoreTitle">Learn more</string>
+    <string name="maliciousSiteSettingTitle">Site Safety Warnings</string>
+    <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
+    <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
+
 
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
