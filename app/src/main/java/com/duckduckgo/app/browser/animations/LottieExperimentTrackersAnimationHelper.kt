@@ -131,6 +131,6 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
             location[0] + view.width,
             location[1] + view.height,
         )
-        return Rect.intersects(screenRect, viewRect)
+        return screenRect.contains(viewRect)
     }
 }
