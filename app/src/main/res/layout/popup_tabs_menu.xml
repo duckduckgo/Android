@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/popup_menu_bg">
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/newTabMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/newTabMenuItem" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/selectAllMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/selectAllTabsMenuItem" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/selectionActionsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/shareSelectedLinksMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/bookmarkSelectedTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/bookmarkAllTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/bookmarkAllTabsMenuItem" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/selectTabsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/selectTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/selectTabsMenuItem" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/closeAllTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/closeAllTabsMenuItem"
+        app:primaryTextType="destructive" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/closeOtherTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/closeOtherTabsMenuItem"
+        app:primaryTextType="destructive" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/closeSelectedTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryTextType="destructive" />
+
+</LinearLayout>
