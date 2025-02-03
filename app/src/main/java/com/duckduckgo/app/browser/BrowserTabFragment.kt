@@ -813,6 +813,11 @@ class BrowserTabFragment :
             trackersBurstAnimationView = binding.trackersBurstAnimationView,
             omnibarShieldAnimationView = omnibar.shieldIcon,
             omnibarPosition = omnibar.omnibarPosition,
+            omnibarView = if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
+                binding.newOmnibar
+            } else {
+                binding.newOmnibarBottom
+            },
             logos = logos,
         )
     }

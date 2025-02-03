@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.animations
 
 import android.content.Context
+import android.view.View
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -32,6 +33,7 @@ interface ExperimentTrackersAnimationHelper {
         trackersBurstAnimationView: LottieAnimationView,
         omnibarShieldAnimationView: LottieAnimationView,
         omnibarPosition: OmnibarPosition,
+        omnibarView: View,
         logos: List<TrackerLogo>,
     )
 
