@@ -375,6 +375,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -459,6 +460,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2625,7 +2627,20 @@ class BrowserTabViewModel @Inject constructor(
         longPress: Boolean = false,
     ) {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModelScope.launch {
+                val emptyTab = tabRepository.flowTabs.first().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                if (emptyTab != null) {
+                    tabRepository.select(tabId = emptyTab)
+                } else {
+                    command.value = LaunchNewTab
+                }
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
+
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }

@@ -46,7 +46,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -61,11 +60,11 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -84,7 +83,18 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    val viewState = combine(
+        _viewState,
+        tabRepository.flowTabs,
+        defaultBrowserPromptsExperiment.highlightPopupMenu,
+    ) { state, tabs, highlightOverflowMenu ->
+        state.copy(
+            shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
+            tabCount = tabs.size,
+            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+            showBrowserMenuHighlight = highlightOverflowMenu,
+        )
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -102,7 +112,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val updateOmnibarText: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
         val shouldMoveCaretToStart: Boolean = false,
-        val tabs: List<TabEntity> = emptyList(),
+        val tabCount: Int = 0,
+        val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
@@ -131,27 +142,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            defaultBrowserPromptsExperiment.highlightPopupMenu.collect { highlightOverflowMenu ->
-                _viewState.update {
-                    it.copy(showBrowserMenuHighlight = highlightOverflowMenu)
-                }
-            }
-        }
-    }
-
-    fun onAttachedToWindow() {
-        tabRepository.flowTabs
-            .onEach { tabs ->
-                _viewState.update {
-                    it.copy(
-                        shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
-                        tabs = tabs,
-                    )
-                }
-            }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
-
         logVoiceSearchAvailability()
     }
 

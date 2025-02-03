@@ -74,7 +74,35 @@ class OmnibarLayoutViewModelTest {
     @Before
     fun before() {
         whenever(defaultBrowserPromptsExperiment.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
+        whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
+        whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
 
+        initializeViewModel()
+    }
+
+    @Test
+    fun whenViewModelAttachedAndNoTabsOpenThenTabsRetrieved() = runTest {
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.tabCount == 0)
+        }
+    }
+
+    @Test
+    fun whenViewModelAttachedAndTabsOpenedThenTabsRetrieved() = runTest {
+        whenever(tabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(tabId = "0", position = 0))))
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.tabCount == 1)
+            assertTrue(viewState.shouldUpdateTabsCount)
+        }
+    }
+
+    private fun initializeViewModel() {
         testee = OmnibarLayoutViewModel(
             tabRepository = tabRepository,
             voiceSearchAvailability = voiceSearchAvailability,
@@ -86,40 +114,13 @@ class OmnibarLayoutViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
         )
-
-        whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
-        whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-    }
-
-    @Test
-    fun whenViewModelAttachedAndNoTabsOpenThenTabsRetrieved() = runTest {
-        testee.onAttachedToWindow()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.tabs.isEmpty())
-        }
-    }
-
-    @Test
-    fun whenViewModelAttachedAndTabsOpenedThenTabsRetrieved() = runTest {
-        whenever(tabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(tabId = "0", position = 0))))
-
-        testee.onAttachedToWindow()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.tabs.size == 1)
-            assertTrue(viewState.shouldUpdateTabsCount)
-        }
     }
 
     @Test
     fun whenViewModelAttachedAndVoiceSearchSupportedThenPixelLogged() = runTest {
         whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(true)
 
-        testee.onAttachedToWindow()
+        initializeViewModel()
 
         verify(voiceSearchPixelLogger).log()
     }
@@ -127,8 +128,6 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenViewModelAttachedAndVoiceSearchNotSupportedThenPixelLogged() = runTest {
         whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(false)
-
-        testee.onAttachedToWindow()
 
         verifyNoInteractions(voiceSearchPixelLogger)
     }

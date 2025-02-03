@@ -27,6 +27,7 @@ interface UserStageStore {
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
     suspend fun moveToStage(appStage: AppStage)
+    val currentAppStage: Flow<AppStage>
 }
 
 class AppUserStageStore @Inject constructor(
@@ -64,6 +65,8 @@ class AppUserStageStore @Inject constructor(
     override suspend fun moveToStage(appStage: AppStage) {
         userStageDao.updateUserStage(appStage)
     }
+
+    override val currentAppStage: Flow<AppStage> = userStageDao.currentAppStage().map { it.appStage }
 }
 
 suspend fun UserStageStore.isNewUser(): Boolean {
