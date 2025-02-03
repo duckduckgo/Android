@@ -20,11 +20,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/trackersBurstAnimationView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        app:layout_behavior="com.duckduckgo.app.browser.animations.TrackersBlockingAnimationViewBehavior"
+        app:lottie_imageAssetsFolder="images"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
+
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:omnibarPosition="top" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/trackersBlockedSlidingView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?daxColorSurface"
+        android:elevation="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/shield"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_shield_green_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/trackers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toEndOf="@id/shield"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:textType="primary"
+            app:typography="body2"
+            tools:text="3" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/website"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            app:textType="secondary"
+            app:typography="body2"
+            tools:text="website.com" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"

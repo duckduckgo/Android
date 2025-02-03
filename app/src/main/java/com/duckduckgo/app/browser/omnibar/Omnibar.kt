@@ -39,6 +39,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -117,6 +118,7 @@ class Omnibar(
         fun onTouchEvent(event: MotionEvent)
         fun onOmnibarTextChanged(state: OmnibarTextState)
         fun onShowSuggestions(state: OmnibarTextState)
+        fun onTrackersCountFinished(logos: List<TrackerLogo>)
     }
 
     data class OmnibarTextState(
@@ -320,6 +322,10 @@ class Omnibar(
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
         newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+    }
+
+    fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 
     fun cancelTrackersAnimation() {
