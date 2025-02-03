@@ -76,6 +76,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -953,9 +954,16 @@ class BrowserTabFragment :
     }
 
     private fun notifyVerticalOffsetChanged(scrollFraction: Float) {
+        // Ensure the trackersBlockedSlidingView is hidden on new tab or when scrolling is disabled.
+        if (binding.trackersBlockedSlidingView.isVisible && (binding.browserLayout.isGone || !binding.newOmnibar.isOmnibarScrollingEnabled())) {
+            binding.trackersBlockedSlidingView.hide()
+            return
+        }
+
         if (!viewModel.isSiteProtected() || scrollFraction == 1.0f) {
             return
         }
+
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
         binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
