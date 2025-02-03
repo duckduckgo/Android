@@ -18,18 +18,17 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +38,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
+import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -59,12 +60,14 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -72,13 +75,13 @@ import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -144,16 +147,20 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private lateinit var toolbar: Toolbar
     private lateinit var tabsFab: ExtendedFloatingActionButton
 
+    private var popupMenuItem: MenuItem? = null
     private var layoutTypeMenuItem: MenuItem? = null
     private var layoutType: LayoutType? = null
 
+    private val binding: ActivityTabSwitcherBinding by viewBinding()
+    private val popupMenu by lazy {
+        PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tab_switcher)
+        setContentView(binding.root)
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
-
-        tabsFab = findViewById(R.id.tabsFab)
 
         extractIntentExtras()
         configureViewReferences()
@@ -165,6 +172,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureFab() {
+        tabsFab = binding.tabsFab
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
             tabsFab.show()
             tabsFab.setOnClickListener {
@@ -377,24 +385,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
+            popupMenuItem = menu.findItem(R.id.popupMenuItem)
+
             val mode = viewModel.viewState.value.mode
             when (mode) {
                 TabSwitcherViewModel.ViewState.Mode.Normal -> {
                     createNormalModeMenu(menu)
                 }
                 is TabSwitcherViewModel.ViewState.Mode.Selection -> {
-                    if (mode.selectedTabs.isNotEmpty()) {
-                        createSelectionModeMenu(menu, mode.selectedTabs.size)
-                    } else {
-                        createEmptySelectionModeMenu(menu)
-                    }
+                    createSelectionModeMenu(menu, mode.selectedTabs.size)
                 }
             }
-
-            MenuCompat.setGroupDividerEnabled(menu, true)
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-            layoutTypeMenuItem = menu.findItem(R.id.layoutType)
+            layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
 
             when (layoutType) {
                 LayoutType.GRID -> showListLayoutButton()
@@ -407,32 +412,50 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun createSelectionModeMenu(menu: Menu, numSelectedTabs: Int) {
-        menuInflater.inflate(R.menu.menu_tab_switcher_selection_mode, menu)
-        menu.findItem(R.id.shareSelectedLinks).title = resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs)
-        menu.findItem(R.id.shareSelectedLinksIcon).title = resources.getQuantityString(
-            R.plurals.shareLinksMenuItem,
-            numSelectedTabs,
-            numSelectedTabs,
-        )
-        menu.findItem(R.id.bookmarkSelectedTabs).title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs)
-        menu.findItem(R.id.bookmarkSelectedTabsIcon).title = resources.getQuantityString(
-            R.plurals.bookmarkTabsMenuItem,
-            numSelectedTabs,
-            numSelectedTabs,
-        )
-        menu.findItem(R.id.closeSelectedTabs).title = resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs)
-        menu.findItem(R.id.closeSelectedTabs).colorRed()
-        menu.findItem(R.id.closeOtherTabs).colorRed()
-    }
+        menu.findItem(R.id.layoutTypeMenuItem).isVisible = false
+        menu.findItem(R.id.fireMenuItem).isVisible = false
 
-    private fun createEmptySelectionModeMenu(menu: Menu) {
-        menuInflater.inflate(R.menu.menu_tab_switcher_selection_mode_no_selection, menu)
-        menu.findItem(R.id.closeAllTabs).colorRed()
+        menu.findItem(R.id.bookmarkMenuItem).apply {
+            if (numSelectedTabs == 0) {
+                isEnabled = false
+                iconTintList = ContextCompat.getColorStateList(this@TabSwitcherActivity, com.duckduckgo.mobile.android.R.color.disabledColor)
+            }
+            title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs)
+        }
+        menu.findItem(R.id.shareLinkMenuItem).apply {
+            if (numSelectedTabs == 0) {
+                isEnabled = false
+                iconTintList = ContextCompat.getColorStateList(this@TabSwitcherActivity, com.duckduckgo.mobile.android.R.color.disabledColor)
+            }
+            title = resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs)
+        }
+
+        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
+
+        popupBinding.newTabMenuItem.isVisible = false
+        popupBinding.selectAllMenuItem.isVisible = true
+        popupBinding.selectionActionsDivider.isVisible = numSelectedTabs > 0
+        popupBinding.shareSelectedLinksMenuItem.isVisible = numSelectedTabs > 0
+        popupBinding.bookmarkSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
+        popupBinding.selectTabsDivider.isVisible = false
+        popupBinding.selectTabsMenuItem.isVisible = false
+        popupBinding.closeOtherTabsMenuItem.isVisible = numSelectedTabs > 0
+        popupBinding.closeSelectedTabsMenuItem.isVisible = numSelectedTabs > 0
+        popupBinding.closeAllTabsMenuItem.isVisible = numSelectedTabs == 0
+
+        popupBinding.shareSelectedLinksMenuItem.apply {
+            setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, numSelectedTabs, numSelectedTabs))
+        }
+        popupBinding.bookmarkSelectedTabsMenuItem.apply {
+            setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, numSelectedTabs, numSelectedTabs))
+        }
+        popupBinding.closeSelectedTabsMenuItem.apply {
+            setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
+        }
     }
 
     private fun createNormalModeMenu(menu: Menu) {
-        menuInflater.inflate(R.menu.menu_tab_switcher_normal_mode, menu)
-        layoutTypeMenuItem = menu.findItem(R.id.layoutType)
+        layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
 
         when (layoutType) {
             LayoutType.GRID -> showListLayoutButton()
@@ -440,21 +463,35 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             null -> layoutTypeMenuItem?.isVisible = false
         }
 
-        menu.findItem(R.id.shareSelectedLinks).title = resources.getQuantityString(R.plurals.shareLinksMenuItem, 1)
-        menu.findItem(R.id.bookmarkSelectedTabs).title = resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, 1)
-        menu.findItem(R.id.closeAllTabs).colorRed()
-    }
+        menu.findItem(R.id.bookmarkMenuItem).isVisible = false
+        menu.findItem(R.id.shareLinkMenuItem).isVisible = false
 
-    private fun MenuItem.colorRed() {
-        val text = SpannableString(title)
-        text.setSpan(ForegroundColorSpan(Color.RED), 0, text.length, 0)
-        title = text
+        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
+
+        popupBinding.newTabMenuItem.isVisible = true
+        popupBinding.selectAllMenuItem.isVisible = false
+        popupBinding.selectionActionsDivider.isVisible = true
+        popupBinding.shareSelectedLinksMenuItem.isVisible = true
+        popupBinding.bookmarkSelectedTabsMenuItem.isVisible = true
+        popupBinding.selectTabsDivider.isVisible = true
+        popupBinding.selectTabsMenuItem.isVisible = true
+        popupBinding.closeSelectedTabsMenuItem.isVisible = false
+        popupBinding.closeOtherTabsMenuItem.isVisible = false
+        popupBinding.closeAllTabsMenuItem.isVisible = true
+
+        popupBinding.shareSelectedLinksMenuItem.apply {
+            setPrimaryText(resources.getQuantityString(R.plurals.shareLinksMenuItem, 1))
+        }
+        popupBinding.bookmarkSelectedTabsMenuItem.apply {
+            setPrimaryText(resources.getQuantityString(R.plurals.bookmarkTabsMenuItem, 1))
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.layoutType -> onLayoutTypeToggled()
-            R.id.fire -> onFire()
+            R.id.layoutTypeMenuItem -> onLayoutTypeToggled()
+            R.id.fireMenuItem -> onFire()
+            R.id.popupMenuItem -> showPopupMenu(item.itemId)
             R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
             R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
             R.id.duckChat -> {
@@ -470,6 +507,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showPopupMenu(itemId: Int) {
+        val anchorView = findViewById<View>(itemId)
+        popupMenu.show(binding.root, anchorView)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
