@@ -20,14 +20,14 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/layoutType"
+        android:id="@+id/layoutTypeMenuItem"
         android:icon="@drawable/ic_list_view_24"
         android:title="@string/tabSwitcherListViewMenu"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/fire"
+        android:id="@+id/fireMenuItem"
         android:icon="@drawable/ic_fire"
         android:title="@string/fireMenu"
         app:showAsAction="always" />
