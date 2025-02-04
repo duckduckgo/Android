@@ -6,7 +6,7 @@ name: "Sync Critical Path: Devices can be added to an existing account"
 - launchApp:
     clearState: true
     stopApp: true
-- runFlow: ../../shared/onboarding.yaml
+- runFlow: ../../shared/pre_onboarding.yaml
 - runFlow: ../../shared/open_sync_dev_settings_screen.yaml
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingSwitch"

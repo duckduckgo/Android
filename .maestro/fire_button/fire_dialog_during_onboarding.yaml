@@ -23,10 +23,11 @@ tags:
       - assertVisible:
             text: ".*browsing activity with the fire button.*"
       - tapOn:
-          id: "com.duckduckgo.mobile.android:id/fireIconImageView"
-      - tapOn: "Cancel"
+          text: "skip"
       - assertNotVisible: ".*browsing activity with the Fire Button.*"
+      - assertVisible:
+          text: ".*Remember: every time you browse with me a creepy ad loses its wings.*"
       - tapOn:
             id: "com.duckduckgo.mobile.android:id/fireIconImageView"
       - tapOn: "Clear All Tabs And Data"
-      - assertVisible: "You've got this!.*"
+      - assertNotVisible: "You've got this!.*"

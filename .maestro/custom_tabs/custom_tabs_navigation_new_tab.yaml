@@ -22,10 +22,11 @@ tags:
           commands:
             - tapOn: "duckduckgo"
             - tapOn: "set as default"
-            - assertVisible:
-                text: ".*Awesome! Welcome to the duck side.*"
-            - tapOn: "start browsing"
-
+      - assertVisible:
+          text: ".*where should I put your address bar?.*"
+      - tapOn: "next"
+      - assertVisible:
+          text: ".*Try a search!.*"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
       - tapOn:

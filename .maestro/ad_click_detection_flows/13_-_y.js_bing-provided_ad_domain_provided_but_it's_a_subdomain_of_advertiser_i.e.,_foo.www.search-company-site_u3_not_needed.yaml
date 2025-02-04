@@ -8,7 +8,7 @@ tags:
       - launchApp:
           clearState: true
 
-      - runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/pre_onboarding.yaml
 
       - inputText: "https://www.search-company.site/#ad-id-13"
       - pressKey: Enter
