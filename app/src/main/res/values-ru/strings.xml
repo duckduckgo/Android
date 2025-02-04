@@ -746,7 +746,7 @@
         <item quantity="other"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Понятно</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Давайте попробуем! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Убедитесь сами! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
@@ -759,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Защита включена</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Блокировка запросов и всплывающих окон куки</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Блокирует запросы и всплывающие окна куки</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Быстрое удаление данных из браузера</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Какой цвет мне идет?</string>
@@ -775,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда конфиденциальны.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Это — <b>DuckDuckGo Search</b>! Надежно. Быстро. Меньше рекламы.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Дай пять!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Попробовать</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропустить</string>
 
