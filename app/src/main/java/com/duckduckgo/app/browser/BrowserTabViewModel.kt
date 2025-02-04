@@ -1023,6 +1023,7 @@ class BrowserTabViewModel @Inject constructor(
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
+
             is BrokenSitePromptDialogCta -> {
                 viewModelScope.launch(dispatchers.main()) {
                     command.value = HideBrokenSitePromptCta(cta)
@@ -1900,6 +1901,7 @@ class BrowserTabViewModel @Inject constructor(
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
                 )
             }
+
             LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
             ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
         }
@@ -2650,6 +2652,15 @@ class BrowserTabViewModel @Inject constructor(
 
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        } else {
+            val url = site?.url
+            if (url != null) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                }
+            }
         }
 
         onUserDismissedCta(ctaViewState.value?.cta)
