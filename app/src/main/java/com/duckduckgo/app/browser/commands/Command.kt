@@ -42,6 +42,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -219,6 +220,7 @@ sealed class Command {
 
     data class ShowWarningMaliciousSite(
         val url: Uri,
+        val feed: Feed,
     ) : Command()
 
     data object HideWarningMaliciousSite : Command()
@@ -227,6 +229,7 @@ sealed class Command {
 
     data class BypassMaliciousSiteWarning(
         val url: Uri,
+        val feed: Feed,
     ) : Command()
 
     data class OpenBrokenSiteLearnMore(val url: String) : Command()
@@ -257,4 +260,5 @@ sealed class Command {
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
+    data object CloseCustomTab : Command()
 }

@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 interface WebViewClientListener {
@@ -95,7 +96,7 @@ interface WebViewClientListener {
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
-    fun onReceivedMaliciousSiteWarning(url: Uri)
+    fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean)
     fun recordErrorCode(error: String, url: String)
     fun recordHttpErrorCode(statusCode: Int, url: String)
 

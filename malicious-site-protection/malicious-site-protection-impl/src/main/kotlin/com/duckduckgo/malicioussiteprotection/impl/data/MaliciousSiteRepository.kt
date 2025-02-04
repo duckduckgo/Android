@@ -18,16 +18,17 @@ package com.duckduckgo.malicioussiteprotection.impl.data
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.FilterSetResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.HashPrefixResponse
 import com.duckduckgo.malicioussiteprotection.impl.data.network.MaliciousSiteService
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.MALWARE
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
+import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
@@ -45,7 +46,7 @@ import kotlinx.coroutines.withContext
 
 interface MaliciousSiteRepository {
     suspend fun containsHashPrefix(hashPrefix: String): Boolean
-    suspend fun getFilters(hash: String): List<Filter>?
+    suspend fun getFilters(hash: String): List<FilterSet>?
     suspend fun matches(hashPrefix: String): List<Match>
     suspend fun loadFilters(): Result<Unit>
     suspend fun loadHashPrefixes(): Result<Unit>
@@ -63,18 +64,32 @@ class RealMaliciousSiteRepository @Inject constructor(
         return maliciousSiteDao.getHashPrefix(hashPrefix) != null
     }
 
-    override suspend fun getFilters(hash: String): List<Filter>? {
-        return maliciousSiteDao.getFilter(hash)?.let {
-            it.map {
-                Filter(it.hash, it.regex)
-            }
+    override suspend fun getFilters(hash: String): List<FilterSet>? {
+        return maliciousSiteDao.getFilter(hash)?.groupBy { it.type }?.map { (type, filters) ->
+            FilterSet(
+                filters = filters.map { Filter(it.hash, it.regex) },
+                feed = when (type) {
+                    PHISHING.name -> PHISHING
+                    MALWARE.name -> MALWARE
+                    else -> throw IllegalArgumentException("Unknown feed $type")
+                },
+            )
         }
     }
 
     override suspend fun matches(hashPrefix: String): List<Match> {
         return try {
-            maliciousSiteService.getMatches(hashPrefix).matches.map {
-                Match(it.hostname, it.url, it.regex, it.hash)
+            maliciousSiteService.getMatches(hashPrefix).matches.mapNotNull {
+                val feed = when (it.feed.uppercase()) {
+                    PHISHING.name -> PHISHING
+                    MALWARE.name -> MALWARE
+                    else -> null
+                }
+                if (feed != null) {
+                    Match(it.hostname, it.url, it.regex, it.hash, feed)
+                } else {
+                    null
+                }
             }
         } catch (e: Exception) {
             listOf()

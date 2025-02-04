@@ -24,14 +24,21 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.os.SystemClock
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
@@ -47,6 +54,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -76,6 +85,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -86,7 +96,9 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 // open class so that we can test BrowserApplicationStateInfo
@@ -138,9 +150,26 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var maliciousSiteBlockerWebViewIntegration: RealMaliciousSiteBlockerWebViewIntegration
 
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
+    @Inject
+    lateinit var tabManager: TabManager
+
     private val lastActiveTabs = TabList()
 
-    private var currentTab: BrowserTabFragment? = null
+    private var _currentTab: BrowserTabFragment? = null
+    private var currentTab: BrowserTabFragment?
+        get() {
+            return if (swipingTabsFeature.isEnabled) {
+                tabPagerAdapter.currentFragment
+            } else {
+                _currentTab
+            }
+        }
+        set(value) {
+            _currentTab = value
+        }
 
     private val viewModel: BrowserViewModel by bindViewModel()
 
@@ -152,9 +181,58 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrowserBinding by viewBinding()
 
+    private val tabPager: ViewPager2 by lazy {
+        binding.tabPager
+    }
+
+    private val tabPagerAdapter by lazy {
+        TabPagerAdapter(
+            fragmentManager = supportFragmentManager,
+            lifecycleOwner = this,
+            activityIntent = intent,
+            getSelectedTabId = tabManager::getSelectedTabId,
+            getTabById = ::getTabById,
+            requestAndWaitForNewTab = ::requestAndWaitForNewTab,
+        )
+    }
+
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
     private var openMessageInNewTabJob: Job? = null
+
+    private val onTabPageChangeListener = object : ViewPager2.OnPageChangeCallback() {
+        private val TOUCH_DELAY_MS = 200L
+        private var wasSwipingStarted = false
+
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            if (wasSwipingStarted) {
+                wasSwipingStarted = false
+
+                viewModel.onTabsSwiped()
+                onTabPageSwiped(position)
+
+                enableWebViewScrolling()
+            }
+        }
+
+        private fun enableWebViewScrolling() {
+            // ViewPager2 requires an artificial tap to disable intercepting touch events and enable nested scrolling
+            val time = SystemClock.uptimeMillis()
+            val motionEvent = MotionEvent.obtain(time, time + 1, MotionEvent.ACTION_DOWN, 0f, 0f, 0)
+
+            tabPager.postDelayed(TOUCH_DELAY_MS) {
+                tabPager.dispatchTouchEvent(motionEvent)
+            }
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            super.onPageScrollStateChanged(state)
+            if (state == ViewPager2.SCROLL_STATE_DRAGGING) {
+                wasSwipingStarted = true
+            }
+        }
+    }
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
@@ -209,6 +287,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         setContentView(binding.root)
+
+        initializeTabs()
+
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
@@ -223,11 +304,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
+
         super.onStop()
     }
 
     override fun onDestroy() {
         currentTab = null
+
+        if (swipingTabsFeature.isEnabled) {
+            binding.tabPager.adapter = null
+            binding.tabPager.unregisterOnPageChangeCallback(onTabPageChangeListener)
+        }
+
         super.onDestroy()
     }
 
@@ -376,7 +464,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
-            lifecycleScope.launch { viewModel.onNewTabRequested() }
+            launchNewTab()
             return
         }
 
@@ -400,7 +488,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.submitQuery(sharedText)
                 } else {
                     Timber.w("can't use current tab, opening in new tab instead")
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                    if (swipingTabsFeature.isEnabled) {
+                        launchNewTab(query = sharedText, skipHome = true)
+                    } else {
+                        lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                    }
                 }
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
@@ -413,7 +505,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
-                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+                if (swipingTabsFeature.isEnabled) {
+                    launchNewTab(query = sharedText, sourceTabId = sourceTabId, skipHome = skipHome)
+                } else {
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
+                }
             }
         } else {
             Timber.i("shared text empty, defaulting to show on app launch option")
@@ -430,22 +526,47 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this) {
             processCommand(it)
         }
-        viewModel.selectedTab.observe(this) {
-            if (it != null) {
-                selectTab(it)
+
+        if (swipingTabsFeature.isEnabled) {
+            lifecycleScope.launch {
+                viewModel.tabsFlow.flowWithLifecycle(lifecycle).collectLatest {
+                    tabManager.onTabsChanged(it)
+                }
             }
-        }
-        viewModel.tabs.observe(this) {
-            clearStaleTabs(it)
-            removeOldTabs()
-            lifecycleScope.launch { viewModel.onTabsUpdated(it) }
+
+            lifecycleScope.launch {
+                viewModel.selectedTabFlow.flowWithLifecycle(lifecycle).collectLatest {
+                    tabManager.onSelectedTabChanged(it)
+                }
+            }
+
+            lifecycleScope.launch {
+                viewModel.selectedTabIndex.flowWithLifecycle(lifecycle).collectLatest {
+                    onMoveToTabRequested(it)
+                }
+            }
+        } else {
+            viewModel.selectedTab.observe(this) {
+                if (it != null) {
+                    selectTab(it)
+                }
+            }
+
+            viewModel.tabs.observe(this) {
+                clearStaleTabs(it)
+                removeOldTabs()
+                lifecycleScope.launch { viewModel.onTabsUpdated(it) }
+            }
         }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
-        viewModel.selectedTab.removeObservers(this)
-        viewModel.tabs.removeObservers(this)
+
+        if (!swipingTabsFeature.isEnabled) {
+            viewModel.selectedTab.removeObservers(this)
+            viewModel.tabs.removeObservers(this)
+        }
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
@@ -484,6 +605,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
+            is Command.SwitchToTab -> openExistingTab(command.tabId)
+            is Command.OpenInNewTab -> launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.HideSetAsDefaultBrowserDialog -> hideSetAsDefaultBrowserDialog()
@@ -494,6 +617,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchNewSearch(intent: Intent): Boolean {
         return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
+    }
+
+    fun clearTabsAndRecreate() {
+        tabPagerAdapter.clearFragments()
+        recreate()
     }
 
     fun launchFire() {
@@ -518,36 +646,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()
-    }
-
-    fun launchNewTab() {
-        lifecycleScope.launch { viewModel.onNewTabRequested() }
-    }
-
-    fun openInNewTab(
-        query: String,
-        sourceTabId: String?,
-    ) {
-        lifecycleScope.launch {
-            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
-        }
-    }
-
-    fun openMessageInNewTab(
-        message: Message,
-        sourceTabId: String?,
-    ) {
-        openMessageInNewTabJob = lifecycleScope.launch {
-            val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
-            fragment.messageFromPreviousTab = message
-        }
-    }
-
-    fun openExistingTab(tabId: String) {
-        lifecycleScope.launch {
-            viewModel.onTabSelected(tabId)
-        }
     }
 
     fun launchSettings() {
@@ -640,7 +738,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
-        private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val LAUNCH_FROM_DEDICATED_WEBVIEW = "LAUNCH_FROM_DEDICATED_WEBVIEW"
 
@@ -660,6 +758,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     hideWebContent()
                 } else {
                     showWebContent()
+                }
+
+                if (swipingTabsFeature.isEnabled) {
+                    tabPager.isUserInputEnabled = viewState.isTabSwipingEnabled
                 }
             }
         }
@@ -682,6 +784,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 processedOriginalIntent = true
             }
         }
+    }
+
+    private fun initializeTabs() {
+        if (swipingTabsFeature.isEnabled) {
+            tabManager.registerCallbacks(
+                onTabsUpdated = ::onTabsUpdated,
+            )
+
+            tabPager.adapter = tabPagerAdapter
+            tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+            tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
+        }
+
+        binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
+        tabPager.isVisible = swipingTabsFeature.isEnabled
     }
 
     private val Intent.launchedFromRecents: Boolean
@@ -782,6 +899,78 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchPlayStore() {
         playStoreUtils.launchPlayStore()
+    }
+
+    private fun onMoveToTabRequested(index: Int) {
+        tabPager.post {
+            tabPager.setCurrentItem(index, false)
+        }
+    }
+
+    private fun onTabPageSwiped(newPosition: Int) = lifecycleScope.launch {
+        val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
+        if (tabId != null) {
+            tabManager.switchToTab(tabId)
+        }
+    }
+
+    private fun onTabsUpdated(updatedTabIds: List<String>) {
+        tabPagerAdapter.onTabsUpdated(updatedTabIds)
+    }
+
+    private fun getTabById(tabId: String): TabEntity? = runBlocking {
+        return@runBlocking tabManager.getTabById(tabId)
+    }
+
+    private fun requestAndWaitForNewTab(): TabEntity = runBlocking {
+        return@runBlocking tabManager.requestAndWaitForNewTab()
+    }
+
+    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
+        lifecycleScope.launch {
+            if (swipingTabsFeature.isEnabled) {
+                tabManager.openNewTab(query, sourceTabId, skipHome)
+            } else {
+                viewModel.onNewTabRequested()
+            }
+        }
+    }
+
+    fun openInNewTab(
+        query: String,
+        sourceTabId: String?,
+    ) {
+        lifecycleScope.launch {
+            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
+        }
+    }
+
+    fun openMessageInNewTab(
+        message: Message,
+        sourceTabId: String?,
+    ) {
+        openMessageInNewTabJob = lifecycleScope.launch {
+            if (swipingTabsFeature.isEnabled) {
+                tabPagerAdapter.setMessageForNewFragment(message)
+                tabManager.openNewTab(sourceTabId)
+            } else {
+                val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
+                val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
+                fragment.messageFromPreviousTab = message
+            }
+        }
+    }
+
+    fun openExistingTab(tabId: String) = lifecycleScope.launch {
+        if (swipingTabsFeature.isEnabled) {
+            tabManager.switchToTab(tabId)
+        } else {
+            viewModel.onTabSelected(tabId)
+        }
+    }
+
+    fun onEditModeChanged(isInEditMode: Boolean) {
+        viewModel.onOmnibarEditModeChanged(isInEditMode)
     }
 
     private data class CombinedInstanceState(

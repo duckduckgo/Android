@@ -28,6 +28,9 @@ interface UserStageDao {
     @Query("select * from $USER_STAGE_TABLE_NAME limit 1")
     suspend fun currentUserAppStage(): UserStage?
 
+    @Query("select * from $USER_STAGE_TABLE_NAME limit 1")
+    fun currentAppStage(): Flow<UserStage>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(userStage: UserStage)
 

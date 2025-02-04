@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.data.network
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.common.utils.AppUrl.Url.API
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.moshi.Json
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -31,21 +32,27 @@ private const val MALWARE = "malware"
 
 @ContributesServiceApi(AppScope::class)
 interface MaliciousSiteService {
+    @AuthRequired
     @GET("$BASE_URL$HASH_PREFIX_PATH?$CATEGORY=$PHISHING")
     suspend fun getPhishingHashPrefixes(@Query("revision") revision: Int): HashPrefixResponse
 
+    @AuthRequired
     @GET("$BASE_URL$HASH_PREFIX_PATH?$CATEGORY=$MALWARE")
     suspend fun getMalwareHashPrefixes(@Query("revision") revision: Int): HashPrefixResponse
 
+    @AuthRequired
     @GET("$BASE_URL$FILTER_SET_PATH?$CATEGORY=$PHISHING")
     suspend fun getPhishingFilterSet(@Query("revision") revision: Int): FilterSetResponse
 
+    @AuthRequired
     @GET("$BASE_URL$FILTER_SET_PATH?$CATEGORY=$MALWARE")
     suspend fun getMalwareFilterSet(@Query("revision") revision: Int): FilterSetResponse
 
+    @AuthRequired
     @GET("$BASE_URL/matches")
     suspend fun getMatches(@Query("hashPrefix") hashPrefix: String): MatchesResponse
 
+    @AuthRequired
     @GET("$BASE_URL/revision")
     suspend fun getRevision(): RevisionResponse
 }
@@ -78,8 +85,17 @@ data class MatchResponse(
     val url: String,
     val regex: String,
     val hash: String,
+    @field:Json(name = "category")
+    val feed: String,
 )
 
 data class RevisionResponse(
     val revision: Int,
 )
+
+/**
+ * This annotation is used in interceptors to be able to intercept the annotated service calls
+ */
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AuthRequired

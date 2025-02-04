@@ -41,6 +41,8 @@ interface TabRepository {
 
     val liveSelectedTab: LiveData<TabEntity>
 
+    val flowSelectedTab: Flow<TabEntity?>
+
     val tabSwitcherData: Flow<TabSwitcherData>
 
     /**
@@ -98,6 +100,8 @@ interface TabRepository {
     suspend fun getSelectedTab(): TabEntity?
 
     suspend fun select(tabId: String)
+
+    suspend fun getTab(tabId: String): TabEntity?
 
     fun updateTabPreviewImage(
         tabId: String,

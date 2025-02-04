@@ -179,6 +179,8 @@ class Omnibar(
         newOmnibar.omnibarTextInput.rootView
     }
 
+    val isInEditMode = newOmnibar.isEditingFlow
+
     var isScrollingEnabled: Boolean
         get() =
             newOmnibar.isScrollingEnabled

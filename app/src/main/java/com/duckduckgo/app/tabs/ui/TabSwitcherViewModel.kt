@@ -22,6 +22,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -47,6 +48,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : ViewModel() {
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val activeTab = tabRepository.liveSelectedTab
@@ -66,7 +68,17 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
-        tabRepository.add()
+        if (swipingTabsFeature.isEnabled) {
+            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
+            if (emptyTab != null) {
+                tabRepository.select(tabId = emptyTab)
+            } else {
+                tabRepository.add()
+            }
+        } else {
+            tabRepository.add()
+        }
+
         command.value = Command.Close
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED)

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -34,9 +35,11 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -84,9 +87,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -139,7 +142,13 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    private lateinit var pulseAnimation: PulseAnimation
+    private val lifecycleOwner: LifecycleOwner by lazy {
+        requireNotNull(findViewTreeLifecycleOwner())
+    }
+
+    private val pulseAnimation: PulseAnimation by lazy {
+        PulseAnimation(lifecycleOwner)
+    }
 
     private var omnibarTextListener: Omnibar.TextListener? = null
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
@@ -190,6 +199,8 @@ class OmnibarLayout @JvmOverloads constructor(
             R.layout.view_new_omnibar
         }
         inflate(context, layout, this)
+
+        AndroidSupportInjection.inject(this)
     }
 
     private fun omnibarViews(): List<View> = listOf(
@@ -221,6 +232,12 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
+    val isEditingFlow by lazy {
+        viewModel.viewState.map {
+            isAttachedToWindow && it.hasFocus
+        }
+    }
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     private val viewModel: OmnibarLayoutViewModel by lazy {
@@ -234,22 +251,21 @@ class OmnibarLayout @JvmOverloads constructor(
     private val conflatedCommandJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        pulseAnimation = PulseAnimation(findViewTreeLifecycleOwner()!!)
+        val coroutineScope = requireNotNull(findViewTreeLifecycleOwner()?.lifecycleScope)
 
-        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
+        conflatedStateJob += coroutineScope.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                render(it)
+            }
+        }
 
-        conflatedStateJob += viewModel.viewState
-            .onEach { render(it) }
-            .launchIn(coroutineScope!!)
-
-        conflatedCommandJob += viewModel.commands()
-            .onEach { processCommand(it) }
-            .launchIn(coroutineScope!!)
-
-        viewModel.onAttachedToWindow()
+        conflatedCommandJob += coroutineScope.launch {
+            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                processCommand(it)
+            }
+        }
 
         if (decoration != null) {
             decorateDeferred(decoration!!)
@@ -270,6 +286,7 @@ class OmnibarLayout @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     fun setOmnibarTextListener(textListener: Omnibar.TextListener) {
         omnibarTextListener = textListener
 
@@ -415,8 +432,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderTabIcon(viewState: ViewState) {
         if (viewState.shouldUpdateTabsCount) {
-            tabsMenu.count = viewState.tabs.count()
-            tabsMenu.hasUnread = viewState.tabs.firstOrNull { !it.viewed } != null
+            tabsMenu.count = viewState.tabCount
+            tabsMenu.hasUnread = viewState.hasUnreadTabs
         }
     }
 
@@ -612,32 +629,19 @@ class OmnibarLayout @JvmOverloads constructor(
             null
         }
 
-        // omnibar only scrollable when browser showing and the fire button is not promoted
         if (targetView != null) {
-            if (this::pulseAnimation.isInitialized) {
-                if (pulseAnimation.isActive) {
-                    pulseAnimation.stop()
-                }
-                doOnLayout {
-                    if (this::pulseAnimation.isInitialized) {
-                        pulseAnimation.playOn(targetView)
-                    }
-                }
-            }
-        } else {
-            if (this::pulseAnimation.isInitialized) {
+            if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
+            doOnLayout {
+                pulseAnimation.playOn(targetView)
+            }
+        } else {
+            pulseAnimation.stop()
         }
     }
 
-    fun isPulseAnimationPlaying(): Boolean {
-        return if (this::pulseAnimation.isInitialized) {
-            pulseAnimation.isActive
-        } else {
-            false
-        }
-    }
+    fun isPulseAnimationPlaying() = pulseAnimation.isActive
 
     private fun createCookiesAnimation(isCosmetic: Boolean) {
         if (this::animatorHelper.isInitialized) {
