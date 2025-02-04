@@ -310,6 +310,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
                 _viewState.update {
                     it.copy(
+                        viewMode = viewMode,
                         leadingIconState = leadingIcon,
                         scrollingEnabled = scrollingEnabled,
                         showVoiceSearch = shouldShowVoiceSearch(
