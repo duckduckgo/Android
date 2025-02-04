@@ -13,7 +13,18 @@ appId: com.duckduckgo.mobile.android
             - assertVisible:
                 text: ".*Welcome to DuckDuckGo!.*"
                 optional: true
-            - runFlow: ../shared/pre_onboarding.yaml
+            - assertVisible:
+                text: ".*Ready for a faster browser that keeps you protected?.*"
+            - tapOn: "let's do it!"
+            - assertVisible:
+                text: "Protections activated!"
+            - tapOn: "choose your browser"
+            - tapOn: "cancel"
+            - assertVisible:
+                text: ".*where should I put your address bar?.*"
+            - tapOn: "next"
+            - assertVisible:
+                text: ".*Try a search!.*"
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
             - tapOn:
