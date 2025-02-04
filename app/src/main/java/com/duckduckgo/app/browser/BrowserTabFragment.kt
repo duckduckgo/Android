@@ -594,17 +594,11 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogIntroBubbleCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
+    private val daxDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
-    private val daxDialogOnboardingCta
-        get() = binding.includeOnboardingDaxDialog
-
-    private val daxDialogIntroBubbleCtaExperiment
-        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCtaExperiment
-
-    private val daxDialogOnboardingCtaExperiment
-        get() = binding.includeOnboardingDaxDialogExperiment
+    private val daxDialogInContext
+        get() = binding.includeOnboardingInContextDaxDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -1871,8 +1865,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogOnboardingCta.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        daxDialogOnboardingCtaExperiment.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2715,8 +2708,7 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
-        daxDialogIntroBubbleCta.root.gone()
-        daxDialogIntroBubbleCtaExperiment.root.gone()
+        daxDialogIntroBubble.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -3956,10 +3948,6 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
-                is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta, is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
-                is DaxBubbleCta.DaxExperimentEndCta, is DaxBubbleCta.DaxExperimentPrivacyProCta,
-                -> showDaxExperimentOnboardingBubbleCta(configuration as DaxBubbleCta)
-
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -3969,7 +3957,7 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                showCta(daxDialogIntroBubbleCta.daxCtaContainer) {
+                showCta(daxDialogIntroBubble.daxCtaContainer) {
                     setOnOptionClicked { userEnteredQuery(it.link) }
                 }
                 setOnPrimaryCtaClicked {
@@ -3979,33 +3967,14 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaSecondaryButton(configuration)
                 }
             }
-            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
-        }
-
-        private fun showDaxExperimentOnboardingBubbleCta(configuration: DaxBubbleCta) {
-            hideNewTab()
-            configuration.apply {
-                showCta(daxDialogIntroBubbleCtaExperiment.daxCtaContainer) {
-                    setOnOptionClicked { userEnteredQuery(it.link) }
-                }
-                setOnPrimaryCtaClicked {
-                    viewModel.onUserClickCtaOkButton(configuration)
-                }
-                setOnSecondaryCtaClicked {
-                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                }
-            }
-            viewModel.setBrowserExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
         @SuppressLint("ClickableViewAccessibility")
         private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideNewTab()
-            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
-                configuration is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta
-            ) {
+            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
                 {}
@@ -4018,19 +3987,12 @@ class BrowserTabFragment :
             )
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
-                    daxDialogOnboardingCta,
+                    daxDialogInContext,
                 ) {
                     userEnteredQuery(it.link)
                 }
             }
-            if (configuration is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta) {
-                configuration.setOnOptionClicked(
-                    daxDialogOnboardingCtaExperiment,
-                ) {
-                    userEnteredQuery(it.link)
-                }
-            }
-            viewModel.setOnboardingDialogExperimentBackground(appTheme.isLightModeEnabled())
+            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
 
@@ -4112,10 +4074,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
-            daxDialogOnboardingCta.daxCtaContainer.gone()
-            daxDialogOnboardingCtaExperiment.dialogTextCta.cancelAnimation()
-            daxDialogOnboardingCtaExperiment.daxCtaContainer.gone()
+            daxDialogInContext.dialogTextCta.cancelAnimation()
+            daxDialogInContext.daxCtaContainer.gone()
         }
 
         fun renderHomeCta() {

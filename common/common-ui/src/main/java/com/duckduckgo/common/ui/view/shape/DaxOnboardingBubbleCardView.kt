@@ -26,7 +26,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.EdgeTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 
-class DaxBubbleCardViewExperiment
+class DaxOnboardingBubbleCardView
 @JvmOverloads
 constructor(
     context: Context,
@@ -35,23 +35,23 @@ constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DaxBubbleCardViewExperiment, defStyleAttr, 0)
-        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.DaxBubbleCardViewExperiment_edgePosition, 0))
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DaxOnboardingBubbleCardView, defStyleAttr, 0)
+        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.DaxOnboardingBubbleCardView_edgePosition, 0))
         val arrowHeightPx = attr.getDimensionPixelSize(
-            R.styleable.DaxBubbleCardViewExperiment_arrowHeight,
+            R.styleable.DaxOnboardingBubbleCardView_arrowHeight,
             when (edgePosition) {
                 EdgePosition.TOP -> DaxBubbleTopEdgeTreatment.ORIGINAL_TOP_ARROW_HEIGHT_DP.toPx()
                 EdgePosition.LEFT -> DaxBubbleLeftEdgeTreatment.ORIGINAL_LEFT_ARROW_HEIGHT_DP.toPx()
             },
         )
-        val offsetStart = attr.getDimensionPixelSize(R.styleable.DaxBubbleCardViewExperiment_arrowOffsetStart, 0)
-        val offsetEnd = attr.getDimensionPixelSize(R.styleable.DaxBubbleCardViewExperiment_arrowOffsetEnd, 0)
+        val offsetStart = attr.getDimensionPixelSize(R.styleable.DaxOnboardingBubbleCardView_arrowOffsetStart, 0)
+        val offsetEnd = attr.getDimensionPixelSize(R.styleable.DaxOnboardingBubbleCardView_arrowOffsetEnd, 0)
 
         if (offsetStart != 0 && offsetEnd != 0) {
             throw IllegalArgumentException("Only one of arrowOffsetStart or arrowOffsetEnd can be set")
         }
 
-        val cornerRadius = resources.getDimension(R.dimen.dax_bubble_card_view_corner_radius_experiment)
+        val cornerRadius = resources.getDimension(R.dimen.dax_onboarding_bubble_card_view_corner_radius)
 
         setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface)))
 

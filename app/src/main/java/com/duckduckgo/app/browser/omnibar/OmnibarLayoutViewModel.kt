@@ -451,36 +451,18 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
-        if (decoration.privacyShield) {
-            _viewState.update {
-                it.copy(
-                    highlightPrivacyShield = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = true,
-                    ),
-                    highlightFireButton = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = false,
-                    ),
-                    scrollingEnabled = false,
-                )
-            }
-        }
-
-        if (decoration.fireButton) {
-            _viewState.update {
-                it.copy(
-                    highlightPrivacyShield = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = false,
-                    ),
-                    highlightFireButton = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = true,
-                    ),
-                    scrollingEnabled = false,
-                )
-            }
+        _viewState.update {
+            it.copy(
+                highlightPrivacyShield = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = decoration.privacyShield,
+                ),
+                highlightFireButton = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = decoration.fireButton,
+                ),
+                scrollingEnabled = false,
+            )
         }
     }
 
