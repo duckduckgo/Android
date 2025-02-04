@@ -11,11 +11,7 @@ tags:
       - launchApp:
           clearState: true
 
-      # optionally, run through onboarding if not already onboarded
-      - runFlow:
-          when:
-            visible: ".*Ready for a better, more private internet?.*"
-          file: ../../shared/pre_onboarding.yaml
+      - runFlow: ../../shared/pre_onboarding.yaml
 
       # setup an existing credential
       - runFlow: ../steps/manually_add_existing_credential.yaml
