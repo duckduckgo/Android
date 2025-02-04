@@ -272,6 +272,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -1385,7 +1386,7 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showMaliciousWarning(url: Uri) {
+    private fun showMaliciousWarning(url: Uri, feed: Feed) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -1396,8 +1397,8 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
-        maliciousWarningView.bind { action ->
-            viewModel.onMaliciousSiteUserAction(action, url, isActiveCustomTab())
+        maliciousWarningView.bind(feed) { action ->
+            viewModel.onMaliciousSiteUserAction(action, url, feed, isActiveCustomTab())
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
@@ -1427,8 +1428,9 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
 
-    private fun onBypassMaliciousWarning(url: Uri) {
+    private fun onBypassMaliciousWarning(url: Uri, feed: Feed) {
         showBrowser()
+        webViewClient.addExemptedMaliciousSite(url, feed)
         webView?.loadUrl(url.toString())
     }
 
@@ -1801,11 +1803,12 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed)
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
-            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
+            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)

@@ -78,6 +78,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -709,6 +710,10 @@ class BrowserWebViewClient @Inject constructor(
             SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
             else -> "ERROR_OTHER"
         }
+    }
+
+    fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
+        requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
 }
 

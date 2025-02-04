@@ -21,7 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Type

@@ -16,19 +16,26 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.models
 
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.MALWARE
-import com.duckduckgo.malicioussiteprotection.impl.models.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 
 data class Match(
     val hostname: String,
     val url: String,
     val regex: String,
     val hash: String,
+    val feed: Feed,
 )
 
 data class Filter(
     val hash: String,
     val regex: String,
+)
+
+class FilterSet(
+    val filters: List<Filter>,
+    val feed: Feed,
 )
 
 sealed class FilterSetWithRevision(
@@ -75,11 +82,6 @@ sealed class HashPrefixesWithRevision(
         override val revision: Int,
         override val replace: Boolean,
     ) : HashPrefixesWithRevision(insert, delete, revision, replace, MALWARE)
-}
-
-enum class Feed {
-    PHISHING,
-    MALWARE,
 }
 
 enum class Type {

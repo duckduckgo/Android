@@ -218,6 +218,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -677,7 +678,6 @@ class BrowserTabViewModelTest {
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
-            maliciousSiteBlockerWebViewIntegration = mock(),
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
         )
@@ -5085,7 +5085,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabThenClose() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
     }
@@ -5093,7 +5093,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.EscapeMaliciousSite })
     }
