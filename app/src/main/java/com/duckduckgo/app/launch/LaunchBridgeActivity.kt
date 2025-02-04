@@ -52,6 +52,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
             )
 
             lifecycleScope.launch {
+                viewModel.sendWelcomeScreenPixel()
                 delay(delay)
                 viewModel.determineViewToShow()
             }
