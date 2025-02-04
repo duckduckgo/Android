@@ -1397,7 +1397,7 @@ class BrowserTabFragment :
         webView?.hide()
         webView?.stopLoading()
         maliciousWarningView.bind { action ->
-            viewModel.onMaliciousSiteUserAction(action, url)
+            viewModel.onMaliciousSiteUserAction(action, url, isActiveCustomTab())
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
@@ -1421,8 +1421,10 @@ class BrowserTabFragment :
 
     private fun onEscapeMaliciousSite() {
         maliciousWarningView.gone()
-        viewModel.openNewTab()
-        viewModel.closeCurrentTab()
+    }
+
+    private fun closeCustomTab() {
+        (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
 
     private fun onBypassMaliciousWarning(url: Uri) {
@@ -1802,6 +1804,7 @@ class BrowserTabFragment :
             is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url)
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
+            is Command.CloseCustomTab -> closeCustomTab()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
