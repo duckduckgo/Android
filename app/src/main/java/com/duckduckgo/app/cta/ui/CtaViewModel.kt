@@ -136,7 +136,7 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+            if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
             if (cta is BrokenSitePromptDialogCta) {
