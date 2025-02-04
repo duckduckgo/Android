@@ -9,7 +9,7 @@ tags:
       commands:
         - launchApp:
               clearState: true
-        - runFlow: ../shared/onboarding.yaml
+        - runFlow: ../shared/pre_onboarding.yaml
 
         - tapOn:
             id: "omnibarTextInput"
