@@ -83,21 +83,21 @@
     <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
-    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity">
+    <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Share Link</item>
         <item quantity="one">Share Link</item>
-        <item quantity="other">Share %d Links</item>
+        <item quantity="other">Share %1$d Links</item>
     </plurals>
-    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity">
+    <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Bookmark This Page</item>
         <item quantity="one">Bookmark This Page</item>
-        <item quantity="other">Bookmark %d Tabs</item>
+        <item quantity="other">Bookmark %1$d Tabs</item>
     </plurals>
     <string name="bookmarkAllTabsMenuItem">Bookmark All Tabs…</string>
-    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity">
+    <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Close Tab</item>
         <item quantity="one">Close Tab</item>
-        <item quantity="other">Close %d Tabs</item>
+        <item quantity="other">Close %1$d Tabs</item>
     </plurals>
     <string name="closeOtherTabsMenuItem">Close Other Tabs</string>
 
