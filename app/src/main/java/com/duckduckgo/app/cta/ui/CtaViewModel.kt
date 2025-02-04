@@ -145,15 +145,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
-        withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta) {
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                completeStageIfDaxOnboardingCompleted()
-            }
-        }
-    }
-
     private suspend fun completeStageIfDaxOnboardingCompleted() {
         if (daxOnboardingActive() && allOnboardingCtasShown()) {
             Timber.d("Completing DAX ONBOARDING")
@@ -266,7 +257,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
-        daxOnboardingActive() && daxDialogIntroShown() && !hideTips() &&
+        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips() &&
             !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread
@@ -359,6 +350,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
+
+    private fun daxDialogIntroVisitSiteShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
