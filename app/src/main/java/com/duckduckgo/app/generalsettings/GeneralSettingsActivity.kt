@@ -41,7 +41,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -95,7 +94,6 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                 },
             ),
         )
-        binding.maliciousDisabledMessage.setTextColor(getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDestructive))
 
         configureUiEventHandlers()
         observeViewModel()
@@ -128,7 +126,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     } else {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
-                    binding.maliciousDisabledMessage.visibility = if (it.maliciousSiteProtectionEnabled) View.GONE else View.VISIBLE
+                    binding.maliciousDisabledMessage.isVisible = !it.maliciousSiteProtectionEnabled
                     binding.maliciousToggle.quietlySetIsChecked(
                         newCheckedState = it.maliciousSiteProtectionEnabled,
                         changeListener = maliciousSiteProtectionToggleListener,

@@ -106,7 +106,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         documentUri: Uri?,
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): WebResourceResponse? {
-        if (!isFeatureEnabled || !isSettingEnabled) {
+        if (!isEnabled()) {
             return null
         }
         val url = request.url.let {
@@ -147,7 +147,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (isMalicious: Boolean) -> Unit,
     ): Boolean {
         return runBlocking {
-            if (!isFeatureEnabled || !isSettingEnabled) {
+            if (!isEnabled()) {
                 return@runBlocking false
             }
             val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
@@ -196,6 +196,10 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         request.url.path?.contains("/embed/") == true ||
         request.url.path?.contains("/iframe/") == true ||
         request.requestHeaders["Accept"]?.contains("text/html") == true
+
+    private fun isEnabled(): Boolean {
+        return isFeatureEnabled && isSettingEnabled
+    }
 
     override fun onPageLoadStarted() {
         processedUrls.clear()

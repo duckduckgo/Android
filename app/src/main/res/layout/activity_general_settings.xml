@@ -108,8 +108,7 @@
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:text="@string/maliciousSiteSettingLearnMore"
-                app:typography="body2"
-                app:textType="secondary" />
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/maliciousDisabledMessage"
@@ -120,8 +119,8 @@
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:text="@string/maliciousSiteSettingDisabled"
                 android:visibility="visible"
-                app:typography="body2"
-                app:textType="secondary" />
+                android:textColor="?daxColorDestructive"
+                app:typography="body2" />
 
         </LinearLayout>
     </ScrollView>
