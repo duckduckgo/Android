@@ -69,6 +69,8 @@ jobs:
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Assemble the bundle
+        env:
+          MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
         run: ./gradlew bundleRelease -PuseUploadSigning -Pbuild-date-time
 
       - name: Capture App Bundle Path
