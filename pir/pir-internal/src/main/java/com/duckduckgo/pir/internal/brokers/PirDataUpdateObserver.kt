@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.PirRemoteFeatures
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -37,11 +38,12 @@ class PirDataUpdateObserver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val subscriptions: Subscriptions,
+    private val pirRemoteFeatures: PirRemoteFeatures,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            Timber.d("PIR-update: Attempting to update all broker data")
-            if (subscriptions.getAccessToken() != null) {
+            if (pirRemoteFeatures.allowPirRun().isEnabled() && subscriptions.getAccessToken() != null) {
+                Timber.d("PIR-update: Attempting to update all broker data")
                 if (brokerJsonUpdater.update()) {
                     Timber.d("PIR-update: Update successfully completed.")
                 } else {
