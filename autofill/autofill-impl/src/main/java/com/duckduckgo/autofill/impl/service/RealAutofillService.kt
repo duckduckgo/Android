@@ -43,6 +43,8 @@ class RealAutofillService : AutofillService() {
     @AppCoroutineScope
     lateinit var coroutineScope: CoroutineScope
 
+    @Inject lateinit var autofillServiceFeature: AutofillServiceFeature
+
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
@@ -69,6 +71,10 @@ class RealAutofillService : AutofillService() {
 
         autofillJob += coroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
+                if (autofillServiceFeature.self().isEnabled().not()) {
+                    callback.onSuccess(null)
+                    return@launch
+                }
                 val structure = request.fillContexts.lastOrNull()?.structure
                 if (structure == null) {
                     callback.onSuccess(null)
