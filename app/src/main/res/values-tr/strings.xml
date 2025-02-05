@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Gizli. Hızlı. Daha az reklam.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
 
