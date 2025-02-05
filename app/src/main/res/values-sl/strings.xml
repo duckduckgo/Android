@@ -746,7 +746,7 @@
         <item quantity="other"><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Razumem!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Uspelo vam bo!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Končano!</string>
@@ -759,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Zaščite so aktivirane!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokiranje zahtev za piškotke in pojavna okna</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokirajte zahteve za piškotke in pojavna okna</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Hitro izbrišite podatke o brskanju</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Katera barva mi najbolje pristaja?</string>
@@ -775,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno zasebna.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je iskanje <b>DuckDuckGo Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Ne pozabi: vsakič, ko brskate z mano, grozljiv oglas izgubi krila.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Petka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Preizkusite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
