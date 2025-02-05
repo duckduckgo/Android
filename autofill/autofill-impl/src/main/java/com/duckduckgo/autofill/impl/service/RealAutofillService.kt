@@ -68,27 +68,32 @@ class RealAutofillService : AutofillService() {
         cancellationSignal.setOnCancelListener { autofillJob.cancel() }
 
         autofillJob += coroutineScope.launch(dispatcherProvider.io()) {
-            val structure = request.fillContexts.lastOrNull()?.structure
-            if (structure == null) {
+            runCatching {
+                val structure = request.fillContexts.lastOrNull()?.structure
+                if (structure == null) {
+                    callback.onSuccess(null)
+                    return@launch
+                }
+                val parsedRootNodes = autofillParser.parseStructure(structure)
+                val nodeToAutofill = findBestFillableNode(parsedRootNodes)
+
+                if (nodeToAutofill == null || shouldSkipAutofillSuggestions(nodeToAutofill)) {
+                    callback.onSuccess(null)
+                    return@launch
+                }
+
+                // prepare response
+                val response = autofillProviderSuggestions.buildSuggestionsResponse(
+                    context = this@RealAutofillService,
+                    nodeToAutofill = nodeToAutofill,
+                    request = request,
+                )
+
+                callback.onSuccess(response)
+            }.onFailure {
+                // TODO: to include a crash pixel here
                 callback.onSuccess(null)
-                return@launch
             }
-            val parsedRootNodes = autofillParser.parseStructure(structure)
-            val nodeToAutofill = findBestFillableNode(parsedRootNodes)
-
-            if (nodeToAutofill == null || shouldSkipAutofillSuggestions(nodeToAutofill)) {
-                callback.onSuccess(null)
-                return@launch
-            }
-
-            // prepare response
-            val response = autofillProviderSuggestions.buildSuggestionsResponse(
-                context = this@RealAutofillService,
-                nodeToAutofill = nodeToAutofill,
-                request = request,
-            )
-
-            callback.onSuccess(response)
         }
     }
 
