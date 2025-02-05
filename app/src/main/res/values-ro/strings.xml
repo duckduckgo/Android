@@ -744,7 +744,7 @@
         <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
@@ -773,6 +773,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Bate palma!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
 
