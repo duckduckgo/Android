@@ -1,6 +1,8 @@
 package com.duckduckgo.malicioussiteprotection.impl.data
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSitePixelName.MALICIOUS_SITE_CLIENT_TIMEOUT
 import com.duckduckgo.malicioussiteprotection.impl.data.db.FilterEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.HashPrefixEntity
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
@@ -17,6 +19,7 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.
 import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,7 +37,13 @@ class RealMaliciousSiteRepositoryTest {
 
     private val maliciousSiteDao: MaliciousSiteDao = mock()
     private val maliciousSiteService: MaliciousSiteService = mock()
-    private val repository = RealMaliciousSiteRepository(maliciousSiteDao, maliciousSiteService, coroutineRule.testDispatcherProvider)
+    private val mockPixel: Pixel = mock()
+    private val repository = RealMaliciousSiteRepository(
+        maliciousSiteDao,
+        maliciousSiteService,
+        coroutineRule.testDispatcherProvider,
+        mockPixel,
+    )
 
     @Test
     fun loadFilters_updatesFiltersWhenNetworkRevisionIsHigher() = runTest {
@@ -135,5 +144,17 @@ class RealMaliciousSiteRepositoryTest {
         val result = repository.matches(hashPrefix)
 
         assertEquals(matchesResponse.matches.map { Match(it.hostname, it.url, it.regex, it.hash, PHISHING) }, result)
+    }
+
+    @Test
+    fun matches_returnsEmptyListOnTimeout() = runTest {
+        val hashPrefix = "testPrefix"
+
+        whenever(maliciousSiteService.getMatches(hashPrefix)).thenThrow(TimeoutCancellationException::class.java)
+
+        val result = repository.matches(hashPrefix)
+
+        assertTrue(result.isEmpty())
+        verify(mockPixel).fire(MALICIOUS_SITE_CLIENT_TIMEOUT)
     }
 }

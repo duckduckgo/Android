@@ -54,6 +54,8 @@ dependencies {
 
     implementation Google.android.material
 
+    implementation project(path: ':statistics-api')
+
     testImplementation AndroidX.test.ext.junit
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
     testImplementation Testing.junit4

@@ -24,8 +24,10 @@ import com.duckduckgo.app.browser.webview.ExemptedUrlsHolder.ExemptedUrl
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -97,6 +99,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val exemptedUrlsHolder: ExemptedUrlsHolder,
     @IsMainProcess private val isMainProcess: Boolean,
+    private val pixel: Pixel,
 ) : MaliciousSiteBlockerWebViewIntegration, PrivacyConfigCallbackPlugin {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -161,19 +164,31 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         }
 
         val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-        if (request.isForMainFrame || (isForIframe(request) && belongsToCurrentPage)) {
-            when (val result = checkMaliciousUrl(decodedUrl, confirmationCallback)) {
+        val isForIframe = isForIframe(request) && belongsToCurrentPage
+        if (request.isForMainFrame || isForIframe) {
+            val result = checkMaliciousUrl(decodedUrl) {
+                if (isForIframe && it is Malicious) {
+                    firePixelForMaliciousIframe(it.feed)
+                }
+                confirmationCallback(it)
+            }
+            when (result) {
                 is ConfirmedResult -> {
                     when (val status = result.status) {
                         is Malicious -> {
+                            if (isForIframe) {
+                                firePixelForMaliciousIframe(status.feed)
+                            }
                             return IsMaliciousViewData.MaliciousSite(url, status.feed, false)
                         }
+
                         is Safe -> {
                             processedUrls.add(decodedUrl)
                             return IsMaliciousViewData.Safe
                         }
                     }
                 }
+
                 is WaitForConfirmation -> {
                     processedUrls.add(decodedUrl)
                     return IsMaliciousViewData.WaitForConfirmation
@@ -229,6 +244,10 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             }
             IsMaliciousViewData.Safe
         }
+    }
+
+    private fun firePixelForMaliciousIframe(feed: Feed) {
+        pixel.fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to feed.name.lowercase()))
     }
 
     private suspend fun checkMaliciousUrl(

@@ -6,8 +6,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.webview.ExemptedUrlsHolder.ExemptedUrl
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -41,6 +43,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     private val maliciousSiteProtection: MaliciousSiteProtection = mock(MaliciousSiteProtection::class.java)
     private val mockSettingsDataStore: SettingsDataStore = mock(SettingsDataStore::class.java)
     private val mockExemptedUrlsHolder = mock(ExemptedUrlsHolder::class.java)
+    private val mockPixel: Pixel = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val maliciousUri = "http://malicious.com".toUri()
     private val exampleUri = "http://example.com".toUri()
@@ -52,6 +55,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         appCoroutineScope = coroutineRule.testScope,
         isMainProcess = true,
         exemptedUrlsHolder = mockExemptedUrlsHolder,
+        pixel = mockPixel,
     )
 
     @Before
@@ -120,11 +124,12 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     fun `shouldInterceptRequest returns result when feature is enabled, setting is enabled, is malicious, and is iframe`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
-        whenever(request.isForMainFrame).thenReturn(true)
-        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe"))
+        whenever(request.isForMainFrame).thenReturn(false)
+        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe", "Referer" to maliciousUri.toString()))
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
+        verify(mockPixel).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
         assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result)
     }
 
