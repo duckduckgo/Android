@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -43,7 +44,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -54,8 +54,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import java.time.ZonedDateTime
-import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -99,7 +97,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val experimentAppUsageRepository: ExperimentAppUsageRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator>,
@@ -167,6 +165,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch {
+            experimentAppUsageRepository.recordAppUsedNow()
             evaluate()
         }
     }
@@ -206,12 +205,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         } else if (isDefaultBrowser) {
             CONVERTED
         } else {
-            /**
-             * The [appDaysUsedRepository] expects a [Date] but the experiment framework stores the enrollment date as [ZonedDateTime],
-             * so we're doing a conversion here.
-             */
-            val enrollmentDateGMT = defaultBrowserPromptsFeatureToggles.getEnrollmentDate() ?: run {
-                Timber.e("Missing enrollment date even though cohort is assigned.")
+            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment(
+                defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+            ).getOrElse { throwable ->
+                Timber.e(throwable)
                 return
             }
 
@@ -229,7 +226,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 NOT_ENROLLED -> ENROLLED
 
                 ENROLLED -> {
-                    if (appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(enrollmentDateGMT) >= configSettings.activeDaysUntilStage1) {
+                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage1) {
                         STAGE_1
                     } else {
                         null
@@ -237,7 +234,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 }
 
                 STAGE_1 -> {
-                    if (appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(enrollmentDateGMT) >= configSettings.activeDaysUntilStage2) {
+                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage2) {
                         STAGE_2
                     } else {
                         null
@@ -245,7 +242,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 }
 
                 STAGE_2 -> {
-                    if (appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(enrollmentDateGMT) >= configSettings.activeDaysUntilStop) {
+                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStop) {
                         STOPPED
                     } else {
                         null
@@ -379,12 +376,6 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             }
         }
     }
-
-    private fun DefaultBrowserPromptsFeatureToggles.getEnrollmentDate(): Date? =
-        defaultBrowserAdditionalPrompts202501().getCohort()?.enrollmentDateET?.let { enrollmentZonedDateET ->
-            val instant = ZonedDateTime.parse(enrollmentZonedDateET).toInstant()
-            return Date.from(instant)
-        }
 
     private fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
         for (cohort in AdditionalPromptsCohortName.entries) {
