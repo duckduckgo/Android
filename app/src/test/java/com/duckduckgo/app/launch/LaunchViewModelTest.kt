@@ -25,6 +25,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.fakes.FakePixel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -49,6 +50,7 @@ class LaunchViewModelTest {
     private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
         on { it.isHighlightsEnabled() } doReturn false
     }
+    private val fakePixel: FakePixel = FakePixel()
 
     private lateinit var testee: LaunchViewModel
 
@@ -63,6 +65,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -78,6 +81,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -93,6 +97,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -108,6 +113,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -121,6 +127,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -134,6 +141,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -147,6 +155,7 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
