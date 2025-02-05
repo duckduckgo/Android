@@ -452,7 +452,8 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
-        // We only want to disable scrolling if one of the elements is highligthed
+        // We only want to disable scrolling if one of the elements is highlighted
+        Timber.d("Omnibar: onHighlightItem")
         val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
         _viewState.update {
             it.copy(
