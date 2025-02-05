@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -91,6 +92,7 @@ class RealExemptedUrlsHolder @Inject constructor() : ExemptedUrlsHolder {
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val maliciousSiteProtection: MaliciousSiteProtection,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val exemptedUrlsHolder: ExemptedUrlsHolder,
@@ -101,6 +103,8 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     val processedUrls = mutableListOf<String>()
 
     private var isFeatureEnabled = false
+    private val isSettingEnabled: Boolean
+        get() = settingsDataStore.maliciousSiteProtectionEnabled
     private var currentCheckId = AtomicInteger(0)
 
     init {
@@ -130,7 +134,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         documentUri: Uri?,
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
-        if (!isFeatureEnabled) {
+        if (!isEnabled()) {
             return IsMaliciousViewData.Safe
         }
         val url = request.url.let {
@@ -185,7 +189,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
         return runBlocking {
-            if (!isFeatureEnabled) {
+            if (!isEnabled()) {
                 return@runBlocking IsMaliciousViewData.Safe
             }
             val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
@@ -248,6 +252,10 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         request.url.path?.contains("/embed/") == true ||
         request.url.path?.contains("/iframe/") == true ||
         request.requestHeaders["Accept"]?.contains("text/html") == true
+
+    private fun isEnabled(): Boolean {
+        return isFeatureEnabled && isSettingEnabled
+    }
 
     override fun onPageLoadStarted() {
         processedUrls.clear()

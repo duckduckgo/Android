@@ -80,6 +80,48 @@
                 app:primaryText="@string/showOnAppLaunchOptionTitle"
                 tools:secondaryText="Last Opened Tab" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/maliciousSiteHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:primaryText="@string/maliciousSiteSettingTitle" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/maliciousToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                app:primaryText="@string/maliciousSiteToggleHint"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/maliciousLearnMore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/maliciousSiteSettingLearnMore"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/maliciousDisabledMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/maliciousSiteSettingDisabled"
+                android:visibility="visible"
+                android:textColor="?daxColorDestructive"
+                app:typography="body2" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

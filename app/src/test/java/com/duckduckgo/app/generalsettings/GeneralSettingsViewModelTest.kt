@@ -20,13 +20,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
+import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.OpenMaliciousLearnMore
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -45,6 +48,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -293,6 +299,61 @@ internal class GeneralSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenMaliciousSiteProtectionEnabledThenViewStateEmittedSettingOnAndPixelFired() = runTest {
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        val viewState = defaultViewState()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+
+        initTestee()
+
+        testee.onMaliciousSiteProtectionSettingChanged(true)
+        testee.viewState.test {
+            assertEquals(viewState.copy(maliciousSiteProtectionEnabled = true), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+
+        assertTrue(fakeAppSettingsDataStore.maliciousSiteProtectionEnabled)
+        verify(mockPixel).fire(eq(AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED), paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.firstValue
+        assertEquals("true", params["newState"])
+    }
+
+    @Test
+    fun whenMaliciousSiteProtectionDisabledThenViewStateEmittedSettingOffAndPixelFired() = runTest {
+        fakeAppSettingsDataStore.autoCompleteSuggestionsEnabled = true
+        fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        val viewState = defaultViewState()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+
+        initTestee()
+
+        testee.onMaliciousSiteProtectionSettingChanged(false)
+        testee.viewState.test {
+            assertEquals(viewState.copy(maliciousSiteProtectionEnabled = false), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+
+        assertFalse(fakeAppSettingsDataStore.maliciousSiteProtectionEnabled)
+        verify(mockPixel).fire(eq(AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED), paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.firstValue
+        assertEquals("false", params["newState"])
+    }
+
+    @Test
+    fun whenMaliciousSiteLearnMoreClickedThenOpenMaliciousLearnMoreCommandEmitted() = runTest {
+        initTestee()
+
+        testee.maliciousSiteLearnMoreClicked()
+
+        testee.commands.test {
+            assertEquals(OpenMaliciousLearnMore, awaitItem())
+        }
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
@@ -301,6 +362,7 @@ internal class GeneralSettingsViewModelTest {
         voiceSearchEnabled = false,
         isShowOnAppLaunchOptionVisible = fakeShowOnAppLaunchFeatureToggle.self().isEnabled(),
         showOnAppLaunchSelectedOption = LastOpenedTab,
+        maliciousSiteProtectionEnabled = true,
     )
 
     private fun initTestee() {
