@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Fire button is working"
+name: "ReleaseTest: Fire button skip working"
 tags:
     - releaseTest
 ---
