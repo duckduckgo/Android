@@ -1882,7 +1882,9 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         when (action) {
             LeaveSite -> {
-                if (activeCustomTab) {
+                if (webNavigationState?.canGoBack == true) {
+                    command.postValue(HideWarningMaliciousSite)
+                } else if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
                 } else {
                     command.postValue(EscapeMaliciousSite)
