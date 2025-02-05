@@ -28,9 +28,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@drawable/onboarding_background_small_light" />
 
     <LinearLayout
@@ -38,11 +35,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/foregroundImageView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/daxLogo"
@@ -58,8 +55,8 @@
             android:layout_marginStart="54dp"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="54dp"
-            android:text="@string/onboardingWelcomeTitle"
             android:gravity="center"
+            android:text="@string/onboardingWelcomeTitle"
             app:typography="title" />
     </LinearLayout>
 
@@ -67,8 +64,8 @@
         android:id="@+id/foregroundImageView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/keyline_6"
         android:adjustViewBounds="true"
+        android:paddingTop="@dimen/keyline_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -66,8 +66,8 @@
             android:layout_marginStart="54dp"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="54dp"
-            android:text="@string/onboardingWelcomeTitle"
             android:gravity="center"
+            android:text="@string/onboardingWelcomeTitle"
             app:typography="title" />
     </LinearLayout>
 
@@ -75,12 +75,13 @@
         android:id="@+id/daxDialogCta"
         layout="@layout/pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"
-        app:layout_constraintHeight_max="672dp"/>
+        app:layout_constraintWidth_max="600dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
