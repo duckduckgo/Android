@@ -285,6 +285,8 @@ dependencies {
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
+    internalImplementation project(':pir-internal')
+
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-dashboard-impl')
 
