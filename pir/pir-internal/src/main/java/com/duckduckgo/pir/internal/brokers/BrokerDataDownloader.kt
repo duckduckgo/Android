@@ -30,8 +30,11 @@ import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import okhttp3.ResponseBody
-import timber.log.Timber
+import okio.FileSystem.Companion.SYSTEM
+import okio.Path.Companion.toPath
 
 interface BrokerDataDownloader {
     /**
@@ -56,7 +59,7 @@ class RealBrokerDataDownloader @Inject constructor(
                 val extractFolder = File(context.filesDir, "unzipped-broker-json")
                 extractJsonFilesFromResponse(dbpService.getBrokerJsonFiles(), extractFolder)
                 processBrokerJsonFiles(extractFolder, brokersToUpdate)
-                deleteDirectory(extractFolder)
+                SYSTEM.deleteRecursively(extractFolder.path.toPath())
             }
         }
     }
@@ -65,7 +68,7 @@ class RealBrokerDataDownloader @Inject constructor(
         responseBody: ResponseBody,
         outputDir: File,
     ) {
-        Timber.d("PIR-update: Extracting data from $responseBody")
+        logcat { "PIR-update: Extracting data from $responseBody" }
         ZipInputStream(responseBody.byteStream()).use { zipInputStream ->
             var entry = zipInputStream.nextEntry
             while (entry != null) {
@@ -83,16 +86,16 @@ class RealBrokerDataDownloader @Inject constructor(
                 entry = zipInputStream.nextEntry
             }
         }
-        Timber.d("PIR-update: Extraction complete")
+        logcat { "PIR-update: Extraction complete" }
     }
 
     private suspend fun processBrokerJsonFiles(
         directory: File,
         brokersToUpdate: List<String>,
     ) {
-        Timber.d("PIR-update: Attempting to process all relevant json for $brokersToUpdate")
+        logcat { "PIR-update: Attempting to process all relevant json for $brokersToUpdate" }
         if (!directory.exists() || !directory.isDirectory) {
-            Timber.e("PIR-update: $directory is not the json directory")
+            logcat(ERROR) { "PIR-update: $directory is not the json directory" }
             return
         }
 
@@ -105,7 +108,7 @@ class RealBrokerDataDownloader @Inject constructor(
         directory.listFiles()?.get(0)?.listFiles { file ->
             file.extension == "json" && brokersToUpdate.contains(file.name)
         }?.forEach { jsonFile ->
-            Timber.d("PIR-update: Processing data from ${jsonFile.name}")
+            logcat { "PIR-update: Processing data from ${jsonFile.name}" }
             val content = jsonFile.readText() // Read JSON file as string
             val broker = adapter.fromJson(content)
             if (broker != null) {
@@ -113,19 +116,6 @@ class RealBrokerDataDownloader @Inject constructor(
             }
         }
 
-        Timber.d("PIR-update: Stored all new broker data")
-    }
-
-    private fun deleteDirectory(directory: File): Boolean {
-        if (directory.exists()) {
-            directory.listFiles()?.forEach { file ->
-                if (file.isDirectory) {
-                    deleteDirectory(file) // Recursively delete subdirectories
-                } else {
-                    file.delete() // Delete files
-                }
-            }
-        }
-        return directory.delete() // Finally, delete the empty folder
+        logcat { "PIR-update: Stored all new broker data" }
     }
 }

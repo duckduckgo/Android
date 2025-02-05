@@ -30,5 +30,5 @@ interface PirRemoteFeatures {
     fun self(): Toggle
 
     @DefaultValue(false)
-    fun allowPirRun(): Toggle // kill switch
+    fun allowPirRun(): Toggle
 }

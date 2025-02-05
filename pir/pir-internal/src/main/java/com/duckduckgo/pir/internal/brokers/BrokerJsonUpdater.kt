@@ -25,7 +25,8 @@ import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 interface BrokerJsonUpdater {
     /**
@@ -56,24 +57,24 @@ class RealBrokerJsonUpdater @Inject constructor(
     override suspend fun update(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {
             dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also {
-                Timber.d("PIR-update: Main config result $it.")
+                logcat { "PIR-update: Main config result $it." }
                 if (it.code() == 304) {
-                    Timber.d("PIR-update: Main config did not change, nothing to do here")
+                    logcat { "PIR-update: Main config did not change, nothing to do here" }
                 } else if (it.isSuccessful) {
-                    Timber.d("PIR-update: Main config is new.")
+                    logcat { "PIR-update: Main config is new." }
                     it.body()?.let { config ->
-                        Timber.d("PIR-update: Main config $config.")
+                        logcat { "PIR-update: Main config $config." }
                         checkUpdatesFromMainConfig(config)
                         pirRepository.updateMainEtag(config.etag)
                     }
                 } else {
-                    Timber.e("PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}")
+                    logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }
                     return@withContext false
                 }
             }
             true
         }.getOrElse {
-            Timber.e("PIR-update: Json update failed to complete due to: $it")
+            logcat(ERROR) { "PIR-update: Json update failed to complete due to: $it" }
             false
         }
     }

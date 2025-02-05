@@ -27,7 +27,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -43,11 +43,11 @@ class PirDataUpdateObserver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (pirRemoteFeatures.allowPirRun().isEnabled() && subscriptions.getAccessToken() != null) {
-                Timber.d("PIR-update: Attempting to update all broker data")
+                logcat { "PIR-update: Attempting to update all broker data" }
                 if (brokerJsonUpdater.update()) {
-                    Timber.d("PIR-update: Update successfully completed.")
+                    logcat { "PIR-update: Update successfully completed." }
                 } else {
-                    Timber.d("PIR-update: Failed to complete.")
+                    logcat { "PIR-update: Failed to complete." }
                 }
             }
         }
