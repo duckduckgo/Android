@@ -230,17 +230,18 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
     ) {
         val handler = Handler(Looper.getMainLooper())
-        val trackerCountUpdateDelay = if (entities.size >= TRACKER_THRESHOLD) {
-            HIGH_TRACKERS_COUNT_ANIMATION_DURATION
-        } else {
-            LOW_TRACKERS_COUNT_ANIMATION_DURATION
-        }
-        val animationCompletionDelay = 1000L
+        val totalDuration = 2000L
+        val trackerCountUpdateDelay = totalDuration / entities.size
+        val animationCompletionDelay = if (logos.size < MAX_LOGOS_SHOWN) 10L else 1000L
 
         fun updateTackersCountText(index: Int) {
             if (index <= entities.size) {
-                trackersBlockedCountAnimationView?.text = index.toString()
-                handler.postDelayed({ updateTackersCountText(index + 1) }, trackerCountUpdateDelay)
+                if ((index == TRACKER_START_INDEX) || (index > (entities.size - TRACKER_THRESHOLD + TRACKER_START_INDEX))) {
+                    trackersBlockedCountAnimationView?.text = index.toString()
+                    handler.postDelayed({ updateTackersCountText(index + 1) }, trackerCountUpdateDelay)
+                } else {
+                    handler.post { updateTackersCountText(index + 1) }
+                }
             } else {
                 handler.postDelayed(
                     {
@@ -262,7 +263,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             }
         }
 
-        updateTackersCountText(1)
+        updateTackersCountText(TRACKER_START_INDEX)
     }
 
     override fun createCookiesAnimation(
@@ -558,9 +559,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
-        private const val TRACKER_THRESHOLD = 10
-        private const val HIGH_TRACKERS_COUNT_ANIMATION_DURATION = 100L
-        private const val LOW_TRACKERS_COUNT_ANIMATION_DURATION = 150L
+        private const val TRACKER_THRESHOLD = 5
+        private const val TRACKER_START_INDEX = 1
     }
 }
 
