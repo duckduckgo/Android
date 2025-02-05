@@ -55,7 +55,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTh
                 Timber.i("Shield: UNKNOWN")
             }
             MALICIOUS -> {
-                val res = R.raw.alert_red
+                val res = if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
                 holder.setAnimation(res)
                 holder.progress = 0.0f
                 Timber.i("Shield: WARNING")
