@@ -18,7 +18,7 @@ Alternatively, if you already have the project checked out, you can initialize t
 
 We have taken steps to update our terminology and remove words with problematic racial connotations, most notably the change to `main` branches, `allow lists`, and `blocklists`. Closed issues or PRs may contain deprecated terminology that should not be used going forward.
 
-## Contribute
+## Contribute 'GitHub' Android Mobile Devices
 
 Please refer to [contributing](CONTRIBUTING.md).
 
