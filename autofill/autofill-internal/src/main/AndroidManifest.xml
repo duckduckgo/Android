@@ -26,6 +26,7 @@
             android:name="com.duckduckgo.autofill.impl.service.RealAutofillService"
             android:exported="true"
             android:label="@string/appName"
+            android:enabled="false"
             android:permission="android.permission.BIND_AUTOFILL_SERVICE">
             <intent-filter>
                 <action android:name="android.service.autofill.AutofillService" />

@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.PASSWORD
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
+import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -47,6 +48,7 @@ class RealAutofillProviderSuggestionsTest {
     }
 
     private val autofillStore = mock<AutofillStore>()
+    private val appCredentialProvider = mock<AppCredentialProvider>()
 
     private val mockViewProvider = mock<AutofillServiceViewProvider>()
 
@@ -60,6 +62,7 @@ class RealAutofillProviderSuggestionsTest {
         autofillStore = autofillStore,
         viewProvider = mockViewProvider,
         suggestionsFormatter = suggestionFormatter,
+        appCredentialProvider = appCredentialProvider,
     )
 
     @Test
@@ -75,8 +78,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -100,8 +103,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -130,8 +133,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -160,8 +163,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -189,8 +192,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -202,6 +205,60 @@ class RealAutofillProviderSuggestionsTest {
     }
 
     @Test
+    fun whenCredentialsForPackageAndDomainFoundThenAddBothTypeSuggestions() = runTest {
+        val credentialsDomain = listOf(
+            LoginCredentials(1L, "username", "password", "example.com"),
+        )
+        val credentialsPackage = listOf(
+            LoginCredentials(2L, "username2", "password2", "example2.com"),
+        )
+        whenever(autofillStore.getCredentials(any())).thenReturn(credentialsDomain)
+        whenever(appCredentialProvider.getCredentials(any())).thenReturn(credentialsPackage)
+        whenever(mockViewProvider.createFormPresentation(any(), any(), any(), any())).thenReturn(mock())
+
+        testee.buildSuggestionsResponse(
+            context = context,
+            AutofillRootNode(
+                "com.example.app",
+                "example.com",
+                listOf(
+                    ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
+                ),
+            ),
+            mock(),
+        )
+
+        verify(mockViewProvider, times(3)).createFormPresentation(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenCredentialsForPackageAndDomainAreSameThenDedupSuggestions() = runTest {
+        val credentialsDomain = listOf(
+            LoginCredentials(1L, "username", "password", "example.com"),
+        )
+        val credentialsPackage = listOf(
+            LoginCredentials(1L, "username", "password", "example.com"),
+        )
+        whenever(autofillStore.getCredentials(any())).thenReturn(credentialsDomain)
+        whenever(appCredentialProvider.getCredentials(any())).thenReturn(credentialsPackage)
+        whenever(mockViewProvider.createFormPresentation(any(), any(), any(), any())).thenReturn(mock())
+
+        testee.buildSuggestionsResponse(
+            context = context,
+            AutofillRootNode(
+                "com.example.app",
+                "example.com",
+                listOf(
+                    ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
+                ),
+            ),
+            mock(),
+        )
+
+        verify(mockViewProvider, times(2)).createFormPresentation(any(), any(), any(), any())
+    }
+
+    @Test
     fun whenNoCredentialsFoundThenOnlyOpenDDGAppItemIsAdded() = runTest {
         whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
         whenever(mockViewProvider.createFormPresentation(any(), any(), any(), any())).thenReturn(mock())
@@ -209,8 +266,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                 ),
@@ -232,8 +289,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                     ParsedAutofillField(autofillId(), "", "", "", PASSWORD, viewNode()),
@@ -258,8 +315,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                     ParsedAutofillField(autofillId(), "", "", "", PASSWORD, viewNode()),
@@ -286,8 +343,8 @@ class RealAutofillProviderSuggestionsTest {
         testee.buildSuggestionsResponse(
             context = context,
             AutofillRootNode(
-                "com.example.app",
                 null,
+                "example.com",
                 listOf(
                     ParsedAutofillField(autofillId(), "", "", "", USERNAME, viewNode()),
                     ParsedAutofillField(autofillId(), "", "", "", PASSWORD, viewNode()),

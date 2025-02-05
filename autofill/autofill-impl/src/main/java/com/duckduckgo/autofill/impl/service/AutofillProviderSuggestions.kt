@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
+import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -53,6 +54,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
     private val autofillStore: AutofillStore,
     private val viewProvider: AutofillServiceViewProvider,
     private val suggestionsFormatter: AutofillServiceSuggestionCredentialFormatter,
+    private val appCredentialProvider: AppCredentialProvider,
 ) : AutofillProviderSuggestions {
 
     companion object {
@@ -205,7 +207,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
         } ?: emptyList()
 
         val crendentialsForPackage = node.packageId.takeUnless { it.isNullOrBlank() }?.let {
-            autofillStore.getCredentials(it)
+            appCredentialProvider.getCredentials(it)
         } ?: emptyList()
 
         Timber.v("DDGAutofillService credentials for domain: $crendentialsForDomain")
