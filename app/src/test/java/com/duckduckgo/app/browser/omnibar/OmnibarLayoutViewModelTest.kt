@@ -631,7 +631,7 @@ class OmnibarLayoutViewModelTest {
                 ),
             )
 
-            assertFalse(viewState.scrollingEnabled)
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 
