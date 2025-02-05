@@ -23,11 +23,13 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.fakes.FakePixel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -164,5 +166,19 @@ class LaunchViewModelTest {
         testee.determineViewToShow()
 
         verify(mockHighlightsOnboardingExperimentManager).setExperimentVariants()
+    }
+
+    @Test
+    fun whenSendingWelcomeScreenPixelThenSplashScreenShownPixelIsSent() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
+        )
+
+        testee.sendWelcomeScreenPixel()
+
+        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
     }
 }
