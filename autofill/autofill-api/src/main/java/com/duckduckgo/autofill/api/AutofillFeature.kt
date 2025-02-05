@@ -114,4 +114,12 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(false)
     fun partialFormSaves(): Toggle
+
+    /**
+     * Kill switch for toggling how deep a domain comparison to do when saving/updating credentials.
+     * We want to limit times we save duplicates, and we can do that with a deeper comparison of domains to decide if we already have a matching cred.
+     * By deeper, this means comparing using E-TLD+1
+     */
+    @Toggle.DefaultValue(true)
+    fun deepDomainComparisonsOnExistingCredentialsChecks(): Toggle
 }
