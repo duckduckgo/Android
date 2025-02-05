@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Skjønner!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Fjern nettleseraktiviteten din umiddelbart med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Fjern nettleseraktiviteten din umiddelbart med <b>Fire Button</b>.<br/><br/>Prøv den!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Dette går bra!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
     <string name="onboardingEndDaxDialogButton">Ferdig!</string>
@@ -755,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for en raskere nettleser som holder deg beskyttet?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokker tredjepartssporere</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokker forespørsler om informasjonskapsler og popup-vinduer</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokker forespørsler og popup-vinduer om informasjonskapsler</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Slett nettleserdata raskt</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Hvilken farge passer best på meg?</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Raskt. Færre annonser.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hopp over</string>
 
