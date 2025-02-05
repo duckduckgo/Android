@@ -96,7 +96,7 @@ interface WebViewClientListener {
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
-    fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean)
+    fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean)
     fun recordErrorCode(error: String, url: String)
     fun recordHttpErrorCode(statusCode: Int, url: String)
 

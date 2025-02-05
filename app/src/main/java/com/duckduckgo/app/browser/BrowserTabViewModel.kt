@@ -1882,6 +1882,8 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         when (action) {
             LeaveSite -> {
+                val params = mapOf(CATEGORY_KEY to feed.name)
+                pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
                 } else {
@@ -3197,8 +3199,9 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
-    override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean) {
-        // TODO (cbarreiro): Fire pixel
+    override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        val params = mapOf(CATEGORY_KEY to feed.name, CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
+        pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
         site?.maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
@@ -3821,6 +3824,9 @@ class BrowserTabViewModel @Inject constructor(
         private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
         private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix
         private const val HTTP_STATUS_CODE_SERVER_ERROR_PREFIX = 5 // 5xx, server error status code prefix
+
+        private const val CATEGORY_KEY = "category"
+        private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(

@@ -364,6 +364,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER("duckplayer_setting_always_duck-player"),
 
     MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED("m_malicious-site-protection_feature-toggled"),
+    MALICIOUS_SITE_PROTECTION_VISIT_SITE("m_malicious-site-protection_visit-site"),
+    MALICIOUS_SITE_PROTECTION_ERROR_SHOWN ("m_malicious-site-protection_error-page-shown"),
 
     ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 
