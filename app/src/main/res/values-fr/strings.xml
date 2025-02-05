@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">J\'ai compris !</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Bien joué !"</string>
     <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
     <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
@@ -755,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Protections activées !</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquez les demandes et les fenêtres contextuelles de cookies</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquez les demandes de cookies et les fenêtres contextuelles</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Effacez rapidement les données de navigation</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Quelle couleur me va le mieux ?</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[C\'est <b>DuckDuckGo Search !</b> Privé. Rapide. Moins de publicités.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Bien joué !</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Essayez</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorer</string>
 
