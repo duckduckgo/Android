@@ -609,7 +609,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.OpenInNewTab -> launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
-            is Command.HideSetAsDefaultBrowserDialog -> hideSetAsDefaultBrowserDialog()
+            is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
         }
@@ -985,8 +985,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 viewModel.onSetDefaultBrowserDialogShown()
             }
 
-            override fun onDismissed() {
-                viewModel.onSetDefaultBrowserDismissed()
+            override fun onCanceled() {
+                viewModel.onSetDefaultBrowserDialogCanceled()
             }
 
             override fun onSetBrowserButtonClicked() {
@@ -1001,7 +1001,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         setAsDefaultBrowserDialog = dialog
     }
 
-    private fun hideSetAsDefaultBrowserDialog() {
+    private fun dismissSetAsDefaultBrowserDialog() {
         setAsDefaultBrowserDialog?.dismiss()
         setAsDefaultBrowserDialog = null
     }
@@ -1009,7 +1009,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun showSystemDefaultAppsActivity(intent: Intent) {
         try {
             startDefaultAppsSystemActivityForResult.launch(intent)
-            viewModel.onSystemDefaultAppsActivityOpened()
         } catch (ex: Exception) {
             Timber.e(ex)
         }
