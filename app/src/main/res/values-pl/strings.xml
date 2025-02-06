@@ -746,7 +746,7 @@
         <item quantity="other"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Rozumiem!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Wypróbuj go! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Spróbuj!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Udało się!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
@@ -759,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Ochrona aktywowana!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokowanie wyskakujących okienek z informacją o plikach cookie</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokuj żądania dotyczące plików cookie i wyskakujące okienka</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Szybkie usuwanie danych przeglądania</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Który kolor będzie najlepszy?</string>
@@ -775,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Wyszukiwania w DuckDuckGo zawsze są prywatne.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To <b>DuckDuckGo Search</b>! Prywatna. Szybka. Z mniejszą liczbą reklam.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Piątka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Wypróbuj</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Pomiń</string>
 
