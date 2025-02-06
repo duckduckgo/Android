@@ -94,7 +94,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Update Plan or Cancel</string>
-    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
+    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
