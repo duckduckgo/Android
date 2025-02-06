@@ -80,7 +80,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenLightModeAndPrivacyShieldWarningThenUseLightAnimation() {
+    fun whenLightModeAndPrivacyShieldMaliciousThenUseLightAnimation() {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
@@ -88,12 +88,12 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, MALICIOUS)
 
-        verify(holder).setAnimation(R.raw.unprotected_shield)
-        verify(holder).progress = 1.0f
+        verify(holder).setAnimation(R.raw.alert_red)
+        verify(holder).progress = 0.0f
     }
 
     @Test
-    fun whenDarkModeAndPrivacyShieldWarningThenUseDarkAnimation() {
+    fun whenDarkModeAndPrivacyShieldMaliciousThenUseDarkAnimation() {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
@@ -101,7 +101,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, MALICIOUS)
 
-        verify(holder).setAnimation(R.raw.dark_unprotected_shield)
-        verify(holder).progress = 1.0f
+        verify(holder).setAnimation(R.raw.alert_red_dark)
+        verify(holder).progress = 0.0f
     }
 }
