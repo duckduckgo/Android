@@ -95,6 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Atualizar Plano ou Cancelar</string>
+    <string name="changePlanDescription">A tua subscrição foi adquirida na Apple App Store. Para alterares o teu plano ou as definições de faturação, acede a Definições &gt; Conta Apple &gt; Subscrições num dispositivo com sessão iniciada na mesma conta Apple utilizada para comprar a tua subscrição.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Ativa o Privacy Pro no computador para configurar a Personal Information Removal</string>

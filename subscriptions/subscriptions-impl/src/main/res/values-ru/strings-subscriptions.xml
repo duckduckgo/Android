@@ -95,6 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Изменить или отменить подписку</string>
+    <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Чтобы включить функцию Personal Information Removal, активируйте подписку Privacy Pro на настольном компьютере</string>
