@@ -22,12 +22,24 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "browserTheming",
+    featureName = "experimentalBrowserTheming",
 )
 interface BrowserThemingFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
-    fun colorTheming(): Toggle
+    fun colors(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun omnibar(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun icons(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun webview(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun tabManager(): Toggle
 }
