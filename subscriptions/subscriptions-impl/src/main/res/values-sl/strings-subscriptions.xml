@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Posodobitev paketa ali preklic</string>
-    <string name="changePlanDescription">Vaša naročnina je bila kupljena v trgovini Apple App Store. Če želite spremeniti nastavitve načrta ali obračunavanja, pojdite v Nastavitve &gt; Apple ID &gt; Naročnine v napravi, ki je prijavljena v isti Apple ID, ki je bil uporabljen za nakup naročnine.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivirajte Privacy Pro na namizju, da nastavite Personal Information Removal</string>

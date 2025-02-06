@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Актуализиране или отмяна на плана</string>
-    <string name="changePlanDescription">Вашият абонамент е закупен през Apple App Store. За да промените плана или настройките за фактуриране, влезте в Настройки &gt; Apple ID &gt; Абонаменти на устройство, вписано със същия Apple ID, който е използван за закупуване на абонамента.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Активирайте Privacy Pro на настолен компютър, за да настроите Personal Information Removal</string>

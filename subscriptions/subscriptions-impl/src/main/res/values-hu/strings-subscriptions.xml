@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Csomag frissítése vagy lemondása</string>
-    <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve mint, amellyel az előfizetés meg lett vásárolva.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Privacy Pro aktiválása asztali számítógépen a Personal Information Removal beállításához</string>

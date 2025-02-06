@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Ažuriraj plan ili odustani</string>
-    <string name="changePlanDescription">Tvoja pretplata kupljena je putem Apple App Storea. Za promjenu postavki plana ili naplate, idi na Postavke &gt; Apple ID &gt; Pretplate na uređaju prijavljenom na isti Apple ID koji je korišten za kupnju pretplate.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktiviraj Privacy Pro na radnoj površini kako bi postavio Personal Information Removal</string>

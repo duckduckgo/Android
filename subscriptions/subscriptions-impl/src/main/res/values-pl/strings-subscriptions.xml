@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Aktualizuj lub anuluj plan</string>
-    <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Apple ID &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple ID wykorzystane do zakupu subskrypcji.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktywuj Privacy Pro na komputerze, aby skonfigurować usługę Personal Information Removal</string>

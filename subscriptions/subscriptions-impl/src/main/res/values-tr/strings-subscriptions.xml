@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Planı Güncelle veya İptal Et</string>
-    <string name="changePlanDescription">Aboneliğiniz Apple App Store üzerinden satın alınmış. Planınızı veya faturalandırma ayarlarınızı değiştirmek için lütfen aboneliğinizi satın alırken kullandığınız Apple Kimliği ile giriş yapmış bir cihazdan Ayarlar &gt; Apple Kimliği &gt; Abonelikler bölümüne gidin.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde Privacy Pro\'yu etkinleştirin</string>

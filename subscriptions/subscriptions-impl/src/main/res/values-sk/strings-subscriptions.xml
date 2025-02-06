@@ -95,7 +95,6 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Aktualizovať plán alebo zrušiť</string>
-    <string name="changePlanDescription">Tvoje predplatné bolo zakúpené prostredníctvom obchodu Apple App Store. Ak chceš zmeniť nastavenia plánu alebo fakturácie, prejdi do časti Nastavenia &gt; Apple ID &gt; Predplatné na zariadení prihlásenom do rovnakého Apple ID, ktoré bolo použité na zakúpenie predplatného.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivuj si Privacy Pro na pracovnej ploche a nastav si Personal Information Removal</string>
