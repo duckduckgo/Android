@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
     <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
     <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
 
