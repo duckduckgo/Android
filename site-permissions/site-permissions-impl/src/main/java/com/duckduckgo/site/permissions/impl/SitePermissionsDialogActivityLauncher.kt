@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -73,6 +74,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var permissionsHandledAutomatically: List<String>
     private var siteURL: String = ""
     private var tabId: String = ""
+    private var currentDialog: DaxAlertDialog? = null
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -165,7 +167,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             R.string.preciseLocationSiteDialogSubtitle
         }
 
-        TextAlertDialogBuilder(activity)
+        this.currentDialog = TextAlertDialogBuilder(activity)
             .setTitle(
                 String.format(activity.getString(R.string.sitePermissionsLocationDialogTitle), domain),
             )
@@ -196,8 +198,16 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         rememberChoice = checked
                     }
                 },
-            )
-            .show()
+            ).build()
+        this.currentDialog?.show()
+    }
+
+    override fun forceDismissDialog() {
+        this.currentDialog?.let {
+            if (it.isShowing()) {
+                this.currentDialog?.dismiss()
+            }
+        }
     }
 
     private fun showSitePermissionsRationaleDialog(
@@ -208,7 +218,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         onPermissionAllowed: (Boolean) -> Unit,
     ) {
         sendDialogImpressionPixel(pixelType)
-        TextAlertDialogBuilder(activity)
+        this.currentDialog = TextAlertDialogBuilder(activity)
             .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
             .setMessage(messageRes)
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
@@ -233,8 +243,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         super.onCheckedChanged(checked)
                     }
                 },
-            )
-            .show()
+            ).build()
+        this.currentDialog?.show()
     }
 
     private fun showSiteDrmPermissionsDialog(
@@ -263,7 +273,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting and no config --> proceed to show dialog
         val title = url.websiteFromGeoLocationsApiOrigin()
-        TextAlertDialogBuilder(activity)
+        this.currentDialog = TextAlertDialogBuilder(activity)
             .setTitle(
                 String.format(
                     activity.getString(R.string.drmSiteDialogTitle),
@@ -312,8 +322,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         rememberChoice = checked
                     }
                 },
-            )
-            .show()
+            ).build()
+        this.currentDialog?.show()
     }
 
     private fun onSiteDrmPermissionSave(
@@ -588,7 +598,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
             SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
         }
-        TextAlertDialogBuilder(activity)
+        this.currentDialog = TextAlertDialogBuilder(activity)
             .setTitle(titleRes)
             .setMessage(contentRes)
             .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
@@ -603,8 +613,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         activity.startActivity(intent)
                     }
                 },
-            )
-            .show()
+            ).build()
+        this.currentDialog?.show()
     }
 
     private fun storeFavicon(url: String) {

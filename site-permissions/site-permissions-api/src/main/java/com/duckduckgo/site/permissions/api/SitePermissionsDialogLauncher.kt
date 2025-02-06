@@ -35,4 +35,9 @@ interface SitePermissionsDialogLauncher {
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     )
+
+    /**
+     * This method could be called to force dismiss the site permission dialog that is currently showing, if any.
+     */
+    fun forceDismissDialog()
 }
