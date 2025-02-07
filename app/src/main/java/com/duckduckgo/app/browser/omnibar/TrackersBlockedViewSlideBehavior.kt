@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHel
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.isInsideScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extractDomain
@@ -92,7 +93,7 @@ class TrackersBlockedViewSlideBehavior(
         if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
             val bottomOmnibarHeight = bottomOmnibar?.height ?: 0
-            if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true) {
+            if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true || bottomOmnibar?.isInsideScreen() == true) {
                 child.hide()
             } else {
                 trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
