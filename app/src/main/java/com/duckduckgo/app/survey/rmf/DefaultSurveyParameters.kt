@@ -112,5 +112,5 @@ class LocaleSurveyParameterPlugin @Inject constructor(
 ) : SurveyParameterPlugin {
     override val surveyParamKey: String = "locale"
 
-    override suspend fun evaluate(): String = appBuildConfig.deviceLocale.toString()
+    override suspend fun evaluate(): String = "${appBuildConfig.deviceLocale.language}-${appBuildConfig.deviceLocale.country}"
 }
