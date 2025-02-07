@@ -87,7 +87,7 @@ class PrivacyDashboardRenderer(
         val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
         webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
 
-        val maliciousStateJson = """{"kind": "${viewState.maliciousSiteStatus}"}"""
+        val maliciousStateJson = """{"kind": ${viewState.maliciousSiteStatus?.let { "\"$it\"" } ?: "null"}}"""
         webView.evaluateJavascript("javascript:onChangeMaliciousSiteStatus($maliciousStateJson);", null)
 
         // remote feature settings
