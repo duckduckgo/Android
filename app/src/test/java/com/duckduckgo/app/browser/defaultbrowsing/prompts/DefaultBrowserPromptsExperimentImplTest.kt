@@ -598,6 +598,32 @@ class DefaultBrowserPromptsExperimentImplTest {
     }
 
     @Test
+    fun `evaluate - if enrolled, browser not set as default, and experiment disabled remotely, then move to stopped`() = runTest {
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_2,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
+        whenever(additionalPromptsToggleMock.getCohort()).thenReturn(null)
+        whenever(additionalPromptsToggleMock.isEnabled(any())).thenReturn(false)
+        mockFeatureSettings(
+            activeDaysUntilStage1 = 1,
+            activeDaysUntilStage2 = 3,
+            activeDaysUntilStop = 5,
+        )
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(4))
+
+        testee.onResume(lifecycleOwnerMock)
+
+        verify(dataStoreMock).storeExperimentStage(ExperimentStage.STOPPED)
+        verify(dataStoreMock).storeShowSetAsDefaultPopupMenuItemState(show = false)
+        verify(dataStoreMock).storeHighlightPopupMenuState(highlight = false)
+    }
+
+    @Test
     fun `evaluate - if enrolled, browser not set as default, and enough active days until stop, then move to stopped`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialExperimentStage = ExperimentStage.STAGE_2,
@@ -853,6 +879,31 @@ class DefaultBrowserPromptsExperimentImplTest {
 
         assertTrue(result)
         verify(dataStoreMock).storeHighlightPopupMenuState(highlight = true)
+    }
+
+    @Test
+    fun `evaluate - if changing stage but evaluator for a cohort not found, then abort and clean up`() = runTest {
+        val dataStoreMock = createDataStoreFake(
+            initialExperimentStage = ExperimentStage.STAGE_1,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
+        mockActiveCohort(cohortName = AdditionalPromptsCohortName.VARIANT_2)
+        mockFeatureSettings(
+            activeDaysUntilStage1 = 1,
+            activeDaysUntilStage2 = 3,
+            activeDaysUntilStop = 5,
+        )
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(3))
+        whenever(experimentStageEvaluatorPluginPointMock.getPlugins()).thenReturn(emptySet())
+
+        testee.onResume(lifecycleOwnerMock)
+
+        verify(dataStoreMock).storeShowSetAsDefaultPopupMenuItemState(show = false)
+        verify(dataStoreMock).storeHighlightPopupMenuState(highlight = false)
     }
 
     @Test
