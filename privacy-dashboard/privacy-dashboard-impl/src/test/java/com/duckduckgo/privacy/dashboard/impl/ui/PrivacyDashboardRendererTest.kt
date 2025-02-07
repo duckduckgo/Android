@@ -113,7 +113,7 @@ class PrivacyDashboardRendererTest {
 
         testee.render(aViewState())
 
-        verify(spyWebView, times(9)).evaluateJavascript(captor.capture(), eq(null))
+        verify(spyWebView, times(8)).evaluateJavascript(captor.capture(), eq(null))
 
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeLocale") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeFeatureSettings") })
@@ -123,7 +123,6 @@ class PrivacyDashboardRendererTest {
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeUpgradedHttps") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeRequestData") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeConsentManaged") })
-        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeMaliciousSiteStatus") })
     }
 
     fun aViewState() = ViewState(
