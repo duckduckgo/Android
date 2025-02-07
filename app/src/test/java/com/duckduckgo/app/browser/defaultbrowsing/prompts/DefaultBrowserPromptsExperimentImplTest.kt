@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -39,7 +40,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -49,8 +49,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.time.Instant
-import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -98,7 +96,7 @@ class DefaultBrowserPromptsExperimentImplTest {
 
     @Mock private lateinit var defaultBrowserDetectorMock: DefaultBrowserDetector
 
-    @Mock private lateinit var appDaysUsedRepositoryMock: AppDaysUsedRepository
+    @Mock private lateinit var experimentAppUsageRepositoryMock: ExperimentAppUsageRepository
 
     @Mock private lateinit var userStageStoreMock: UserStageStore
 
@@ -137,7 +135,6 @@ class DefaultBrowserPromptsExperimentImplTest {
     private lateinit var dataStoreMock: DefaultBrowserPromptsDataStore
 
     private val fakeEnrollmentDateETString = "2025-01-16T00:00-05:00[America/New_York]"
-    private val fakeEnrollmentDate = Date.from(Instant.ofEpochMilli(1737003600000))
 
     private lateinit var fakeUserAppStageFlow: MutableSharedFlow<AppStage>
 
@@ -376,6 +373,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(0))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.ENROLLED,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -404,6 +402,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(0))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.ENROLLED,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -444,7 +443,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(0)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(0))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.ENROLLED,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -476,7 +475,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(1)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(1))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_1,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -513,7 +512,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(2)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(2))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_1,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -545,7 +544,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(3)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(3))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_2,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -582,7 +581,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(4)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(4))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_2,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -614,7 +613,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(5)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(5))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STOPPED,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -766,7 +765,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(1)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(1))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_1,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -800,7 +799,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(3)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(3))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_2,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -837,7 +836,7 @@ class DefaultBrowserPromptsExperimentImplTest {
             activeDaysUntilStage2 = 3,
             activeDaysUntilStop = 5,
         )
-        whenever(appDaysUsedRepositoryMock.getNumberOfDaysAppUsedSinceDate(fakeEnrollmentDate)).thenReturn(3)
+        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment(additionalPromptsToggleMock)).thenReturn(Result.success(3))
         val evaluatorMock = mockStageEvaluator(
             forNewStage = ExperimentStage.STAGE_2,
             forCohortName = AdditionalPromptsCohortName.VARIANT_2,
@@ -961,6 +960,15 @@ class DefaultBrowserPromptsExperimentImplTest {
         verify(pixelMock).fire(SET_AS_DEFAULT_IN_MENU_CLICK, expectedParams)
     }
 
+    @Test
+    fun `when resumed, record app usage`() = runTest {
+        val testee = createTestee()
+
+        testee.onResume(lifecycleOwnerMock)
+
+        verify(experimentAppUsageRepositoryMock).recordAppUsedNow()
+    }
+
     private fun createTestee(
         appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope,
         dispatchers: DispatcherProvider = coroutinesTestRule.testDispatcherProvider,
@@ -968,7 +976,7 @@ class DefaultBrowserPromptsExperimentImplTest {
         defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles = featureTogglesMock,
         defaultBrowserDetector: DefaultBrowserDetector = defaultBrowserDetectorMock,
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog = defaultRoleBrowserDialogMock,
-        appDaysUsedRepository: AppDaysUsedRepository = appDaysUsedRepositoryMock,
+        experimentAppUsageRepository: ExperimentAppUsageRepository = experimentAppUsageRepositoryMock,
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator> = experimentStageEvaluatorPluginPointMock,
@@ -982,7 +990,7 @@ class DefaultBrowserPromptsExperimentImplTest {
         defaultBrowserPromptsFeatureToggles = defaultBrowserPromptsFeatureToggles,
         defaultBrowserDetector = defaultBrowserDetector,
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-        appDaysUsedRepository = appDaysUsedRepository,
+        experimentAppUsageRepository = experimentAppUsageRepository,
         userStageStore = userStageStore,
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         experimentStageEvaluatorPluginPoint = experimentStageEvaluatorPluginPoint,
