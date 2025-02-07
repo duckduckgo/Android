@@ -95,6 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Atnaujinkite planą arba atšaukite</string>
+    <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktyvuokite „Privacy Pro“ darbalaukyje, kad nustatytumėte Asmeninės informacijos pašalinimą.</string>
