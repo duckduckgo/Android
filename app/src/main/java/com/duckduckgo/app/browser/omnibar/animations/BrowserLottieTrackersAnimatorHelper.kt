@@ -21,8 +21,6 @@ import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.transition.Scene
 import android.transition.Slide
 import android.transition.Transition
@@ -48,9 +46,13 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -72,6 +74,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
     private var hasCookiesAnimationBeenCanceled = false
+
+    private val conflatedJob = ConflatedJob()
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
@@ -229,41 +233,35 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         logos: List<TrackerLogo>,
         omnibarViews: List<View>,
     ) {
-        val handler = Handler(Looper.getMainLooper())
         val totalDuration = 2000L
         val trackerCountUpdateDelay = totalDuration / entities.size
         val animationCompletionDelay = if (logos.size < MAX_LOGOS_SHOWN) 10L else 1000L
 
-        fun updateTackersCountText(index: Int) {
-            if (index <= entities.size) {
-                if ((index == TRACKER_START_INDEX) || (index > (entities.size - TRACKER_THRESHOLD + TRACKER_START_INDEX))) {
-                    trackersBlockedCountAnimationView?.text = index.toString()
-                    handler.postDelayed({ updateTackersCountText(index + 1) }, trackerCountUpdateDelay)
+        fun updateTrackersCountText(index: Int) {
+            conflatedJob += MainScope().launch {
+                if (index <= entities.size) {
+                    if (index == TRACKER_START_INDEX || index > (entities.size - TRACKER_THRESHOLD + TRACKER_START_INDEX)) {
+                        trackersBlockedCountAnimationView?.text = index.toString()
+                        delay(trackerCountUpdateDelay)
+                        updateTrackersCountText(index + 1)
+                    } else {
+                        updateTrackersCountText(index + 1) // Skip delay for certain indexes
+                    }
                 } else {
-                    handler.post { updateTackersCountText(index + 1) }
-                }
-            } else {
-                handler.postDelayed(
-                    {
-                        trackersBlockedAnimationView?.gone()
-                        trackersBlockedCountAnimationView?.text = ""
-                        trackersBlockedCountAnimationView?.gone()
-                        animateOmnibarIn(omnibarViews).start()
-                        listener?.onAnimationFinished(logos)
-                    },
-                    animationCompletionDelay,
-                )
+                    delay(animationCompletionDelay)
+                    trackersBlockedAnimationView?.gone()
+                    trackersBlockedCountAnimationView?.text = ""
+                    trackersBlockedCountAnimationView?.gone()
+                    animateOmnibarIn(omnibarViews).start()
+                    listener?.onAnimationFinished(logos)
 
-                handler.postDelayed(
-                    {
-                        tryToStartCookiesAnimation(context, omnibarViews)
-                    },
-                    2500L,
-                )
+                    delay(2500L)
+                    tryToStartCookiesAnimation(context, omnibarViews)
+                }
             }
         }
 
-        updateTackersCountText(TRACKER_START_INDEX)
+        updateTrackersCountText(TRACKER_START_INDEX)
     }
 
     override fun createCookiesAnimation(
@@ -303,6 +301,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
+        conflatedJob.cancel()
     }
 
     private fun tryToStartCookiesAnimation(
