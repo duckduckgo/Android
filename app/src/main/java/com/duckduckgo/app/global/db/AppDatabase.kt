@@ -687,6 +687,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_56_TO_57: Migration = object : Migration(56, 57) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `experiment_app_usage_entity` (`isoDateET` TEXT NOT NULL, PRIMARY KEY(`isoDateET`))")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -768,6 +774,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
             MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57,
         )
 
     @Deprecated(
