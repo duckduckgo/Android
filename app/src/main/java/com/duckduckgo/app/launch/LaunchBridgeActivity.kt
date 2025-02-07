@@ -46,14 +46,14 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             val splashScreenAnimationEndTime =
                 Instant.ofEpochMilli(splashScreenView.iconAnimationStartMillis + splashScreenView.iconAnimationDurationMillis)
-            val delay = Instant.now().until(
+            val remainingAnimationTime = Instant.now().until(
                 splashScreenAnimationEndTime,
                 ChronoUnit.MILLIS,
             )
 
             lifecycleScope.launch {
                 viewModel.sendWelcomeScreenPixel()
-                delay(delay)
+                delay(remainingAnimationTime)
                 viewModel.determineViewToShow()
             }
         }
