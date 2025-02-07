@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.animations
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.content.Context
-import android.graphics.Rect
 import android.view.Gravity
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -29,6 +28,7 @@ import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackersLottieAssetDelegate
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.isInsideScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
@@ -104,7 +104,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 },
             )
 
-            if (isViewInsideScreen(omnibarView)) {
+            if (omnibarView.isInsideScreen()) {
                 this.setMaxProgress(1f)
                 this.playAnimation()
             }
@@ -114,23 +114,5 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
     override fun cancelAnimations() {
         this.trackersBurstAnimationView?.cancelAnimation()
         this.omnibarShieldAnimationView?.cancelAnimation()
-    }
-
-    private fun isViewInsideScreen(view: View): Boolean {
-        val location = IntArray(2)
-        view.getLocationOnScreen(location)
-        val screenRect = Rect(
-            0,
-            0,
-            view.context.resources.displayMetrics.widthPixels,
-            view.context.resources.displayMetrics.heightPixels,
-        )
-        val viewRect = Rect(
-            location[0],
-            location[1],
-            location[0] + view.width,
-            location[1] + view.height,
-        )
-        return screenRect.contains(viewRect)
     }
 }

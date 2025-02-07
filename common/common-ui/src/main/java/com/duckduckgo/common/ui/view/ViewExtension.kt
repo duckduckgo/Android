@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.view
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -198,6 +199,32 @@ fun View.visibilityChanged(action: (View) -> Unit) {
             action(this)
         }
     }
+}
+
+/**
+ * Checks if the view is completely inside the screen.
+ *
+ * This function calculates the view's position on the screen and compares it with the screen's dimensions
+ * to determine if the view is fully contained within the screen boundaries.
+ *
+ * @return `true` if the view is completely inside the screen, `false` otherwise.
+ */
+fun View.isInsideScreen(): Boolean {
+    val location = IntArray(2)
+    this.getLocationOnScreen(location)
+    val screenRect = Rect(
+        0,
+        0,
+        this.context.resources.displayMetrics.widthPixels,
+        this.context.resources.displayMetrics.heightPixels,
+    )
+    val viewRect = Rect(
+        location[0],
+        location[1],
+        location[0] + this.width,
+        location[1] + this.height,
+    )
+    return screenRect.contains(viewRect)
 }
 
 /**

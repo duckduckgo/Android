@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
+import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -249,6 +250,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.isInsideScreen
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -545,6 +547,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appPersonalityFeature: AppPersonalityFeature
+
+    @Inject
+    lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -981,11 +986,13 @@ class BrowserTabFragment :
                 layoutParams.behavior = null
                 configureTopOmnibarOffsetChangedListener()
             }
+
             OmnibarPosition.BOTTOM -> {
                 val elevationInDp = 4
                 binding.trackersBlockedSlidingView.elevation = elevationInDp * displayMetrics.density
                 layoutParams.gravity = Gravity.BOTTOM
-                layoutParams.behavior = TrackersBlockedViewSlideBehavior(viewModel.siteLiveData, requireContext())
+                layoutParams.behavior =
+                    TrackersBlockedViewSlideBehavior(viewModel.siteLiveData, experimentTrackersCountAnimationHelper, requireContext())
             }
         }
     }
@@ -1017,10 +1024,7 @@ class BrowserTabFragment :
             if (binding.trackersBurstAnimationView.isAnimating) {
                 binding.trackersBurstAnimationView.cancelAnimation()
             }
-            val count = viewModel.trackersCount()
-            if (count != binding.trackers.text) {
-                binding.trackers.text = count
-            }
+            experimentTrackersCountAnimationHelper.animate(binding.trackers, viewModel.siteLiveData)
             binding.website.text = viewModel.url?.extractDomain()
             binding.trackersBlockedSlidingView.show()
         }
@@ -1293,6 +1297,7 @@ class BrowserTabFragment :
     override fun onStop() {
         alertDialog?.dismiss()
         experimentTrackersAnimationHelper.cancelAnimations()
+        experimentTrackersCountAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -3917,7 +3922,7 @@ class BrowserTabFragment :
                 }
                 val privacyProtectionsPopupVisible = lastSeenBrowserViewState
                     ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
-                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible && isOmnibarOnScreen()) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
@@ -3925,6 +3930,11 @@ class BrowserTabFragment :
                     }
                 }
             }
+        }
+
+        private fun isOmnibarOnScreen(): Boolean {
+            return (omnibar.omnibarPosition == OmnibarPosition.TOP && binding.newOmnibar.isInsideScreen()) ||
+                (omnibar.omnibarPosition == OmnibarPosition.BOTTOM && binding.newOmnibarBottom.isInsideScreen())
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {

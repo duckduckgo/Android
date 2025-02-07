@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
@@ -41,6 +42,7 @@ import com.duckduckgo.common.utils.extractDomain
  */
 class TrackersBlockedViewSlideBehavior(
     private val siteLiveData: MutableLiveData<Site>,
+    private val experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper,
     context: Context,
     attrs: AttributeSet? = null,
 ) : CoordinatorLayout.Behavior<View>(context, attrs) {
@@ -93,9 +95,8 @@ class TrackersBlockedViewSlideBehavior(
             if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true) {
                 child.hide()
             } else {
-                val site = siteLiveData.value
-                trackers?.text = site?.trackerCount.toString()
-                website?.text = site?.url?.extractDomain()
+                trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
+                website?.text = siteLiveData.value?.url?.extractDomain()
                 if (trackersBurstAnimationView?.isAnimating == true) {
                     trackersBurstAnimationView?.cancelAnimation()
                 }
