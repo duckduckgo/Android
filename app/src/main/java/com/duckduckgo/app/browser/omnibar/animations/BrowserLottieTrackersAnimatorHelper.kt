@@ -150,7 +150,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val logos = getLogos(context, entities)
+        val logos = getExperimentLogos(context, entities)
         if (logos.isEmpty()) {
             tryToStartCookiesAnimation(context, omnibarViews)
             return
@@ -480,6 +480,43 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
+    private fun getExperimentLogos(
+        context: Context,
+        entities: List<Entity>,
+    ): List<TrackerLogo> {
+        if (context.packageName == null) return emptyList()
+        val trackerLogoList = entities
+            .asSequence()
+            .distinct()
+            .take(MAX_LOGOS_SHOWN + 1)
+            .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
+            .map {
+                val resId = TrackersRenderer().networkLogoIcon(context, it.name, TRACKER_LOGO_PREFIX)
+                if (resId == null) {
+                    getExperimentLetterLogo(context, it)
+                } else {
+                    ImageLogo(resId)
+                }
+            }.toMutableList()
+
+        return if (trackerLogoList.size <= MAX_LOGOS_SHOWN) {
+            trackerLogoList
+        } else {
+            trackerLogoList.take(MAX_LOGOS_SHOWN)
+                .toMutableList()
+                .apply { add(StackedLogo()) }
+        }
+    }
+
+    private fun getExperimentLetterLogo(
+        context: Context,
+        entity: Entity,
+    ): TrackerLogo {
+        val drawable = "$TRACKER_LOGO_PREFIX${entity.displayName.take(1).lowercase()}"
+        val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
+        return if (resource != 0) ImageLogo(resource) else LetterLogo(entity.displayName.take(1))
+    }
+
     private fun stopTrackersAnimation() {
         val trackersAnimation = this.trackersAnimation ?: return
         val shieldAnimation = this.shieldAnimation ?: return
@@ -561,6 +598,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
         private const val TRACKER_THRESHOLD = 5
         private const val TRACKER_START_INDEX = 1
+        private const val TRACKER_LOGO_PREFIX = "exp_network_logo_"
     }
 }
 
