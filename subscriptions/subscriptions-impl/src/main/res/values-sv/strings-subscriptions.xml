@@ -95,6 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Uppdatera abonnemang eller avbryt</string>
+    <string name="changePlanDescription">Ditt abonnemang köptes genom Apple App Store. För att ändra ditt abonnemang eller faktureringsinställningar går du till Inställningar &gt; Apple-konto &gt; Abonnemang på en enhet som är inloggad på det Apple-konto som användes för att köpa ditt abonnemang.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivera Privacy Pro på en dator för att konfigurera Personal Information Removal</string>
