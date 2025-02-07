@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Selvä!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Hyvin menee!"</string>
     <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
     <string name="onboardingEndDaxDialogButton">Valmista!</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Ylävitonen!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
 

@@ -741,7 +741,7 @@
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got it!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try!️ &#128293;]]></string>
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
@@ -754,14 +754,14 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Protections activated!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Block 3rd party trackers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Block cookie requests &amp; popups</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Block cookie requests &amp; pop-ups</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Erase browsing data swiftly</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Which color looks best on me?</string>
     <string name="highlightsPreOnboardingSelectAppIconDescription">Pick your app icon:</string>
     <string name="highlightsPreOnboardingSelectAppIconOkButton">Next</string>
     <string name="highlightsPreOnboardingAddressBarTitle">Where should I put your address bar?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (Default)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (default)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Easy to see</string>
     <string name="highlightsPreOnboardingAddressBarOkButton">Next</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
@@ -770,7 +770,8 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>DuckDuckGo Search</b>! Private. Fast. Fewer ads.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings.</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Try it</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
 
     <!-- Appearance settings -->

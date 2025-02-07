@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Ho capito!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <b>Fire Button</b>.<br/><br/>Provalo! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <b>Fire Button</b>.<br/><br/>Provalo! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Ben fatto!"</string>
     <string name="onboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Fatto!</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Questo è <b>DuckDuckGo Search!</b> Privato. Veloce. Meno annunci.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Batti cinque!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Provalo</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Salta</string>
 

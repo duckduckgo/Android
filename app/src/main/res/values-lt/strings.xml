@@ -746,7 +746,7 @@
         <item quantity="other"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Supratau!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
     <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
@@ -775,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Duok penkis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
 

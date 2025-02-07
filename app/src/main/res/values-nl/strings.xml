@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Ik snap het!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
@@ -755,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokkeer cookieverzoeken en pop-ups</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Cookieverzoeken en pop-ups blokkeren</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Wis browsegegevens snel</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Welke kleur staat mij het beste?</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
 

@@ -746,7 +746,7 @@
         <item quantity="other"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Mám to!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"A je to!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
     <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
@@ -759,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Jsi připravený na rychlejší prohlížeč, který tě ochrání?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokovat trackery třetích stran</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokování požadavků na soubory cookie a vyskakovacích oken</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokování vyskakovacích oken a požadavků na soubory cookie</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Rychle vymazání údajů o prohlížení</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Která barva mi sluší nejvíc?</string>
@@ -775,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky soukromé.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Pamatujte: pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Plácnutí!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
 
