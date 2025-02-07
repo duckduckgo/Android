@@ -95,6 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Päivitä tilaus tai peruuta</string>
+    <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivoi Privacy Pro tietokoneella Personal Information Removalin asentamiseksi</string>
