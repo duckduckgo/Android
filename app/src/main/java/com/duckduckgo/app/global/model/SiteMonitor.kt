@@ -22,7 +22,6 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
-import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -168,7 +167,6 @@ class SiteMonitor(
         userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
         if (userAllowList || !isHttps) return UNPROTECTED
-        if (maliciousSiteStatus != null) return MALICIOUS
 
         if (!fullSiteDetailsAvailable) {
             Timber.i("Shield: not fullSiteDetailsAvailable for $domain")
