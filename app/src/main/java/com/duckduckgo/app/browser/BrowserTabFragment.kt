@@ -874,7 +874,9 @@ class BrowserTabFragment :
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
-                        updateOrDeleteWebViewPreview()
+                        if (viewModel.browserViewState.value?.maliciousSiteDetected != true) {
+                            updateOrDeleteWebViewPreview()
+                        }
                     }
                 }
             },
@@ -1399,6 +1401,10 @@ class BrowserTabFragment :
         webView?.stopLoading()
         maliciousWarningView.bind(feed) { action ->
             viewModel.onMaliciousSiteUserAction(action, url, feed, isActiveCustomTab())
+        }
+        viewModel.deleteTabPreview(tabId)
+        lifecycleScope.launch(dispatchers.main()) {
+            viewModel.updateTabTitle(tabId, newTitle = SITE_SECURITY_WARNING)
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
@@ -3653,6 +3659,8 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val AUTOCOMPLETE_PADDING_DP = 6
+
+        private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
 
         fun newInstance(
             tabId: String,
