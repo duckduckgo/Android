@@ -205,7 +205,7 @@ class WebViewRequestInterceptor(
         when (result) {
             WaitForConfirmation, Safe -> return false
             is MaliciousSite -> {
-                handleSiteBlocked(webViewClientListener, url, result.feed, result.exempted, true)
+                handleSiteBlocked(webViewClientListener, url, result.feed, result.exempted, clientSideHit = true)
                 return !result.exempted
             }
         }
@@ -220,7 +220,7 @@ class WebViewRequestInterceptor(
             /*
              * If the site is exempted, we'll never get here, as we won't call isMalicious
              */
-            handleSiteBlocked(webViewClientListener, url, isMalicious.feed, false, false)
+            handleSiteBlocked(webViewClientListener, url, isMalicious.feed, exempted = false, clientSideHit = false)
         }
     }
 

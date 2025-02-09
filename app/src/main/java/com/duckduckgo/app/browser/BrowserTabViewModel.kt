@@ -3200,13 +3200,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
-        val params = mapOf(CATEGORY_KEY to feed.name, CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
-        pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
         site?.maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
         if (!exempted) {
+            val params = mapOf(CATEGORY_KEY to feed.name, CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
+            pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             loadingViewState.postValue(
                 currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
             )
@@ -3218,6 +3218,13 @@ class BrowserTabViewModel @Inject constructor(
                 ),
             )
             command.postValue(ShowWarningMaliciousSite(url, feed))
+        }
+    }
+
+    suspend fun updateTabTitle(tabId: String, newTitle: String) {
+        getSite()?.let { site ->
+            site.title = newTitle
+            tabRepository.update(tabId, site)
         }
     }
 
