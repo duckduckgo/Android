@@ -1882,8 +1882,6 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         when (action) {
             LeaveSite -> {
-                val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
-                pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
                 } else {
@@ -1894,6 +1892,8 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             VisitSite -> {
+                val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
+                pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 command.postValue(BypassMaliciousSiteWarning(url, feed))
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
