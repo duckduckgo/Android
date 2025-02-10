@@ -25,8 +25,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -71,12 +71,12 @@ class TabItemDecorator(
                 when (mode) {
                     is Normal -> {
                         if (tab.tabId == highlightedTabId) {
-                            drawActiveTabDecoration(child, canvas)
+                            drawTabDecoration(child, canvas, activeTabBorderStroke)
                         }
                     }
                     is Mode.Selection -> {
                         if (tab.tabId in (mode as Mode.Selection).selectedTabs) {
-                            drawSelectionTabDecoration(child, canvas)
+                            drawTabDecoration(child, canvas, selectionBorderStroke)
                         }
                     }
                 }
@@ -91,20 +91,9 @@ class TabItemDecorator(
         this.mode = mode
     }
 
-    private fun drawActiveTabDecoration(
-        child: View,
-        c: Canvas,
-    ) {
-        activeTabBorderStroke.alpha = (child.alpha * 255).toInt()
-        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, activeTabBorderStroke)
-    }
-
-    private fun drawSelectionTabDecoration(
-        child: View,
-        c: Canvas,
-    ) {
+    private fun drawTabDecoration(child: View, c: Canvas, paint: Paint) {
         selectionBorderStroke.alpha = (child.alpha * 255).toInt()
-        c.drawRoundRect(child.getBounds(), SELECTION_BORDER_WIDTH, SELECTION_BORDER_WIDTH, selectionBorderStroke)
+        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, paint)
     }
 
     private fun View.getBounds(): RectF {
