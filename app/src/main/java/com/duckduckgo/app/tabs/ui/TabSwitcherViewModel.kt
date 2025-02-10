@@ -36,6 +36,7 @@ import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
@@ -94,7 +95,7 @@ class TabSwitcherViewModel @Inject constructor(
                 if (tabSwitcherAnimationFeature.self().isEnabled()) {
                     collectTabItemsWithOptionalAnimationTile(tabEntities)
                 } else {
-                    val tabItems = tabEntities.map { Tab(it) }
+                    val tabItems = tabEntities.map { Tab(it, false) }
                     emit(tabItems)
                 }
             }
@@ -108,22 +109,16 @@ class TabSwitcherViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState())
-    val viewState = combine(_viewState, tabRepository.flowTabs) { viewState, tabs ->
-        viewState.copy(items = tabs.map { TabSwitcherItem.Tab(it) })
+    val viewState = combine(
+        _viewState,
+        tabRepository.flowTabs,
+        tabRepository.flowSelectedTab,
+    ) { viewState, tabs, selectedTab ->
+        viewState.copy(
+            items = tabs.map { TabSwitcherItem.Tab(it, false) },
+            selectedTab = selectedTab,
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
-
-    val layoutType = if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-        combine(tabRepository.tabSwitcherData, viewState) { tabSwitcherData, viewState ->
-            if (viewState.dynamicInterface.isLayoutTypeButtonVisible) {
-                tabSwitcherData.layoutType
-            } else {
-                null
-            }
-        }
-    } else {
-        tabRepository.tabSwitcherData
-            .map { it.layoutType }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     sealed class Command {
         data object Close : Command()
@@ -156,9 +151,20 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     suspend fun onTabSelected(tab: TabEntity) {
-        tabRepository.select(tab.tabId)
-        command.value = Command.Close
-        pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _viewState.value.mode is ViewState.Mode.Selection) {
+            _viewState.update {
+                val selectionMode = it.mode as ViewState.Mode.Selection
+                if (tab.tabId in selectionMode.selectedTabs) {
+                    it.copy(mode = ViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                } else {
+                    it.copy(mode = ViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+                }
+            }
+        } else {
+            tabRepository.select(tab.tabId)
+            command.value = Command.Close
+            pixel.fire(AppPixelName.TAB_MANAGER_SWITCH_TABS)
+        }
     }
 
     suspend fun onTabDeleted(tab: TabEntity) {
@@ -258,16 +264,16 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onLayoutTypeToggled() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val newLayoutType = if (layoutType.value == GRID) {
-                pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-                LIST
-            } else {
-                pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-                GRID
-            }
-            tabRepository.setTabLayoutType(newLayoutType)
-        }
+        // viewModelScope.launch(dispatcherProvider.io()) {
+        //     val newLayoutType = if (layoutType == GRID) {
+        //         pixel.fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+        //         LIST
+        //     } else {
+        //         pixel.fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+        //         GRID
+        //     }
+        //     tabRepository.setTabLayoutType(newLayoutType)
+        // }
     }
 
     fun onFabClicked() {
@@ -338,8 +344,9 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val mode: Mode = Normal,
         val items: List<TabSwitcherItem> = emptyList(),
+        val selectedTab: TabEntity? = null,
+        val mode: Mode = Mode.Normal,
     ) {
         val dynamicInterface: DynamicInterface
             get() = when (mode) {
