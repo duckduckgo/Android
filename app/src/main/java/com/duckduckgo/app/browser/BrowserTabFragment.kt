@@ -1019,14 +1019,38 @@ class BrowserTabFragment :
         // Move the trackersBlockedSlidingView in sync with the top omnibar.
         binding.trackersBlockedSlidingView.translationY = -binding.trackersBlockedSlidingView.height * (1 - scrollFraction)
         if (scrollFraction == 0.0f) {
-            binding.trackersBlockedSlidingView.gone()
+            binding.trackersBlockedSlidingView.post {
+                binding.trackersBlockedSlidingView.gone()
+            }
+            offsetTopBySlidingView(binding.browserLayout, scrollFraction)
         } else {
             if (binding.trackersBurstAnimationView.isAnimating) {
                 binding.trackersBurstAnimationView.cancelAnimation()
             }
             experimentTrackersCountAnimationHelper.animate(binding.trackers, viewModel.siteLiveData)
             binding.website.text = viewModel.url?.extractDomain()
-            binding.trackersBlockedSlidingView.show()
+            binding.trackersBlockedSlidingView.post {
+                binding.trackersBlockedSlidingView.x = 0f
+                binding.trackersBlockedSlidingView.y = 0f
+                binding.trackersBlockedSlidingView.show()
+            }
+            offsetTopBySlidingView(binding.browserLayout, scrollFraction)
+        }
+    }
+
+    private fun offsetTopBySlidingView(
+        view: View?,
+        scrollFraction: Float,
+    ) {
+        (view?.layoutParams as? CoordinatorLayout.LayoutParams)?.let { layoutParams ->
+            val newTopMargin =
+                binding.trackersBlockedSlidingView.measuredHeight - binding.trackersBlockedSlidingView.height * (1 - scrollFraction).toInt()
+            if (layoutParams.topMargin != newTopMargin) {
+                layoutParams.topMargin = newTopMargin
+                view.postOnAnimation {
+                    view.requestLayout()
+                }
+            }
         }
     }
 

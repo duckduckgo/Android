@@ -93,7 +93,9 @@ class TrackersBlockedViewSlideBehavior(
         if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             val translation = bottomOmnibar?.getTranslation() ?: 0f
             val bottomOmnibarHeight = bottomOmnibar?.height ?: 0
+            val childHeight = child.height
             if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true || bottomOmnibar?.isInsideScreen() == true) {
+                browserLayout?.setPadding(0, 0, 0, 0)
                 child.hide()
             } else {
                 trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
@@ -101,6 +103,7 @@ class TrackersBlockedViewSlideBehavior(
                 if (trackersBurstAnimationView?.isAnimating == true) {
                     trackersBurstAnimationView?.cancelAnimation()
                 }
+                browserLayout?.setPadding(0, 0, 0, childHeight)
                 child.show()
             }
             child.postOnAnimation {
