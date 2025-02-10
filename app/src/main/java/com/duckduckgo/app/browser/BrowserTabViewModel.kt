@@ -2754,6 +2754,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun deleteTabPreview(tabId: String) {
         tabRepository.updateTabPreviewImage(tabId, null)
+        tabRepository.updateTabFavicon(tabId, null)
     }
 
     override fun handleAppLink(
