@@ -835,7 +835,7 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
