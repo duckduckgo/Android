@@ -48,7 +48,8 @@ class TabSwitcherItemDiffCallback(
                 oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
-                    oldItem.tabEntity.url == newItem.tabEntity.url
+                    oldItem.tabEntity.url == newItem.tabEntity.url &&
+                    oldItem.isSelected == newItem.isSelected
             }
             else -> false
         }
@@ -76,6 +77,10 @@ class TabSwitcherItemDiffCallback(
 
                 if (oldItem.tabEntity.tabPreviewFile != newItem.tabEntity.tabPreviewFile) {
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
+                }
+
+                if (oldItem.isSelected != newItem.isSelected) {
+                    diffBundle.putBoolean(DIFF_KEY_SELECTION, newItem.isSelected)
                 }
             }
             oldItem is TabSwitcherItem.TrackerAnimationInfoPanel && newItem is TabSwitcherItem.TrackerAnimationInfoPanel -> {
@@ -127,5 +132,6 @@ class TabSwitcherItemDiffCallback(
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
         const val DIFF_ALPHA = "alpha"
+        const val DIFF_KEY_SELECTION = "selection"
     }
 }
