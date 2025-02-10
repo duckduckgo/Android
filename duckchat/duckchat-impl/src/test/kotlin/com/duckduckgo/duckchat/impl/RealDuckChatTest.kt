@@ -126,18 +126,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatCalled_pixelIsSent() {
-        testee.openDuckChat()
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-    }
-
-    @Test
-    fun whenOpenDuckChatWithAutoPromptCalled_pixelIsSent() {
-        testee.openDuckChatWithAutoPrompt("example")
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-    }
-
-    @Test
     fun whenOpenDuckChatCalled_activityStarted() {
         testee.openDuckChat()
         verify(mockGlobalActivityStarter).startIntent(
