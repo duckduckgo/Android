@@ -23,6 +23,7 @@ import android.graphics.RectF
 import android.util.TypedValue
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
@@ -32,13 +33,26 @@ class TabItemDecorator(
     var tabSwitcherItemId: String?,
 ) : RecyclerView.ItemDecoration() {
 
-    private val borderStroke: Paint = Paint().apply {
+    var highlightedTabId: String? = tabSwitcherItemId
+        private set
+
+    private val activeTabBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
-        strokeWidth = BORDER_WIDTH
+        strokeWidth = ACTIVE_TAB_BORDER_WIDTH
 
         val typedValue = TypedValue()
         context.theme.resolveAttribute(CommonR.attr.daxColorBackgroundInverted, typedValue, true)
+        color = ContextCompat.getColor(context, typedValue.resourceId)
+    }
+
+    private val selectionBorderStroke: Paint = Paint().apply {
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+        strokeWidth = SELECTION_BORDER_WIDTH
+
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(CommonR.attr.daxColorAccentBlue, typedValue, true)
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 
@@ -48,14 +62,13 @@ class TabItemDecorator(
         state: RecyclerView.State,
     ) {
         val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
-
-        for (i in 0 until recyclerView.childCount) {
-            val child = recyclerView.getChildAt(i)
-
+        recyclerView.children.forEach { child ->
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
             adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
-                if (tabSwitcherItem.id == tabSwitcherItemId) {
-                    drawSelectedTabDecoration(child, canvas)
+                if (tabSwitcherItem.isSelected) {
+                    drawSelectionTabDecoration(child, canvas)
+                } else if (tabSwitcherItem.id == highlightedTabId) {
+                    drawActiveTabDecoration(child, canvas)
                 }
             }
         }
@@ -63,12 +76,20 @@ class TabItemDecorator(
         super.onDrawOver(canvas, recyclerView, state)
     }
 
-    private fun drawSelectedTabDecoration(
+    private fun drawActiveTabDecoration(
         child: View,
         c: Canvas,
     ) {
-        borderStroke.alpha = (child.alpha * 255).toInt()
-        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, borderStroke)
+        activeTabBorderStroke.alpha = (child.alpha * 255).toInt()
+        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, activeTabBorderStroke)
+    }
+
+    private fun drawSelectionTabDecoration(
+        child: View,
+        c: Canvas,
+    ) {
+        selectionBorderStroke.alpha = (child.alpha * 255).toInt()
+        c.drawRoundRect(child.getBounds(), SELECTION_BORDER_WIDTH, SELECTION_BORDER_WIDTH, selectionBorderStroke)
     }
 
     private fun View.getBounds(): RectF {
@@ -83,7 +104,8 @@ class TabItemDecorator(
 
     companion object {
         private val BORDER_RADIUS = 12.toPx().toFloat()
-        private val BORDER_WIDTH = 2.toPx().toFloat()
+        private val ACTIVE_TAB_BORDER_WIDTH = 2.toPx().toFloat()
+        private val SELECTION_BORDER_WIDTH = 4.toPx().toFloat()
         private val BORDER_PADDING = 3.toPx().toFloat()
     }
 }
