@@ -25,6 +25,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -35,13 +38,25 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        splashScreen.setKeepOnScreenCondition { true }
 
         setContentView(R.layout.activity_launch)
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val splashScreenAnimationEndTime =
+                Instant.ofEpochMilli(splashScreenView.iconAnimationStartMillis + splashScreenView.iconAnimationDurationMillis)
+            val remainingAnimationTime = Instant.now().until(
+                splashScreenAnimationEndTime,
+                ChronoUnit.MILLIS,
+            )
+
+            lifecycleScope.launch {
+                viewModel.sendWelcomeScreenPixel()
+                delay(remainingAnimationTime)
+                viewModel.determineViewToShow()
+            }
+        }
     }
 
     private fun configureObservers() {

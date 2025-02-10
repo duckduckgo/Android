@@ -20,8 +20,10 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.pixels.AppPixelName.SPLASHSCREEN_SHOWN
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -32,6 +34,7 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val pixel: Pixel,
 ) :
     ViewModel() {
 
@@ -40,6 +43,10 @@ class LaunchViewModel @Inject constructor(
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
+    }
+
+    fun sendWelcomeScreenPixel() {
+        pixel.fire(SPLASHSCREEN_SHOWN)
     }
 
     suspend fun determineViewToShow() {
