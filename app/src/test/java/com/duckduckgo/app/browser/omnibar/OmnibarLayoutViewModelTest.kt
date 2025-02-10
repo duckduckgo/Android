@@ -423,7 +423,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenPrivacyShieldChangedToWarningThenViewStateCorrect() = runTest {
-        val privacyShield = PrivacyShield.MALICIOUS
+        val privacyShield = PrivacyShield.WARNING
         testee.onPrivacyShieldChanged(privacyShield)
 
         testee.viewState.test {

@@ -26,6 +26,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageEntity
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
@@ -73,7 +75,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 56,
+    version = 57,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -107,6 +109,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         Entity::class,
         Relation::class,
         RefreshEntity::class,
+        ExperimentAppUsageEntity::class,
     ],
 )
 
@@ -161,6 +164,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 
     abstract fun refreshDao(): RefreshDao
+
+    abstract fun experimentAppUsageDao(): ExperimentAppUsageDao
 }
 
 @Suppress("PropertyName")
@@ -682,6 +687,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_56_TO_57: Migration = object : Migration(56, 57) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `experiment_app_usage_entity` (`isoDateET` TEXT NOT NULL, PRIMARY KEY(`isoDateET`))")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -763,6 +774,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
             MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57,
         )
 
     @Deprecated(

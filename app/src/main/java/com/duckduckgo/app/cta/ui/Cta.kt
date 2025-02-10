@@ -422,7 +422,7 @@ sealed class OnboardingDaxDialogCta(
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.highlightsOnboardingEndDaxDialogDescription,
-        R.string.daxDialogHighFive,
+        R.string.highlightsOnboardingEndDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -629,7 +629,7 @@ sealed class DaxBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
         description = R.string.highlightsOnboardingEndDaxDialogDescription,
-        primaryCta = R.string.daxDialogHighFive,
+        primaryCta = R.string.highlightsOnboardingEndDaxDialogButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,

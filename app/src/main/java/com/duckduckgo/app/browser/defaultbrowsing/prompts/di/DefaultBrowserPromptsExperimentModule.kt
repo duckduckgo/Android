@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -28,7 +29,7 @@ import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object DefaultBrowserPromptsDataStoreModule {
+object DefaultBrowserPromptsExperimentModule {
 
     private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "default_browser_prompts",
@@ -36,7 +37,10 @@ object DefaultBrowserPromptsDataStoreModule {
 
     @Provides
     @DefaultBrowserPrompts
-    fun defaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
+    fun providesDefaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
+
+    @Provides
+    fun providesExperimentAppUsageDao(database: AppDatabase) = database.experimentAppUsageDao()
 }
 
 @Qualifier

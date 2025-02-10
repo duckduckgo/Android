@@ -744,7 +744,7 @@
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk. ️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sapratu!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Izdevās!"</string>
     <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
@@ -773,6 +773,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Dod pieci!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
 

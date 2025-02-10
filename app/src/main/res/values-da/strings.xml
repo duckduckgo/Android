@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Forstået</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Giv mig fem!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
 

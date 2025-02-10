@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.WARNING
 import com.duckduckgo.common.ui.store.AppTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -80,28 +80,28 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenLightModeAndPrivacyShieldMaliciousThenUseLightAnimation() {
+    fun whenLightModeAndPrivacyShieldWarningThenUseLightAnimation() {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
-        testee.setAnimationView(holder, MALICIOUS)
+        testee.setAnimationView(holder, WARNING)
 
-        verify(holder).setAnimation(R.raw.alert_red)
-        verify(holder).progress = 0.0f
+        verify(holder).setAnimation(R.raw.unprotected_shield)
+        verify(holder).progress = 1.0f
     }
 
     @Test
-    fun whenDarkModeAndPrivacyShieldMaliciousThenUseDarkAnimation() {
+    fun whenDarkModeAndPrivacyShieldWarningThenUseDarkAnimation() {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
-        testee.setAnimationView(holder, MALICIOUS)
+        testee.setAnimationView(holder, WARNING)
 
-        verify(holder).setAnimation(R.raw.alert_red_dark)
-        verify(holder).progress = 0.0f
+        verify(holder).setAnimation(R.raw.dark_unprotected_shield)
+        verify(holder).progress = 1.0f
     }
 }

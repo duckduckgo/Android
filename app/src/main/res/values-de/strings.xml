@@ -742,7 +742,7 @@
         <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Verstanden.</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Versuch es doch mal! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Probier’s doch mal aus!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du schaffst das!"</string>
     <string name="onboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
     <string name="onboardingEndDaxDialogButton">Alles erledigt!</string>
@@ -755,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich schützt?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blockiert Tracker von Drittanbietern</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Cookie-Anfragen und Popups blocken</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Cookie-Anfragen und Pop-ups blockieren</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Browserdaten schnell löschen</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Welche Farbe gefällt dir am besten?</string>
@@ -771,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Das ist die <b>**DuckDuckGo Search**!</b> Privat. Schnell. Weniger Werbung.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Schlag ein!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
 

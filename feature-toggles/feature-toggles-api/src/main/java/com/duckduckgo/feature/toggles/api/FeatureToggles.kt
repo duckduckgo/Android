@@ -229,7 +229,12 @@ interface Toggle {
         data class Cohort(
             val name: String,
             val weight: Int,
-            // This is nullable because only assigned cohort should have a value here, it's ET timezone
+
+            /**
+             * Represents serialized [ZonedDateTime] with "America/New_York" zone ID.
+             *
+             * This is nullable because only assigned cohort should have a value here, it's ET timezone
+             */
             val enrollmentDateET: String? = null,
         ) {
             companion object {
