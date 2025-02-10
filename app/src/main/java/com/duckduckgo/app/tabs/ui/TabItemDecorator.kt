@@ -68,9 +68,9 @@ class TabItemDecorator(
                 when (tabSwitcherItem) {
                     is TabSwitcherItem.Tab -> {
                         if (tabSwitcherItem.isSelected) {
-                            drawSelectionTabDecoration(child, canvas)
+                            drawTabDecoration(child, canvas, selectionBorderStroke)
                         } else if (tabSwitcherItem.id == highlightedTabId) {
-                            drawActiveTabDecoration(child, canvas)
+                            drawTabDecoration(child, canvas, activeTabBorderStroke)
                         }
                     }
                     is TabSwitcherItem.TrackerAnimationInfoPanel -> Unit // No border for animation tile
@@ -81,18 +81,7 @@ class TabItemDecorator(
         super.onDrawOver(canvas, recyclerView, state)
     }
 
-    private fun drawActiveTabDecoration(
-        child: View,
-        c: Canvas,
-    ) {
-        activeTabBorderStroke.alpha = (child.alpha * 255).toInt()
-        c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, activeTabBorderStroke)
-    }
-
-    private fun drawSelectionTabDecoration(
-        child: View,
-        c: Canvas,
-    ) {
+    private fun drawTabDecoration(child: View, c: Canvas, paint: Paint) {
         selectionBorderStroke.alpha = (child.alpha * 255).toInt()
         c.drawRoundRect(child.getBounds(), SELECTION_BORDER_WIDTH, SELECTION_BORDER_WIDTH, selectionBorderStroke)
     }
