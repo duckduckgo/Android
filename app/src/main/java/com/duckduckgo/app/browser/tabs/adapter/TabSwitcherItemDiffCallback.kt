@@ -42,7 +42,8 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
                 oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
-                    oldItem.tabEntity.url == newItem.tabEntity.url
+                    oldItem.tabEntity.url == newItem.tabEntity.url &&
+                    oldItem.isSelected == newItem.isSelected
             }
             else -> false
         }
@@ -70,6 +71,10 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
 
                 if (oldItem.tabEntity.tabPreviewFile != newItem.tabEntity.tabPreviewFile) {
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
+                }
+
+                if (oldItem.isSelected != newItem.isSelected) {
+                    diffBundle.putBoolean(DIFF_KEY_SELECTION, newItem.isSelected)
                 }
             }
         }
@@ -114,5 +119,6 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
         const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
+        const val DIFF_KEY_SELECTION = "selection"
     }
 }
