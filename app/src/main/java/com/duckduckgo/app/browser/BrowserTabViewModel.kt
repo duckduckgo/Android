@@ -1882,7 +1882,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         when (action) {
             LeaveSite -> {
-                val params = mapOf(CATEGORY_KEY to feed.name)
+                val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
@@ -3206,7 +3206,7 @@ class BrowserTabViewModel @Inject constructor(
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
         if (!exempted) {
-            val params = mapOf(CATEGORY_KEY to feed.name, CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
+            val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             loadingViewState.postValue(
                 currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
