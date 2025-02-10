@@ -58,8 +58,6 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -221,7 +219,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.viewState.value.mode)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
@@ -245,52 +243,44 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureObservers() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
             lifecycleScope.launch {
-                viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
-                    tabsAdapter.updateData(it.tabs, it.mode)
-
+                viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
 
-                    updateFabType(it.fabType)
-
-                    if (it.layoutType != null) {
-                        updateLayoutType(it.layoutType)
-                    }
-
-                    if (it.deletableTabs.isNotEmpty()) {
-                        onDeletableTab(it.deletableTabs.last())
-                    }
+                    tabsAdapter.updateSelection(it.mode)
 
                     // if (it.selectedTab != null && it.selectedTab.tabId != tabItemDecorator.highlightedTabId && !it.selectedTab.deletable) {
-                    updateTabGridItemDecorator(it.selectedTab, it.mode)
+                    updateTabGridItemDecorator(it.activeTab?.tabId)
                     // }
 
                     invalidateOptionsMenu()
                 }
             }
         } else {
-            viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
-                tabsAdapter.updateData(tabSwitcherItems)
-
-                val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
-                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                    updateTabGridItemDecorator(tabSwitcherItems.last().id)
-                }
-            }
             viewModel.activeTab.observe(this) { tab ->
                 if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
                     updateTabGridItemDecorator(tab.tabId)
                 }
             }
-            viewModel.deletableTabs.observe(this) {
-                if (it.isNotEmpty()) {
-                    onDeletableTab(it.last())
-                }
-            }
+        }
 
-            lifecycleScope.launch {
-                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                    updateLayoutType(it)
-                }
+        viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+            tabsAdapter.updateData(tabSwitcherItems)
+
+            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
+                updateTabGridItemDecorator(tabSwitcherItems.last().id)
+            }
+        }
+
+        viewModel.deletableTabs.observe(this) {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                updateLayoutType(it)
             }
         }
 
@@ -334,13 +324,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.show()
     }
 
-    private fun updateFabType(fabType: TabSwitcherViewModel.ViewState.FabType) {
+    private fun updateFabType(fabType: TabSwitcherViewModel.SelectionViewState.FabType) {
         when (fabType) {
-            TabSwitcherViewModel.ViewState.FabType.NEW_TAB -> {
+            TabSwitcherViewModel.SelectionViewState.FabType.NEW_TAB -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_add_24)
                 tabsFab.setText(R.string.tabSwitcherFabNewTab)
             }
-            TabSwitcherViewModel.ViewState.FabType.CLOSE_TABS -> {
+            TabSwitcherViewModel.SelectionViewState.FabType.CLOSE_TABS -> {
                 tabsFab.icon = AppCompatResources.getDrawable(this, com.duckduckgo.mobile.android.R.drawable.ic_close_24)
                 tabsFab.setText(R.string.tabSwitcherFabCloseTabs)
             }
@@ -407,12 +397,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
             popupMenuItem = menu.findItem(R.id.popupMenuItem)
 
-            val mode = viewModel.viewState.value.mode
+            val mode = viewModel.selectionViewState.value.mode
             when (mode) {
-                TabSwitcherViewModel.ViewState.Mode.Normal -> {
+                TabSwitcherViewModel.SelectionViewState.Mode.Normal -> {
                     createNormalModeMenu(menu)
                 }
-                is TabSwitcherViewModel.ViewState.Mode.Selection -> {
+                is TabSwitcherViewModel.SelectionViewState.Mode.Selection -> {
                     createSelectionModeMenu(menu, mode.selectedTabs.size)
                 }
             }
@@ -547,7 +537,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        closeAllTabsMenuItem?.isVisible = viewModel.tabSwitcherItems.value?.isNotEmpty() == true
+        closeAllTabsMenuItem?.isVisible = !viewModel.tabSwitcherItems.value.isNullOrEmpty()
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
@@ -588,12 +578,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        updateTabGridItemDecorator(tab.tabId)
+        updateTabGridItemDecorator(selectedTabId)
         launch { viewModel.onTabSelected(tab) }
     }
 
-    private fun updateTabGridItemDecorator(tabSwitcherItemId: String) {
-        tabItemDecorator.tabSwitcherItemId = tabSwitcherItemId
+    private fun updateTabGridItemDecorator(tabId: String?) {
+        tabItemDecorator.tabSwitcherItemId = tabId
         tabsRecycler.invalidateItemDecorations()
     }
 
