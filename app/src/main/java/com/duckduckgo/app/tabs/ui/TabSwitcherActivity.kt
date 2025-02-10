@@ -216,7 +216,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.viewState.value.mode)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
@@ -240,50 +240,44 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureObservers() {
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
             lifecycleScope.launch {
-                viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
-                    tabsAdapter.updateData(it.tabs, it.mode)
-
+                viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
 
-                    if (it.layoutType != null) {
-                        updateLayoutType(it.layoutType)
-                    }
-
-                    if (it.deletableTabs.isNotEmpty()) {
-                        onDeletableTab(it.deletableTabs.last())
-                    }
+                    tabsAdapter.updateSelection(it.mode)
 
                     // if (it.selectedTab != null && it.selectedTab.tabId != tabItemDecorator.highlightedTabId && !it.selectedTab.deletable) {
-                    updateTabGridItemDecorator(it.selectedTab, it.mode)
+                    updateTabGridItemDecorator(it.activeTab?.tabId)
                     // }
 
                     invalidateOptionsMenu()
                 }
             }
         } else {
-            viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
-                tabsAdapter.updateData(tabSwitcherItems)
-
-                val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
-                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                    updateTabGridItemDecorator(tabSwitcherItems.last().id)
-                }
-            }
             viewModel.activeTab.observe(this) { tab ->
                 if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
                     updateTabGridItemDecorator(tab.tabId)
                 }
             }
-            viewModel.deletableTabs.observe(this) {
-                if (it.isNotEmpty()) {
-                    onDeletableTab(it.last())
-                }
-            }
+        }
 
-            lifecycleScope.launch {
-                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                    updateLayoutType(it)
-                }
+        viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+            tabsAdapter.updateData(tabSwitcherItems)
+
+            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
+                updateTabGridItemDecorator(tabSwitcherItems.last().id)
+            }
+        }
+
+        viewModel.deletableTabs.observe(this) {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                updateLayoutType(it)
             }
         }
 
@@ -488,12 +482,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        updateTabGridItemDecorator(tab.tabId)
+        updateTabGridItemDecorator(selectedTabId)
         launch { viewModel.onTabSelected(tab) }
     }
 
-    private fun updateTabGridItemDecorator(tabSwitcherItemId: String) {
-        tabItemDecorator.tabSwitcherItemId = tabSwitcherItemId
+    private fun updateTabGridItemDecorator(tabId: String?) {
+        tabItemDecorator.tabSwitcherItemId = tabId
         tabsRecycler.invalidateItemDecorations()
     }
 
