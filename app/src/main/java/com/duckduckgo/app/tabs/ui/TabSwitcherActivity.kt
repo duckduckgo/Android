@@ -56,7 +56,6 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -217,8 +216,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, selectedTabId)
+        tabItemDecorator = TabItemDecorator(this, selectedTabId, viewModel.viewState.value.mode)
         tabsRecycler.addItemDecoration(tabItemDecorator)
+
         tabsRecycler.setHasFixedSize(true)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
@@ -238,40 +238,57 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
+            lifecycleScope.launch {
+                viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
+                    tabsAdapter.updateData(it.tabs, it.mode)
 
-            render(tabSwitcherItems)
+                    tabsRecycler.invalidateItemDecorations()
 
-            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
-            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                updateTabGridItemDecorator(tabSwitcherItems.last().id)
+                    if (it.layoutType != null) {
+                        updateLayoutType(it.layoutType)
+                    }
+
+                    if (it.deletableTabs.isNotEmpty()) {
+                        onDeletableTab(it.deletableTabs.last())
+                    }
+
+                    // if (it.selectedTab != null && it.selectedTab.tabId != tabItemDecorator.highlightedTabId && !it.selectedTab.deletable) {
+                    updateTabGridItemDecorator(it.selectedTab, it.mode)
+                    // }
+
+                    invalidateOptionsMenu()
+                }
+            }
+        } else {
+            viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
+                tabsAdapter.updateData(tabSwitcherItems)
+
+                val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
+                    updateTabGridItemDecorator(tabSwitcherItems.last().id)
+                }
+
+                if (firstTimeLoadingTabsList) {
+                    firstTimeLoadingTabsList = false
+                    scrollToActiveTab()
+                }
+            }
+            viewModel.activeTab.observe(this) { tab ->
+                if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
+                    updateTabGridItemDecorator(tab.tabId)
+                }
+            }
+            viewModel.deletableTabs.observe(this) {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
+                }
             }
 
-            if (firstTimeLoadingTabsList) {
-                firstTimeLoadingTabsList = false
-                scrollToActiveTab()
-            }
-        }
-        viewModel.activeTab.observe(this) { tab ->
-            if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
-                updateTabGridItemDecorator(tab.tabId)
-            }
-        }
-        viewModel.deletableTabs.observe(this) {
-            if (it.isNotEmpty()) {
-                onDeletableTab(it.last())
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                updateLayoutType(it)
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
-                invalidateOptionsMenu()
+            lifecycleScope.launch {
+                viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
+                    updateLayoutType(it)
+                }
             }
         }
 
@@ -339,10 +356,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             viewModeMenuItem.title = getString(R.string.tabSwitcherListViewMenu)
             viewModeMenuItem.setVisible(true)
         }
-    }
-
-    private fun render(tabs: List<TabSwitcherItem>) {
-        tabsAdapter.updateData(tabs)
     }
 
     private fun scrollToActiveTab() {
