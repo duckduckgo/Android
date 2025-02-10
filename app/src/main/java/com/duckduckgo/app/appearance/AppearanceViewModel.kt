@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.appearance
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
@@ -180,6 +181,8 @@ class AppearanceViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
+    // only visible for UI Internal experiments
     fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             browserThemingFeature.experimentalUI().setRawStoredState(State(checked))
