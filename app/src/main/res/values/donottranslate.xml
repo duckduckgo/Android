@@ -83,6 +83,7 @@
     <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
+    <string name="tabSelectionTitle">%1$d Selected</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Share Link</item>
         <item quantity="one">Share Link</item>
