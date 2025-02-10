@@ -205,6 +205,12 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onEmptyAreaClicked() {
+        if (tabManagerFeatureFlags.multiSelection().isEnabled() && _selectionViewState.value.mode is SelectionViewState.Mode.Selection) {
+            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
+        }
+    }
+
     fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
     }

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -231,6 +232,24 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         } else if (dy < 0) {
                             tabsFab.extend()
                         }
+                    }
+                },
+            )
+            tabsRecycler.addOnItemTouchListener(
+                object : RecyclerView.OnItemTouchListener {
+                    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                        if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null) {
+                            viewModel.onEmptyAreaClicked()
+                        }
+                        return false
+                    }
+
+                    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+                        // no-op
+                    }
+
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                        // no-op
                     }
                 },
             )
