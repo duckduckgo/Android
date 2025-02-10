@@ -58,9 +58,9 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -384,8 +384,7 @@ class TabSwitcherAdapter(
         )
     }
 
-    fun updateData(updatedList: List<TabSwitcherItem>, uiMode: Mode = Normal) {
-        this.uiMode = uiMode
+    fun updateData(updatedList: List<TabSwitcherItem>) {
         val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList, isDragging))
         list.clear()
         list.addAll(updatedList)
