@@ -20,5 +20,5 @@ import com.duckduckgo.app.tabs.model.TabEntity
 
 sealed class TabSwitcherItem(val id: String) {
 
-    data class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId)
+    data class Tab(val tabEntity: TabEntity, val isSelected: Boolean) : TabSwitcherItem(tabEntity.tabId)
 }
