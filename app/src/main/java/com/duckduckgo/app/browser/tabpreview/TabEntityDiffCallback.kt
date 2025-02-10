@@ -23,15 +23,15 @@ import com.duckduckgo.app.tabs.model.TabEntity
 class TabEntityDiffCallback(
     old: List<TabEntity>,
     new: List<TabEntity>,
-    oldSelectedIds: List<String>,
-    newSelectedIds: List<String>,
+    oldSelectedIds: List<String>? = null,
+    newSelectedIds: List<String>? = null,
 ) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
     private val oldList = old.toList()
     private val newList = new.toList()
-    private val oldSelectedTabIds = oldSelectedIds.toList()
-    private val newSelectedIds = newSelectedIds.toList()
+    private val oldSelectedTabIds = oldSelectedIds?.toList()
+    private val newSelectedIds = newSelectedIds?.toList()
 
     private fun areItemsTheSame(
         oldItem: TabEntity,
@@ -48,7 +48,7 @@ class TabEntityDiffCallback(
             oldItem.viewed == newItem.viewed &&
             oldItem.title == newItem.title &&
             oldItem.url == newItem.url &&
-            oldItem.tabId in oldSelectedTabIds == newItem.tabId in newSelectedIds
+            oldSelectedTabIds?.contains(oldItem.tabId) == newSelectedIds?.contains(newItem.tabId)
     }
 
     private fun getChangePayload(
@@ -73,8 +73,8 @@ class TabEntityDiffCallback(
             diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabPreviewFile)
         }
 
-        if (oldItem.tabId in oldSelectedTabIds != newItem.tabId in newSelectedIds) {
-            diffBundle.putBoolean(DIFF_KEY_SELECTION, newItem.tabId in newSelectedIds)
+        if (oldSelectedTabIds?.contains(oldItem.tabId) != newSelectedIds?.contains(newItem.tabId)) {
+            diffBundle.putString(DIFF_KEY_SELECTION, newItem.tabId)
         }
 
         return diffBundle

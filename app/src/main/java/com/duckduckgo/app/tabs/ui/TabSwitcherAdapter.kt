@@ -47,9 +47,9 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -234,12 +234,17 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(updatedList: List<TabEntity>, mode: Mode = Normal) {
-        val oldSelectedIds = (uiMode as? Selection)?.selectedTabs.orEmpty()
-        val newSelectedIds = (mode as? Selection)?.selectedTabs.orEmpty()
+    fun updateSelection(mode: Mode) {
+        val oldSelectedIds = (uiMode as? Selection)?.selectedTabs
+        val newSelectedIds = (mode as? Selection)?.selectedTabs
         uiMode = mode
 
-        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList, oldSelectedIds, newSelectedIds))
+        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, list, oldSelectedIds, newSelectedIds))
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun updateData(updatedList: List<TabEntity>) {
+        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
