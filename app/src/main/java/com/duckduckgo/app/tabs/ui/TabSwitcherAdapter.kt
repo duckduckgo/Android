@@ -49,9 +49,9 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -311,8 +311,17 @@ class TabSwitcherAdapter(
         )
     }
 
-    fun updateData(updatedList: List<TabSwitcherItem>, uiMode: Mode = Normal) {
-        this.uiMode = uiMode
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateSelection(mode: Mode) {
+        if (uiMode != mode) {
+            val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, list, uiMode, mode))
+            diffResult.dispatchUpdatesTo(this)
+
+            uiMode = mode
+        }
+    }
+
+    fun updateData(updatedList: List<TabSwitcherItem>) {
         val diffResult = DiffUtil.calculateDiff(TabSwitcherItemDiffCallback(list, updatedList))
         list.clear()
         list.addAll(updatedList)
