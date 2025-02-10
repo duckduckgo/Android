@@ -29,6 +29,9 @@ interface BrowserThemingFeature {
     fun self(): Toggle
 
     @Toggle.DefaultValue(false)
+    fun experimentalUI(): Toggle
+
+    @Toggle.DefaultValue(false)
     fun colors(): Toggle
 
     @Toggle.DefaultValue(false)

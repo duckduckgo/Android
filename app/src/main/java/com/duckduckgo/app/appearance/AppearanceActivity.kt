@@ -87,6 +87,28 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private val experimentalUIToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onExperimentalUIModeChanged(isChecked)
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.appearanceNightModeDialogTitle)
+            .setMessage(R.string.appearanceNightModeDialogMessage)
+            .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
+            .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        FireActivity.triggerRestart(baseContext, false)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        // no-op
+                    }
+                },
+            )
+            .show()
+    }
+
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
             Timber.d("Icon changed.")
@@ -121,6 +143,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
                     updateSelectedOmnibarPosition(it.isOmnibarPositionFeatureEnabled, it.omnibarPosition)
+                    updateExperimentalUISetting(it.isBrowserThemingFeatureVisible, it.isBrowserThemingFeatureEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -157,6 +180,18 @@ class AppearanceActivity : DuckDuckGoActivity() {
         } else {
             binding.addressBarPositionSettingDivider.gone()
             binding.addressBarPositionSetting.gone()
+        }
+    }
+
+    private fun updateExperimentalUISetting(
+        browserThemingFeatureVisible: Boolean,
+        browserThemingFeatureEnabled: Boolean,
+    ) {
+        if (browserThemingFeatureVisible) {
+            binding.internalUISettingsLayout.show()
+            binding.experimentalUIMode.quietlySetIsChecked(browserThemingFeatureEnabled, experimentalUIToggleListener)
+        } else {
+            binding.internalUISettingsLayout.gone()
         }
     }
 

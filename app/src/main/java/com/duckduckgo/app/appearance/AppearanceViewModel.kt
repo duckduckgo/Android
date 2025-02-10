@@ -29,15 +29,19 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
+import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -57,6 +61,8 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val appBuildConfig: AppBuildConfig,
+    private val browserThemingFeature: BrowserThemingFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -67,6 +73,8 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isBrowserThemingFeatureVisible: Boolean = false,
+        val isBrowserThemingFeatureEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -90,6 +98,8 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isBrowserThemingFeatureEnabled = browserThemingFeature.experimentalUI().isEnabled(),
+                    isBrowserThemingFeatureVisible = appBuildConfig.isInternalBuild(),
                 )
             }
         }
@@ -167,6 +177,12 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    fun onExperimentalUIModeChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            browserThemingFeature.experimentalUI().setRawStoredState(State(checked))
         }
     }
 }
