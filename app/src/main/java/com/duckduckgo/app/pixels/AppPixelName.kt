@@ -146,9 +146,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
     SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
-    SETTINGS_GENERAL_APP_LAUNCH_LAST_OPENED_TAB_SELECTED("m_settings_general_app_launch_last_opened_tab_selected"),
-    SETTINGS_GENERAL_APP_LAUNCH_NEW_TAB_PAGE_SELECTED("m_settings_general_app_launch_new_tab_page_selected"),
-    SETTINGS_GENERAL_APP_LAUNCH_SPECIFIC_PAGE_SELECTED("m_settings_general_app_launch_specific_page_selected"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
