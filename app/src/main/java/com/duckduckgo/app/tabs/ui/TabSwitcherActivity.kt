@@ -57,6 +57,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -223,44 +224,70 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.setHasFixedSize(true)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            tabsRecycler.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        if (dy > 0) {
-                            tabsFab.shrink()
-                        } else if (dy < 0) {
-                            tabsFab.extend()
-                        }
-                    }
-                },
-            )
-            tabsRecycler.addOnItemTouchListener(
-                object : RecyclerView.OnItemTouchListener {
-                    private var lastEventAction: Int? = null
-                    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                        if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
-                            e.action == MotionEvent.ACTION_MOVE
-                        ) {
-                            lastEventAction = e.action
-                        } else if (e.action == MotionEvent.ACTION_UP) {
-                            if (lastEventAction == MotionEvent.ACTION_DOWN) {
-                                viewModel.onEmptyAreaClicked()
-                            }
-                            lastEventAction = null
-                        }
-                        return false
-                    }
+            handleFabStateUpdates()
+            handleSelectionModeCancellation()
+        }
+    }
 
-                    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-                        // no-op
+    private fun handleSelectionModeCancellation() {
+        tabsRecycler.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var lastEventAction: Int? = null
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
+                    e.action == MotionEvent.ACTION_MOVE
+                ) {
+                    lastEventAction = e.action
+                } else if (e.action == MotionEvent.ACTION_UP) {
+                    if (lastEventAction == MotionEvent.ACTION_DOWN) {
+                        viewModel.onEmptyAreaClicked()
                     }
+                    lastEventAction = null
+                }
+                return false
+            }
 
-                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-                        // no-op
+            override fun onTouchEvent(
+                rv: RecyclerView,
+                e: MotionEvent,
+            ) {
+                // no-op
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                // no-op
+            }
+        },
+        )
+    }
+
+    private fun handleFabStateUpdates() {
+        tabsRecycler.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: RecyclerView,
+                    dx: Int,
+                    dy: Int,
+                ) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0) {
+                        tabsFab.shrink()
+                    } else if (dy < 0) {
+                        tabsFab.extend()
                     }
-                },
-            )
+                }
+            },
+        )
+    }
+
+    private fun updateToolbarTitle(mode: Mode) {
+        toolbar.title = if (mode is Mode.Selection) {
+            if (mode.selectedTabs.isEmpty()) {
+                getString(R.string.selectTabsMenuItem)
+            } else {
+                getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
+            }
+        } else {
+            getString(R.string.tabActivityTitle)
         }
     }
 
@@ -269,13 +296,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             lifecycleScope.launch {
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
-
                     tabsAdapter.updateSelection(it.mode)
-
-                    // if (it.selectedTab != null && it.selectedTab.tabId != tabItemDecorator.highlightedTabId && !it.selectedTab.deletable) {
+                    updateToolbarTitle(it.mode)
                     updateTabGridItemDecorator(it.activeTab?.tabId)
-                    // }
-
                     invalidateOptionsMenu()
                 }
             }
