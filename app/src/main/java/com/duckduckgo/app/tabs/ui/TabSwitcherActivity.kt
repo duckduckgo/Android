@@ -237,9 +237,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             )
             tabsRecycler.addOnItemTouchListener(
                 object : RecyclerView.OnItemTouchListener {
+                    private var lastEventAction: Int? = null
                     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                        if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null) {
-                            viewModel.onEmptyAreaClicked()
+                        if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
+                            e.action == MotionEvent.ACTION_MOVE
+                        ) {
+                            lastEventAction = e.action
+                        } else if (e.action == MotionEvent.ACTION_UP) {
+                            if (lastEventAction == MotionEvent.ACTION_DOWN) {
+                                viewModel.onEmptyAreaClicked()
+                            }
+                            lastEventAction = null
                         }
                         return false
                     }
