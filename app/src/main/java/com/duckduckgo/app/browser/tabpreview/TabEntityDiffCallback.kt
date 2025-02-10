@@ -20,11 +20,18 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUtil.Callback() {
+class TabEntityDiffCallback(
+    old: List<TabEntity>,
+    new: List<TabEntity>,
+    oldSelectedIds: List<String>,
+    newSelectedIds: List<String>,
+) : DiffUtil.Callback() {
 
     // keep a local copy of the lists to avoid any changes to the lists during the diffing process
     private val oldList = old.toList()
     private val newList = new.toList()
+    private val oldSelectedTabIds = oldSelectedIds.toList()
+    private val newSelectedIds = newSelectedIds.toList()
 
     private fun areItemsTheSame(
         oldItem: TabEntity,
@@ -40,7 +47,8 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
             oldItem.viewed == newItem.viewed &&
             oldItem.title == newItem.title &&
-            oldItem.url == newItem.url
+            oldItem.url == newItem.url &&
+            oldItem.tabId in oldSelectedTabIds == newItem.tabId in newSelectedIds
     }
 
     private fun getChangePayload(
@@ -63,6 +71,10 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
 
         if (oldItem.tabPreviewFile != newItem.tabPreviewFile) {
             diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabPreviewFile)
+        }
+
+        if (oldItem.tabId in oldSelectedTabIds != newItem.tabId in newSelectedIds) {
+            diffBundle.putBoolean(DIFF_KEY_SELECTION, newItem.tabId in newSelectedIds)
         }
 
         return diffBundle
@@ -105,5 +117,6 @@ class TabEntityDiffCallback(old: List<TabEntity>, new: List<TabEntity>) : DiffUt
         const val DIFF_KEY_URL = "url"
         const val DIFF_KEY_PREVIEW = "previewImage"
         const val DIFF_KEY_VIEWED = "viewed"
+        const val DIFF_KEY_SELECTION = "selection"
     }
 }

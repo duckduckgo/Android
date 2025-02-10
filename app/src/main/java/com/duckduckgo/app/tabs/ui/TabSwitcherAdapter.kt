@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_SELECTION
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
@@ -46,6 +47,10 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.GridTabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder.ListTabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
@@ -65,6 +70,7 @@ class TabSwitcherAdapter(
     private val list = mutableListOf<TabEntity>()
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = LayoutType.GRID
+    private var uiMode: Mode = Normal
 
     init {
         setHasStableIds(true)
@@ -107,6 +113,7 @@ class TabSwitcherAdapter(
         holder.url.visibility = if (tab.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab)
         loadFavicon(tab, holder.favicon)
+        loadSelectionState(holder, tab)
         attachClickListeners(holder, tab)
     }
 
@@ -117,7 +124,24 @@ class TabSwitcherAdapter(
         updateUnreadIndicator(holder, tab)
         loadFavicon(tab, holder.favicon)
         loadTabPreviewImage(tab, glide, holder)
+        loadSelectionState(holder, tab)
         attachClickListeners(holder, tab)
+    }
+
+    private fun loadSelectionState(holder: TabViewHolder, tab: TabEntity) {
+        if (uiMode is Selection) {
+            val selectedTabs = (uiMode as Selection).selectedTabs
+            if (tab.tabId in selectedTabs) {
+                holder.selectionIndicator.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_blue_round_24)
+            } else {
+                holder.selectionIndicator.setImageResource(com.duckduckgo.mobile.android.R.drawable.shape_grey_circle_24)
+            }
+            holder.selectionIndicator.show()
+            holder.close.hide()
+        } else {
+            holder.selectionIndicator.hide()
+            holder.close.show()
+        }
     }
 
     private fun extractTabTitle(tab: TabEntity, context: Context): String {
@@ -159,6 +183,10 @@ class TabSwitcherAdapter(
 
             bundle.getString(DIFF_KEY_TITLE)?.let {
                 holder.title.text = it
+            }
+
+            if (bundle.containsKey(DIFF_KEY_SELECTION)) {
+                loadSelectionState(holder, tab)
             }
 
             if (bundle.containsKey(DIFF_KEY_VIEWED)) {
@@ -206,8 +234,12 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(updatedList: List<TabEntity>) {
-        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList))
+    fun updateData(updatedList: List<TabEntity>, mode: Mode = Normal) {
+        val oldSelectedIds = (uiMode as? Selection)?.selectedTabs.orEmpty()
+        val newSelectedIds = (mode as? Selection)?.selectedTabs.orEmpty()
+        uiMode = mode
+
+        val diffResult = DiffUtil.calculateDiff(TabEntityDiffCallback(list, updatedList, oldSelectedIds, newSelectedIds))
         list.clear()
         list.addAll(updatedList)
         diffResult.dispatchUpdatesTo(this)
@@ -245,17 +277,18 @@ class TabSwitcherAdapter(
         val favicon: ImageView,
         val title: TextView,
         val close: ImageView,
+        val selectionIndicator: ImageView,
         val tabUnread: ImageView,
     ) : ViewHolder(rootView) {
         data class GridTabViewHolder(
             val binding: ItemTabGridBinding,
-        ) : TabViewHolder(binding.root, binding.favicon, binding.title, binding.close, binding.tabUnread) {
+        ) : TabViewHolder(binding.root, binding.favicon, binding.title, binding.close, binding.selectionIndicator, binding.tabUnread) {
             val tabPreview: ImageView = binding.tabPreview
         }
 
         data class ListTabViewHolder(
             val binding: ItemTabListBinding,
-        ) : TabViewHolder(binding.root, binding.favicon, binding.title, binding.close, binding.tabUnread) {
+        ) : TabViewHolder(binding.root, binding.favicon, binding.title, binding.close, binding.selectionIndicator, binding.tabUnread) {
             val url: TextView = binding.url
         }
     }
