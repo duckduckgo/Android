@@ -210,6 +210,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectionModeRequested() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(emptyList())) }
     }
 
     fun onCloseSelectedTabs() {
@@ -283,18 +284,6 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
-        when {
-            selectionViewState.value.mode is SelectionViewState.Mode.Normal -> {
-                _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(emptyList())) }
-            }
-            selectionViewState.value.mode is SelectionViewState.Mode.Selection -> {
-                if ((selectionViewState.value.mode as SelectionViewState.Mode.Selection).selectedTabs.isEmpty()) {
-                    _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(listOf("123", "456"))) }
-                } else {
-                    _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
-                }
-            }
-        }
     }
 
     fun onDuckChatMenuClicked() {
