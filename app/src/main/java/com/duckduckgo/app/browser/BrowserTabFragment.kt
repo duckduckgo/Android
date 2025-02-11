@@ -311,6 +311,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -628,6 +629,8 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private var webView: DuckDuckGoWebView? = null
+
+    private lateinit var offsetChangedListener: AppBarLayout.OnOffsetChangedListener
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -976,6 +979,7 @@ class BrowserTabFragment :
             return
         }
 
+        removeTopOmnibarOffsetChangedListener()
         val displayMetrics = resources.displayMetrics
         val layoutParams = binding.trackersBlockedSlidingView.layoutParams as CoordinatorLayout.LayoutParams
         when (omnibar.omnibarPosition) {
@@ -998,10 +1002,18 @@ class BrowserTabFragment :
     }
 
     private fun configureTopOmnibarOffsetChangedListener() {
-        binding.newOmnibar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+        offsetChangedListener = AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
             val totalScrollRange = appBarLayout.totalScrollRange
             val scrollFraction = -verticalOffset / totalScrollRange.toFloat()
             notifyVerticalOffsetChanged(scrollFraction)
+        }
+
+        binding.newOmnibar.addOnOffsetChangedListener(offsetChangedListener)
+    }
+
+    private fun removeTopOmnibarOffsetChangedListener() {
+        if (::offsetChangedListener.isInitialized) {
+            binding.newOmnibar.removeOnOffsetChangedListener(offsetChangedListener)
         }
     }
 
@@ -1293,6 +1305,7 @@ class BrowserTabFragment :
         super.onResume()
 
         if (viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)) {
+            removeTopOmnibarOffsetChangedListener()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
             } else {
