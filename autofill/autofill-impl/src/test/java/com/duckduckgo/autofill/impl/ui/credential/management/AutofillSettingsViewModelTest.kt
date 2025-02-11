@@ -66,6 +66,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
@@ -977,10 +979,38 @@ class AutofillSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenShowListModeWithNewFeatureEnabledThenSeeNewListMode() = runTest {
+        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = true))
+        testee.onInitialiseListMode()
+        testee.commands.test {
+            awaitItem().verifyHasCommandToShowListMode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenShowListModeWithNewScrollFeatureDisabledThenSeeLegacyListMode() = runTest {
+        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = false))
+        testee.onInitialiseListMode()
+        testee.commands.test {
+            awaitItem().verifyHasCommandToShowLegacyListMode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {
         val confirmationCommand = this.firstOrNull { it is LaunchDeleteAllPasswordsConfirmation }
         assertNotNull(confirmationCommand)
         assertEquals(expectedNumberOfCredentialsToDelete, (confirmationCommand as LaunchDeleteAllPasswordsConfirmation).numberToDelete)
+    }
+
+    private fun List<Command>.verifyHasCommandToShowListMode() {
+        assertNotNull(this.firstOrNull { it is ShowListMode })
+    }
+
+    private fun List<Command>.verifyHasCommandToShowLegacyListMode() {
+        assertNotNull(this.firstOrNull { it is ShowListModeLegacy })
     }
 
     private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowDeleteAllConfirmation() {

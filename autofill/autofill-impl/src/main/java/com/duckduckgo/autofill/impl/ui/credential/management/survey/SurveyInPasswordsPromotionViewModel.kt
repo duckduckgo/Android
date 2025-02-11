@@ -47,8 +47,14 @@ class SurveyInPasswordsPromotionViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    // want to ensure this pixel doesn't trigger repeatedly as it's scrolled in and out of the list
+    private var promoDisplayedPixelSent = false
+
     fun onPromoShown() {
-        pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
+        if (!promoDisplayedPixelSent) {
+            promoDisplayedPixelSent = true
+            pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
+        }
     }
 
     fun onUserChoseToOpenSurvey(survey: SurveyDetails) {

@@ -399,34 +399,48 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         binding.addSampleLoginsButton.setClickListener {
             val timestamp = dateFormatter.format(System.currentTimeMillis())
             lifecycleScope.launch(dispatchers.io()) {
-                sampleCredentials(domain = "fill.dev", username = "alice-$timestamp", password = "alice-$timestamp").save()
-                sampleCredentials(domain = "fill.dev", username = "bob-$timestamp", password = "bob-$timestamp").save()
-                sampleCredentials(domain = "subdomain1.fill.dev", username = "charlie-$timestamp", password = "charlie-$timestamp").save()
-                sampleCredentials(domain = "subdomain2.fill.dev", username = "daniel-$timestamp", password = "daniel-$timestamp").save()
+                listOf(
+                    sampleCredentials(domain = "fill.dev", username = "alice-$timestamp", password = "alice-$timestamp"),
+                    sampleCredentials(domain = "fill.dev", username = "bob-$timestamp", password = "bob-$timestamp"),
+                    sampleCredentials(domain = "subdomain1.fill.dev", username = "charlie-$timestamp", password = "charlie-$timestamp"),
+                    sampleCredentials(domain = "subdomain2.fill.dev", username = "daniel-$timestamp", password = "daniel-$timestamp"),
+                ).save()
             }
         }
 
         binding.add100LoginsButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
-                repeat(100) { sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it").save() }
+                val credentials = mutableListOf<LoginCredentials>()
+                repeat(100) {
+                    credentials.add(sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it"))
+                }
+                credentials.save()
             }
         }
 
         binding.add1000LoginsButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
-                repeat(1_000) { sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it").save() }
+                val credentials = mutableListOf<LoginCredentials>()
+                repeat(1_000) {
+                    credentials.add(sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it"))
+                }
+                credentials.save()
             }
         }
 
         binding.addSampleLoginsContainingDuplicatesSameDomainButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
-                repeat(3) { sampleCredentials(domain = "fill.dev", username = "user").save() }
+                val credentials = mutableListOf<LoginCredentials>()
+                repeat(3) { credentials.add(sampleCredentials(domain = "fill.dev", username = "user")) }
+                credentials.save()
             }
         }
 
         binding.addSampleLoginsContainingDuplicatesAcrossSubdomainsButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
-                repeat(3) { sampleCredentials("https://subdomain$it.fill.dev", username = "user").save() }
+                val credentials = mutableListOf<LoginCredentials>()
+                repeat(3) { credentials.add(sampleCredentials("https://subdomain$it.fill.dev", username = "user")) }
+                credentials.save()
             }
         }
 
@@ -481,21 +495,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun onUserChoseToClearSavedLogins() {
         lifecycleScope.launch(dispatchers.io()) {
-            val idsToDelete = mutableListOf<Long>()
-            autofillStore.getAllCredentials().first().forEach { login ->
-                login.id?.let {
-                    idsToDelete.add(it)
-                }
-            }
-
-            logcat { "There are ${idsToDelete.size} logins to delete" }
-
-            idsToDelete.forEach {
-                autofillStore.deleteCredentials(it)
-            }
-
+            autofillStore.getCredentialCount()
+            val deleted = autofillStore.deleteAllCredentials().size
             withContext(dispatchers.main()) {
-                Toast.makeText(this@AutofillInternalSettingsActivity, "Deleted %d logins".format(idsToDelete.size), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AutofillInternalSettingsActivity, "Deleted %d logins".format(deleted), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -597,9 +600,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
-    private suspend fun LoginCredentials.save() {
+    private suspend fun List<LoginCredentials>.save() {
         withContext(dispatchers.io()) {
-            autofillStore.saveCredentials(this@save.domain ?: "", this@save)
+            autofillStore.bulkInsert(this@save)
         }
     }
 

@@ -36,7 +36,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillProviderListBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapterLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -90,7 +90,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private val binding: FragmentAutofillProviderListBinding by viewBinding()
-    private lateinit var adapter: AutofillManagementRecyclerAdapter
+    private lateinit var adapter: AutofillManagementRecyclerAdapterLegacy
 
     private var searchMenuItem: MenuItem? = null
 
@@ -227,7 +227,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private fun configureRecyclerView() {
-        adapter = AutofillManagementRecyclerAdapter(
+        adapter = AutofillManagementRecyclerAdapterLegacy(
             this,
             dispatchers = dispatchers,
             faviconManager = faviconManager,
@@ -235,7 +235,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
             initialExtractor = initialExtractor,
             suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
-            onContextMenuItemClicked = null,
+            onContextMenuItemClicked = { },
             onReportBreakageClicked = { },
         ).also { binding.logins.adapter = it }
     }
