@@ -427,7 +427,15 @@ class OmnibarLayout @JvmOverloads constructor(
             is StartTrackersAnimation -> {
                 startTrackersAnimation(command.entities)
             }
+
+            OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
+                moveCaretToFront()
+            }
         }
+    }
+
+    private fun moveCaretToFront() {
+        omnibarTextInput.setSelection(0)
     }
 
     private fun renderTabIcon(viewState: ViewState) {
@@ -498,10 +506,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
-        }
-
-        if (viewState.shouldMoveCaretToStart) {
-            omnibarTextInput.setSelection(0)
         }
 
         if (viewState.isLoading) {

@@ -110,7 +110,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val expanded: Boolean = false,
         val expandedAnimated: Boolean = false,
         val updateOmnibarText: Boolean = false,
-        val shouldMoveCaretToStart: Boolean = false,
         val tabCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
@@ -130,6 +129,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelTrackersAnimation : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data object MoveCaretToFront : Command()
     }
 
     enum class LeadingIconState {
@@ -167,7 +167,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    shouldMoveCaretToStart = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -207,10 +206,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
-                    shouldMoveCaretToStart = true,
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                 )
+            }
+
+            viewModelScope.launch {
+                command.send(Command.MoveCaretToFront)
             }
         }
     }
