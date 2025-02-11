@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Atjaunināt plānu vai atcelt</string>
-    <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple ID &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple ID, kas izmantots abonementa iegādei.</string>
+    <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivizē Privacy Pro datorā, lai iestatītu Personal Information Removal</string>

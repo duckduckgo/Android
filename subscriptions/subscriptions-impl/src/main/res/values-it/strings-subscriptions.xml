@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Aggiorna o o annulla il piano</string>
-    <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; ID Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso ID Apple utilizzato per acquistare l\'abbonamento.</string>
+    <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; Account Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso account Apple utilizzato per acquistare l\'abbonamento.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Attiva Privacy Pro sul desktop per impostare Personal Information Removal</string>
