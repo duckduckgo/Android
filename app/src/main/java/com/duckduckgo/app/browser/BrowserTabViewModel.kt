@@ -762,6 +762,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String? = null,
         stillExternal: Boolean? = false,
+        maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
         Timber.v("buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
@@ -770,6 +771,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
+        site?.maliciousSiteStatus = maliciousSiteStatus
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1316,7 +1318,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (currentBrowserViewState().maliciousSiteBlocked) {
             site?.uri?.let {
-                command.postValue(HideWarningMaliciousSite)
+                command.postValue(HideWarningMaliciousSite(it, site?.title))
             }
             return true
         }
@@ -3214,11 +3216,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
-        site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
-        site?.maliciousSiteStatus = when (feed) {
+        val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
+        buildSiteFactory(url = url.toString(), maliciousSiteStatus = maliciousSiteStatus)
+
         if (!exempted) {
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
@@ -3228,7 +3231,9 @@ class BrowserTabViewModel @Inject constructor(
             loadingViewState.postValue(
                 currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString(), privacyOn = false),
             )
-            command.postValue(ShowWarningMaliciousSite(url, feed))
+            command.postValue(
+                ShowWarningMaliciousSite(url, feed) { navigationStateChanged(it) },
+            )
         }
     }
 
