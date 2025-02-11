@@ -228,6 +228,32 @@ fun View.isInsideScreen(): Boolean {
 }
 
 /**
+ * Checks if the view is partially inside the screen.
+ *
+ * This function calculates the view's position on the screen and compares it with the screen's dimensions
+ * to determine if the view is partially contained within the screen boundaries.
+ *
+ * @return `true` if the view is partially inside the screen, `false` otherwise.
+ */
+fun View.isPartiallyOnScreen(): Boolean {
+    val location = IntArray(2)
+    this.getLocationOnScreen(location)
+    val screenRect = Rect(
+        0,
+        0,
+        this.context.resources.displayMetrics.widthPixels,
+        this.context.resources.displayMetrics.heightPixels,
+    )
+    val viewRect = Rect(
+        location[0],
+        location[1],
+        location[0] + this.width,
+        location[1] + this.height,
+    )
+    return screenRect.intersect(viewRect)
+}
+
+/**
  * Executes [block] with a typed version of the View's layoutParams and reassigns the
  * layoutParams with the updated version.
  *

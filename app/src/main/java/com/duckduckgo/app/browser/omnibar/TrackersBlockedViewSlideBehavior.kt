@@ -96,7 +96,9 @@ class TrackersBlockedViewSlideBehavior(
             val childHeight = child.height
             if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true || bottomOmnibar?.isInsideScreen() == true) {
                 browserLayout?.setPadding(0, 0, 0, 0)
-                child.hide()
+                child.postOnAnimation {
+                    child.hide()
+                }
             } else {
                 trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
                 website?.text = siteLiveData.value?.url?.extractDomain()
@@ -104,7 +106,9 @@ class TrackersBlockedViewSlideBehavior(
                     trackersBurstAnimationView?.cancelAnimation()
                 }
                 browserLayout?.setPadding(0, 0, 0, childHeight)
-                child.show()
+                child.postOnAnimation {
+                    child.show()
+                }
             }
             child.postOnAnimation {
                 super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)

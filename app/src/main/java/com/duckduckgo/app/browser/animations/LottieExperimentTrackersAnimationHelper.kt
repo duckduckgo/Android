@@ -27,8 +27,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackersLottieAssetDelegate
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isInsideScreen
+import com.duckduckgo.common.ui.view.isPartiallyOnScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
@@ -112,7 +115,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 },
             )
 
-            if (omnibarView.isInsideScreen()) {
+            if ((omnibarPosition == TOP && omnibarView.isInsideScreen()) || (omnibarPosition == BOTTOM && omnibarView.isPartiallyOnScreen())) {
                 this.setMaxProgress(1f)
                 this.playAnimation()
             }
