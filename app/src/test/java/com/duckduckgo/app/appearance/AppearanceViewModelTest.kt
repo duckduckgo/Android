@@ -27,8 +27,11 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -66,7 +69,11 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
-    private val featureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
+    @Mock
+    private lateinit var mockAppBuildConfig: AppBuildConfig
+
+    private val omnibarFeatureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
+    private val browserTheming = FakeFeatureToggleFactory.create(BrowserThemingFeature::class.java)
 
     @Before
     fun before() {
@@ -76,15 +83,19 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
 
-        featureFlag.self().setRawStoredState(Toggle.State(enable = true))
+        omnibarFeatureFlag.self().setRawStoredState(Toggle.State(enable = true))
+        browserTheming.experimentalUI().setRawStoredState(Toggle.State(enable = false))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
-            featureFlag,
+            omnibarFeatureFlag,
+            mockAppBuildConfig,
+            browserTheming,
         )
     }
 
