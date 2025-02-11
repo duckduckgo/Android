@@ -110,7 +110,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val expanded: Boolean = false,
         val expandedAnimated: Boolean = false,
         val updateOmnibarText: Boolean = false,
-        val shouldMoveCaretToEnd: Boolean = false,
         val shouldMoveCaretToStart: Boolean = false,
         val tabCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
@@ -494,7 +493,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
-                        shouldMoveCaretToEnd = omnibarViewState.shouldMoveCaretToEnd,
                         omnibarText = omnibarViewState.omnibarText,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(

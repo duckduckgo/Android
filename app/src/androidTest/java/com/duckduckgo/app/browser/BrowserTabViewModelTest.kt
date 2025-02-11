@@ -2311,13 +2311,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        testee.onUserSubmittedQuery("foo")
-        assertFalse(omnibarViewState().shouldMoveCaretToEnd)
-    }
-
-    @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
@@ -5166,7 +5159,6 @@ class BrowserTabViewModelTest {
         assertEquals(false, loadingViewState().isLoading)
 
         assertEquals("", omnibarViewState().omnibarText)
-        assertEquals(false, omnibarViewState().shouldMoveCaretToEnd)
         assertEquals(true, omnibarViewState().forceExpand)
     }
 

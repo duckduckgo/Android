@@ -795,7 +795,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
@@ -805,7 +804,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 
@@ -815,7 +813,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
         testee.onOmnibarFocusChanged(true, QUERY)
@@ -836,7 +833,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 

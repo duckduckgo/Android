@@ -499,9 +499,6 @@ class OmnibarLayout @JvmOverloads constructor(
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
         }
-        if (viewState.shouldMoveCaretToEnd) {
-            omnibarTextInput.setSelection(viewState.omnibarText.length)
-        }
 
         if (viewState.shouldMoveCaretToStart) {
             omnibarTextInput.setSelection(0)
