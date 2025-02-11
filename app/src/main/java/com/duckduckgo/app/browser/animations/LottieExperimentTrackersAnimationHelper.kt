@@ -31,15 +31,21 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isInsideScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
 class LottieExperimentTrackersAnimationHelper @Inject constructor() : ExperimentTrackersAnimationHelper {
 
     private var trackersBurstAnimationView: LottieAnimationView? = null
     private var omnibarShieldAnimationView: LottieAnimationView? = null
+
+    private val conflatedJob = ConflatedJob()
 
     override fun startShieldPopAnimation(
         omnibarShieldAnimationView: LottieAnimationView,
@@ -89,9 +95,11 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 object : AnimatorListener {
                     override fun onAnimationStart(animation: Animator) {
                         this@LottieExperimentTrackersAnimationHelper.trackersBurstAnimationView?.show()
-                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.speed = 0.4f
-                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.setMaxProgress(1f)
-                        this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.playAnimation()
+                        conflatedJob += MainScope().launch {
+                            delay(800L)
+                            this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.setMaxProgress(1f)
+                            this@LottieExperimentTrackersAnimationHelper.omnibarShieldAnimationView?.playAnimation()
+                        }
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
@@ -114,5 +122,6 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
     override fun cancelAnimations() {
         this.trackersBurstAnimationView?.cancelAnimation()
         this.omnibarShieldAnimationView?.cancelAnimation()
+        conflatedJob.cancel()
     }
 }
