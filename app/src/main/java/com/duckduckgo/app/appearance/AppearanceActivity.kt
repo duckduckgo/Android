@@ -89,7 +89,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val experimentalUIToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onExperimentalUIModeChanged(isChecked)
-        FireActivity.triggerRestart(baseContext, false)
+        sendThemeChangedBroadcast()
     }
 
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
