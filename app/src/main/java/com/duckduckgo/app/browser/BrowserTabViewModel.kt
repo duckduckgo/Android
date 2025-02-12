@@ -3221,11 +3221,7 @@ class BrowserTabViewModel @Inject constructor(
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             browserViewState.postValue(
-                currentBrowserViewState().copy(
-                    browserShowing = false,
-                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                    maliciousSiteBlocked = true,
-                ),
+                browserStateModifier.copyForMaliciousErrorShowing(currentBrowserViewState()),
             )
             loadingViewState.postValue(
                 currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),

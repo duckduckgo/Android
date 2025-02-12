@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import io.reactivex.annotations.CheckReturnValue
 
 class BrowserStateModifier {
@@ -51,6 +52,24 @@ class BrowserStateModifier {
             addToHomeEnabled = false,
             canGoBack = false,
             canPrintPage = false,
+        )
+    }
+
+    @CheckReturnValue
+    fun copyForMaliciousErrorShowing(original: BrowserViewState): BrowserViewState {
+        return original.copy(
+            browserShowing = false,
+            canChangePrivacyProtection = false,
+            canFireproofSite = false,
+            canReportSite = false,
+            canSharePage = false,
+            canSaveSite = false,
+            canFindInPage = false,
+            canChangeBrowsingMode = false,
+            addToHomeEnabled = false,
+            canPrintPage = false,
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
+            maliciousSiteBlocked = true,
         )
     }
 }
