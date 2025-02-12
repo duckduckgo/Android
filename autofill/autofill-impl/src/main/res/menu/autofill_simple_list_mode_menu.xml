@@ -14,7 +14,13 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="autofill_service_suggestion_search_passwords">Search Passwords</string>
-    <string name="autofill_service_select_password_activity">Select a Saved Password</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/searchLogins"
+        android:icon="@drawable/ic_find_search_24"
+        android:title="@string/autofillManagementSearchLogins"
+        android:visible="false"
+        android:orderInCategory="1"
+        app:showAsAction="always" />
+</menu>
