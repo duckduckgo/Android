@@ -835,7 +835,7 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
@@ -2676,6 +2676,7 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
+            val isErrorShowing = currentBrowserViewState().maliciousSiteDetected
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
@@ -2692,6 +2693,7 @@ class BrowserTabViewModel @Inject constructor(
                 cta = cta,
                 daxOnboardingComplete = isOnboardingComplete,
                 isBrowserShowing = isBrowserShowing,
+                isErrorShowing = isErrorShowing,
             )
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
@@ -3212,6 +3214,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
         site?.maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING

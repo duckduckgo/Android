@@ -4293,6 +4293,12 @@ body.environment--macos, body.environment--browser, body.environment--windows, b
   background: rgb(57, 57, 57);
   border-color: rgba(255, 255, 255, 0.09);
 }
+.environment--windows .scrollable {
+  scrollbar-color: #a1a1a1 transparent;
+}
+.environment--windows.body--theme-dark .scrollable {
+  scrollbar-color: #7e7e7e transparent;
+}
 
 .data-list__content {
   font-size: 14px;

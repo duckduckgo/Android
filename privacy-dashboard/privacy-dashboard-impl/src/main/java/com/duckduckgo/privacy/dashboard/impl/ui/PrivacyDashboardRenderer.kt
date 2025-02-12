@@ -87,6 +87,9 @@ class PrivacyDashboardRenderer(
         val cookiePromptManagementStatusJson = cookiePromptManagementStatusAdapter.toJson(viewState.cookiePromptManagementStatus)
         webView.evaluateJavascript("javascript:onChangeConsentManaged($cookiePromptManagementStatusJson);", null)
 
+        val maliciousStateJson = """{"kind": ${viewState.maliciousSiteStatus?.let { "\"$it\"" } ?: "null"}}"""
+        webView.evaluateJavascript("javascript:onChangeMaliciousSiteStatus($maliciousStateJson);", null)
+
         // remote feature settings
         val remoteFeatureSettingsAdapter = moshi.adapter(RemoteFeatureSettingsViewState::class.java)
         val remoteFeatureSettingsJson = remoteFeatureSettingsAdapter.toJson(viewState.remoteFeatureSettings)
