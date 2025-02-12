@@ -435,7 +435,9 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun moveCaretToFront() {
-        omnibarTextInput.setSelection(0)
+        omnibarTextInput.post {
+            omnibarTextInput.setSelection(0)
+        }
     }
 
     private fun renderTabIcon(viewState: ViewState) {
