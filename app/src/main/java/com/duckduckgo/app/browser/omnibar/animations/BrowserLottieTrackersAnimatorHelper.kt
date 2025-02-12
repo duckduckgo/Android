@@ -298,10 +298,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     override fun cancelAnimations(
         omnibarViews: List<View>,
     ) {
+        stopTrackersCountAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
-        conflatedJob.cancel()
     }
 
     private fun tryToStartCookiesAnimation(
@@ -514,6 +514,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val drawable = "$TRACKER_LOGO_PREFIX${entity.displayName.take(1).lowercase()}"
         val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
         return if (resource != 0) ImageLogo(resource) else LetterLogo(entity.displayName.take(1))
+    }
+
+    private fun stopTrackersCountAnimation() {
+        trackersBlockedAnimationView?.gone()
+        trackersBlockedCountAnimationView?.gone()
+
+        conflatedJob.cancel()
     }
 
     private fun stopTrackersAnimation() {
