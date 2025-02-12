@@ -652,7 +652,9 @@ class BrowserTabFragment :
                     delay(COOKIES_ANIMATION_DELAY)
                 }
                 context?.let {
-                    omnibar.createCookiesAnimation(isCosmetic)
+                    if (this@BrowserTabFragment.viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
+                        omnibar.createCookiesAnimation(isCosmetic)
+                    }
                 }
             }
         }
@@ -875,7 +877,7 @@ class BrowserTabFragment :
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
-                        if (viewModel.browserViewState.value?.maliciousSiteDetected != true) {
+                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
                             updateOrDeleteWebViewPreview()
                         }
                     }
@@ -3787,7 +3789,7 @@ class BrowserTabFragment :
                         omnibar.cancelTrackersAnimation()
                     }
 
-                    if (viewState.progress == MAX_PROGRESS) {
+                    if (viewState.progress == MAX_PROGRESS && lastSeenBrowserViewState?.maliciousSiteBlocked != true) {
                         createTrackersAnimation()
                     }
                 }

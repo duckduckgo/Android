@@ -835,7 +835,7 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
@@ -1312,8 +1312,10 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
-        if (currentBrowserViewState().maliciousSiteDetected) {
-            command.postValue(HideWarningMaliciousSite)
+        if (currentBrowserViewState().maliciousSiteBlocked) {
+            site?.uri?.let {
+                command.postValue(HideWarningMaliciousSite)
+            }
             return true
         }
 
@@ -2672,7 +2674,7 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
-            val isErrorShowing = currentBrowserViewState().maliciousSiteDetected
+            val isErrorShowing = currentBrowserViewState().maliciousSiteBlocked
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
@@ -3131,8 +3133,8 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
-        if (currentBrowserViewState().maliciousSiteDetected) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+        if (currentBrowserViewState().maliciousSiteBlocked) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
         }
     }
 
@@ -3218,15 +3220,15 @@ class BrowserTabViewModel @Inject constructor(
         if (!exempted) {
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
-            loadingViewState.postValue(
-                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
-            )
             browserViewState.postValue(
                 currentBrowserViewState().copy(
                     browserShowing = false,
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                    maliciousSiteDetected = true,
+                    maliciousSiteBlocked = true,
                 ),
+            )
+            loadingViewState.postValue(
+                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
             )
             command.postValue(ShowWarningMaliciousSite(url, feed))
         }
@@ -3536,7 +3538,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteBlocked = false)
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3547,7 +3549,7 @@ class BrowserTabViewModel @Inject constructor(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 browserShowing = showBrowser,
                 sslError = NONE,
-                maliciousSiteDetected = false,
+                maliciousSiteBlocked = false,
             )
         }
     }
