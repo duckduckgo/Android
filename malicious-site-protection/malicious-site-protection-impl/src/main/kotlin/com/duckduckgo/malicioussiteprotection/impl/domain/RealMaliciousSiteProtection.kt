@@ -48,6 +48,10 @@ class RealMaliciousSiteProtection @Inject constructor(
 
     private val timber = Timber.tag("MaliciousSiteProtection")
 
+    override fun isFeatureEnabled(): Boolean {
+        return maliciousSiteProtectionRCFeature.isFeatureEnabled()
+    }
+
     override suspend fun isMalicious(
         url: Uri,
         confirmationCallback: (confirmedResult: MaliciousStatus) -> Unit,
