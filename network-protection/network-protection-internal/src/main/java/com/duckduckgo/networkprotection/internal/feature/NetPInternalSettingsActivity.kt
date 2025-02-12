@@ -234,7 +234,11 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.forceRekey.setClickListener {
             lifecycleScope.launch {
-                sendBroadcast(Intent(DebugRekeyReceiver.ACTION_FORCE_REKEY))
+                Intent(DebugRekeyReceiver.ACTION_FORCE_REKEY).apply {
+                    setPackage(this@NetPInternalSettingsActivity.packageName)
+                }.also {
+                    sendBroadcast(it)
+                }
             }
         }
 
