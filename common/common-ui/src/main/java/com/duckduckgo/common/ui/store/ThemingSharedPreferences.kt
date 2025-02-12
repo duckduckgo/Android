@@ -20,12 +20,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-) :
-    ThemingDataStore {
+    private val browserThemingFeature: BrowserThemingFeature,
+) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
 
@@ -39,7 +40,7 @@ class ThemingSharedPreferences @Inject constructor(
 
     private fun selectedThemeSavedValue(): DuckDuckGoTheme {
         val savedValue = preferences.getString(KEY_THEME, null)
-        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.SYSTEM_DEFAULT)
+        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.SYSTEM_DEFAULT, browserThemingFeature.self().isEnabled())
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -56,16 +57,27 @@ class ThemingSharedPreferences @Inject constructor(
             when (theme) {
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
                 DuckDuckGoTheme.LIGHT -> THEME_LIGHT
-                DuckDuckGoTheme.DARK -> THEME_DARK
+                else -> THEME_DARK
             }
 
         fun themeFrom(
             value: String?,
             defValue: DuckDuckGoTheme,
+            isExperimentEnabled: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> DuckDuckGoTheme.LIGHT
-                THEME_DARK -> DuckDuckGoTheme.DARK
+                THEME_LIGHT -> if (isExperimentEnabled) {
+                    DuckDuckGoTheme.LIGHT_EXPERIMENT
+                } else {
+                    DuckDuckGoTheme.LIGHT
+                }
+
+                THEME_DARK -> if (isExperimentEnabled) {
+                    DuckDuckGoTheme.DARK_EXPERIMENT
+                } else {
+                    DuckDuckGoTheme.DARK
+                }
+
                 THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
                 else -> defValue
             }

@@ -102,6 +102,39 @@
                 app:primaryTextTruncated="false"
                 app:secondaryText="@string/settingsAddressBarPositionTop" />
 
+            <LinearLayout
+                android:id="@+id/internalUISettingsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/internalUISettingsDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="0dp" />
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:primaryText="@string/experimentalUISettings"/>
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/experimentalUIMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/experimentalUITitle"
+                    app:primaryTextTruncated="false"
+                    app:showSwitch="true"
+                    app:secondaryText="@string/experimentalUIMessage" />
+
+
+            </LinearLayout>
+
         </LinearLayout>
+
+
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

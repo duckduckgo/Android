@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.appearance
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
@@ -24,12 +25,24 @@ import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
+import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -49,6 +62,8 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val appBuildConfig: AppBuildConfig,
+    private val browserThemingFeature: BrowserThemingFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -59,6 +74,8 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isBrowserThemingFeatureVisible: Boolean = false,
+        val isBrowserThemingFeatureEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -82,6 +99,8 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
+                    isBrowserThemingFeatureVisible = appBuildConfig.isInternalBuild(),
                 )
             }
         }
@@ -126,9 +145,11 @@ class AppearanceViewModel @Inject constructor(
 
         val pixelName =
             when (selectedTheme) {
-                DuckDuckGoTheme.LIGHT -> AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
-                DuckDuckGoTheme.DARK -> AppPixelName.SETTINGS_THEME_TOGGLED_DARK
-                DuckDuckGoTheme.SYSTEM_DEFAULT -> AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+                LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DARK -> SETTINGS_THEME_TOGGLED_DARK
+                SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+                DARK_EXPERIMENT -> SETTINGS_THEME_TOGGLED_DARK
+                LIGHT_EXPERIMENT -> SETTINGS_THEME_TOGGLED_LIGHT
             }
         pixel.fire(pixelName)
     }
@@ -157,6 +178,14 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    // only visible for UI Internal experiments
+    fun onExperimentalUIModeChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            browserThemingFeature.self().setRawStoredState(State(checked))
         }
     }
 }

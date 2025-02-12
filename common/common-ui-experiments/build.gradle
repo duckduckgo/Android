@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace 'com.duckduckgo.mobile.android'
+    namespace 'com.duckduckgo.common.ui.experiments'
 }
 
 android {
@@ -38,7 +38,6 @@ android {
 dependencies {
 
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui-experiments')
     implementation project(path: ':di')
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -54,17 +53,4 @@ dependencies {
     implementation Google.dagger
 
     implementation "androidx.core:core-ktx:_"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
-    // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    implementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
-    testImplementation 'app.cash.turbine:turbine:_'
-    testImplementation Testing.robolectric
-    testImplementation project(path: ':common-test')
 }
