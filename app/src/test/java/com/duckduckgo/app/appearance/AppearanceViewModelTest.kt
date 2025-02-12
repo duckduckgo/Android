@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.appearance
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
@@ -75,6 +76,7 @@ internal class AppearanceViewModelTest {
     private val omnibarFeatureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
     private val browserTheming = FakeFeatureToggleFactory.create(BrowserThemingFeature::class.java)
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
