@@ -89,24 +89,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val experimentalUIToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onExperimentalUIModeChanged(isChecked)
-
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.appearanceNightModeDialogTitle)
-            .setMessage(R.string.appearanceNightModeDialogMessage)
-            .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
-            .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        FireActivity.triggerRestart(baseContext, false)
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        // no-op
-                    }
-                },
-            )
-            .show()
+        FireActivity.triggerRestart(baseContext, false)
     }
 
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
