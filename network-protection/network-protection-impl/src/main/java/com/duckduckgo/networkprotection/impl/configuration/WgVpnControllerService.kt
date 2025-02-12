@@ -17,10 +17,15 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
 import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.squareup.anvil.annotations.ContributesTo
@@ -28,15 +33,14 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.security.KeyStore
-import java.security.Security
+import java.net.InetAddress
 import javax.inject.Named
 import javax.inject.Qualifier
-import javax.net.ssl.SSLSocket
-import javax.net.ssl.TrustManagerFactory
-import javax.net.ssl.X509TrustManager
+import logcat.logcat
+import okhttp3.Dns
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import org.conscrypt.Conscrypt
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -57,35 +61,33 @@ object WgVpnControllerServiceModule {
     @SingleInstanceIn(VpnScope::class)
     fun provideInternalCustomHttpClient(
         @Named("api") okHttpClient: OkHttpClient,
-        delegatingSSLSocketFactory: DelegatingSSLSocketFactory,
+        context: Context,
+        appBuildConfig: AppBuildConfig,
     ): OkHttpClient {
-        val trustManagerFactory = TrustManagerFactory.getInstance(
-            TrustManagerFactory.getDefaultAlgorithm(),
-        )
-        trustManagerFactory.init(null as KeyStore?)
-        val trustManagers = trustManagerFactory.trustManagers
-        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-            ("Unexpected default trust managers: ${trustManagers.contentToString()}")
-        }
-        val trustManager = trustManagers[0] as X509TrustManager
+        val network = context.getNonVpnNetwork()
 
         return okHttpClient.newBuilder()
-            .sslSocketFactory(delegatingSSLSocketFactory, trustManager)
-            .build()
-    }
+            .apply {
+                if (appBuildConfig.isInternalBuild()) {
+                    addNetworkInterceptor(LoggingNetworkInterceptor())
+                }
+                network?.socketFactory?.let {
+                    socketFactory(it)
 
-    @Provides
-    @SingleInstanceIn(VpnScope::class)
-    fun provideDelegatingSSLSocketFactory(
-        socketProtector: Lazy<VpnSocketProtector>,
-        @Named("api") okHttpClient: Lazy<OkHttpClient>,
-    ): DelegatingSSLSocketFactory {
-        return object : DelegatingSSLSocketFactory(okHttpClient.get().sslSocketFactory) {
-            override fun configureSocket(sslSocket: SSLSocket): SSLSocket {
-                socketProtector.get().protect(sslSocket)
-                return sslSocket
+                    dns(
+                        object : Dns {
+                            override fun lookup(hostname: String): List<InetAddress> {
+                                return try {
+                                    network.getAllByName(hostname).toList()
+                                } catch (t: Throwable) {
+                                    Dns.SYSTEM.lookup(hostname)
+                                }
+                            }
+                        },
+                    )
+                }
             }
-        }
+            .build()
     }
 
     @Provides
@@ -100,10 +102,36 @@ object WgVpnControllerServiceModule {
             .callFactory { customClient.get().newCall(it) }
             .build()
 
-        // insertProviderAt trick to avoid error during handshakes
-        Security.insertProviderAt(Conscrypt.newProvider(), 1)
-
         return customRetrofit.create(WgVpnControllerService::class.java)
+    }
+
+    private fun Context.getNonVpnNetwork(): Network? {
+        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connectivityManager?.let { cm ->
+            cm.allNetworks.firstOrNull()?.let { network ->
+                cm.getNetworkCapabilities(network)?.let { capabilities ->
+                    if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        return network
+                    }
+                }
+            }
+        }
+
+        return null
+    }
+}
+
+private class LoggingNetworkInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val connection = chain.connection()
+
+        // Get the IP of the socket used
+        val socketAddress = connection?.socket()?.localAddress?.hostAddress
+
+        logcat { "Request to: ${request.url} uses socket: $socketAddress" }
+
+        return chain.proceed(request)
     }
 }
 
