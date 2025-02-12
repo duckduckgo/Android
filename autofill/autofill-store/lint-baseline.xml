@@ -8,7 +8,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/store/AutofillPrefsStore.kt"
-            line="55"
+            line="54"
             column="9"/>
     </issue>
 

@@ -8,7 +8,7 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/site/permissions/store/SitePermissionsPreferences.kt"
-            line="34"
+            line="33"
             column="58"/>
     </issue>
 

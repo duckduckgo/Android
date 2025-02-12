@@ -162,7 +162,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-saved-sites.xml"
-            line="69"
+            line="66"
             column="5"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-saved-sites.xml"
-            line="69"
+            line="66"
             column="5"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-saved-sites.xml"
-            line="69"
+            line="66"
             column="5"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-saved-sites.xml"
-            line="69"
+            line="66"
             column="5"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-saved-sites.xml"
-            line="73"
+            line="70"
             column="5"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-saved-sites.xml"
-            line="73"
+            line="70"
             column="5"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-saved-sites.xml"
-            line="73"
+            line="70"
             column="5"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-saved-sites.xml"
-            line="73"
+            line="70"
             column="5"/>
     </issue>
 
@@ -250,7 +250,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-saved-sites.xml"
-            line="90"
+            line="87"
             column="5"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-saved-sites.xml"
-            line="90"
+            line="87"
             column="5"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-saved-sites.xml"
-            line="90"
+            line="87"
             column="5"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-saved-sites.xml"
-            line="90"
+            line="87"
             column="5"/>
     </issue>
 
@@ -316,7 +316,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-saved-sites.xml"
-            line="71"
+            line="68"
             column="5"/>
     </issue>
 
@@ -327,7 +327,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-saved-sites.xml"
-            line="77"
+            line="74"
             column="5"/>
     </issue>
 
@@ -338,7 +338,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-saved-sites.xml"
-            line="96"
+            line="93"
             column="5"/>
     </issue>
 
@@ -372,17 +372,6 @@
         <location
             file="src/main/res/layout/bottom_sheet_add_bookmark.xml"
             line="25"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/popup_bookmarks_menu.xml"
-            line="22"
             column="5"/>
     </issue>
 
@@ -447,39 +436,6 @@
             file="src/main/res/menu/edit_saved_site_menu.xml"
             line="30"
             column="9"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="74"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="94"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="114"
-            column="26"/>
     </issue>
 
     <issue
