@@ -81,6 +81,7 @@
                 tools:secondaryText="Last Opened Tab" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/maliciousSiteDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
