@@ -53,6 +53,7 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
+import com.wireguard.crypto.KeyPair
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -152,6 +153,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.overrideServerBackendSelector.isEnabled = isEnabled
                 binding.overrideServerBackendSelector.setSecondaryText(serverRepository.getSelectedServer()?.name ?: AUTOMATIC)
                 binding.forceRekey.isEnabled = isEnabled
+                binding.egressFailure.isEnabled = isEnabled
                 if (isEnabled) {
                     val wgConfig = wgTunnelConfig.getWgConfig()
                     wgConfig?.`interface`?.addresses?.joinToString(", ") { it.toString() }?.let {
@@ -242,6 +244,12 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.egressFailure.setClickListener {
+            lifecycleScope.launch {
+                modifyKeys()
+            }
+        }
+
         with(netPInternalFeatureToggles.useVpnStagingEnvironment()) {
             binding.changeEnvironment.setIsChecked(this.isEnabled())
             binding.changeEnvironment.setOnCheckedChangeListener { _, isChecked ->
@@ -249,6 +257,23 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 handleStagingInput(isChecked)
             }
             handleStagingInput(isEnabled())
+        }
+    }
+
+    private suspend fun modifyKeys() = withContext(dispatcherProvider.io()) {
+        val oldConfig = wgTunnelConfig.getWgConfig()
+        val newConfig = oldConfig?.builder?.let { config ->
+            val interfaceBuilder = config.interfaze?.builder?.apply {
+                this.setKeyPair(KeyPair())
+            }
+
+            config.setInterface(interfaceBuilder?.build())
+        }
+
+        if (newConfig != null) {
+            val config = newConfig.build()
+            wgTunnelConfig.setWgConfig(config)
+            networkProtectionState.restart()
         }
     }
 
