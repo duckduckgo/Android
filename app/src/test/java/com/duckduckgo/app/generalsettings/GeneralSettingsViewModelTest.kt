@@ -28,6 +28,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -85,6 +86,8 @@ internal class GeneralSettingsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
+
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun before() {
@@ -363,6 +366,7 @@ internal class GeneralSettingsViewModelTest {
         isShowOnAppLaunchOptionVisible = fakeShowOnAppLaunchFeatureToggle.self().isEnabled(),
         showOnAppLaunchSelectedOption = LastOpenedTab,
         maliciousSiteProtectionEnabled = true,
+        maliciousSiteProtectionFeatureAvailable = false,
     )
 
     private fun initTestee() {
@@ -375,6 +379,7 @@ internal class GeneralSettingsViewModelTest {
             dispatcherProvider,
             fakeShowOnAppLaunchFeatureToggle,
             fakeShowOnAppLaunchOptionDataStore,
+            fakeBrowserConfigFeature,
         )
     }
 }

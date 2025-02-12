@@ -126,11 +126,20 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                     } else {
                         binding.autocompleteRecentlyVisitedSitesToggle.isVisible = false
                     }
-                    binding.maliciousDisabledMessage.isVisible = !it.maliciousSiteProtectionEnabled
-                    binding.maliciousToggle.quietlySetIsChecked(
-                        newCheckedState = it.maliciousSiteProtectionEnabled,
-                        changeListener = maliciousSiteProtectionToggleListener,
-                    )
+                    if (it.maliciousSiteProtectionFeatureAvailable) {
+                        binding.maliciousDisabledMessage.isVisible = !it.maliciousSiteProtectionEnabled
+                        binding.maliciousToggle.quietlySetIsChecked(
+                            newCheckedState = it.maliciousSiteProtectionEnabled,
+                            changeListener = maliciousSiteProtectionToggleListener,
+                        )
+                    } else {
+                        binding.maliciousDisabledMessage.isVisible = false
+                    }
+                    binding.maliciousLearnMore.isVisible = it.maliciousSiteProtectionFeatureAvailable
+                    binding.maliciousSiteDivider.isVisible = it.maliciousSiteProtectionFeatureAvailable
+                    binding.maliciousSiteHeading.isVisible = it.maliciousSiteProtectionFeatureAvailable
+                    binding.maliciousToggle.isVisible = it.maliciousSiteProtectionFeatureAvailable
+
                     if (it.showVoiceSearch) {
                         binding.voiceSearchToggle.isVisible = true
                         binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
