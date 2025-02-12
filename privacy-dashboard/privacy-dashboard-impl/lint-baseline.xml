@@ -19,63 +19,8 @@
         errorLine2="                                         ~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="79"
+            line="80"
             column="42"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="119"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="131"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="238"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="295"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        webBrokenSiteFormFeature.self().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModelTest.kt"
-            line="311"
-            column="9"/>
     </issue>
 
     <issue

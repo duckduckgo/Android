@@ -8,7 +8,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="152"
+            line="164"
             column="25"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="155"
+            line="167"
             column="29"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="156"
+            line="168"
             column="30"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/examplefeature/internal/ui/FeatureToggleInventoryActivity.kt"
-            line="169"
+            line="181"
             column="44"/>
     </issue>
 

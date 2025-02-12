@@ -8,7 +8,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="743"
+            line="822"
             column="9"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckplayer/impl/RealDuckPlayerTest.kt"
-            line="744"
+            line="823"
             column="9"/>
     </issue>
 

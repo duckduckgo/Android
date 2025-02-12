@@ -30,7 +30,7 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/statistics/pixels/FeatureRetentionPixelSender.kt"
-            line="53"
+            line="49"
             column="58"/>
     </issue>
 

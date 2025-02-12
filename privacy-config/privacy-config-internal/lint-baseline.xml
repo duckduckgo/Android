@@ -19,7 +19,7 @@
         errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/privacy/config/internal/PrivacyConfigInternalSettingsActivity.kt"
-            line="141"
+            line="142"
             column="39"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/privacy/config/internal/PrivacyConfigInternalSettingsActivity.kt"
-            line="141"
+            line="142"
             column="40"/>
     </issue>
 

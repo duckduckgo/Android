@@ -19,7 +19,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/mobile/android/vpn/pixels/DeviceShieldPixels.kt"
-            line="676"
+            line="680"
             column="19"/>
     </issue>
 
@@ -27,7 +27,7 @@
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/d14625ee55ebfba3972ab06f22b2b3b9/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="$GRADLE_USER_HOME/caches/8.8/transforms/ed9f0a40d3f975b196d47cc278eb8107/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -1183,6 +1183,13 @@
             file="src/main/res/values-hr/strings-vpn.xml"
             line="421"
             column="5"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `drawable`.">
+        <location
+            file="src/main/res/drawable-v23"/>
     </issue>
 
     <issue

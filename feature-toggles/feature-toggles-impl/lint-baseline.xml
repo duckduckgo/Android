@@ -437,30 +437,19 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3095"
+            line="3320"
             column="20"/>
     </issue>
 
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)"
+        errorLine1="        val date = testFeature.fooFeature().getRawStoredState()!!.assignedCohort?.enrollmentDateET"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3321"
+            line="3325"
             column="20"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            testFeature.fooFeature().getRawStoredState()!!.assignedCohort,"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3331"
-            column="13"/>
     </issue>
 
     <issue
@@ -470,7 +459,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3375"
+            line="3371"
             column="32"/>
     </issue>
 
@@ -481,7 +470,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3457"
+            line="3453"
             column="23"/>
     </issue>
 
@@ -492,7 +481,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3501"
+            line="3497"
             column="19"/>
     </issue>
 
@@ -503,7 +492,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3542"
+            line="3538"
             column="19"/>
     </issue>
 
@@ -514,7 +503,7 @@
         errorLine2="                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3586"
+            line="3582"
             column="19"/>
     </issue>
 
@@ -525,7 +514,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3662"
+            line="3658"
             column="35"/>
     </issue>
 
@@ -536,7 +525,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3671"
+            line="3667"
             column="27"/>
     </issue>
 
@@ -547,7 +536,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3718"
+            line="3714"
             column="23"/>
     </issue>
 
@@ -558,7 +547,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3758"
+            line="3754"
             column="23"/>
     </issue>
 
@@ -569,7 +558,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3802"
+            line="3798"
             column="23"/>
     </issue>
 
@@ -580,7 +569,7 @@
         errorLine2="               ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/codegen/ContributesRemoteFeatureCodeGeneratorTest.kt"
-            line="3833"
+            line="3829"
             column="16"/>
     </issue>
 
@@ -899,7 +888,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="49"
+            line="48"
             column="9"/>
     </issue>
 
@@ -910,7 +899,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="75"
+            line="74"
             column="9"/>
     </issue>
 
@@ -921,7 +910,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="101"
+            line="100"
             column="9"/>
     </issue>
 
@@ -932,7 +921,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="127"
+            line="126"
             column="9"/>
     </issue>
 
@@ -943,7 +932,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="153"
+            line="152"
             column="9"/>
     </issue>
 
@@ -954,7 +943,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="183"
+            line="182"
             column="9"/>
     </issue>
 
@@ -965,7 +954,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="209"
+            line="208"
             column="9"/>
     </issue>
 
@@ -976,7 +965,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="235"
+            line="234"
             column="9"/>
     </issue>
 
@@ -987,7 +976,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/MetricPixelInterceptorTest.kt"
-            line="261"
+            line="260"
             column="9"/>
     </issue>
 
@@ -1009,7 +998,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="168"
+            line="167"
             column="9"/>
     </issue>
 
@@ -1020,7 +1009,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="175"
+            line="174"
             column="9"/>
     </issue>
 
@@ -1031,7 +1020,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="192"
+            line="191"
             column="9"/>
     </issue>
 
@@ -1042,7 +1031,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="199"
+            line="198"
             column="9"/>
     </issue>
 
@@ -1053,7 +1042,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="217"
+            line="216"
             column="9"/>
     </issue>
 
@@ -1064,7 +1053,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="224"
+            line="223"
             column="9"/>
     </issue>
 
@@ -1075,7 +1064,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="242"
+            line="241"
             column="9"/>
     </issue>
 
@@ -1086,7 +1075,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="249"
+            line="248"
             column="9"/>
     </issue>
 
@@ -1097,7 +1086,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="264"
+            line="263"
             column="9"/>
     </issue>
 
@@ -1108,7 +1097,7 @@
         errorLine2="        ^">
         <location
             file="src/test/java/com/duckduckgo/feature/toggles/impl/metrics/RetentionMetricsAtbLifecyclePluginTest.kt"
-            line="271"
+            line="270"
             column="9"/>
     </issue>
 
