@@ -101,6 +101,7 @@ import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRe
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
@@ -655,10 +656,13 @@ class AutofillSettingsViewModel @Inject constructor(
      * There are multiple ways to launch this screen, so we include a source parameter to differentiate between them.
      */
     fun sendLaunchPixel(launchSource: AutofillSettingsLaunchSource) {
-        Timber.v("Opened autofill management screen from from %s", launchSource)
+        viewModelScope.launch {
+            Timber.v("Opened autofill management screen from from %s", launchSource)
 
-        val source = launchSource.asString()
-        pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source))
+            val source = launchSource.asString()
+            val hasCredentialsSaved = autofillStore.getCredentialCount().first() > 0
+            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "hasCredentialsSaved" to hasCredentialsSaved.toBinaryString()))
+        }
     }
 
     fun onUserConfirmationToClearNeverSavedSites() {
