@@ -201,6 +201,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onSelectAllTabs() {
+        _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Selection(tabs.value?.map { it.tabId } ?: emptyList())) }
     }
 
     fun onShareSelectedTabs() {
@@ -290,6 +291,16 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFabClicked() {
+        when (selectionViewState.value.fabType) {
+            SelectionViewState.FabType.NEW_TAB -> {
+                viewModelScope.launch {
+                    onNewTabRequested(fromOverflowMenu = false)
+                }
+            }
+            SelectionViewState.FabType.CLOSE_TABS -> {
+                onCloseSelectedTabs()
+            }
+        }
     }
 
     fun onDuckChatMenuClicked() {

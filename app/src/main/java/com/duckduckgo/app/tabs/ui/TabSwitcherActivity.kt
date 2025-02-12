@@ -275,33 +275,34 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun handleSelectionModeCancellation() {
-        tabsRecycler.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
-            private var lastEventAction: Int? = null
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
-                    e.action == MotionEvent.ACTION_MOVE
-                ) {
-                    lastEventAction = e.action
-                } else if (e.action == MotionEvent.ACTION_UP) {
-                    if (lastEventAction == MotionEvent.ACTION_DOWN) {
-                        viewModel.onEmptyAreaClicked()
+        tabsRecycler.addOnItemTouchListener(
+            object : RecyclerView.OnItemTouchListener {
+                private var lastEventAction: Int? = null
+                override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                    if (e.action == MotionEvent.ACTION_DOWN && tabsRecycler.findChildViewUnder(e.x, e.y) == null ||
+                        e.action == MotionEvent.ACTION_MOVE
+                    ) {
+                        lastEventAction = e.action
+                    } else if (e.action == MotionEvent.ACTION_UP) {
+                        if (lastEventAction == MotionEvent.ACTION_DOWN) {
+                            viewModel.onEmptyAreaClicked()
+                        }
+                        lastEventAction = null
                     }
-                    lastEventAction = null
+                    return false
                 }
-                return false
-            }
 
-            override fun onTouchEvent(
-                rv: RecyclerView,
-                e: MotionEvent,
-            ) {
-                // no-op
-            }
+                override fun onTouchEvent(
+                    rv: RecyclerView,
+                    e: MotionEvent,
+                ) {
+                    // no-op
+                }
 
-            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-                // no-op
-            }
-        },
+                override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                    // no-op
+                }
+            },
         )
     }
 
@@ -373,8 +374,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 viewModel.selectionViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collectLatest {
                     tabsRecycler.invalidateItemDecorations()
                     tabsAdapter.updateSelection(it.mode)
+
                     updateToolbarTitle(it.mode)
                     updateTabGridItemDecorator(it.activeTab?.tabId)
+                    updateFabType(it.fabType)
+
                     invalidateOptionsMenu()
                 }
             }
