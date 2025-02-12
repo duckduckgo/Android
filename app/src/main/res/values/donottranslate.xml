@@ -79,6 +79,6 @@
     <!-- Appearance -->
     <string name="experimentalUISettings">Experimental UI Settings</string>
     <string name="experimentalUITitle">Enable visual design updates from O-A</string>
-    <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes. Changing this setting will relaunch the app.</string>
+    <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
 
 </resources>
