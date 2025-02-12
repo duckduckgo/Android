@@ -274,7 +274,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 }
             }
 
-            val action = experimentStageEvaluatorPluginPoint.getPlugins().first { it.targetCohort == activeCohortName }.evaluate(newExperimentStage)
+            val action = experimentStageEvaluatorPluginPoint.getPlugins()
+                .firstOrNull { it.targetCohort == activeCohortName }?.evaluate(newExperimentStage)
+                ?: DefaultBrowserPromptsExperimentStageAction.disableAll // if there's no matching evaluator, or cohort is null or disabled, clean up
+
             if (action.showMessageDialog) {
                 _commands.send(OpenMessageDialog)
             }
