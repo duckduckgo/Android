@@ -99,7 +99,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
-                    isBrowserThemingFeatureEnabled = browserThemingFeature.experimentalUI().isEnabled(),
+                    isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
                     isBrowserThemingFeatureVisible = appBuildConfig.isInternalBuild(),
                 )
             }
@@ -185,7 +185,7 @@ class AppearanceViewModel @Inject constructor(
     // only visible for UI Internal experiments
     fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            browserThemingFeature.experimentalUI().setRawStoredState(State(checked))
+            browserThemingFeature.self().setRawStoredState(State(checked))
         }
     }
 }

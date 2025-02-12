@@ -88,7 +88,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
 
         omnibarFeatureFlag.self().setRawStoredState(Toggle.State(enable = true))
-        browserTheming.experimentalUI().setRawStoredState(Toggle.State(enable = false))
+        browserTheming.self().setRawStoredState(Toggle.State(enable = false))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
