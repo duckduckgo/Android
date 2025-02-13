@@ -155,7 +155,6 @@ class OmnibarLayoutViewModelTest {
             assertFalse(viewState.showTabsMenu)
             assertFalse(viewState.showFireIcon)
             assertFalse(viewState.showBrowserMenu)
-            assertFalse(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
             assertTrue(viewState.showVoiceSearch)
         }
@@ -174,7 +173,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertFalse(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
             assertTrue(viewState.showVoiceSearch)
         }
@@ -194,9 +192,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -215,9 +217,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -236,9 +242,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -257,9 +267,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -795,7 +809,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
@@ -805,7 +818,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 
@@ -815,7 +827,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
         testee.onOmnibarFocusChanged(true, QUERY)
@@ -836,7 +847,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 

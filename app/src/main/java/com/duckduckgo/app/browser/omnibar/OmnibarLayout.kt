@@ -427,6 +427,16 @@ class OmnibarLayout @JvmOverloads constructor(
             is StartTrackersAnimation -> {
                 startTrackersAnimation(command.entities)
             }
+
+            OmnibarLayoutViewModel.Command.MoveCaretToFront -> {
+                moveCaretToFront()
+            }
+        }
+    }
+
+    private fun moveCaretToFront() {
+        omnibarTextInput.post {
+            omnibarTextInput.setSelection(0)
         }
     }
 
@@ -498,13 +508,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         if (viewState.expanded) {
             setExpanded(true, viewState.expandedAnimated)
-        }
-        if (viewState.shouldMoveCaretToEnd) {
-            omnibarTextInput.setSelection(viewState.omnibarText.length)
-        }
-
-        if (viewState.shouldMoveCaretToStart) {
-            omnibarTextInput.setSelection(0)
         }
 
         if (viewState.isLoading) {

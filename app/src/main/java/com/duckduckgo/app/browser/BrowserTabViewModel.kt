@@ -1097,7 +1097,6 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(
@@ -1357,7 +1356,6 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = "",
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -1497,7 +1495,6 @@ class BrowserTabViewModel @Inject constructor(
         val omnibarText = omnibarTextForUrl(url)
         omnibarViewState.value = currentOmnibarViewState.copy(
             omnibarText = omnibarText,
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
@@ -1667,7 +1664,6 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.postValue(
             currentOmnibarViewState.copy(
                 omnibarText = omnibarText,
-                shouldMoveCaretToEnd = false,
                 forceExpand = false,
             ),
         )
@@ -3544,7 +3540,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
-                shouldMoveCaretToEnd = false,
                 forceExpand = true,
             )
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
