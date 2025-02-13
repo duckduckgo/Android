@@ -250,8 +250,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
-import com.duckduckgo.common.ui.view.isInsideScreen
-import com.duckduckgo.common.ui.view.isPartiallyOnScreen
+import com.duckduckgo.common.ui.view.isFullyWithinScreenBounds
+import com.duckduckgo.common.ui.view.isPartiallyWithinScreenBounds
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -3971,8 +3971,8 @@ class BrowserTabFragment :
         }
 
         private fun isOmnibarOnScreen(): Boolean {
-            return (omnibar.omnibarPosition == OmnibarPosition.TOP && binding.newOmnibar.isInsideScreen()) ||
-                (omnibar.omnibarPosition == OmnibarPosition.BOTTOM && binding.newOmnibarBottom.isPartiallyOnScreen())
+            return (omnibar.omnibarPosition == OmnibarPosition.TOP && binding.newOmnibar.isFullyWithinScreenBounds()) ||
+                (omnibar.omnibarPosition == OmnibarPosition.BOTTOM && binding.newOmnibarBottom.isPartiallyWithinScreenBounds())
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {

@@ -63,7 +63,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             PROTECTED -> if (appTheme.isLightModeEnabled()) protectedShield else protectedShieldDark
             UNPROTECTED -> if (appTheme.isLightModeEnabled()) unprotectedShield else unprotectedShieldDark
             UNKNOWN -> null
-            MALICIOUS ->  if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
+            MALICIOUS -> if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
         }
 
         if (newAnimation != null && newAnimation != currentAnimation) {
@@ -76,4 +76,3 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         }
     }
 }
-

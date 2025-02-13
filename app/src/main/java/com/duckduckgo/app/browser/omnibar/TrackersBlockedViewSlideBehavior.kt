@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHel
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
-import com.duckduckgo.common.ui.view.isPartiallyOnScreen
+import com.duckduckgo.common.ui.view.isPartiallyWithinScreenBounds
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extractDomain
@@ -79,7 +79,7 @@ class TrackersBlockedViewSlideBehavior(
             }
         }
 
-        if (bottomOmnibar?.isPartiallyOnScreen() == true) {
+        if (bottomOmnibar?.isPartiallyWithinScreenBounds() == true) {
             child.hide()
         }
 
@@ -146,7 +146,7 @@ class TrackersBlockedViewSlideBehavior(
             translation == 0f ||
                 translation < height ||
                 browserLayout?.isGone == true ||
-                bottomOmnibar?.isPartiallyOnScreen() == true
+                bottomOmnibar?.isPartiallyWithinScreenBounds() == true
             )
     }
 }

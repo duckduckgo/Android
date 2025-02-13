@@ -209,7 +209,7 @@ fun View.visibilityChanged(action: (View) -> Unit) {
  *
  * @return `true` if the view is completely inside the screen, `false` otherwise.
  */
-fun View.isInsideScreen(): Boolean {
+fun View.isFullyWithinScreenBounds(): Boolean {
     val location = IntArray(2)
     this.getLocationOnScreen(location)
     val screenRect = Rect(
@@ -235,7 +235,7 @@ fun View.isInsideScreen(): Boolean {
  *
  * @return `true` if the view is partially inside the screen, `false` otherwise.
  */
-fun View.isPartiallyOnScreen(): Boolean {
+fun View.isPartiallyWithinScreenBounds(): Boolean {
     val location = IntArray(2)
     this.getLocationOnScreen(location)
     val screenRect = Rect(

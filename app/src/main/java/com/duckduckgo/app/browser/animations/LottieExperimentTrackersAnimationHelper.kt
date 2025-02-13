@@ -30,8 +30,8 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.isInsideScreen
-import com.duckduckgo.common.ui.view.isPartiallyOnScreen
+import com.duckduckgo.common.ui.view.isFullyWithinScreenBounds
+import com.duckduckgo.common.ui.view.isPartiallyWithinScreenBounds
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
@@ -72,7 +72,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
         this.omnibarShieldAnimationView = omnibarShieldAnimationView
 
         val negativeMarginPx = (-72).toPx()
-        val gravity = if (omnibarPosition == OmnibarPosition.BOTTOM) Gravity.BOTTOM else Gravity.NO_GRAVITY
+        val gravity = if (omnibarPosition == BOTTOM) Gravity.BOTTOM else Gravity.NO_GRAVITY
         val layoutParams = trackersBurstAnimationView.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.gravity = gravity
         layoutParams.marginStart = negativeMarginPx
@@ -90,7 +90,7 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
             this.setCacheComposition(false)
             this.setAnimation(R.raw.trackers_burst)
             this.maintainOriginalImageBounds = true
-            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos, omnibarPosition == OmnibarPosition.BOTTOM))
+            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos, omnibarPosition == BOTTOM))
             this.removeAllAnimatorListeners()
             this.show()
 
@@ -115,7 +115,9 @@ class LottieExperimentTrackersAnimationHelper @Inject constructor() : Experiment
                 },
             )
 
-            if ((omnibarPosition == TOP && omnibarView.isInsideScreen()) || (omnibarPosition == BOTTOM && omnibarView.isPartiallyOnScreen())) {
+            val isOmnibarTopAndFullyVisible = (omnibarPosition == TOP && omnibarView.isFullyWithinScreenBounds())
+            val isOmnibarBottomAndPartiallyVisible = (omnibarPosition == BOTTOM && omnibarView.isPartiallyWithinScreenBounds())
+            if (isOmnibarTopAndFullyVisible || isOmnibarBottomAndPartiallyVisible) {
                 this.setMaxProgress(1f)
                 this.playAnimation()
             }
