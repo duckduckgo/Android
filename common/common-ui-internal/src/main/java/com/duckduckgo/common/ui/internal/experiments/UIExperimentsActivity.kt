@@ -38,6 +38,9 @@ class UIExperimentsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
+
         experimentalUIPlugins.getPlugins().forEach { plugin ->
             binding.experimentalUILayout.addView(
                 plugin.getView(this),

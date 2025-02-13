@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.internal.experiments.visual.VisualDesignExperime
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,6 +56,7 @@ class VisualDesignExperimentView @JvmOverloads constructor(
     }
 
     override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
