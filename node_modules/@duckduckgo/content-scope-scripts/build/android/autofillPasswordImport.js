@@ -3506,6 +3506,7 @@
      * @property {ButtonAnimationStyle} animationStyle
      * @property {boolean} shouldTap
      * @property {boolean} shouldWatchForRemoval
+     * @property {boolean} tapOnce
      */
 
     /**
@@ -3532,6 +3533,9 @@
         #currentElementConfig;
 
         #domLoaded;
+
+        /** @type {WeakSet<Element>} */
+        #tappedElements = new WeakSet();
 
         /**
          * @returns {ButtonAnimationStyle}
@@ -3623,6 +3627,7 @@
                           element,
                           shouldTap: this.#settingsButtonSettings?.shouldAutotap ?? false,
                           shouldWatchForRemoval: false,
+                          tapOnce: false,
                       }
                     : null;
             } else if (path === '/options') {
@@ -3633,6 +3638,7 @@
                           element,
                           shouldTap: this.#exportButtonSettings?.shouldAutotap ?? false,
                           shouldWatchForRemoval: true,
+                          tapOnce: true,
                       }
                     : null;
             } else if (path === '/intro') {
@@ -3643,6 +3649,7 @@
                           element,
                           shouldTap: this.#signInButtonSettings?.shouldAutotap ?? false,
                           shouldWatchForRemoval: false,
+                          tapOnce: false,
                       }
                     : null;
             } else {
@@ -3659,6 +3666,9 @@
                 this.currentOverlay.remove();
                 this.currentOverlay = null;
                 document.removeEventListener('scroll', this);
+                if (this.currentElementConfig?.element) {
+                    this.#tappedElements.delete(this.currentElementConfig?.element);
+                }
             }
         }
 
@@ -3881,7 +3891,12 @@
             if (this.isSupportedPath(path)) {
                 try {
                     this.setCurrentElementConfig(await this.getElementAndStyleFromPath(path));
-                    await this.animateOrTapElement();
+                    if (this.currentElementConfig?.element && !this.#tappedElements.has(this.currentElementConfig?.element)) {
+                        await this.animateOrTapElement();
+                        if (this.currentElementConfig?.shouldTap && this.currentElementConfig?.tapOnce) {
+                            this.#tappedElements.add(this.currentElementConfig.element);
+                        }
+                    }
                 } catch {
                     console.error('password-import: failed for path:', path);
                 }
