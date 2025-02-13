@@ -82,6 +82,7 @@ class RealAutofillService : AutofillService() {
                 val parsedRootNodes = autofillParser.parseStructure(structure)
                 val nodeToAutofill = parsedRootNodes.findBestFillableNode()
                 if (nodeToAutofill == null || shouldSkipAutofillSuggestions(nodeToAutofill)) {
+                    Timber.v("DDGAutofillService onFillRequest: no autofill suggestions")
                     callback.onSuccess(null)
                     return@launch
                 }
@@ -108,7 +109,13 @@ class RealAutofillService : AutofillService() {
 
         if (nodeToAutofill.packageId.equals("android", ignoreCase = true)) return true
 
-        if (nodeToAutofill.packageId in PACKAGES_TO_EXCLUDE) return true
+        if (autofillServiceFeature.canAutofillInsideDDG().isEnabled().not() && nodeToAutofill.packageId in DDG_PACKAGE_IDS) {
+            return true
+        }
+
+        if (nodeToAutofill.packageId in BROWSERS_PACKAGE_IDS && nodeToAutofill.website.isNullOrBlank()) {
+            return true // if a browser we require a website
+        }
 
         return false
     }
@@ -136,9 +143,10 @@ class RealAutofillService : AutofillService() {
     }
 
     companion object {
-        private val PACKAGES_TO_EXCLUDE = setOf(
+        private val DDG_PACKAGE_IDS = setOf(
             "com.duckduckgo.mobile.android",
             "com.duckduckgo.mobile.android.debug",
         )
+        private val BROWSERS_PACKAGE_IDS = DDG_PACKAGE_IDS
     }
 }

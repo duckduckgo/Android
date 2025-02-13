@@ -38,4 +38,8 @@ interface AutofillServiceFeature {
     @Toggle.DefaultValue(false)
     @InternalAlwaysEnabled
     fun canMapAppToDomain(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @InternalAlwaysEnabled
+    fun canAutofillInsideDDG(): Toggle
 }
