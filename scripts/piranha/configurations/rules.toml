@@ -1,0 +1,63 @@
+[[rules]]
+name = "replace_isEnabled_with_boolean_literal"
+query = """(
+  (call_expression
+    (navigation_expression
+      (call_expression
+        (navigation_expression (_) (navigation_suffix (simple_identifier) @feature_call))
+        (call_suffix (value_arguments))
+      )
+      (navigation_suffix (simple_identifier) @m_name)
+    )
+    (call_suffix)
+  ) @call_expression
+  (#eq? @feature_call @flag_name)
+  (#eq? @m_name "isEnabled")
+)"""
+replace_node = "call_expression"
+replace = "@treated"
+groups = ["replace_expression_with_boolean_literal"]
+holes = ["treated", "flag_name"]
+
+[[rules]]
+name = "delete_feature_flag"
+query = """(
+  (class_declaration
+    (class_body
+      (function_declaration
+        (simple_identifier) @feature_call
+        (function_value_parameters)
+        (user_type 
+          (type_identifier) @toggle_type
+        )
+      ) @function_declaration
+    )
+  )
+  (#eq? @feature_call @flag_name)
+  (#eq? @toggle_type "Toggle")
+)"""
+replace_node = "function_declaration"
+replace = ""
+holes = ["flag_name"]
+groups = ["delete_feature_flag"]
+
+[[rules]]
+name = "remove_calls_onto_feature_flag"
+query = """(
+  (call_expression
+    (navigation_expression
+      (call_expression
+        (navigation_expression (_) (navigation_suffix (simple_identifier) @feature_call))
+        (call_suffix (value_arguments))
+      )
+      (navigation_suffix (simple_identifier))
+    )
+    (call_suffix)
+  ) @call_expression
+  (#eq? @feature_call @flag_name)
+)"""
+replace_node = "call_expression"
+replace = ""
+groups = ["remove_calls_onto_feature_flag"]
+holes = ["flag_name"]
+
