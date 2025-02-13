@@ -62,20 +62,21 @@ class TrackersBlockedViewSlideBehavior(
             return false
         }
 
-        if (dependency.id == R.id.browserLayout) {
-            browserLayout = dependency
-        } else if (dependency.id == R.id.trackersBurstAnimationView) {
-            trackersBurstAnimationView = dependency as LottieAnimationView
-        } else if (dependency.id == R.id.newOmnibarBottom) {
-            if (gravity == null) {
-                val layoutParams = child.layoutParams as? CoordinatorLayout.LayoutParams
-                gravity = layoutParams?.gravity
-                child.hide()
-            }
-            if (bottomOmnibar == null) {
-                bottomOmnibar = dependency as OmnibarLayout
-                trackers = child.findViewById(R.id.trackers)
-                website = child.findViewById(R.id.website)
+        when (dependency.id) {
+            R.id.browserLayout -> browserLayout = dependency
+            R.id.trackersBurstAnimationView -> trackersBurstAnimationView = dependency as LottieAnimationView
+            R.id.newOmnibarBottom -> {
+                if (gravity == null) {
+                    (child.layoutParams as? CoordinatorLayout.LayoutParams)?.let {
+                        gravity = it.gravity
+                        child.hide()
+                    }
+                }
+                if (bottomOmnibar == null) {
+                    bottomOmnibar = dependency as OmnibarLayout
+                    trackers = child.findViewById(R.id.trackers)
+                    website = child.findViewById(R.id.website)
+                }
             }
         }
 
@@ -97,22 +98,11 @@ class TrackersBlockedViewSlideBehavior(
     ) {
         if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
             if (shouldHideChildView()) {
-                browserLayout?.setPadding(0, 0, 0, 0)
-                child.postOnAnimation {
-                    child.hide()
-                }
+                prepareLayoutAndHideChild(child)
             } else {
-                val childHeight = child.height
-                trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
-                website?.text = siteLiveData.value?.url?.extractDomain()
-                if (trackersBurstAnimationView?.isAnimating == true) {
-                    trackersBurstAnimationView?.cancelAnimation()
-                }
-                browserLayout?.setPadding(0, 0, 0, childHeight)
-                child.postOnAnimation {
-                    child.show()
-                }
+                updateChildForVisibleState(child)
             }
+
             child.postOnAnimation {
                 super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
             }
@@ -148,5 +138,21 @@ class TrackersBlockedViewSlideBehavior(
                 browserLayout?.isGone == true ||
                 bottomOmnibar?.isPartiallyWithinScreenBounds() == true
             )
+    }
+
+    private fun prepareLayoutAndHideChild(child: View) {
+        browserLayout?.setPadding(0, 0, 0, 0)
+        child.postOnAnimation { child.hide() }
+    }
+
+    private fun updateChildForVisibleState(child: View) {
+        trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
+        website?.text = siteLiveData.value?.url?.extractDomain()
+        trackersBurstAnimationView?.takeIf { it.isAnimating }?.cancelAnimation()
+
+        val childHeight = child.height
+        browserLayout?.setPadding(0, 0, 0, childHeight)
+
+        child.postOnAnimation { child.show() }
     }
 }
