@@ -33,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
@@ -61,6 +62,7 @@ class GeneralSettingsViewModel @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val maliciousSiteProtection: MaliciousSiteProtection,
 ) : ViewModel() {
 
     data class ViewState(
@@ -101,7 +103,8 @@ class GeneralSettingsViewModel @Inject constructor(
                 isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
-                maliciousSiteProtectionFeatureAvailable = androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled(),
+                maliciousSiteProtectionFeatureAvailable =
+                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
             )
         }
 

@@ -35,6 +35,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.duckduckgo.voice.store.VoiceSearchRepository
@@ -48,6 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -88,6 +90,8 @@ internal class GeneralSettingsViewModelTest {
     private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
     private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
+    private val mockMaliciousSiteProtection: MaliciousSiteProtection = mock()
 
     @Before
     fun before() {
@@ -380,6 +384,7 @@ internal class GeneralSettingsViewModelTest {
             fakeShowOnAppLaunchFeatureToggle,
             fakeShowOnAppLaunchOptionDataStore,
             fakeBrowserConfigFeature,
+            mockMaliciousSiteProtection,
         )
     }
 }
