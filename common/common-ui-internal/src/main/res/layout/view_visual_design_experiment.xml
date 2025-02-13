@@ -36,4 +36,13 @@
         app:secondaryText="@string/experimentalUIMessage"
         app:showSwitch="true" />
 
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/experimentalUIColorPalette"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/experimentalUIWarmColorsTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/experimentalUIWarmColorsMessage"
+        app:showSwitch="true" />
+
 </LinearLayout>
