@@ -59,6 +59,11 @@ data class SubscriptionResponse(
     val expiresOrRenewsAt: Long,
     val platform: String,
     val status: String,
+    val activeOffers: List<ActiveOfferResponse>,
+)
+
+data class ActiveOfferResponse(
+    val type: String,
 )
 
 data class ConfirmationBody(
