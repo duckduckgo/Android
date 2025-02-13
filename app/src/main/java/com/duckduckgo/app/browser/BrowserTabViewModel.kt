@@ -139,6 +139,7 @@ import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.Command.ShowDomainHasPermissionMessage
 import com.duckduckgo.app.browser.commands.Command.ShowEditSavedSiteDialog
@@ -162,6 +163,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
+import com.duckduckgo.app.browser.commands.Command.UpdateOrDeleteWebPreview
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -3224,7 +3226,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserStateModifier.copyForMaliciousErrorShowing(currentBrowserViewState()),
             )
             loadingViewState.postValue(
-                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
+                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString(), privacyOn = false),
             )
             command.postValue(ShowWarningMaliciousSite(url, feed))
         }
@@ -3825,6 +3827,18 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
+    }
+
+    fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            command.postValue(ShowAutoconsentAnimation(isCosmetic))
+        }
+    }
+
+    fun lifecycleStopped() {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            command.postValue(UpdateOrDeleteWebPreview)
+        }
     }
 
     companion object {

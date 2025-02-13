@@ -647,16 +647,7 @@ class BrowserTabFragment :
         override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
-            launch {
-                if (isCosmetic) {
-                    delay(COOKIES_ANIMATION_DELAY)
-                }
-                context?.let {
-                    if (this@BrowserTabFragment.viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
-                        omnibar.createCookiesAnimation(isCosmetic)
-                    }
-                }
-            }
+            viewModel.onAutoConsentPopUpHandled(isCosmetic)
         }
 
         override fun onResultReceived(
@@ -877,9 +868,7 @@ class BrowserTabFragment :
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
-                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
-                            updateOrDeleteWebViewPreview()
-                        }
+                        viewModel.lifecycleStopped()
                     }
                 }
             },
@@ -1869,9 +1858,22 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
+            is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
+            is Command.UpdateOrDeleteWebPreview -> updateOrDeleteWebViewPreview()
 
             else -> {
                 // NO OP
+            }
+        }
+    }
+
+    private fun showAutoconsentAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.createCookiesAnimation(isCosmetic)
             }
         }
     }
@@ -3789,7 +3791,7 @@ class BrowserTabFragment :
                         omnibar.cancelTrackersAnimation()
                     }
 
-                    if (viewState.progress == MAX_PROGRESS && lastSeenBrowserViewState?.maliciousSiteBlocked != true) {
+                    if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
                     }
                 }

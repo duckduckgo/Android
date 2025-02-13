@@ -261,4 +261,6 @@ sealed class Command {
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
     data object CloseCustomTab : Command()
+    data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
+    data object UpdateOrDeleteWebPreview : Command()
 }
