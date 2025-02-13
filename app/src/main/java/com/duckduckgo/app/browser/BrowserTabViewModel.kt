@@ -762,7 +762,6 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String? = null,
         stillExternal: Boolean? = false,
-        maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
         Timber.v("buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
@@ -771,7 +770,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
-        site?.maliciousSiteStatus = maliciousSiteStatus
+        site?.maliciousSiteStatus = currentBrowserViewState().maliciousSiteStatus
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1107,6 +1106,8 @@ class BrowserTabViewModel @Inject constructor(
             browserShowing = true,
             browserError = OMITTED,
             sslError = NONE,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
         )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
@@ -1719,6 +1720,8 @@ class BrowserTabViewModel @Inject constructor(
             canReportSite = false,
             canFireproofSite = false,
             canPrintPage = false,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
         )
         Timber.d("showPrivacyShield=false, showSearchIcon=true, showClearButton=true")
     }
@@ -3138,7 +3141,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
         if (currentBrowserViewState().maliciousSiteBlocked) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteBlocked = false, maliciousSiteStatus = null)
         }
     }
 
@@ -3220,13 +3223,12 @@ class BrowserTabViewModel @Inject constructor(
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
-        buildSiteFactory(url = url.toString(), maliciousSiteStatus = maliciousSiteStatus)
 
         if (!exempted) {
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             browserViewState.postValue(
-                browserStateModifier.copyForMaliciousErrorShowing(currentBrowserViewState()),
+                browserStateModifier.copyForMaliciousErrorShowing(currentBrowserViewState(), maliciousSiteStatus),
             )
             loadingViewState.postValue(
                 currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString(), privacyOn = false),
@@ -3234,6 +3236,8 @@ class BrowserTabViewModel @Inject constructor(
             command.postValue(
                 ShowWarningMaliciousSite(url, feed) { navigationStateChanged(it) },
             )
+        } else {
+            browserViewState.postValue(currentBrowserViewState().copy(maliciousSiteBlocked = false, maliciousSiteStatus = maliciousSiteStatus))
         }
     }
 
@@ -3541,7 +3545,12 @@ class BrowserTabViewModel @Inject constructor(
 
     fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteBlocked = false)
+            browserViewState.value = currentBrowserViewState().copy(
+                browserShowing = true,
+                sslError = NONE,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3553,6 +3562,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserShowing = showBrowser,
                 sslError = NONE,
                 maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
             )
         }
     }
