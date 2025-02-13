@@ -68,6 +68,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -391,6 +392,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureLoginsUiEventHandlers() {
+        binding.accessAutofillSystemSettingsButton.setOnClickListener {
+            this.launchAutofillProviderSystemSettings()
+        }
+
         binding.addSampleLoginsButton.setClickListener {
             val timestamp = dateFormatter.format(System.currentTimeMillis())
             lifecycleScope.launch(dispatchers.io()) {
