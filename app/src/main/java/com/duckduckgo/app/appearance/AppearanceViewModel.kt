@@ -31,9 +31,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -137,8 +139,10 @@ class AppearanceViewModel @Inject constructor(
                 LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DARK -> SETTINGS_THEME_TOGGLED_DARK
                 SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
-                DARK_EXPERIMENT -> SETTINGS_THEME_TOGGLED_DARK
-                LIGHT_EXPERIMENT -> SETTINGS_THEME_TOGGLED_LIGHT
+                EXPERIMENT_DARK_WARM -> SETTINGS_THEME_TOGGLED_DARK
+                EXPERIMENT_DARK_COOL -> SETTINGS_THEME_TOGGLED_DARK
+                EXPERIMENT_LIGHT_COOL -> SETTINGS_THEME_TOGGLED_LIGHT
+                EXPERIMENT_LIGHT_WARM -> SETTINGS_THEME_TOGGLED_LIGHT
             }
         pixel.fire(pixelName)
     }

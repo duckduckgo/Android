@@ -40,9 +40,11 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -136,8 +138,10 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 DARK -> R.string.settingsDarkTheme
                 LIGHT -> R.string.settingsLightTheme
                 SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-                DARK_EXPERIMENT -> R.string.settingsDarkTheme
-                LIGHT_EXPERIMENT -> R.string.settingsLightTheme
+                EXPERIMENT_DARK_COOL -> R.string.settingsDarkTheme
+                EXPERIMENT_DARK_WARM -> R.string.settingsDarkTheme
+                EXPERIMENT_LIGHT_WARM -> R.string.settingsLightTheme
+                EXPERIMENT_LIGHT_COOL -> R.string.settingsLightTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)
