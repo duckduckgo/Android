@@ -37,6 +37,8 @@
     <string name="autofillDevSettingsNeverSavedSitesCountSubtitle" instruction="%1$d is count of how many websites have been added to a list">Number of sites: %1$d</string>
     <string name="autofillDevSettingsNeverSavedSitesAddSampleButton">Add sample site (fill.dev)</string>
 
+    <string name="autofillDevSettingsAutofillSystemServiceAccessTitle">Autofill System Settings</string>
+    <string name="autofillDevSettingsAutofillSystemServiceAccessSubtitle">Enable to use autofill in other apps</string>
     <string name="autofillDevSettingsImportPasswordsTitle">Import Passwords</string>
     <string name="autofillDevSettingsImportPasswordsExportPasswordsOurAppTitle">Launch Google Passwords (normal tab)</string>
     <string name="autofillDevSettingsImportPasswordsExportPasswordsImportFlowTitle">Launch Google Passwords (import flow)</string>

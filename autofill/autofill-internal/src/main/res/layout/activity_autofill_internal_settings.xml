@@ -30,10 +30,17 @@
             android:id="@+id/includeToolbar"
             layout="@layout/include_default_toolbar" />
 
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/accessAutofillSystemSettingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:primaryText="@string/autofillDevSettingsAutofillSystemServiceAccessTitle"
+            app:secondaryText="@string/autofillDevSettingsAutofillSystemServiceAccessSubtitle" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/autofillLoginsSectionTitle"
             android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             app:primaryText="@string/autofillDevSettingsLoginsSectionTitle" />
 
