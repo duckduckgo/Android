@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <application>
-        <activity
-            android:name="com.duckduckgo.common.ui.internal.experiments.UIExperimentsActivity"
-            android:exported="true"
-            android:label="Experimental UI Settings"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-    </application>
+    <!-- Appearance -->
+    <string name="experimentalUISettings">Experimental UI Settings</string>
+    <string name="experimentalUITitle">Enable visual design updates from O-A</string>
+    <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
 
-</manifest>
+</resources>

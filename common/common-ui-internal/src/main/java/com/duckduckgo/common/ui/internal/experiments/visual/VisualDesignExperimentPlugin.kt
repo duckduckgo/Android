@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.internal.experiments
+package com.duckduckgo.common.ui.internal.experiments.visual
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import android.content.Context
+import android.view.View
+import com.duckduckgo.common.ui.internal.experiments.ExperimentalUIPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "experimentalBrowserTheming",
-)
-interface BrowserThemingFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+@ContributesMultibinding(AppScope::class)
+class VisualDesignExperimentPlugin @Inject constructor() : ExperimentalUIPlugin {
+
+    override fun getView(context: Context): View {
+        return VisualDesignExperimentView(context)
+    }
 }

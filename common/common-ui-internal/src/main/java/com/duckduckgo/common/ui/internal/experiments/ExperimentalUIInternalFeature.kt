@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package com.duckduckgo.common.ui.internal.experiments
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(InternalFeaturePlugin.ADS_SETTINGS_PRIO_KEY)
+@PriorityKey(InternalFeaturePlugin.EXPERIMENTAL_UI_SETTINGS)
 class ExperimentalUIInternalFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
         return "Experimental UI Settings"
@@ -36,6 +35,6 @@ class ExperimentalUIInternalFeature @Inject constructor() : InternalFeaturePlugi
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        activityContext.startActivity(AppComponentsActivity.intent(activityContext))
+        activityContext.startActivity(UIExperimentsActivity.intent(activityContext))
     }
 }
