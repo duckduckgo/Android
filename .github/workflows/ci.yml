@@ -149,6 +149,19 @@ jobs:
       - name: Build
         run: ./gradlew androidTestsBuild
 
+      - name: Find test APK path
+        id: find-apk
+        run: |
+          TEST_APK_PATH=$(find . -path '*/build/outputs/apk/play/debug/*.apk' -type f -print -quit)
+          echo "Found test APK at: $TEST_APK_PATH"
+          echo "apk_path=$TEST_APK_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Make script executable
+        run: chmod +x scripts/check_elf_alignment.sh
+
+      - name: Check native libraries alignment
+        run: ./scripts/check_elf_alignment.sh ${{ steps.find-apk.outputs.apk_path }}
+
       - name: Run Android Tests
         run: ./gradlew runFlankAndroidTests
 
