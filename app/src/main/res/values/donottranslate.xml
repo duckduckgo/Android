@@ -65,7 +65,7 @@
 
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
-    <string name="tabSelectionTitle">%1$d Selected</string>
+    <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %1$d Links</item>
