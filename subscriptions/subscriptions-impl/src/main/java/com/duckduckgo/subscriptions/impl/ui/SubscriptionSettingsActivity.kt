@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -176,17 +177,35 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
-            val status = when (viewState.status) {
-                AUTO_RENEWABLE -> getString(string.renews)
-                else -> getString(string.expires)
-            }
+            // Free Trial active
+            if (viewState.activeOffers.contains(ActiveOfferType.TRIAL)) {
+                binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusFreeTrial)
 
-            val subscriptionsDataStringResId = when (viewState.duration) {
-                Monthly -> string.subscriptionsDataMonthly
-                Yearly -> string.subscriptionsDataYearly
-            }
+                val subscriptionRenewalDetailsRes = when {
+                    viewState.status == AUTO_RENEWABLE && viewState.duration == Monthly ->
+                        getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.monthly))
+                    viewState.status == AUTO_RENEWABLE && viewState.duration == Yearly ->
+                        getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.yearly))
+                    else -> getString(string.freeTrialCancelledSubscriptionsData)
+                }
+                binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
 
-            binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
+                // Active status without a Free Trial
+            } else {
+                binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusSubscribed)
+
+                val status = when (viewState.status) {
+                    AUTO_RENEWABLE -> getString(string.renews)
+                    else -> getString(string.expires)
+                }
+
+                val subscriptionsDataStringResId = when (viewState.duration) {
+                    Monthly -> string.subscriptionsDataMonthly
+                    Yearly -> string.subscriptionsDataYearly
+                }
+
+                binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
+            }
 
             when (viewState.platform.lowercase()) {
                 "apple", "ios" ->

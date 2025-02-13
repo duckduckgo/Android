@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -98,6 +99,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 platform = subscription.platform,
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
+                activeOffers = subscription.activeOffers,
             ),
         )
     }
@@ -152,6 +154,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val platform: String,
             val email: String?,
             val showFeedback: Boolean = false,
+            val activeOffers: List<ActiveOfferType>,
         ) : ViewState()
     }
 }
