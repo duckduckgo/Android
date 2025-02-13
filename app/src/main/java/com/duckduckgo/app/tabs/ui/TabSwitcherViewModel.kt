@@ -203,6 +203,9 @@ class TabSwitcherViewModel @Inject constructor(
             // Make sure all exemptions are removed as all tabs are deleted.
             adClickManager.clearAll()
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
+
+            // Trigger a normal mode when there are no tabs
+            _selectionViewState.update { it.copy(mode = SelectionViewState.Mode.Normal) }
         }
     }
 
