@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -427,6 +428,7 @@ class RealSubscriptionsManager @Inject constructor(
                 expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
                 status = confirmationResponse.subscription.status.toStatus(),
                 platform = confirmationResponse.subscription.platform,
+                activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
             )
 
             authRepository.setSubscription(subscription)
@@ -524,6 +526,7 @@ class RealSubscriptionsManager @Inject constructor(
                     expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                     status = subscription.status.toStatus(),
                     platform = subscription.platform,
+                    activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
                 ),
             )
             authRepository.setEntitlements(accountData.entitlements.toEntitlements())
@@ -589,6 +592,7 @@ class RealSubscriptionsManager @Inject constructor(
                 expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                 status = subscription.status.toStatus(),
                 platform = subscription.platform,
+                activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
             ),
         )
 
@@ -1013,6 +1017,13 @@ fun String.toStatus(): SubscriptionStatus {
         "Expired" -> EXPIRED
         "Waiting" -> WAITING
         else -> UNKNOWN
+    }
+}
+
+fun String.toActiveOfferType(): ActiveOfferType {
+    return when (this) {
+        "Trial" -> ActiveOfferType.TRIAL
+        else -> ActiveOfferType.UNKNOWN
     }
 }
 

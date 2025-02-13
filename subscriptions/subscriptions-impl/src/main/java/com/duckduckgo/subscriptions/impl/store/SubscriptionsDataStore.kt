@@ -41,6 +41,7 @@ interface SubscriptionsDataStore {
     var status: String?
     var entitlements: String?
     var productId: String?
+    var freeTrialActive: Boolean
 
     var subscriptionFeatures: String?
 
@@ -120,6 +121,14 @@ internal class SubscriptionsEncryptedDataStore constructor(
         set(value) {
             encryptedPreferences?.edit(commit = true) {
                 putString(KEY_ENTITLEMENTS, value)
+            }
+        }
+
+    override var freeTrialActive: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_FREE_TRIAL_ACTIVE, false) ?: false
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_FREE_TRIAL_ACTIVE, value)
             }
         }
 
@@ -217,5 +226,6 @@ internal class SubscriptionsEncryptedDataStore constructor(
         const val KEY_STATUS = "KEY_STATUS"
         const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
         const val KEY_SUBSCRIPTION_FEATURES = "KEY_SUBSCRIPTION_FEATURES"
+        const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
     }
 }

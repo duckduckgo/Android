@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.repository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -166,6 +167,7 @@ internal class RealAuthRepository constructor(
             startedAt = subscription?.startedAt
             expiresOrRenewsAt = subscription?.expiresOrRenewsAt
             status = subscription?.status?.statusName
+            freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
         }
     }
 
@@ -175,12 +177,14 @@ internal class RealAuthRepository constructor(
         val startedAt = subscriptionsDataStore.startedAt ?: return@withContext null
         val expiresOrRenewsAt = subscriptionsDataStore.expiresOrRenewsAt ?: return@withContext null
         val status = subscriptionsDataStore.status?.toStatus() ?: return@withContext null
+        val activeOffers = if (subscriptionsDataStore.freeTrialActive) listOf(ActiveOfferType.TRIAL) else listOf()
         Subscription(
             productId = productId,
             platform = platform,
             startedAt = startedAt,
             expiresOrRenewsAt = expiresOrRenewsAt,
             status = status,
+            activeOffers = activeOffers,
         )
     }
 
@@ -249,6 +253,7 @@ data class Subscription(
     val expiresOrRenewsAt: Long,
     val status: SubscriptionStatus,
     val platform: String,
+    val activeOffers: List<ActiveOfferType>,
 ) {
     fun isActive(): Boolean = status.isActive()
 }

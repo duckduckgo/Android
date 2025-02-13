@@ -1274,6 +1274,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = "AUTO_RENEWABLE",
+                activeOffers = listOf(),
             )
         }
 
@@ -1355,6 +1356,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = status,
+                activeOffers = listOf(),
             ),
         )
     }
@@ -1368,6 +1370,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                 expiresOrRenewsAt = 1234,
                 platform = "android",
                 status = status,
+                activeOffers = listOf(),
             ),
         )
     }
@@ -1564,6 +1567,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                     status = "Auto-Renewable",
                     startedAt = 1000000L,
                     expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
                 ),
             ),
         )
