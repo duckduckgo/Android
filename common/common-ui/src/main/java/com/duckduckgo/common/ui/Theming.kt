@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -46,8 +47,8 @@ enum class DuckDuckGoTheme {
     fun getOptionIndex(): Int {
         return when (this) {
             SYSTEM_DEFAULT -> 1
-            LIGHT -> 2
-            DARK -> 3
+            DARK -> 2
+            LIGHT -> 3
             EXPERIMENT_DARK_WARM -> 4
             EXPERIMENT_DARK_COOL -> 5
             EXPERIMENT_LIGHT_WARM -> 6
@@ -71,6 +72,7 @@ object Theming {
 }
 
 fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
+    Log.d("Theming", "themeFrom: $theme")
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme))
     }

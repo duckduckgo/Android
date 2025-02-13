@@ -74,6 +74,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
-        binding.experimentalUIMode.quietlySetIsChecked(viewState.useWarmColors, warmColorsPaletteToggleListener)
+        binding.experimentalUIColorPalette.quietlySetIsChecked(viewState.useWarmColors, warmColorsPaletteToggleListener)
     }
 }
