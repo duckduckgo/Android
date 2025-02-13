@@ -20,12 +20,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
+import com.duckduckgo.common.ui.internal.experiments.BrowserThemingFeature
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val browserThemingFeature: BrowserThemingFeature,
+    private val browserThemingFeature: com.duckduckgo.common.ui.internal.experiments.BrowserThemingFeature,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()

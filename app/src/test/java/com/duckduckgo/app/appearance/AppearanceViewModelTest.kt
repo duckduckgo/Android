@@ -32,7 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
+import com.duckduckgo.common.ui.internal.experiments.BrowserThemingFeature
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory

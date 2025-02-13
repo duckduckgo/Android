@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.experiments
+package com.duckduckgo.common.ui.internal.experiments
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "experimentalBrowserTheming",
-)
-interface BrowserThemingFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+@InjectWith(ActivityScope::class)
+class UIExperimentsActivity: DuckDuckGoActivity() {
+
+
+
 }
