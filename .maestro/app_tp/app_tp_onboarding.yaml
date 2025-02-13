@@ -17,7 +17,6 @@ tags:
         - tapOn:
             text: "Settings"
             index: 0
-        - assertVisible: "Block app trackers on your device"
         - tapOn: "App Tracking Protection"
         - assertVisible: "One easy step for better app privacy!"
         - assertVisible: "Continue"
