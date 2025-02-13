@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.animations.ExperimentTrackersCountAnimationHel
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.common.ui.view.hide
-import com.duckduckgo.common.ui.view.isInsideScreen
+import com.duckduckgo.common.ui.view.isPartiallyOnScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extractDomain
@@ -78,6 +78,11 @@ class TrackersBlockedViewSlideBehavior(
                 website = child.findViewById(R.id.website)
             }
         }
+
+        if (bottomOmnibar?.isPartiallyOnScreen() == true) {
+            child.hide()
+        }
+
         return super.layoutDependsOn(parent, child, dependency)
     }
 
@@ -91,15 +96,13 @@ class TrackersBlockedViewSlideBehavior(
         type: Int,
     ) {
         if (bottomOmnibar?.isOmnibarScrollingEnabled() == true && isSiteProtected()) {
-            val translation = bottomOmnibar?.getTranslation() ?: 0f
-            val bottomOmnibarHeight = bottomOmnibar?.height ?: 0
-            val childHeight = child.height
-            if (translation == 0f || translation < bottomOmnibarHeight || browserLayout?.isGone == true || bottomOmnibar?.isInsideScreen() == true) {
+            if (shouldHideChildView()) {
                 browserLayout?.setPadding(0, 0, 0, 0)
                 child.postOnAnimation {
                     child.hide()
                 }
             } else {
+                val childHeight = child.height
                 trackers?.let { experimentTrackersCountAnimationHelper.animate(it, siteLiveData) }
                 website?.text = siteLiveData.value?.url?.extractDomain()
                 if (trackersBurstAnimationView?.isAnimating == true) {
@@ -134,5 +137,16 @@ class TrackersBlockedViewSlideBehavior(
         val site = siteLiveData.value
         val shield = site?.privacyProtection() ?: PrivacyShield.UNKNOWN
         return shield == PrivacyShield.PROTECTED
+    }
+
+    private fun shouldHideChildView(): Boolean {
+        val translation = bottomOmnibar?.getTranslation() ?: 0f
+        val height = bottomOmnibar?.height ?: 0
+        return (
+            translation == 0f ||
+                translation < height ||
+                browserLayout?.isGone == true ||
+                bottomOmnibar?.isPartiallyOnScreen() == true
+            )
     }
 }
