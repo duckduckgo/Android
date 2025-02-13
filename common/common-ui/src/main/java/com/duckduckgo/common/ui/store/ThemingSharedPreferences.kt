@@ -23,8 +23,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
-    private val context: Context,
-    private val browserThemingFeature: BrowserThemingFeature,
+    private val context: Context
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -42,8 +41,6 @@ class ThemingSharedPreferences @Inject constructor(
         return themePrefMapper.themeFrom(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
-            browserThemingFeature.self().isEnabled(),
-            browserThemingFeature.warmColors().isEnabled(),
         )
     }
 
@@ -67,30 +64,10 @@ class ThemingSharedPreferences @Inject constructor(
         fun themeFrom(
             value: String?,
             defValue: DuckDuckGoTheme,
-            isExperimentEnabled: Boolean,
-            warmColors: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
-                    }
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
-
-                THEME_DARK -> if (isExperimentEnabled) {
-                    if (warmColors) {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_WARM
-                    } else {
-                        DuckDuckGoTheme.EXPERIMENT_DARK_COOL
-                    }
-                } else {
-                    DuckDuckGoTheme.DARK
-                }
-
+                THEME_LIGHT -> DuckDuckGoTheme.LIGHT
+                THEME_DARK -> DuckDuckGoTheme.DARK
                 THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
                 else -> defValue
             }
