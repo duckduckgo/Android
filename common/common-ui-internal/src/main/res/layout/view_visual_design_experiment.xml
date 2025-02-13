@@ -22,12 +22,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/internalUISettingsDivider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="0dp" />
-
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -42,5 +36,13 @@
         app:secondaryText="@string/experimentalUIMessage"
         app:showSwitch="true" />
 
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/experimentalUIColorPalette"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/experimentalUIWarmColorsTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/experimentalUIWarmColorsMessage"
+        app:showSwitch="true" />
 
 </LinearLayout>

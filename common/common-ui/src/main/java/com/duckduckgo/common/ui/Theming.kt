@@ -24,8 +24,10 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
@@ -35,8 +37,10 @@ enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
     LIGHT,
-    DARK_EXPERIMENT,
-    LIGHT_EXPERIMENT,
+    EXPERIMENT_DARK_WARM,
+    EXPERIMENT_DARK_COOL,
+    EXPERIMENT_LIGHT_WARM,
+    EXPERIMENT_LIGHT_COOL,
     ;
 
     fun getOptionIndex(): Int {
@@ -44,8 +48,10 @@ enum class DuckDuckGoTheme {
             SYSTEM_DEFAULT -> 1
             LIGHT -> 2
             DARK -> 3
-            LIGHT_EXPERIMENT -> 4
-            DARK_EXPERIMENT -> 5
+            EXPERIMENT_DARK_WARM -> 4
+            EXPERIMENT_DARK_COOL -> 5
+            EXPERIMENT_LIGHT_WARM -> 6
+            EXPERIMENT_LIGHT_COOL -> 7
         }
     }
 }
@@ -75,8 +81,10 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DARK -> R.style.Theme_DuckDuckGo_Dark
-        LIGHT_EXPERIMENT -> R.style.Theme_DuckDuckGo_Light_Experiment
-        DARK_EXPERIMENT -> R.style.Theme_DuckDuckGo_Dark_Experiment
+        EXPERIMENT_DARK_COOL -> R.style.Theme_DuckDuckGo_Dark_Experiment_Cool
+        EXPERIMENT_DARK_WARM -> R.style.Theme_DuckDuckGo_Dark_Experiment_Warm
+        EXPERIMENT_LIGHT_WARM -> R.style.Theme_DuckDuckGo_Light_Experiment_Warm
+        EXPERIMENT_LIGHT_COOL -> R.style.Theme_DuckDuckGo_Light_Experiment_Warm
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }

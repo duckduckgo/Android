@@ -39,7 +39,12 @@ class ThemingSharedPreferences @Inject constructor(
 
     private fun selectedThemeSavedValue(): DuckDuckGoTheme {
         val savedValue = preferences.getString(KEY_THEME, null)
-        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.SYSTEM_DEFAULT, browserThemingFeature.self().isEnabled())
+        return themePrefMapper.themeFrom(
+            savedValue,
+            DuckDuckGoTheme.SYSTEM_DEFAULT,
+            browserThemingFeature.self().isEnabled(),
+            browserThemingFeature.warmColors().isEnabled(),
+        )
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -63,16 +68,25 @@ class ThemingSharedPreferences @Inject constructor(
             value: String?,
             defValue: DuckDuckGoTheme,
             isExperimentEnabled: Boolean,
+            warmColors: Boolean,
         ) =
             when (value) {
                 THEME_LIGHT -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.LIGHT_EXPERIMENT
+                    if (warmColors) {
+                        DuckDuckGoTheme.EXPERIMENT_LIGHT_WARM
+                    } else {
+                        DuckDuckGoTheme.EXPERIMENT_LIGHT_COOL
+                    }
                 } else {
                     DuckDuckGoTheme.LIGHT
                 }
 
                 THEME_DARK -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.DARK_EXPERIMENT
+                    if (warmColors) {
+                        DuckDuckGoTheme.EXPERIMENT_DARK_WARM
+                    } else {
+                        DuckDuckGoTheme.EXPERIMENT_DARK_COOL
+                    }
                 } else {
                     DuckDuckGoTheme.DARK
                 }

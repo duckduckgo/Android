@@ -27,4 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface BrowserThemingFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun warmColors(): Toggle
 }

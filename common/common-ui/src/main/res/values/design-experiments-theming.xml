@@ -16,7 +16,7 @@
 
 <resources>
 
-    <style name="Theme.DuckDuckGo.Dark.Experiment" parent="Theme.DuckDuckGo.Dark">
+    <style name="Theme.DuckDuckGo.Dark.Experiment.Warm" parent="Theme.DuckDuckGo.Dark">
 
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/pink100</item>
@@ -24,7 +24,19 @@
 
     </style>
 
-    <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
+    <style name="Theme.DuckDuckGo.Dark.Experiment.Cool" parent="Theme.DuckDuckGo.Dark">
+
+        <!-- Design System Reference Colors Dark -->
+        <item name="daxColorBackground">@color/pink100</item>
+        <item name="daxColorSurface">@color/pink90</item>
+
+    </style>
+
+    <style name="Theme.DuckDuckGo.Light.Experiment.Warm" parent="Theme.DuckDuckGo.Light">
+
+    </style>
+
+    <style name="Theme.DuckDuckGo.Light.Experiment.Cool" parent="Theme.DuckDuckGo.Light">
 
     </style>
 

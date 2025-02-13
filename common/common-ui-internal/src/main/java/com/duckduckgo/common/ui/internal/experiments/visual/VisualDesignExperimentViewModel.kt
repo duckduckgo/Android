@@ -41,6 +41,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     data class ViewState(
         val isBrowserThemingFeatureEnabled: Boolean = false,
+        val useWarmColors: Boolean = true,
     )
 
     private fun currentViewState(): ViewState {
@@ -53,16 +54,23 @@ class VisualDesignExperimentViewModel @Inject constructor(
             viewState.update {
                 currentViewState().copy(
                     isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
+                    useWarmColors = browserThemingFeature.warmColors().isEnabled(),
                 )
             }
         }
     }
 
     @SuppressLint("DenyListedApi")
-    // only visible for UI Internal experiments
     fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
             browserThemingFeature.self().setRawStoredState(State(checked))
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    fun onWarmColorsFlagChanged(checked: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            browserThemingFeature.warmColors().setRawStoredState(State(checked))
         }
     }
 }
