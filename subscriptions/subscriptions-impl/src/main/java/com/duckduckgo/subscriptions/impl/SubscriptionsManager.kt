@@ -215,6 +215,13 @@ interface SubscriptionsManager {
     suspend fun getPortalUrl(): String?
 
     suspend fun canSupportEncryption(): Boolean
+
+    /**
+     * Checks whether the user has previously used a trial.
+     *
+     * @return [Boolean] indicating if the user has had a trial before.
+     */
+    suspend fun hadTrial(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -327,6 +334,14 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
+
+    override suspend fun hadTrial(): Boolean {
+        return try {
+            return subscriptionsService.offerStatus().hadTrial
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
