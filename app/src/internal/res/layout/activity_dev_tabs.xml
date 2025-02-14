@@ -72,16 +72,6 @@
                 app:type="single_line"
                 tools:ignore="HardcodedText" />
 
-            <androidx.constraintlayout.helper.widget.Flow
-                android:id="@+id/flowView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:constraint_referenced_ids="addTabsButton, clearTabsButton"
-                app:flow_horizontalStyle="spread"
-                app:flow_wrapMode="chain"
-                app:layout_constraintTop_toBottomOf="@id/generateTabsItem" />
-
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/addTabsButton"
                 android:layout_width="wrap_content"
@@ -97,6 +87,16 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/devSettingsTabsScreenClearTabsButtonText"
                 app:buttonSize="large" />
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/flowView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:constraint_referenced_ids="addTabsButton,clearTabsButton"
+                app:flow_horizontalStyle="spread"
+                app:flow_wrapMode="chain"
+                app:layout_constraintTop_toBottomOf="@id/generateTabsItem" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
