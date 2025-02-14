@@ -1393,10 +1393,7 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showMaliciousWarning(
-        url: Uri,
-        feed: Feed,
-    ) {
+    private fun showMaliciousWarning(url: Uri, feed: Feed, onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -1416,13 +1413,18 @@ class BrowserTabFragment :
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
+        val navigationList = webView?.safeCopyBackForwardList() ?: return
+        onMaliciousWarningShown(ErrorNavigationState(navigationList, url, SITE_SECURITY_WARNING))
     }
 
-    private fun hideMaliciousWarning() {
+    private fun hideMaliciousWarning(uri: Uri, title: String?) {
         val navList = webView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
         if (currentIndex >= 0) {
+            // We force the error state to clear out any previous navigation status that might have been set since the error
+            // was shown and might prevent a clean page refresh
+            navList?.let { viewModel.navigationStateChanged(ErrorNavigationState(it, uri, title)) }
             Timber.d("MaliciousSite: hiding warning page and triggering a reload of the previous")
             viewModel.recoverFromWarningPage(true)
             refresh()
@@ -1821,8 +1823,8 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed)
-            is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed, it.onMaliciousWarningShown)
+            is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.url, it.title)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
