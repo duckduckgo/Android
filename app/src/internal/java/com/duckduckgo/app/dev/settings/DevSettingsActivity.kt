@@ -40,10 +40,12 @@ import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notification
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.SendTdsIntent
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ShowSavedSitesClearedConfirmation
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
 import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
+import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -106,6 +108,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
+        binding.tabs.setOnClickListener { viewModel.tabsClicked() }
     }
 
     private fun observeViewModel() {
@@ -135,6 +138,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
+            Tabs -> showTabs()
         }
     }
 
@@ -177,6 +181,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun showNotifications() {
         startActivity(NotificationsActivity.intent(this))
+    }
+
+    private fun showTabs() {
+        startActivity(DevTabsActivity.intent(this))
     }
 
     companion object {

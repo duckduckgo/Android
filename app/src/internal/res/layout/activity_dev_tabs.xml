@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.dev.settings.notifications.NotificationsActivity">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/tabCountHeader"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="@string/devSettingsTabsScreenHeader"
+            app:typography="caption_allCaps" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/generateTabsItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/tabCount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:primaryText="@string/devSettingsTabsScreenTabsToAdd" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/tabCount"
+                style="@style/Widget.DuckDuckGo.TextInput"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="100"
+                app:layout_constraintBottom_toBottomOf="@id/generateTabsItem"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/generateTabsItem"
+                app:layout_constraintTop_toTopOf="@id/generateTabsItem"
+                app:type="single_line"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/addTabsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenAddTabsButtonText"
+                app:buttonSize="large" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/clearTabsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenClearTabsButtonText"
+                app:buttonSize="large" />
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/flowView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:constraint_referenced_ids="addTabsButton,clearTabsButton"
+                app:flow_horizontalStyle="spread"
+                app:flow_wrapMode="chain"
+                app:layout_constraintTop_toBottomOf="@id/generateTabsItem" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</LinearLayout>

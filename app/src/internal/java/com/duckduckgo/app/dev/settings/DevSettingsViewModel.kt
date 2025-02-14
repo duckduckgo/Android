@@ -61,6 +61,7 @@ class DevSettingsViewModel @Inject constructor(
         object ChangePrivacyConfigUrl : Command()
         object CustomTabs : Command()
         data object Notifications : Command()
+        data object Tabs : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -141,5 +142,9 @@ class DevSettingsViewModel @Inject constructor(
 
     fun notificationsClicked() {
         viewModelScope.launch { command.send(Command.Notifications) }
+    }
+
+    fun tabsClicked() {
+        viewModelScope.launch { command.send(Command.Tabs) }
     }
 }
