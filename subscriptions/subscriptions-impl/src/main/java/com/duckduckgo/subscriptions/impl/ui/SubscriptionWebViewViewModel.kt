@@ -288,11 +288,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun isFreeTrialEligible(): Boolean {
-        val hasUsedFreeTrial: Boolean = true // TODO Noelia check previous purchases
-        return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT) && hasUsedFreeTrial
+        return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT)
     }
 
-    private fun createSubscriptionOptions(
+    private suspend fun createSubscriptionOptions(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
     ): SubscriptionOptionsJson {
@@ -305,7 +304,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         )
     }
 
-    private fun createOptionsJson(offer: SubscriptionOffer, recurrence: String): OptionsJson {
+    private suspend fun createOptionsJson(offer: SubscriptionOffer, recurrence: String): OptionsJson {
         val offerDisplayPrice: String = offer.offerId?.let {
             offer.pricingPhases.getOrNull(1)?.formattedPrice ?: offer.pricingPhases.first().formattedPrice
         } ?: offer.pricingPhases.first().formattedPrice
@@ -317,7 +316,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         )
     }
 
-    private fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
+    private suspend fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
         return offer.offerId?.let {
             val offerType = when (offer.offerId) {
                 MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US -> OfferType.FREE_TRIAL
@@ -328,7 +327,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 type = offerType.type,
                 id = it,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
-                isUserEligible = true, // TODO Noelia: Need to check if they already had a free trial before to return false
+                isUserEligible = !subscriptionsManager.hadTrial(),
             )
         }
     }
