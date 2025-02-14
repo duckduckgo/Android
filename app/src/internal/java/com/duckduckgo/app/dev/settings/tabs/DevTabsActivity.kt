@@ -67,7 +67,7 @@ class DevTabsActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount.toString())
+        binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount)
     }
 
     companion object {
