@@ -102,6 +102,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
         configureRecyclerView()
         observeViewModel()
         configureToolbar()
+        showSearchBar()
     }
 
     override fun onStop() {
