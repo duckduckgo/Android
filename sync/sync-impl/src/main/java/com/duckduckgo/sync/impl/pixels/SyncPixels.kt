@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
@@ -26,8 +27,12 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_ACTIVITY_OPENED_IS_ENABLED
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_ACTIVITY_OPENED_SOURCE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
+import com.duckduckgo.sync.impl.ui.SyncActivity
+import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -88,6 +93,14 @@ interface SyncPixels {
     fun fireUserSwitchedAccount()
     fun fireUserSwitchedLogoutError()
     fun fireUserSwitchedLoginError()
+
+    /**
+     * Fired when the [SyncActivity] is opened.
+     *
+     * @param navigationSource the source which triggered the activity to open
+     * @param isEnabled whether sync was enabled when the activity was opened
+     */
+    fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -286,6 +299,16 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
     }
 
+    override fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean) {
+        pixel.fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
+            parameters = mapOf(
+                SYNC_ACTIVITY_OPENED_SOURCE to navigationSource.value,
+                SYNC_ACTIVITY_OPENED_IS_ENABLED to isEnabled.toBinaryString(),
+            ),
+        )
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
     }
@@ -339,6 +362,8 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SWITCHED_ACCOUNT("sync_user_switched_account"),
     SYNC_USER_SWITCHED_LOGOUT_ERROR("sync_user_switched_logout_error"),
     SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
+
+    SYNC_ACTIVITY_OPENED("sync_opened"),
 }
 
 object SyncPixelParameters {
@@ -359,4 +384,6 @@ object SyncPixelParameters {
     const val ERROR = "error"
     const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
+    const val SYNC_ACTIVITY_OPENED_SOURCE = "source"
+    const val SYNC_ACTIVITY_OPENED_IS_ENABLED = "isEnabled"
 }

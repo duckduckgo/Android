@@ -44,11 +44,11 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.ui.SyncActivityPromotionSource.PASSWORDS
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -122,7 +122,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(source = "promotion_passwords"))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(promotionSource = PASSWORDS))
             context.startActivity(intent)
         }
     }

@@ -87,7 +87,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.SETTINGS
+import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -329,7 +330,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
+            is LaunchSyncSettings -> launchScreen(SyncActivityWithSourceParams(navigationSource = SETTINGS))
             is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))

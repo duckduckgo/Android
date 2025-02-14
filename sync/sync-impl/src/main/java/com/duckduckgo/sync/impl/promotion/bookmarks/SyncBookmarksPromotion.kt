@@ -42,11 +42,11 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.ui.SyncActivityPromotionSource.BOOKMARKS
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -119,7 +119,7 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(source = "promotion_bookmarks"))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(promotionSource = BOOKMARKS))
             context.startActivity(intent)
         }
     }

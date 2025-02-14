@@ -47,6 +47,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
+import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.OTHER
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
@@ -164,6 +165,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
         setupClickListeners()
         setupRecyclerView()
+
+        if (savedInstanceState == null) {
+            viewModel.sendOpenedPixel(navigationSource = extractNavigationSource())
+        }
     }
 
     private fun registerForPermission() {
@@ -255,25 +260,25 @@ class SyncActivity : DuckDuckGoActivity() {
         when (it) {
             is SyncWithAnotherDevice -> {
                 authenticate {
-                    connectFlow.launch(ConnectFlowContractInput(extractSource()))
+                    connectFlow.launch(ConnectFlowContractInput(extractPromotionSource()?.value))
                 }
             }
 
             is IntroCreateAccount -> {
                 authenticate {
-                    syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, extractSource()))
+                    syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, extractPromotionSource()?.value))
                 }
             }
 
             is IntroRecoverSyncData -> {
                 authenticate {
-                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_INTRO, extractSource()))
+                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_INTRO, extractPromotionSource()?.value))
                 }
             }
 
             is ShowRecoveryCode -> {
                 authenticate {
-                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_CODE, extractSource()))
+                    syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_CODE, extractPromotionSource()?.value))
                 }
             }
 
@@ -435,9 +440,26 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun extractSource(): String? {
-        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+    private fun extractNavigationSource(): SyncActivityNavigationSource {
+        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.navigationSource ?: OTHER
+    }
+
+    private fun extractPromotionSource(): SyncActivityPromotionSource? {
+        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.promotionSource
     }
 }
 
-data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams
+data class SyncActivityWithSourceParams(
+    val navigationSource: SyncActivityNavigationSource = OTHER,
+    val promotionSource: SyncActivityPromotionSource? = null,
+) : GlobalActivityStarter.ActivityParams
+
+enum class SyncActivityNavigationSource(val value: String) {
+    SETTINGS("settings"),
+    OTHER("other"),
+}
+
+enum class SyncActivityPromotionSource(val value: String) {
+    BOOKMARKS("promotion_bookmarks"),
+    PASSWORDS("promotion_passwords"),
+}

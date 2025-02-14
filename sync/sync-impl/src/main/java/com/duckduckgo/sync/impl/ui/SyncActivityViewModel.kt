@@ -58,6 +58,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -88,6 +89,14 @@ class SyncActivityViewModel @Inject constructor(
         viewState.onStart {
             observeState()
         }.flowOn(dispatchers.io())
+
+    fun sendOpenedPixel(navigationSource: SyncActivityNavigationSource) {
+        viewModelScope.launch {
+            val syncState = syncStateMonitor.syncState().firstOrNull()
+            val isEnabled = syncState != null && syncState != OFF
+            syncPixels.fireActivityOpenedPixel(navigationSource = navigationSource, isEnabled = isEnabled)
+        }
+    }
 
     private fun observeState() {
         syncStateMonitor.syncState().onEach { syncState ->
