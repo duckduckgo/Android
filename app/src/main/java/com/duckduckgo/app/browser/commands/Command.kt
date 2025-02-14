@@ -27,6 +27,7 @@ import android.webkit.ValueCallback
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
+import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SslErrorResponse
@@ -221,9 +222,13 @@ sealed class Command {
     data class ShowWarningMaliciousSite(
         val url: Uri,
         val feed: Feed,
+        val onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
     ) : Command()
 
-    data object HideWarningMaliciousSite : Command()
+    data class HideWarningMaliciousSite(
+        val url: Uri,
+        val title: String?,
+    ) : Command()
 
     data object EscapeMaliciousSite : Command()
 
