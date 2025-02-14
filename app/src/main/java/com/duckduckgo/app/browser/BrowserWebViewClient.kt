@@ -469,8 +469,7 @@ class BrowserWebViewClient @Inject constructor(
 
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
-                navigationStateChanged(WebViewNavigationState(navigationList))
-                url?.let { prefetchFavicon(url) }
+                pageFinished(WebViewNavigationState(navigationList), url)
             }
             flushCookies()
             printInjector.injectPrint(webView)

@@ -37,7 +37,10 @@ interface WebViewClientListener {
     fun onPageContentStart(url: String)
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
-    fun progressChanged(newProgress: Int)
+    fun progressChanged(
+        newProgress: Int,
+        webViewNavigationState: WebViewNavigationState,
+    )
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
@@ -108,4 +111,8 @@ interface WebViewClientListener {
         errorResponse: SslErrorResponse,
     )
     fun onShouldOverride()
+    fun pageFinished(
+        webViewNavigationState: WebViewNavigationState,
+        url: String?,
+    )
 }

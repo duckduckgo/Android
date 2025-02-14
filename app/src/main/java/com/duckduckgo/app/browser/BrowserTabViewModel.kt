@@ -771,14 +771,18 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String? = null,
         stillExternal: Boolean? = false,
+        maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
-        Timber.v("buildSiteFactory for url=$url")
+        Timber.v(
+            "buildSiteFactory for url=$url, maliciousSiteStatus=$maliciousSiteStatus, maliciousSiteDetected=${currentBrowserViewState().maliciousSiteDetected}",
+        )
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
+        site?.maliciousSiteStatus = maliciousSiteStatus ?: currentBrowserViewState().maliciousSiteStatus
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1110,10 +1114,13 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = trimmedInput,
             forceExpand = true,
         )
+        Timber.tag("Cris").d("onUserSubmittedQuery, browserShowing = true")
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = true,
             browserError = OMITTED,
             sslError = NONE,
+            maliciousSiteDetected = false,
+            maliciousSiteStatus = null,
         )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
@@ -1324,7 +1331,9 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentBrowserViewState().maliciousSiteDetected) {
-            command.postValue(HideWarningMaliciousSite)
+            site?.uri?.let {
+                command.postValue(HideWarningMaliciousSite(it, site?.title))
+            }
             return true
         }
 
@@ -1424,6 +1433,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
+                            Timber.tag("Cris").d("navigationStatechanged with new page, triggers buildSiteFactory with null maliciousSiteStatus")
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -1513,6 +1523,7 @@ class BrowserTabViewModel @Inject constructor(
 
         findInPageViewState.value = FindInPageViewState(visible = false)
 
+        Timber.tag("Cris").d("pageChanged, browserShowing = true")
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canSaveSite = domain != null,
@@ -1735,8 +1746,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun progressChanged(newProgress: Int) {
+    override fun progressChanged(
+        newProgress: Int,
+        webViewNavigationState: WebViewNavigationState,
+    ) {
         Timber.v("Loading in progress $newProgress")
+
+        if (!currentBrowserViewState().maliciousSiteDetected) {
+            Timber.tag("Cris").d("progressChanged maliciousSiteBlocked is false")
+            navigationStateChanged(webViewNavigationState)
+        }
+
         if (!currentBrowserViewState().browserShowing) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
@@ -1753,6 +1773,17 @@ class BrowserTabViewModel @Inject constructor(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+        }
+    }
+
+    override fun pageFinished(
+        webViewNavigationState: WebViewNavigationState,
+        url: String?,
+    ) {
+        if (!currentBrowserViewState().maliciousSiteDetected) {
+            Timber.tag("Cris").d("pageFinished with maliciousSiteBlocked = false, url = $url")
+            navigationStateChanged(webViewNavigationState)
+            url?.let { prefetchFavicon(url) }
         }
     }
 
@@ -1906,6 +1937,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                    // TODO (cbarreiro): Set maliciousSiteDetected to false when the user navigates to a new page
                 )
             }
 
@@ -2544,6 +2576,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showBrowser() {
+        Timber.tag("Cris").d("showBrowser browserShowing = true")
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
         globalLayoutState.value = Browser(isNewTabState = false)
     }
@@ -3139,7 +3172,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
         if (currentBrowserViewState().maliciousSiteDetected) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false, maliciousSiteStatus = null)
         }
     }
 
@@ -3218,11 +3251,12 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
         val previousSite = site
-        site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
-        site?.maliciousSiteStatus = when (feed) {
+        val maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
+        // TODO (Can I avoid passing maliciousSiteStatus here and rely on browserViewState?):
+        buildSiteFactory(url = url.toString(), maliciousSiteStatus = maliciousSiteStatus)
 
         if (!exempted) {
             if (currentBrowserViewState().maliciousSiteDetected && previousSite?.url == url.toString()) return
@@ -3237,9 +3271,20 @@ class BrowserTabViewModel @Inject constructor(
                     browserShowing = false,
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
                     maliciousSiteDetected = true,
+                    maliciousSiteStatus = maliciousSiteStatus,
                 ),
             )
-            command.postValue(ShowWarningMaliciousSite(url, feed))
+            command.postValue(
+                ShowWarningMaliciousSite(url, feed) { navigationStateChanged(it) },
+            )
+        } else {
+            browserViewState.postValue(
+                currentBrowserViewState().copy(
+                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                    maliciousSiteDetected = false,
+                    maliciousSiteStatus = maliciousSiteStatus,
+                ),
+            )
         }
     }
 
@@ -3547,7 +3592,12 @@ class BrowserTabViewModel @Inject constructor(
 
     fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
+            browserViewState.value = currentBrowserViewState().copy(
+                browserShowing = true,
+                sslError = NONE,
+                maliciousSiteDetected = false,
+                maliciousSiteStatus = null,
+            )
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
@@ -3559,6 +3609,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserShowing = showBrowser,
                 sslError = NONE,
                 maliciousSiteDetected = false,
+                maliciousSiteStatus = null,
             )
         }
     }
