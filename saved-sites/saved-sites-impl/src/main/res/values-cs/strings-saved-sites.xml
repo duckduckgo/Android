@@ -61,8 +61,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Upravit záložku</string>
     <string name="favoriteDialogTitleEdit">Upravit oblíbené</string>
-    <string name="locationLabel">Poloha</string>
-    <string name="folderLocationTitle">Vybrat umístění</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Poloha</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Vybrat umístění</string>
     <string name="addFolder">Přidat složku</string>
     <string name="editFolder">Upravit složku</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Smazat složku a její obsah?"</string>
