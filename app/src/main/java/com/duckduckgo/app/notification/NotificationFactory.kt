@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import com.duckduckgo.app.notification.model.NotificationSpec
 import javax.inject.Inject
 
@@ -41,7 +40,7 @@ class NotificationFactory @Inject constructor(
             .setContentTitle(specification.title)
             .setContentText(specification.description)
             .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
-            .setColor(ContextCompat.getColor(context, specification.color))
+            .setColor(specification.color)
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
             .setAutoCancel(specification.autoCancel)
