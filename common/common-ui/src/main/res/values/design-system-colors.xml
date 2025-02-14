@@ -160,7 +160,8 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
-    <color name="blue10">#803969EF</color>
+    <color name="blue10">#803969FF</color>
+    <color name="blue10_solid">#9CB4FF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
