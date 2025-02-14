@@ -50,7 +50,7 @@
     <!-- Tabs -->
     <string name="devSettingsScreenTabs">Tabs</string>
     <string name="devSettingsScreenTabsSubtitle">Create tabs for testing</string>
-    <string name="devSettingsTabsScreenHeader" instruction="Not translated">Current tab count: %s</string>
+    <string name="devSettingsTabsScreenHeader" instruction="Not translated">Current tab count: %1$d</string>
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
