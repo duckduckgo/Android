@@ -41,7 +41,7 @@ class NotificationFactory @Inject constructor(
             .setContentTitle(specification.title)
             .setContentText(specification.description)
             .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
-            .setColor(ContextCompat.getColor(context, specification.color))
+            .setColor(specification.color)
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
             .setAutoCancel(specification.autoCancel)
