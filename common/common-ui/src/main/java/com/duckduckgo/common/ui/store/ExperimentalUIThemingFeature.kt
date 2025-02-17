@@ -24,7 +24,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     scope = AppScope::class,
     featureName = "experimentalUITheming",
 )
-interface BrowserThemingFeature {
+interface ExperimentalUIThemingFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 

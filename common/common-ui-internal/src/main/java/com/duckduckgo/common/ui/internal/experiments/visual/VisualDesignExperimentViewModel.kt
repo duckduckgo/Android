@@ -21,8 +21,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.store.BrowserThemingFeature
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val browserThemingFeature: BrowserThemingFeature,
+    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
     private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -57,7 +57,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            browserThemingFeature.self().setRawStoredState(State(checked))
+            experimentalUIThemingFeature.self().setRawStoredState(State(checked))
             updateCurrentState()
         }
     }
@@ -65,7 +65,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
     @SuppressLint("DenyListedApi")
     fun onWarmColorsFlagChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
-            browserThemingFeature.warmColors().setRawStoredState(State(checked))
+            experimentalUIThemingFeature.warmColors().setRawStoredState(State(checked))
             updateCurrentState()
         }
     }
@@ -74,8 +74,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.update {
                 currentViewState().copy(
-                    isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
-                    useWarmColors = browserThemingFeature.warmColors().isEnabled(),
+                    isBrowserThemingFeatureEnabled = experimentalUIThemingFeature.self().isEnabled(),
+                    useWarmColors = experimentalUIThemingFeature.warmColors().isEnabled(),
                     selectedTheme = themingDataStore.theme.toString(),
                 )
             }
