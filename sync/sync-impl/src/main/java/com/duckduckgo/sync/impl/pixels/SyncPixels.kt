@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTIO
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.impl.ui.SyncActivity
 import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
+import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.SETTINGS
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -301,13 +302,9 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean) {
-        pixel.fire(
-            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
-            parameters = mapOf(
-                SYNC_ACTIVITY_OPENED_SOURCE to navigationSource.value,
-            ),
-            type = PixelType.Unique(),
-        )
+        if (navigationSource == SETTINGS) {
+            pixel.fire(pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE, type = PixelType.Unique())
+        }
         pixel.fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
             parameters = mapOf(
@@ -372,7 +369,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
 
     SYNC_ACTIVITY_OPENED("sync_opened"),
-    SYNC_ACTIVITY_OPENED_UNIQUE("sync_opened_unique"),
+    SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE("sync_opened_from_settings_unique"),
 }
 
 object SyncPixelParameters {

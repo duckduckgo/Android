@@ -29,8 +29,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -195,11 +197,10 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel and source settings, then unique pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = true)
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = false)
 
         verify(pixel).fire(
-            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
-            parameters = mapOf("source" to "settings"),
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE,
             type = Pixel.PixelType.Unique(),
         )
     }
@@ -208,11 +209,7 @@ class RealSyncPixelsTest {
     fun `when fire activity opened pixel and other settings, then unique pixel sent`() {
         testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = false)
 
-        verify(pixel).fire(
-            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
-            parameters = mapOf("source" to "other"),
-            type = Pixel.PixelType.Unique(),
-        )
+        verify(pixel, never()).fire(eq(SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE), any(), any(), any())
     }
 
     private fun givenSomeDailyStats(): DailyStats {
