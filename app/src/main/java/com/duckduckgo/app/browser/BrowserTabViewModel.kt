@@ -764,16 +764,16 @@ class BrowserTabViewModel @Inject constructor(
         stillExternal: Boolean? = false,
         maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
-        Timber.v(
-            "buildSiteFactory for url=$url, maliciousSiteStatus=$maliciousSiteStatus, maliciousSiteDetected=${currentBrowserViewState().maliciousSiteDetected}",
-        )
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
-        site?.maliciousSiteStatus = maliciousSiteStatus ?: currentBrowserViewState().maliciousSiteStatus
+        site?.maliciousSiteStatus = maliciousSiteStatus
+        Timber.v(
+            "buildSiteFactory for url=$url, maliciousSiteStatus=${site?.maliciousSiteStatus}, maliciousSiteDetected=${currentBrowserViewState().maliciousSiteDetected}",
+        )
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1495,12 +1495,13 @@ class BrowserTabViewModel @Inject constructor(
     private fun pageChanged(
         url: String,
         title: String?,
+        maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
         Timber.v("Page changed: $url")
         cleanupBlobDownloadReplyProxyMaps()
 
         hasCtaBeenShownForCurrentPage.set(false)
-        buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
+        buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url), maliciousSiteStatus)
         setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -1733,7 +1734,7 @@ class BrowserTabViewModel @Inject constructor(
     override fun pageRefreshed(refreshedUrl: String) {
         if (url == null || refreshedUrl == url) {
             Timber.v("Page refreshed: $refreshedUrl")
-            pageChanged(refreshedUrl, title)
+            pageChanged(refreshedUrl, title, currentBrowserViewState().maliciousSiteStatus)
         }
     }
 
