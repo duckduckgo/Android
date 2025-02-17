@@ -30,4 +30,7 @@ interface ExperimentalUIThemingFeature {
 
     @Toggle.DefaultValue(true)
     fun warmColors(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun icons(): Toggle
 }
