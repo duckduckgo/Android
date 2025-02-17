@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
-    <string name="settingsDefaultBrowserEnabled">Als Standard-Browser festlegen</string>
+    <string name="setAsDefaultBrowser">Als Standard-Browser festlegen</string>
     <string name="defaultBrowserMaybeLater">Vielleicht später</string>
-    <string name="defaultBrowserLetsDoIt">Als Standard-Browser festlegen</string>
     <string name="defaultBrowserDescriptionNoDefault">Öffne Links jederzeit sicher und ohne Sorge.</string>
     <string name="defaultBrowserInstructions">Wähle DuckDuckGo aus und tippe auf <font color="#678fff">Immer</font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Diese Website verlassen</string>
     <string name="sslErrorAdvancedCTA">Erweitert</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo warnt dich, wenn eine Website ein ungültiges Zertifikat hat.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Risiko akzeptieren und Website besuchen<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Risiko akzeptieren und Website besuchen</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s ist abgelaufen. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s stimmt nicht mit *.%2$s überein. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Das Sicherheitszertifikat für %1$s wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft. Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Verstanden.</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Versuch es doch mal! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Probier’s doch mal aus!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du schaffst das!"</string>
     <string name="onboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
     <string name="onboardingEndDaxDialogButton">Alles erledigt!</string>
@@ -756,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich schützt?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blockiert Tracker von Drittanbietern</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Cookie-Anfragen und Popups blocken</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Cookie-Anfragen und Pop-ups blockieren</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Browserdaten schnell löschen</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Welche Farbe gefällt dir am besten?</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Deine Suchen über DuckDuckGo sind immer privat.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Das ist die <b>**DuckDuckGo Search**!</b> Privat. Schnell. Weniger Werbung.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Schlag ein!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Neuer AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Mit DuckDuckGo kannst du mehr von dem schützen, was du online tust</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Mach uns zu deinem Standardbrowser, damit alle Links in DuckDuckGo geöffnet werden.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Jetzt nicht</string>
 
 </resources>

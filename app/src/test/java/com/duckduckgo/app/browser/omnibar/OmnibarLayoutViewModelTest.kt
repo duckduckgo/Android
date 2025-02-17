@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
@@ -31,6 +32,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -58,6 +60,9 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
+    private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -68,6 +73,36 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
+        whenever(defaultBrowserPromptsExperiment.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
+        whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
+        whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
+
+        initializeViewModel()
+    }
+
+    @Test
+    fun whenViewModelAttachedAndNoTabsOpenThenTabsRetrieved() = runTest {
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.tabCount == 0)
+        }
+    }
+
+    @Test
+    fun whenViewModelAttachedAndTabsOpenedThenTabsRetrieved() = runTest {
+        whenever(tabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(tabId = "0", position = 0))))
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.tabCount == 1)
+            assertTrue(viewState.shouldUpdateTabsCount)
+        }
+    }
+
+    private fun initializeViewModel() {
         testee = OmnibarLayoutViewModel(
             tabRepository = tabRepository,
             voiceSearchAvailability = voiceSearchAvailability,
@@ -77,41 +112,15 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
         )
-
-        whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
-        whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-    }
-
-    @Test
-    fun whenViewModelAttachedAndNoTabsOpenThenTabsRetrieved() = runTest {
-        testee.onAttachedToWindow()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.tabs.isEmpty())
-        }
-    }
-
-    @Test
-    fun whenViewModelAttachedAndTabsOpenedThenTabsRetrieved() = runTest {
-        whenever(tabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity(tabId = "0", position = 0))))
-
-        testee.onAttachedToWindow()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.tabs.size == 1)
-            assertTrue(viewState.shouldUpdateTabsCount)
-        }
     }
 
     @Test
     fun whenViewModelAttachedAndVoiceSearchSupportedThenPixelLogged() = runTest {
         whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(true)
 
-        testee.onAttachedToWindow()
+        initializeViewModel()
 
         verify(voiceSearchPixelLogger).log()
     }
@@ -119,8 +128,6 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenViewModelAttachedAndVoiceSearchNotSupportedThenPixelLogged() = runTest {
         whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(false)
-
-        testee.onAttachedToWindow()
 
         verifyNoInteractions(voiceSearchPixelLogger)
     }
@@ -148,7 +155,6 @@ class OmnibarLayoutViewModelTest {
             assertFalse(viewState.showTabsMenu)
             assertFalse(viewState.showFireIcon)
             assertFalse(viewState.showBrowserMenu)
-            assertFalse(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
             assertTrue(viewState.showVoiceSearch)
         }
@@ -167,7 +173,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertFalse(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightPrivacyShield == HighlightableButton.Gone)
             assertTrue(viewState.showVoiceSearch)
         }
@@ -187,9 +192,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -208,9 +217,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -229,9 +242,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -250,9 +267,13 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
             assertTrue(viewState.showBrowserMenu)
-            assertTrue(viewState.shouldMoveCaretToStart)
             assertTrue(viewState.highlightFireButton == HighlightableButton.Visible(highlighted = false))
             assertTrue(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem().assertCommand(Command.MoveCaretToFront::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -280,6 +301,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
             assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
 
@@ -291,6 +313,19 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
             assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.SSLWarning)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToMaliciousSiteWarningThenViewStateCorrect() = runTest {
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
 
@@ -302,6 +337,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
             assertFalse(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
     }
 
@@ -313,6 +349,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
             assertTrue(viewState.scrollingEnabled)
+            assertTrue(viewState.viewMode is ViewMode.Browser)
         }
     }
 
@@ -324,6 +361,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
 
@@ -335,6 +373,19 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.viewMode is ViewMode.SSLWarning)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToMaliciousSiteWarningAndFocusThenViewStateCorrect() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
 
@@ -346,6 +397,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
     }
 
@@ -357,6 +409,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.viewMode is ViewMode.Browser)
         }
     }
 
@@ -384,7 +437,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenPrivacyShieldChangedToWarningThenViewStateCorrect() = runTest {
-        val privacyShield = PrivacyShield.WARNING
+        val privacyShield = PrivacyShield.MALICIOUS
         testee.onPrivacyShieldChanged(privacyShield)
 
         testee.viewState.test {
@@ -574,6 +627,29 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenFireButtonItemHighlightedRemovedThenViewStateCorrect() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightPrivacyShield == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+
+            assertTrue(viewState.scrollingEnabled)
+        }
+    }
+
+    @Test
     fun whenFireIconPressedAndFireIconHighlightedThenViewStateCorrectAndPixelSent() = runTest {
         val animationPlaying = true
         testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
@@ -733,7 +809,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
@@ -743,7 +818,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 
@@ -753,7 +827,6 @@ class OmnibarLayoutViewModelTest {
             navigationChange = false,
             omnibarText = QUERY,
             forceExpand = false,
-            shouldMoveCaretToEnd = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
         testee.onOmnibarFocusChanged(true, QUERY)
@@ -774,7 +847,6 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertTrue(viewState.updateOmnibarText)
-            assertTrue(viewState.shouldMoveCaretToEnd == omnibarState.shouldMoveCaretToEnd)
         }
     }
 
@@ -902,6 +974,16 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.omnibarText == RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun `when default browser experiment updates browser menu highlight, then update the view state`() = runTest {
+        defaultBrowserPromptsExperimentHighlightOverflowMenuFlow.value = true
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showBrowserMenuHighlight)
         }
     }
 

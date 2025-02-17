@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Tarif aktualisieren oder kündigen</string>
-    <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-ID angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-ID &gt; Abonnements.</string>
+    <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-Konto angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-Konto &gt; Abonnements.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktiviere Privacy Pro auf dem Desktop, um Personal Information Removal einzurichten</string>

@@ -1,0 +1,33 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Fire button skip working"
+tags:
+    - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/pre_onboarding.yaml
+
+      - tapOn:
+          text: "search or type URL"
+      - inputText: "https://privacy-test-pages.site"
+      - pressKey: Enter
+      - assertVisible:
+          text: ".*keep browsing.*"
+      - tapOn:
+          text: "got it"
+      - assertVisible:
+            text: ".*browsing activity with the fire button.*"
+      - tapOn:
+          text: "skip"
+      - assertNotVisible: ".*browsing activity with the Fire Button.*"
+      - assertVisible:
+          text: ".*Remember: every time you browse with me a creepy ad loses its wings.*"
+      - tapOn:
+            id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - tapOn: "Clear All Tabs And Data"
+      - assertNotVisible: "You've got this!.*"

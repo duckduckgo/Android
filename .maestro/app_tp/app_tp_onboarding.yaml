@@ -10,14 +10,13 @@ tags:
               clearState: true
               stopApp: true
 
-        - runFlow: ../shared/onboarding.yaml
+        - runFlow: ../shared/pre_onboarding.yaml
 
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
         - tapOn:
             text: "Settings"
             index: 0
-        - assertVisible: "Block app trackers on your device"
         - tapOn: "App Tracking Protection"
         - assertVisible: "One easy step for better app privacy!"
         - assertVisible: "Continue"

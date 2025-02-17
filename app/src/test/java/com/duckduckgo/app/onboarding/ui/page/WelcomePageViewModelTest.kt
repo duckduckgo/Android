@@ -27,12 +27,9 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowExperimentInitialDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
@@ -46,7 +43,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -61,9 +57,6 @@ class WelcomePageViewModelTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
-    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
-        on { it.isHighlightsEnabled() } doReturn false
-    }
     private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val testee: WelcomePageViewModel by lazy {
@@ -72,7 +65,6 @@ class WelcomePageViewModelTest {
             mockContext,
             mockPixel,
             mockAppInstallStore,
-            mockHighlightsOnboardingExperimentManager,
             mockSettingsDataStore,
         )
     }
@@ -89,13 +81,6 @@ class WelcomePageViewModelTest {
         testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
 
         verify(mockPixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun whenAffirmationDialogIsShownThenSendPixel() {
-        testee.onDialogShown(PreOnboardingDialogType.CELEBRATION)
-
-        verify(mockPixel).fire(PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = Unique())
     }
 
     @Test
@@ -168,7 +153,7 @@ class WelcomePageViewModelTest {
         verify(mockAppInstallStore).defaultBrowser = false
         verify(mockPixel).fire(
             AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
         )
     }
 
@@ -180,34 +165,12 @@ class WelcomePageViewModelTest {
         verify(mockAppInstallStore).defaultBrowser = true
         verify(mockPixel).fire(
             AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
         )
     }
 
     @Test
-    fun whenDDGIsSetAsDefaultBrowserFromOnboardingThenShowCelebrationScreen() = runTest {
-        testee.onDefaultBrowserSet()
-
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowSuccessDialog)
-        }
-    }
-
-    @Test
-    fun givenCelebrationDialogWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.CELEBRATION)
-
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is Finish)
-        }
-    }
-
-    @Test
-    fun givenHighlightsExperimentWhenDDGIsSetAsDefaultBrowserFromOnboardingThenShowAddressBarPositionDialog() = runTest {
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-
+    fun whenDDGIsSetAsDefaultBrowserFromOnboardingThenShowAddressBarPositionDialog() = runTest {
         testee.onDefaultBrowserSet()
 
         testee.commands.test {
@@ -217,9 +180,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenHighlightsExperimentWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-
+    fun whenOnPrimaryCtaClickedThenFinishFlow() = runTest {
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
         testee.commands.test {
@@ -229,9 +190,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSendPixel() = runTest {
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-
+    fun whenBottomAddressBarIsSelectedThenSendPixel() = runTest {
         testee.onAddressBarPositionOptionSelected(false)
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
@@ -239,9 +198,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenHighlightsExperimentWhenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-
+    fun whenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
         testee.onAddressBarPositionOptionSelected(false)
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
@@ -249,14 +206,12 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenHighlightsExperimentWhenLoadingInitialDaxDialogThenShowDaxExperimentCta() = runTest {
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-
+    fun whenLoadingInitialDaxDialogThenShowDaxExperimentCta() = runTest {
         testee.loadDaxDialog()
 
         testee.commands.test {
             val command = awaitItem()
-            Assert.assertTrue(command is ShowExperimentInitialDialog)
+            Assert.assertTrue(command is ShowInitialDialog)
         }
     }
 }

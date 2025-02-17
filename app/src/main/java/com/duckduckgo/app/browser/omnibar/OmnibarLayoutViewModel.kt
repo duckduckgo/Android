@@ -22,10 +22,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
@@ -44,7 +46,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -59,11 +60,11 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -78,10 +79,22 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    val viewState = combine(
+        _viewState,
+        tabRepository.flowTabs,
+        defaultBrowserPromptsExperiment.highlightPopupMenu,
+    ) { state, tabs, highlightOverflowMenu ->
+        state.copy(
+            shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
+            tabCount = tabs.size,
+            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+            showBrowserMenuHighlight = highlightOverflowMenu,
+        )
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -97,15 +110,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         val expanded: Boolean = false,
         val expandedAnimated: Boolean = false,
         val updateOmnibarText: Boolean = false,
-        val shouldMoveCaretToEnd: Boolean = false,
-        val shouldMoveCaretToStart: Boolean = false,
-        val tabs: List<TabEntity> = emptyList(),
+        val tabCount: Int = 0,
+        val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
+        val showBrowserMenuHighlight: Boolean = false,
         val scrollingEnabled: Boolean = true,
         val isLoading: Boolean = false,
         val loadingProgress: Int = 0,
@@ -116,6 +129,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     sealed class Command {
         data object CancelTrackersAnimation : Command()
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data object MoveCaretToFront : Command()
     }
 
     enum class LeadingIconState {
@@ -126,18 +140,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         GLOBE,
     }
 
-    fun onAttachedToWindow() {
-        tabRepository.flowTabs
-            .onEach { tabs ->
-                _viewState.update {
-                    it.copy(
-                        shouldUpdateTabsCount = tabs.count() != it.tabs.count() || tabs.isNotEmpty(),
-                        tabs = tabs,
-                    )
-                }
-            }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
-
+    init {
         logVoiceSearchAvailability()
     }
 
@@ -164,7 +167,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
-                    shouldMoveCaretToStart = false,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
@@ -204,10 +206,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
-                    shouldMoveCaretToStart = true,
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                 )
+            }
+
+            viewModelScope.launch {
+                command.send(Command.MoveCaretToFront)
             }
         }
     }
@@ -231,9 +236,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error -> GLOBE
+            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
             NewTab -> SEARCH
-            SSLWarning -> GLOBE
             else -> {
                 if (hasFocus) {
                     SEARCH
@@ -299,15 +303,15 @@ class OmnibarLayoutViewModel @Inject constructor(
                     LeadingIconState.SEARCH
                 } else {
                     when (viewMode) {
-                        Error -> GLOBE
+                        Error, SSLWarning, MaliciousSiteWarning -> GLOBE
                         NewTab -> SEARCH
-                        SSLWarning -> GLOBE
                         else -> SEARCH
                     }
                 }
 
                 _viewState.update {
                     it.copy(
+                        viewMode = viewMode,
                         leadingIconState = leadingIcon,
                         scrollingEnabled = scrollingEnabled,
                         showVoiceSearch = shouldShowVoiceSearch(
@@ -449,36 +453,21 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
-        if (decoration.privacyShield) {
-            _viewState.update {
-                it.copy(
-                    highlightPrivacyShield = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = true,
-                    ),
-                    highlightFireButton = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = false,
-                    ),
-                    scrollingEnabled = false,
-                )
-            }
-        }
-
-        if (decoration.fireButton) {
-            _viewState.update {
-                it.copy(
-                    highlightPrivacyShield = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = false,
-                    ),
-                    highlightFireButton = HighlightableButton.Visible(
-                        enabled = true,
-                        highlighted = true,
-                    ),
-                    scrollingEnabled = false,
-                )
-            }
+        // We only want to disable scrolling if one of the elements is highlighted
+        Timber.d("Omnibar: onHighlightItem")
+        val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
+        _viewState.update {
+            it.copy(
+                highlightPrivacyShield = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = decoration.privacyShield,
+                ),
+                highlightFireButton = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = decoration.fireButton,
+                ),
+                scrollingEnabled = !isScrollingDisabled,
+            )
         }
     }
 
@@ -506,7 +495,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
-                        shouldMoveCaretToEnd = omnibarViewState.shouldMoveCaretToEnd,
                         omnibarText = omnibarViewState.omnibarText,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
@@ -577,6 +565,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
         Timber.d("Omnibar: LaunchTrackersAnimation")
+        if (_viewState.value.viewMode == MaliciousSiteWarning) {
+            return
+        }
         if (!decoration.entities.isNullOrEmpty()) {
             val hasFocus = _viewState.value.hasFocus
             if (!hasFocus) {

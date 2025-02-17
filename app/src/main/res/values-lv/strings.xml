@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
-    <string name="settingsDefaultBrowserEnabled">Iestatīt kā noklusējuma pārlūku</string>
+    <string name="setAsDefaultBrowser">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
-    <string name="defaultBrowserLetsDoIt">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atver saites bez raizēm.</string>
     <string name="defaultBrowserInstructions">Atlasi DuckDuckGo un pieskaries <font color="#678fff">Vienmēr</font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Pamest šo vietni</string>
     <string name="sslErrorAdvancedCTA">Detalizēti</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo brīdina tevi, ja vietnei ir nederīgs sertifikāts.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Pieņemt risku un apmeklēt vietni<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Pieņemt risku un apmeklēt vietni</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s drošības sertifikāta derīguma termiņš ir beidzies. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s drošības sertifikāts neatbilst *.%2$s. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Tavas ierīces operētājsistēma neuzticas %1$s drošības sertifikātam. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
@@ -745,7 +744,7 @@
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. Es tos bloķēju!<br/><br/>☝️ Pieskaries vairogam, lai uzzinātu vairāk. ️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sapratu!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Izdevās!"</string>
     <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
@@ -774,6 +773,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Dod pieci!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
 
@@ -794,5 +794,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne tagad</string>
 
 </resources>

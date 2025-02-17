@@ -10,7 +10,7 @@ tags:
           clearState: true
           stopApp: true
 
-      - runFlow: ../shared/onboarding.yaml
+      - runFlow: ../shared/pre_onboarding.yaml
 
       - tapOn:
           text: "search or type URL"

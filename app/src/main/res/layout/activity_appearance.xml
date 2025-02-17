@@ -103,5 +103,6 @@
                 app:secondaryText="@string/settingsAddressBarPositionTop" />
 
         </LinearLayout>
+
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

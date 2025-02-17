@@ -21,10 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
-import android.graphics.drawable.Drawable
-import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
@@ -41,31 +38,13 @@ enum class DuckDuckGoTheme {
     fun getOptionIndex(): Int {
         return when (this) {
             SYSTEM_DEFAULT -> 1
-            LIGHT -> 2
-            DARK -> 3
+            DARK -> 2
+            LIGHT -> 3
         }
     }
 }
 
 object Theming {
-
-    fun getThemedDrawable(
-        context: Context,
-        drawableId: Int,
-        theme: DuckDuckGoTheme,
-    ): Drawable? {
-        val themeId = when (theme) {
-            SYSTEM_DEFAULT -> context.getSystemDefaultTheme()
-            DARK -> R.style.Theme_DuckDuckGo_Dark
-            else -> R.style.Theme_DuckDuckGo_Light
-        }
-        return ResourcesCompat.getDrawable(
-            context.resources,
-            drawableId,
-            ContextThemeWrapper(context, themeId).theme,
-        )
-    }
-
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
@@ -74,6 +53,7 @@ object Theming {
             "com.duckduckgo.sync.impl.ui.ShowQRCodeActivity",
             "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
             "com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity",
+            "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
         )
     }
 }

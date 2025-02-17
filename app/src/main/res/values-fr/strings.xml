@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossible de lancer l\'écran des paramètres par défaut de l\'application</string>
-    <string name="settingsDefaultBrowserEnabled">Définir comme navigateur par défaut</string>
+    <string name="setAsDefaultBrowser">Définir comme navigateur par défaut</string>
     <string name="defaultBrowserMaybeLater">Peut-être plus tard</string>
-    <string name="defaultBrowserLetsDoIt">Définir comme navigateur par défaut</string>
     <string name="defaultBrowserDescriptionNoDefault">Des liens ouverts en toute tranquillité d\'esprit, à chaque fois.</string>
     <string name="defaultBrowserInstructions">Sélectionnez DuckDuckGo et appuyez sur <font color="#678fff">Toujours </font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Quitter ce site</string>
     <string name="sslErrorAdvancedCTA">Options avancées</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo vous avertit lorsque le certificat d\'un site Web n\'est pas valide.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s a expiré. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s ne correspond pas à *.%2$s. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s n\'est pas approuvé par le système d\'exploitation de votre appareil. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">J\'ai compris !</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Bien joué !"</string>
     <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
     <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
@@ -756,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Protections activées !</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquez les demandes et les fenêtres contextuelles de cookies</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquez les demandes de cookies et les fenêtres contextuelles</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Effacez rapidement les données de navigation</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Quelle couleur me va le mieux ?</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[C\'est <b>DuckDuckGo Search !</b> Privé. Rapide. Moins de publicités.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Bien joué !</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Essayez</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorer</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Nouvel AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Laissez DuckDuckGo protéger davantage ce que vous faites en ligne</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Choisissez-nous comme navigateur par défaut afin que tous les liens de site s\'ouvrent dans DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Pas maintenant</string>
 
 </resources>

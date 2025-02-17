@@ -7,7 +7,7 @@ tags:
       commands:
             - launchApp:
                 clearState: true
-            - runFlow: ../shared/onboarding.yaml
+            - runFlow: ../shared/pre_onboarding.yaml
             - doubleTapOn:
                 id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-rewrite.html"

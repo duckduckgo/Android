@@ -2027,6 +2027,17 @@
 
     <issue
         id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/gray0` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
         errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2434,6 +2445,61 @@
             file="src/main/res/layout/dialog_email_protection_in_context_sign_up.xml"
             line="24"
             column="10"/>
+    </issue>
+
+    <issue
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="        &lt;TextView"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="29"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="        &lt;TextView"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="36"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:textColor=&quot;@color/gray100&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="34"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="            android:textColor=&quot;@color/gray100&quot;/>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="41"
+            column="13"/>
     </issue>
 
 </issues>

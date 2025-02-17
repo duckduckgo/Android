@@ -21,9 +21,11 @@ import android.util.AttributeSet
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
+import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -77,7 +79,15 @@ class SettingsListItem @JvmOverloads constructor(
 
     /** Sets the item click listener */
     fun setClickListener(onClick: (() -> Unit)?) {
-        binding.root.setOnClickListener { onClick?.invoke() }
+        with(binding) {
+            if (onClick == null) {
+                setOnClickListener(null)
+                root.background = null
+            } else {
+                setOnClickListener { onClick() }
+                root.background = ContextCompat.getDrawable(context, context.defaultSelectableItemBackground())
+            }
+        }
     }
 
     /** Sets whether the status indicator is on or off */

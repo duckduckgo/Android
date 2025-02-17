@@ -24,8 +24,7 @@ import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-) :
-    ThemingDataStore {
+) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
 
@@ -39,7 +38,10 @@ class ThemingSharedPreferences @Inject constructor(
 
     private fun selectedThemeSavedValue(): DuckDuckGoTheme {
         val savedValue = preferences.getString(KEY_THEME, null)
-        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.SYSTEM_DEFAULT)
+        return themePrefMapper.themeFrom(
+            savedValue,
+            DuckDuckGoTheme.SYSTEM_DEFAULT,
+        )
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -56,7 +58,7 @@ class ThemingSharedPreferences @Inject constructor(
             when (theme) {
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
                 DuckDuckGoTheme.LIGHT -> THEME_LIGHT
-                DuckDuckGoTheme.DARK -> THEME_DARK
+                else -> THEME_DARK
             }
 
         fun themeFrom(

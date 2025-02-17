@@ -39,6 +39,9 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -128,9 +131,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
         val subtitle = getString(
             when (selectedTheme) {
-                DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
-                DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
-                DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
+                DARK -> R.string.settingsDarkTheme
+                LIGHT -> R.string.settingsLightTheme
+                SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)

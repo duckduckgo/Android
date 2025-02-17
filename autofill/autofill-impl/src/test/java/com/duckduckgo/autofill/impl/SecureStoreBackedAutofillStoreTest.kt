@@ -16,8 +16,11 @@
 
 package com.duckduckgo.autofill.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
@@ -39,6 +42,8 @@ import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -57,6 +62,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SecureStoreBackedAutofillStoreTest {
 
@@ -66,6 +72,8 @@ class SecureStoreBackedAutofillStoreTest {
     private val lastUpdatedTimeProvider = object : LastUpdatedTimeProvider {
         override fun getInMillis(): Long = UPDATED_INITIAL_LAST_UPDATED
     }
+
+    val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     @Mock
     private lateinit var autofillPrefsStore: AutofillPrefsStore
@@ -181,11 +189,56 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
-    fun whenStoreContainsMatchingDomainAndUsernameAndPassword() = runTest {
+    fun whenStoreContainsMatchingDomainAndUsernameAndPasswordThenReturnExactMatch() = runTest {
         setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "password")
         assertExactMatch(result)
+    }
+
+    @Test
+    fun whenStoreHasASubdomainThenTopLevelDomainConsideredExactMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://test.example.com", "username", "password")
+        val siteToTest = "example.com"
+
+        enableDeepDomainCheckFeatureFlag().also {
+            assertExactMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
+
+        disableDeepDomainCheckFeatureFlag().also {
+            assertExactMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
+    }
+
+    @Test
+    fun whenStoreHasATopLevelDomainThenSubdomainConsideredExactMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://example.com", "username", "password")
+        val siteToTest = "test.example.com"
+
+        enableDeepDomainCheckFeatureFlag().also {
+            assertExactMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
+
+        disableDeepDomainCheckFeatureFlag().also {
+            assertNotMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
+    }
+
+    @Test
+    fun whenStoreHasADifferentSubdomainToVisitedSiteSubdomainThenConsideredExactMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(1, "https://foo.example.com", "username", "password")
+        val siteToTest = "bar.example.com"
+
+        enableDeepDomainCheckFeatureFlag().also {
+            assertExactMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
+
+        disableDeepDomainCheckFeatureFlag().also {
+            assertNotMatch(testee.containsCredentials(siteToTest, "username", "password"))
+        }
     }
 
     @Test
@@ -213,23 +266,129 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenPasswordIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
         setupTesteeWithAutofillAvailable()
-        val url = "https://example.com"
-        storeCredentials(1, url, "username1", "password123")
-        storeCredentials(2, url, "username2", "password456")
-        storeCredentials(3, url, "username3", "password789")
+        val rawUrl = "https://example.com"
+        val expectedStoredDomain = "example.com"
+        storeCredentials(1, rawUrl, "username1", "password123")
+        storeCredentials(2, rawUrl, "username2", "password456")
+        storeCredentials(3, rawUrl, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url,
+            domain = rawUrl,
             username = "username1",
             password = "newpassword",
             id = 1,
         )
 
-        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
+        testee.updateCredentials(rawUrl, credentials, Password)
 
-        testee.getCredentials(url).run {
-            this.assertHasLoginCredentials(url, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
-            this.assertHasLoginCredentials(url, "username2", "password456")
-            this.assertHasLoginCredentials(url, "username3", "password789")
+        testee.getCredentials(rawUrl).run {
+            this.assertHasLoginCredentials(expectedStoredDomain, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
+            this.assertHasLoginCredentials(expectedStoredDomain, "username2", "password456")
+            this.assertHasLoginCredentials(expectedStoredDomain, "username3", "password789")
+        }
+    }
+
+    @Test
+    fun whenStoreHasTopLevelDomainAndUpdateCalledForMatchingTopLevelDomainThenPasswordUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val storedDomain = "example.com"
+        val domainFromWebView = "example.com"
+        storeCredentials(1, storedDomain, "username1", "password123")
+        val credentials = LoginCredentials(domain = domainFromWebView, username = "username1", password = NEW_PASSWORD, id = 1)
+
+        // check behaviour when feature flag disabled
+        disableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials, Password)
+            assertEquals(NEW_PASSWORD, updated!!.password)
+        }
+
+        // check behaviour when feature flag enabled
+        enableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials.copy(password = ANOTHER_NEW_PASSWORD), Password)
+            assertEquals(ANOTHER_NEW_PASSWORD, updated!!.password)
+        }
+    }
+
+    @Test
+    fun whenStoreHasSubdomainAndUpdateCalledForMatchingTopLevelDomainThenPasswordUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val storedDomain = "test.example.com"
+        val domainFromWebView = "example.com"
+        storeCredentials(1, storedDomain, "username1", "password123")
+        val credentials = LoginCredentials(domain = domainFromWebView, username = "username1", password = NEW_PASSWORD, id = 1)
+
+        // check behaviour when feature flag disabled
+        disableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials, Password)
+            assertEquals(NEW_PASSWORD, updated!!.password)
+        }
+
+        // check behaviour when feature flag enabled
+        enableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials.copy(password = ANOTHER_NEW_PASSWORD), Password)
+            assertEquals(ANOTHER_NEW_PASSWORD, updated!!.password)
+        }
+    }
+
+    @Test
+    fun whenStoreHasTopLevelDomainAndUpdateCalledForMatchingSubdomainThenPasswordUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val storedDomain = "example.com"
+        val domainFromWebView = "test.example.com"
+        storeCredentials(1, storedDomain, "username1", "password123")
+        val credentials = LoginCredentials(domain = domainFromWebView, username = "username1", password = NEW_PASSWORD, id = 1)
+
+        // check behaviour when feature flag disabled
+        disableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials, Password)
+            assertNull(updated)
+        }
+
+        // check behaviour when feature flag enabled
+        enableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials.copy(password = ANOTHER_NEW_PASSWORD), Password)
+            assertEquals(ANOTHER_NEW_PASSWORD, updated!!.password)
+        }
+    }
+
+    @Test
+    fun whenStoreHasSubdomainAndUpdateCalledForSiblingSubdomainThenPasswordUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val storedDomain = "foo.example.com"
+        val domainFromWebView = "bar.example.com"
+        storeCredentials(1, storedDomain, "username1", "password123")
+        val credentials = LoginCredentials(domain = domainFromWebView, username = "username1", password = NEW_PASSWORD, id = 1)
+
+        // check behaviour when feature flag disabled
+        disableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials, Password)
+            assertNull(updated)
+        }
+
+        // check behaviour when feature flag enabled
+        enableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials.copy(password = ANOTHER_NEW_PASSWORD), Password)
+            assertEquals(ANOTHER_NEW_PASSWORD, updated!!.password)
+        }
+    }
+
+    @Test
+    fun whenUpdateCalledForUnrelatedDomainThenPasswordNotUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val storedDomain = "example.com"
+        val domainFromWebView = "different-domain.com"
+        storeCredentials(1, storedDomain, "username1", "password123")
+        val credentials = LoginCredentials(domain = domainFromWebView, username = "username1", password = NEW_PASSWORD, id = 1)
+
+        // check behaviour when feature flag disabled
+        disableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials, Password)
+            assertNull(updated)
+        }
+
+        // check behaviour when feature flag enabled
+        enableDeepDomainCheckFeatureFlag().also {
+            val updated = testee.updateCredentials(domainFromWebView, credentials.copy(password = ANOTHER_NEW_PASSWORD), Password)
+            assertNull(updated)
         }
     }
 
@@ -481,6 +640,14 @@ class SecureStoreBackedAutofillStoreTest {
         assertEquals(DEFAULT_INITIAL_LAST_UPDATED, updated.lastUpdatedMillis)
     }
 
+    private fun enableDeepDomainCheckFeatureFlag() {
+        autofillFeature.deepDomainComparisonsOnExistingCredentialsChecks().setRawStoredState(State(true))
+    }
+
+    private fun disableDeepDomainCheckFeatureFlag() {
+        autofillFeature.deepDomainComparisonsOnExistingCredentialsChecks().setRawStoredState(State(false))
+    }
+
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
         url: String,
         username: String,
@@ -512,7 +679,7 @@ class SecureStoreBackedAutofillStoreTest {
     private fun setupTestee(
         canAccessSecureStorage: Boolean,
     ) {
-        secureStore = FakeSecureStore(canAccessSecureStorage)
+        secureStore = FakeSecureStore(canAccessSecureStorage, autofillUrlMatcher)
         testee = SecureStoreBackedAutofillStore(
             secureStorage = secureStore,
             lastUpdatedTimeProvider = lastUpdatedTimeProvider,
@@ -525,6 +692,7 @@ class SecureStoreBackedAutofillStoreTest {
                 coroutineTestRule.testDispatcherProvider,
                 coroutineTestRule.testScope,
             ),
+            autofillFeature = autofillFeature,
         )
     }
 
@@ -566,12 +734,16 @@ class SecureStoreBackedAutofillStoreTest {
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
         notes: String = "notes",
     ): LoginCredentials {
-        val details = WebsiteLoginDetails(domain = domain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
+        val cleanedDomain = autofillUrlMatcher.cleanRawUrl(domain)
+        val details = WebsiteLoginDetails(domain = cleanedDomain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password, notes)
         return secureStore.addWebsiteLoginDetailsWithCredentials(credentials).toLoginCredentials()
     }
 
-    private class FakeSecureStore(val canAccessSecureStorage: Boolean) : SecureStorage {
+    private class FakeSecureStore(
+        private val canAccessSecureStorage: Boolean,
+        private val urlMatcher: AutofillUrlMatcher,
+    ) : SecureStorage {
 
         private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
@@ -594,11 +766,7 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
             return flow {
                 emit(
-                    credentials.filter {
-                        it.details.domain?.contains(domain) == true
-                    }.map {
-                        it.details
-                    },
+                    domainLookup(domain).map { it.details },
                 )
             }
         }
@@ -616,12 +784,18 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> {
             return flow {
                 emit(
-                    credentials.filter {
-                        it.details.domain?.contains(domain) == true
-                    },
+                    domainLookup(domain),
                 )
             }
         }
+
+        private fun domainLookup(domain: String) = credentials
+            .filter { it.details.domain?.contains(domain) == true }
+            .filter {
+                val visitedSite = urlMatcher.extractUrlPartsForAutofill(domain)
+                val savedSite = urlMatcher.extractUrlPartsForAutofill(it.details.domain)
+                urlMatcher.matchingForAutofill(visitedSite, savedSite)
+            }
 
         override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> {
             return flow {
@@ -661,5 +835,8 @@ class SecureStoreBackedAutofillStoreTest {
     companion object {
         private const val DEFAULT_INITIAL_LAST_UPDATED = 200L
         private const val UPDATED_INITIAL_LAST_UPDATED = 10000L
+
+        private const val NEW_PASSWORD = "new-password"
+        private const val ANOTHER_NEW_PASSWORD = "another-new-password"
     }
 }

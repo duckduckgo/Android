@@ -22,15 +22,16 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.fakes.FakePixel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -46,9 +47,8 @@ class LaunchViewModelTest {
 
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
-    private val mockHighlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager = mock {
-        on { it.isHighlightsEnabled() } doReturn false
-    }
+
+    private val fakePixel: FakePixel = FakePixel()
 
     private lateinit var testee: LaunchViewModel
 
@@ -62,7 +62,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -77,7 +77,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -92,7 +92,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -107,7 +107,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -120,7 +120,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -133,7 +133,7 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -142,18 +142,15 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun givenHighlightsExperimentWhenIsNewUserAndReferrerDataTimesOutThenAllocateVariants() = runTest {
+    fun whenSendingWelcomeScreenPixelThenSplashScreenShownPixelIsSent() = runTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            mockHighlightsOnboardingExperimentManager,
+            fakePixel,
         )
-        whenever(mockHighlightsOnboardingExperimentManager.isHighlightsEnabled()).thenReturn(true)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-        testee.command.observeForever(mockCommandObserver)
 
-        testee.determineViewToShow()
+        testee.sendWelcomeScreenPixel()
 
-        verify(mockHighlightsOnboardingExperimentManager).setExperimentVariants()
+        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
     }
 }

@@ -76,6 +76,18 @@ fun AppCompatActivity.launchIgnoreBatteryOptimizationSettings(): Boolean {
     return true
 }
 
+@SuppressLint("InlinedApi")
+fun AppCompatActivity.launchAutofillProviderSystemSettings(): Boolean {
+    val intent = Intent().apply {
+        action = Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE
+        data = Uri.parse("package:$packageName")
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    runCatching { startActivity(intent) }.onFailure { return false }
+
+    return true
+}
+
 fun Activity.showKeyboard(editText: EditText) {
     editText.requestFocus()
     WindowInsetsControllerCompat(window, editText).show(WindowInsetsCompat.Type.ime())

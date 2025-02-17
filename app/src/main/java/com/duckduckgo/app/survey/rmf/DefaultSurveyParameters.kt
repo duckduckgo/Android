@@ -105,3 +105,12 @@ class LastActiveDateSurveyParameterPlugin @Inject constructor(
 
     override suspend fun evaluate(): String = appDaysUsedRepository.getLastActiveDay()
 }
+
+@ContributesMultibinding(AppScope::class)
+class LocaleSurveyParameterPlugin @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : SurveyParameterPlugin {
+    override val surveyParamKey: String = "locale"
+
+    override suspend fun evaluate(): String = "${appBuildConfig.deviceLocale.language}-${appBuildConfig.deviceLocale.country}"
+}

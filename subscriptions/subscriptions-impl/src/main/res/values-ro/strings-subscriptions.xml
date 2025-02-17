@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Actualizează planul sau anulează</string>
-    <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Apple ID &gt; Abonamente pe un dispozitiv conectat la același ID Apple folosit pentru achiziționarea abonamentului.</string>
+    <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activează Privacy Pro pe desktop pentru a configura Personal Information Removal</string>

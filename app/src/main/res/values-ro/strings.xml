@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
-    <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>
+    <string name="setAsDefaultBrowser">Setare ca browser implicit</string>
     <string name="defaultBrowserMaybeLater">Poate mai târziu</string>
-    <string name="defaultBrowserLetsDoIt">Setare ca browser implicit</string>
     <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile liniștit, de fiecare dată.</string>
     <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Părăsește acest site</string>
     <string name="sslErrorAdvancedCTA">Avansat</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo te avertizează când un site web are un certificat nevalid.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
@@ -745,7 +744,7 @@
         <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
@@ -774,6 +773,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Bate palma!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
 
@@ -794,5 +794,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Chat AI nou</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Nu acum</string>
 
 </resources>

@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
-    <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
+    <string name="setAsDefaultBrowser">Angiv som standardbrowser</string>
     <string name="defaultBrowserMaybeLater">Måske senere</string>
-    <string name="defaultBrowserLetsDoIt">Angiv som standardbrowser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
     <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Forlad dette websted</string>
     <string name="sslErrorAdvancedCTA">Avanceret</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo advarer dig, når en hjemmeside har et ugyldigt certifikat.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter risiko og besøg webstedet<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter risiko og besøg webstedet</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s er udløbet. Det er muligt, at webstedet er forkert konfigureret, at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s matcher ikke *.%2$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Enhedens operativsystem har ikke tillid til sikkerhedscertifikatet for %1$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Forstået</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Giv mig fem!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Ny AI-chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Gør os til din standardbrowser, så alle links åbner i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nu</string>
 
 </resources>

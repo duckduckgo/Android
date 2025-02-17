@@ -139,7 +139,6 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun openDuckChat(parameters: Map<String, String>) {
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         val url = appendParameters(parameters, duckChatLink)
         startDuckChatActivity(url)
     }

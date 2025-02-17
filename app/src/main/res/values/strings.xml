@@ -32,9 +32,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
-    <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
+    <string name="setAsDefaultBrowser">Set As Default Browser</string>
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
-    <string name="defaultBrowserLetsDoIt">Set as Default Browser</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
@@ -695,7 +694,7 @@
     <string name="sslErrorLeaveCTA">Leave This Site</string>
     <string name="sslErrorAdvancedCTA">Advanced</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo warns you when a website has an invalid certificate.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is expired. It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s does not match *.%2$s. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
@@ -742,7 +741,7 @@
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got it!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try!️ &#128293;]]></string>
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
@@ -755,14 +754,14 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Protections activated!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Block 3rd party trackers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Block cookie requests &amp; popups</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Block cookie requests &amp; pop-ups</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Erase browsing data swiftly</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Which color looks best on me?</string>
     <string name="highlightsPreOnboardingSelectAppIconDescription">Pick your app icon:</string>
     <string name="highlightsPreOnboardingSelectAppIconOkButton">Next</string>
     <string name="highlightsPreOnboardingAddressBarTitle">Where should I put your address bar?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (Default)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (default)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Easy to see</string>
     <string name="highlightsPreOnboardingAddressBarOkButton">Next</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
@@ -771,7 +770,8 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>DuckDuckGo Search</b>! Private. Fast. Fewer ads.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings.</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Try it</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
 
     <!-- Appearance settings -->
@@ -791,5 +791,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">New AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
 
 </resources>

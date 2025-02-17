@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/maliciousSiteLayout"
+    android:background="?attr/daxColorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="150dp"
+        android:paddingBottom="50dp" >
+
+        <ImageView
+            android:id="@+id/alertImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:src="@drawable/malware_site_128"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/errorTitle"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:breakStrategy="balanced"
+            android:gravity="center"
+            android:text="@string/maliciousSiteTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alertImage"
+            app:typography="h2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/errorHeadline"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:gravity="center"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/errorTitle"
+            app:typography="body1"
+            android:text="@string/maliciousSiteMalwareHeadline" />
+
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/leaveSiteCTA"
+            android:layout_width="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_6"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:text="@string/maliciousSiteLeaveCTA"
+            app:buttonSize="large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/errorHeadline"/>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/advancedCTA"
+            android:layout_width="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:text="@string/sslErrorAdvancedCTA"
+            app:buttonSize="large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/leaveSiteCTA" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/advancedGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="advancedDivider, expandedHeadline, expandedCTA"/>
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/advancedDivider"
+            app:defaultPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/advancedCTA"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/expandedHeadline"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/advancedDivider"
+            app:typography="body2"
+            android:text="@string/maliciousSiteExpandedHeadline" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/expandedCTA"
+            android:layout_width="@dimen/sslWarningTextWidth"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/expandedHeadline"
+            app:typography="body2"
+            android:text="@string/maliciousSiteExpandedCTA" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

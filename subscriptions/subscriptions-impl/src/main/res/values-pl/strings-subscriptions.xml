@@ -44,9 +44,9 @@
     <string name="subscriptionRemoved">Twoja subskrypcja została usunięta z tego urządzenia</string>
     <string name="removeFromDevice">Usunąć z tego urządzenia?</string>
     <string name="removeFromDeviceDescription">Nie będziesz już mieć dostępu do subskrypcji Privacy Pro na tym urządzeniu. Nie spowoduje to anulowania Twojej subskrypcji, która pozostanie aktywna na pozostałych urządzeniach.</string>
-    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Twoja miesięczna subskrypcja %1$s w dniu %2$s.</string>
-    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Twoja roczna subskrypcja %1$s w dniu %2$s.</string>
-    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Twoja subskrypcja wygasła w dniu %1$s.</string>
+    <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Twoja miesięczna subskrypcja %1$s %2$s.</string>
+    <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Twoja roczna subskrypcja %1$s %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Twoja subskrypcja wygasła %1$s.</string>
     <string name="monthlySubscription">Subskrypcja miesięczna</string>
     <string name="yearlySubscription">Subskrypcja roczna</string>
     <string name="renews">zostaje odnowiona</string>
@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Aktualizuj lub anuluj plan</string>
-    <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Apple ID &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple ID wykorzystane do zakupu subskrypcji.</string>
+    <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Konto Apple &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktywuj Privacy Pro na komputerze, aby skonfigurować usługę Personal Information Removal</string>

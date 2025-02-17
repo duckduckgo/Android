@@ -34,7 +34,10 @@ interface AppDaysUsedRepository {
     suspend fun recordAppUsedToday()
 
     /**
-     * Get the number of days the app has been used since a given date
+     * Get the number of days the app has been used since a given date.
+     *
+     * The provided [date] is compared against records of app usage collected by day-truncated local date at a time of capture.
+     * It might not be precise enough for all applications.
      */
     suspend fun getNumberOfDaysAppUsedSinceDate(date: Date): Long
 

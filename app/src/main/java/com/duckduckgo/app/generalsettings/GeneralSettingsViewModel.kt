@@ -27,11 +27,13 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGG
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_GENERAL_SETTINGS_TOGGLED_ON
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_OFF
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_GENERAL_SETTINGS_ON
@@ -59,6 +61,8 @@ class GeneralSettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val maliciousSiteProtection: MaliciousSiteProtection,
 ) : ViewModel() {
 
     data class ViewState(
@@ -69,10 +73,13 @@ class GeneralSettingsViewModel @Inject constructor(
         val voiceSearchEnabled: Boolean,
         val isShowOnAppLaunchOptionVisible: Boolean,
         val showOnAppLaunchSelectedOption: ShowOnAppLaunchOption,
+        val maliciousSiteProtectionEnabled: Boolean,
+        val maliciousSiteProtectionFeatureAvailable: Boolean,
     )
 
     sealed class Command {
         data object LaunchShowOnAppLaunchScreen : Command()
+        data object OpenMaliciousLearnMore : Command()
     }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -95,6 +102,9 @@ class GeneralSettingsViewModel @Inject constructor(
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
+                maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
+                maliciousSiteProtectionFeatureAvailable =
+                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
             )
         }
 
@@ -151,6 +161,24 @@ class GeneralSettingsViewModel @Inject constructor(
         pixel.fire(AppPixelName.SETTINGS_GENERAL_APP_LAUNCH_PRESSED)
     }
 
+    fun onMaliciousSiteProtectionSettingChanged(enabled: Boolean) {
+        Timber.i("User changed malicious site setting, is now enabled: $enabled")
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.maliciousSiteProtectionEnabled = enabled
+            pixel.fire(
+                AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED,
+                mapOf(NEW_STATE to enabled.toString()),
+            )
+            _viewState.value = _viewState.value?.copy(
+                maliciousSiteProtectionEnabled = enabled,
+            )
+        }
+    }
+
+    fun maliciousSiteLearnMoreClicked() {
+        sendCommand(Command.OpenMaliciousLearnMore)
+    }
+
     private fun observeShowOnAppLaunchOption() {
         showOnAppLaunchOptionDataStore.optionFlow
             .onEach { showOnAppLaunchOption ->
@@ -162,5 +190,9 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _commands.send(newCommand)
         }
+    }
+
+    companion object {
+        private const val NEW_STATE = "newState"
     }
 }

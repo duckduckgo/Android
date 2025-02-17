@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Не удаётся открыть настройки приложения по умолчанию</string>
-    <string name="settingsDefaultBrowserEnabled">Сделать браузером по умолчанию</string>
+    <string name="setAsDefaultBrowser">Сделать браузером по умолчанию</string>
     <string name="defaultBrowserMaybeLater">Позже</string>
-    <string name="defaultBrowserLetsDoIt">Сделать браузером по умолчанию</string>
     <string name="defaultBrowserDescriptionNoDefault">Открывайте ссылки, ни о чем не беспокоясь.</string>
     <string name="defaultBrowserInstructions">Выберите DuckDuckGo и нажмите <font color="#678fff">Всегда</font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Покинуть сайт</string>
     <string name="sslErrorAdvancedCTA">Дополнительно</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo предупредит вас, если у сайта окажется недействительный сертификат.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Принять риск и перейти на сайт<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Принять риск и перейти на сайт</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Срок действия сертификата безопасности сайта %1$s истек. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Сертификат безопасности сайта %1$s не подходит для домена *.%2$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
@@ -747,7 +746,7 @@
         <item quantity="other"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Понятно</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Давайте попробуем! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Убедитесь сами! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
@@ -760,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Защита включена</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Блокировка запросов и всплывающих окон куки</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Блокирует запросы и всплывающие окна куки</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Быстрое удаление данных из браузера</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Какой цвет мне идет?</string>
@@ -776,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда конфиденциальны.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Это — <b>DuckDuckGo Search</b>! Надежно. Быстро. Меньше рекламы.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Дай пять!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Попробовать</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Пропустить</string>
 
@@ -796,5 +796,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Запустить AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Оставайтесь под защитой DuckDuckGo большую часть времени, проводимого в Интернете</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Сделайте его браузером по умолчанию, чтобы все ссылки на сайты открывались в DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Не сейчас</string>
 
 </resources>

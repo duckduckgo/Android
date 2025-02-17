@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
-    <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>
+    <string name="setAsDefaultBrowser">Postavi kao zadani preglednik</string>
     <string name="defaultBrowserMaybeLater">Možda kasnije</string>
-    <string name="defaultBrowserLetsDoIt">Postavi kao zadani preglednik</string>
     <string name="defaultBrowserDescriptionNoDefault">Svaki put poveznice otvori spokojno.</string>
     <string name="defaultBrowserInstructions">Odaberi DuckDuckGo i dodirni <font color="#678fff">Uvijek </font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Napusti ovo web-mjesto</string>
     <string name="sslErrorAdvancedCTA">Napredno</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo te upozorava kada web-mjesto ima nevažeći certifikat.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Prihvati rizik i posjeti web-mjesto<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Prihvati rizik i posjeti web-mjesto</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sigurnosni certifikat za %1$s je istekao. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sigurnosni certifikat za %1$s ne odgovara *.%2$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operativni sustav tvog uređaja ne vjeruje sigurnosnom certifikatu za %1$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
@@ -747,7 +746,7 @@
         <item quantity="other"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Shvaćam!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Probaj! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Isprobaj ga! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
     <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gotovo!</string>
@@ -760,7 +759,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokiraj zahtjeve kolačića &amp; skočne prozore</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blokiraj zahtjeve kolačića i skočne prozore</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Brzo izbriši podatke o pregledavanju</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Koja boja izgleda najbolje na meni?</string>
@@ -776,6 +775,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Zapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Daj pet!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
 
@@ -796,5 +796,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Nova opcija AI čavrljanja</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Neka DuckDuckGo zaštiti više onoga što radiš online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Postavi nas kao svoj zadani preglednik kako bi se sve poveznice otvorile u DuckDuckGou.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne sad</string>
 
 </resources>

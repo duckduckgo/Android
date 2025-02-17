@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/welcomeContent"
-        app:srcCompat="@drawable/onboarding_experiment_foreground" />
+        app:srcCompat="@drawable/onboarding_hike_foreground" />
 
     <LinearLayout
         android:id="@+id/welcomeContent"
@@ -66,8 +66,8 @@
             android:layout_marginStart="54dp"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="54dp"
-            android:text="@string/onboardingWelcomeTitle"
             android:gravity="center"
+            android:text="@string/onboardingWelcomeTitle"
             app:typography="title" />
     </LinearLayout>
 
@@ -75,29 +75,13 @@
         android:id="@+id/daxDialogCta"
         layout="@layout/pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"
-        app:layout_constraintHeight_max="672dp"/>
-
-    <include
-        android:id="@+id/daxDialogCtaExperiment"
-        layout="@layout/pre_onboarding_dax_dialog_cta_experiment"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"
-        app:layout_constraintHeight_max="672dp"/>
-
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/setAsDefaultKonfetti"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        app:layout_constraintWidth_max="600dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

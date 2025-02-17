@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.squareup.moshi.Moshi
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -307,7 +306,7 @@ class RefreshPixelSenderTest {
     }
 
     private fun assignToExperiment() {
-        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
             State(
                 remoteEnableState = true,

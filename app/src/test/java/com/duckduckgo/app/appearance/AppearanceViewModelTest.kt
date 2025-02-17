@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.appearance
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
@@ -66,8 +67,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
-    private val featureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
+    private val omnibarFeatureFlag = FakeFeatureToggleFactory.create(ChangeOmnibarPositionFeature::class.java)
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -77,14 +79,14 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
 
-        featureFlag.self().setRawStoredState(Toggle.State(enable = true))
+        omnibarFeatureFlag.self().setRawStoredState(Toggle.State(enable = true))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
-            featureFlag,
+            omnibarFeatureFlag,
         )
     }
 

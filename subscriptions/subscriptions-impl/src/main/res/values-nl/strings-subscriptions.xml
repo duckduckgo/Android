@@ -95,7 +95,7 @@
 
     <!-- Change Plan -->
     <string name="changePlanTitle">Plan bijwerken of annuleren</string>
-    <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Je kunt je abonnement of factureringsinstellingen wijzigen door \'Instellingen\' &gt; \'Apple-ID\' &gt; \'Abonnementen\' te openen op een apparaat dat is aangemeld bij dezelfde Apple-ID waarmee je het abonnement hebt gekocht.</string>
+    <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activeer Privacy Pro op je desktop om Personal Information Removal in te stellen.</string>

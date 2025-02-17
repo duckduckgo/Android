@@ -429,7 +429,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockSettingsDataStore)
+        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()

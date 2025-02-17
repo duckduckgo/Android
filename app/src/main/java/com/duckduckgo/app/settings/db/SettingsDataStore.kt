@@ -39,6 +39,7 @@ interface SettingsDataStore {
     @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var maliciousSiteProtectionEnabled: Boolean
     var appIcon: AppIcon
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
@@ -116,6 +117,10 @@ class SettingsSharedPreferences @Inject constructor(
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
+
+    override var maliciousSiteProtectionEnabled: Boolean
+        get() = preferences.getBoolean(KEY_MALICIOUS_SITE_PROTECTION_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_MALICIOUS_SITE_PROTECTION_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
         get() = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
@@ -252,6 +257,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
+        const val KEY_MALICIOUS_SITE_PROTECTION_ENABLED = "MALICIOUS_SITE_PROTECTION_ENABLED"
         const val KEY_AUTOMATIC_FIREPROOF_SETTING = "KEY_AUTOMATIC_FIREPROOF_SETTING"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"

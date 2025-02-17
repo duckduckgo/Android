@@ -33,7 +33,6 @@ import com.duckduckgo.feature.toggles.impl.RetentionMetric
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -90,7 +89,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when search atb refreshed and matches metric and conversion window, pixel sent to all active experiments`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         setCohorts(today)
@@ -107,7 +106,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when app use atb refreshed and no metric match conversion window, do not send pixels`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         setCohorts(today)
 
         atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
@@ -116,7 +115,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when search atb refreshed, fire all pixels which metric matches the number of searches done and conversion window`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).toString()
         val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         setCohorts(today)
@@ -140,7 +139,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when app use atb refreshed, fire all pixels which metric matches the number of app use and conversion window`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(6).toString()
         val parsedDate: String = ZonedDateTime.parse(today).format(DateTimeFormatter.ISO_LOCAL_DATE).toString()
 
         setCohorts(today)
@@ -164,7 +163,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when search atb refreshed, only fire pixels with active experiments`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testFeature.experimentFooFeature().setRawStoredState(
             State(
                 remoteEnableState = false,
@@ -188,7 +187,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when search atb refreshed, only fire pixels from experiments with cohorts assigned`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testFeature.experimentFooFeature().setRawStoredState(
             State(
                 remoteEnableState = true,
@@ -212,7 +211,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when app use refreshed, only fire pixels with active experiments`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
             State(
@@ -237,7 +236,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     @Test
     fun `when app use refreshed, only fire pixels from experiments with cohorts assigned`() = runTest {
-        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).truncatedTo(ChronoUnit.DAYS).toString()
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).minusDays(1).toString()
 
         testFeature.experimentFooFeature().setRawStoredState(
             State(

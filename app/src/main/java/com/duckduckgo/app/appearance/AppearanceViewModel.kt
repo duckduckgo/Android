@@ -24,9 +24,15 @@ import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -126,9 +132,9 @@ class AppearanceViewModel @Inject constructor(
 
         val pixelName =
             when (selectedTheme) {
-                DuckDuckGoTheme.LIGHT -> AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
-                DuckDuckGoTheme.DARK -> AppPixelName.SETTINGS_THEME_TOGGLED_DARK
-                DuckDuckGoTheme.SYSTEM_DEFAULT -> AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+                LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DARK -> SETTINGS_THEME_TOGGLED_DARK
+                SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
     }

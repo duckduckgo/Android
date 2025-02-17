@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="autofill_service_suggestion_search_passwords">Search Passwords</string>
+    <string name="autofill_service_select_password_activity">Select a Saved Password</string>
 </resources>

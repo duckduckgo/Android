@@ -24,6 +24,17 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".service.AutofillProviderFillSuggestionActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".service.AutofillProviderChooseActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

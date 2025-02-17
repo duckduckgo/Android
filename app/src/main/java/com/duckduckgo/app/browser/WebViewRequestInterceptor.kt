@@ -23,6 +23,10 @@ import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.WaitForConfirmation
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -36,6 +40,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -62,9 +69,12 @@ interface RequestInterceptor {
 
     @WorkerThread
     fun shouldOverrideUrlLoading(
+        webViewClientListener: WebViewClientListener?,
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean
+
+    fun addExemptedMaliciousSite(url: Uri, feed: Feed)
 }
 
 class WebViewRequestInterceptor(
@@ -105,11 +115,10 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri? = request.url
 
-        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) {
-            handleSiteBlocked()
-        }?.let {
-            handleSiteBlocked()
-            return it
+        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+            handleConfirmationCallback(isMalicious, webViewClientListener, url)
+        }.let {
+            if (shouldBlock(it, webViewClientListener, url)) return WebResourceResponse(null, null, null)
         }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
@@ -163,6 +172,17 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUri, webViewClientListener)
     }
 
+    override fun shouldOverrideUrlLoading(webViewClientListener: WebViewClientListener?, url: Uri, isForMainFrame: Boolean): Boolean {
+        maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
+            url,
+            isForMainFrame,
+        ) { isMalicious ->
+            handleConfirmationCallback(isMalicious, webViewClientListener, url)
+        }.let {
+            return shouldBlock(it, webViewClientListener, url)
+        }
+    }
+
     override suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
         documentUrl: Uri?,
@@ -177,22 +197,39 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, null)
     }
 
-    override fun shouldOverrideUrlLoading(url: Uri, isForMainFrame: Boolean): Boolean {
-        if (maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
-                url,
-                isForMainFrame,
-            ) {
-                handleSiteBlocked()
+    private fun shouldBlock(
+        result: IsMaliciousViewData,
+        webViewClientListener: WebViewClientListener?,
+        url: Uri?,
+    ): Boolean {
+        when (result) {
+            WaitForConfirmation, Safe -> return false
+            is MaliciousSite -> {
+                handleSiteBlocked(webViewClientListener, url, result.feed, result.exempted, clientSideHit = true)
+                return !result.exempted
             }
-        ) {
-            handleSiteBlocked()
-            return true
         }
-        return false
     }
 
-    private fun handleSiteBlocked() {
-        // TODO (cbarreiro): Handle site blocked
+    private fun handleConfirmationCallback(
+        isMalicious: MaliciousStatus,
+        webViewClientListener: WebViewClientListener?,
+        url: Uri?,
+    ) {
+        if (isMalicious is Malicious) {
+            /*
+             * If the site is exempted, we'll never get here, as we won't call isMalicious
+             */
+            handleSiteBlocked(webViewClientListener, url, isMalicious.feed, exempted = false, clientSideHit = false)
+        }
+    }
+
+    private fun handleSiteBlocked(webViewClientListener: WebViewClientListener?, url: Uri?, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        url?.let { webViewClientListener?.onReceivedMaliciousSiteWarning(it, feed, exempted, clientSideHit) }
+    }
+
+    override fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
+        maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
     private fun getWebResourceResponse(

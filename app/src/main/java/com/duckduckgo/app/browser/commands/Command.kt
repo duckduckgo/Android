@@ -42,6 +42,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -217,6 +218,23 @@ sealed class Command {
         val url: String,
     ) : Command()
 
+    data class ShowWarningMaliciousSite(
+        val url: Uri,
+        val feed: Feed,
+    ) : Command()
+
+    data object HideWarningMaliciousSite : Command()
+
+    data object EscapeMaliciousSite : Command()
+
+    data class BypassMaliciousSiteWarning(
+        val url: Uri,
+        val feed: Feed,
+    ) : Command()
+
+    data class OpenBrokenSiteLearnMore(val url: String) : Command()
+    data class ReportBrokenSiteError(val url: String) : Command()
+
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(val data: JsCallbackData) : Command()
     data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()
@@ -242,4 +260,5 @@ sealed class Command {
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
+    data object CloseCustomTab : Command()
 }

@@ -82,8 +82,10 @@ import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.browser.commands.Command.BrokenSiteFeedback
+import com.duckduckgo.app.browser.commands.Command.BypassMaliciousSiteWarning
 import com.duckduckgo.app.browser.commands.Command.CancelIncomingAutofillRequest
 import com.duckduckgo.app.browser.commands.Command.ChildTabClosed
+import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.ConvertBlobToDataUri
 import com.duckduckgo.app.browser.commands.Command.CopyAliasToClipboard
 import com.duckduckgo.app.browser.commands.Command.CopyLink
@@ -95,6 +97,7 @@ import com.duckduckgo.app.browser.commands.Command.DismissFindInPage
 import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
+import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -103,6 +106,7 @@ import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
+import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
@@ -113,6 +117,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
+import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
@@ -120,6 +125,7 @@ import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
+import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
 import com.duckduckgo.app.browser.commands.Command.ResetHistory
@@ -152,6 +158,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
+import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
@@ -159,6 +166,7 @@ import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.duckchat.DuckChatJSHelper
 import com.duckduckgo.app.browser.duckchat.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
@@ -202,6 +210,11 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
+import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -217,13 +230,13 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.model.MaliciousSiteStatus
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.HighlightsOnboardingExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -286,6 +299,9 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -362,6 +378,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -373,6 +390,9 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import timber.log.Timber
+
+private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
+private const val MALICIOUS_SITE_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -434,13 +454,14 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
-    private val highlightsOnboardingExperimentManager: HighlightsOnboardingExperimentManager,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
+    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -676,6 +697,12 @@ class BrowserTabViewModel @Inject constructor(
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
+
+        defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
+            .onEach {
+                browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -808,7 +835,7 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteDetected) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
@@ -983,7 +1010,6 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            is DaxBubbleCta.DaxExperimentIntroSearchOptionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
@@ -992,13 +1018,12 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            is DaxBubbleCta.DaxExperimentIntroVisitSiteOptionsCta,
-            is OnboardingDaxDialogCta.DaxExperimentSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
             }
+
             is BrokenSitePromptDialogCta -> {
                 viewModelScope.launch(dispatchers.main()) {
                     command.value = HideBrokenSitePromptCta(cta)
@@ -1072,7 +1097,6 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(
@@ -1188,6 +1212,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
+    }
+
     fun closeAndReturnToSourceIfBlankTab() {
         if (url == null) {
             closeAndSelectSourceTab()
@@ -1283,6 +1312,11 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            command.postValue(HideWarningMaliciousSite)
+            return true
+        }
+
         if (!currentBrowserViewState().browserShowing) {
             return false
         }
@@ -1322,7 +1356,6 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = "",
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -1462,7 +1495,6 @@ class BrowserTabViewModel @Inject constructor(
         val omnibarText = omnibarTextForUrl(url)
         omnibarViewState.value = currentOmnibarViewState.copy(
             omnibarText = omnibarText,
-            shouldMoveCaretToEnd = false,
             forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
@@ -1632,7 +1664,6 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.postValue(
             currentOmnibarViewState.copy(
                 omnibarText = omnibarText,
-                shouldMoveCaretToEnd = false,
                 forceExpand = false,
             ),
         )
@@ -1838,6 +1869,38 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
         site?.consentCosmeticHide = isCosmetic
+    }
+
+    fun onMaliciousSiteUserAction(
+        action: MaliciousSiteBlockedWarningLayout.Action,
+        url: Uri,
+        feed: Feed,
+        activeCustomTab: Boolean,
+    ) {
+        when (action) {
+            LeaveSite -> {
+                if (activeCustomTab) {
+                    command.postValue(CloseCustomTab)
+                } else {
+                    command.postValue(EscapeMaliciousSite)
+                    openNewTab()
+                    closeCurrentTab()
+                }
+            }
+
+            VisitSite -> {
+                val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
+                pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
+                command.postValue(BypassMaliciousSiteWarning(url, feed))
+                browserViewState.value = currentBrowserViewState().copy(
+                    browserShowing = true,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                )
+            }
+
+            LearnMore -> command.postValue(OpenBrokenSiteLearnMore(MALICIOUS_SITE_LEARN_MORE_URL))
+            ReportError -> command.postValue(ReportBrokenSiteError("$MALICIOUS_SITE_REPORT_ERROR_URL$url"))
+        }
     }
 
     private fun onSiteChanged() {
@@ -2449,7 +2512,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserSelected() {
-        // no-op, to be implemented
+        defaultBrowserPromptsExperiment.onSetAsDefaultPopupMenuItemSelected()
     }
 
     fun onShareSelected() {
@@ -2561,13 +2624,39 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPopupMenuLaunched() {
+        defaultBrowserPromptsExperiment.onPopupMenuLaunched()
+    }
+
     fun userRequestedOpeningNewTab(
         longPress: Boolean = false,
     ) {
         command.value = GenerateWebViewPreviewImage
-        command.value = LaunchNewTab
+
+        if (swipingTabsFeature.isEnabled) {
+            viewModelScope.launch {
+                val emptyTab = tabRepository.flowTabs.first().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                if (emptyTab != null) {
+                    tabRepository.select(tabId = emptyTab)
+                } else {
+                    command.value = LaunchNewTab
+                }
+            }
+        } else {
+            command.value = LaunchNewTab
+        }
+
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+        } else {
+            val url = site?.url
+            if (url != null) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP)
+                } else {
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE)
+                }
+            }
         }
 
         onUserDismissedCta(ctaViewState.value?.cta)
@@ -2583,6 +2672,7 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
+            val isErrorShowing = currentBrowserViewState().maliciousSiteDetected
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
@@ -2599,6 +2689,7 @@ class BrowserTabViewModel @Inject constructor(
                 cta = cta,
                 daxOnboardingComplete = isOnboardingComplete,
                 isBrowserShowing = isBrowserShowing,
+                isErrorShowing = isErrorShowing,
             )
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
@@ -2607,7 +2698,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
@@ -2638,13 +2729,13 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is DaxBubbleCta.DaxExperimentPrivacyProCta) {
+            if (cta is DaxBubbleCta.DaxPrivacyProCta) {
                 val updatedCta = refreshCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
             } else if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
-            if (cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
                 pixel.fire(ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA))
                 val updatedCta = ctaViewModel.getEndStaticDialogCta()
                 ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
@@ -2656,6 +2747,9 @@ class BrowserTabViewModel @Inject constructor(
         cta?.let {
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)
+            }
+            if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
         }
     }
@@ -2669,6 +2763,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun deleteTabPreview(tabId: String) {
         tabRepository.updateTabPreviewImage(tabId, null)
+        tabRepository.updateTabFavicon(tabId, null)
     }
 
     override fun handleAppLink(
@@ -3036,6 +3131,9 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         }
+        if (currentBrowserViewState().maliciousSiteDetected) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, maliciousSiteDetected = false)
+        }
     }
 
     fun onWebViewRefreshed() {
@@ -3109,6 +3207,36 @@ class BrowserTabViewModel @Inject constructor(
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         command.postValue(WebViewError(errorType, url))
+    }
+
+    override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
+        site?.maliciousSiteStatus = when (feed) {
+            MALWARE -> MaliciousSiteStatus.MALWARE
+            PHISHING -> MaliciousSiteStatus.PHISHING
+        }
+        if (!exempted) {
+            val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
+            pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
+            loadingViewState.postValue(
+                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
+            )
+            browserViewState.postValue(
+                currentBrowserViewState().copy(
+                    browserShowing = false,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                    maliciousSiteDetected = true,
+                ),
+            )
+            command.postValue(ShowWarningMaliciousSite(url, feed))
+        }
+    }
+
+    suspend fun updateTabTitle(tabId: String, newTitle: String) {
+        getSite()?.let { site ->
+            site.title = newTitle
+            tabRepository.update(tabId, site)
+        }
     }
 
     override fun recordErrorCode(
@@ -3371,6 +3499,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
+        activeCustomTab: Boolean = false,
     ) {
         when (action) {
             is Action.Shown -> {
@@ -3388,8 +3517,12 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             Action.LeaveSite -> {
-                command.postValue(HideSSLError)
                 pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+                if (activeCustomTab) {
+                    command.postValue(CloseCustomTab)
+                } else {
+                    command.postValue(HideSSLError)
+                }
             }
 
             Action.Proceed -> {
@@ -3401,13 +3534,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun recoverFromSSLWarningPage(showBrowser: Boolean) {
+    fun recoverFromWarningPage(showBrowser: Boolean) {
         if (showBrowser) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE, maliciousSiteDetected = false)
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
-                shouldMoveCaretToEnd = false,
                 forceExpand = true,
             )
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -3415,6 +3547,7 @@ class BrowserTabViewModel @Inject constructor(
                 showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 browserShowing = showBrowser,
                 sslError = NONE,
+                maliciousSiteDetected = false,
             )
         }
     }
@@ -3437,7 +3570,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
-            is OnboardingDaxDialogCta.DaxSerpCta, is OnboardingDaxDialogCta.DaxExperimentSerpCta -> {
+            is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
                     val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
@@ -3451,13 +3584,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta,
-            is OnboardingDaxDialogCta.DaxExperimentNoTrackersCta,
-            is OnboardingDaxDialogCta.DaxExperimentMainNetworkCta,
             -> {
-                if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
-                    browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-                }
                 viewModelScope.launch {
                     val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
@@ -3468,7 +3595,7 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxExperimentFireButtonCta -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
+            is OnboardingDaxDialogCta.DaxFireButtonCta -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
@@ -3477,11 +3604,11 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
         onUserDismissedCta(cta)
         return when (cta) {
-            is DaxBubbleCta.DaxPrivacyProCta, is DaxBubbleCta.DaxExperimentPrivacyProCta -> {
+            is DaxBubbleCta.DaxPrivacyProCta -> {
                 LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_pro_android_onboarding".toUri())
             }
 
-            is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxExperimentEndCta -> {
+            is DaxBubbleCta.DaxEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
@@ -3495,24 +3622,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
-        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is OnboardingDaxDialogCta.DaxExperimentTrackersBlockedCta) {
-            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-        }
-
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
     }
 
     fun onFireMenuSelected() {
         val cta = currentCtaViewState().cta
-        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is OnboardingDaxDialogCta.DaxExperimentFireButtonCta) {
+        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
-        }
-        if (currentBrowserViewState().fireButton.isHighlighted()) {
-            viewModelScope.launch {
-                ctaViewModel.dismissPulseAnimation()
-            }
         }
     }
 
@@ -3692,26 +3810,20 @@ class BrowserTabViewModel @Inject constructor(
         refreshPixelSender.sendCustomTabRefreshPixel()
     }
 
-    fun setBrowserExperimentBackground(lightModeEnabled: Boolean) {
+    fun setBrowserBackground(lightModeEnabled: Boolean) {
         command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    fun setOnboardingDialogExperimentBackground(lightModeEnabled: Boolean) {
+    fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    private fun getBackgroundResource(lightModeEnabled: Boolean): Int {
-        return when {
-            lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
-                R.drawable.onboarding_experiment_background_bitmap_light
-
-            !lightModeEnabled && highlightsOnboardingExperimentManager.isHighlightsEnabled() ->
-                R.drawable.onboarding_experiment_background_bitmap_dark
-
-            lightModeEnabled -> R.drawable.onboarding_background_bitmap_light
-            else -> R.drawable.onboarding_background_bitmap_dark
+    private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
+        if (lightModeEnabled) {
+            R.drawable.onboarding_background_bitmap_light
+        } else {
+            R.drawable.onboarding_background_bitmap_dark
         }
-    }
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
@@ -3729,6 +3841,9 @@ class BrowserTabViewModel @Inject constructor(
         private const val HTTP_STATUS_CODE_BAD_REQUEST_ERROR = 400
         private const val HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX = 4 // 4xx, client error status code prefix
         private const val HTTP_STATUS_CODE_SERVER_ERROR_PREFIX = 5 // 5xx, server error status code prefix
+
+        private const val CATEGORY_KEY = "category"
+        private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(

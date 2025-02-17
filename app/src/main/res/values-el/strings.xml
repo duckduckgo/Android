@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
-    <string name="settingsDefaultBrowserEnabled">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
+    <string name="setAsDefaultBrowser">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserMaybeLater">Ίσως αργότερα</string>
-    <string name="defaultBrowserLetsDoIt">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserDescriptionNoDefault">Ανοίξτε συνδέσμους με ηρεμία και ασφάλεια, κάθε φορά.</string>
     <string name="defaultBrowserInstructions">Επιλέξτε DuckDuckGo και πιέστε <font color="#678fff"> Always </font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Αποχωρήστε από τον ιστότοπο αυτόν</string>
     <string name="sslErrorAdvancedCTA">Προχωρημένο</string>
     <string name="sslErrorExpandedHeadline">Το DuckDuckGo σάς προειδοποιεί όταν ένας ιστότοπος έχει μη έγκυρο πιστοποιητικό.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Αποδεχτείτε τον κίνδυνο και επισκεφτείτε τον ιστότοπο<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Αποδεχτείτε τον κίνδυνο και επισκεφτείτε τον ιστότοπο</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s έχει λήξει. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά, κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφάλειας για τον τομέα %1$s δεν ταιριάζει με το *.%2$s. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
     <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
     <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Νέο AI Chat</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Αφήστε το DuckDuckGo να προστατεύσει περισσότερα από όσα κάνετε στο διαδίκτυο</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ορίστε μας ως το προεπιλεγμένο πρόγραμμα περιήγησής σας ώστε όλοι οι σύνδεσμοι του ιστότοπου να ανοίγουν στο DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Όχι τώρα</string>
 
 </resources>

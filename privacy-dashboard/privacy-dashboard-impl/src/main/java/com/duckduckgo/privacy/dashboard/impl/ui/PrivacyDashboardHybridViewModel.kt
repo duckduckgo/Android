@@ -117,6 +117,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val protectionStatus: ProtectionStatusViewState,
         val cookiePromptManagementStatus: CookiePromptManagementState,
         val remoteFeatureSettings: RemoteFeatureSettingsViewState,
+        val maliciousSiteStatus: String? = null,
     )
 
     data class ProtectionStatusViewState(
@@ -289,6 +290,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
                     cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
                     remoteFeatureSettings = createRemoteFeatureSettings(),
+                    maliciousSiteStatus = site.maliciousSiteStatus?.name?.lowercase(),
                 ),
             )
         }

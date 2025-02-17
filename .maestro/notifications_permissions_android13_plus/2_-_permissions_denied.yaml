@@ -14,12 +14,15 @@ appId: com.duckduckgo.mobile.android
                 text: ".*Welcome to DuckDuckGo!.*"
                 optional: true
             - assertVisible:
-                text: ".*Ready for a better, more private internet?.*"
+                text: ".*Ready for a faster browser that keeps you protected?.*"
             - tapOn: "let's do it!"
             - assertVisible:
-                text: ".*Privacy protections activated.*"
+                text: "Protections activated!"
             - tapOn: "choose your browser"
             - tapOn: "cancel"
+            - assertVisible:
+                text: ".*where should I put your address bar?.*"
+            - tapOn: "next"
             - assertVisible:
                 text: ".*Try a search!.*"
             - tapOn:

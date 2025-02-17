@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
-    <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>
+    <string name="setAsDefaultBrowser">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
-    <string name="defaultBrowserLetsDoIt">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserDescriptionNoDefault">Sluta oroa dig varje gång du öppnar länkar.</string>
     <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Lämna denna webbplats</string>
     <string name="sslErrorAdvancedCTA">Avancerat</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo varnar dig när en webbplats har ett ogiltigt certifikat.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptera risken och besök webbplatsen<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptera risken och besök webbplatsen</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s har löpt ut. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Säkerhetscertifikatet för %1$s matchar inte *.%2$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Din enhets operativsystem litar inte på säkerhetscertifikatet för %1$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ försökte spåra dig här. Jag blockerade dem!<br/><br/>☝️ Tryck på skölden för mer information.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Jag förstår!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
     <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
     <string name="onboardingEndDaxDialogButton">Allt klart!</string>
@@ -756,7 +755,7 @@
     <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
     <string name="highlightsPreOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="highlightsPreOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blockera förfrågningar och popup-fönster för cookies</string>
+    <string name="highlightsPreOnboardingComparisonChartItem3">Blockera cookieförfrågningar och popup-fönster</string>
     <string name="highlightsPreOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="highlightsPreOnboardingComparisonChartItem5">Radera webbläsardata snabbt</string>
     <string name="highlightsPreOnboardingSelectAppIconTitle">Vilken färg passar bäst på mig?</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid privata.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det är <b>DuckDuckGo Search</b>! Privat. Snabbt. Färre annonser.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">High Five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Ny AI-chatt</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Inte nu</string>
 
 </resources>

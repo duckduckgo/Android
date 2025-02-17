@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
@@ -56,6 +57,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
+    private val autofillFeature: AutofillFeature,
     passwordStoreEventListenersPlugins: PluginPoint<PasswordStoreEventListener>,
 ) : InternalAutofillStore, AutofillDeclineStore {
 
@@ -153,7 +155,13 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ): LoginCredentials? {
-        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
+        Timber.v("Updating credentials. Update type: %s. for %s", updateType, rawUrl)
+
+        val url = getUrlToCompare(rawUrl)
+        if (url == null) {
+            Timber.w("Cannot update credentials as URL to lookup is null")
+            return null
+        }
 
         val filter = when (updateType) {
             Username -> filterMatchingPassword(credentials)
@@ -161,7 +169,10 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             else -> return null
         }
 
-        val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()?.filter(filter)
+        val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url)
+            .firstOrNull()
+            ?.filter(filter)
+
         if (matchingCredentials.isNullOrEmpty()) {
             Timber.w("Cannot update credentials as no credentials were found for %s", url)
             return null
@@ -238,8 +249,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         username: String?,
         password: String?,
     ): ContainsCredentialsResult {
-        val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
-        val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
+        val urlToCompare = getUrlToCompare(rawUrl) ?: return NoMatch
+
+        val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(urlToCompare).firstOrNull() ?: return NoMatch
 
         var exactMatchFound = false
         var usernameMatchFound = false
@@ -276,6 +288,14 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         Timber.v("Determined match type is %s", matchType.javaClass.simpleName)
         return matchType
+    }
+
+    private fun getUrlToCompare(rawUrl: String): String? {
+        return if (autofillFeature.deepDomainComparisonsOnExistingCredentialsChecks().isEnabled()) {
+            autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl).eTldPlus1
+        } else {
+            autofillUrlMatcher.cleanRawUrl(rawUrl)
+        }
     }
 
     private fun LoginCredentials.prepareForBulkInsertion(): WebsiteLoginDetailsWithCredentials {

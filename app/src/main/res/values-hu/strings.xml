@@ -33,9 +33,8 @@
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
-    <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>
+    <string name="setAsDefaultBrowser">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserMaybeLater">Talán később</string>
-    <string name="defaultBrowserLetsDoIt">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
@@ -696,7 +695,7 @@
     <string name="sslErrorLeaveCTA">Webhely elhagyása</string>
     <string name="sslErrorAdvancedCTA">Haladó</string>
     <string name="sslErrorExpandedHeadline">A DuckDuckGo figyelmeztet, ha egy webhely érvénytelen tanúsítvánnyal rendelkezik.</string>
-    <string name="sslErrorExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása<u/>]]></string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása</u>]]></string>
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa lejárt. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa nem egyezik ezzel: *.%2$s. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
@@ -743,7 +742,7 @@
         <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
-    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki! ☝️️]]></string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki!️ 🔥]]></string>
     <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
@@ -772,6 +771,7 @@
     <string name="highlightsOnboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
     <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
     <string name="highlightsOnboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét.</string>
+    <string name="highlightsOnboardingEndDaxDialogButton">Pacsi!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
 
@@ -792,5 +792,10 @@
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
     <string name="duckChatMenuItem">Új AI-csevegés</string>
+
+    <!--    Default Browser Bottom Sheet Dialog -->
+    <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton">Most nem</string>
 
 </resources>

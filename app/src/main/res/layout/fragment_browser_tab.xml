@@ -66,6 +66,12 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
+        android:id="@+id/maliciousSiteWarningLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"
@@ -83,13 +89,8 @@
             android:elevation="@dimen/keyline_4">
 
             <include
-                android:id="@+id/includeOnboardingDaxDialog"
-                layout="@layout/include_onboarding_view_dax_dialog"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/includeOnboardingDaxDialogExperiment"
-                layout="@layout/include_onboarding_view_dax_dialog_experiment"
+                android:id="@+id/includeOnboardingInContextDaxDialog"
+                layout="@layout/include_onboarding_in_context_dax_dialog"
                 android:visibility="gone" />
 
             <include

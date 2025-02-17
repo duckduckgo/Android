@@ -28,7 +28,6 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
@@ -230,7 +229,12 @@ interface Toggle {
         data class Cohort(
             val name: String,
             val weight: Int,
-            // This is nullable because only assigned cohort should have a value here, it's ET timezone
+
+            /**
+             * Represents serialized [ZonedDateTime] with "America/New_York" zone ID.
+             *
+             * This is nullable because only assigned cohort should have a value here, it's ET timezone
+             */
             val enrollmentDateET: String? = null,
         ) {
             companion object {
@@ -506,7 +510,7 @@ internal class ToggleImpl constructor(
         }
 
         return getRandomCohort(cohorts)?.copy(
-            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.DAYS).toString(),
+            enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString(),
         )
     }
 

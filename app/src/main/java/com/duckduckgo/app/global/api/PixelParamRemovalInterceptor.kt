@@ -94,6 +94,16 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             SITE_NOT_WORKING_SHOWN.pixelName to PixelParameter.removeAtb(),
             SITE_NOT_WORKING_WEBSITE_BROKEN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_VERSION_AT_SEARCH_TIME.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK.pixelName to PixelParameter.removeAll(),
+            AppPixelName.SPLASHSCREEN_SHOWN.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SITE.pixelName to PixelParameter.removeAll(),
+            AppPixelName.MENU_ACTION_NEW_TAB_PRESSED_FROM_SERP.pixelName to PixelParameter.removeAll(),
         )
     }
 }

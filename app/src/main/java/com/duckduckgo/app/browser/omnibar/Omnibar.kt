@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
@@ -126,6 +127,7 @@ class Omnibar(
     sealed class ViewMode {
         data object Error : ViewMode()
         data object SSLWarning : ViewMode()
+        data object MaliciousSiteWarning : ViewMode()
         data object NewTab : ViewMode()
         data class Browser(val url: String?) : ViewMode()
         data class CustomTab(
@@ -177,6 +179,8 @@ class Omnibar(
         newOmnibar.omnibarTextInput.rootView
     }
 
+    val isInEditMode = newOmnibar.isEditingFlow
+
     var isScrollingEnabled: Boolean
         get() =
             newOmnibar.isScrollingEnabled
@@ -195,6 +199,10 @@ class Omnibar(
             }
 
             SSLWarning -> {
+                newOmnibar.decorate(Mode(viewMode))
+            }
+
+            MaliciousSiteWarning -> {
                 newOmnibar.decorate(Mode(viewMode))
             }
 
