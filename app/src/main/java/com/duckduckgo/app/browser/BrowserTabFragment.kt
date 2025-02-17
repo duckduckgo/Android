@@ -886,7 +886,7 @@ class BrowserTabFragment :
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
-                        if (viewModel.browserViewState.value?.maliciousSiteDetected != true) {
+                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
                             updateOrDeleteWebViewPreview()
                         }
                     }
