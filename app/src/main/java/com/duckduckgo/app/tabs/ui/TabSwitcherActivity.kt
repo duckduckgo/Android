@@ -188,17 +188,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(this) { tabs ->
-            render(tabs)
+        viewModel.tabSwitcherItems.observe(this) { tabSwitcherItems ->
 
-            val noTabSelected = tabs.none { it.tabId == tabItemDecorator.selectedTabId }
-            if (noTabSelected && tabs.isNotEmpty()) {
-                updateTabGridItemDecorator(tabs.last())
+            render(tabSwitcherItems)
+
+            val noTabSelected = tabSwitcherItems.none { it.id == tabItemDecorator.tabSwitcherItemId }
+            if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
+                updateTabGridItemDecorator(tabSwitcherItems.last().id)
             }
         }
         viewModel.activeTab.observe(this) { tab ->
-            if (tab != null && tab.tabId != tabItemDecorator.selectedTabId && !tab.deletable) {
-                updateTabGridItemDecorator(tab)
+            if (tab != null && tab.tabId != tabItemDecorator.tabSwitcherItemId && !tab.deletable) {
+                updateTabGridItemDecorator(tab.tabId)
             }
         }
         viewModel.deletableTabs.observe(this) {
@@ -286,7 +287,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
-    private fun render(tabs: List<TabEntity>) {
+    private fun render(tabs: List<TabSwitcherItem>) {
         tabsAdapter.updateData(tabs)
     }
 
@@ -349,7 +350,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
+        closeAllTabsMenuItem?.isVisible = viewModel.tabSwitcherItems.value?.isNotEmpty() == true
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
         duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
 
@@ -390,23 +391,27 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        updateTabGridItemDecorator(tab)
+        updateTabGridItemDecorator(tab.tabId)
         launch { viewModel.onTabSelected(tab) }
     }
 
-    private fun updateTabGridItemDecorator(tab: TabEntity) {
-        tabItemDecorator.selectedTabId = tab.tabId
+    private fun updateTabGridItemDecorator(tabSwitcherItemId: String) {
+        tabItemDecorator.tabSwitcherItemId = tabSwitcherItemId
         tabsRecycler.invalidateItemDecorations()
     }
 
     override fun onTabDeleted(position: Int, deletedBySwipe: Boolean) {
-        tabsAdapter.getTab(position)?.let { tab ->
-            launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
+        tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
+            when(tab) {
+                is TabSwitcherItem.Tab -> {
+                    launch { viewModel.onTabDeleted(tab.tabEntity) }
+                }
+            }
         }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        val tabCount = viewModel.tabs.value?.size ?: 0
+        val tabCount = viewModel.tabSwitcherItems.value?.size ?: 0
         val canSwap = from in 0..< tabCount && to in 0..< tabCount
         if (canSwap) {
             tabsAdapter.onTabMoved(from, to)
@@ -489,7 +494,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {
-        viewModel.tabs.removeObservers(this)
+        viewModel.tabSwitcherItems.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
     }
 
