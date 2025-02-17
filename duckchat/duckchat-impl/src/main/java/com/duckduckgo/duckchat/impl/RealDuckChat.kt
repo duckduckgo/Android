@@ -26,8 +26,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.BrowserMenu
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.NewTabMenu
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.WebView
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -52,6 +57,11 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
      */
     fun observeShowInBrowserMenuUserSetting(): Flow<Boolean>
+
+    /**
+     * Returns `true` if Duck Chat was ever opened before.
+     */
+    suspend fun wasOpenedBefore(): Boolean
 }
 
 data class DuckChatSettingJson(
@@ -123,24 +133,29 @@ class RealDuckChat @Inject constructor(
         return showInBrowserMenu
     }
 
-    override fun openDuckChat(query: String?) {
+    override fun openDuckChat(query: String?, launchSource: DuckChatLaunchSource) {
         val parameters = query?.let {
             mapOf(QUERY to it)
         } ?: emptyMap()
-        openDuckChat(parameters)
+        openDuckChat(parameters, launchSource)
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, launchSource: DuckChatLaunchSource) {
         val parameters = mapOf(
             QUERY to query,
             PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
         )
-        openDuckChat(parameters)
+        openDuckChat(parameters, launchSource)
     }
 
-    private fun openDuckChat(parameters: Map<String, String>) {
+    override suspend fun wasOpenedBefore(): Boolean {
+        return duckChatFeatureRepository.wasOpenedBefore()
+    }
+
+    private fun openDuckChat(parameters: Map<String, String>, launchSource: DuckChatLaunchSource) {
         val url = appendParameters(parameters, duckChatLink)
         startDuckChatActivity(url)
+        recordActivityAndSendPixels(launchSource)
     }
 
     private fun startDuckChatActivity(url: String) {
@@ -203,6 +218,24 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
             showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() && isDuckChatEnabled
+        }
+    }
+
+    private fun recordActivityAndSendPixels(launchSource: DuckChatLaunchSource) {
+        appCoroutineScope.launch {
+            val wasOpenedBefore = duckChatFeatureRepository.wasOpenedBefore()
+            duckChatFeatureRepository.registerOpened()
+            when (launchSource) {
+                WebView -> {
+                    // do not send pixels when origin was in-browser
+                }
+                BrowserMenu, NewTabMenu -> {
+                    pixel.fire(
+                        DuckChatPixelName.DUCK_CHAT_OPEN,
+                        parameters = mapOf("source" to launchSource.value, "was_used_before" to wasOpenedBefore.toBinaryString()),
+                    )
+                }
+            }
         }
     }
 

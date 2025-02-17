@@ -39,14 +39,14 @@ interface DuckChat {
     fun showInBrowserMenu(): Boolean
 
     /**
-     * Opens the DuckChat WebView with optional pre-filled [String] query.
+     * Opens the DuckChat WebView with optional pre-filled [query]. The [launchSource] parameter is used for metrics.
      */
-    fun openDuckChat(query: String? = null)
+    fun openDuckChat(query: String? = null, launchSource: DuckChatLaunchSource)
 
     /**
-     * Auto-prompts the DuckChat WebView with the provided [String] query.
+     * Auto-prompts the DuckChat WebView with the provided [query]. The [launchSource] parameter is used for metrics.
      */
-    fun openDuckChatWithAutoPrompt(query: String)
+    fun openDuckChatWithAutoPrompt(query: String, launchSource: DuckChatLaunchSource)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
@@ -54,4 +54,13 @@ interface DuckChat {
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean
+}
+
+/**
+ * Origin of the action to launch Duck Chat.
+ */
+enum class DuckChatLaunchSource(val value: String) {
+    WebView("web_view"),
+    BrowserMenu("browser_menu"),
+    NewTabMenu("new_tab_menu"),
 }

@@ -266,7 +266,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -1027,8 +1027,7 @@ class BrowserTabFragment :
                 onOmnibarNewTabRequested()
             }
             onMenuItemClicked(duckChatMenuItem) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(launchSource = DuckChatLaunchSource.BrowserMenu)
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 browserActivity?.launchBookmarks()

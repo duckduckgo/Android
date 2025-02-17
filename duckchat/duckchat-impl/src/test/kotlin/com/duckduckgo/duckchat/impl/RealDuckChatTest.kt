@@ -22,6 +22,9 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.BrowserMenu
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.NewTabMenu
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.WebView
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -37,6 +40,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -127,7 +132,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalled_activityStarted() {
-        testee.openDuckChat()
+        testee.openDuckChat(launchSource = WebView)
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
@@ -141,7 +146,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQuery_activityStartedWithQuery() {
-        testee.openDuckChat(query = "example")
+        testee.openDuckChat(query = "example", launchSource = WebView)
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
@@ -155,7 +160,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPrompt_activityStartedWithQueryAndAutoPrompt() {
-        testee.openDuckChatWithAutoPrompt(query = "example")
+        testee.openDuckChatWithAutoPrompt(query = "example", launchSource = WebView)
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             WebViewActivityWithParams(
@@ -180,6 +185,52 @@ class RealDuckChatTest {
     @Test
     fun whenIsNotDuckDuckGoHostAndDuckChatEnabled_isNotDuckChatUrl() {
         assertFalse(testee.isDuckChatUrl("https://example.com/?ia=chat".toUri()))
+    }
+
+    @Test
+    fun `when duck chat opened, source is browser menu and not used before, then fire pixel`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(false)
+
+        testee.openDuckChat(launchSource = BrowserMenu)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN, mapOf("source" to "browser_menu", "was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when duck chat opened, source is browser menu and used before, then fire pixel`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
+
+        testee.openDuckChat(launchSource = BrowserMenu)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN, mapOf("source" to "browser_menu", "was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when duck chat opened, source is new tab menu and not used before, then fire pixel`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(false)
+
+        testee.openDuckChat(launchSource = NewTabMenu)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN, mapOf("source" to "new_tab_menu", "was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when duck chat opened, source is new tab menu and used before, then fire pixel`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
+
+        testee.openDuckChat(launchSource = NewTabMenu)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN, mapOf("source" to "new_tab_menu", "was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when duck chat opened, source is web view, then don't fire pixel`() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.wasOpenedBefore()).thenReturn(true)
+
+        testee.openDuckChat(launchSource = WebView)
+
+        verify(mockPixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_OPEN), any(), any(), any())
+        verify(mockPixel, never()).fire(eq("aichat_open"), any(), any(), any())
     }
 
     private fun setFeatureToggle(enabled: Boolean) {

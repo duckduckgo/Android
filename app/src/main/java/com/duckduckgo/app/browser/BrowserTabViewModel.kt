@@ -295,6 +295,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -1044,7 +1045,7 @@ class BrowserTabViewModel @Inject constructor(
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
-                    duckChat.openDuckChat(urlToNavigate.toUri().getQueryParameter(QUERY))
+                    duckChat.openDuckChat(urlToNavigate.toUri().getQueryParameter(QUERY), launchSource = DuckChatLaunchSource.WebView)
                     return
                 }
             }

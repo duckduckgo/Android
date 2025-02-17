@@ -26,6 +26,8 @@ interface DuckChatFeatureRepository {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun shouldShowInBrowserMenu(): Boolean
+    suspend fun registerOpened()
+    suspend fun wasOpenedBefore(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -44,5 +46,13 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun shouldShowInBrowserMenu(): Boolean {
         return duckChatDataStore.getShowInBrowserMenu()
+    }
+
+    override suspend fun registerOpened() {
+        duckChatDataStore.registerOpened()
+    }
+
+    override suspend fun wasOpenedBefore(): Boolean {
+        return duckChatDataStore.wasOpenedBefore()
     }
 }

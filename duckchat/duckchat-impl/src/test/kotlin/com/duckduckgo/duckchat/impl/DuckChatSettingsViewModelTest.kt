@@ -17,7 +17,10 @@
 package com.duckduckgo.duckchat.impl
 
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource.Other
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource.Settings
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -25,7 +28,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,13 +44,16 @@ class DuckChatSettingsViewModelTest {
 
     private lateinit var testee: DuckChatSettingsViewModel
 
-    private val duckChat: DuckChatInternal = mock()
+    @Mock
+    private lateinit var duckChat: DuckChatInternal
+
+    @Mock
+    private lateinit var pixel: Pixel
 
     @Before
     fun setUp() {
-        runTest {
-            testee = DuckChatSettingsViewModel(duckChat)
-        }
+        MockitoAnnotations.openMocks(this)
+        testee = DuckChatSettingsViewModel(duckChat, pixel)
     }
 
     @Test
@@ -63,7 +73,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(true))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, pixel)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInBrowserMenu)
@@ -73,10 +83,62 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsDisabledThenEmitDisabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, pixel)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInBrowserMenu)
         }
+    }
+
+    @Test
+    fun `when screen opened, source settings and wasn't used before, then send count pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+
+        testee.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED, mapOf("source" to "settings", "was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when screen opened, source settings and was used before, then send count pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+
+        testee.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED, mapOf("source" to "settings", "was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when screen opened, source other and wasn't used before, then send count pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+
+        testee.onScreenOpened(launchSource = Other)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED, mapOf("source" to "other", "was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when screen opened, source other and was used before, then send count pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+
+        testee.onScreenOpened(launchSource = Other)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED, mapOf("source" to "other", "was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when screen opened, source settings, then send unique pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+        testee.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED_FROM_SETTINGS_UNIQUE, type = Pixel.PixelType.Unique())
+    }
+
+    @Test
+    fun `when screen opened, source other, then don't send unique pixel`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+        testee.onScreenOpened(launchSource = Other)
+
+        verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED_FROM_SETTINGS_UNIQUE), any(), any(), any())
     }
 }

@@ -72,6 +72,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -201,7 +202,7 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
-                        duckChat.openDuckChat(url.getQueryParameter(QUERY))
+                        duckChat.openDuckChat(url.getQueryParameter(QUERY), launchSource = DuckChatLaunchSource.WebView)
                     }.isSuccess
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {

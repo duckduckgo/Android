@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.WebView
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -237,7 +238,7 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockPreferencesStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(launchSource = WebView)
     }
 
     @Test
@@ -248,7 +249,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
         verify(mockPreferencesStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(launchSource = WebView)
     }
 
     @Test
@@ -260,6 +261,6 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
         verify(mockPreferencesStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(launchSource = WebView)
     }
 }

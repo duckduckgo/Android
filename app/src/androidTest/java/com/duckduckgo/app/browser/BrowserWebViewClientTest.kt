@@ -75,6 +75,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
@@ -432,7 +433,7 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?q=example&ia=chat&duckai=5".toUri())
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(mockDuckChat).openDuckChat("example")
+        verify(mockDuckChat).openDuckChat("example", launchSource = DuckChatLaunchSource.WebView)
     }
 
     @UiThreadTest
@@ -442,7 +443,7 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?ia=chat".toUri())
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(launchSource = DuckChatLaunchSource.WebView)
     }
 
     @UiThreadTest

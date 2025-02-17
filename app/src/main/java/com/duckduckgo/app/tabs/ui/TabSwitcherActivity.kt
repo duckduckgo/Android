@@ -62,7 +62,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatPixelName
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.NewTabMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -332,8 +332,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
             R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
             R.id.duckChat -> {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(launchSource = NewTabMenu)
             }
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()

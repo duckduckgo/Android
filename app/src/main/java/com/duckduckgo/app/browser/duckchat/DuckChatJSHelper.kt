@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.WebView
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -55,7 +56,7 @@ class RealDuckChatJSHelper @Inject constructor(
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)
             preferencesStore.updateUserPreferences(payload)
-            duckChat.openDuckChat()
+            duckChat.openDuckChat(launchSource = WebView)
             null
         }
         else -> null

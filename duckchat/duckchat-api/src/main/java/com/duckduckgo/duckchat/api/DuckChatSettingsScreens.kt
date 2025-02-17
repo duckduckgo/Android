@@ -21,4 +21,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 /**
  * Use this model to launch the Duck Player Settings screen
  */
-object DuckChatSettingsNoParams : GlobalActivityStarter.ActivityParams
+data class DuckChatSettingsParams(val launchSource: DuckChatSettingsLaunchSource) : GlobalActivityStarter.ActivityParams
+
+enum class DuckChatSettingsLaunchSource(val value: String) {
+    Settings("settings"),
+    Other("other"),
+}

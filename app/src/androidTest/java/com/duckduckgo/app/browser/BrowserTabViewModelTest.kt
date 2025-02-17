@@ -200,6 +200,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatLaunchSource.BrowserMenu
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -5727,7 +5728,7 @@ class BrowserTabViewModelTest {
             "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
-        mockDuckChat.openDuckChat("example")
+        mockDuckChat.openDuckChat("example", launchSource = BrowserMenu)
     }
 
     @Test
@@ -5735,7 +5736,7 @@ class BrowserTabViewModelTest {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
         testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
-        mockDuckChat.openDuckChat()
+        mockDuckChat.openDuckChat(launchSource = BrowserMenu)
     }
 
     @Test

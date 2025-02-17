@@ -78,7 +78,8 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource.Settings
+import com.duckduckgo.duckchat.api.DuckChatSettingsParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -336,7 +337,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
-            is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
+            is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsParams(launchSource = Settings))
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)

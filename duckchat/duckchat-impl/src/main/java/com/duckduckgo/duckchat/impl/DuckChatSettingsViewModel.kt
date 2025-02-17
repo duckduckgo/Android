@@ -19,8 +19,10 @@ package com.duckduckgo.duckchat.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource
 import com.duckduckgo.duckchat.impl.DuckChatSettingsViewModel.Command.OpenLearnMore
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -34,6 +36,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -62,6 +65,16 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
+        }
+    }
+
+    fun onScreenOpened(launchSource: DuckChatSettingsLaunchSource) {
+        if (launchSource == DuckChatSettingsLaunchSource.Settings) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED_FROM_SETTINGS_UNIQUE, type = Pixel.PixelType.Unique())
+        }
+        viewModelScope.launch {
+            val wasOpenedBefore = duckChat.wasOpenedBefore().toBinaryString()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_OPENED, mapOf("source" to launchSource.value, "was_used_before" to wasOpenedBefore))
         }
     }
 }

@@ -29,15 +29,18 @@ import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource
+import com.duckduckgo.duckchat.api.DuckChatSettingsLaunchSource.Other
+import com.duckduckgo.duckchat.api.DuckChatSettingsParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatSettingsNoParams::class)
+@ContributeToActivityStarter(DuckChatSettingsParams::class)
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
@@ -66,6 +69,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.onScreenOpened(launchSource = extractLaunchSource())
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -102,5 +108,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 )
             }
         }
+    }
+
+    private fun extractLaunchSource(): DuckChatSettingsLaunchSource {
+        return intent.getActivityParams(DuckChatSettingsParams::class.java)?.launchSource ?: Other
     }
 }
