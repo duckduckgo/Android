@@ -111,7 +111,7 @@ interface SubscriptionsManager {
     suspend fun purchase(
         activity: Activity,
         planId: String,
-        offerId: String? = null,
+        offerId: String?,
     )
 
     /**
@@ -840,6 +840,7 @@ class RealSubscriptionsManager @Inject constructor(
                 activity = activity,
                 planId = planId,
                 externalId = authRepository.getAccount()!!.externalId,
+                offerId = offerId,
             )
         } catch (e: Exception) {
             val error = extractError(e)
