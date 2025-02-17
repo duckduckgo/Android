@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
@@ -101,7 +102,8 @@ class LegacyProSettingNetPViewModel(
             val screen = networkProtectionAccessState.getScreenForCurrentState()
             screen?.let {
                 command.send(OpenNetPScreen(screen))
-                pixel.fire(NETP_SETTINGS_PRESSED)
+                val isOnboarded = networkProtectionState.isOnboarded()
+                pixel.fire(NETP_SETTINGS_PRESSED, mapOf("was_used_before" to isOnboarded.toBinaryString()))
             } ?: logcat { "Get screen for current NetP state is null" }
         }
     }

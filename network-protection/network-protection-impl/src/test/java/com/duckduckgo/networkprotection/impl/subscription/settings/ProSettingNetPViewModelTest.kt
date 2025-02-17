@@ -71,15 +71,32 @@ class ProSettingNetPViewModelTest {
     }
 
     @Test
-    fun `when netp Setting clicked then netp screen is opened`() = runTest {
+    fun `when netp Setting clicked and user not onboarded then netp screen is opened`() = runTest {
         val testScreen = object : ActivityParams {}
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
 
         proSettingNetPViewModel.commands().test {
             proSettingNetPViewModel.onNetPSettingClicked()
 
             assertEquals(Command.OpenNetPScreen(testScreen), awaitItem())
-            verify(pixel).fire(NETP_SETTINGS_PRESSED)
+            verify(pixel).fire(NETP_SETTINGS_PRESSED, mapOf("was_used_before" to "0"))
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when netp Setting clicked and user onboarded then netp screen is opened`() = runTest {
+        val testScreen = object : ActivityParams {}
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
+        proSettingNetPViewModel.commands().test {
+            proSettingNetPViewModel.onNetPSettingClicked()
+
+            assertEquals(Command.OpenNetPScreen(testScreen), awaitItem())
+            verify(pixel).fire(NETP_SETTINGS_PRESSED, mapOf("was_used_before" to "1"))
 
             cancelAndConsumeRemainingEvents()
         }
