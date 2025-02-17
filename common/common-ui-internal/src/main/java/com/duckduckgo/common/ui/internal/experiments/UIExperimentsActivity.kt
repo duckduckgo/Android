@@ -21,7 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.internal.databinding.ActivityExperimentalSettingsBinding
+import com.duckduckgo.common.ui.internal.databinding.ActivityExperimentalUiSettingsBinding
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -30,7 +30,7 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 class UIExperimentsActivity : DuckDuckGoActivity() {
 
-    private val binding: ActivityExperimentalSettingsBinding by viewBinding()
+    private val binding: ActivityExperimentalUiSettingsBinding by viewBinding()
 
     @Inject
     lateinit var experimentalUIPlugins: PluginPoint<ExperimentalUIPlugin>
