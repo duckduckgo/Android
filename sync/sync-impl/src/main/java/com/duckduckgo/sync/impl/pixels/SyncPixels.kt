@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncableType
@@ -301,6 +302,13 @@ class RealSyncPixels @Inject constructor(
 
     override fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean) {
         pixel.fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
+            parameters = mapOf(
+                SYNC_ACTIVITY_OPENED_SOURCE to navigationSource.value,
+            ),
+            type = PixelType.Unique(),
+        )
+        pixel.fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
             parameters = mapOf(
                 SYNC_ACTIVITY_OPENED_SOURCE to navigationSource.value,
@@ -364,6 +372,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
 
     SYNC_ACTIVITY_OPENED("sync_opened"),
+    SYNC_ACTIVITY_OPENED_UNIQUE("sync_opened_unique"),
 }
 
 object SyncPixelParameters {
@@ -385,5 +394,5 @@ object SyncPixelParameters {
     const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_ACTIVITY_OPENED_SOURCE = "source"
-    const val SYNC_ACTIVITY_OPENED_IS_ENABLED = "isEnabled"
+    const val SYNC_ACTIVITY_OPENED_IS_ENABLED = "is_enabled"
 }

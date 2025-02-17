@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
+import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import org.junit.Before
 import org.junit.Test
@@ -146,6 +147,72 @@ class RealSyncPixelsTest {
         testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
 
         verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when fire activity opened pixel, source settings and disabled, then count pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = false)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
+            parameters = mapOf("source" to "settings", "is_enabled" to "0"),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when fire activity opened pixel, source settings and enabled, then count pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = true)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
+            parameters = mapOf("source" to "settings", "is_enabled" to "1"),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when fire activity opened pixel, source other and disabled, then count pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = false)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
+            parameters = mapOf("source" to "other", "is_enabled" to "0"),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when fire activity opened pixel, source other and enabled, then count pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = true)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
+            parameters = mapOf("source" to "other", "is_enabled" to "1"),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when fire activity opened pixel and source settings, then unique pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = true)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
+            parameters = mapOf("source" to "settings"),
+            type = Pixel.PixelType.Unique(),
+        )
+    }
+
+    @Test
+    fun `when fire activity opened pixel and other settings, then unique pixel sent`() {
+        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = false)
+
+        verify(pixel).fire(
+            pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_UNIQUE,
+            parameters = mapOf("source" to "other"),
+            type = Pixel.PixelType.Unique(),
+        )
     }
 
     private fun givenSomeDailyStats(): DailyStats {
