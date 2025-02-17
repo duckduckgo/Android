@@ -1114,7 +1114,6 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = trimmedInput,
             forceExpand = true,
         )
-        Timber.tag("Cris").d("onUserSubmittedQuery, browserShowing = true")
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = true,
             browserError = OMITTED,
@@ -1433,7 +1432,6 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
-                            Timber.tag("Cris").d("navigationStatechanged with new page, triggers buildSiteFactory with null maliciousSiteStatus")
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -1524,7 +1522,6 @@ class BrowserTabViewModel @Inject constructor(
 
         findInPageViewState.value = FindInPageViewState(visible = false)
 
-        Timber.tag("Cris").d("pageChanged, browserShowing = true")
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canSaveSite = domain != null,
@@ -1754,7 +1751,6 @@ class BrowserTabViewModel @Inject constructor(
         Timber.v("Loading in progress $newProgress")
 
         if (!currentBrowserViewState().maliciousSiteDetected) {
-            Timber.tag("Cris").d("progressChanged maliciousSiteBlocked is false")
             navigationStateChanged(webViewNavigationState)
         }
 
@@ -1782,7 +1778,6 @@ class BrowserTabViewModel @Inject constructor(
         url: String?,
     ) {
         if (!currentBrowserViewState().maliciousSiteDetected) {
-            Timber.tag("Cris").d("pageFinished with maliciousSiteBlocked = false, url = $url")
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
         }
@@ -1938,7 +1933,18 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
-                    // TODO (cbarreiro): Set maliciousSiteDetected to false when the user navigates to a new page
+                    maliciousSiteDetected = false,
+                )
+                loadingViewState.value = currentLoadingViewState().copy(
+                    isLoading = true,
+                    privacyOn = true,
+                    progress = 0,
+                    url = url.toString(),
+                )
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = url.toString(),
+                    isEditing = false,
+                    navigationChange = true,
                 )
             }
 
@@ -1954,7 +1960,6 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
                 privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
@@ -2577,7 +2582,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showBrowser() {
-        Timber.tag("Cris").d("showBrowser browserShowing = true")
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
         globalLayoutState.value = Browser(isNewTabState = false)
     }
