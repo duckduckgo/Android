@@ -54,7 +54,7 @@ data class BrowserViewState(
     val showAutofill: Boolean = false,
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
     val sslError: SSLErrorType = SSLErrorType.NONE,
-    val maliciousSiteDetected: Boolean = false,
+    val maliciousSiteBlocked: Boolean = false,
     val maliciousSiteStatus: MaliciousSiteStatus? = null,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     val showDuckChatOption: Boolean = false,
