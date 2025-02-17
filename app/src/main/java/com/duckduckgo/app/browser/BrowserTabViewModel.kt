@@ -3269,6 +3269,12 @@ class BrowserTabViewModel @Inject constructor(
                     maliciousSiteStatus = maliciousSiteStatus,
                 ),
             )
+            omnibarViewState.postValue(
+                currentOmnibarViewState().copy(
+                    omnibarText = url.toString(),
+                    isEditing = false,
+                ),
+            )
             command.postValue(
                 ShowWarningMaliciousSite(url, feed) { navigationStateChanged(it) },
             )
