@@ -770,7 +770,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
-        site?.maliciousSiteStatus = maliciousSiteStatus
+        site?.maliciousSiteStatus = maliciousSiteStatus ?: currentBrowserViewState().maliciousSiteStatus
         Timber.v(
             "buildSiteFactory for url=$url, maliciousSiteStatus=${site?.maliciousSiteStatus}, maliciousSiteDetected=${currentBrowserViewState().maliciousSiteDetected}",
         )
