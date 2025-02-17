@@ -32,9 +32,9 @@
             android:endX="12.503"
             android:endY="18.274"
             android:type="linear">
-          <item android:offset="0" android:color="#FFFA8B38"/>
-          <item android:offset="0.52" android:color="#FFE72A57"/>
-          <item android:offset="1" android:color="#FFCC165B"/>
+          <item android:offset="0" android:color="?daxColorFireButtonOne"/>
+          <item android:offset="0.52" android:color="?daxColorFireButtonTwo"/>
+          <item android:offset="1" android:color="?daxColorFireButtonThree"/>
         </gradient>
       </aapt:attr>
     </path>
@@ -48,9 +48,9 @@
             android:endX="12.503"
             android:endY="18.274"
             android:type="linear">
-          <item android:offset="0" android:color="#FFFA8B38"/>
-          <item android:offset="0.52" android:color="#FFE72A57"/>
-          <item android:offset="1" android:color="#FFCC165B"/>
+          <item android:offset="0" android:color="?daxColorFireButtonOne"/>
+          <item android:offset="0.52" android:color="?daxColorFireButtonTwo"/>
+          <item android:offset="1" android:color="?daxColorFireButtonThree"/>
         </gradient>
       </aapt:attr>
     </path>
