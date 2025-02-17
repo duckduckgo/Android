@@ -23,6 +23,10 @@
         <item name="daxColorSurfaceTransparent">@color/white_12</item>
         <item name="daxColorWindow">@color/warm_gray85</item>
 
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Dark.Experiment.Cool" parent="Theme.DuckDuckGo.Dark">
@@ -31,6 +35,10 @@
         <item name="daxColorSurface">@color/gray87</item>
         <item name="daxColorSurfaceTransparent">@color/white_12</item>
         <item name="daxColorWindow">@color/cool_gray85</item>
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
 
     </style>
 
@@ -41,6 +49,10 @@
         <item name="daxColorPrimaryIcon">@color/warm_gray85_84</item>
         <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
 
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment.Cool" parent="Theme.DuckDuckGo.Light">
@@ -49,6 +61,10 @@
         <item name="daxColorSurfaceTransparent">@color/white_70</item>
         <item name="daxColorPrimaryIcon">@color/cool_gray85_84</item>
         <item name="daxColorSecondaryIcon">@color/cool_gray85_50</item>
+
+        <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
+        <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
+        <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
 
     </style>
 

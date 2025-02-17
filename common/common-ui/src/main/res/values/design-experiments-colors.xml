@@ -70,4 +70,17 @@
     <color name="white_70">#B3FFFFFF</color>
     <color name="white_12">#1FFFFFFF</color>
 
+    <!-- Experimental Fire Button -->
+    <attr name="daxColorFireButtonOne" format="color"/>
+    <attr name="daxColorFireButtonTwo" format="color"/>
+    <attr name="daxColorFireButtonThree" format="color"/>
+
+    <color name="daxColorFireButtonOne_Dark">#FFBB5C</color>
+    <color name="daxColorFireButtonTwo_Dark">#F68161</color>
+    <color name="daxColorFireButtonThree_Dark">#F14D1F</color>
+    <color name="daxColorFireButtonOne_Light">#FA8B38</color>
+    <color name="daxColorFireButtonTwo_Light">#E72A57</color>
+    <color name="daxColorFireButtonThree_Light">#CC165B</color>
+
+
 </resources>
