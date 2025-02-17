@@ -25,4 +25,4 @@ import com.duckduckgo.di.scopes.AppScope
     boundType = ExperimentalUIPlugin::class,
 )
 @Suppress("unused")
-interface VisualDesignExperimentFeaturePluginPoint
+interface ExperimentalUIPluginPoint

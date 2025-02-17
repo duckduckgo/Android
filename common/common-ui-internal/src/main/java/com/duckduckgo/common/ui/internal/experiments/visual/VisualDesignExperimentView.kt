@@ -59,8 +59,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-
         val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         viewModel.viewState()

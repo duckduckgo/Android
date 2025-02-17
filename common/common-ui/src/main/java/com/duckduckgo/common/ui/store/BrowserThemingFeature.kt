@@ -22,7 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "experimentalBrowserTheming",
+    featureName = "experimentalUITheming",
 )
 interface BrowserThemingFeature {
     @Toggle.DefaultValue(false)
