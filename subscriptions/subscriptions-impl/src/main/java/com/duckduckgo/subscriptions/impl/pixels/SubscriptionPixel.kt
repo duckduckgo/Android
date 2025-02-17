@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 
 enum class SubscriptionPixel(
-    private val baseName: String,
+    val baseName: String,
     private val types: Set<PixelType>,
     private val withSuffix: Boolean = true,
 ) {
@@ -125,6 +125,14 @@ enum class SubscriptionPixel(
     ),
     APP_SETTINGS_IDTR_CLICK(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
+        type = Count,
+    ),
+    APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK_UNIQUE(
+        baseName = "m_privacy-pro_app-settings_get_click_unique",
+        type = Unique(),
+    ),
+    APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK(
+        baseName = "m_privacy-pro_app-settings_get_click",
         type = Count,
     ),
     APP_SETTINGS_RESTORE_PURCHASE_CLICK(

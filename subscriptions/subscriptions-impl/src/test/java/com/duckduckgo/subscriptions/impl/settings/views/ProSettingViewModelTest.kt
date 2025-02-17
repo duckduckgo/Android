@@ -46,6 +46,7 @@ class ProSettingViewModelTest {
         viewModel.commands().test {
             viewModel.onBuy()
             assertTrue(awaitItem() is OpenBuyScreen)
+            verify(pixelSender).reportAppSettingsGetSubscriptionClick()
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -55,6 +56,7 @@ class ProSettingViewModelTest {
         viewModel.commands().test {
             viewModel.onRestore()
             assertTrue(awaitItem() is OpenRestoreScreen)
+            verify(pixelSender).reportAppSettingsRestorePurchaseClick()
             cancelAndConsumeRemainingEvents()
         }
     }

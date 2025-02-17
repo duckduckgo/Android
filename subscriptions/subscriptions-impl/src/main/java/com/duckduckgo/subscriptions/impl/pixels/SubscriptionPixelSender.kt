@@ -24,6 +24,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK_UNIQUE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
@@ -90,6 +92,7 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
+    fun reportAppSettingsGetSubscriptionClick()
     fun reportAppSettingsRestorePurchaseClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
@@ -195,6 +198,11 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAppSettingsIdtrClick() =
         fire(APP_SETTINGS_IDTR_CLICK)
+
+    override fun reportAppSettingsGetSubscriptionClick() {
+        fire(APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK_UNIQUE)
+        fire(APP_SETTINGS_RESTORE_GET_SUBSCRIPTION_CLICK)
+    }
 
     override fun reportAppSettingsRestorePurchaseClick() =
         fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)
