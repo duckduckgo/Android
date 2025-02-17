@@ -20,12 +20,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.BrowserThemingFeature
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val browserThemingFeature: BrowserThemingFeature,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -40,7 +38,10 @@ class ThemingSharedPreferences @Inject constructor(
 
     private fun selectedThemeSavedValue(): DuckDuckGoTheme {
         val savedValue = preferences.getString(KEY_THEME, null)
-        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.SYSTEM_DEFAULT, browserThemingFeature.self().isEnabled())
+        return themePrefMapper.themeFrom(
+            savedValue,
+            DuckDuckGoTheme.SYSTEM_DEFAULT,
+        )
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -63,21 +64,10 @@ class ThemingSharedPreferences @Inject constructor(
         fun themeFrom(
             value: String?,
             defValue: DuckDuckGoTheme,
-            isExperimentEnabled: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.LIGHT_EXPERIMENT
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
-
-                THEME_DARK -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.DARK_EXPERIMENT
-                } else {
-                    DuckDuckGoTheme.DARK
-                }
-
+                THEME_LIGHT -> DuckDuckGoTheme.LIGHT
+                THEME_DARK -> DuckDuckGoTheme.DARK
                 THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
                 else -> defValue
             }

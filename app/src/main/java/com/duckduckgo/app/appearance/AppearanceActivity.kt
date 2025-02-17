@@ -40,9 +40,7 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT_EXPERIMENT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
@@ -87,11 +85,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private val experimentalUIToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onExperimentalUIModeChanged(isChecked)
-        sendThemeChangedBroadcast()
-    }
-
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
             Timber.d("Icon changed.")
@@ -126,7 +119,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
                     updateSelectedOmnibarPosition(it.isOmnibarPositionFeatureEnabled, it.omnibarPosition)
-                    updateExperimentalUISetting(it.isBrowserThemingFeatureVisible, it.isBrowserThemingFeatureEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -142,8 +134,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 DARK -> R.string.settingsDarkTheme
                 LIGHT -> R.string.settingsLightTheme
                 SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-                DARK_EXPERIMENT -> R.string.settingsDarkTheme
-                LIGHT_EXPERIMENT -> R.string.settingsLightTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)
@@ -163,18 +153,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
         } else {
             binding.addressBarPositionSettingDivider.gone()
             binding.addressBarPositionSetting.gone()
-        }
-    }
-
-    private fun updateExperimentalUISetting(
-        browserThemingFeatureVisible: Boolean,
-        browserThemingFeatureEnabled: Boolean,
-    ) {
-        if (browserThemingFeatureVisible) {
-            binding.internalUISettingsLayout.show()
-            binding.experimentalUIMode.quietlySetIsChecked(browserThemingFeatureEnabled, experimentalUIToggleListener)
-        } else {
-            binding.internalUISettingsLayout.gone()
         }
     }
 

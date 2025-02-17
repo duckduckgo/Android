@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2025 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.DuckDuckGo.Dark.Experiment" parent="Theme.DuckDuckGo.Dark">
-
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
-
-    </style>
-
-    <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
-
-    </style>
-
+    <!-- Appearance -->
+    <string name="experimentalUISettings">Visual design updates from O-A</string>
+    <string name="experimentalUITitle">Enable all changes</string>
+    <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
+    <string name="experimentalUIWarmColorsTitle">Use Warm colors palette</string>
+    <string name="experimentalUIWarmColorsMessage">When disabled, it uses Cool colors instead.</string>
 </resources>
