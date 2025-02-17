@@ -18,33 +18,33 @@
 
     <style name="Theme.DuckDuckGo.Dark.Experiment.Warm" parent="Theme.DuckDuckGo.Dark">
 
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
+        <item name="daxColorBackground">@color/warm_gray90</item>
+        <item name="daxColorSurface">@color/gray87</item>
+        <item name="daxColorWindow">@color/warm_gray85</item>
 
     </style>
 
     <style name="Theme.DuckDuckGo.Dark.Experiment.Cool" parent="Theme.DuckDuckGo.Dark">
 
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
+        <item name="daxColorBackground">@color/cool_gray90</item>
+        <item name="daxColorSurface">@color/gray87</item>
+        <item name="daxColorWindow">@color/cool_gray85</item>
 
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment.Warm" parent="Theme.DuckDuckGo.Light">
 
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
+        <item name="daxColorBackground">@color/warm_gray15</item>
+        <item name="daxColorPrimaryIcon">@color/warm_gray85_84</item>
+        <item name="daxColorSecondaryIcon">@color/warm_gray85_50</item>
 
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment.Cool" parent="Theme.DuckDuckGo.Light">
 
-        <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/pink100</item>
-        <item name="daxColorSurface">@color/pink90</item>
+        <item name="daxColorBackground">@color/cool_gray15</item>
+        <item name="daxColorPrimaryIcon">@color/cool_gray85_84</item>
+        <item name="daxColorSecondaryIcon">@color/cool_gray85_50</item>
 
     </style>
 
