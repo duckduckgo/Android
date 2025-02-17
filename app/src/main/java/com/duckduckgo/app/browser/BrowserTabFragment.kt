@@ -1360,6 +1360,7 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
+        Timber.tag("Cris").d("ShowBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1370,6 +1371,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+        Timber.tag("Cris").d("ShowBrowser ${viewModel.url}")
     }
 
     private fun showError(
@@ -1418,6 +1420,8 @@ class BrowserTabFragment :
     }
 
     private fun hideMaliciousWarning(uri: Uri, title: String?) {
+        Timber.tag("Cris").d("hideMaliciousWarning")
+
         val navList = webView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
@@ -1425,7 +1429,7 @@ class BrowserTabFragment :
             // We force the error state to clear out any previous navigation status that might have been set since the error
             // was shown and might prevent a clean page refresh
             navList?.let { viewModel.navigationStateChanged(ErrorNavigationState(it, uri, title)) }
-            Timber.d("MaliciousSite: hiding warning page and triggering a reload of the previous")
+            Timber.tag("Cris").d("MaliciousSite: hiding warning page and triggering a reload of the previous")
             viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
@@ -1827,7 +1831,6 @@ class BrowserTabFragment :
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.url, it.title)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
-            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
@@ -3787,13 +3790,15 @@ class BrowserTabFragment :
                 lastSeenLoadingViewState = viewState
 
                 if (viewState.progress == MAX_PROGRESS) {
+                    Timber.tag("Cris").d("renderLoadingIndicator viewState.progress == MAX_PROGRESS")
                     if (lastSeenBrowserViewState?.browserError == LOADING) {
+                        Timber.tag("Cris").d("renderLoadingIndicator lastSeenBrowserViewState?.browserError == LOADING")
                         showBrowser()
                         viewModel.resetBrowserError()
                     }
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
-
+                Timber.tag("Cris").d("renderLoadingIndicator viewState.privacyOn ${viewState.privacyOn}")
                 omnibar.renderLoadingViewState(viewState)
 
                 if (viewState.privacyOn) {
@@ -3822,6 +3827,7 @@ class BrowserTabFragment :
                 }
                 val privacyProtectionsPopupVisible = lastSeenBrowserViewState
                     ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
+                Timber.tag("Cris").d("createTrackersAnimation privacyProtectionsPopupVisible $privacyProtectionsPopupVisible")
                 if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
@@ -3866,6 +3872,7 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
                     if (browserShowing) {
+                        Timber.tag("Cris").d("renderBrowserViewState browserShowingChanged")
                         showBrowser()
                     } else {
                         showHome()
@@ -3875,6 +3882,7 @@ class BrowserTabFragment :
                         showError(viewState.browserError, webView?.url)
                     } else {
                         if (browserShowing) {
+                            Timber.tag("Cris").d("renderBrowserViewState errorChanged")
                             showBrowser()
                         } else {
                             showHome()
@@ -3883,6 +3891,7 @@ class BrowserTabFragment :
                 } else if (sslErrorChanged) {
                     if (viewState.sslError == NONE) {
                         if (browserShowing) {
+                            Timber.tag("Cris").d("renderBrowserViewState sslErrorChanged")
                             showBrowser()
                         } else {
                             showHome()
