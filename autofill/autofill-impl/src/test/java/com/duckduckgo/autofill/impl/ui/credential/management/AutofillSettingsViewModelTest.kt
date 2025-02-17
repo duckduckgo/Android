@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
@@ -45,6 +46,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOG
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
@@ -710,49 +712,63 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenScreenLaunchedFromSnackbarThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserSnackbar)
-        val expectedParams = mapOf("source" to "browser_snackbar", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "browser_snackbar")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromBrowserThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(BrowserOverflow)
-        val expectedParams = mapOf("source" to "overflow_menu", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "overflow_menu")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSyncThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(Sync)
-        val expectedParams = mapOf("source" to "sync", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "sync")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromDisablePromptThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(DisableInSettingsPrompt)
-        val expectedParams = mapOf("source" to "save_login_disable_prompt", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "save_login_disable_prompt")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromNewTabShortcutThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(NewTabShortcut)
-        val expectedParams = mapOf("source" to "new_tab_page_shortcut", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "new_tab_page_shortcut")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(SettingsActivity)
-        val expectedParams = mapOf("source" to "settings", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "settings")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
     @Test
     fun whenScreenLaunchedFromInternalDevSettingsActivityThenCorrectLaunchPixelSent() {
         testee.sendLaunchPixel(InternalDevSettings)
-        val expectedParams = mapOf("source" to "internal_dev_settings", "hasCredentialsSaved" to "0")
+        val expectedUniqueParams = mapOf("source" to "internal_dev_settings")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "0")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
@@ -761,7 +777,9 @@ class AutofillSettingsViewModelTest {
         whenever(mockStore.getCredentialCount()).thenReturn(flowOf(1))
 
         testee.sendLaunchPixel(SettingsActivity)
-        val expectedParams = mapOf("source" to "settings", "hasCredentialsSaved" to "1")
+        val expectedUniqueParams = mapOf("source" to "settings")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "1")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 
@@ -770,7 +788,9 @@ class AutofillSettingsViewModelTest {
         whenever(mockStore.getCredentialCount()).thenReturn(flowOf(7))
 
         testee.sendLaunchPixel(BrowserOverflow)
-        val expectedParams = mapOf("source" to "overflow_menu", "hasCredentialsSaved" to "1")
+        val expectedUniqueParams = mapOf("source" to "overflow_menu")
+        verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE), eq(expectedUniqueParams), any(), eq(PixelType.Unique()))
+        val expectedParams = expectedUniqueParams + mapOf("has_credentials_saved" to "1")
         verify(pixel).fire(eq(AUTOFILL_MANAGEMENT_SCREEN_OPENED), eq(expectedParams), any(), eq(Count))
     }
 

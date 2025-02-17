@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.BrowserOverflow
@@ -46,6 +47,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANUALLY_SAVE_CREDENTIAL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
@@ -661,7 +663,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
             val source = launchSource.asString()
             val hasCredentialsSaved = autofillStore.getCredentialCount().first() > 0
-            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "hasCredentialsSaved" to hasCredentialsSaved.toBinaryString()))
+            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
+            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED_UNIQUE, mapOf("source" to source), type = PixelType.Unique())
         }
     }
 
