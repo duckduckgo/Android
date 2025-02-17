@@ -268,7 +268,8 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatLaunchSource
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource.Other
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -1832,7 +1833,7 @@ class BrowserTabFragment :
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
-            is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
+            is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsParams(launchSource = Other))
             is Command.OpenDuckPlayerPageInfo -> {
                 context?.resources?.configuration?.let {
                     duckPlayer.showDuckPlayerPrimeModal(it, childFragmentManager, fromDuckPlayerPage = true)

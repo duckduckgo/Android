@@ -93,6 +93,11 @@ interface DuckPlayerInternal : DuckPlayer {
      * Stores setting to determine if Duck Player should be opened in a new tab.
      */
     fun setOpenInNewTab(enabled: Boolean)
+
+    /**
+     * Returns `true` if Duck Player was ever used before.
+     */
+    suspend fun wasUsedBefore(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -337,6 +342,9 @@ class RealDuckPlayer @Inject constructor(
                     AlwaysAsk -> "default"
                     else -> null
                 }?.let { setting ->
+                    appCoroutineScope.launch {
+                        duckPlayerFeatureRepository.setUsed()
+                    }
                     pixel.fire(
                         DUCK_PLAYER_DAILY_UNIQUE_VIEW,
                         type = Daily(),
@@ -492,5 +500,9 @@ class RealDuckPlayer @Inject constructor(
 
     override fun setDuckPlayerOrigin(origin: DuckPlayerOrigin) {
         duckPlayerOrigin = origin
+    }
+
+    override suspend fun wasUsedBefore(): Boolean {
+        return duckPlayerFeatureRepository.wasUsedBefore()
     }
 }

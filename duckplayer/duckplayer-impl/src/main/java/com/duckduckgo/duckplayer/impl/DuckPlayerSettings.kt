@@ -19,11 +19,10 @@ package com.duckduckgo.duckplayer.impl
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
-import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource.Settings
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsParams
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
@@ -35,7 +34,6 @@ import javax.inject.Inject
 @PriorityKey(100)
 class DuckPlayerSettingsTitle @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
-    private val pixel: Pixel,
     private val settingsPageFeature: SettingsPageFeature,
 ) : DuckPlayerSettingsPlugin {
     override fun getView(context: Context): View {
@@ -46,8 +44,7 @@ class DuckPlayerSettingsTitle @Inject constructor(
 
             setPrimaryText(context.getString(R.string.duck_player_setting_title))
             setOnClickListener {
-                pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED)
-                globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
+                globalActivityStarter.start(this.context, DuckPlayerSettingsParams(launchSource = Settings), null)
             }
         }
     }

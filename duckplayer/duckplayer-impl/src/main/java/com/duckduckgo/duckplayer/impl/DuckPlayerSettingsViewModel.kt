@@ -20,15 +20,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT
 import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED_UNIQUE
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.DisabledWithHelpLink
@@ -119,5 +123,15 @@ class DuckPlayerSettingsViewModel @Inject constructor(
 
     fun onOpenDuckPlayerInNewTabToggled(checked: Boolean) {
         duckPlayer.setOpenInNewTab(checked)
+    }
+
+    fun onScreenOpened(launchSource: DuckPlayerSettingsLaunchSource) {
+        viewModelScope.launch {
+            if (launchSource == DuckPlayerSettingsLaunchSource.Settings) {
+                pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED_UNIQUE, type = Pixel.PixelType.Unique())
+                val wasUsedBefore = duckPlayer.wasUsedBefore().toBinaryString()
+                pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED, mapOf("was_used_before" to wasUsedBefore))
+            }
+        }
     }
 }

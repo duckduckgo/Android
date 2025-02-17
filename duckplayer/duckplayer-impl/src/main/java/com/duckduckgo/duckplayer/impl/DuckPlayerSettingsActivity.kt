@@ -35,7 +35,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource.Other
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsParams
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
@@ -43,13 +45,14 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState
 import com.duckduckgo.duckplayer.impl.databinding.ActivityDuckPlayerSettingsBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckPlayerSettingsNoParams::class)
+@ContributeToActivityStarter(DuckPlayerSettingsParams::class)
 class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckPlayerSettingsViewModel by bindViewModel()
@@ -93,6 +96,9 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.onScreenOpened(launchSource = extractLaunchSource())
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -252,5 +258,9 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
             binding.legacyDuckPlayerSettingsIcon.isVisible = isVisible
             binding.legacyDuckPlayerSettingsText.isVisible = isVisible
         }
+    }
+
+    private fun extractLaunchSource(): DuckPlayerSettingsLaunchSource {
+        return intent.getActivityParams(DuckPlayerSettingsParams::class.java)?.launchSource ?: Other
     }
 }

@@ -640,6 +640,7 @@ class RealDuckPlayerTest {
             type = Daily(),
             parameters = mapOf("setting" to "always", "newtab" to "false"),
         )
+        verify(mockDuckPlayerFeatureRepository).setUsed()
         assertEquals("text/html", result?.mimeType)
     }
 

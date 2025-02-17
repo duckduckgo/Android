@@ -6,6 +6,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource.Other
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsLaunchSource.Settings
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
@@ -21,7 +23,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -114,5 +119,50 @@ class DuckPlayerSettingsViewModelTest {
         viewModel.onOpenDuckPlayerInNewTabToggled(true)
 
         verify(duckPlayer).setOpenInNewTab(true)
+    }
+
+    @Test
+    fun `when screen opened, source settings and wasn't used before, then send count pixel`() = runTest {
+        whenever(duckPlayer.wasUsedBefore()).thenReturn(false)
+
+        viewModel.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED, mapOf("was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when screen opened, source settings and was used before, then send count pixel`() = runTest {
+        whenever(duckPlayer.wasUsedBefore()).thenReturn(true)
+
+        viewModel.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED, mapOf("was_used_before" to "1"))
+    }
+
+    @Test
+    fun `when screen opened, source settings, then send unique pixel`() = runTest {
+        whenever(duckPlayer.wasUsedBefore()).thenReturn(false)
+
+        viewModel.onScreenOpened(launchSource = Settings)
+
+        verify(pixel).fire(DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED_UNIQUE, type = Pixel.PixelType.Unique())
+    }
+
+    @Test
+    fun `when screen opened, source other, then don't send count pixel`() = runTest {
+        whenever(duckPlayer.wasUsedBefore()).thenReturn(true)
+
+        viewModel.onScreenOpened(launchSource = Other)
+
+        verify(pixel, never()).fire(eq(DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED), any(), any(), any())
+    }
+
+    @Test
+    fun `when screen opened, source other, then don't send unique pixel`() = runTest {
+        whenever(duckPlayer.wasUsedBefore()).thenReturn(false)
+
+        viewModel.onScreenOpened(launchSource = Other)
+
+        verify(pixel, never()).fire(eq(DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED_UNIQUE), any(), any(), any())
     }
 }
