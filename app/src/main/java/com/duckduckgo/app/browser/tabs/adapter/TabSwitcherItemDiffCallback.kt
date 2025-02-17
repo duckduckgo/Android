@@ -56,7 +56,6 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
 
         when {
             oldItem is TabSwitcherItem.Tab && newItem is TabSwitcherItem.Tab -> {
-
                 if (oldItem.tabEntity.title != newItem.tabEntity.title) {
                     diffBundle.putString(DIFF_KEY_TITLE, newItem.tabEntity.title)
                 }
@@ -72,7 +71,6 @@ class TabSwitcherItemDiffCallback(old: List<TabSwitcherItem>, new: List<TabSwitc
                 if (oldItem.tabEntity.tabPreviewFile != newItem.tabEntity.tabPreviewFile) {
                     diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabEntity.tabPreviewFile)
                 }
-
             }
         }
 

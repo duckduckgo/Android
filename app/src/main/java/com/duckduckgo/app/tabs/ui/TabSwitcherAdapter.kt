@@ -50,10 +50,10 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import java.io.File
+import kotlin.Int
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.Int
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -77,7 +77,7 @@ class TabSwitcherAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return when(viewType) {
+        return when (viewType) {
             GRID_TAB -> {
                 val binding = ItemTabGridBinding.inflate(inflater, parent, false)
                 return TabSwitcherViewHolder.GridTabViewHolder(binding)
@@ -91,7 +91,7 @@ class TabSwitcherAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-        when(list[position]) {
+        when (list[position]) {
             is TabSwitcherItem.Tab -> {
                 when (layoutType) {
                     LayoutType.GRID -> GRID_TAB
@@ -159,16 +159,16 @@ class TabSwitcherAdapter(
             return
         }
 
-        when(holder.itemViewType) {
+        when (holder.itemViewType) {
             GRID_TAB -> handlePayloadsForGridTab(
                 viewHolder = holder as TabSwitcherViewHolder.GridTabViewHolder,
                 tab = list[position] as TabSwitcherItem.Tab,
-                payloads = payloads
+                payloads = payloads,
             )
             LIST_TAB -> handlePayloadsForListTab(
                 viewHolder = holder as TabSwitcherViewHolder.ListTabViewHolder,
                 tab = list[position] as TabSwitcherItem.Tab,
-                payloads = payloads
+                payloads = payloads,
             )
         }
     }
@@ -299,14 +299,14 @@ class TabSwitcherAdapter(
         private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
 
-    sealed class TabSwitcherViewHolder(rootView: View): ViewHolder(rootView) {
+    sealed class TabSwitcherViewHolder(rootView: View) : ViewHolder(rootView) {
 
         companion object {
             const val GRID_TAB = 0
             const val LIST_TAB = 1
         }
 
-        interface TabViewHolder{
+        interface TabViewHolder {
             val rootView: View
             val favicon: ImageView
             val title: TextView
@@ -321,7 +321,7 @@ class TabSwitcherAdapter(
             override val title: TextView = binding.title,
             override val close: ImageView = binding.close,
             override val tabUnread: ImageView = binding.tabUnread,
-            val tabPreview: ImageView = binding.tabPreview
+            val tabPreview: ImageView = binding.tabPreview,
         ) : TabSwitcherViewHolder(binding.root), TabViewHolder
 
         data class ListTabViewHolder(
@@ -331,7 +331,7 @@ class TabSwitcherAdapter(
             override val title: TextView = binding.title,
             override val close: ImageView = binding.close,
             override val tabUnread: ImageView = binding.tabUnread,
-            val url: TextView = binding.url
+            val url: TextView = binding.url,
         ) : TabSwitcherViewHolder(binding.root), TabViewHolder
     }
 }
