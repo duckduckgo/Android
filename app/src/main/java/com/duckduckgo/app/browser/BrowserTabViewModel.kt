@@ -3269,7 +3269,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.postValue(
                 currentBrowserViewState().copy(
                     browserShowing = false,
-                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                    showPrivacyShield = HighlightableButton.Gone,
                     maliciousSiteDetected = true,
                     maliciousSiteStatus = maliciousSiteStatus,
                 ),
