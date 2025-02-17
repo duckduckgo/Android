@@ -84,7 +84,7 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
         EXPERIMENT_DARK_COOL -> R.style.Theme_DuckDuckGo_Dark_Experiment_Cool
         EXPERIMENT_DARK_WARM -> R.style.Theme_DuckDuckGo_Dark_Experiment_Warm
         EXPERIMENT_LIGHT_WARM -> R.style.Theme_DuckDuckGo_Light_Experiment_Warm
-        EXPERIMENT_LIGHT_COOL -> R.style.Theme_DuckDuckGo_Light_Experiment_Warm
+        EXPERIMENT_LIGHT_COOL -> R.style.Theme_DuckDuckGo_Light_Experiment_Cool
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }

@@ -67,5 +67,7 @@
     <color name="cool_gray0">#F8F9FA</color>
 
     <color name="gray87">#393E45</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_12">#1FFFFFFF</color>
 
 </resources>
