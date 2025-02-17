@@ -206,26 +206,45 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedAndEmailIsSupportedThenEmitCommandLaunchEmailProtectionAndPixelFired() = runTest {
+    fun `when onEmailProtectionSettingClicked, feature supported and user not signed in, then command launched and pixels sent`() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(true)
+        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 
             assertEquals(Command.LaunchEmailProtection(EMAIL_PROTECTION_URL), awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED)
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED, mapOf("is_signed_in" to "0"))
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedAndEmailIsNotSupportedThenEmitCommandLaunchEmailProtectionNotSupportedAndPixelFired() = runTest {
+    fun `when onEmailProtectionSettingClicked, feature supported and user signed in, then send correct pixels`() = runTest {
+        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(true)
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+        testee.commands().test {
+            testee.onEmailProtectionSettingClicked()
+
+            assertEquals(Command.LaunchEmailProtection(EMAIL_PROTECTION_URL), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED, mapOf("is_signed_in" to "1"))
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onEmailProtectionSettingClicked, feature not supported and user not signed in, then command launched and pixels sent`() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
+        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 
             assertEquals(Command.LaunchEmailProtectionNotSupported, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED)
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED, mapOf("is_signed_in" to "0"))
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE)
 
             cancelAndConsumeRemainingEvents()
         }

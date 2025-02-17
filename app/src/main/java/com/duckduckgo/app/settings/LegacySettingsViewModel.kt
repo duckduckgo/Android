@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
@@ -224,7 +225,9 @@ class LegacySettingsViewModel @Inject constructor(
             }
             this@LegacySettingsViewModel.command.send(command)
         }
-        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE)
+        val isSignedIn = emailManager.isSignedIn()
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED, mapOf("is_signed_in" to isSignedIn.toBinaryString()))
     }
 
     fun onMacOsSettingClicked() {

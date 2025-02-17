@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
@@ -68,6 +69,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -281,7 +283,9 @@ class NewSettingsViewModel @Inject constructor(
             }
             this@NewSettingsViewModel.command.send(command)
         }
-        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED_UNIQUE)
+        val isSignedIn = emailManager.isSignedIn()
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED, mapOf("is_signed_in" to isSignedIn.toBinaryString()))
     }
 
     fun onAppTPSettingClicked() {
