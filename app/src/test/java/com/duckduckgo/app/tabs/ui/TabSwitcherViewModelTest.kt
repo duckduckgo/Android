@@ -38,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -257,17 +258,15 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeletedAndPixelFired() = runTest {
         val tab = TabEntity("ID", position = 0)
-        tabs.postValue(listOf(tab))
+        tabs.value = listOf(tab)
+
+        testee.tabSwitcherItems.blockingObserve()
 
         testee.onCloseAllTabsConfirmed()
 
-        testee.tabs.observeForever {
-            runBlocking {
-                verify(mockTabRepository).delete(tab)
-            }
-            verify(mockAdClickManager).clearTabId(tab.tabId)
-            verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
-        }
+        verify(mockTabRepository).delete(tab)
+        verify(mockAdClickManager).clearTabId(tab.tabId)
+        verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
     }
 
