@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.internal.experiments.visual.VisualDesignExperime
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -73,5 +74,6 @@ class VisualDesignExperimentView @JvmOverloads constructor(
     private fun render(viewState: ViewState) {
         binding.experimentalUIMode.quietlySetIsChecked(viewState.isBrowserThemingFeatureEnabled, experimentalUIToggleListener)
         binding.experimentalUIColorPalette.quietlySetIsChecked(viewState.useWarmColors, warmColorsPaletteToggleListener)
+        Snackbar.make(binding.root, "Selected theme is ${viewState.selectedTheme}", Snackbar.LENGTH_SHORT).show()
     }
 }

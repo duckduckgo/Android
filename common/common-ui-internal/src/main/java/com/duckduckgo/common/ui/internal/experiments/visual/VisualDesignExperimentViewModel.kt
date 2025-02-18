@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.store.BrowserThemingFeature
+import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -37,11 +38,13 @@ import kotlinx.coroutines.launch
 class VisualDesignExperimentViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val browserThemingFeature: BrowserThemingFeature,
+    private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val isBrowserThemingFeatureEnabled: Boolean = false,
         val useWarmColors: Boolean = false,
+        val selectedTheme: String = "",
     )
 
     private fun currentViewState(): ViewState {
@@ -49,21 +52,13 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch {
-            viewState.update {
-                currentViewState().copy(
-                    isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
-                    useWarmColors = browserThemingFeature.warmColors().isEnabled(),
-                )
-            }
-        }
-    }
+    fun viewState(): Flow<ViewState> = viewState.onStart { updateCurrentState() }
 
     @SuppressLint("DenyListedApi")
     fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
             browserThemingFeature.self().setRawStoredState(State(checked))
+            updateCurrentState()
         }
     }
 
@@ -71,6 +66,19 @@ class VisualDesignExperimentViewModel @Inject constructor(
     fun onWarmColorsFlagChanged(checked: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
             browserThemingFeature.warmColors().setRawStoredState(State(checked))
+            updateCurrentState()
+        }
+    }
+
+    private fun updateCurrentState() {
+        viewModelScope.launch {
+            viewState.update {
+                currentViewState().copy(
+                    isBrowserThemingFeatureEnabled = browserThemingFeature.self().isEnabled(),
+                    useWarmColors = browserThemingFeature.warmColors().isEnabled(),
+                    selectedTheme = themingDataStore.theme.toString(),
+                )
+            }
         }
     }
 }
