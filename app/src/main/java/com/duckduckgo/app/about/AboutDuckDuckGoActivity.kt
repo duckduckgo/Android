@@ -122,13 +122,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun addClickableLinks(): SpannableString {
-        val fullText = getText(
-            if (settingsPageFeature.newSettingsPage().isEnabled()) {
-                R.string.aboutDescriptionBrandUpdate2025
-            } else {
-                R.string.aboutDescriptionBrandUpdate2025
-            },
-        ) as SpannedString
+        val fullText = getText(R.string.aboutDescriptionBrandUpdate2025) as SpannedString
 
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
