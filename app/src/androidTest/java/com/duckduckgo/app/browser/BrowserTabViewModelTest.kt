@@ -32,7 +32,9 @@ import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import android.webkit.WebBackForwardList
 import android.webkit.WebChromeClient.FileChooserParams
+import android.webkit.WebHistoryItem
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
@@ -507,6 +509,7 @@ class BrowserTabViewModelTest {
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+    val mockStack: WebBackForwardList = mock()
 
     @Before
     fun before() = runTest {
@@ -684,6 +687,10 @@ class BrowserTabViewModelTest {
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.title).thenReturn("title")
+        whenever(mockWebHistoryItem.url).thenReturn("http://example.com")
+        whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
     }
 
     @After
@@ -1138,7 +1145,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
@@ -1149,7 +1156,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
@@ -1160,7 +1167,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRedirectedThenNotifyLoginDetector() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         overrideUrl("http://example.com")
 
@@ -1170,7 +1177,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenLoadingProgressReaches50ThenShowWebContent() = runTest {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         overrideUrl("http://example.com")
         advanceTimeBy(2000)
 
@@ -1212,11 +1219,11 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         setBrowserShowing(true)
 
-        testee.progressChanged(50)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
         assertEquals(100, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -1225,7 +1232,7 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(15)
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
     }
@@ -1233,7 +1240,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
         setBrowserShowing(false)
-        testee.progressChanged(10)
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -1286,7 +1293,7 @@ class BrowserTabViewModelTest {
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
         assertEquals(50, loadingViewState().progress)
     }
 
@@ -3263,7 +3270,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProgressIs100ThenRefreshUserAgentCommandSent() {
         loadUrl("http://duckduckgo.com")
-        testee.progressChanged(100)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
         assertCommandIssued<Command.RefreshUserAgent>()
     }
