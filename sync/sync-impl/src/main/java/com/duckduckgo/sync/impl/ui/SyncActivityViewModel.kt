@@ -90,11 +90,11 @@ class SyncActivityViewModel @Inject constructor(
             observeState()
         }.flowOn(dispatchers.io())
 
-    fun sendOpenedPixel(navigationSource: SyncActivityNavigationSource) {
+    fun sendOpenedPixel(launchSource: SyncActivityLaunchSource) {
         viewModelScope.launch {
             val syncState = syncStateMonitor.syncState().firstOrNull()
             val isEnabled = syncState != null && syncState != OFF
-            syncPixels.fireActivityOpenedPixel(navigationSource = navigationSource, isEnabled = isEnabled)
+            syncPixels.fireActivityOpenedPixel(launchSource = launchSource, isEnabled = isEnabled)
         }
     }
 

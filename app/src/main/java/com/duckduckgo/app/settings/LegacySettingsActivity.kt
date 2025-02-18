@@ -65,7 +65,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.SETTINGS
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource.SETTINGS
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -377,7 +377,7 @@ class LegacySettingsActivity : DuckDuckGoActivity() {
 
     private fun launchSyncSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, SyncActivityWithSourceParams(navigationSource = SETTINGS), options)
+        globalActivityStarter.start(this, SyncActivityWithSourceParams(launchSource = SETTINGS), options)
     }
 
     private fun launchAppTPTrackersScreen() {

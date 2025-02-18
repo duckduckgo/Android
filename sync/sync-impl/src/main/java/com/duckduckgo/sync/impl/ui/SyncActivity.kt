@@ -47,7 +47,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.OTHER
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource.OTHER
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
@@ -167,7 +167,7 @@ class SyncActivity : DuckDuckGoActivity() {
         setupRecyclerView()
 
         if (savedInstanceState == null) {
-            viewModel.sendOpenedPixel(navigationSource = extractNavigationSource())
+            viewModel.sendOpenedPixel(launchSource = extractLaunchSource())
         }
     }
 
@@ -440,8 +440,8 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun extractNavigationSource(): SyncActivityNavigationSource {
-        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.navigationSource ?: OTHER
+    private fun extractLaunchSource(): SyncActivityLaunchSource {
+        return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.launchSource ?: OTHER
     }
 
     private fun extractPromotionSource(): SyncActivityPromotionSource? {
@@ -449,17 +449,45 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 }
 
+/**
+ * Use this model to launch the Sync Settings screen.
+ *
+ * @param launchSource the interaction origin that opened the settings screen
+ * @param promotionSource optional parameter if the origin was also part of a CTA/promotion.
+ */
 data class SyncActivityWithSourceParams(
-    val navigationSource: SyncActivityNavigationSource = OTHER,
+    val launchSource: SyncActivityLaunchSource = OTHER,
     val promotionSource: SyncActivityPromotionSource? = null,
 ) : GlobalActivityStarter.ActivityParams
 
-enum class SyncActivityNavigationSource(val value: String) {
+/**
+ * Source interaction that launched the settings screen.
+ */
+enum class SyncActivityLaunchSource(val value: String) {
+
+    /**
+     * Click in the browser settings.
+     */
     SETTINGS("settings"),
+
+    /**
+     * Any other source.
+     */
     OTHER("other"),
 }
 
+/**
+ * Interaction that was part of a CTA/promotion.
+ */
 enum class SyncActivityPromotionSource(val value: String) {
+
+    /**
+     * Promotion in the bookmarks screen.
+     */
     BOOKMARKS("promotion_bookmarks"),
+
+    /**
+     * Promotion in the passwords screen.
+     */
     PASSWORDS("promotion_passwords"),
 }

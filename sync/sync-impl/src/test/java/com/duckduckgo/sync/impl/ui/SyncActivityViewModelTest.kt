@@ -38,8 +38,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.OTHER
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.SETTINGS
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource.OTHER
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource.SETTINGS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -637,54 +637,54 @@ class SyncActivityViewModelTest {
     fun `when activity opened with settings navigation source and sync disabled then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(flowOf(OFF))
 
-        testee.sendOpenedPixel(navigationSource = SETTINGS)
+        testee.sendOpenedPixel(launchSource = SETTINGS)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = SETTINGS, isEnabled = false)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = SETTINGS, isEnabled = false)
     }
 
     @Test
     fun `when activity opened with other navigation source and sync disabled then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(flowOf(OFF))
 
-        testee.sendOpenedPixel(navigationSource = OTHER)
+        testee.sendOpenedPixel(launchSource = OTHER)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = OTHER, isEnabled = false)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = OTHER, isEnabled = false)
     }
 
     @Test
     fun `when activity opened and sync lacks state then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
 
-        testee.sendOpenedPixel(navigationSource = SETTINGS)
+        testee.sendOpenedPixel(launchSource = SETTINGS)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = SETTINGS, isEnabled = false)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = SETTINGS, isEnabled = false)
     }
 
     @Test
     fun `when activity opened and sync ready then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(flowOf(READY))
 
-        testee.sendOpenedPixel(navigationSource = SETTINGS)
+        testee.sendOpenedPixel(launchSource = SETTINGS)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = SETTINGS, isEnabled = true)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = SETTINGS, isEnabled = true)
     }
 
     @Test
     fun `when activity opened and sync in progress then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(flowOf(IN_PROGRESS))
 
-        testee.sendOpenedPixel(navigationSource = SETTINGS)
+        testee.sendOpenedPixel(launchSource = SETTINGS)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = SETTINGS, isEnabled = true)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = SETTINGS, isEnabled = true)
     }
 
     @Test
     fun `when activity opened and sync failed then send correct pixel`() = runTest {
         whenever(syncStateMonitor.syncState()).thenReturn(flowOf(FAILED))
 
-        testee.sendOpenedPixel(navigationSource = SETTINGS)
+        testee.sendOpenedPixel(launchSource = SETTINGS)
 
-        verify(syncPixels).fireActivityOpenedPixel(navigationSource = SETTINGS, isEnabled = true)
+        verify(syncPixels).fireActivityOpenedPixel(launchSource = SETTINGS, isEnabled = true)
     }
 
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {

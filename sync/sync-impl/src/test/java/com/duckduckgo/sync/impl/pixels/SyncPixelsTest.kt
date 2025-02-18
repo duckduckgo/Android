@@ -25,7 +25,7 @@ import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import org.junit.Before
 import org.junit.Test
@@ -153,7 +153,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel, source settings and disabled, then count pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = false)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.SETTINGS, isEnabled = false)
 
         verify(pixel).fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
@@ -164,7 +164,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel, source settings and enabled, then count pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = true)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.SETTINGS, isEnabled = true)
 
         verify(pixel).fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
@@ -175,7 +175,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel, source other and disabled, then count pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = false)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.OTHER, isEnabled = false)
 
         verify(pixel).fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
@@ -186,7 +186,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel, source other and enabled, then count pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = true)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.OTHER, isEnabled = true)
 
         verify(pixel).fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
@@ -197,7 +197,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel and source settings, then unique pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.SETTINGS, isEnabled = false)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.SETTINGS, isEnabled = false)
 
         verify(pixel).fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE,
@@ -207,7 +207,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when fire activity opened pixel and other settings, then unique pixel sent`() {
-        testee.fireActivityOpenedPixel(SyncActivityNavigationSource.OTHER, isEnabled = false)
+        testee.fireActivityOpenedPixel(SyncActivityLaunchSource.OTHER, isEnabled = false)
 
         verify(pixel, never()).fire(eq(SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE), any(), any(), any())
     }

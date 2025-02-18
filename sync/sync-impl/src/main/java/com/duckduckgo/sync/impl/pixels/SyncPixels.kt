@@ -33,8 +33,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_ACTIVITY_OPENED_
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.impl.ui.SyncActivity
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource
-import com.duckduckgo.sync.impl.ui.SyncActivityNavigationSource.SETTINGS
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource
+import com.duckduckgo.sync.impl.ui.SyncActivityLaunchSource.SETTINGS
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -99,10 +99,10 @@ interface SyncPixels {
     /**
      * Fired when the [SyncActivity] is opened.
      *
-     * @param navigationSource the source which triggered the activity to open
+     * @param launchSource the source which triggered the activity to open
      * @param isEnabled whether sync was enabled when the activity was opened
      */
-    fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean)
+    fun fireActivityOpenedPixel(launchSource: SyncActivityLaunchSource, isEnabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -301,14 +301,14 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
     }
 
-    override fun fireActivityOpenedPixel(navigationSource: SyncActivityNavigationSource, isEnabled: Boolean) {
-        if (navigationSource == SETTINGS) {
+    override fun fireActivityOpenedPixel(launchSource: SyncActivityLaunchSource, isEnabled: Boolean) {
+        if (launchSource == SETTINGS) {
             pixel.fire(pixel = SyncPixelName.SYNC_ACTIVITY_OPENED_FROM_SETTINGS_UNIQUE, type = PixelType.Unique())
         }
         pixel.fire(
             pixel = SyncPixelName.SYNC_ACTIVITY_OPENED,
             parameters = mapOf(
-                SYNC_ACTIVITY_OPENED_SOURCE to navigationSource.value,
+                SYNC_ACTIVITY_OPENED_SOURCE to launchSource.value,
                 SYNC_ACTIVITY_OPENED_IS_ENABLED to isEnabled.toBinaryString(),
             ),
         )
