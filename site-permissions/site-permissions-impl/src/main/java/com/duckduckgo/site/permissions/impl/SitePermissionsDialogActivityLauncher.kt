@@ -433,7 +433,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             systemPermissionGranted()
         } else {
             systemPermissionsHelper.requestMultiplePermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                // ACCESS_FINE_LOCATION is now considered optional, so ACCESS_COARSE_LOCATION should be first on the list,
+                // because of how systemPermissionsHelper handles showing rationale dialog in case permissions are rejected.
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
             )
         }
     }
@@ -446,10 +448,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun onResultMultipleSystemPermissionsRequest(grantedPermissions: Map<String, Boolean>) {
-        if (grantedPermissions.values.contains(false)) {
-            systemPermissionDenied()
+        val locationPermissions = setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+
+        val permissionsGranted = if (grantedPermissions.keys == locationPermissions) {
+            // For location permissions request, it is enough for the user to grant access to approximate location
+            grantedPermissions.getValue(Manifest.permission.ACCESS_COARSE_LOCATION)
         } else {
+            !grantedPermissions.containsValue(false)
+        }
+
+        if (permissionsGranted) {
             systemPermissionGranted()
+        } else {
+            systemPermissionDenied()
         }
     }
 
