@@ -30,11 +30,18 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.ui.view.setAllParentsClip
+import com.duckduckgo.common.utils.ConflatedJob
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
+    private val conflatedJob = ConflatedJob()
+
     val isActive: Boolean
         get() = pulseAnimation.isRunning
 
@@ -50,14 +57,15 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         if (pulseAnimation.isRunning) {
             pulseAnimation.pause()
         }
+        conflatedJob.cancel()
     }
 
-    fun playOn(targetView: View) {
+    fun playOn(targetView: View, isExperimentAndShieldView: Boolean) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView)
+            highlightImageView = addHighlightView(targetView, isExperimentAndShieldView)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
-                startPulseAnimation(it)
+                startPulseAnimation(it, isExperimentAndShieldView)
             }
             lifecycleOwner.lifecycle.addObserver(this)
         }
@@ -72,11 +80,21 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         lifecycleOwner.lifecycle.removeObserver(this)
     }
 
-    private fun startPulseAnimation(view: View) {
+    @SuppressLint("NoHardcodedCoroutineDispatcher")
+    private fun startPulseAnimation(view: View, isExperimentAndShieldView: Boolean) {
         if (!pulseAnimation.isRunning) {
             val pulse = getPulseObjectAnimator(view)
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
+
+            if (isExperimentAndShieldView) {
+                pulse.startDelay = 3500L
+                view.alpha = 0.0f
+                conflatedJob += CoroutineScope(Dispatchers.Main).launch {
+                    delay(3500L)
+                    view.alpha = 1.0f
+                }
+            }
 
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
@@ -109,13 +127,20 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         }
     }
 
-    private fun addHighlightView(targetView: View): View {
+    private fun addHighlightView(targetView: View, isExperimentAndShieldView: Boolean): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
-        highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
-        val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
+        val gravity: Int
+        if (isExperimentAndShieldView) {
+            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
+            gravity = Gravity.START
+        } else {
+            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+            gravity = Gravity.CENTER
+        }
+        val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, gravity)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
     }

@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.Typeface
@@ -38,6 +39,7 @@ import com.duckduckgo.common.ui.view.toPx
 internal class TrackersLottieAssetDelegate(
     val context: Context,
     val logos: List<TrackerLogo>,
+    private val flipLogos: Boolean = false,
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
@@ -72,13 +74,12 @@ internal class TrackersLottieAssetDelegate(
     }
 
     private fun TrackerLogo.asDrawable(context: Context): Bitmap {
-        return kotlin.runCatching {
-            when (this) {
-                is ImageLogo -> ContextCompat.getDrawable(context, resId)!!.toBitmap()
-                is LetterLogo -> generateDefaultDrawable(context, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
-                is StackedLogo -> ContextCompat.getDrawable(context, this.resId)!!.toBitmap()
-            }
-        }.getOrThrow()
+        val bitmap = when (this) {
+            is ImageLogo -> ContextCompat.getDrawable(context, resId)!!.toBitmap()
+            is LetterLogo -> generateDefaultDrawable(context, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
+            is StackedLogo -> ContextCompat.getDrawable(context, this.resId)!!.toBitmap()
+        }
+        return if (flipLogos) flipBitmapHorizontallyAndVertically(bitmap) else bitmap
     }
 
     private fun generateDefaultDrawable(
@@ -114,8 +115,15 @@ internal class TrackersLottieAssetDelegate(
             }
 
             override fun getOpacity(): Int {
-                return PixelFormat.TRANSPARENT
+                return PixelFormat.UNKNOWN
             }
         }
+    }
+
+    // This is needed for the experiment animation to flip the logos when the animation is played at the bottom of the screen.
+    private fun flipBitmapHorizontallyAndVertically(source: Bitmap): Bitmap {
+        val matrix = Matrix()
+        matrix.postScale(1.0f, -1.0f, source.getWidth() / 2f, source.getHeight() / 2f)
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true)
     }
 }

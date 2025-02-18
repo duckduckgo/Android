@@ -29,8 +29,13 @@ import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.TranslateAnimation
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
@@ -40,9 +45,14 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -52,6 +62,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var listener: TrackersAnimatorListener? = null
     private var trackersAnimation: LottieAnimationView? = null
     private var shieldAnimation: LottieAnimationView? = null
+
+    private var trackersBlockedAnimationView: DaxTextView? = null
+    private var trackersBlockedCountAnimationView: DaxTextView? = null
+
     private lateinit var cookieView: LottieAnimationView
     private lateinit var cookieScene: ViewGroup
     private lateinit var cookieViewBackground: View
@@ -60,6 +74,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
     private var hasCookiesAnimationBeenCanceled = false
+
+    private val conflatedJob = ConflatedJob()
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
@@ -104,7 +120,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     override fun onAnimationEnd(animation: Animator) {
                         animateOmnibarIn(omnibarViews).start()
                         tryToStartCookiesAnimation(context, omnibarViews)
-                        listener?.onAnimationFinished()
+                        listener?.onAnimationFinished(emptyList())
                     }
 
                     override fun onAnimationCancel(animation: Animator) {
@@ -122,6 +138,132 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
+    override fun startExperimentTrackersAnimation(
+        context: Context,
+        shieldAnimationView: LottieAnimationView,
+        trackersBlockedAnimationView: DaxTextView,
+        trackersBlockedCountAnimationView: DaxTextView,
+        omnibarViews: List<View>,
+        entities: List<Entity>?,
+    ) {
+        this.trackersBlockedAnimationView = trackersBlockedAnimationView
+        this.trackersBlockedCountAnimationView = trackersBlockedCountAnimationView
+
+        if (entities.isNullOrEmpty()) {
+            tryToStartCookiesAnimation(context, omnibarViews)
+            return
+        }
+
+        val logos = getExperimentLogos(context, entities)
+        if (logos.isEmpty()) {
+            tryToStartCookiesAnimation(context, omnibarViews)
+            return
+        }
+
+        animateTrackersBlockedView(omnibarViews)
+        animateTrackersBlockedCountView(context, entities, logos, omnibarViews)
+    }
+
+    private fun animateTrackersBlockedView(omnibarViews: List<View>) {
+        val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
+            duration = 500L
+            startOffset = 100L
+        }
+        val slideInAnimation = TranslateAnimation(
+            Animation.RELATIVE_TO_SELF,
+            -0.08f,
+            Animation.RELATIVE_TO_SELF,
+            0f,
+            Animation.RELATIVE_TO_SELF,
+            0f,
+            Animation.RELATIVE_TO_SELF,
+            0f,
+        ).apply {
+            duration = 500L
+            startOffset = 200L
+        }
+
+        slideInAnimation.interpolator = LinearOutSlowInInterpolator()
+
+        val animationSet = AnimationSet(false).apply {
+            addAnimation(fadeInAnimation)
+            addAnimation(slideInAnimation)
+        }
+
+        trackersBlockedAnimationView?.show()
+        trackersBlockedAnimationView?.startAnimation(animationSet)
+
+        animationSet.setAnimationListener(
+            object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {
+                    animateOmnibarOut(omnibarViews).start()
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {}
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+            },
+        )
+    }
+
+    private fun animateTrackersBlockedCountView(context: Context, entities: List<Entity>, logos: List<TrackerLogo>, omnibarViews: List<View>) {
+        val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
+            duration = 200L
+        }
+
+        trackersBlockedCountAnimationView?.show()
+        trackersBlockedCountAnimationView?.startAnimation(fadeInAnimation)
+
+        fadeInAnimation.setAnimationListener(
+            object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    updateTrackersCountWithAnimation(context, entities, logos, omnibarViews)
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+            },
+        )
+    }
+
+    private fun updateTrackersCountWithAnimation(
+        context: Context,
+        entities: List<Entity>,
+        logos: List<TrackerLogo>,
+        omnibarViews: List<View>,
+    ) {
+        val totalDuration = 2000L
+        val trackerCountUpdateDelay = totalDuration / entities.size
+        val animationCompletionDelay = if (logos.size < MAX_LOGOS_SHOWN) 10L else 1000L
+
+        fun updateTrackersCountText(index: Int) {
+            conflatedJob += MainScope().launch {
+                if (index <= entities.size) {
+                    if (index == TRACKER_START_INDEX || index > (entities.size - TRACKER_THRESHOLD + TRACKER_START_INDEX)) {
+                        trackersBlockedCountAnimationView?.text = index.toString()
+                        delay(trackerCountUpdateDelay)
+                        updateTrackersCountText(index + 1)
+                    } else {
+                        updateTrackersCountText(index + 1) // Skip delay for certain indexes
+                    }
+                } else {
+                    delay(animationCompletionDelay)
+                    trackersBlockedAnimationView?.gone()
+                    trackersBlockedCountAnimationView?.text = ""
+                    trackersBlockedCountAnimationView?.gone()
+                    animateOmnibarIn(omnibarViews).start()
+                    listener?.onAnimationFinished(logos)
+
+                    delay(2500L)
+                    tryToStartCookiesAnimation(context, omnibarViews)
+                }
+            }
+        }
+
+        updateTrackersCountText(TRACKER_START_INDEX)
+    }
+
     override fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
@@ -129,16 +271,19 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieAnimationView: LottieAnimationView,
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
+        enqueueCookieAnimation: Boolean,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
         this.cookieCosmeticHide = cookieCosmeticHide
 
-        if (this.trackersAnimation?.isAnimating != true) {
+        if (enqueueCookieAnimation) {
+            this.enqueueCookiesAnimation = true
+        } else if (this.trackersAnimation?.isAnimating != true) {
             startCookiesAnimation(context, omnibarViews)
         } else {
-            enqueueCookiesAnimation = true
+            enqueueCookiesAnimation = false
         }
     }
 
@@ -153,6 +298,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     override fun cancelAnimations(
         omnibarViews: List<View>,
     ) {
+        stopTrackersCountAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
@@ -214,14 +360,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                             doOnEnd {
                                                 cookieView.gone()
                                                 isCookiesAnimationRunning = false
-                                                listener?.onAnimationFinished()
+                                                listener?.onAnimationFinished(emptyList())
                                             },
                                         )
                                         start()
                                     }
                                 } else {
                                     isCookiesAnimationRunning = false
-                                    listener?.onAnimationFinished()
+                                    listener?.onAnimationFinished(emptyList())
                                 }
                             },
                         )
@@ -248,7 +394,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                         cookieScene.gone()
                     } else {
                         isCookiesAnimationRunning = false
-                        listener?.onAnimationFinished()
+                        listener?.onAnimationFinished(emptyList())
                     }
                 }
 
@@ -333,6 +479,50 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
+    private fun getExperimentLogos(
+        context: Context,
+        entities: List<Entity>,
+    ): List<TrackerLogo> {
+        if (context.packageName == null) return emptyList()
+        val trackerLogoList = entities
+            .asSequence()
+            .distinct()
+            .take(MAX_LOGOS_SHOWN + 1)
+            .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
+            .map {
+                val resId = TrackersRenderer().networkLogoIcon(context, it.name, TRACKER_LOGO_PREFIX)
+                if (resId == null) {
+                    getExperimentLetterLogo(context, it)
+                } else {
+                    ImageLogo(resId)
+                }
+            }.toMutableList()
+
+        return if (trackerLogoList.size <= MAX_LOGOS_SHOWN) {
+            trackerLogoList
+        } else {
+            trackerLogoList.take(MAX_LOGOS_SHOWN)
+                .toMutableList()
+                .apply { add(StackedLogo()) }
+        }
+    }
+
+    private fun getExperimentLetterLogo(
+        context: Context,
+        entity: Entity,
+    ): TrackerLogo {
+        val drawable = "$TRACKER_LOGO_PREFIX${entity.displayName.take(1).lowercase()}"
+        val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
+        return if (resource != 0) ImageLogo(resource) else LetterLogo(entity.displayName.take(1))
+    }
+
+    private fun stopTrackersCountAnimation() {
+        trackersBlockedAnimationView?.gone()
+        trackersBlockedCountAnimationView?.gone()
+
+        conflatedJob.cancel()
+    }
+
     private fun stopTrackersAnimation() {
         val trackersAnimation = this.trackersAnimation ?: return
         val shieldAnimation = this.shieldAnimation ?: return
@@ -412,10 +602,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
+        private const val TRACKER_THRESHOLD = 5
+        private const val TRACKER_START_INDEX = 1
+        private const val TRACKER_LOGO_PREFIX = "exp_network_logo_"
     }
 }
 
-internal sealed class TrackerLogo() {
+sealed class TrackerLogo() {
     class ImageLogo(val resId: Int) : TrackerLogo()
     class LetterLogo(
         val trackerLetter: String = "",
