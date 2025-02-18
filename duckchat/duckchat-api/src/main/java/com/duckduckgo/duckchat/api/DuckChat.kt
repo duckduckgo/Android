@@ -60,7 +60,18 @@ interface DuckChat {
  * Origin of the action to launch Duck Chat.
  */
 enum class DuckChatLaunchSource(val value: String) {
+    /**
+     * Opened from anywhere in the WebView, including promos, SERP custom buttons, or direct links.
+     */
     WebView("web_view"),
+
+    /**
+     * Opened from browser's overflow menu.
+     */
     BrowserMenu("browser_menu"),
+
+    /**
+     * Opened from new tab screen's overflow menu.
+     */
     NewTabMenu("new_tab_menu"),
 }
