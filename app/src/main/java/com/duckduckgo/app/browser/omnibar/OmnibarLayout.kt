@@ -493,8 +493,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderButtons(viewState: ViewState) {
         if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.common.ui.internal.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.common.ui.internal.R.drawable.ic_tab_switcher_experiment)
+            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
+            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
         } else {
             fireIconImageView.setImageResource(R.drawable.ic_fire)
             tabsMenu.setIcon(R.drawable.ic_tabs)
