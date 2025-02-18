@@ -22,13 +22,17 @@
         <enum name="bottom" value="1" />
     </attr>
 
+    <attr name="experimentalLayout" format="boolean"/>
+
     <!-- LegacyOmnibarView-->
     <declare-styleable name="LegacyOmnibarView">
         <attr name="omnibarPosition"/>
+        <attr name="experimentalLayout"/>
     </declare-styleable>
 
     <!-- NewOmnibarView-->
     <declare-styleable name="NewOmnibarView">
         <attr name="omnibarPosition"/>
+        <attr name="experimentalLayout"/>
     </declare-styleable>
 </resources>

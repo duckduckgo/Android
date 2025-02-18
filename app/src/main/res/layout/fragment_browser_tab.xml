@@ -24,6 +24,7 @@
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        app:experimentalLayout="?attr/useExperimentalOmnibar"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -137,6 +138,7 @@
         android:id="@+id/newOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        app:experimentalLayout="?attr/useExperimentalOmnibar"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

@@ -193,11 +193,15 @@ class OmnibarLayout @JvmOverloads constructor(
         omnibarPosition =
             OmnibarPosition.entries[attr.getInt(R.styleable.LegacyOmnibarView_omnibarPosition, 0)]
 
+        val experimentalLayout = attr.getBoolean(R.styleable.LegacyOmnibarView_experimentalLayout, false)
+        Timber.d("Omnibar: experimental layout enabled $experimentalLayout")
+
         val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
             R.layout.view_new_omnibar_bottom
         } else {
             R.layout.view_new_omnibar
         }
+
         inflate(context, layout, this)
 
         AndroidSupportInjection.inject(this)
