@@ -1508,7 +1508,7 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
             showPrivacyShield = HighlightableButton.Visible(enabled = true),
-            canReportSite = domain != null,
+            canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionDisabled = false,
             canFindInPage = true,
