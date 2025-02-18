@@ -267,4 +267,5 @@ sealed class Command {
     data class SwitchToTab(val tabId: String) : Command()
     data object CloseCustomTab : Command()
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
+    data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
 }

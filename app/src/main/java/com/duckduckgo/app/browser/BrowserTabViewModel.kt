@@ -140,6 +140,7 @@ import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
+import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.Command.ShowDomainHasPermissionMessage
 import com.duckduckgo.app.browser.commands.Command.ShowEditSavedSiteDialog
@@ -773,6 +774,7 @@ class BrowserTabViewModel @Inject constructor(
         stillExternal: Boolean? = false,
         maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
+        Timber.v("buildSiteFactory for url=$url")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
@@ -780,9 +782,6 @@ class BrowserTabViewModel @Inject constructor(
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
         site?.maliciousSiteStatus = maliciousSiteStatus ?: currentBrowserViewState().maliciousSiteStatus
-        Timber.v(
-            "buildSiteFactory for url=$url, maliciousSiteStatus=${site?.maliciousSiteStatus}, maliciousSiteDetected=${currentBrowserViewState().maliciousSiteBlocked}",
-        )
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -3260,7 +3259,6 @@ class BrowserTabViewModel @Inject constructor(
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
-        // TODO (Can I avoid passing maliciousSiteStatus here and rely on browserViewState?):
         buildSiteFactory(url = url.toString(), maliciousSiteStatus = maliciousSiteStatus)
 
         if (!exempted) {
@@ -3269,7 +3267,12 @@ class BrowserTabViewModel @Inject constructor(
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             loadingViewState.postValue(
-                currentLoadingViewState().copy(isLoading = false, progress = 100, url = url.toString()),
+                currentLoadingViewState().copy(
+                    isLoading = false,
+                    progress = 100,
+                    url = url.toString(),
+                    privacyOn = false,
+                ),
             )
             browserViewState.postValue(
                 currentBrowserViewState().copy(
@@ -3925,6 +3928,29 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 duckChat.openDuckChat()
             }
+        }
+    }
+
+    fun onStop(isVisible: Boolean) {
+        if (isVisible) {
+            if (!currentBrowserViewState().maliciousSiteBlocked) {
+                updateOrDeleteWebViewPreview()
+            }
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview() {
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            deleteTabPreview(tabId)
+        } else {
+            command.value = GenerateWebViewPreviewImage
+        }
+    }
+
+    fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            command.postValue(ShowAutoconsentAnimation(isCosmetic))
         }
     }
 
