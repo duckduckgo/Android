@@ -1612,7 +1612,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain) || currentBrowserViewState().maliciousSiteBlocked
         withContext(dispatchers.main()) {
             loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
         }
@@ -1779,6 +1779,16 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
+        }
+    }
+
+    override fun onPageCommitVisible(
+        url: String,
+        webViewNavigationState: WebViewNavigationState,
+    ) {
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+            onPageContentStart(url)
         }
     }
 

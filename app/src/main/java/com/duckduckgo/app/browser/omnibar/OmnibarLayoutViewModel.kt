@@ -570,9 +570,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onAnimationStarted(decoration: LaunchTrackersAnimation) {
         Timber.d("Omnibar: LaunchTrackersAnimation")
-        if (_viewState.value.viewMode == MaliciousSiteWarning) {
-            return
-        }
         if (!decoration.entities.isNullOrEmpty()) {
             val hasFocus = _viewState.value.hasFocus
             if (!hasFocus) {
