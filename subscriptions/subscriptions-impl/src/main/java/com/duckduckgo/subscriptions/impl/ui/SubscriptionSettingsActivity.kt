@@ -186,7 +186,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                         getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.monthly))
                     viewState.status == AUTO_RENEWABLE && viewState.duration == Yearly ->
                         getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.yearly))
-                    else -> getString(string.freeTrialCancelledSubscriptionsData)
+                    else -> getString(string.freeTrialCancelledSubscriptionsData, viewState.date)
                 }
                 binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
 
@@ -331,7 +331,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
+        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage?environment=staging"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
 

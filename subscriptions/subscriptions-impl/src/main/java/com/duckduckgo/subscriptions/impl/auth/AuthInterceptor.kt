@@ -28,6 +28,7 @@ import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -49,6 +50,7 @@ class AuthInterceptor @Inject constructor(
             val accessToken = getAccessToken()
                 ?: throw IOException("Can't obtain access token for request")
 
+            Timber.e("Free Trials: authToken: $accessToken")
             val authenticatedRequest = request.newBuilder()
                 .header("Authorization", "Bearer $accessToken")
                 .build()

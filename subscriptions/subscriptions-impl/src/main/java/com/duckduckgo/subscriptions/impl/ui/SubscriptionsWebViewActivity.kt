@@ -102,6 +102,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import timber.log.Timber
 
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
@@ -194,6 +195,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                         data: JSONObject?,
                     ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
+                        Timber.e("Free Trials: onCreate processJsCallbackMessage(featureName:$featureName, method:$method, id:$id, data:$data)")
                     }
                 },
             )

@@ -43,6 +43,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import java.time.Instant
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface AuthRepository {
     suspend fun setAccessTokenV2(accessToken: AccessToken?)
@@ -168,6 +169,7 @@ internal class RealAuthRepository constructor(
             expiresOrRenewsAt = subscription?.expiresOrRenewsAt
             status = subscription?.status?.statusName
             freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
+            Timber.e("Free Trials: setSubscription($subscription) ---- freeTrialActive: $freeTrialActive")
         }
     }
 

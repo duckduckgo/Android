@@ -97,6 +97,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import retrofit2.HttpException
+import timber.log.Timber
 
 interface SubscriptionsManager {
 
@@ -337,8 +338,11 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun hadTrial(): Boolean {
         return try {
-            return subscriptionsService.offerStatus().hadTrial
+            val hadTrial = subscriptionsService.offerStatus().hadTrial
+            Timber.e("Free Trials: hadTrial -> $hadTrial")
+            return hadTrial
         } catch (e: Exception) {
+            Timber.e("Free Trials: hadTrial expception: $e")
             false
         }
     }
@@ -436,7 +440,7 @@ class RealSubscriptionsManager @Inject constructor(
                     experimentCohort = cohort,
                 ),
             )
-
+            Timber.e("Free Trials: attemptConfirmPurchase(${confirmationResponse.subscription})")
             val subscription = Subscription(
                 productId = confirmationResponse.subscription.productId,
                 startedAt = confirmationResponse.subscription.startedAt,
@@ -534,6 +538,7 @@ class RealSubscriptionsManager @Inject constructor(
                     externalId = accountData.externalId,
                 ),
             )
+            Timber.e("Free Trials: fetchAndStoreAllData($subscription)")
             authRepository.setSubscription(
                 Subscription(
                     productId = subscription.productId,
@@ -600,6 +605,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
 
+        Timber.e("Free Trials: refreshSubscriptionData($subscription)")
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,

@@ -63,6 +63,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.work.runtimeKtx
     implementation Google.android.material
+    implementation JakeWharton.timber
 
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"

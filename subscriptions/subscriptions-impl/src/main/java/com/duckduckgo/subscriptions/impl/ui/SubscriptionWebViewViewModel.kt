@@ -74,6 +74,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionWebViewViewModel @Inject constructor(
@@ -218,7 +219,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun subscriptionSelected(data: JSONObject?) {
         pixelSender.reportOfferSubscribeClick()
-
+        Timber.e("Free Trials: subscriptionSelected($data)")
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
@@ -289,6 +290,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun isFreeTrialEligible(): Boolean {
+        Timber.e("Free Trials: Experiment eligible -> ${privacyProFeature.privacyProFreeTrialJan25().isEnabled()}")
+        Timber.e("Free Trials: Cohort -> ${privacyProFeature.privacyProFreeTrialJan25().getCohort()?.name}")
         return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT)
     }
 
@@ -323,12 +326,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US -> OfferType.FREE_TRIAL
                 else -> OfferType.UNKNOWN
             }
-
+            val hadFreeTrial = subscriptionsManager.hadTrial()
+            Timber.e("Free Trials: hadTrial($hadFreeTrial)")
             OfferJson(
                 type = offerType.type,
                 id = it,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
-                isUserEligible = !subscriptionsManager.hadTrial(),
+                isUserEligible = true,
             )
         }
     }
