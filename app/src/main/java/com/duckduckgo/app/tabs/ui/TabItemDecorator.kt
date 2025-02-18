@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 class TabItemDecorator(
     context: Context,
-    var selectedTabId: String?,
+    var tabSwitcherItemId: String?,
 ) : RecyclerView.ItemDecoration() {
 
     private val borderStroke: Paint = Paint().apply {
@@ -53,8 +53,8 @@ class TabItemDecorator(
             val child = recyclerView.getChildAt(i)
 
             val positionInAdapter = recyclerView.getChildAdapterPosition(child)
-            adapter.getTab(positionInAdapter)?.let { tab ->
-                if (tab.tabId == selectedTabId) {
+            adapter.getTabSwitcherItem(positionInAdapter)?.let { tabSwitcherItem ->
+                if (tabSwitcherItem.id == tabSwitcherItemId) {
                     drawSelectedTabDecoration(child, canvas)
                 }
             }

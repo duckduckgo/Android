@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -50,7 +51,9 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
 ) : ViewModel() {
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val tabSwitcherItems: LiveData<List<TabSwitcherItem>> = tabRepository.liveTabs.map { tabEntities ->
+        tabEntities.map { TabSwitcherItem.Tab(it) }
+    }
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
@@ -69,9 +72,12 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
         if (swipingTabsFeature.isEnabled) {
-            val emptyTab = tabs.value?.firstOrNull { it.url.isNullOrBlank() }?.tabId
-            if (emptyTab != null) {
-                tabRepository.select(tabId = emptyTab)
+            val tabItemList = tabSwitcherItems.value?.filterIsInstance<TabSwitcherItem.Tab>()
+            val emptyTabItem = tabItemList?.firstOrNull { tabItem -> tabItem.tabEntity.url.isNullOrBlank() }
+            val emptyTabId = emptyTabItem?.tabEntity?.tabId
+
+            if (emptyTabId != null) {
+                tabRepository.select(tabId = emptyTabId)
             } else {
                 tabRepository.add()
             }
@@ -126,8 +132,10 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseAllTabsConfirmed() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabs.value?.forEach {
-                onTabDeleted(it)
+            tabSwitcherItems.value?.forEach { tabSwitcherItem ->
+                when (tabSwitcherItem) {
+                    is TabSwitcherItem.Tab -> onTabDeleted(tabSwitcherItem.tabEntity)
+                }
             }
             // Make sure all exemptions are removed as all tabs are deleted.
             adClickManager.clearAll()
