@@ -91,6 +91,4 @@ class VisualDesignExperimentViewModel @Inject constructor(
             }
         }
     }
-
-
 }
