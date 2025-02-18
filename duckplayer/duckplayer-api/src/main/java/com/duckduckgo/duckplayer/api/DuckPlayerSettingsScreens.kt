@@ -23,7 +23,18 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  */
 data class DuckPlayerSettingsParams(val launchSource: DuckPlayerSettingsLaunchSource) : GlobalActivityStarter.ActivityParams
 
+/**
+ * Source interaction that launched the settings screen.
+ */
 enum class DuckPlayerSettingsLaunchSource(val value: String) {
+
+    /**
+     * Click in the browser settings.
+     */
     Settings("settings"),
+
+    /**
+     * Any other source.
+     */
     Other("other"),
 }
