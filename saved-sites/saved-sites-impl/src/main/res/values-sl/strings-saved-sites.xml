@@ -61,8 +61,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi zaznamek</string>
     <string name="favoriteDialogTitleEdit">Uredi priljubljeno</string>
-    <string name="locationLabel">Lokacija</string>
-    <string name="folderLocationTitle">Izberite lokacijo</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Lokacija</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Izberite lokacijo</string>
     <string name="addFolder">Dodaj mapo</string>
     <string name="editFolder">Uredi mapo</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želite izbrisati mapo in njeno vsebino?"</string>

@@ -60,8 +60,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediģēt grāmatzīmi</string>
     <string name="favoriteDialogTitleEdit">Rediģēt izlasi</string>
-    <string name="locationLabel">Atrašanās vieta</string>
-    <string name="folderLocationTitle">Atlasi atrašanās vietu</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Atrašanās vieta</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Atlasi atrašanās vietu</string>
     <string name="addFolder">Pievienot mapi</string>
     <string name="editFolder">Rediģēt mapi</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Dzēst mapi un tās saturu?"</string>

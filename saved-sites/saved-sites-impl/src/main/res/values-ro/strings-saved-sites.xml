@@ -60,8 +60,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Editare marcaj</string>
     <string name="favoriteDialogTitleEdit">Editare favorit</string>
-    <string name="locationLabel">Locație</string>
-    <string name="folderLocationTitle">Selectează locația</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Locație</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Selectează locația</string>
     <string name="addFolder">Adaugă dosar</string>
     <string name="editFolder">Editează dosarul</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ștergi folderul și conținutul acestuia?"</string>

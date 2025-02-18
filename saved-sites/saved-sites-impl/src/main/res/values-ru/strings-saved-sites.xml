@@ -61,8 +61,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Редактировать закладку</string>
     <string name="favoriteDialogTitleEdit">Изменить избранное</string>
-    <string name="locationLabel">Геопозиция</string>
-    <string name="folderLocationTitle">Выберите геопозицию</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Местоположение</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Выберите местоположение</string>
     <string name="addFolder">Добавить папку</string>
     <string name="editFolder">Изменить папку</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Удалить папку вместе с содержимым?"</string>

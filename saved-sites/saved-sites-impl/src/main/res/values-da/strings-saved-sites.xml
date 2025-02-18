@@ -59,8 +59,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediger bogmærke</string>
     <string name="favoriteDialogTitleEdit">Rediger favorit</string>
-    <string name="locationLabel">Placering</string>
-    <string name="folderLocationTitle">Vælg placering</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Placering</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Vælg placering</string>
     <string name="addFolder">Tilføj mappe</string>
     <string name="editFolder">Rediger mappe</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Vil du slette mappen og dens indhold?"</string>
