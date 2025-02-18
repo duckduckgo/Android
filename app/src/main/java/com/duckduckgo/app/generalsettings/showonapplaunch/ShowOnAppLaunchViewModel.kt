@@ -21,7 +21,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -32,14 +31,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val urlConverter: UrlConverter,
-    private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
@@ -65,23 +62,15 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     }
 
     fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
-        Timber.i("User changed show on app launch option to $option")
         viewModelScope.launch(dispatcherProvider.io()) {
-            firePixel(option)
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
         }
     }
 
     fun setSpecificPageUrl(url: String) {
-        Timber.i("Setting specific page url to $url")
         viewModelScope.launch(dispatcherProvider.io()) {
             val convertedUrl = urlConverter.convertUrl(url)
             showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl)
         }
-    }
-
-    private fun firePixel(option: ShowOnAppLaunchOption) {
-        val pixelName = ShowOnAppLaunchOption.getPixelName(option)
-        pixel.fire(pixelName)
     }
 }
