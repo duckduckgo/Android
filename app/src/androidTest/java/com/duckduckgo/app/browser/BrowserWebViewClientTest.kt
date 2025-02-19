@@ -220,9 +220,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationState() {
+    fun whenOnPageStartedCalledThenListenerNotified() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).navigationStateChanged(any())
+        verify(listener).pageStarted(any())
     }
 
     @UiThreadTest

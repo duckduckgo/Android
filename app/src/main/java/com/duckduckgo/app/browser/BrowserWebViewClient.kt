@@ -429,7 +429,7 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList))
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
