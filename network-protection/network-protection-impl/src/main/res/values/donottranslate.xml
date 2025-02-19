@@ -16,7 +16,8 @@
 
 <resources>
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Block lists</string>
-    <string name="netpDnsBlockMalwarePrimary">Block malware and more</string>
-    <string name="netpDnsBlockMalwareByline">Block malware, phishing attacks, and online scams with a DNS-level blocklist. If a website doesn\'t load, try turning it off.</string>
+    <string name="netpDnsBlockMalwareHeader">Content Blocking and Filtering</string>
+    <string name="netpDnsBlockMalwarePrimary">Block risky domains</string>
+    <string name="netpDnsBlockMalwareByline">Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS Blocklists</string>
 </resources>
