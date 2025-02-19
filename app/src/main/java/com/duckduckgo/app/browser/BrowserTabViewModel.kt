@@ -1788,8 +1788,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageCommitVisible(
-        url: String,
         webViewNavigationState: WebViewNavigationState,
+        url: String,
     ) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
@@ -1951,6 +1951,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(
                     browserShowing = true,
                     showPrivacyShield = HighlightableButton.Visible(enabled = true),
+                    fireButton = HighlightableButton.Visible(enabled = true),
                     maliciousSiteBlocked = false,
                 )
                 loadingViewState.value = currentLoadingViewState().copy(
@@ -3963,10 +3964,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStop(isVisible: Boolean) {
-        if (isVisible) {
-            if (!currentBrowserViewState().maliciousSiteBlocked) {
-                updateOrDeleteWebViewPreview()
-            }
+        if (isVisible && !currentBrowserViewState().maliciousSiteBlocked) {
+            updateOrDeleteWebViewPreview()
         }
     }
 

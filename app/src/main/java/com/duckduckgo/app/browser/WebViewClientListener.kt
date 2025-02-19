@@ -116,8 +116,8 @@ interface WebViewClientListener {
     )
 
     fun onPageCommitVisible(
-        url: String,
         webViewNavigationState: WebViewNavigationState,
+        url: String,
     )
 
     fun pageStarted(webViewNavigationState: WebViewNavigationState)
