@@ -1396,14 +1396,11 @@ class BrowserTabFragment :
         onMaliciousWarningShown(ErrorNavigationState(navigationList, url, SITE_SECURITY_WARNING))
     }
 
-    private fun hideMaliciousWarning(uri: Uri, title: String?) {
+    private fun hideMaliciousWarning() {
         val navList = webView?.safeCopyBackForwardList()
         val currentIndex = navList?.currentIndex ?: 0
 
         if (currentIndex >= 0) {
-            // We force the error state to clear out any previous navigation status that might have been set since the error
-            // was shown and might prevent a clean page refresh
-            navList?.let { viewModel.navigationStateChanged(ErrorNavigationState(it, uri, title)) }
             viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
@@ -1802,7 +1799,7 @@ class BrowserTabFragment :
 
             is Command.WebViewError -> showError(it.errorType, it.url)
             is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed, it.onMaliciousWarningShown)
-            is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.url, it.title)
+            is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)

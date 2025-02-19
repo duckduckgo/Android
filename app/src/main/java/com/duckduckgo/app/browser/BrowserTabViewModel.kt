@@ -1320,9 +1320,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentBrowserViewState().maliciousSiteBlocked) {
-            site?.uri?.let {
-                command.postValue(HideWarningMaliciousSite(it, site?.title))
-            }
+            command.postValue(HideWarningMaliciousSite)
             return true
         }
 
@@ -1384,7 +1382,14 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
+    /*
+     * Calling this method when an error page is shown might cause unexpected issues
+     * Specifically, malicious site protection might prevent a page load from starting altogether, which
+     * means by stopping the WebView, we're effectively stopping the load for the previously loaded
+     * page. If we allow such onProgressChanged/onPageFinished/etc. to trigger an unfiltered navigationStateChanged,
+     * we will end up in a situation where we receive NewPage events for the previous page while the error is shown.
+     */
+    fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
         viewModelScope.launch {
@@ -1781,6 +1786,10 @@ class BrowserTabViewModel @Inject constructor(
             navigationStateChanged(webViewNavigationState)
             onPageContentStart(url)
         }
+    }
+
+    override fun pageStarted(webViewNavigationState: WebViewNavigationState) {
+        navigationStateChanged(webViewNavigationState)
     }
 
     override fun onSitePermissionRequested(
