@@ -243,12 +243,12 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateNavigationState() {
+    fun whenOnPageCommitVisibleCalledThenListenerIsNotified() {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        verify(listener).navigationStateChanged(any())
+        verify(listener).onPageCommitVisible(any(), any())
     }
 
     @UiThreadTest
@@ -259,7 +259,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
         testee.onPageCommitVisible(mockWebView, "foo.com")
-        verify(listener).navigationStateChanged(any())
+        verify(listener).onPageCommitVisible(any(), any())
     }
 
     @UiThreadTest
