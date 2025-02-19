@@ -186,6 +186,10 @@ sealed class Command {
         val requestUserConfirmation: Boolean,
     ) : Command()
 
+    class ShowPdfViewer(
+        val filePath: String,
+    ) : Command()
+
     object ChildTabClosed : Command()
 
     class CopyAliasToClipboard(val alias: String) : Command()
@@ -245,6 +249,7 @@ sealed class Command {
     data object ShowFaviconsPrompt : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
     data object HideSSLError : Command()
+    data object PopPdfViewer : Command()
     class LaunchScreen(
         val screen: String,
         val payload: String,

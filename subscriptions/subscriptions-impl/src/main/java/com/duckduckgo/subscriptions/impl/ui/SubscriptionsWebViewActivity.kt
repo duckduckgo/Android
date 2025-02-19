@@ -283,6 +283,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowPdfViewer -> Unit
         }
     }
 

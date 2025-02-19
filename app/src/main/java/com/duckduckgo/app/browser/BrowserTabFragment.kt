@@ -38,6 +38,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.os.ext.SdkExtensions
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
@@ -68,6 +69,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.RequiresExtension
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -78,6 +80,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
@@ -89,6 +92,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
@@ -1286,6 +1290,11 @@ class BrowserTabFragment :
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowPdfViewer -> {
+                if (Build.VERSION.SDK_INT >= 30 && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
+                    launchPdfViewerFragment(command.fileUri)
+                }
+            }
         }
     }
 
@@ -1436,7 +1445,10 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
 
-    private fun onBypassMaliciousWarning(url: Uri, feed: Feed) {
+    private fun onBypassMaliciousWarning(
+        url: Uri,
+        feed: Feed
+    ) {
         showBrowser()
         webViewClient.addExemptedMaliciousSite(url, feed)
         webView?.loadUrl(url.toString())
@@ -1866,6 +1878,15 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
 
                 browserActivity?.openExistingTab(it.tabId)
+            }
+
+            is Command.PopPdfViewer-> {
+                childFragmentManager.commit {
+                    val fragment = childFragmentManager.findFragmentByTag("pdfViewerFragment")
+                    if (fragment != null){
+                        remove(fragment)
+                    }
+                }
             }
 
             else -> {
@@ -3438,6 +3459,24 @@ class BrowserTabFragment :
 
         val downloadConfirmationFragment = downloadConfirmation.instance(pendingDownload)
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+    private fun launchPdfViewerFragment(documentUri: Uri) {
+        val pdfViewerFragment = PdfViewerFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable("documentUri", documentUri)
+            }
+        }
+
+        viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(
+            isPdfDisplayed = true,
+        )
+
+        childFragmentManager
+            .commit {
+                add(R.id.browserLayout, pdfViewerFragment, "pdfViewerFragment")
+            }
     }
 
     private fun launchFilePicker(

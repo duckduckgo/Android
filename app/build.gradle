@@ -462,6 +462,8 @@ dependencies {
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
+
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"

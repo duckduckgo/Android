@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
           package="com.duckduckgo.app.browser">
 
+    <uses-sdk tools:overrideLibrary="androidx.pdf, androidx.pdf.document.service, androidx.pdf.viewer.fragment" />
+
     <application>
         <activity
             android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"

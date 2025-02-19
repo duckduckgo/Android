@@ -42,6 +42,11 @@
         <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Button</item>
         <item name="textAppearanceCaption">@style/Typography.DuckDuckGo.Caption</item>
 
+        <item name="textAppearanceTitleMedium">@style/MaterialAlertDialog.Material3.Body.Text</item>
+        <item name="colorOnSurfaceVariant">@color/green</item>
+        <item name="colorOnPrimaryContainer">@color/green</item>
+        <item name="colorPrimaryContainer">@color/green</item>
+
         <!-- Shape -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>

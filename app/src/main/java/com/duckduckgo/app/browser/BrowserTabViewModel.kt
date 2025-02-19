@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
+import com.duckduckgo.app.browser.commands.Command.PopPdfViewer
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
@@ -1314,6 +1315,12 @@ class BrowserTabViewModel @Inject constructor(
 
         if (currentBrowserViewState().maliciousSiteDetected) {
             command.postValue(HideWarningMaliciousSite)
+            return true
+        }
+
+        if (currentBrowserViewState().isPdfDisplayed) {
+            browserViewState.value = currentBrowserViewState().copy(isPdfDisplayed = false)
+            command.postValue(PopPdfViewer)
             return true
         }
 

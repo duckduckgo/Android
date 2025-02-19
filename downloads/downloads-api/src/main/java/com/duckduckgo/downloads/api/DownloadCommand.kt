@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.api
 
+import android.net.Uri
 import androidx.annotation.StringRes
 
 /** Specific download commands used to display messages during various download stages. */
@@ -32,6 +33,10 @@ sealed class DownloadCommand(@StringRes val messageId: Int) {
     ) : DownloadCommand(messageId)
     class ShowDownloadFailedMessage(
         @StringRes messageId: Int,
+    ) : DownloadCommand(messageId)
+    class ShowPdfViewer(
+        @StringRes messageId: Int,
+        val fileUri: Uri,
     ) : DownloadCommand(messageId)
 }
 

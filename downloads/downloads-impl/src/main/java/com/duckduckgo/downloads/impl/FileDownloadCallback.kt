@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -125,17 +126,27 @@ class FileDownloadCallback @Inject constructor(
             file = file,
             mimeType = mimeType,
         )
-        appCoroutineScope.launch(dispatchers.io()) {
-            downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
-            mediaScanner.scan(file)
-            downloadsRepository.getDownloadItem(downloadId)?.let {
-                command.send(
-                    ShowDownloadSuccessMessage(
-                        messageId = string.downloadsDownloadFinishedMessage,
-                        fileName = it.fileName,
-                        filePath = it.filePath,
-                    ),
-                )
+        if (mimeType == "application/pdf") {
+            appCoroutineScope.launch {
+                downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
+                mediaScanner.scan(file)
+                downloadsRepository.getDownloadItem(downloadId)?.let {
+                    command.send(DownloadCommand.ShowPdfViewer(messageId = string.downloadsDownloadFinishedMessage, fileUri = file.toUri()))
+                }
+            }
+        } else {
+            appCoroutineScope.launch(dispatchers.io()) {
+                downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
+                mediaScanner.scan(file)
+                downloadsRepository.getDownloadItem(downloadId)?.let {
+                    command.send(
+                        ShowDownloadSuccessMessage(
+                            messageId = string.downloadsDownloadFinishedMessage,
+                            fileName = it.fileName,
+                            filePath = it.filePath,
+                        ),
+                    )
+                }
             }
         }
     }
@@ -148,17 +159,23 @@ class FileDownloadCallback @Inject constructor(
             file = file,
             mimeType = mimeType,
         )
-        appCoroutineScope.launch(dispatchers.io()) {
-            downloadsRepository.update(fileName = file.name, downloadStatus = FINISHED, contentLength = file.length())
-            mediaScanner.scan(file)
-            command.send(
-                ShowDownloadSuccessMessage(
-                    messageId = string.downloadsDownloadFinishedMessage,
-                    fileName = file.name,
-                    filePath = file.absolutePath,
-                    mimeType = mimeType,
-                ),
-            )
+        if (mimeType == "application/pdf") {
+            appCoroutineScope.launch {
+                command.send(DownloadCommand.ShowPdfViewer(messageId = string.downloadsDownloadFinishedMessage, fileUri = file.toUri()))
+            }
+        } else {
+            appCoroutineScope.launch(dispatchers.io()) {
+                downloadsRepository.update(fileName = file.name, downloadStatus = FINISHED, contentLength = file.length())
+                mediaScanner.scan(file)
+                command.send(
+                    ShowDownloadSuccessMessage(
+                        messageId = string.downloadsDownloadFinishedMessage,
+                        fileName = file.name,
+                        filePath = file.absolutePath,
+                        mimeType = mimeType,
+                    ),
+                )
+            }
         }
     }
 
