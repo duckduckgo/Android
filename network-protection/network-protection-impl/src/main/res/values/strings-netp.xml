@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">DNS Server</string>
     <string name="netpPrivateDns">Private DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Block malware)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Block risky domains)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recommended)</string>
     <string name="netpCustomDnsCustom">Custom</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 Address</string>
@@ -233,6 +233,12 @@
     <string name="netpCustomDnsPrivateDnsWarning">Private DNS is already specified in System DNS Settings. Turn off Private DNS to set a custom DNS for DuckDuckGo VPN. <annotation type="open_settings_link">Open System Settings</annotation></string>
     <string name="netpCustomDnsWarning">Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn\'t secure or reliable.</string>
     <string name="netpDdgDnsByLine">DuckDuckGo routes DNS queries through our DNS servers so your internet provider can\'t see what websites you visit.</string>
+
+    <!-- Block malware DNS -->
+    <string name="netpDnsBlockMalwareHeader">Content Blocking and Filtering</string>
+    <string name="netpDnsBlockMalwarePrimary">Block risky domains</string>
+    <string name="netpDnsBlockMalwareByline">Block 150,000+ domains flagged for hosting malware, phishing attacks, and online scams with a DNS-level blocklist. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS Blocklists</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Would you like to exclude apps that are not compatible with VPNs?</string>
