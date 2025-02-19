@@ -136,6 +136,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     override fun findAllAsync(find: String) {
         if (!isDestroyed) {
+            super.findAllAsync("")
             super.findAllAsync(find)
         }
     }
