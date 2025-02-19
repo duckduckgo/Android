@@ -3291,6 +3291,14 @@ class BrowserTabViewModel @Inject constructor(
                     fireButton = HighlightableButton.Gone,
                     maliciousSiteBlocked = true,
                     maliciousSiteStatus = maliciousSiteStatus,
+                    canChangePrivacyProtection = false,
+                    canFireproofSite = false,
+                    canReportSite = false,
+                    canSharePage = false,
+                    canSaveSite = false,
+                    canFindInPage = false,
+                    canChangeBrowsingMode = false,
+                    canPrintPage = false,
                 ),
             )
             omnibarViewState.postValue(
