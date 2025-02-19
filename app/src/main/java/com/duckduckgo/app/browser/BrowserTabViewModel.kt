@@ -1509,7 +1509,7 @@ class BrowserTabViewModel @Inject constructor(
             canSharePage = domain != null,
             showPrivacyShield = HighlightableButton.Visible(enabled = true),
             canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
-            canChangePrivacyProtection = domain != null,
+            canChangePrivacyProtection = domain != null && !duckPlayer.isDuckPlayerUri(url),
             isPrivacyProtectionDisabled = false,
             canFindInPage = true,
             canChangeBrowsingMode = true,
