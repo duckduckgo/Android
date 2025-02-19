@@ -2785,7 +2785,7 @@ class BrowserTabViewModelTest {
     fun whenUserInDuckPlayerThenCannotReportSite() {
         setupNavigation(skipHome = false, isBrowsing = true)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
-        assertFalse(browserViewState().canChangePrivacyProtection)
+        assertFalse(browserViewState().canReportSite)
     }
 
     @Test
