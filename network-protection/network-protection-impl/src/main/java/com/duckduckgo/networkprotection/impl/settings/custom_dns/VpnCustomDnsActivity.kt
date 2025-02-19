@@ -24,7 +24,9 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.setEnabledOpacity
@@ -34,6 +36,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
@@ -61,6 +64,8 @@ import kotlinx.coroutines.launch
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class)
 class VpnCustomDnsActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityNetpCustomDnsBinding by viewBinding()
     private val viewModel: VpnCustomDnsViewModel by bindViewModel()
@@ -146,6 +151,18 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 events.emit(OnApply)
             }
+        }
+        binding.blockMalwareDescription.addClickableLink(
+            "learn_more_link",
+            getText(R.string.netpDnsBlockMalwareByline),
+        ) {
+            globalActivityStarter.start(
+                this,
+                WebViewActivityWithParams(
+                    url = URL_FAQS_DNS_BLOCKLIST,
+                    screenTitle = getString(R.string.netpDnsBlockMalwareFaqsTitle),
+                ),
+            )
         }
     }
 
@@ -266,6 +283,10 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         ) : State()
 
         data class Done(val finish: Boolean = true) : State()
+    }
+
+    companion object {
+        private const val URL_FAQS_DNS_BLOCKLIST = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/dns-blocklists"
     }
 }
 

@@ -137,7 +137,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
-        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = false))
+        vpnRemoteFeatures.allowDnsBlockMalware().setRawStoredState(Toggle.State(enable = false))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
 
@@ -151,7 +151,7 @@ class WgVpnNetworkStackTest {
     fun whenBlockMalwareIsConfiguredDNSIsComputed() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
         netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
-        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = true))
+        vpnRemoteFeatures.allowDnsBlockMalware().setRawStoredState(Toggle.State(enable = true))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
         val expected = wgConfig.toTunnelConfig().copy(
@@ -168,7 +168,7 @@ class WgVpnNetworkStackTest {
     fun whenBlockMalwareKillSwitched() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
         netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))
-        vpnRemoteFeatures.allowBlockMalware().setRawStoredState(Toggle.State(enable = false))
+        vpnRemoteFeatures.allowDnsBlockMalware().setRawStoredState(Toggle.State(enable = false))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
         val expected = wgConfig.toTunnelConfig().copy(
