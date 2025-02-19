@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
+import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Medium
@@ -27,12 +28,13 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
+import java.util.UUID
 
 class OneLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.oneLineListItemStyle,
-) : DaxListItem(context, attrs, defStyleAttr) {
+) : DaxListItem(context, attrs, defStyleAttr), Searchable {
 
     private val binding: ViewOneLineListItemBinding by viewBinding()
     override val primaryText: DaxTextView
@@ -124,5 +126,17 @@ class OneLineListItem @JvmOverloads constructor(
 
             recycle()
         }
+    }
+    private val searchKeywords: MutableSet<String> = mutableSetOf()
+
+    override val id: UUID = UUID.randomUUID()
+
+    fun assignSearchKeywords(keywords: Set<String>) {
+        searchKeywords.clear()
+        searchKeywords.addAll(keywords)
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return searchKeywords
     }
 }

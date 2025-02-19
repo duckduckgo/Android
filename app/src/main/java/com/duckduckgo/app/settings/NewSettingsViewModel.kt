@@ -17,6 +17,7 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -66,6 +67,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.ui.SearchableTag
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -87,8 +89,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.apache.commons.text.similarity.LevenshteinDetailedDistance
+import org.apache.commons.text.similarity.LevenshteinDistance
+import org.apache.commons.text.similarity.SimilarityInput
+import timber.log.Timber
+import java.util.UUID
+import kotlin.random.Random
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -120,6 +129,7 @@ class NewSettingsViewModel @Inject constructor(
         val isDuckPlayerEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
+        val searchResults: Set<UUID>? = null,
     )
 
     sealed class Command {
@@ -340,6 +350,41 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onDdgOnOtherPlatformsClicked() {
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
+    }
+
+    fun onSearchQueryTextChange(
+        query: String?,
+        searchableTags: Sequence<SearchableTag>
+    ) {
+        if (query.isNullOrBlank()) {
+            viewState.update {
+                it.copy(
+                    searchResults = null,
+                )
+            }
+        } else {
+            val normalizedQuery = query.lowercase()
+            viewModelScope.launch(dispatcherProvider.computation()) {
+                val results = searchableTags.filter { tag ->
+                    tag.keywords.forEach { keyword ->
+                        val distance = LevenshteinDistance(4).apply(SimilarityInput.input(keyword), SimilarityInput.input(normalizedQuery))
+                        if (distance >= 0) {
+                            val normalizedDistance = distance.toDouble() / maxOf(query.length, keyword.length)
+                            Timber.d("lp_test; query: $query; keyword: $keyword; distance: $distance; normalizedDistance: $normalizedDistance")
+                            if (normalizedDistance <= 0.5) {
+                                return@filter true
+                            }
+                        }
+                    }
+                    false
+                }.map { it.id }.toSet()
+                viewState.update {
+                    it.copy(
+                        searchResults = results,
+                    )
+                }
+            }
+        }
     }
 
     companion object {

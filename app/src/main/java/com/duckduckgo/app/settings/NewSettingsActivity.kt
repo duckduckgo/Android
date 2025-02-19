@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -74,6 +76,8 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.Searchable
+import com.duckduckgo.common.ui.SearchableTag
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -96,6 +100,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.util.UUID
 import javax.inject.Inject
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
@@ -144,16 +149,16 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private val viewsPrivacy
-        get() = binding.includeSettings.contentSettingsPrivacy
+        get() = binding.includeSettings
 
     private val viewsMain
-        get() = binding.includeSettings.contentSettingsMain
+        get() = binding.includeSettings
 
     private val viewsNextSteps
-        get() = binding.includeSettings.contentSettingsNextSteps
+        get() = binding.includeSettings
 
     private val viewsOther
-        get() = binding.includeSettings.contentSettingsOther
+        get() = binding.includeSettings
 
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
@@ -176,40 +181,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.settings_menu, menu)
-
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-
-        // Configure the SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // Handle search query submission
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Handle search query text changes
-                return true
-            }
-        })
-
-        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                // SearchView is expanded
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                // SearchView is collapsed
-                return true
-            }
-        })
-
-        return true
     }
 
     private fun configureUiEventHandlers() {
@@ -263,6 +234,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
+        assignSearchKeywords()
     }
 
     private fun configureInternalFeatures() {
@@ -284,6 +256,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
+                    // needs to happen first
+                    restoreHiddenBySearch()
+
                     updateDefaultBrowserViewVisibility(it)
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
@@ -296,6 +271,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
+
+                    // needs to happen last
+                    applySearchResults(it.searchResults)
                 }
             }.launchIn(lifecycleScope)
 
@@ -303,6 +281,78 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private val hiddenBySearch = mutableListOf<View>()
+
+    private fun restoreHiddenBySearch() {
+        hiddenBySearch.forEach { hiddenView ->
+            binding.includeSettings.settingsContent.children.find { it == hiddenView }?.show()
+        }
+        hiddenBySearch.clear()
+    }
+
+    private fun applySearchResults(searchResults: Set<UUID>?) {
+        if (searchResults != null) {
+            binding.includeSettings.settingsContent.children.forEach {
+                if (it !is Searchable || !searchResults.contains(it.id)) {
+                    it.gone()
+                    hiddenBySearch.add(it)
+                }
+            }
+        }
+    }
+
+    private fun assignSearchKeywords() {
+        viewsMain.syncSetting.assignSearchKeywords(setOf("sync", "link", "backup", "sync and backup", "sync & backup", "backup & sync", "backup and sync"))
+        viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf("passwords", "manager", "autofill", "auto fill", "credentials", "pass", "access", "fill"))
+        viewsMain.accessibilitySetting.assignSearchKeywords(setOf("text", "text size", "accessibility", "access"))
+        viewsMain.appearanceSetting.assignSearchKeywords(setOf("text", "color", "text color", "appearance", "style", "night", "light", "dark", "mode", "dark mode", "light mode", "theme"))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.settings_menu, menu)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+
+        // Configure the SearchView
+        searchView.setOnQueryTextListener(
+            object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.onSearchQueryTextChange(
+                        newText,
+                        binding.includeSettings.settingsContent.children.mapNotNull {
+                            if (it is Searchable) {
+                                SearchableTag(id = it.id, keywords = it.generateKeywords())
+                            } else null
+                        },
+                    )
+                    return true
+                }
+            },
+        )
+
+        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                val layoutTransition = LayoutTransition()
+                layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
+                layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
+                binding.includeSettings.settingsContent.layoutTransition = layoutTransition
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                binding.includeSettings.settingsContent.layoutTransition = null
+                return true
+            }
+        })
+
+        return true
     }
 
     private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {

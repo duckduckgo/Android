@@ -23,17 +23,61 @@
     tools:ignore="Overdraw">
 
     <LinearLayout
+        android:id="@+id/settingsContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="20dp">
 
-        <include
-            android:id="@+id/contentSettingsPrivacy"
-            layout="@layout/content_settings_new_privacy"
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/settingsPrivacyTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4" />
+            app:primaryText="@string/settingsHeadingProtections" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/setAsDefaultBrowserSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_default_browser_mobile_color_24"
+            app:primaryText="@string/settingsDefaultBrowserTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/privateSearchSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:indicatorStatus="on"
+            app:leadingIcon="@drawable/ic_find_search_color_24"
+            app:primaryText="@string/settingsPrivateSearchTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/webTrackingProtectionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:indicatorStatus="on"
+            app:leadingIcon="@drawable/ic_shield_color_24"
+            app:primaryText="@string/settingsWebTrackingProtectionTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/cookiePopupProtectionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_cookie_color_24"
+            app:primaryText="@string/cookiePopupProtectionTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/vpnSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_lock_color_24"
+            app:primaryText="@string/atp_SettingsTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+            android:id="@+id/emailSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_email_protection_color_24"
+            app:primaryText="@string/settingsEmailProtectionTitle" />
 
         <LinearLayout
             android:id="@+id/contentSettingsPrivacyPro"
@@ -46,23 +90,149 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/settingsSettingsTitle"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsHeadingMainSettings" />
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/generalSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsGeneral"
+            app:leadingIcon="@drawable/ic_settings_color_24" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/syncSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsSyncSetting"
+            app:leadingIcon="@drawable/ic_sync_color_24"/>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/appearanceSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsHeadingAppearance"
+            app:leadingIcon="@drawable/ic_appearance_color_24"/>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/autofillLoginsSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsPasswordsAndAutofillLoginsSetting"
+            app:leadingIcon="@drawable/ic_key_color_24"/>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/accessibilitySetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsAccessibility"
+            app:leadingIcon="@drawable/ic_accessibility_color_24"/>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/permissionsSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsPermissionsSetting"
+            app:leadingIcon="@drawable/ic_lock_color_24"/>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/fireButtonSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsDataClearing"
+            app:leadingIcon="@drawable/ic_fire_color_24"/>
+
         <include
-            android:id="@+id/contentSettingsMain"
-            layout="@layout/content_settings_main_settings"
+            android:id="@+id/includeDuckChatSetting"
+            layout="@layout/view_settings_item_duck_chat" />
+
+        <LinearLayout
+            android:id="@+id/settingsSectionDuckPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settingsNextStepsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsHeadingNextSteps" />
+
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/addWidgetToHomeScreenSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_add_widget_color_24"
+            app:primaryText="@string/settingsAddWidget" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/addressBarPositionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_address_bar_position_bottom_color_24"
+            app:primaryText="@string/settingsAddressBarPosition" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/enableVoiceSearchSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:leadingIcon="@drawable/ic_microphone_color_24"
+            app:primaryText="@string/settingsEnableVoiceSearch"
+            tools:visibility="visible" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/settingsOtherDivider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <include
-            android:id="@+id/contentSettingsNextSteps"
-            layout="@layout/content_settings_next_steps"
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/aboutSetting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsHeadingAbout"
+            app:leadingIcon="@drawable/ic_dax_icon" />
 
-        <include
-            android:id="@+id/contentSettingsOther"
-            layout="@layout/content_settings_new_other"
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/shareFeedbackSetting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:primaryText="@string/leaveFeedbackNew"
+            app:leadingIcon="@drawable/ic_heart_gray_color_24" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/ddgOnOtherPlatformsSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_downloads_color_24"
+            app:primaryText="@string/settingsDDGOnOtherPlatforms"
+            app:trailingIcon="@drawable/ic_open_in_16"
+            app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
 
         <include
             android:id="@+id/contentSettingsInternal"
