@@ -383,7 +383,7 @@ class BrowserWebViewClient @Inject constructor(
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.onPageCommitVisible(url, WebViewNavigationState(navigationList))
+            webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
         }
     }
 
