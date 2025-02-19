@@ -2724,7 +2724,7 @@ class BrowserTabViewModel @Inject constructor(
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
-                    isBrowserShowing,
+                    isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
                 )
             }
@@ -3278,6 +3278,7 @@ class BrowserTabViewModel @Inject constructor(
                 currentBrowserViewState().copy(
                     browserShowing = false,
                     showPrivacyShield = HighlightableButton.Gone,
+                    fireButton = HighlightableButton.Gone,
                     maliciousSiteBlocked = true,
                     maliciousSiteStatus = maliciousSiteStatus,
                 ),
@@ -3295,6 +3296,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.postValue(
                 currentBrowserViewState().copy(
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                    fireButton = HighlightableButton.Visible(enabled = false),
                     maliciousSiteBlocked = false,
                     maliciousSiteStatus = maliciousSiteStatus,
                 ),
@@ -3662,7 +3664,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 viewModelScope.launch {
-                    val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
+                    val cta = withContext(dispatchers.io()) { if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta() }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
                         command.value = HideOnboardingDaxDialog(onboardingCta)
