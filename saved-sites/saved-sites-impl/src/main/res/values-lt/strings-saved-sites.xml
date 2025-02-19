@@ -61,8 +61,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redaguoti žymę</string>
     <string name="favoriteDialogTitleEdit">Redaguoti mėgstamiausią</string>
-    <string name="locationLabel">Vieta</string>
-    <string name="folderLocationTitle">Pasirinkti vietą</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Vieta</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Pasirinkti vietą</string>
     <string name="addFolder">Pridėti aplanką</string>
     <string name="editFolder">Redaguoti aplanką</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ištrinti aplanką ir jo turinį?"</string>

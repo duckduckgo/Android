@@ -59,8 +59,8 @@
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
     <string name="favoriteDialogTitleEdit">Kedvenc szerkesztése</string>
-    <string name="locationLabel">Hely</string>
-    <string name="folderLocationTitle">Hely kiválasztása</string>
+    <string name="locationLabel" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Hely</string>
+    <string name="folderLocationTitle" instruction="Refers to the folder where a bookmark is saved, not a geographical location">Hely kiválasztása</string>
     <string name="addFolder">Mappa hozzáadása</string>
     <string name="editFolder">Mappa szerkesztése</string>
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Törlöd a mappát a tartalmával együtt?"</string>
