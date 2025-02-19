@@ -3682,7 +3682,9 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 viewModelScope.launch {
-                    val cta = withContext(dispatchers.io()) { if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta() }
+                    val cta = withContext(dispatchers.io()) {
+                        if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
+                    }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
                         command.value = HideOnboardingDaxDialog(onboardingCta)
