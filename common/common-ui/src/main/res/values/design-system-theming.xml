@@ -336,7 +336,6 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimationDuration">0</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
     </style>
 
