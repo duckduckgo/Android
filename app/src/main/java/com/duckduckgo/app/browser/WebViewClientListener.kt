@@ -35,7 +35,6 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 interface WebViewClientListener {
 
     fun onPageContentStart(url: String)
-    fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(
         newProgress: Int,
@@ -120,4 +119,6 @@ interface WebViewClientListener {
         url: String,
         webViewNavigationState: WebViewNavigationState,
     )
+
+    fun pageStarted(webViewNavigationState: WebViewNavigationState)
 }

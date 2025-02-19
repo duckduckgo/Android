@@ -225,10 +225,7 @@ sealed class Command {
         val onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
     ) : Command()
 
-    data class HideWarningMaliciousSite(
-        val url: Uri,
-        val title: String?,
-    ) : Command()
+    data object HideWarningMaliciousSite : Command()
 
     data object EscapeMaliciousSite : Command()
 
