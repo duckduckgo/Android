@@ -2782,6 +2782,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserInDuckPlayerThenCannotReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserInDuckPlayerThenCannotAllowList() {
+        setupNavigation(skipHome = false, isBrowsing = true)
+        whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canChangePrivacyProtection)
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCannotAddToHome() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
