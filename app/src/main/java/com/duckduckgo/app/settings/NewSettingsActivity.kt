@@ -295,7 +295,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun applySearchResults(searchResults: Set<UUID>?) {
         if (searchResults != null) {
             binding.includeSettings.settingsContent.children.forEach {
-                if (it !is Searchable || !searchResults.contains(it.id)) {
+                if (it.isVisible && (it !is Searchable || !searchResults.contains(it.id))) {
                     it.gone()
                     hiddenBySearch.add(it)
                 }
@@ -304,10 +304,32 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun assignSearchKeywords() {
-        viewsMain.syncSetting.assignSearchKeywords(setOf("sync", "link", "backup", "sync and backup", "sync & backup", "backup & sync", "backup and sync"))
-        viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf("passwords", "manager", "autofill", "auto fill", "credentials", "pass", "access", "fill"))
-        viewsMain.accessibilitySetting.assignSearchKeywords(setOf("text", "text size", "accessibility", "access"))
-        viewsMain.appearanceSetting.assignSearchKeywords(setOf("text", "color", "text color", "appearance", "style", "night", "light", "dark", "mode", "dark mode", "light mode", "theme"))
+        viewsMain.syncSetting.assignSearchKeywords(setOf(
+            "sync", "backup", "cloud", "restore",
+            "account", "data", "transfer", "storage",
+            "link", "synchronize", "upload", "download"
+        ))
+
+        viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf(
+            "password", "login", "autofill", "credentials",
+            "manager", "security", "vault", "biometric",
+            "2fa", "two-factor", "authentication", "fingerprint",
+            "face recognition", "secure", "protection"
+        ))
+
+        viewsMain.accessibilitySetting.assignSearchKeywords(setOf(
+            "accessibility", "font", "font size", "zoom",
+            "readability", "contrast", "display",
+            "dyslexia", "vision", "screen reader", "text", "text size", "size",
+            "high contrast", "magnifier", "voiceover", "assistive"
+        ))
+
+        viewsMain.appearanceSetting.assignSearchKeywords(setOf(
+            "theme", "dark", "light", "night", "day",
+            "color", "palette", "UI", "interface",
+            "customization", "scheme", "appearance",
+            "text", "font", "mode", "style", "layout", "design"
+        ))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

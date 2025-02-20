@@ -81,6 +81,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -92,6 +93,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.commons.text.similarity.LevenshteinDetailedDistance
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.apache.commons.text.similarity.SimilarityInput
@@ -352,39 +354,96 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
 
+    private var debounceJob: Job? = null
+
     fun onSearchQueryTextChange(
         query: String?,
         searchableTags: Sequence<SearchableTag>
     ) {
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(300) // 300ms debounce
+            processSearch(query, searchableTags)
+        }
+    }
+
+    private suspend fun processSearch(query: String?, searchableTags: Sequence<SearchableTag>) {
         if (query.isNullOrBlank()) {
-            viewState.update {
-                it.copy(
-                    searchResults = null,
-                )
-            }
-        } else {
-            val normalizedQuery = query.lowercase()
-            viewModelScope.launch(dispatcherProvider.computation()) {
-                val results = searchableTags.filter { tag ->
-                    tag.keywords.forEach { keyword ->
-                        val distance = LevenshteinDistance(4).apply(SimilarityInput.input(keyword), SimilarityInput.input(normalizedQuery))
-                        if (distance >= 0) {
-                            val normalizedDistance = distance.toDouble() / maxOf(query.length, keyword.length)
-                            Timber.d("lp_test; query: $query; keyword: $keyword; distance: $distance; normalizedDistance: $normalizedDistance")
-                            if (normalizedDistance <= 0.5) {
-                                return@filter true
-                            }
-                        }
-                    }
+            viewState.update { it.copy(searchResults = null) }
+            return
+        }
+
+        withContext(dispatcherProvider.computation()) {
+            val normalizedQuery = query.lowercase().trim()
+            val queryWords = normalizedQuery.split("\\s+".toRegex())
+            val queryNGrams = generateNGrams(normalizedQuery, 3)  // Using trigrams
+
+            val results = searchableTags.filter { tag ->
+                tag.keywords.any { keyword ->
+                    val normalizedKeyword = keyword.lowercase()
+
+                    // Exact match
+                    if (normalizedKeyword == normalizedQuery) return@any true
+
+                    // Prefix matching (only for single-word queries)
+                    if (queryWords.size == 1 && normalizedKeyword.startsWith(normalizedQuery)) return@any true
+
+                    // Word tokenization and matching
+                    if (queryWords.size > 1 && queryWords.all { word -> normalizedKeyword.contains(word) }) return@any true
+
+                    // N-gram similarity with a higher threshold
+                    val keywordNGrams = generateNGrams(normalizedKeyword, 2)
+                    val similarity = calculateJaccardSimilarity(queryNGrams, keywordNGrams)
+                    if (similarity >= 0.5) return@any true  // Increased threshold for stricter matching
+
+                    // Partial word matching with typo tolerance
+                    if (partialMatchWithTypoTolerance(normalizedQuery, normalizedKeyword)) return@any true
+
                     false
-                }.map { it.id }.toSet()
-                viewState.update {
-                    it.copy(
-                        searchResults = results,
-                    )
+                }
+            }.map { it.id }.toSet()
+
+            viewState.update { it.copy(searchResults = results) }
+        }
+    }
+
+    private fun generateNGrams(text: String, n: Int): Set<String> {
+        return text.windowed(n).toSet()
+    }
+
+    private fun calculateJaccardSimilarity(set1: Set<String>, set2: Set<String>): Double {
+        val intersection = set1.intersect(set2)
+        val union = set1.union(set2)
+        return intersection.size.toDouble() / union.size
+    }
+
+    private fun partialMatchWithTypoTolerance(query: String, keyword: String): Boolean {
+        val queryWords = query.split("\\s+".toRegex())
+        val keywordWords = keyword.split("\\s+".toRegex())
+
+        return queryWords.all { queryWord ->
+            keywordWords.any { keywordWord ->
+                val distance = levenshteinDistance(queryWord, keywordWord)
+                when {
+                    queryWord.length <= 2 -> {
+                        queryWord == keywordWord
+                    }
+                    queryWord.length <= 3 -> {
+                        distance in 0..1
+                    }
+                    queryWord.length <= 5 -> {
+                        distance in 0..2
+                    }
+                    else -> {
+                        distance in 0..3
+                    }
                 }
             }
         }
+    }
+
+    private fun levenshteinDistance(s1: String, s2: String): Int {
+        return LevenshteinDistance(4).apply(SimilarityInput.input(s1), SimilarityInput.input(s2))
     }
 
     companion object {
