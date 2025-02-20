@@ -29,6 +29,7 @@ import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_AUTOFILL_CREDENTIAL_ID_EXTRAS
@@ -36,10 +37,12 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Compa
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_PACKAGE_ID_EXTRAS
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_URL_EXTRAS
 import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
+import com.duckduckgo.autofill.impl.ui.credential.selecting.TimestampBasedLoginSorter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.random.Random
 import timber.log.Timber
 
@@ -59,6 +62,9 @@ class RealAutofillProviderSuggestions @Inject constructor(
     private val viewProvider: AutofillServiceViewProvider,
     private val suggestionsFormatter: AutofillServiceSuggestionCredentialFormatter,
     private val appCredentialProvider: AppCredentialProvider,
+    private val deduplicator: AutofillLoginDeduplicator,
+    @Named("LastUsedCredentialSorter") private val lastUsedCredentialSorter: TimestampBasedLoginSorter,
+    @Named("LastUpdatedCredentialSorter") private val lastUpdatedCredentialSorter: TimestampBasedLoginSorter,
 ) : AutofillProviderSuggestions {
 
     companion object {
@@ -211,8 +217,9 @@ class RealAutofillProviderSuggestions @Inject constructor(
     }
 
     private suspend fun loginCredentials(node: AutofillRootNode): List<LoginCredentials>? {
-        val crendentialsForDomain = node.website.takeUnless { it.isNullOrBlank() }?.let {
-            autofillStore.getCredentials(it)
+        val crendentialsForDomain = node.website.takeUnless { it.isNullOrBlank() }?.let { nonEmtpyWebsite ->
+            val credentials = autofillStore.getCredentials(nonEmtpyWebsite)
+            deduplicator.deduplicate(nonEmtpyWebsite, credentials).sortedWith(timestampComparator())
         } ?: emptyList()
 
         val crendentialsForPackage = node.packageId.takeUnless { it.isNullOrBlank() }?.let {
@@ -222,6 +229,10 @@ class RealAutofillProviderSuggestions @Inject constructor(
         Timber.v("DDGAutofillService credentials for domain: $crendentialsForDomain")
         Timber.v("DDGAutofillService credentials for package: $crendentialsForPackage")
         return crendentialsForDomain.plus(crendentialsForPackage).distinct()
+    }
+
+    private fun timestampComparator(): Comparator<LoginCredentials> {
+        return lastUsedCredentialSorter.reversed().then(lastUpdatedCredentialSorter.reversed())
     }
 
     private fun createAutofillSelectionIntent(context: Context, url: String, packageId: String): PendingIntent {
