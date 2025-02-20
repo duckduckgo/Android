@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.databinding.ContentSettingsPrivateSearchBinding
-import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command

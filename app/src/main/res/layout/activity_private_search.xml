@@ -133,13 +133,10 @@
                 app:primaryText="@string/privateSearchHeadingSearchSettings"
                 tools:visibility="gone" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/privateSearchAutocompleteToggle"
+            <FrameLayout
+                android:id="@+id/content_setting_private_search_autocomplete_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/privateSearchAutocompleteToggle"
-                app:secondaryText="@string/privateSearchAutocompleteHint"
-                app:showSwitch="true" />
+                android:layout_height="wrap_content"/>
 
             <LinearLayout
                 android:id="@+id/privateSearchAutocompleteRecentlyVisitedSites"

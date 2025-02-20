@@ -56,6 +56,7 @@ interface SettingsNode {
 }
 
 interface RootSettingsNode: SettingsNode
+interface NestedSettingsNode: SettingsNode
 
 @ContributesPluginPoint(
     scope = AppScope::class,
@@ -63,3 +64,10 @@ interface RootSettingsNode: SettingsNode
 )
 @Suppress("unused")
 interface RootSettingsNodePluginPoint
+
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = NestedSettingsNode::class,
+)
+@Suppress("unused")
+interface NestedSettingsNodePluginPoint

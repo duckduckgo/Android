@@ -24,19 +24,33 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivateSearchBinding
 import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.RootSettingsNode
+import com.duckduckgo.common.ui.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
+interface PrivateSearchNestedSettingNode: SettingsNode
+
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = PrivateSearchNestedSettingNode::class,
+)
+@Suppress("unused")
+interface PrivateSearchNestedSettingNodePluginPoint
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
@@ -48,12 +62,14 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsPageFeature: SettingsPageFeature
 
+    @Inject
+    lateinit var _nestedSettingsPlugins: PluginPoint<PrivateSearchNestedSettingNode>
+    private val nestedSettingsPlugins by lazy {
+        _nestedSettingsPlugins.getPlugins()
+    }
+
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
-
-    private val autocompleteToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteSettingChanged(isChecked)
-    }
 
     private val autocompleteRecentlyVisitedSitesToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
@@ -79,12 +95,15 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
             }
         }
 
+        nestedSettingsPlugins.forEach {
+            binding.contentSettingPrivateSearchAutocompleteContainer.addView(it.getView(this))
+        }
+
         configureUiEventHandlers()
         observeViewModel()
     }
 
     private fun configureUiEventHandlers() {
-        binding.privateSearchAutocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.privateSearchMoreSearchSettings.setOnClickListener { viewModel.onPrivateSearchMoreSearchSettingsClicked() }
     }
@@ -94,10 +113,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState?.let {
-                    binding.privateSearchAutocompleteToggle.quietlySetIsChecked(
-                        newCheckedState = it.autoCompleteSuggestionsEnabled,
-                        changeListener = autocompleteToggleListener,
-                    )
                     if (it.storeHistoryEnabled) {
                         binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = true
                         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
