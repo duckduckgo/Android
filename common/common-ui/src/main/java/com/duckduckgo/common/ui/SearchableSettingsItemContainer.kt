@@ -16,6 +16,11 @@
 
 package com.duckduckgo.common.ui
 
+import android.content.Context
+import android.view.View
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.common.ui.view.listitem.SettingsListItem
+import com.duckduckgo.di.scopes.AppScope
 import java.util.UUID
 
 interface Searchable {
@@ -27,3 +32,25 @@ data class SearchableTag(
     val id: UUID,
     val keywords: Set<String>
 )
+
+interface SettingsNode : Searchable {
+
+    val parent: SettingsNode?
+
+    val children: List<SettingsNode>
+
+    /**
+     * This method returns a [View] that will be used as a setting item
+     * @return [View]
+     */
+    fun getView(context: Context): View
+}
+
+interface RootSettingsNode: SettingsNode
+
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = RootSettingsNode::class,
+)
+@Suppress("unused")
+interface RootSettingsNodePluginPoint

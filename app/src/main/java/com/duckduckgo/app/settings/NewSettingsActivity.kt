@@ -54,7 +54,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrack
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
@@ -76,6 +75,7 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.RootSettingsNode
 import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.SearchableTag
 import com.duckduckgo.common.ui.view.gone
@@ -125,6 +125,12 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var _settingsPlugins: PluginPoint<RootSettingsNode>
+    private val settingsPlugins by lazy {
+        _settingsPlugins.getPlugins()
+    }
 
     @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
@@ -185,7 +191,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
-            setAsDefaultBrowserSetting.setClickListener { viewModel.onDefaultBrowserSettingClicked() }
+            settingsPlugins.forEach { plugin ->
+                settingsContent.addView(plugin.getView(this@NewSettingsActivity), 0)
+            }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
@@ -259,7 +267,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     // needs to happen first
                     restoreHiddenBySearch()
 
-                    updateDefaultBrowserViewVisibility(it)
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
                     )
@@ -430,7 +437,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is LaunchDefaultBrowser -> launchDefaultAppScreen()
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
@@ -451,17 +457,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
-        }
-    }
-
-    private fun updateDefaultBrowserViewVisibility(it: NewSettingsViewModel.ViewState) {
-        with(viewsPrivacy.setAsDefaultBrowserSetting) {
-            visibility = if (it.showDefaultBrowserSetting) {
-                setStatus(isOn = it.isAppDefaultBrowser)
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
+            else -> {}
         }
     }
 

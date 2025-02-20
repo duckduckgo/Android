@@ -36,13 +36,6 @@
             app:primaryText="@string/settingsHeadingProtections" />
 
         <com.duckduckgo.common.ui.view.listitem.SettingsListItem
-            android:id="@+id/setAsDefaultBrowserSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_default_browser_mobile_color_24"
-            app:primaryText="@string/settingsDefaultBrowserTitle" />
-
-        <com.duckduckgo.common.ui.view.listitem.SettingsListItem
             android:id="@+id/privateSearchSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

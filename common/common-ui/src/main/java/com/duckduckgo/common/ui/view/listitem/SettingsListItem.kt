@@ -102,6 +102,10 @@ class SettingsListItem @JvmOverloads constructor(
         leadingIcon.setImageResource(idRes)
     }
 
+    fun setPrimaryText(text: String) {
+        primaryText.text = text
+    }
+
     override val id: UUID = UUID.randomUUID()
 
     private val searchKeywords: MutableSet<String> = mutableSetOf()

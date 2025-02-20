@@ -50,7 +50,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrack
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
@@ -104,7 +103,6 @@ import kotlin.random.Random
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class NewSettingsViewModel @Inject constructor(
-    private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
     private val emailManager: EmailManager,
@@ -120,8 +118,6 @@ class NewSettingsViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val showDefaultBrowserSetting: Boolean = false,
-        val isAppDefaultBrowser: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
@@ -135,7 +131,6 @@ class NewSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data object LaunchDefaultBrowser : Command()
         data class LaunchEmailProtection(val url: String) : Command()
         data object LaunchEmailProtectionNotSupported : Command()
         data object LaunchAutofillSettings : Command()
@@ -180,13 +175,10 @@ class NewSettingsViewModel @Inject constructor(
 
     @VisibleForTesting
     internal fun start() {
-        val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
 
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    isAppDefaultBrowser = defaultBrowserAlready,
-                    showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                     appTrackingProtectionEnabled = appTrackingProtection.isRunning(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
@@ -239,15 +231,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onDefaultBrowserSettingClicked() {
-        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(isAppDefaultBrowser = defaultBrowserSelected))
-            command.send(LaunchDefaultBrowser)
-        }
-        pixel.fire(SETTINGS_DEFAULT_BROWSER_PRESSED)
     }
 
     fun onPrivateSearchSettingClicked() {
