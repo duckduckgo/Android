@@ -23,7 +23,8 @@
     <com.duckduckgo.app.browser.omnibar.OmnibarLayout
         android:id="@+id/newOmnibar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         app:experimentalLayout="?attr/useExperimentalOmnibar"
         app:omnibarPosition="top" />
 

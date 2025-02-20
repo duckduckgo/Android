@@ -16,12 +16,16 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
@@ -357,5 +361,67 @@ class Omnibar(
 
     fun voiceSearchDisabled(url: String?) {
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
+    }
+
+    fun fadeToolbar(alpha: Float) {
+        newOmnibar.toolbarContainer.alpha = alpha
+        if (alpha == 0f) {
+            newOmnibar.toolbarContainer.isVisible = false
+        } else if (alpha == 1f) {
+            newOmnibar.toolbarContainer.isVisible = true
+        }
+    }
+
+    fun animateToolbarVisibility(visible: Boolean, duration: Long = 200) {
+        if (visible) {
+            if (!newOmnibar.toolbarContainer.isVisible) {
+                newOmnibar.toolbarContainer.fadeIn(duration)
+            }
+        } else {
+            if (newOmnibar.toolbarContainer.isVisible) {
+                newOmnibar.toolbarContainer.isVisible = false
+            }
+        }
+    }
+
+    fun fadeMinibar(alpha: Float) {
+        newOmnibar.minibar.alpha = alpha
+        if (alpha == 0f) {
+            newOmnibar.minibar.isVisible = false
+        } else if (alpha == 1f) {
+            newOmnibar.minibar.isVisible = true
+        }
+    }
+
+    fun animateMinibarVisibility(visible: Boolean, duration: Long = 200) {
+        if (visible) {
+            if (!newOmnibar.minibar.isVisible) {
+                newOmnibar.minibar.fadeIn(duration)
+            }
+        } else {
+            if (newOmnibar.minibar.isVisible) {
+                newOmnibar.minibar.isVisible = false
+            }
+        }
+    }
+
+    fun View.fadeIn(duration: Long = 350) {
+        visibility = View.VISIBLE
+        val fadeIn = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f)
+        fadeIn.duration = duration
+        fadeIn.start()
+    }
+
+    fun View.fadeOut(duration: Long = 200) {
+        val fadeOut = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f)
+        fadeOut.duration = duration // Duration in milliseconds
+        fadeOut.addListener(
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    visibility = View.GONE
+                }
+            },
+        )
+        fadeOut.start()
     }
 }
