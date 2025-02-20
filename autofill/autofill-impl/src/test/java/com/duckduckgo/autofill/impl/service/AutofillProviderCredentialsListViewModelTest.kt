@@ -31,6 +31,7 @@ class AutofillProviderCredentialsListViewModelTest {
         pixel = mock(),
         dispatchers = coroutineRule.testDispatcherProvider,
         credentialListFilter = FakeDomainListFilter(),
+        appCoroutineScope = coroutineRule.testScope,
     )
 
     @Test

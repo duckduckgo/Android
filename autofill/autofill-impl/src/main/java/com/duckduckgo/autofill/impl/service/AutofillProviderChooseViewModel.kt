@@ -19,17 +19,19 @@ package com.duckduckgo.autofill.impl.service
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ContinueWithoutAuthentication
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ForceFinish
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.RequestAuthentication
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,8 +43,9 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class AutofillProviderChooseViewModel @Inject constructor(
     private val autofillProviderDeviceAuth: AutofillProviderDeviceAuth,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
-    private val secureStorage: SecureStorage,
+    private val autofillStore: InternalAutofillStore,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -72,12 +75,20 @@ class AutofillProviderChooseViewModel @Inject constructor(
     fun continueAfterAuthentication(credentialId: Long) {
         Timber.i("DDGAutofillService request to autofill login with credentialId: $credentialId")
         viewModelScope.launch(dispatchers.io()) {
-            secureStorage.getWebsiteLoginDetailsWithCredentials(credentialId)?.toLoginCredentials()?.let {
+            autofillStore.getCredentialsWithId(credentialId)?.let { loginCredential ->
+                loginCredential.updateLastUsedTimestamp()
                 Timber.i("DDGAutofillService $credentialId found, autofilling")
-                command.send(AutofillLogin(it))
+                command.send(AutofillLogin(loginCredential))
             } ?: run {
                 command.send(ForceFinish)
             }
+        }
+    }
+
+    private fun LoginCredentials.updateLastUsedTimestamp() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val updated = this@updateLastUsedTimestamp.copy(lastUsedMillis = System.currentTimeMillis())
+            autofillStore.updateCredentials(updated, refreshLastUpdatedTimestamp = false)
         }
     }
 
