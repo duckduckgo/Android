@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -27,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
@@ -39,6 +41,9 @@ import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command.L
 import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.RootSettingsNode
+import com.duckduckgo.common.ui.SearchStatus
+import com.duckduckgo.common.ui.SearchStatus.MISS
+import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -50,10 +55,12 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
@@ -64,23 +71,25 @@ class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
     override val parent: SettingsNode? = null
     override val children: List<SettingsNode> = emptyList()
 
-    override fun getView(context: Context): View {
-        return SetAsDefaultBrowserSettingNodeView(context)
-    }
-
     override val id: UUID = UUID.randomUUID()
+
+    override fun getView(context: Context): View {
+        return SetAsDefaultBrowserSettingNodeView(context, searchableId = id)
+    }
 
     override fun generateKeywords(): Set<String> {
         return setOf("browser", "default")
     }
 }
 
+@SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
-class SetAsDefaultBrowserSettingNodeView @JvmOverloads constructor(
+class SetAsDefaultBrowserSettingNodeView constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+    override val searchableId: UUID,
+) : FrameLayout(context, attrs, defStyle), Searchable {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -115,6 +124,17 @@ class SetAsDefaultBrowserSettingNodeView @JvmOverloads constructor(
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
+        job.cancel()
+        conflatedStateJob.cancel()
+    }
+
+    override fun setSearchStatus(status: SearchStatus) {
+        viewModel.setSearchStatus(status)
+    }
+
     private fun renderView(viewState: ViewState) {
         with(binding.setAsDefaultBrowserSetting) {
             visibility = if (viewState.showDefaultBrowserSetting) {
@@ -133,13 +153,6 @@ class SetAsDefaultBrowserSettingNodeView @JvmOverloads constructor(
             }
         }
     }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        job.cancel()
-        conflatedStateJob.cancel()
-    }
 }
 
 @ContributesViewModel(ViewScope::class)
@@ -151,8 +164,17 @@ class SetAsDefaultBrowserSettingViewModel @Inject constructor(
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    private val searchStatus = MutableStateFlow(SearchStatus.NONE)
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    val viewState = _viewState.combine(searchStatus) { viewState, searchStatus ->
+        if (searchStatus == MISS) {
+            ViewState(
+                showDefaultBrowserSetting = false,
+            )
+        } else {
+            viewState
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ViewState())
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -169,6 +191,10 @@ class SetAsDefaultBrowserSettingViewModel @Inject constructor(
     fun onDefaultBrowserSettingClicked() {
         _commands.trySend(LaunchDefaultBrowser)
         pixel.fire(SETTINGS_DEFAULT_BROWSER_PRESSED)
+    }
+
+    fun setSearchStatus(status: SearchStatus) {
+        searchStatus.value = status
     }
 
     data class ViewState(

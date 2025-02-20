@@ -23,7 +23,6 @@ import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
 import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
@@ -33,13 +32,12 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewSettingsListItemBinding
-import java.util.UUID
 
 class SettingsListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.oneLineListItemStyle,
-) : ConstraintLayout(context, attrs, defStyleAttr), Searchable {
+) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewSettingsListItemBinding by viewBinding()
 
@@ -100,22 +98,5 @@ class SettingsListItem @JvmOverloads constructor(
     /** Sets the leading icon image resource */
     fun setLeadingIconResource(@DrawableRes idRes: Int) {
         leadingIcon.setImageResource(idRes)
-    }
-
-    fun setPrimaryText(text: String) {
-        primaryText.text = text
-    }
-
-    override val id: UUID = UUID.randomUUID()
-
-    private val searchKeywords: MutableSet<String> = mutableSetOf()
-
-    fun assignSearchKeywords(keywords: Set<String>) {
-        searchKeywords.clear()
-        searchKeywords.addAll(keywords)
-    }
-
-    override fun generateKeywords(): Set<String> {
-        return searchKeywords
     }
 }

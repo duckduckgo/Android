@@ -302,7 +302,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun applySearchResults(searchResults: Set<UUID>?) {
         if (searchResults != null) {
             binding.includeSettings.settingsContent.children.forEach {
-                if (it.isVisible && (it !is Searchable || !searchResults.contains(it.id))) {
+                if (it.isVisible && (it !is Searchable || !searchResults.contains(it.searchableId))) {
                     it.gone()
                     hiddenBySearch.add(it)
                 }
@@ -311,32 +311,32 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun assignSearchKeywords() {
-        viewsMain.syncSetting.assignSearchKeywords(setOf(
-            "sync", "backup", "cloud", "restore",
-            "account", "data", "transfer", "storage",
-            "link", "synchronize", "upload", "download"
-        ))
-
-        viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf(
-            "password", "login", "autofill", "credentials",
-            "manager", "security", "vault", "biometric",
-            "2fa", "two-factor", "authentication", "fingerprint",
-            "face recognition", "secure", "protection"
-        ))
-
-        viewsMain.accessibilitySetting.assignSearchKeywords(setOf(
-            "accessibility", "font", "font size", "zoom",
-            "readability", "contrast", "display",
-            "dyslexia", "vision", "screen reader", "text", "text size", "size",
-            "high contrast", "magnifier", "voiceover", "assistive"
-        ))
-
-        viewsMain.appearanceSetting.assignSearchKeywords(setOf(
-            "theme", "dark", "light", "night", "day",
-            "color", "palette", "UI", "interface",
-            "customization", "scheme", "appearance",
-            "text", "font", "mode", "style", "layout", "design"
-        ))
+        // viewsMain.syncSetting.assignSearchKeywords(setOf(
+        //     "sync", "backup", "cloud", "restore",
+        //     "account", "data", "transfer", "storage",
+        //     "link", "synchronize", "upload", "download"
+        // ))
+        //
+        // viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf(
+        //     "password", "login", "autofill", "credentials",
+        //     "manager", "security", "vault", "biometric",
+        //     "2fa", "two-factor", "authentication", "fingerprint",
+        //     "face recognition", "secure", "protection"
+        // ))
+        //
+        // viewsMain.accessibilitySetting.assignSearchKeywords(setOf(
+        //     "accessibility", "font", "font size", "zoom",
+        //     "readability", "contrast", "display",
+        //     "dyslexia", "vision", "screen reader", "text", "text size", "size",
+        //     "high contrast", "magnifier", "voiceover", "assistive"
+        // ))
+        //
+        // viewsMain.appearanceSetting.assignSearchKeywords(setOf(
+        //     "theme", "dark", "light", "night", "day",
+        //     "color", "palette", "UI", "interface",
+        //     "customization", "scheme", "appearance",
+        //     "text", "font", "mode", "style", "layout", "design"
+        // ))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -355,11 +355,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     viewModel.onSearchQueryTextChange(
                         newText,
-                        binding.includeSettings.settingsContent.children.mapNotNull {
-                            if (it is Searchable) {
-                                SearchableTag(id = it.id, keywords = it.generateKeywords())
-                            } else null
-                        },
+                        searchableTags = settingsPlugins.map { SearchableTag(it.id, it.generateKeywords()) }
                     )
                     return true
                 }

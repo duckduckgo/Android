@@ -24,8 +24,14 @@ import com.duckduckgo.di.scopes.AppScope
 import java.util.UUID
 
 interface Searchable {
-    val id: UUID
-    fun generateKeywords(): Set<String>
+    val searchableId: UUID
+    fun setSearchStatus(status: SearchStatus)
+}
+
+enum class SearchStatus {
+    NONE,
+    HIT,
+    MISS,
 }
 
 data class SearchableTag(
@@ -33,11 +39,14 @@ data class SearchableTag(
     val keywords: Set<String>
 )
 
-interface SettingsNode : Searchable {
+interface SettingsNode {
+    val id: UUID
 
     val parent: SettingsNode?
 
     val children: List<SettingsNode>
+
+    fun generateKeywords(): Set<String>
 
     /**
      * This method returns a [View] that will be used as a setting item

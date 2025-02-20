@@ -341,7 +341,7 @@ class NewSettingsViewModel @Inject constructor(
 
     fun onSearchQueryTextChange(
         query: String?,
-        searchableTags: Sequence<SearchableTag>
+        searchableTags: List<SearchableTag>
     ) {
         debounceJob?.cancel()
         debounceJob = viewModelScope.launch {
@@ -350,7 +350,7 @@ class NewSettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processSearch(query: String?, searchableTags: Sequence<SearchableTag>) {
+    private suspend fun processSearch(query: String?, searchableTags: List<SearchableTag>) {
         if (query.isNullOrBlank()) {
             viewState.update { it.copy(searchResults = null) }
             return
