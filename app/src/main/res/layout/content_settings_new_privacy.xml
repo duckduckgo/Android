@@ -22,7 +22,7 @@
     android:orientation="vertical">
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/settingsPrivacyTitle"
+        android:id="@+id/settings_protections_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingProtections" />

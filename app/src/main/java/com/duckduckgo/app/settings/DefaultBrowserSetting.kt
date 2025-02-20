@@ -20,19 +20,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.FrameLayout
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingsDefaultBrowserBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -42,27 +35,13 @@ import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command.L
 import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SearchStatus
-import com.duckduckgo.common.ui.SearchStatus.MISS
-import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.SettingsNode
-import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
@@ -77,23 +56,6 @@ class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
 
     override fun getView(context: Context): View {
         return SetAsDefaultBrowserSettingNodeView(context, searchableId = id)
-    }
-
-    override fun generateKeywords(): Set<String> {
-        return setOf("browser", "default")
-    }
-}
-
-// @ContributesMultibinding(scope = ActivityScope::class)
-// @PriorityKey(0)
-class TitleProtectionsSettingNode @Inject constructor() : RootSettingsNode {
-    override val parent: SettingsNode? = null
-    override val children: List<SettingsNode> = emptyList()
-
-    override val id: UUID = UUID.randomUUID()
-
-    override fun getView(context: Context): View {
-        return SectionHeaderListItem(context).apply { setText(R.string.settingsHeadingProtections) }
     }
 
     override fun generateKeywords(): Set<String> {
@@ -148,55 +110,6 @@ class SetAsDefaultBrowserSettingNodeView(
     }
 }
 
-@SuppressLint("ViewConstructor")
-abstract class SettingNodeView<C, VS, VM : SettingViewModel<C, VS>>(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-    override val searchableId: UUID,
-) : FrameLayout(context, attrs, defStyle), Searchable {
-
-    protected val viewModel: VM by lazy {
-        provideViewModel()
-    }
-
-    protected abstract fun provideViewModel(): VM
-
-    private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
-    private var conflatedStateJob: ConflatedJob = ConflatedJob()
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        val viewTreeLifecycleOwner = findViewTreeLifecycleOwner()!!
-        viewTreeLifecycleOwner.lifecycle.addObserver(viewModel)
-        val coroutineScope = viewTreeLifecycleOwner.lifecycleScope
-
-        conflatedCommandsJob += viewModel.commands
-            .onEach { processCommands(it) }
-            .launchIn(coroutineScope)
-
-        conflatedStateJob += viewModel.viewState
-            .onEach { renderView(it) }
-            .launchIn(coroutineScope)
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        conflatedCommandsJob.cancel()
-        conflatedStateJob.cancel()
-    }
-
-    final override fun setSearchStatus(status: SearchStatus) {
-        viewModel.setSearchStatus(status)
-    }
-
-    protected abstract fun renderView(viewState: VS)
-
-    protected abstract fun processCommands(command: C)
-}
-
 @ContributesViewModel(ViewScope::class)
 class SetAsDefaultBrowserSettingViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -235,25 +148,3 @@ class SetAsDefaultBrowserSettingViewModel @Inject constructor(
         data object LaunchDefaultBrowser : Command()
     }
 }
-
-abstract class SettingViewModel<C, V>(defaultViewState: V) : ViewModel(), DefaultLifecycleObserver {
-    protected val _commands = Channel<C>(capacity = Channel.CONFLATED)
-    val commands: Flow<C> = _commands.receiveAsFlow()
-
-    private val searchStatus = MutableStateFlow(SearchStatus.NONE)
-    protected val _viewState = MutableStateFlow(defaultViewState)
-    val viewState = _viewState.combine(searchStatus) { viewState, searchStatus ->
-        if (searchStatus == MISS) {
-            getSearchMissViewState()
-        } else {
-            viewState
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, defaultViewState)
-
-    abstract fun getSearchMissViewState(): V
-
-    fun setSearchStatus(status: SearchStatus) {
-        searchStatus.value = status
-    }
-}
-
