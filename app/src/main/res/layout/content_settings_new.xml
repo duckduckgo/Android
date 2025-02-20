@@ -31,10 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
-
-
-        </LinearLayout>
+            android:paddingBottom="20dp"/>
 
         <LinearLayout
             android:id="@+id/settingsContent"
@@ -43,12 +40,6 @@
             android:orientation="vertical"
             android:paddingBottom="20dp"
             android:visibility="gone">
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/settingsPrivacyTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsHeadingProtections" />
 
             <com.duckduckgo.common.ui.view.listitem.SettingsListItem
                 android:id="@+id/privateSearchSetting"

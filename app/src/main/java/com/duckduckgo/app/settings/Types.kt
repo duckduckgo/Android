@@ -32,6 +32,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingsDefaultBrowserBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -45,6 +46,7 @@ import com.duckduckgo.common.ui.SearchStatus
 import com.duckduckgo.common.ui.SearchStatus.MISS
 import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -66,7 +68,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(0)
+@PriorityKey(1)
 class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
     override val parent: SettingsNode? = null
     override val children: List<SettingsNode> = emptyList()
@@ -82,29 +84,88 @@ class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
     }
 }
 
+// @ContributesMultibinding(scope = ActivityScope::class)
+// @PriorityKey(0)
+class TitleProtectionsSettingNode @Inject constructor() : RootSettingsNode {
+    override val parent: SettingsNode? = null
+    override val children: List<SettingsNode> = emptyList()
+
+    override val id: UUID = UUID.randomUUID()
+
+    override fun getView(context: Context): View {
+        return SectionHeaderListItem(context).apply { setText(R.string.settingsHeadingProtections) }
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return setOf("browser", "default")
+    }
+}
+
 @SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
-class SetAsDefaultBrowserSettingNodeView constructor(
+class SetAsDefaultBrowserSettingNodeView(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+    searchableId: UUID,
+) : SettingNodeView<Command, ViewState, SetAsDefaultBrowserSettingViewModel>(context, attrs, defStyle, searchableId) {
+
+    @Inject
+    lateinit var viewModelFactory: ViewViewModelFactory
+
+    override fun provideViewModel(): SetAsDefaultBrowserSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SetAsDefaultBrowserSettingViewModel::class.java]
+    }
+
+    private val binding: ContentSettingsDefaultBrowserBinding by viewBinding()
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+
+        binding.setAsDefaultBrowserSetting.setOnClickListener {
+            viewModel.onDefaultBrowserSettingClicked()
+        }
+    }
+
+    override fun renderView(viewState: ViewState) {
+        with(binding.setAsDefaultBrowserSetting) {
+            visibility = if (viewState.showDefaultBrowserSetting) {
+                setStatus(isOn = viewState.isAppDefaultBrowser)
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
+    }
+
+    override fun processCommands(command: Command) {
+        when (command) {
+            LaunchDefaultBrowser -> {
+                context.launchDefaultAppActivity()
+            }
+        }
+    }
+}
+
+@SuppressLint("ViewConstructor")
+abstract class SettingNodeView<C, VS, VM : SettingViewModel<C, VS>>(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     override val searchableId: UUID,
 ) : FrameLayout(context, attrs, defStyle), Searchable {
 
-    @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
-
-    private val viewModel: SetAsDefaultBrowserSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SetAsDefaultBrowserSettingViewModel::class.java]
+    protected val viewModel: VM by lazy {
+        provideViewModel()
     }
 
-    private val binding: ContentSettingsDefaultBrowserBinding by viewBinding()
+    protected abstract fun provideViewModel(): VM
 
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         val viewTreeLifecycleOwner = findViewTreeLifecycleOwner()!!
@@ -118,10 +179,6 @@ class SetAsDefaultBrowserSettingNodeView constructor(
         conflatedStateJob += viewModel.viewState
             .onEach { renderView(it) }
             .launchIn(coroutineScope)
-
-        binding.setAsDefaultBrowserSetting.setOnClickListener {
-            viewModel.onDefaultBrowserSettingClicked()
-        }
     }
 
     override fun onDetachedFromWindow() {
@@ -131,50 +188,20 @@ class SetAsDefaultBrowserSettingNodeView constructor(
         conflatedStateJob.cancel()
     }
 
-    override fun setSearchStatus(status: SearchStatus) {
+    final override fun setSearchStatus(status: SearchStatus) {
         viewModel.setSearchStatus(status)
     }
 
-    private fun renderView(viewState: ViewState) {
-        with(binding.setAsDefaultBrowserSetting) {
-            visibility = if (viewState.showDefaultBrowserSetting) {
-                setStatus(isOn = viewState.isAppDefaultBrowser)
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-        }
-    }
+    protected abstract fun renderView(viewState: VS)
 
-    private fun processCommands(command: Command) {
-        when (command) {
-            LaunchDefaultBrowser -> {
-                context.launchDefaultAppActivity()
-            }
-        }
-    }
+    protected abstract fun processCommands(command: C)
 }
 
 @ContributesViewModel(ViewScope::class)
 class SetAsDefaultBrowserSettingViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val pixel: Pixel,
-) : ViewModel(), DefaultLifecycleObserver {
-
-    private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
-    val commands: Flow<Command> = _commands.receiveAsFlow()
-
-    private val searchStatus = MutableStateFlow(SearchStatus.NONE)
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.combine(searchStatus) { viewState, searchStatus ->
-        if (searchStatus == MISS) {
-            ViewState(
-                showDefaultBrowserSetting = false,
-            )
-        } else {
-            viewState
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, ViewState())
+) : SettingViewModel<Command, ViewState>(ViewState()) {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -188,13 +215,15 @@ class SetAsDefaultBrowserSettingViewModel @Inject constructor(
         }
     }
 
+    override fun getSearchMissViewState(): ViewState {
+        return ViewState(
+            showDefaultBrowserSetting = false,
+        )
+    }
+
     fun onDefaultBrowserSettingClicked() {
         _commands.trySend(LaunchDefaultBrowser)
         pixel.fire(SETTINGS_DEFAULT_BROWSER_PRESSED)
-    }
-
-    fun setSearchStatus(status: SearchStatus) {
-        searchStatus.value = status
     }
 
     data class ViewState(
@@ -204,6 +233,27 @@ class SetAsDefaultBrowserSettingViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchDefaultBrowser : Command()
+    }
+}
+
+abstract class SettingViewModel<C, V>(defaultViewState: V) : ViewModel(), DefaultLifecycleObserver {
+    protected val _commands = Channel<C>(capacity = Channel.CONFLATED)
+    val commands: Flow<C> = _commands.receiveAsFlow()
+
+    private val searchStatus = MutableStateFlow(SearchStatus.NONE)
+    protected val _viewState = MutableStateFlow(defaultViewState)
+    val viewState = _viewState.combine(searchStatus) { viewState, searchStatus ->
+        if (searchStatus == MISS) {
+            getSearchMissViewState()
+        } else {
+            viewState
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, defaultViewState)
+
+    abstract fun getSearchMissViewState(): V
+
+    fun setSearchStatus(status: SearchStatus) {
+        searchStatus.value = status
     }
 }
 
