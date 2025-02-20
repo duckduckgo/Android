@@ -51,6 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
@@ -64,6 +65,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillMan
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementLockedMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
@@ -199,7 +201,8 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Password)
             is OfferUserUndoDeletion -> showUserCredentialDeletedWithUndoAction(command)
             is OfferUserUndoMassDeletion -> showUserCredentialsMassDeletedWithUndoAction(command)
-            is ShowListMode -> showListMode()
+            is ShowListMode -> showListMode(legacyList = false)
+            is ShowListModeLegacy -> showListMode(legacyList = true)
             is ShowDisabledMode -> showDisabledMode()
             is ShowDeviceUnsupportedMode -> showDeviceUnsupportedMode()
             is ShowLockedMode -> showLockMode()
@@ -250,15 +253,19 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         }.show()
     }
 
-    private fun showListMode() {
+    private fun showListMode(legacyList: Boolean) {
         resetToolbar()
         val currentUrl = extractSuggestionsUrl()
         val privacyProtectionStatus = extractPrivacyProtectionEnabled()
         val launchSource = extractLaunchSource()
-        Timber.v("showListMode. currentUrl is %s", currentUrl)
+        Timber.v("showListMode (isLegacy = %s). currentUrl is %s", legacyList, currentUrl)
 
         supportFragmentManager.commitNow {
-            val fragment = AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus, launchSource)
+            val fragment = if (legacyList) {
+                AutofillManagementListModeLegacy.instance(currentUrl, privacyProtectionStatus, launchSource)
+            } else {
+                AutofillManagementListMode.instance(currentUrl, privacyProtectionStatus, launchSource)
+            }
             replace(R.id.fragment_container_view, fragment, TAG_ALL_CREDENTIALS)
         }
     }

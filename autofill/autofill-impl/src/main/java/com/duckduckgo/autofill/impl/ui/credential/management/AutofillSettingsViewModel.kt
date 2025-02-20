@@ -70,6 +70,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
@@ -191,8 +192,16 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private fun onShowListMode() {
-        _viewState.value = _viewState.value.copy(credentialMode = ListMode)
-        addCommand(ShowListMode)
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = _viewState.value.copy(credentialMode = ListMode)
+
+            val command = if (autofillFeature.newScrollBehaviourInPasswordManagementScreen().isEnabled()) {
+                ShowListMode
+            } else {
+                ShowListModeLegacy
+            }
+            addCommand(command)
+        }
     }
 
     fun onViewCredentials(
@@ -447,6 +456,7 @@ class AutofillSettingsViewModel @Inject constructor(
             val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
             val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
             val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+            Timber.v("Can import from Google Password Manager: $canImport")
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
         }
     }
@@ -863,6 +873,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
+        object ShowListModeLegacy : Command()
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()
