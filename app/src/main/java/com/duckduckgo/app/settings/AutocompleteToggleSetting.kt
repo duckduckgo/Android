@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingPrivateSearchAutocompleteBinding
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_ON
@@ -61,7 +62,7 @@ import javax.inject.Inject
 )
 @PriorityKey(0)
 class PrivateSearchAutocompleteSettingNode @Inject constructor() : PrivateSearchNestedSettingNode, NestedSettingsNode {
-    override val parent: SettingsNode? = null
+    override val categoryNameResId = R.string.settingsHeadingProtections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

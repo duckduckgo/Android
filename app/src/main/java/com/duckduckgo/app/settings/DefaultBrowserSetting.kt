@@ -26,6 +26,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingsDefaultBrowserBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -49,7 +50,7 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(1)
 class SetAsDefaultBrowserSettingNode @Inject constructor() : RootSettingsNode {
-    override val parent: SettingsNode? = null
+    override val categoryNameResId = R.string.settingsHeadingProtections
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()

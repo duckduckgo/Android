@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui
 
 import android.content.Context
 import android.view.View
+import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.di.scopes.AppScope
@@ -42,9 +43,9 @@ data class SearchableTag(
 interface SettingsNode {
     val id: UUID
 
-    val parent: SettingsNode?
+    val categoryNameResId: Int
 
-    val children: List<SettingsNode>
+    val children: Collection<SettingsNode>
 
     fun generateKeywords(): Set<String>
 

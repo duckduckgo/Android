@@ -25,8 +25,10 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingsPrivateSearchBinding
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
+import com.duckduckgo.app.privatesearch.PrivateSearchNestedSettingNode
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command
 import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command.LaunchPrivateSearchWebPage
@@ -36,6 +38,7 @@ import com.duckduckgo.common.ui.RootSettingsNode
 import com.duckduckgo.common.ui.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -47,8 +50,13 @@ import javax.inject.Inject
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(2)
 class PrivateSearchSettingNode @Inject constructor() : RootSettingsNode {
-    override val parent: SettingsNode? = null
-    override val children: List<SettingsNode> = emptyList()
+    override val categoryNameResId = R.string.settingsHeadingProtections
+
+    @Inject
+    lateinit var _nestedSettingsPlugins: PluginPoint<PrivateSearchNestedSettingNode>
+    override val children by lazy {
+        _nestedSettingsPlugins.getPlugins()
+    }
 
     override val id: UUID = UUID.randomUUID()
 
