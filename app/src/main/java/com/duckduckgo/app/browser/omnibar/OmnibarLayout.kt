@@ -492,6 +492,14 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderButtons(viewState: ViewState) {
+        if (viewState.experimentalIconsEnabled) {
+            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
+            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
+        } else {
+            fireIconImageView.setImageResource(R.drawable.ic_fire)
+            tabsMenu.setIcon(R.drawable.ic_tabs)
+        }
+
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = viewState.showTabsMenu

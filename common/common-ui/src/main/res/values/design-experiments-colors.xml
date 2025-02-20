@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!-- New Gray Palette -->
+    <!-- https://app.asana.com/0/72649045549333/1209374776057934 -->
+    <color name="warm_gray100">#10161D</color>
+    <color name="warm_gray95">#191E25</color>
+    <color name="warm_gray90">#20262D</color>
+    <color name="warm_gray85">#30363D</color>
+    <color name="warm_gray85_84">#D630363D</color>
+    <color name="warm_gray85_50">#8030363D</color>
+    <color name="warm_gray80">#41464D</color>
+    <color name="warm_gray75">#51565E</color>
+    <color name="warm_gray70">#61666E</color>
+    <color name="warm_gray65">#72777E</color>
+    <color name="warm_gray60">#83878D</color>
+    <color name="warm_gray55">#93979D</color>
+    <color name="warm_gray50">#A3A8AD</color>
+    <color name="warm_gray45">#B4B8BE</color>
+    <color name="warm_gray40">#CACBCB</color>
+    <color name="warm_gray35">#D3D4D2</color>
+    <color name="warm_gray30">#DDDDDA</color>
+    <color name="warm_gray25">#E5E4E2</color>
+    <color name="warm_gray20">#EEEDEA</color>
+    <color name="warm_gray15">#F2F1EE</color>
+    <color name="warm_gray10">#F5F5F3</color>
+    <color name="warm_gray5">#F7F7F5</color>
+    <color name="warm_gray0">#FAFAF8</color>
+
+    <color name="cool_gray100">#10161D</color>
+    <color name="cool_gray95">#191E25</color>
+    <color name="cool_gray90">#20262D</color>
+    <color name="cool_gray85">#30363D</color>
+    <color name="cool_gray85_84">#D630363D</color>
+    <color name="cool_gray85_50">#8030363D</color>
+    <color name="cool_gray80">#41464D</color>
+    <color name="cool_gray75">#51565E</color>
+    <color name="cool_gray70">#61666E</color>
+    <color name="cool_gray65">#71767E</color>
+    <color name="cool_gray60">#83878D</color>
+    <color name="cool_gray55">#93979D</color>
+    <color name="cool_gray50">#A3A8AD</color>
+    <color name="cool_gray45">#B4B8BE</color>
+    <color name="cool_gray40">#C4C8CE</color>
+    <color name="cool_gray35">#CCD0D6</color>
+    <color name="cool_gray30">#D4D8DE</color>
+    <color name="cool_gray25">#DEE1E6</color>
+    <color name="cool_gray20">#E9EBEE</color>
+    <color name="cool_gray15">#F0F1F2</color>
+    <color name="cool_gray10">#F3F4F5</color>
+    <color name="cool_gray5">#F5F6F7</color>
+    <color name="cool_gray0">#F8F9FA</color>
+
+    <color name="gray87">#393E45</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_12">#1FFFFFFF</color>
+
+    <!-- Experimental Fire Button -->
+    <attr name="daxColorFireButtonOne" format="color"/>
+    <attr name="daxColorFireButtonTwo" format="color"/>
+    <attr name="daxColorFireButtonThree" format="color"/>
+
+    <color name="daxColorFireButtonOne_Dark">#FFBB5C</color>
+    <color name="daxColorFireButtonTwo_Dark">#F68161</color>
+    <color name="daxColorFireButtonThree_Dark">#F14D1F</color>
+    <color name="daxColorFireButtonOne_Light">#FA8B38</color>
+    <color name="daxColorFireButtonTwo_Light">#E72A57</color>
+    <color name="daxColorFireButtonThree_Light">#CC165B</color>
+
+
+</resources>
