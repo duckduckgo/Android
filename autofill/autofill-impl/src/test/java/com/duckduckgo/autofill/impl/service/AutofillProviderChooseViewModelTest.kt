@@ -2,12 +2,15 @@ package com.duckduckgo.autofill.impl.service
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.FakeSecureStorage
+import com.duckduckgo.autofill.sync.fakeAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -27,10 +30,19 @@ class AutofillProviderChooseViewModelTest {
 
     private val secureStorage: SecureStorage = FakeSecureStorage()
 
+    val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+
     private val testee = AutofillProviderChooseViewModel(
         autofillProviderDeviceAuth = autofillProviderDeviceAuth,
         dispatchers = coroutineRule.testDispatcherProvider,
-        secureStorage = secureStorage,
+        autofillStore = fakeAutofillStore(
+            secureStorage = secureStorage,
+            autofillPrefsStore = mock(),
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            coroutineScope = coroutineRule.testScope,
+            autofillFeature = autofillFeature,
+        ),
+        appCoroutineScope = coroutineRule.testScope,
     )
 
     @Test
