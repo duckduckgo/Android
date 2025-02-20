@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val browserThemingFeature: BrowserThemingFeature,
+    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -42,8 +42,8 @@ class ThemingSharedPreferences @Inject constructor(
         return themePrefMapper.themeFrom(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
-            browserThemingFeature.self().isEnabled(),
-            browserThemingFeature.warmColors().isEnabled(),
+            experimentalUIThemingFeature.self().isEnabled(),
+            experimentalUIThemingFeature.warmColors().isEnabled(),
         )
     }
 

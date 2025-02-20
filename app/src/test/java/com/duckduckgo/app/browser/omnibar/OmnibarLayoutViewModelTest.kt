@@ -27,7 +27,9 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.store.ExperimentalUIThemingFeature
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -59,6 +61,8 @@ class OmnibarLayoutViewModelTest {
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
+    private val mockToggle: Toggle = mock()
+    private val experimentalUIThemingFeature: ExperimentalUIThemingFeature = mock()
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -77,6 +81,10 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
+        whenever(experimentalUIThemingFeature.self()).thenReturn(mockToggle)
+        whenever(experimentalUIThemingFeature.self().isEnabled()).thenReturn(false)
+        whenever(experimentalUIThemingFeature.icons()).thenReturn(mockToggle)
+        whenever(experimentalUIThemingFeature.icons().isEnabled()).thenReturn(false)
 
         initializeViewModel()
     }
@@ -113,6 +121,7 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
+            experimentalUIThemingFeature = experimentalUIThemingFeature,
         )
     }
 
