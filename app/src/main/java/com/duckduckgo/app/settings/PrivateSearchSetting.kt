@@ -25,85 +25,113 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.browser.databinding.ContentSettingsTitleProtectionsBinding
-import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command
-import com.duckduckgo.app.settings.TitleProtectionsSettingViewModel.ViewState
+import com.duckduckgo.app.browser.databinding.ContentSettingsPrivateSearchBinding
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
+import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command
+import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.ViewState
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.RootSettingsNode
 import com.duckduckgo.common.ui.SettingsNode
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(0)
-class TitleProtectionsSettingNode @Inject constructor() : RootSettingsNode {
+@PriorityKey(2)
+class PrivateSearchSettingNode @Inject constructor() : RootSettingsNode {
     override val parent: SettingsNode? = null
     override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()
 
     override fun getView(context: Context): View {
-        return TitleProtectionsSettingNodeView(context, searchableId = id)
+        return PrivateSearchSettingNodeView(context, searchableId = id)
     }
 
     override fun generateKeywords(): Set<String> {
-        return setOf()
+        return setOf("private", "search", "privacy", "trackers", "tracking", "spy")
     }
 }
 
 @SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
-class TitleProtectionsSettingNodeView(
+class PrivateSearchSettingNodeView(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     searchableId: UUID,
-) : SettingNodeView<Command, ViewState, TitleProtectionsSettingViewModel>(context, attrs, defStyle, searchableId) {
+) : SettingNodeView<Command, ViewState, PrivateSearchSettingViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    override fun provideViewModel(): TitleProtectionsSettingViewModel {
-        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[TitleProtectionsSettingViewModel::class.java]
+    override fun provideViewModel(): PrivateSearchSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PrivateSearchSettingViewModel::class.java]
     }
 
-    private val binding: ContentSettingsTitleProtectionsBinding by viewBinding()
+    private val binding: ContentSettingsPrivateSearchBinding by viewBinding()
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+
+        binding.privateSearchSetting.setOnClickListener {
+            viewModel.onPrivateSearchSettingClicked()
+        }
     }
 
     override fun renderView(viewState: ViewState) {
-        with(binding.settingsProtectionsTitle) {
-            if (viewState.visible) {
-                show()
+        with(binding.privateSearchSetting) {
+            visibility = if (viewState.showPrivateSearchSetting) {
+                View.VISIBLE
             } else {
-                gone()
+                View.GONE
+            }
+        }
+    }
+
+    override fun processCommands(command: Command) {
+        when (command) {
+            LaunchPrivateSearchWebPage -> {
+                globalActivityStarter.start(context, PrivateSearchScreenNoParams)
             }
         }
     }
 }
 
 @ContributesViewModel(ViewScope::class)
-class TitleProtectionsSettingViewModel @Inject constructor() : SettingViewModel<Command, ViewState>(ViewState()) {
+class PrivateSearchSettingViewModel @Inject constructor(
+    private val pixel: Pixel,
+) : SettingViewModel<Command, ViewState>(ViewState()) {
 
     override fun getSearchMissViewState(): ViewState {
         return ViewState(
-            visible = false,
+            showPrivateSearchSetting = false,
         )
     }
 
+    fun onPrivateSearchSettingClicked() {
+        _commands.trySend(LaunchPrivateSearchWebPage)
+        pixel.fire(SETTINGS_PRIVATE_SEARCH_PRESSED)
+    }
+
     data class ViewState(
-        val visible: Boolean = true,
+        val showPrivateSearchSetting: Boolean = true,
     )
 
-    sealed class Command
+    sealed class Command {
+        data object LaunchPrivateSearchWebPage : Command()
+    }
 }

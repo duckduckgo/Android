@@ -64,7 +64,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSet
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -193,7 +192,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
-            privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
@@ -375,13 +373,16 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 val layoutTransition = LayoutTransition()
                 layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
+                layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+                layoutTransition.enableTransitionType(LayoutTransition.CHANGE_APPEARING)
+                layoutTransition.enableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
                 layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
-                binding.includeSettings.settingsContent.layoutTransition = layoutTransition
+                binding.includeSettings.searchableSettingsContent.layoutTransition = layoutTransition
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                binding.includeSettings.settingsContent.layoutTransition = null
+                binding.includeSettings.searchableSettingsContent.layoutTransition = null
                 return true
             }
         })
@@ -450,7 +451,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
-            is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
             is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
@@ -462,16 +462,11 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
-            else -> {}
         }
     }
 
     private fun updateDeviceShieldSettings(appTPEnabled: Boolean) {
         viewsPrivacy.vpnSetting.setStatus(isOn = appTPEnabled)
-    }
-
-    private fun launchDefaultAppScreen() {
-        launchDefaultAppActivity()
     }
 
     private fun launchScreen(activityParams: ActivityParams) {

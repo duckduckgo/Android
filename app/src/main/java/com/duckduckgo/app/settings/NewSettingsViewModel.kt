@@ -59,7 +59,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSet
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -139,7 +138,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
-        data object LaunchPrivateSearchWebPage : Command()
         data object LaunchWebTrackingProtectionScreen : Command()
         data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
@@ -231,11 +229,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onPrivateSearchSettingClicked() {
-        viewModelScope.launch { command.send(LaunchPrivateSearchWebPage) }
-        pixel.fire(SETTINGS_PRIVATE_SEARCH_PRESSED)
     }
 
     fun onWebTrackingProtectionSettingClicked() {

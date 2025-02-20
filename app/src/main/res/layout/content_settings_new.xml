@@ -42,14 +42,6 @@
             android:visibility="gone">
 
             <com.duckduckgo.common.ui.view.listitem.SettingsListItem
-                android:id="@+id/privateSearchSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:indicatorStatus="on"
-                app:leadingIcon="@drawable/ic_find_search_color_24"
-                app:primaryText="@string/settingsPrivateSearchTitle" />
-
-            <com.duckduckgo.common.ui.view.listitem.SettingsListItem
                 android:id="@+id/webTrackingProtectionSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
