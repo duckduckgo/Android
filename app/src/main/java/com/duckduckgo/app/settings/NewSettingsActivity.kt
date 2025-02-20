@@ -25,6 +25,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.children
+import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -76,6 +77,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.RootSettingsNode
+import com.duckduckgo.common.ui.SearchStatus
 import com.duckduckgo.common.ui.Searchable
 import com.duckduckgo.common.ui.SearchableTag
 import com.duckduckgo.common.ui.view.gone
@@ -191,9 +193,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
-            settingsPlugins.forEach { plugin ->
-                settingsContent.addView(plugin.getView(this@NewSettingsActivity), 0)
-            }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
@@ -242,6 +241,15 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
+
+        settingsPlugins.forEach { plugin ->
+            binding.includeSettings.searchableSettingsContent.addView(plugin.getView(this@NewSettingsActivity))
+        }
+        binding.includeSettings.searchableSettingsContent.children.forEach { view ->
+            view.doOnAttach { attachedView ->
+                attachedView.updateSearchStatus(viewModel.viewState().value.searchResults)
+            }
+        }
         assignSearchKeywords()
     }
 
@@ -264,8 +272,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
-                    // needs to happen first
-                    restoreHiddenBySearch()
 
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
@@ -290,24 +296,27 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private val hiddenBySearch = mutableListOf<View>()
-
-    private fun restoreHiddenBySearch() {
-        hiddenBySearch.forEach { hiddenView ->
-            binding.includeSettings.settingsContent.children.find { it == hiddenView }?.show()
+    private fun applySearchResults(searchResults: Set<UUID>?) {
+        binding.includeSettings.searchableSettingsContent.children.forEach {
+            it.updateSearchStatus(searchResults)
         }
-        hiddenBySearch.clear()
     }
 
-    private fun applySearchResults(searchResults: Set<UUID>?) {
-        if (searchResults != null) {
-            binding.includeSettings.settingsContent.children.forEach {
-                if (it.isVisible && (it !is Searchable || !searchResults.contains(it.searchableId))) {
-                    it.gone()
-                    hiddenBySearch.add(it)
-                }
-            }
+    private fun View.updateSearchStatus(searchResults: Set<UUID>?) {
+        if (!isAttachedToWindow) {
+            return
         }
+        val searchableView = this as Searchable
+        val status = if (searchResults != null) {
+            if (searchResults.contains(searchableId)) {
+                SearchStatus.HIT
+            } else {
+                SearchStatus.MISS
+            }
+        } else {
+            SearchStatus.NONE
+        }
+        searchableView.setSearchStatus(status)
     }
 
     private fun assignSearchKeywords() {

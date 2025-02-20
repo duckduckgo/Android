@@ -100,7 +100,7 @@ class SetAsDefaultBrowserSettingNodeView constructor(
 
     private val binding: ContentSettingsDefaultBrowserBinding by viewBinding()
 
-    private var job: ConflatedJob = ConflatedJob()
+    private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
@@ -111,7 +111,7 @@ class SetAsDefaultBrowserSettingNodeView constructor(
         viewTreeLifecycleOwner.lifecycle.addObserver(viewModel)
         val coroutineScope = viewTreeLifecycleOwner.lifecycleScope
 
-        job += viewModel.commands
+        conflatedCommandsJob += viewModel.commands
             .onEach { processCommands(it) }
             .launchIn(coroutineScope)
 
@@ -127,7 +127,7 @@ class SetAsDefaultBrowserSettingNodeView constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        job.cancel()
+        conflatedCommandsJob.cancel()
         conflatedStateJob.cancel()
     }
 
