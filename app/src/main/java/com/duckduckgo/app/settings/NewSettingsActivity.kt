@@ -39,7 +39,6 @@ import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
-import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
@@ -51,8 +50,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScr
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
@@ -182,10 +179,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        with(viewsPrivacy) {
-            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
-        }
-
         with(viewsMain) {
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
@@ -260,7 +253,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
-                    updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
@@ -458,10 +450,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateEmailSubtitle(emailAddress: String?) {
-        viewsPrivacy.emailSetting.setStatus(isOn = !emailAddress.isNullOrEmpty())
-    }
-
     private fun updateSyncSetting(visible: Boolean) {
         with(viewsMain.syncSetting) {
             isVisible = visible
@@ -472,8 +460,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
-            is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
-            is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)

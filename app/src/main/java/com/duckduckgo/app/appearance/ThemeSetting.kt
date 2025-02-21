@@ -40,6 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+import com.duckduckgo.app.settings.getActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -163,14 +164,6 @@ class AppearanceThemeSettingNodeView(
                 },
             )
             .show()
-    }
-
-    private fun Context.getActivity(): AppCompatActivity? {
-        return when (this) {
-            is AppCompatActivity -> this
-            is ContextWrapper -> this.getActivity()
-            else -> null
-        }
     }
 }
 

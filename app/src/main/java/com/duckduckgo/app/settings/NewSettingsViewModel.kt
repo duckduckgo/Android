@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
@@ -40,8 +39,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScr
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
@@ -51,7 +48,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifie
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.ui.settings.SearchableTag
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -83,7 +79,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class NewSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val deviceSyncState: DeviceSyncState,
     private val dispatcherProvider: DispatcherProvider,
@@ -95,7 +90,6 @@ class NewSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val appTrackingProtectionEnabled: Boolean = false,
-        val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
@@ -105,8 +99,6 @@ class NewSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data class LaunchEmailProtection(val url: String) : Command()
-        data object LaunchEmailProtectionNotSupported : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
@@ -141,7 +133,6 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
@@ -191,18 +182,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onGeneralSettingClicked() {
         viewModelScope.launch { command.send(LaunchGeneralSettingsScreen) }
         pixel.fire(SETTINGS_GENERAL_PRESSED)
-    }
-
-    fun onEmailProtectionSettingClicked() {
-        viewModelScope.launch {
-            val command = if (emailManager.isEmailFeatureSupported()) {
-                LaunchEmailProtection(EMAIL_PROTECTION_URL)
-            } else {
-                LaunchEmailProtectionNotSupported
-            }
-            this@NewSettingsViewModel.command.send(command)
-        }
-        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
 
     private fun currentViewState(): ViewState {
@@ -337,9 +316,5 @@ class NewSettingsViewModel @Inject constructor(
 
     private fun levenshteinDistance(s1: String, s2: String): Int {
         return LevenshteinDistance(4).apply(SimilarityInput.input(s1), SimilarityInput.input(s2))
-    }
-
-    companion object {
-        const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
     }
 }
