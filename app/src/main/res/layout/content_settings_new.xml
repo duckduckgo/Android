@@ -41,13 +41,7 @@
             android:paddingBottom="20dp"
             android:visibility="gone">
 
-            <com.duckduckgo.common.ui.view.listitem.SettingsListItem
-                android:id="@+id/webTrackingProtectionSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:indicatorStatus="on"
-                app:leadingIcon="@drawable/ic_shield_color_24"
-                app:primaryText="@string/settingsWebTrackingProtectionTitle" />
+            <include layout="@layout/content_setting_web_tracking_protection" />
 
             <com.duckduckgo.common.ui.view.listitem.SettingsListItem
                 android:id="@+id/cookiePopupProtectionSetting"

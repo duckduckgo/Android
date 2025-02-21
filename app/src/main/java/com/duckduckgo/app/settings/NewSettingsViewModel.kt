@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
@@ -37,7 +36,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -56,7 +54,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatf
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -72,11 +69,9 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.Job
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -91,6 +86,7 @@ import kotlinx.coroutines.withContext
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.apache.commons.text.similarity.SimilarityInput
 import java.util.UUID
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -129,7 +125,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
-        data object LaunchWebTrackingProtectionScreen : Command()
         data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
@@ -218,11 +213,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onWebTrackingProtectionSettingClicked() {
-        viewModelScope.launch { command.send(LaunchWebTrackingProtectionScreen) }
-        pixel.fire(SETTINGS_WEB_TRACKING_PROTECTION_PRESSED)
     }
 
     fun onCookiePopupProtectionSettingClicked() {
