@@ -17,9 +17,9 @@
 <com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cookieProtectionSetting"
+    android:id="@+id/app_tracking_protection_setting"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:leadingIcon="@drawable/ic_cookie_color_24"
-    app:primaryText="@string/cookiePopupProtectionTitle"
+    app:leadingIcon="@drawable/ic_lock_color_24"
+    app:primaryText="@string/atp_SettingsTitle"
     tools:showIn="@layout/content_settings_new" />

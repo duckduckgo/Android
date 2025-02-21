@@ -48,8 +48,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
@@ -83,8 +81,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
@@ -188,7 +184,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
-            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
 
         with(viewsMain) {
@@ -265,10 +260,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
-
-                    updateDeviceShieldSettings(
-                        it.appTrackingProtectionEnabled,
-                    )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -481,8 +472,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
-            is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
-            is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
             is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
@@ -497,10 +486,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
         }
-    }
-
-    private fun updateDeviceShieldSettings(appTPEnabled: Boolean) {
-        viewsPrivacy.vpnSetting.setStatus(isOn = appTPEnabled)
     }
 
     private fun launchScreen(activityParams: ActivityParams) {

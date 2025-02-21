@@ -87,20 +87,17 @@ class CookieProtectionSettingNodeView(
 
     private val binding: ContentSettingCookieProtectionBinding by viewBinding()
 
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
-
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.cookiePopupProtectionSetting.setOnClickListener {
+        binding.cookieProtectionSetting.setOnClickListener {
             viewModel.onCookieProtectionSettingClicked()
         }
     }
 
     override fun renderView(viewState: ViewState) {
-        with(binding.cookiePopupProtectionSetting) {
+        with(binding.cookieProtectionSetting) {
             visibility = if (viewState.showCookieProtectionSetting) {
                 View.VISIBLE
             } else {

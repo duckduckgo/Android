@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
@@ -38,8 +37,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboarding
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
@@ -56,14 +53,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.ui.settings.SearchableTag
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -77,7 +72,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.text.similarity.LevenshteinDistance
@@ -88,7 +82,6 @@ import javax.inject.Inject
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class NewSettingsViewModel @Inject constructor(
-    private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
@@ -117,8 +110,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
-        data object LaunchAppTPTrackersScreen : Command()
-        data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
@@ -134,7 +125,6 @@ class NewSettingsViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-    private val appTPPollJob = ConflatedJob()
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -143,12 +133,6 @@ class NewSettingsViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         start()
-        startPollingAppTPState()
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        appTPPollJob.cancel()
     }
 
     @VisibleForTesting
@@ -157,7 +141,6 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    appTrackingProtectionEnabled = appTrackingProtection.isRunning(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
@@ -166,23 +149,6 @@ class NewSettingsViewModel @Inject constructor(
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),
             )
-        }
-    }
-
-    // FIXME
-    // We need to fix this. This logic as inside the start method but it messes with the unit tests
-    // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
-    // becomes a while(true) without any delay
-    private fun startPollingAppTPState() {
-        appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
-            while (isActive) {
-                val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val currentState = currentViewState()
-                viewState.value = currentState.copy(
-                    appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                )
-                delay(1_000)
-            }
         }
     }
 
@@ -237,17 +203,6 @@ class NewSettingsViewModel @Inject constructor(
             this@NewSettingsViewModel.command.send(command)
         }
         pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
-    }
-
-    fun onAppTPSettingClicked() {
-        viewModelScope.launch {
-            if (appTrackingProtection.isOnboarded()) {
-                command.send(LaunchAppTPTrackersScreen)
-            } else {
-                command.send(LaunchAppTPOnboarding)
-            }
-            pixel.fire(SETTINGS_APPTP_PRESSED)
-        }
     }
 
     private fun currentViewState(): ViewState {

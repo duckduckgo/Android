@@ -119,6 +119,11 @@ class ProSettingViewModel @Inject constructor(
         startPollingSubscriptionEligibility()
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        appTPPollJob.cancel()
+    }
+
     private fun startPollingSubscriptionEligibility() {
         appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
