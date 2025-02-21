@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
@@ -35,7 +34,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScr
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -87,7 +85,6 @@ class NewSettingsViewModel @Inject constructor(
     sealed class Command {
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
-        data object LaunchFireButtonScreen : Command()
         data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
@@ -152,11 +149,6 @@ class NewSettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-
-    fun onFireButtonSettingClicked() {
-        viewModelScope.launch { command.send(LaunchFireButtonScreen) }
-        pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 
     fun onDuckChatSettingClicked() {

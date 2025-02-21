@@ -39,7 +39,6 @@ import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
-import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
@@ -48,7 +47,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScr
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -171,7 +169,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsMain) {
-            fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
@@ -400,7 +397,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)

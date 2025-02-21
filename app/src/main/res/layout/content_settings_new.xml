@@ -88,12 +88,7 @@
 
             <include layout="@layout/content_setting_permissions" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/fireButtonSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsDataClearing"
-                app:leadingIcon="@drawable/ic_fire_color_24"/>
+            <include layout="@layout/content_setting_data_clearing" />
 
             <include
                 android:id="@+id/includeDuckChatSetting"
