@@ -3210,12 +3210,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedMaliciousSiteWarning(url: Uri, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
+        val previousSite = site
         site = siteFactory.buildSite(url = url.toString(), tabId = tabId)
         site?.maliciousSiteStatus = when (feed) {
             MALWARE -> MaliciousSiteStatus.MALWARE
             PHISHING -> MaliciousSiteStatus.PHISHING
         }
+
         if (!exempted) {
+            if (currentBrowserViewState().maliciousSiteDetected && previousSite?.url == url.toString()) return
+            Timber.tag("Cris").d("Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit")
             val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
             pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             loadingViewState.postValue(

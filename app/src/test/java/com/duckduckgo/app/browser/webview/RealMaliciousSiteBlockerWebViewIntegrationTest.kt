@@ -20,6 +20,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -31,6 +32,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -102,11 +105,19 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldOverrideUrlLoading returns safe when url is already processed`() = runTest {
-        testee.processedUrls.add(exampleUri.toString())
+    fun `shouldOverrideUrlLoading returns safe when url is already processed and safe`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
         assertEquals(Safe, result)
+    }
+
+    @Test
+    fun `shouldOverrideUrlLoading returns malicious when url is already processed and malicious`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+
+        val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
+        assertEquals(MaliciousSite(exampleUri, MALWARE, false), result)
     }
 
     @Test
@@ -118,6 +129,32 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result)
+    }
+
+    @Test
+    fun `shouldInterceptRequest returns safe when url is already processed and safe`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(exampleUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+
+        assertEquals(Safe, result)
+    }
+
+    @Test
+    fun `shouldInterceptRequest returns malicious when url is already processed and malicious`() = runTest {
+        testee.processedUrls[exampleUri.toString()] = Malicious(MALWARE)
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(exampleUri)
+        whenever(request.isForMainFrame).thenReturn(true)
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+
+        assertEquals(MaliciousSite(exampleUri, MALWARE, false), result)
     }
 
     @Test
@@ -180,10 +217,17 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `onPageLoadStarted clears processedUrls`() = runTest {
-        testee.processedUrls.add(exampleUri.toString())
-        testee.onPageLoadStarted()
+    fun `onPageLoadStarted with different URL clears processedUrls`() = runTest {
+        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.onPageLoadStarted("http://another.com")
         assertTrue(testee.processedUrls.isEmpty())
+    }
+
+    @Test
+    fun `onPageLoadStarted with same URL does not clear processedUrls`() = runTest {
+        testee.processedUrls.put(exampleUri.toString(), MaliciousStatus.Safe)
+        testee.onPageLoadStarted(exampleUri.toString())
+        assertFalse(testee.processedUrls.isEmpty())
     }
 
     @Test
@@ -292,6 +336,24 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
         assertEquals(MaliciousSite(maliciousUri, MALWARE, true), result)
+    }
+
+    @Test
+    fun `shouldOverride called several times with same iframe URL without onPageStarted only fires pixel once`() = runTest {
+        val request = mock(WebResourceRequest::class.java)
+        whenever(request.url).thenReturn(maliciousUri)
+        whenever(request.isForMainFrame).thenReturn(false)
+        whenever(request.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe", "Referer" to maliciousUri.toString()))
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+
+        val result = testee.shouldIntercept(request, maliciousUri) {}
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result)
+
+        val result2 = testee.shouldIntercept(request, maliciousUri) {}
+        verify(mockPixel, times(1)).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
+        verify(maliciousSiteProtection, times(1)).isMalicious(eq(maliciousUri), any())
+
+        assertEquals(MaliciousSite(maliciousUri, MALWARE, false), result2)
     }
 
     private fun updateFeatureEnabled(enabled: Boolean) {
