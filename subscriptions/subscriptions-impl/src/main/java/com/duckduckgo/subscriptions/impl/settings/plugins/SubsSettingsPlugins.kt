@@ -47,7 +47,7 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(3)
+@PriorityKey(202)
 class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
     override val categoryNameResId = R.string.privacyPro
     override val children: List<SettingsNode> = emptyList()

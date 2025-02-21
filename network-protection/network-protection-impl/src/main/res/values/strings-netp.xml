@@ -16,6 +16,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="privacyPro" translatable="false">Privacy Pro</string>
     <string name="netp_name" translatable="false">DuckDuckGo VPN</string>
     <string name="netpManagementTitle" translatable="false">DuckDuckGo VPN</string>
     <string name="netpManagementHeadlineStatusOn">DuckDuckGo VPN is On</string>

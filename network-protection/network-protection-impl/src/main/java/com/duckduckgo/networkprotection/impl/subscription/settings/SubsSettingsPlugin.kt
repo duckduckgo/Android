@@ -19,20 +19,32 @@ package com.duckduckgo.networkprotection.impl.subscription.settings
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
-@PriorityKey(200)
-class ProSettingsNetP @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
+@PriorityKey(201)
+class ProSettingsNetP @Inject constructor() : RootSettingsNode {
+
+    override val categoryNameResId = R.string.privacyPro
+    override val children: List<SettingsNode> = emptyList()
+
+    override val id: UUID = UUID.randomUUID()
+
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
-            ProSettingNetPView(context)
-        } else {
-            return LegacyProSettingNetPView(context)
-        }
+        return ProSettingNetPView(context, searchableId = id)
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return setOf(
+            "vpn", "protection", "tunnel", "tunneling", "ip", "ip address",
+        )
     }
 }

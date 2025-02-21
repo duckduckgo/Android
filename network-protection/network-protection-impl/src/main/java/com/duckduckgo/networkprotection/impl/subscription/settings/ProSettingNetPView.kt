@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.subscription.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -26,6 +27,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -40,18 +42,22 @@ import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNet
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Disabled
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Enabled
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.UUID
 
+@SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
 class ProSettingNetPView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+    searchableId: UUID,
+) : SettingNodeView<Command, ViewState, ProSettingNetPViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: Factory
@@ -64,32 +70,18 @@ class ProSettingNetPView @JvmOverloads constructor(
 
     private val binding: ViewSettingsNetpBinding by viewBinding()
 
-    private val viewModel: ProSettingNetPViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingNetPViewModel::class.java]
+    override fun provideViewModel(): ProSettingNetPViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingNetPViewModel::class.java]
     }
-    private val conflatedStateJob = ConflatedJob()
-    private val conflatedCommandJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-
-        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
-
-        conflatedStateJob += viewModel.viewState
-            .onEach { updateNetPSettings(it.netPEntryState) }
-            .launchIn(coroutineScope!!)
-
-        conflatedCommandJob += viewModel.commands()
-            .onEach { processCommands(it) }
-            .launchIn(coroutineScope!!)
     }
 
-    private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
+    override fun renderView(viewState: ViewState)  {
         with(binding.netpPSetting) {
-            when (networkProtectionEntryState) {
+            when (viewState.netPEntryState) {
                 Hidden -> isGone = true
                 is Disabled -> {
                     isVisible = true
@@ -103,20 +95,13 @@ class ProSettingNetPView @JvmOverloads constructor(
                     isClickable = true
                     setClickListener { viewModel.onNetPSettingClicked() }
                     setLeadingIconResource(R.drawable.ic_vpn_color_24)
-                    setStatus(isOn = networkProtectionEntryState.isActive)
+                    setStatus(isOn = viewState.netPEntryState.isActive)
                 }
             }
         }
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        conflatedCommandJob.cancel()
-        conflatedStateJob.cancel()
-    }
-
-    private fun processCommands(command: Command) {
+    override fun processCommands(command: Command) {
         when (command) {
             is OpenNetPScreen -> {
                 globalActivityStarter.start(context, command.params)

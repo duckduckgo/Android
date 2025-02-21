@@ -23,13 +23,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.settings.SettingViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.ViewState
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -55,7 +58,7 @@ class ProSettingNetPViewModel(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
-) : ViewModel(), DefaultLifecycleObserver {
+) : SettingViewModel<Command, ViewState>(ViewState()) {
 
     data class ViewState(val netPEntryState: NetPEntryState = NetPEntryState.Hidden)
 
@@ -64,16 +67,14 @@ class ProSettingNetPViewModel(
     }
 
     sealed class NetPEntryState {
-
         data object Hidden : NetPEntryState()
         data class Enabled(val isActive: Boolean) : NetPEntryState()
         data object Disabled : NetPEntryState()
     }
 
-    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-    internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    override fun getSearchMissViewState(): ViewState {
+        return ViewState(netPEntryState = NetPEntryState.Hidden)
+    }
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -135,7 +136,7 @@ class ProSettingNetPViewModel(
         viewModelScope.launch {
             val screen = networkProtectionAccessState.getScreenForCurrentState()
             screen?.let {
-                command.send(OpenNetPScreen(screen))
+                _commands.trySend(OpenNetPScreen(screen))
                 pixel.fire(NETP_SETTINGS_PRESSED)
             } ?: logcat { "Get screen for current NetP state is null" }
         }
