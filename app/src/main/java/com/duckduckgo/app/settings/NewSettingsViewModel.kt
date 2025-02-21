@@ -27,7 +27,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
@@ -41,7 +40,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSe
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
@@ -108,7 +106,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
-        data object LaunchGeneralSettingsScreen : Command()
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
@@ -177,11 +174,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onAboutSettingClicked() {
         viewModelScope.launch { command.send(LaunchAboutScreen) }
         pixel.fire(SETTINGS_ABOUT_PRESSED)
-    }
-
-    fun onGeneralSettingClicked() {
-        viewModelScope.launch { command.send(LaunchGeneralSettingsScreen) }
-        pixel.fire(SETTINGS_GENERAL_PRESSED)
     }
 
     private fun currentViewState(): ViewState {

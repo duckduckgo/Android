@@ -76,12 +76,7 @@
                     app:primaryText="@string/settingsHeadingMainSettings" />
             </LinearLayout>
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/generalSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsGeneral"
-                app:leadingIcon="@drawable/ic_settings_color_24" />
+            <include layout="@layout/content_settings_main_general" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/syncSetting"
