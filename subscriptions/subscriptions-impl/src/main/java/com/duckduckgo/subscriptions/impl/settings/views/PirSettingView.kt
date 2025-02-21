@@ -16,18 +16,16 @@
 
 package com.duckduckgo.subscriptions.impl.settings.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -42,17 +40,17 @@ import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import dagger.android.support.AndroidSupportInjection
+import java.util.UUID
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
+@SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
 class PirSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+    searchableId: UUID,
+) : SettingNodeView<Command, ViewState, PirSettingViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -65,36 +63,16 @@ class PirSettingView @JvmOverloads constructor(
 
     private val binding: ViewPirSettingsBinding by viewBinding()
 
-    private val viewModel: PirSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
+    override fun provideViewModel(): PirSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
     }
-
-    private var job: ConflatedJob = ConflatedJob()
-    private val conflatedStateJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-
-        job += viewModel.commands()
-            .onEach { processCommands(it) }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
-        conflatedStateJob += viewModel.viewState
-            .onEach { renderView(it) }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        job.cancel()
-        conflatedStateJob.cancel()
-    }
-
-    private fun renderView(viewState: ViewState) {
+    override fun renderView(viewState: ViewState) {
         with(binding.pirSettings) {
             when (viewState.pirState) {
                 is Enabled -> {
@@ -116,7 +94,7 @@ class PirSettingView @JvmOverloads constructor(
         }
     }
 
-    private fun processCommands(command: Command) {
+    override fun processCommands(command: Command) {
         when (command) {
             is OpenPir -> {
                 globalActivityStarter.start(context, PirScreenWithEmptyParams)

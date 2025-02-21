@@ -47,7 +47,7 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(202)
+@PriorityKey(204)
 class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
     override val categoryNameResId = R.string.privacyPro
     override val children: List<SettingsNode> = emptyList()
@@ -66,25 +66,37 @@ class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(300)
-class PIRSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
+@PriorityKey(202)
+class PIRSettingNode @Inject constructor() : RootSettingsNode {
+    override val categoryNameResId = R.string.privacyPro
+    override val children: List<SettingsNode> = emptyList()
+    override val id: UUID = UUID.randomUUID()
+
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
-            PirSettingView(context)
-        } else {
-            LegacyPirSettingView(context)
-        }
+        return PirSettingView(context, searchableId = id)
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return setOf(
+            "privacy", "pro", "privacy pro", "pir", "information", "removal", "private",
+        )
     }
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(400)
-class ITRSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
+@PriorityKey(203)
+class ITRSettingNode @Inject constructor() : RootSettingsNode {
+    override val categoryNameResId = R.string.privacyPro
+    override val children: List<SettingsNode> = emptyList()
+    override val id: UUID = UUID.randomUUID()
+
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
-            ItrSettingView(context)
-        } else {
-            LegacyItrSettingView(context)
-        }
+        return ItrSettingView(context, searchableId = id)
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return setOf(
+            "privacy", "pro", "privacy pro", "itr", "theft", "identity", "restoration",
+        )
     }
 }

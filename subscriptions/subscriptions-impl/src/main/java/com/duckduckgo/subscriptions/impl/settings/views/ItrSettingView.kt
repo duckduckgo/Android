@@ -16,18 +16,16 @@
 
 package com.duckduckgo.subscriptions.impl.settings.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.settings.SettingNodeView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -41,17 +39,17 @@ import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
+import java.util.UUID
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
+@SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
 class ItrSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+    searchableId: UUID,
+) : SettingNodeView<Command, ViewState, ItrSettingViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -64,37 +62,16 @@ class ItrSettingView @JvmOverloads constructor(
 
     private val binding: ViewItrSettingsBinding by viewBinding()
 
-    private val viewModel: ItrSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ItrSettingViewModel::class.java]
+    override fun provideViewModel(): ItrSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ItrSettingViewModel::class.java]
     }
-
-    private var job: ConflatedJob = ConflatedJob()
-    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
-
-        job += viewModel.commands()
-            .onEach { processCommands(it) }
-            .launchIn(coroutineScope!!)
-
-        conflatedStateJob += viewModel.viewState
-            .onEach { renderView(it) }
-            .launchIn(coroutineScope!!)
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        job.cancel()
-        conflatedStateJob.cancel()
-    }
-
-    private fun renderView(viewState: ViewState) {
+    override fun renderView(viewState: ViewState) {
         with(binding.itrSettings) {
             when (viewState.itrState) {
                 is ItrState.Enabled -> {
@@ -116,7 +93,7 @@ class ItrSettingView @JvmOverloads constructor(
         }
     }
 
-    private fun processCommands(command: Command) {
+    override fun processCommands(command: Command) {
         when (command) {
             is OpenItr -> {
                 globalActivityStarter.start(
