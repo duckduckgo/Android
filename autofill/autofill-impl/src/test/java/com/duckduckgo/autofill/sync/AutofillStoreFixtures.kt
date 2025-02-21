@@ -33,7 +33,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 
 fun fakeAutofillStore(
-    secureStorage: SecureStorage = secureStore(),
+    secureStorage: SecureStorage = FakeSecureStorage(),
     lastUpdatedTimeProvider: LastUpdatedTimeProvider = lastUpdatedTimeProvider(),
     autofillPrefsStore: AutofillPrefsStore,
     autofillUrlMatcher: AutofillUrlMatcher = autofillDomainNameUrlMatcher(),
@@ -54,8 +54,6 @@ fun fakeAutofillStore(
     ),
     autofillFeature = autofillFeature,
 )
-
-fun secureStore() = FakeSecureStorage()
 
 fun lastUpdatedTimeProvider() = object : LastUpdatedTimeProvider {
     override fun getInMillis(): Long = 10000L

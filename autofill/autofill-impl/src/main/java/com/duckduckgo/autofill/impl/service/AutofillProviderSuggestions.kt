@@ -28,16 +28,12 @@ import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_AUTOFILL_CREDENTIAL_ID_EXTRAS
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_AUTOFILL_ID_EXTRAS
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_PACKAGE_ID_EXTRAS
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_URL_EXTRAS
-import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
-import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -57,12 +53,9 @@ interface AutofillProviderSuggestions {
 @ContributesBinding(AppScope::class)
 class RealAutofillProviderSuggestions @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    private val autofillStore: AutofillStore,
     private val viewProvider: AutofillServiceViewProvider,
     private val suggestionsFormatter: AutofillServiceSuggestionCredentialFormatter,
-    private val appCredentialProvider: AppCredentialProvider,
-    private val loginDeduplicator: AutofillLoginDeduplicator,
-    private val grouper: AutofillSelectCredentialsGrouper,
+    private val autofillSuggestions: AutofillSuggestions,
 ) : AutofillProviderSuggestions {
 
     companion object {
@@ -215,24 +208,15 @@ class RealAutofillProviderSuggestions @Inject constructor(
     }
 
     private suspend fun loginCredentials(node: AutofillRootNode): List<LoginCredentials> {
-        val crendentialsForDomain = node.website.takeUnless { it.isNullOrBlank() }?.let { nonEmtpyWebsite ->
-            val credentials = autofillStore.getCredentials(nonEmtpyWebsite)
-            loginDeduplicator.deduplicate(nonEmtpyWebsite, credentials).let { dedupLogins ->
-                grouper.group(nonEmtpyWebsite, dedupLogins).let { groups ->
-                    groups.perfectMatches
-                        .plus(groups.partialMatches.values.flatten())
-                        .plus(groups.shareableCredentials.values.flatten())
-                }
-            }
+        val credentialsForDomain = node.website.takeUnless { it.isNullOrBlank() }?.let { nonEmptyWebsite ->
+            autofillSuggestions.getSiteSuggestions(nonEmptyWebsite)
         } ?: emptyList()
 
-        val crendentialsForPackage = node.packageId.takeUnless { it.isNullOrBlank() }?.let {
-            appCredentialProvider.getCredentials(it)
+        val credentialsForPackage = node.packageId.takeUnless { it.isNullOrBlank() }?.let { nonEmptyPackageId ->
+            autofillSuggestions.getAppSuggestions(nonEmptyPackageId)
         } ?: emptyList()
 
-        Timber.v("DDGAutofillService credentials for domain: $crendentialsForDomain")
-        Timber.v("DDGAutofillService credentials for package: $crendentialsForPackage")
-        return crendentialsForDomain.plus(crendentialsForPackage).distinct()
+        return credentialsForDomain.plus(credentialsForPackage).distinct()
     }
 
     private fun createAutofillSelectionIntent(context: Context, url: String, packageId: String): PendingIntent {

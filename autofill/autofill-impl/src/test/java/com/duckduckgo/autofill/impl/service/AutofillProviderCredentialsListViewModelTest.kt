@@ -15,7 +15,10 @@ import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -62,6 +65,13 @@ class AutofillProviderCredentialsListViewModelTest {
             assertEquals(1, awaitItem.logins?.size)
             assertEquals(twitterCredentials, awaitItem.logins?.get(0))
         }
+    }
+
+    @Test
+    fun whenCredentialSelectedThenUpdateLastUsedTimestamp() = runTest {
+        val credentials = twitterCredentials
+        testee.onCredentialSelected(credentials)
+        verify(autofillStore).updateCredentials(any(), refreshLastUpdatedTimestamp = eq(false))
     }
 
     private class FakeDomainListFilter : CredentialListFilter {

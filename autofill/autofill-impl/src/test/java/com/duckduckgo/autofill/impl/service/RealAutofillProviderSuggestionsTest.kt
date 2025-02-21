@@ -59,14 +59,18 @@ class RealAutofillProviderSuggestionsTest {
         whenever(this.getOpenDuckDuckGoSuggestionSpecs()).thenReturn(SuggestionUISpecs("Search in DuckDuckGo", "", 0))
     }
 
-    private val testee = RealAutofillProviderSuggestions(
-        appBuildConfig = appBuildConfig,
+    private val autofillSuggestions = AutofillServiceSuggestions(
         autofillStore = autofillStore,
-        viewProvider = mockViewProvider,
-        suggestionsFormatter = suggestionFormatter,
         appCredentialProvider = appCredentialProvider,
         loginDeduplicator = noopDeduplicator(),
         grouper = noopGroupBuilder(),
+    )
+
+    private val testee = RealAutofillProviderSuggestions(
+        appBuildConfig = appBuildConfig,
+        viewProvider = mockViewProvider,
+        suggestionsFormatter = suggestionFormatter,
+        autofillSuggestions = autofillSuggestions,
     )
 
     @Test

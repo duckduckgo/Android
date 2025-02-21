@@ -93,6 +93,19 @@ class AutofillProviderChooseViewModelTest {
         }
     }
 
+    @Test
+    fun whenContinueAfterAuthenticationThenUpdateLastUsedTimestamp() = runTest {
+        givenLocalCredentials(twitterCredentials)
+        whenever(autofillProviderDeviceAuth.isAuthRequired()).thenReturn(true)
+
+        testee.commands().test {
+            awaitItem() // requires auth
+            testee.continueAfterAuthentication(twitterCredentials.id!!)
+            val awaitItem = awaitItem()
+            assertEquals(AutofillProviderChooseViewModel.Command.AutofillLogin(twitterCredentials), awaitItem)
+        }
+    }
+
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
         credentials.forEach {
             secureStorage.addWebsiteLoginDetailsWithCredentials(it.toWebsiteLoginCredentials())
