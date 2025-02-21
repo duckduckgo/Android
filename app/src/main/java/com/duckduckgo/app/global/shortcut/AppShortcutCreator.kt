@@ -66,7 +66,7 @@ class AppShortcutCreatorLifecycleObserver(
     override fun onCreate(owner: LifecycleOwner) {
         Timber.i("Configure app shortcuts")
         appShortcutCreator.configureAppShortcuts()
-    }
+    } 
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -164,7 +164,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_ai_chat_24))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcuts_duck_ai))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
