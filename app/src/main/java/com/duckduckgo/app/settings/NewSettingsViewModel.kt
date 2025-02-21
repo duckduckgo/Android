@@ -35,7 +35,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScree
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
@@ -43,7 +42,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatf
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.common.ui.settings.SearchableTag
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -74,7 +72,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class NewSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val dispatcherProvider: DispatcherProvider,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
@@ -84,7 +81,6 @@ class NewSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val appTrackingProtectionEnabled: Boolean = false,
-        val showAutofill: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
@@ -92,7 +88,6 @@ class NewSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
         data object LaunchFireButtonScreen : Command()
@@ -124,7 +119,6 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
@@ -153,10 +147,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onAutofillSettingsClick() {
-        viewModelScope.launch { command.send(LaunchAutofillSettings) }
     }
 
     fun onAccessibilitySettingClicked() {

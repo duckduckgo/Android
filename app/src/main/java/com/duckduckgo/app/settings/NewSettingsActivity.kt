@@ -47,7 +47,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScree
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
@@ -57,8 +56,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifie
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SearchStatus
@@ -176,7 +173,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsMain) {
-            autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
@@ -247,7 +243,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
-                    updateAutofill(it.showAutofill)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -435,17 +430,8 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         viewsNextSteps.enableVoiceSearchSetting.isVisible = isVisible
     }
 
-    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {
-        visibility = if (autofillEnabled) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-    }
-
     private fun processCommand(it: Command) {
         when (it) {
-            is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)

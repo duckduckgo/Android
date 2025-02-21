@@ -82,12 +82,7 @@
 
             <include layout="@layout/content_setting_appearance" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/autofillLoginsSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsPasswordsAndAutofillLoginsSetting"
-                app:leadingIcon="@drawable/ic_key_color_24"/>
+            <include layout="@layout/content_setting_main_autofill" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/accessibilitySetting"
