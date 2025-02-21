@@ -66,7 +66,10 @@ class PrivateSearchSettingNode @Inject constructor() : RootSettingsNode {
     }
 
     override fun generateKeywords(): Set<String> {
-        return setOf("private", "search", "privacy", "trackers", "tracking", "spy")
+        return setOf(
+            "private", "search", "privacy", "trackers", "tracking", "spy",
+            "suggestions", "bookmark", "complete", "autocomplete", "autofill"
+        )
     }
 }
 

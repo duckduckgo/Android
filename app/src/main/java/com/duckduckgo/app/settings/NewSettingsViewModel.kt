@@ -239,14 +239,11 @@ class NewSettingsViewModel @Inject constructor(
             keywordWords.any { keywordWord ->
                 val distance = levenshteinDistance(queryWord, keywordWord)
                 when {
-                    queryWord.length <= 2 -> {
+                    queryWord.length <= 3 -> {
                         queryWord == keywordWord
                     }
-                    queryWord.length <= 3 -> {
-                        distance in 0..1
-                    }
                     queryWord.length <= 5 -> {
-                        distance in 0..2
+                        distance in 0..1
                     }
                     else -> {
                         distance in 0..3
@@ -257,6 +254,6 @@ class NewSettingsViewModel @Inject constructor(
     }
 
     private fun levenshteinDistance(s1: String, s2: String): Int {
-        return LevenshteinDistance(4).apply(SimilarityInput.input(s1), SimilarityInput.input(s2))
+        return LevenshteinDistance(3).apply(SimilarityInput.input(s1), SimilarityInput.input(s2))
     }
 }
