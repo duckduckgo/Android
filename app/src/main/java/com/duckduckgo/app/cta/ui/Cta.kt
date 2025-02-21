@@ -28,7 +28,6 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextDaxDialogBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -88,6 +87,7 @@ interface OnboardingDaxCta {
         onPrimaryCtaClicked: () -> Unit,
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit,
+        onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
     )
 
     fun hideOnboardingCta(
@@ -120,31 +120,50 @@ sealed class OnboardingDaxDialogCta(
     internal fun setOnboardingDialogView(
         daxTitle: String? = null,
         daxText: String,
-        buttonText: String?,
+        primaryCtaText: String?,
+        secondaryCtaText: String? = null,
         binding: FragmentBrowserTabBinding,
+        onPrimaryCtaClicked: () -> Unit,
+        onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit = {},
     ) {
         val daxDialog = binding.includeOnboardingInContextDaxDialog
 
         daxDialog.root.show()
+        binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener(null)
+        binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener(null)
         daxDialog.dialogTextCta.text = ""
         daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
         daxTitle?.let {
             daxDialog.onboardingDialogTitle.show()
             daxDialog.onboardingDialogTitle.text = daxTitle
         } ?: daxDialog.onboardingDialogTitle.gone()
-        buttonText?.let {
+        primaryCtaText?.let {
             daxDialog.primaryCta.show()
             daxDialog.primaryCta.alpha = MIN_ALPHA
-            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.text = primaryCtaText
         } ?: daxDialog.primaryCta.gone()
+        secondaryCtaText?.let {
+            daxDialog.secondaryCta.show()
+            daxDialog.secondaryCta.alpha = MIN_ALPHA
+            daxDialog.secondaryCta.text = secondaryCtaText
+        } ?: daxDialog.secondaryCta.gone()
         daxDialog.onboardingDialogSuggestionsContent.gone()
         daxDialog.onboardingDialogContent.show()
         daxDialog.root.alpha = MAX_ALPHA
-        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-            daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+        TransitionManager.beginDelayedTransition(daxDialog.cardView, AutoTransition())
+        val afterAnimation = {
+            daxDialog.dialogTextCta.finishAnimation()
+            primaryCtaText?.let { daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
+            secondaryCtaText?.let { daxDialog.secondaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
+            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
             onTypingAnimationFinished.invoke()
         }
+        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+        daxDialog.onboardingDaxDialogBackground.setOnClickListener { afterAnimation() }
+        daxDialog.onboardingDialogContent.setOnClickListener { afterAnimation() }
+        daxDialog.onboardingDialogSuggestionsContent.setOnClickListener { afterAnimation() }
     }
 
     class DaxSerpCta(
@@ -166,14 +185,17 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = description?.let { context.getString(it) }.orEmpty(),
-                buttonText = buttonText?.let { context.getString(it) },
+                primaryCtaText = buttonText?.let { context.getString(it) },
                 binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
             )
-            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
     }
 
@@ -198,15 +220,17 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = getTrackersDescription(context, trackers),
-                buttonText = buttonText?.let { context.getString(it) },
+                primaryCtaText = buttonText?.let { context.getString(it) },
                 binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
             )
-            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
 
         @VisibleForTesting
@@ -254,14 +278,17 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = getTrackersDescription(context),
-                buttonText = buttonText?.let { context.getString(it) },
+                primaryCtaText = buttonText?.let { context.getString(it) },
                 binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
             )
-            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
 
         @VisibleForTesting
@@ -305,14 +332,17 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = description?.let { context.getString(it) }.orEmpty(),
-                buttonText = buttonText?.let { context.getString(it) },
+                primaryCtaText = buttonText?.let { context.getString(it) },
                 binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
             )
-            binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
     }
 
@@ -335,27 +365,18 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
-            val daxDialog = binding.includeOnboardingInContextDaxDialog
-            val daxText = description?.let { context.getString(it) }.orEmpty()
-
-            daxDialog.primaryCta.alpha = MIN_ALPHA
-            daxDialog.secondaryCta.alpha = MIN_ALPHA
-            daxDialog.primaryCta.show()
-            daxDialog.secondaryCta.show()
-            daxDialog.primaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogOkButton)
-            daxDialog.secondaryCta.text = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton)
-            daxDialog.dialogTextCta.text = ""
-            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
-            TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
-            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-                daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                daxDialog.secondaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                onTypingAnimationFinished.invoke()
-                binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
-                binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
-            }
+            setOnboardingDialogView(
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                secondaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogCancelButton),
+                binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+            )
         }
     }
 
@@ -378,6 +399,7 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingInContextDaxDialog
@@ -388,7 +410,8 @@ sealed class OnboardingDaxDialogCta(
             daxDialog.suggestionsDialogTextCta.text = ""
             daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
             TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
-            daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) {
+            val afterAnimation = {
+                onTypingAnimationFinished()
                 val optionsViews = listOf<DaxButton>(
                     daxDialog.daxDialogOption1,
                     daxDialog.daxDialogOption2,
@@ -401,18 +424,18 @@ sealed class OnboardingDaxDialogCta(
                     options[index].setOptionView(buttonView)
                     buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
-            }
-        }
 
-        fun setOnOptionClicked(
-            daxDialog: IncludeOnboardingInContextDaxDialogBinding,
-            onOptionClicked: (DaxDialogIntroOption) -> Unit,
-        ) {
-            val options = onboardingStore.getSitesOptions()
-            daxDialog.daxDialogOption1.setOnClickListener { onOptionClicked.invoke(options[0]) }
-            daxDialog.daxDialogOption2.setOnClickListener { onOptionClicked.invoke(options[1]) }
-            daxDialog.daxDialogOption3.setOnClickListener { onOptionClicked.invoke(options[2]) }
-            daxDialog.daxDialogOption4.setOnClickListener { onOptionClicked.invoke(options[3]) }
+                val options = onboardingStore.getSitesOptions()
+                daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
+                daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
+                daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
+                daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
+            }
+            daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+            daxDialog.onboardingDialogContent.setOnClickListener {
+                daxDialog.dialogTextCta.finishAnimation()
+                afterAnimation()
+            }
         }
     }
 
@@ -437,24 +460,17 @@ sealed class OnboardingDaxDialogCta(
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
             onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
         ) {
             val context = binding.root.context
-            val daxDialog = binding.includeOnboardingInContextDaxDialog
-            val daxText = description?.let { context.getString(it) }.orEmpty()
-
-            daxDialog.root.show()
-            daxDialog.primaryCta.show()
-            daxDialog.primaryCta.alpha = MIN_ALPHA
-            buttonText?.let { daxDialog.primaryCta.text = context.getString(it) }
-            daxDialog.secondaryCta.gone()
-            daxDialog.dialogTextCta.text = ""
-            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
-            TransitionManager.beginDelayedTransition(daxDialog.cardView, AutoTransition())
-            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-                daxDialog.primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
-                onTypingAnimationFinished.invoke()
-            }
+            setOnboardingDialogView(
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                primaryCtaText = buttonText?.let { context.getString(it) },
+                binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+            )
         }
     }
 
@@ -548,18 +564,22 @@ sealed class DaxBubbleCta(
             alpha = 0f
             text = daxTitle.html(view.context)
         }
-        view.animate().alpha(1f).setDuration(500).setStartDelay(600)
-            .withEndAction {
-                view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle).animate().alpha(1f).setDuration(500)
-                    .withEndAction {
-                        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
-                            view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
-                            view.findViewById<DaxButton>(R.id.primaryCta).animate().alpha(1f).setDuration(500)
-                            view.findViewById<DaxButton>(R.id.secondaryCta).animate().alpha(1f).setDuration(500)
-                            onTypingAnimationFinished()
-                        }
+        val afterAnimation = {
+            view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle).animate().alpha(1f).setDuration(500)
+                .withEndAction {
+                    view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
+                        view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
+                        view.findViewById<DaxButton>(R.id.primaryCta).animate().alpha(1f).setDuration(500)
+                        view.findViewById<DaxButton>(R.id.secondaryCta).animate().alpha(1f).setDuration(500)
+                        onTypingAnimationFinished()
                     }
-            }
+                }
+        }
+        view.animate().alpha(1f).setDuration(500).setStartDelay(600).withEndAction { afterAnimation() }
+        view.findViewById<View>(R.id.cardView).setOnClickListener {
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).finishAnimation()
+            afterAnimation()
+        }
     }
 
     fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
