@@ -512,6 +512,12 @@ sealed class DaxBubbleCta(
         ctaView = view
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
+        val optionsViews: List<DaxButton> = listOf(
+            view.findViewById(R.id.daxDialogOption1),
+            view.findViewById(R.id.daxDialogOption2),
+            view.findViewById(R.id.daxDialogOption3),
+            view.findViewById(R.id.daxDialogOption4),
+        )
 
         primaryCta?.let {
             view.findViewById<DaxButton>(R.id.primaryCta).show()
@@ -538,24 +544,16 @@ sealed class DaxBubbleCta(
             view.findViewById<DaxButton>(R.id.daxDialogOption4).gone()
         } else {
             options?.let {
-                val optionsViews = listOf<DaxButton>(
-                    view.findViewById(R.id.daxDialogOption1),
-                    view.findViewById(R.id.daxDialogOption2),
-                    view.findViewById(R.id.daxDialogOption3),
-                    view.findViewById(R.id.daxDialogOption4),
-                )
                 optionsViews.forEachIndexed { index, buttonView ->
                     if (it.size > index) {
                         it[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(1f).setDuration(500L).setStartDelay(2800L).withEndAction {
-                            onTypingAnimationFinished()
-                        }
                     } else {
                         buttonView.gone()
                     }
                 }
             }
         }
+
         TransitionManager.beginDelayedTransition(view.findViewById(R.id.cardView), AutoTransition())
         view.show()
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
@@ -565,21 +563,29 @@ sealed class DaxBubbleCta(
             text = daxTitle.html(view.context)
         }
         val afterAnimation = {
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).finishAnimation()
+            view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
+            view.findViewById<DaxButton>(R.id.primaryCta).animate().alpha(1f).setDuration(500)
+            view.findViewById<DaxButton>(R.id.secondaryCta).animate().alpha(1f).setDuration(500)
+            options?.let {
+                optionsViews.forEachIndexed { index, buttonView ->
+                    if (it.size > index) {
+                        buttonView.animate().alpha(1f).setDuration(500)
+                    }
+                }
+            }
+            onTypingAnimationFinished()
+        }
+
+        view.animate().alpha(1f).setDuration(500).setStartDelay(600).withEndAction {
             view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle).animate().alpha(1f).setDuration(500)
                 .withEndAction {
                     view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
-                        view.findViewById<ImageView>(R.id.placeholder).animate().alpha(1f).setDuration(500)
-                        view.findViewById<DaxButton>(R.id.primaryCta).animate().alpha(1f).setDuration(500)
-                        view.findViewById<DaxButton>(R.id.secondaryCta).animate().alpha(1f).setDuration(500)
-                        onTypingAnimationFinished()
+                        afterAnimation()
                     }
                 }
         }
-        view.animate().alpha(1f).setDuration(500).setStartDelay(600).withEndAction { afterAnimation() }
-        view.findViewById<View>(R.id.cardView).setOnClickListener {
-            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).finishAnimation()
-            afterAnimation()
-        }
+        view.findViewById<View>(R.id.cardContainer).setOnClickListener { afterAnimation() }
     }
 
     fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
