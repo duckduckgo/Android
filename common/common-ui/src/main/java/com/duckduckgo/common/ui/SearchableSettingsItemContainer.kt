@@ -49,15 +49,10 @@ interface SettingsNode {
 
     fun generateKeywords(): Set<String>
 
-    /**
-     * This method returns a [View] that will be used as a setting item
-     * @return [View]
-     */
     fun getView(context: Context): View
 }
 
 interface RootSettingsNode: SettingsNode
-interface NestedSettingsNode: SettingsNode
 
 @ContributesPluginPoint(
     scope = AppScope::class,
@@ -65,10 +60,3 @@ interface NestedSettingsNode: SettingsNode
 )
 @Suppress("unused")
 interface RootSettingsNodePluginPoint
-
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = NestedSettingsNode::class,
-)
-@Suppress("unused")
-interface NestedSettingsNodePluginPoint

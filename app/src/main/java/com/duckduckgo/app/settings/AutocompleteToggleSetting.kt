@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
@@ -36,7 +37,6 @@ import com.duckduckgo.app.settings.PrivateSearchAutocompleteSettingViewModel.Com
 import com.duckduckgo.app.settings.PrivateSearchAutocompleteSettingViewModel.ViewState
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.NestedSettingsNode
 import com.duckduckgo.common.ui.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -56,12 +56,8 @@ import javax.inject.Inject
     scope = ActivityScope::class,
     boundType = PrivateSearchNestedSettingNode::class,
 )
-@ContributesMultibinding(
-    scope = ActivityScope::class,
-    boundType = NestedSettingsNode::class,
-)
 @PriorityKey(0)
-class PrivateSearchAutocompleteSettingNode @Inject constructor() : PrivateSearchNestedSettingNode, NestedSettingsNode {
+class PrivateSearchAutocompleteSettingNode @Inject constructor() : PrivateSearchNestedSettingNode {
     override val categoryNameResId = R.string.settingsHeadingProtections
     override val children: List<SettingsNode> = emptyList()
 
@@ -134,7 +130,13 @@ class PrivateSearchAutocompleteSettingViewModel @Inject constructor(
         )
     }
 
-    init {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+
+        /*
+         * Update on each start to reflect state changes from nested activities.
+         * `settingsDataStore` is not observable, requiring manual management.
+         */
         viewModelScope.launch(dispatcherProvider.io()) {
             val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
             if (!autoCompleteEnabled) {
