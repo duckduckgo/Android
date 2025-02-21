@@ -111,12 +111,7 @@
                 app:primaryText="@string/settingsSyncSetting"
                 app:leadingIcon="@drawable/ic_sync_color_24"/>
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/appearanceSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsHeadingAppearance"
-                app:leadingIcon="@drawable/ic_appearance_color_24"/>
+            <include layout="@layout/content_setting_appearance" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/autofillLoginsSetting"

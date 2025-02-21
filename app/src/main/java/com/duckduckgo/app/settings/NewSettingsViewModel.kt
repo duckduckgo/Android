@@ -295,11 +295,6 @@ class NewSettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(LaunchDuckChatScreen) }
     }
 
-    fun onAppearanceSettingClicked() {
-        viewModelScope.launch { command.send(LaunchAppearanceScreen) }
-        pixel.fire(SETTINGS_APPEARANCE_PRESSED)
-    }
-
     fun onShareFeedbackClicked() {
         viewModelScope.launch {
             if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
