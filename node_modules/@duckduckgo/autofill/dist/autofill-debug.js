@@ -12188,16 +12188,16 @@ const formatPhoneNumber = phone => phone.replaceAll(/[^0-9|+]/g, '');
 /**
  * Infer credentials from password and identities
  * @param {InternalDataStorageObject['credentials']} credentials
- * @param {InternalDataStorageObject['identities']} identities
- * @param {string|undefined} cardNumber
- * @return {InternalDataStorageObject['credentials'] | undefined}
+ * @param {InternalIdentityObject} identities
+ * @param {InternalCreditCardObject|undefined} creditCards
+ * @return InternalCredentialsObject|undefined
  */
 exports.formatPhoneNumber = formatPhoneNumber;
-const inferCredentialsForPartialSave = (credentials, identities, cardNumber) => {
+const inferCredentialsForPartialSave = (credentials, identities, creditCards) => {
   // Try to infer username from identity or card number
-  if (!credentials.username && ((0, _autofillUtils.hasUsernameLikeIdentity)(identities) || cardNumber)) {
+  if (!credentials.username) {
     // @ts-ignore - We know that username is not a useful value here
-    credentials.username = identities.emailAddress || identities.phone || cardNumber;
+    credentials.username = (0, _autofillUtils.getUsernameLikeIdentity)(identities, creditCards);
   }
   // Discard empty credentials
   if (Object.keys(credentials ?? {}).length === 0) {
@@ -12209,18 +12209,18 @@ const inferCredentialsForPartialSave = (credentials, identities, cardNumber) => 
 /**
  * Infer credentials from password and identities
  * @param {InternalDataStorageObject['credentials']} credentials
- * @param {InternalDataStorageObject['identities']} identities
- * @param {string|undefined} cardNumber
- * @return {InternalDataStorageObject['credentials'] | undefined}
+ * @param {InternalIdentityObject} identities
+ * @param {InternalCreditCardObject|undefined} creditCards
+ * @return InternalCredentialsObject|undefined
  */
-const inferCredentials = (credentials, identities, cardNumber) => {
+const inferCredentials = (credentials, identities, creditCards) => {
   if (!credentials.password) {
     return undefined;
   }
   // Try to use email as username if password exists but username is missing
-  if (credentials.password && !credentials.username && ((0, _autofillUtils.hasUsernameLikeIdentity)(identities) || cardNumber)) {
+  if (credentials.password && !credentials.username) {
     // @ts-ignore - We know that username is not a useful value here
-    credentials.username = identities.emailAddress || identities.phone || cardNumber;
+    credentials.username = (0, _autofillUtils.getUsernameLikeIdentity)(identities, creditCards);
   }
   return credentials;
 };
@@ -12229,6 +12229,7 @@ const inferCredentials = (credentials, identities, cardNumber) => {
  * Formats form data into an object to send to the device for storage
  * If values are insufficient for a complete entry, they are discarded
  * @param {InternalDataStorageObject} formValues
+ * @param {boolean} canTriggerPartialSave
  * @return {DataStorageObject}
  */
 const prepareFormValuesForStorage = function (formValues) {
@@ -12257,7 +12258,7 @@ const prepareFormValuesForStorage = function (formValues) {
    * but not reproducible with the current tests. Once the feature is stable, we should
    * revisit and remove the older logic.
    */
-  credentials = canTriggerPartialSave ? inferCredentialsForPartialSave(credentials, identities, creditCards.cardNumber) : inferCredentials(credentials, identities, creditCards.cardNumber);
+  credentials = canTriggerPartialSave ? inferCredentialsForPartialSave(credentials, identities, creditCards) : inferCredentials(credentials, identities, creditCards);
 
   /** Fixes for identities **/
   // Don't store if there isn't enough data
@@ -17255,7 +17256,7 @@ exports.getActiveElement = getActiveElement;
 exports.getDaxBoundingBox = void 0;
 exports.getFormControlElements = getFormControlElements;
 exports.getTextShallow = void 0;
-exports.hasUsernameLikeIdentity = hasUsernameLikeIdentity;
+exports.getUsernameLikeIdentity = getUsernameLikeIdentity;
 exports.isEventWithinDax = exports.isAutofillEnabledFromProcessedConfig = void 0;
 exports.isFormLikelyToBeUsedAsPageWrapper = isFormLikelyToBeUsedAsPageWrapper;
 exports.isLikelyASubmitButton = exports.isIncontextSignupEnabledFromProcessedConfig = void 0;
@@ -17932,12 +17933,22 @@ function queryElementsWithShadow(element, selector) {
 }
 
 /**
- * Checks if there is a single username-like identity, i.e. email or phone
+ * Checks if there is a single username-like identity, i.e. email or phone or credit card number
+ * If there is then returns that, otherwise returns undefined
  * @param {InternalIdentityObject} identities
- * @returns {boolean}
+ * @param {InternalCreditCardObject} creditCards
+ * @returns {string | undefined}
  */
-function hasUsernameLikeIdentity(identities) {
-  return Object.keys(identities ?? {}).length === 1 && Boolean(identities?.emailAddress || identities.phone);
+function getUsernameLikeIdentity(identities, creditCards) {
+  if (identities?.emailAddress) {
+    return identities.emailAddress;
+  }
+  if (Object.keys(identities ?? {}).length === 1 && Boolean(identities.phone)) {
+    return identities.phone;
+  }
+  if (Object.keys(creditCards ?? {}).length === 1 && Boolean(creditCards.cardNumber)) {
+    return creditCards.cardNumber;
+  }
 }
 
 },{"./Form/matching.js":44,"./constants.js":67,"@duckduckgo/content-scope-scripts/src/apple-utils":1}],65:[function(require,module,exports){
