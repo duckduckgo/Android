@@ -31,7 +31,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -43,7 +42,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButton
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.common.ui.settings.SearchableTag
@@ -55,7 +53,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HEL
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -78,7 +75,6 @@ import javax.inject.Inject
 class NewSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
-    private val deviceSyncState: DeviceSyncState,
     private val dispatcherProvider: DispatcherProvider,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
@@ -89,7 +85,6 @@ class NewSettingsViewModel @Inject constructor(
     data class ViewState(
         val appTrackingProtectionEnabled: Boolean = false,
         val showAutofill: Boolean = false,
-        val showSyncSetting: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
@@ -100,7 +95,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
-        data object LaunchSyncSettings : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchDuckChatScreen : Command()
@@ -131,7 +125,6 @@ class NewSettingsViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
-                    showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
@@ -178,11 +171,6 @@ class NewSettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-
-    fun onSyncSettingClicked() {
-        viewModelScope.launch { command.send(LaunchSyncSettings) }
-        pixel.fire(SETTINGS_SYNC_PRESSED)
     }
 
     fun onFireButtonSettingClicked() {

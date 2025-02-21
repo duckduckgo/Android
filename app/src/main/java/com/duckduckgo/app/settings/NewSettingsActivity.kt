@@ -40,7 +40,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
-import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command
@@ -52,11 +51,9 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSe
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -83,7 +80,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -181,7 +177,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         with(viewsMain) {
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
-            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
@@ -253,7 +248,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutofill(it.showAutofill)
-                    updateSyncSetting(visible = it.showSyncSetting)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -449,18 +443,11 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateSyncSetting(visible: Boolean) {
-        with(viewsMain.syncSetting) {
-            isVisible = visible
-        }
-    }
-
     private fun processCommand(it: Command) {
         when (it) {
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)

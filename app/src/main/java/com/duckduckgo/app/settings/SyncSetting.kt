@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.appearance
+package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.appearance.AppearanceSettingViewModel.Command
-import com.duckduckgo.app.appearance.AppearanceSettingViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.appearance.AppearanceSettingViewModel.ViewState
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentSettingAppearanceBinding
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPEARANCE_PRESSED
+import com.duckduckgo.app.browser.databinding.ContentSettingMainSyncBinding
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
+import com.duckduckgo.app.settings.SyncSettingViewModel.Command
+import com.duckduckgo.app.settings.SyncSettingViewModel.Command.LaunchSyncScreen
+import com.duckduckgo.app.settings.SyncSettingViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.RootSettingsNode
 import com.duckduckgo.common.ui.settings.SettingNodeView
@@ -39,69 +39,55 @@ import com.duckduckgo.common.ui.settings.SettingViewModel
 import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
 
-interface AppearanceNestedSettingNode : SettingsNode
-
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = AppearanceNestedSettingNode::class,
-)
-@Suppress("unused")
-interface AppearanceNestedSettingNodePluginPoint
-
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(303)
-class AppearanceSettingNode @Inject constructor() : RootSettingsNode {
+@PriorityKey(302)
+class SyncSettingNode @Inject constructor() : RootSettingsNode {
     override val categoryNameResId = R.string.settingsHeadingMainSettings
-
-    @Inject
-    lateinit var _nestedSettingsPlugins: PluginPoint<AppearanceNestedSettingNode>
-    override val children by lazy {
-        _nestedSettingsPlugins.getPlugins()
-    }
+    override val children: List<SettingsNode> = emptyList()
 
     override val id: UUID = UUID.randomUUID()
 
     override fun getView(context: Context): View {
-        return AppearanceSettingNodeView(context, searchableId = id)
+        return SyncSettingNodeView(context, searchableId = id)
     }
 
     override fun generateKeywords(): Set<String> {
         return setOf(
-                "theme", "dark", "light", "night", "day",
-                "color", "palette", "UI", "interface",
-                "customization", "scheme", "appearance",
-                "text", "font", "mode", "style", "layout", "design",
+            "sync", "backup", "cloud", "restore",
+            "account", "data", "transfer", "storage",
+            "link", "synchronize", "upload", "download",
         )
     }
 }
 
 @SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
-class AppearanceSettingNodeView(
+class SyncSettingNodeView(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     searchableId: UUID,
-) : SettingNodeView<Command, ViewState, AppearanceSettingViewModel>(context, attrs, defStyle, searchableId) {
+) : SettingNodeView<Command, ViewState, SyncSettingViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
-    override fun provideViewModel(): AppearanceSettingViewModel {
-        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AppearanceSettingViewModel::class.java]
+    override fun provideViewModel(): SyncSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncSettingViewModel::class.java]
     }
 
-    private val binding: ContentSettingAppearanceBinding by viewBinding()
+    private val binding: ContentSettingMainSyncBinding by viewBinding()
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -110,14 +96,14 @@ class AppearanceSettingNodeView(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.appearanceSetting.setOnClickListener {
-            viewModel.onAppearanceSettingClicked()
+        binding.syncSetting.setOnClickListener {
+            viewModel.onSyncSettingClicked()
         }
     }
 
     override fun renderView(viewState: ViewState) {
-        with(binding.appearanceSetting) {
-            visibility = if (viewState.showAppearanceSetting) {
+        with(binding.syncSetting) {
+            visibility = if (viewState.showSyncSetting && viewState.isSyncEnabled) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -127,34 +113,45 @@ class AppearanceSettingNodeView(
 
     override fun processCommands(command: Command) {
         when (command) {
-            LaunchAppearanceScreen -> {
-                globalActivityStarter.start(context, AppearanceScreen.Default)
+            LaunchSyncScreen -> {
+                globalActivityStarter.start(context, SyncActivityWithEmptyParams)
             }
         }
     }
 }
 
 @ContributesViewModel(ViewScope::class)
-class AppearanceSettingViewModel @Inject constructor(
+class SyncSettingViewModel @Inject constructor(
+    private val deviceSyncState: DeviceSyncState,
     private val pixel: Pixel,
 ) : SettingViewModel<Command, ViewState>(ViewState()) {
 
     override fun getSearchMissViewState(): ViewState {
         return ViewState(
-            showAppearanceSetting = false,
+            showSyncSetting = false,
         )
     }
 
-    fun onAppearanceSettingClicked() {
-        _commands.trySend(LaunchAppearanceScreen)
-        pixel.fire(SETTINGS_APPEARANCE_PRESSED)
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        _viewState.update {
+            it.copy(
+                isSyncEnabled = deviceSyncState.isFeatureEnabled(),
+            )
+        }
+    }
+
+    fun onSyncSettingClicked() {
+        _commands.trySend(LaunchSyncScreen)
+        pixel.fire(SETTINGS_SYNC_PRESSED)
     }
 
     data class ViewState(
-        val showAppearanceSetting: Boolean = true,
+        val showSyncSetting: Boolean = true,
+        val isSyncEnabled: Boolean = false,
     )
 
     sealed class Command {
-        data object LaunchAppearanceScreen : Command()
+        data object LaunchSyncScreen : Command()
     }
 }
