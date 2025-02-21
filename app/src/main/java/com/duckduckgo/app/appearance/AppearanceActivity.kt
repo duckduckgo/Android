@@ -31,29 +31,24 @@ import com.duckduckgo.app.appearance.AppearanceScreen.HighlightedItem
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
-import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSettings
-import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
-import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "appearance")
@@ -62,6 +57,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
+
+    @Inject
+    lateinit var _nestedSettingsPlugins: PluginPoint<AppearanceNestedSettingNode>
+    private val nestedSettingsPlugins by lazy {
+        _nestedSettingsPlugins.getPlugins()
+    }
 
     private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onForceDarkModeSettingChanged(isChecked)
@@ -97,13 +98,16 @@ class AppearanceActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        nestedSettingsPlugins.forEach {
+            binding.appearanceSettingsContent.addView(it.getView(this), 0)
+        }
+
         configureUiEventHandlers()
         observeViewModel()
         scrollToHighlightedItem()
     }
 
     private fun configureUiEventHandlers() {
-        binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         binding.addressBarPositionSetting.setOnClickListener { viewModel.userRequestedToChangeAddressBarPosition() }
     }
@@ -113,7 +117,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
@@ -126,17 +129,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
-    }
-
-    private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
-        val subtitle = getString(
-            when (selectedTheme) {
-                DARK -> R.string.settingsDarkTheme
-                LIGHT -> R.string.settingsLightTheme
-                SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-            },
-        )
-        binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
     private fun updateSelectedOmnibarPosition(isFeatureEnabled: Boolean, position: OmnibarPosition) {
@@ -159,43 +151,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is LaunchAppIcon -> launchAppIconChange()
-            is UpdateTheme -> sendThemeChangedBroadcast()
-            is LaunchThemeSettings -> launchThemeSelector(it.theme)
             is LaunchOmnibarPositionSettings -> launchOmnibarPositionSelector(it.position)
         }
     }
 
     private fun launchAppIconChange() {
         changeIconFlow.launch(null)
-    }
-
-    private fun launchThemeSelector(theme: DuckDuckGoTheme) {
-        val currentTheme = theme.getOptionIndex()
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsTheme)
-            .setOptions(
-                listOf(
-                    R.string.settingsSystemTheme,
-                    R.string.settingsLightTheme,
-                    R.string.settingsDarkTheme,
-                ),
-                currentTheme,
-            )
-            .setPositiveButton(R.string.settingsThemeDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedTheme = when (selectedItem) {
-                            2 -> DuckDuckGoTheme.LIGHT
-                            3 -> DuckDuckGoTheme.DARK
-                            else -> DuckDuckGoTheme.SYSTEM_DEFAULT
-                        }
-                        viewModel.onThemeSelected(selectedTheme)
-                    }
-                },
-            )
-            .show()
     }
 
     private fun launchOmnibarPositionSelector(position: OmnibarPosition) {

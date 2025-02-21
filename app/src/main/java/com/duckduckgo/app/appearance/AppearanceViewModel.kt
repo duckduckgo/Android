@@ -58,7 +58,6 @@ class AppearanceViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
@@ -68,9 +67,7 @@ class AppearanceViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data object LaunchAppIcon : Command()
-        data object UpdateTheme : Command()
         data class LaunchOmnibarPositionSettings(val position: OmnibarPosition) : Command()
     }
 
@@ -81,7 +78,6 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.update {
                 currentViewState().copy(
-                    theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
                     canForceDarkMode = canForceDarkMode(),
@@ -101,11 +97,6 @@ class AppearanceViewModel @Inject constructor(
         return themingDataStore.theme != DuckDuckGoTheme.LIGHT
     }
 
-    fun userRequestedToChangeTheme() {
-        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
-        pixel.fire(AppPixelName.SETTINGS_THEME_OPENED)
-    }
-
     fun userRequestedToChangeIcon() {
         viewModelScope.launch { command.send(Command.LaunchAppIcon) }
         pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
@@ -114,29 +105,6 @@ class AppearanceViewModel @Inject constructor(
     fun userRequestedToChangeAddressBarPosition() {
         viewModelScope.launch { command.send(Command.LaunchOmnibarPositionSettings(viewState.value.omnibarPosition)) }
         pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
-    }
-
-    fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        Timber.d("User toggled theme, theme to set: $selectedTheme")
-        if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
-            return
-        }
-        viewModelScope.launch(dispatcherProvider.io()) {
-            themingDataStore.theme = selectedTheme
-            withContext(dispatcherProvider.main()) {
-                viewState.update { currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
-                command.send(Command.UpdateTheme)
-            }
-        }
-
-        val pixelName =
-            when (selectedTheme) {
-                LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
-                DARK -> SETTINGS_THEME_TOGGLED_DARK
-                SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
-            }
-        pixel.fire(pixelName)
     }
 
     fun onOmnibarPositionUpdated(position: OmnibarPosition) {

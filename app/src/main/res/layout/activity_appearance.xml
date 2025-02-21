@@ -33,20 +33,12 @@
         tools:ignore="Overdraw">
 
         <LinearLayout
+            android:id="@+id/appearanceSettingsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/selectedThemeSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:primaryText="@string/settingsTheme"
-                app:primaryTextTruncated="false"
-                app:secondaryText="@string/settingsSystemTheme" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/experimentalNightMode"

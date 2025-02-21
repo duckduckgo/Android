@@ -248,6 +248,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 attachedView.updateSearchStatus(viewModel.viewState().value.searchResults)
             }
         }
+        // when activity recreates (for example during theme change),
+        // we need to clean up the cached search results because they are not pointing towards view IDs that are dead
+        viewModel.onSearchQueryTextChange(null, emptyList())
         assignSearchKeywords()
     }
 
@@ -419,6 +422,7 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                viewModel.onSearchQueryTextChange(null, searchableTags = settingsPlugins.generateSearchableTags())
                 return true
             }
         })
