@@ -249,39 +249,54 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             it.updateSearchStatus(searchResults)
         }
         if (searchResults != null) {
-            val hitNestedPluginsMap = searchResults.filter { result ->
+            val hitNestedPlugins = searchResults.filter { result ->
                 binding.includeSettings.searchableSettingsContent.children.none {
                     val searchableView = it as Searchable
                     searchableView.searchableId == result
                 }
-            }.mapNotNull {
-                settingsPlugins.findNodeById(it)
-            }.associateBy { it.categoryNameResId }
+            }.map {
+                settingsPlugins.findNodesById(it)
+            }.flatten()
 
-            hitNestedPluginsMap.values.forEach {
-                val view = it.getView(this)
+            hitNestedPlugins.forEach { foundNode ->
+                val view = foundNode.node.getView(this)
                 view.doOnAttach {
                     (view as Searchable).setSearchStatus(HIT)
                 }
+
                 if (!binding.includeSettings.searchableSettingsContent.contains(view)) {
-                    binding.includeSettings.searchableSettingsContent.addView(view)
+                    // Find the parent view
+                    val parentView = foundNode.parent?.let { parent ->
+                        binding.includeSettings.searchableSettingsContent.children.find {
+                            (it as Searchable).searchableId == parent.id
+                        }
+                    }
+
+                    if (parentView != null) {
+                        // If parent is found, insert the child right after it
+                        val parentIndex = binding.includeSettings.searchableSettingsContent.indexOfChild(parentView)
+                        binding.includeSettings.searchableSettingsContent.addView(view, parentIndex + 1)
+                    } else {
+                        // If no parent found, add to the end
+                        binding.includeSettings.searchableSettingsContent.addView(view)
+                    }
                 }
             }
 
-            // clean up
+            // Clean up
             binding.includeSettings.searchableSettingsContent.children.filter { view ->
                 val searchableView = view as Searchable
-                val plugin = settingsPlugins.findNodeById(searchableView.searchableId)
-                plugin !is RootSettingsNode && !searchResults.contains(searchableView.searchableId)
+                val foundNodes = settingsPlugins.findNodesById(searchableView.searchableId)
+                foundNodes.any { it.node !is RootSettingsNode && !searchResults.contains(searchableView.searchableId) }
             }.forEach {
                 binding.includeSettings.searchableSettingsContent.removeView(it)
             }
         } else {
-            // clean up
+            // Clean up
             binding.includeSettings.searchableSettingsContent.children.filter { view ->
                 val searchableView = view as Searchable
-                val plugin = settingsPlugins.findNodeById(searchableView.searchableId)
-                plugin !is RootSettingsNode
+                val foundNodes = settingsPlugins.findNodesById(searchableView.searchableId)
+                foundNodes.any { it.node !is RootSettingsNode }
             }.forEach {
                 binding.includeSettings.searchableSettingsContent.removeView(it)
             }
@@ -321,30 +336,32 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     viewModel.onSearchQueryTextChange(
                         newText,
-                        searchableTags = settingsPlugins.generateSearchableTags()
+                        searchableTags = settingsPlugins.generateSearchableTags(),
                     )
                     return true
                 }
             },
         )
 
-        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                val layoutTransition = LayoutTransition()
-                layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
-                layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
-                layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-                layoutTransition.enableTransitionType(LayoutTransition.CHANGE_APPEARING)
-                layoutTransition.enableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
-                binding.includeSettings.searchableSettingsContent.layoutTransition = layoutTransition
-                return true
-            }
+        searchItem.setOnActionExpandListener(
+            object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    val layoutTransition = LayoutTransition()
+                    layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
+                    layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
+                    layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+                    layoutTransition.enableTransitionType(LayoutTransition.CHANGE_APPEARING)
+                    layoutTransition.enableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
+                    binding.includeSettings.searchableSettingsContent.layoutTransition = layoutTransition
+                    return true
+                }
 
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                viewModel.onSearchQueryTextChange(null, searchableTags = settingsPlugins.generateSearchableTags())
-                return true
-            }
-        })
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                    viewModel.onSearchQueryTextChange(null, searchableTags = settingsPlugins.generateSearchableTags())
+                    return true
+                }
+            },
+        )
 
         return true
     }
@@ -357,14 +374,22 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         return this.flatMap { generateTagsRecursively(it) }
     }
 
-    private fun Collection<SettingsNode>.findNodeById(id: UUID): SettingsNode? {
-        fun findRecursively(node: SettingsNode): SettingsNode? =
+    data class FoundNode(
+        val parent: SettingsNode?,
+        val node: SettingsNode,
+    )
+
+    private fun Collection<SettingsNode>.findNodesById(id: UUID): List<FoundNode> {
+        fun findRecursively(
+            node: SettingsNode,
+            parent: SettingsNode?
+        ): List<FoundNode> =
             when {
-                node.id == id -> node
-                else -> node.children.asSequence().mapNotNull { findRecursively(it) }.firstOrNull()
+                node.id == id -> listOf(FoundNode(parent, node))
+                else -> node.children.flatMap { findRecursively(it, node) }
             }
 
-        return this.asSequence().mapNotNull { findRecursively(it) }.firstOrNull()
+        return this.flatMap { findRecursively(it, null) }
     }
 
     private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
