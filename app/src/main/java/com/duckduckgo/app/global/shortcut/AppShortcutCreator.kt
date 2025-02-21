@@ -66,7 +66,7 @@ class AppShortcutCreatorLifecycleObserver(
     override fun onCreate(owner: LifecycleOwner) {
         Timber.i("Configure app shortcuts")
         appShortcutCreator.configureAppShortcuts()
-    } 
+    }
 }
 
 @SingleInstanceIn(AppScope::class)
