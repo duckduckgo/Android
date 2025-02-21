@@ -52,7 +52,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboa
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
@@ -66,7 +65,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -189,7 +187,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
-            cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
@@ -275,7 +272,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
-                    updateAutoconsent(it.isAutoconsentEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -481,10 +477,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateAutoconsent(enabled: Boolean) {
-        viewsPrivacy.cookiePopupProtectionSetting.setStatus(isOn = enabled)
-    }
-
     private fun processCommand(it: Command) {
         when (it) {
             is LaunchAutofillSettings -> launchScreen(AutofillSettingsScreen(source = AutofillSettingsLaunchSource.SettingsActivity))
@@ -495,7 +487,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
-            is LaunchCookiePopupProtectionScreen -> launchActivity(AutoconsentSettingsActivity.intent(this))
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
             is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)

@@ -27,7 +27,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APPTP_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_GENERAL_PRESSED
@@ -43,7 +42,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPOnboa
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppTPTrackersScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAutofillSettings
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchEmailProtectionNotSupported
@@ -55,7 +53,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermission
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.ui.settings.SearchableTag
@@ -97,7 +94,6 @@ class NewSettingsViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val deviceSyncState: DeviceSyncState,
     private val dispatcherProvider: DispatcherProvider,
-    private val autoconsent: Autoconsent,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -109,7 +105,6 @@ class NewSettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val isAutoconsentEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
@@ -125,7 +120,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
-        data object LaunchCookiePopupProtectionScreen : Command()
         data object LaunchFireButtonScreen : Command()
         data object LaunchPermissionsScreen : Command()
         data object LaunchDuckChatScreen : Command()
@@ -167,7 +161,6 @@ class NewSettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
@@ -213,11 +206,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onCookiePopupProtectionSettingClicked() {
-        viewModelScope.launch { command.send(LaunchCookiePopupProtectionScreen) }
-        pixel.fire(SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED)
     }
 
     fun onAutofillSettingsClick() {
