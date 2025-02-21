@@ -84,12 +84,7 @@
 
             <include layout="@layout/content_setting_main_autofill" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/accessibilitySetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsAccessibility"
-                app:leadingIcon="@drawable/ic_accessibility_color_24"/>
+            <include layout="@layout/content_setting_accessibility" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/permissionsSetting"

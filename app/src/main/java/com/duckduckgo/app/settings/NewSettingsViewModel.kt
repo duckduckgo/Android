@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
@@ -147,11 +146,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onEnableVoiceSearchClicked() {
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
-    }
-
-    fun onAccessibilitySettingClicked() {
-        viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
-        pixel.fire(SETTINGS_ACCESSIBILITY_PRESSED)
     }
 
     fun onAboutSettingClicked() {

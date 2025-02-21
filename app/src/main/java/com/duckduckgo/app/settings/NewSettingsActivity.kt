@@ -175,7 +175,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         with(viewsMain) {
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
-            accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
