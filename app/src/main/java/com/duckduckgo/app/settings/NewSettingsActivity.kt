@@ -28,6 +28,7 @@ import androidx.core.view.children
 import androidx.core.view.contains
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
+import androidx.core.view.iterator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -58,8 +59,10 @@ import com.duckduckgo.common.ui.settings.SearchStatus.HIT
 import com.duckduckgo.common.ui.settings.Searchable
 import com.duckduckgo.common.ui.settings.SearchableTag
 import com.duckduckgo.common.ui.settings.SettingsNode
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
+import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -233,7 +236,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
 
-                    // needs to happen last
                     applySearchResults(it.searchResults)
                 }
             }.launchIn(lifecycleScope)
@@ -244,7 +246,19 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
+    private fun removeHeaders() {
+        val iterator = binding.includeSettings.searchableSettingsContent.iterator()
+        while (iterator.hasNext()) {
+            val view = iterator.next()
+            if (view !is Searchable) {
+                iterator.remove()
+            }
+        }
+    }
+
     private fun applySearchResults(searchResults: Set<UUID>?) {
+        removeHeaders()
+
         binding.includeSettings.searchableSettingsContent.children.forEach {
             it.updateSearchStatus(searchResults)
         }
@@ -254,9 +268,9 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     val searchableView = it as Searchable
                     searchableView.searchableId == result
                 }
-            }.map {
-                settingsPlugins.findNodesById(it)
-            }.flatten()
+            }.mapNotNull {
+                settingsPlugins.findNodeAndParentById(it)
+            }
 
             hitNestedPlugins.forEach { foundNode ->
                 val view = foundNode.node.getView(this)
@@ -265,7 +279,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                 }
 
                 if (!binding.includeSettings.searchableSettingsContent.contains(view)) {
-                    // Find the parent view
                     val parentView = foundNode.parent?.let { parent ->
                         binding.includeSettings.searchableSettingsContent.children.find {
                             (it as Searchable).searchableId == parent.id
@@ -273,32 +286,65 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     }
 
                     if (parentView != null) {
-                        // If parent is found, insert the child right after it
                         val parentIndex = binding.includeSettings.searchableSettingsContent.indexOfChild(parentView)
                         binding.includeSettings.searchableSettingsContent.addView(view, parentIndex + 1)
                     } else {
-                        // If no parent found, add to the end
                         binding.includeSettings.searchableSettingsContent.addView(view)
                     }
                 }
             }
 
-            // Clean up
+            // clean up
             binding.includeSettings.searchableSettingsContent.children.filter { view ->
                 val searchableView = view as Searchable
-                val foundNodes = settingsPlugins.findNodesById(searchableView.searchableId)
-                foundNodes.any { it.node !is RootSettingsNode && !searchResults.contains(searchableView.searchableId) }
+                val plugin = settingsPlugins.findNodeAndParentById(searchableView.searchableId)?.node
+                plugin !is RootSettingsNode && !searchResults.contains(searchableView.searchableId)
             }.forEach {
                 binding.includeSettings.searchableSettingsContent.removeView(it)
             }
         } else {
-            // Clean up
+            // clean up
             binding.includeSettings.searchableSettingsContent.children.filter { view ->
                 val searchableView = view as Searchable
-                val foundNodes = settingsPlugins.findNodesById(searchableView.searchableId)
-                foundNodes.any { it.node !is RootSettingsNode }
+                val plugin = settingsPlugins.findNodeAndParentById(searchableView.searchableId)?.node
+                plugin !is RootSettingsNode
             }.forEach {
                 binding.includeSettings.searchableSettingsContent.removeView(it)
+            }
+        }
+        addHeaders(searchResults)
+    }
+
+    private fun addHeaders(searchResults: Set<UUID>?) {
+        var previousTitleRes: Int? = null
+        val iterator = binding.includeSettings.searchableSettingsContent.children.iterator().withIndex()
+        while (iterator.hasNext()) {
+            val indexedValue = iterator.next()
+            val view = indexedValue.value
+            val index = indexedValue.index
+            if (view !is Searchable) {
+                continue
+            }
+            val searchableView = view as Searchable
+            val plugin = settingsPlugins.findNodeAndParentById(searchableView.searchableId)!!.node
+            if (searchResults != null && !searchResults.contains(plugin.id)) {
+                continue
+            }
+            val titleRes = plugin.categoryNameResId
+            if (index == 0) {
+                val header = SectionHeaderListItem(this)
+                header.setText(titleRes)
+                binding.includeSettings.searchableSettingsContent.addView(header, 0)
+                previousTitleRes = titleRes
+            } else if (previousTitleRes != titleRes) {
+                val header = SectionHeaderListItem(this)
+                header.setText(titleRes)
+                binding.includeSettings.searchableSettingsContent.addView(header, index)
+
+                val divider = HorizontalDivider(this)
+                binding.includeSettings.searchableSettingsContent.addView(divider, index)
+
+                previousTitleRes = titleRes
             }
         }
     }
@@ -379,17 +425,21 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         val node: SettingsNode,
     )
 
-    private fun Collection<SettingsNode>.findNodesById(id: UUID): List<FoundNode> {
+    private fun Collection<SettingsNode>.findNodeAndParentById(id: UUID): FoundNode? {
         fun findRecursively(
             node: SettingsNode,
             parent: SettingsNode?
-        ): List<FoundNode> =
+        ): FoundNode? =
             when {
-                node.id == id -> listOf(FoundNode(parent, node))
-                else -> node.children.flatMap { findRecursively(it, node) }
+                node.id == id -> FoundNode(parent, node)
+                else -> node.children.asSequence()
+                    .mapNotNull { findRecursively(it, node) }
+                    .firstOrNull()
             }
 
-        return this.flatMap { findRecursively(it, null) }
+        return this.asSequence()
+            .mapNotNull { findRecursively(it, null) }
+            .firstOrNull()
     }
 
     private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {

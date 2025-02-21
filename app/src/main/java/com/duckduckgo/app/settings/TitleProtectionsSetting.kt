@@ -44,8 +44,6 @@ import dagger.android.support.AndroidSupportInjection
 import java.util.UUID
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(0)
 class TitleProtectionsSettingNode @Inject constructor() : RootSettingsNode {
     override val categoryNameResId = R.string.settingsHeadingProtections
     override val children: List<SettingsNode> = emptyList()
