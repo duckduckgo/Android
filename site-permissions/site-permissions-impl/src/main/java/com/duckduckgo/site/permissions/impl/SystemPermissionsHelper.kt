@@ -73,7 +73,8 @@ class SystemPermissionsHelperImpl @Inject constructor(
         }
 
         multiplePermissionsLauncher = caller.registerForActivityResult(RequestMultiplePermissions()) {
-            onResultMultiplePermissionsRequest(it)
+            val permissionsRequestResult = optimiseLocationPermissions(it)
+            onResultMultiplePermissionsRequest(permissionsRequestResult)
         }
     }
 
@@ -97,4 +98,15 @@ class SystemPermissionsHelperImpl @Inject constructor(
 
     override fun isPermissionsRejectedForever(activity: Activity): Boolean =
         currentPermissionRequested?.let { !ActivityCompat.shouldShowRequestPermissionRationale(activity, it) } ?: true
+
+    private fun optimiseLocationPermissions(permissionsRequestedResult: Map<String, Boolean>): Map<String, Boolean> {
+        val locationPermissions = setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+
+        return if (permissionsRequestedResult.keys == locationPermissions) {
+            // For location permissions request, it is enough for the user to grant access to approximate location
+            mapOf(Manifest.permission.ACCESS_COARSE_LOCATION to permissionsRequestedResult.getValue(Manifest.permission.ACCESS_COARSE_LOCATION))
+        } else {
+            permissionsRequestedResult
+        }
+    }
 }

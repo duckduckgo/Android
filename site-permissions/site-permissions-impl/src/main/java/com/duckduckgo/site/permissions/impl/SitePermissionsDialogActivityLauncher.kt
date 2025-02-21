@@ -448,19 +448,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun onResultMultipleSystemPermissionsRequest(grantedPermissions: Map<String, Boolean>) {
-        val locationPermissions = setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-
-        val permissionsGranted = if (grantedPermissions.keys == locationPermissions) {
-            // For location permissions request, it is enough for the user to grant access to approximate location
-            grantedPermissions.getValue(Manifest.permission.ACCESS_COARSE_LOCATION)
-        } else {
-            !grantedPermissions.containsValue(false)
-        }
-
-        if (permissionsGranted) {
-            systemPermissionGranted()
-        } else {
+        if (grantedPermissions.values.contains(false)) {
             systemPermissionDenied()
+        } else {
+            systemPermissionGranted()
         }
     }
 
