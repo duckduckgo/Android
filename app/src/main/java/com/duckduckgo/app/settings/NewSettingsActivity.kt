@@ -45,7 +45,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScree
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
@@ -66,7 +65,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -168,10 +166,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        with(viewsMain) {
-            includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
-        }
-
         with(viewsNextSteps) {
             addWidgetToHomeScreenSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             addressBarPositionSetting.setOnClickListener { viewModel.onChangeAddressBarPositionClicked() }
@@ -397,7 +391,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
-            is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
             is LaunchFeedback -> launchFeedback()

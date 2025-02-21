@@ -32,7 +32,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScree
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAppearanceScreen
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
@@ -85,7 +84,6 @@ class NewSettingsViewModel @Inject constructor(
     sealed class Command {
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
-        data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchFeedback : Command()
@@ -149,10 +147,6 @@ class NewSettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-
-    fun onDuckChatSettingClicked() {
-        viewModelScope.launch { command.send(LaunchDuckChatScreen) }
     }
 
     fun onShareFeedbackClicked() {
