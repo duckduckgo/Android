@@ -225,7 +225,7 @@
     <string name="netpCustomDnsSettingText">DNS-kiszolgáló</string>
     <string name="netpPrivateDns">Privát DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (rosszindulatú programok blokkolása)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (kockázatos domainek blokkolása)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (ajánlott)</string>
     <string name="netpCustomDnsCustom">Egyéni</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-cím</string>
@@ -236,8 +236,10 @@
     <string name="netpDdgDnsByLine">A DuckDuckGo a saját DNS-kiszolgálóin keresztül irányítja át a DNS-lekérdezéseket, így az internetszolgáltatód nem láthatja, hogy milyen webhelyeket látogatsz meg.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Rosszindulatú programok blokkolása</string>
-    <string name="netpDnsBlockMalwareByline">Rosszindulatú programok blokkolása DNS-szintű tiltólistával. Ha egy weboldal nem töltődik be, próbálkozz azzal, hogy kikapcsolod a blokkolást.</string>
+    <string name="netpDnsBlockMalwareHeader">Tartalom blokkolása és szűrése</string>
+    <string name="netpDnsBlockMalwarePrimary">Kockázatos domainek blokkolása</string>
+    <string name="netpDnsBlockMalwareByline">Több mint 150 000 olyan domaint blokkolhatsz DNS-szintű tiltólistával, amelyeket rosszindulatú programok terjesztésével, adathalász támadásokkal és online csalásokkal hoztak kapcsolatba. <annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS tiltólisták</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Szeretnéd kizárni a VPN-ekkel nem kompatibilis alkalmazásokat?</string>
