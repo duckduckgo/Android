@@ -34,8 +34,9 @@ import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command
 import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.PrivateSearchSettingViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingNodeView
+import com.duckduckgo.common.ui.settings.SettingViewModel
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint

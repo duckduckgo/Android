@@ -31,8 +31,7 @@ import com.duckduckgo.app.browser.databinding.ActivityPrivateSearchBinding
 import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope

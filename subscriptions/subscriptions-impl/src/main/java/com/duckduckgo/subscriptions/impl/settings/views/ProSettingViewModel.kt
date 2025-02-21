@@ -17,42 +17,45 @@
 package com.duckduckgo.subscriptions.impl.settings.views
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion
-import javax.inject.Inject
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
+    private val subscriptions: Subscriptions,
     private val subscriptionsManager: SubscriptionsManager,
+    private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
-) : ViewModel(), DefaultLifecycleObserver {
+) : SettingViewModel<Command, ViewState>(ViewState())  {
 
     sealed class Command {
         data object OpenSettings : Command()
@@ -60,17 +63,15 @@ class ProSettingViewModel @Inject constructor(
         data object OpenRestoreScreen : Command()
     }
 
-    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-    internal fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(
+        val visible: Boolean = false,
         val status: SubscriptionStatus = UNKNOWN,
         val region: SubscriptionRegion? = null,
     ) {
         enum class SubscriptionRegion { US, ROW }
     }
 
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    private val appTPPollJob = ConflatedJob()
 
     fun onSettings() {
         sendCommand(OpenSettings)
@@ -83,6 +84,12 @@ class ProSettingViewModel @Inject constructor(
     fun onRestore() {
         pixelSender.reportAppSettingsRestorePurchaseClick()
         sendCommand(OpenRestoreScreen)
+    }
+
+    override fun getSearchMissViewState(): ViewState {
+        return ViewState(
+            visible = false,
+        )
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -100,9 +107,32 @@ class ProSettingViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun sendCommand(newCommand: Command) {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         viewModelScope.launch {
-            command.send(newCommand)
+            _viewState.update {
+                it.copy(
+                    visible = subscriptions.isEligible()
+                )
+            }
         }
+        startPollingSubscriptionEligibility()
+    }
+
+    private fun startPollingSubscriptionEligibility() {
+        appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
+            while (isActive) {
+                _viewState.update {
+                    it.copy(
+                        visible = subscriptions.isEligible()
+                    )
+                }
+                delay(1_000)
+            }
+        }
+    }
+
+    private fun sendCommand(newCommand: Command) {
+        _commands.trySend(newCommand)
     }
 }

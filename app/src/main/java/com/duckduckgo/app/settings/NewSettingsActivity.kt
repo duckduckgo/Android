@@ -42,11 +42,9 @@ import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
-import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
-import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
@@ -76,12 +74,12 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SearchStatus
-import com.duckduckgo.common.ui.SearchStatus.HIT
-import com.duckduckgo.common.ui.Searchable
-import com.duckduckgo.common.ui.SearchableTag
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SearchStatus
+import com.duckduckgo.common.ui.settings.SearchStatus.HIT
+import com.duckduckgo.common.ui.settings.Searchable
+import com.duckduckgo.common.ui.settings.SearchableTag
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -281,7 +279,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
-                    updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -414,9 +411,10 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 val layoutTransition = LayoutTransition()
                 layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
+                layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
+                layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
                 layoutTransition.enableTransitionType(LayoutTransition.CHANGE_APPEARING)
                 layoutTransition.enableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
-                layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
                 binding.includeSettings.searchableSettingsContent.layoutTransition = layoutTransition
                 return true
             }
@@ -445,15 +443,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             }
 
         return this.asSequence().mapNotNull { findRecursively(it) }.firstOrNull()
-    }
-
-    private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {
-        if (isPrivacyProEnabled) {
-            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = Daily())
-            viewsPro.show()
-        } else {
-            viewsPro.gone()
-        }
     }
 
     private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {

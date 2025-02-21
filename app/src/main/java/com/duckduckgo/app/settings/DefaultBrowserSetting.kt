@@ -35,8 +35,10 @@ import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command
 import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingNodeView
+import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope

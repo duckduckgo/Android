@@ -29,8 +29,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSettingsTitleProtectionsBinding
 import com.duckduckgo.app.settings.SetAsDefaultBrowserSettingViewModel.Command
 import com.duckduckgo.app.settings.TitleProtectionsSettingViewModel.ViewState
-import com.duckduckgo.common.ui.RootSettingsNode
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingNodeView
+import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding

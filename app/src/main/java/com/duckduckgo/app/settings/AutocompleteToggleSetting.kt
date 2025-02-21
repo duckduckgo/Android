@@ -37,7 +37,9 @@ import com.duckduckgo.app.settings.PrivateSearchAutocompleteSettingViewModel.Com
 import com.duckduckgo.app.settings.PrivateSearchAutocompleteSettingViewModel.ViewState
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.SettingsNode
+import com.duckduckgo.common.ui.settings.SettingNodeView
+import com.duckduckgo.common.ui.settings.SettingViewModel
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory

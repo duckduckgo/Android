@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui
+package com.duckduckgo.common.ui.settings
 
 import android.content.Context
 import android.view.View
-import androidx.annotation.StringRes
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.di.scopes.AppScope
 import java.util.UUID
 

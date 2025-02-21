@@ -19,6 +19,8 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.common.ui.settings.RootSettingsNode
+import com.duckduckgo.common.ui.settings.SettingsNode
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
@@ -31,6 +33,7 @@ import com.duckduckgo.subscriptions.impl.settings.views.LegacyProSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.UUID
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
@@ -44,14 +47,21 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(500)
-class ProSettings @Inject constructor(private val settingsPageFeature: SettingsPageFeature) : ProSettingsPlugin {
+@PriorityKey(3)
+class PrivacyProSettingNode @Inject constructor() : RootSettingsNode {
+    override val categoryNameResId = R.string.privacyPro
+    override val children: List<SettingsNode> = emptyList()
+    override val id: UUID = UUID.randomUUID()
+
     override fun getView(context: Context): View {
-        return if (settingsPageFeature.newPrivacyProSection().isEnabled()) {
-            ProSettingView(context)
-        } else {
-            LegacyProSettingView(context)
-        }
+        return ProSettingView(context, searchableId = id)
+    }
+
+    override fun generateKeywords(): Set<String> {
+        return setOf(
+            "vpn", "subscription", "removal", "privacy", "pro",
+            "privacy pro", "itr", "pir", "theft", "information", "identity", "restoration",
+        )
     }
 }
 

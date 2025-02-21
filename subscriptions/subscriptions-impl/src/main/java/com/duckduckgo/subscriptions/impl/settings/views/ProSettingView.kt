@@ -27,6 +27,10 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.common.ui.settings.SettingNodeView
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -58,13 +62,16 @@ import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.UUID
 
+@SuppressLint("ViewConstructor")
 @InjectWith(ViewScope::class)
 class ProSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+    searchableId: UUID,
+) : SettingNodeView<Command, ViewState, ProSettingViewModel>(context, attrs, defStyle, searchableId) {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -77,28 +84,13 @@ class ProSettingView @JvmOverloads constructor(
 
     private val binding: ViewSettingsBinding by viewBinding()
 
-    private val viewModel: ProSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingViewModel::class.java]
+    override fun provideViewModel(): ProSettingViewModel {
+        return ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingViewModel::class.java]
     }
-
-    private var job: ConflatedJob = ConflatedJob()
-    private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
-
-        val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
-
-        job += viewModel.commands()
-            .onEach { processCommands(it) }
-            .launchIn(coroutineScope!!)
-
-        conflatedStateJob += viewModel.viewState
-            .onEach { renderView(it) }
-            .launchIn(coroutineScope!!)
 
         binding.subscriptionSetting.setOnClickListener(null)
         binding.subscriptionSetting.setOnTouchListener(null)
@@ -122,15 +114,14 @@ class ProSettingView @JvmOverloads constructor(
         }
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        job.cancel()
-        conflatedStateJob.cancel()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
-    private fun renderView(viewState: ViewState) {
+    override fun renderView(viewState: ViewState) {
+        if (viewState.visible) {
+            binding.root.show()
+            // TODO send "m_privacy-pro_is-enabled" pixel
+        } else {
+            binding.root.gone()
+        }
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
                 with(binding) {
@@ -187,7 +178,7 @@ class ProSettingView @JvmOverloads constructor(
         }
     }
 
-    private fun processCommands(command: Command) {
+    override fun processCommands(command: Command) {
         when (command) {
             is OpenSettings -> {
                 globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings
+package com.duckduckgo.common.ui.settings
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -25,17 +25,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.common.ui.SearchStatus
-import com.duckduckgo.common.ui.SearchStatus.MISS
-import com.duckduckgo.common.ui.SearchStatus.NONE
-import com.duckduckgo.common.ui.Searchable
+import com.duckduckgo.common.ui.settings.SearchStatus.MISS
+import com.duckduckgo.common.ui.settings.SearchStatus.NONE
 import com.duckduckgo.common.utils.ConflatedJob
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.SharingStarted.Companion
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
