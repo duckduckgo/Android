@@ -32,6 +32,26 @@
     "title" : "<b>VIRHE:</b> virheellinen videotunnus",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "blockedVideoErrorHeading" : {
+    "title" : "YouTube ei salli Duck Playerin ladata tätä videota.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "YouTube ei salli tämän videon katsomista YouTuben ulkopuolella.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Voit yhä katsoa tämän videon YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "YouTube estää tämän videon latautumisen. Jos käytät VPN:ää, kytke se pois päältä ja lataa tämä sivu uudelleen.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Jos tämä ei toimi, voit silti katsoa tämän videon YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
   "tooltipInfo" : {
     "title" : "Duck Player tarjoaa puhtaan katselukokemuksen ilman kohdennettuja mainoksia ja estää katseluhistoriaa vaikuttamasta YouTube-suosituksiisi."
   }

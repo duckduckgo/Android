@@ -32,6 +32,26 @@
     "title" : "<b>KLAIDA:</b> netinkamas vaizdo įrašo ID",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "blockedVideoErrorHeading" : {
+    "title" : "„YouTube“ neleidžia „Duck Player“ įkelti šio vaizdo įrašo",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "blockedVideoErrorMessage1" : {
+    "title" : "„YouTube“ neleidžia šio vaizdo įrašo žiūrėti ne „YouTube“ platformoje.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "blockedVideoErrorMessage2" : {
+    "title" : "Šį vaizdo įrašą vis dar gali žiūrėti „YouTube“, bet be papildomo „Duck Player“ privatumo.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "signInRequiredErrorMessage1" : {
+    "title" : "„YouTube“ blokuoja šio vaizdo įrašo įkėlimą. Jei naudoji VPN, pabandyk jį išjungti ir iš naujo įkelti šį puslapį.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2" : {
+    "title" : "Jei tai neveikia, vis tiek gali žiūrėti šį vaizdo įrašą „YouTube“, bet be papildomo „Duck Player“ privatumo.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
   "tooltipInfo" : {
     "title" : "„Duck Player“ užtikrina nepriekaištingą žiūrėjimo patirtį be suasmenintų reklamų ir neleidžia žiūrėjimo veiklai daryti įtakos „YouTube“ rekomendacijoms."
   }
