@@ -40,7 +40,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
-import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
@@ -51,7 +50,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatSc
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -174,7 +172,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         with(viewsMain) {
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
-            permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
@@ -220,7 +217,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         // when activity recreates (for example during theme change),
         // we need to clean up the cached search results because they are not pointing towards view IDs that are dead
         viewModel.onSearchQueryTextChange(null, emptyList())
-        assignSearchKeywords()
     }
 
     private fun configureInternalFeatures() {
@@ -318,35 +314,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
         searchableView.setSearchStatus(status)
     }
 
-    private fun assignSearchKeywords() {
-        // viewsMain.syncSetting.assignSearchKeywords(setOf(
-        //     "sync", "backup", "cloud", "restore",
-        //     "account", "data", "transfer", "storage",
-        //     "link", "synchronize", "upload", "download"
-        // ))
-        //
-        // viewsMain.autofillLoginsSetting.assignSearchKeywords(setOf(
-        //     "password", "login", "autofill", "credentials",
-        //     "manager", "security", "vault", "biometric",
-        //     "2fa", "two-factor", "authentication", "fingerprint",
-        //     "face recognition", "secure", "protection"
-        // ))
-        //
-        // viewsMain.accessibilitySetting.assignSearchKeywords(setOf(
-        //     "accessibility", "font", "font size", "zoom",
-        //     "readability", "contrast", "display",
-        //     "dyslexia", "vision", "screen reader", "text", "text size", "size",
-        //     "high contrast", "magnifier", "voiceover", "assistive"
-        // ))
-        //
-        // viewsMain.appearanceSetting.assignSearchKeywords(setOf(
-        //     "theme", "dark", "light", "night", "day",
-        //     "color", "palette", "UI", "interface",
-        //     "customization", "scheme", "appearance",
-        //     "text", "font", "mode", "style", "layout", "design"
-        // ))
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.settings_menu, menu)
 
@@ -434,7 +401,6 @@ class NewSettingsActivity : DuckDuckGoActivity() {
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchFireButtonScreen -> launchScreen(FireButtonScreenNoParams)
-            is LaunchPermissionsScreen -> launchScreen(PermissionsScreenNoParams)
             is LaunchDuckChatScreen -> launchScreen(DuckChatSettingsNoParams)
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)

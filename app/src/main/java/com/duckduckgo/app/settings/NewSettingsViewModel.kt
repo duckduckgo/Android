@@ -29,7 +29,6 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_FIRE_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_ADDRESS_BAR
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_NEXT_STEPS_VOICE_SEARCH
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -38,7 +37,6 @@ import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchDuckChatSc
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchOtherPlatforms
-import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPermissionsScreen
 import com.duckduckgo.app.settings.NewSettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.settings.SearchableTag
@@ -90,7 +88,6 @@ class NewSettingsViewModel @Inject constructor(
         data object LaunchAccessibilitySettings : Command()
         data object LaunchAddHomeScreenWidget : Command()
         data object LaunchFireButtonScreen : Command()
-        data object LaunchPermissionsScreen : Command()
         data object LaunchDuckChatScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
@@ -160,11 +157,6 @@ class NewSettingsViewModel @Inject constructor(
     fun onFireButtonSettingClicked() {
         viewModelScope.launch { command.send(LaunchFireButtonScreen) }
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
-    }
-
-    fun onPermissionsSettingClicked() {
-        viewModelScope.launch { command.send(LaunchPermissionsScreen) }
-        pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
     }
 
     fun onDuckChatSettingClicked() {

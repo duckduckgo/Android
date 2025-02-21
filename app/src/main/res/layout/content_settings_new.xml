@@ -86,12 +86,7 @@
 
             <include layout="@layout/content_setting_accessibility" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/permissionsSetting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/settingsPermissionsSetting"
-                app:leadingIcon="@drawable/ic_lock_color_24"/>
+            <include layout="@layout/content_setting_permissions" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/fireButtonSetting"
