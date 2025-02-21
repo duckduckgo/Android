@@ -69,6 +69,8 @@ class Omnibar(
     private val binding: FragmentBrowserTabBinding,
 ) {
 
+    private val scrollThreshold = 200
+
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
@@ -363,24 +365,28 @@ class Omnibar(
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 
+    fun onScrollChanged(scrollY: Int) {
+        val scrollRatio = (scrollY.toFloat() / scrollThreshold).coerceIn(0f, 1f)
+        fadeToolbar(1f - scrollRatio)
+        fadeMinibar(scrollRatio)
+
+        // Calculate the new height for the AppBarLayout
+        val toolbarHeight = toolbar.height
+        val textHeight = newOmnibar.minibar.height
+        val newHeight = (toolbarHeight * (1f - scrollRatio) + textHeight * scrollRatio).toInt()
+
+        // Update the AppBarLayout's height
+        val layoutParams = newOmnibar.layoutParams
+        layoutParams.height = newHeight
+        newOmnibar.layoutParams = layoutParams
+    }
+
     fun fadeToolbar(alpha: Float) {
         newOmnibar.toolbarContainer.alpha = alpha
         if (alpha == 0f) {
             newOmnibar.toolbarContainer.isVisible = false
-        } else if (alpha == 1f) {
+        } else if (!newOmnibar.toolbarContainer.isVisible) {
             newOmnibar.toolbarContainer.isVisible = true
-        }
-    }
-
-    fun animateToolbarVisibility(visible: Boolean, duration: Long = 200) {
-        if (visible) {
-            if (!newOmnibar.toolbarContainer.isVisible) {
-                newOmnibar.toolbarContainer.fadeIn(duration)
-            }
-        } else {
-            if (newOmnibar.toolbarContainer.isVisible) {
-                newOmnibar.toolbarContainer.isVisible = false
-            }
         }
     }
 
@@ -388,20 +394,8 @@ class Omnibar(
         newOmnibar.minibar.alpha = alpha
         if (alpha == 0f) {
             newOmnibar.minibar.isVisible = false
-        } else if (alpha == 1f) {
+        } else if (!newOmnibar.minibar.isVisible) {
             newOmnibar.minibar.isVisible = true
-        }
-    }
-
-    fun animateMinibarVisibility(visible: Boolean, duration: Long = 200) {
-        if (visible) {
-            if (!newOmnibar.minibar.isVisible) {
-                newOmnibar.minibar.fadeIn(duration)
-            }
-        } else {
-            if (newOmnibar.minibar.isVisible) {
-                newOmnibar.minibar.isVisible = false
-            }
         }
     }
 

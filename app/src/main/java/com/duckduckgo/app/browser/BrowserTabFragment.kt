@@ -585,10 +585,6 @@ class BrowserTabFragment :
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
 
-    private var previousScrollY: Int = 0
-    private val scrollThreshold: Int = 200
-    private val minScrollForToolbarFadeIn = 50
-
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
 
@@ -2124,47 +2120,6 @@ class BrowserTabFragment :
         appLinksSnackBar = null
     }
 
-    private fun updateViewVisibility(scrollY: Int) {
-        val dy = scrollY - previousScrollY
-        previousScrollY = scrollY
-
-        val scrollRatio = scrollY.toFloat() / scrollThreshold
-
-        when {
-            scrollY == 0 -> {
-                // Top of the page: full toolbar, no text
-                omnibar.animateToolbarVisibility(true)
-                omnibar.animateMinibarVisibility(false)
-            }
-            else -> {
-                // Any scrolling: fade out toolbar and fade in text
-                if (dy < 0) {
-                    // Scrolling up
-                    var toolbarAlpha = if (scrollY > minScrollForToolbarFadeIn) {
-                        scrollRatio
-                    } else {
-                        0f
-                    }
-
-                    var minibarAlpha = if (scrollY > minScrollForToolbarFadeIn) {
-                        1f
-                    } else {
-                        scrollRatio
-                    }
-
-                    omnibar.fadeToolbar(toolbarAlpha)
-                    omnibar.fadeMinibar(minibarAlpha)
-                } else {
-                    // Scrolling down
-                    omnibar.fadeToolbar(0f)
-                    omnibar.fadeMinibar(1f)
-                }
-                // omnibar.animateToolbarVisibility(false)
-                // omnibar.animateMinibarVisibility(true)
-            }
-        }
-    }
-
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
@@ -2693,7 +2648,7 @@ class BrowserTabFragment :
             }
 
             it.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-                updateViewVisibility(scrollY)
+                omnibar.onScrollChanged(scrollY)
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
