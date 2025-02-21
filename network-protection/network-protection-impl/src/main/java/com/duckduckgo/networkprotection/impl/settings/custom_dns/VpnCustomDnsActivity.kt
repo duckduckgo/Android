@@ -51,6 +51,7 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsAct
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.Event.OnBlockMalwareEnabled
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.CustomDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.DefaultDns
+import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.DefaultDnsNoBlockMalware
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.Done
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen.Default
 import javax.inject.Inject
@@ -183,6 +184,18 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 binding.blockMalwareToggle.quietlySetIsChecked(state.blockMalware, blockMalwareToggleListener)
             }
 
+            is DefaultDnsNoBlockMalware -> {
+                handleAllowChange(state.allowChange)
+
+                binding.defaultDnsOption.quietlySetIsChecked(true, defaultDnsListener)
+                binding.defaultDnsDescription.isEnabled = true
+                binding.defaultDnsDescription.show()
+
+                binding.customDns.removeTextChangedListener(customDnsTextWatcher)
+                binding.customDns.isEditable = false
+                binding.customDnsSection.gone()
+                binding.blockMalwareSection.gone()
+            }
             is CustomDns -> {
                 handleAllowChange(state.allowChange)
                 binding.defaultDnsDescription.gone()
@@ -274,6 +287,10 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
         data class DefaultDns(
             val allowChange: Boolean,
             val blockMalware: Boolean,
+        ) : State()
+
+        data class DefaultDnsNoBlockMalware(
+            val allowChange: Boolean,
         ) : State()
 
         data class CustomDns(
