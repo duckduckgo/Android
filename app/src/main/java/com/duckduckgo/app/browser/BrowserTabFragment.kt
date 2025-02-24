@@ -878,7 +878,11 @@ class BrowserTabFragment :
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
-                    viewModel.onStop(isVisible)
+                    if (isVisible) {
+                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
+                            updateOrDeleteWebViewPreview()
+                        }
+                    }
                 }
             },
         )
@@ -890,6 +894,16 @@ class BrowserTabFragment :
 
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview() {
+        val url = viewModel.url
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            viewModel.deleteTabPreview(tabId)
+        } else {
+            generateWebViewPreviewImage()
         }
     }
 
