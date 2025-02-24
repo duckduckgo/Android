@@ -259,7 +259,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }.launchIn(lifecycleScope)
 
         if (savedInstanceState == null && params.url == BUY_URL) {
-            pixelSender.reportOfferScreenShown()
+            viewModel.paywallShown()
         }
     }
 
