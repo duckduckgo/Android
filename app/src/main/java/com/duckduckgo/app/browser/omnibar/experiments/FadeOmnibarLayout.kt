@@ -18,13 +18,16 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 
@@ -35,7 +38,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
 
-    internal val minibar: DaxTextView by lazy { findViewById(R.id.newOmnibarDomain) }
+    private val minibar: View by lazy { findViewById(R.id.minibar) }
+    private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
 
     private val scrollThreshold = 200
 
@@ -46,21 +50,19 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             OmnibarPosition.entries[attr.getInt(R.styleable.FadeOmnibarLayout_omnibarPosition, 0)]
 
         val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_new_omnibar_bottom
+            R.layout.view_fade_omnibar_bottom
         } else {
-            R.layout.view_new_omnibar
+            R.layout.view_fade_omnibar
         }
         inflate(context, layout, this)
 
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-    }
+    override fun render(viewState: ViewState) {
+        super.render(viewState)
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
+        minibarText.text = viewState.url.extractDomain()
     }
 
     fun onScrollChanged(scrollY: Int) {

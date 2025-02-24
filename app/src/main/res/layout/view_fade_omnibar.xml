@@ -26,18 +26,49 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
-        android:elevation="2dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface">
+        android:layout_height="wrap_content"
+        android:background="?daxColorSurface">
+
+        <LinearLayout
+            android:id="@+id/minibar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingHorizontal="@dimen/keyline_4">
+
+            <ImageView
+                android:id="@+id/minibarShield"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_shield_exploration" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/minibarText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_1"
+                app:typography="body1"
+                android:gravity="center"
+                android:visibility="visible"
+                android:text="domain.com"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorSurface"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
+            android:background="?attr/daxColorSurface"
             android:layout_marginHorizontal="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
@@ -97,8 +128,8 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
-                        app:srcCompat="@drawable/ic_ddg_logo"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_ddg_logo" />
 
                     <ImageView
                         android:id="@+id/duckPlayerIcon"
@@ -107,8 +138,8 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:padding="@dimen/keyline_1"
-                        app:srcCompat="@drawable/ic_duckplayer"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_duckplayer" />
 
                     <ImageView
                         android:id="@+id/searchIcon"
@@ -146,8 +177,8 @@
                         android:id="@+id/placeholder"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
+                        android:layout_gravity="center"
                         android:layout_marginEnd="@dimen/keyline_1"
-                        android:gravity="center"
                         android:visibility="invisible" />
 
                 </FrameLayout>
@@ -157,8 +188,8 @@
                     android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
                     android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
                     android:layout_gravity="start|center_vertical"
-                    android:layout_marginStart="2dp"
                     android:alpha="0"
+                    android:layout_marginStart="2dp"
                     android:background="@drawable/cookies_dummy_background"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@id/omniBarContainer"
@@ -169,8 +200,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
-                    android:layout_marginStart="2dp"
                     android:saveEnabled="false"
+                    android:layout_marginStart="2dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@id/omniBarContainer"
                     app:layout_constraintTop_toTopOf="parent"
@@ -209,21 +240,21 @@
                     android:contentDescription="@string/voiceSearchIconContentDescription"
                     android:padding="@dimen/toolbarIconPadding"
                     android:visibility="gone"
-                    tools:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/spacer"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_microphone_24" />
+                    app:srcCompat="@drawable/ic_microphone_24"
+                    tools:visibility="visible" />
 
                 <View
                     android:id="@+id/spacer"
                     android:layout_width="10dp"
                     android:layout_height="0dp"
-                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton"
+                    android:importantForAccessibility="no"
                     app:layout_constraintBottom_toBottomOf="@id/voiceSearchButton"
                     app:layout_constraintEnd_toEndOf="@id/voiceSearchButton"
                     app:layout_constraintStart_toStartOf="@id/clearTextButton"
-                    android:importantForAccessibility="no"/>
+                    app:layout_constraintTop_toTopOf="@id/voiceSearchButton" />
 
                 <ImageView
                     android:id="@+id/clearTextButton"
@@ -251,9 +282,9 @@
             android:layout_height="4dp"
             android:progressDrawable="@drawable/loading_progress"
             android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:progress="50"
             tools:visibility="visible" />
 
@@ -332,5 +363,4 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </merge>

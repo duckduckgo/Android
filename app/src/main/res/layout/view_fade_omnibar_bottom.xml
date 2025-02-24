@@ -31,6 +31,38 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorSurface">
 
+        <LinearLayout
+            android:id="@+id/minibar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingHorizontal="@dimen/keyline_4">
+
+            <ImageView
+                android:id="@+id/minibarShield"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/browserPopupMenu"
+                android:src="@drawable/ic_shield_exploration" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/minibarText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_1"
+                app:typography="body1"
+                android:gravity="center"
+                android:visibility="visible"
+                android:text="domain.com"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
