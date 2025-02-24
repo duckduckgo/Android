@@ -36,10 +36,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 
 fun fakeAutofillStore(
-    secureStorage: SecureStorage = FakeSecureStore(
-        canAccessSecureStorage = true,
-        urlMatcher = autofillDomainNameUrlMatcher(),
-    ),
+    secureStorage: SecureStorage = fakeStorage(),
     lastUpdatedTimeProvider: LastUpdatedTimeProvider = lastUpdatedTimeProvider(),
     autofillPrefsStore: AutofillPrefsStore,
     autofillUrlMatcher: AutofillUrlMatcher = autofillDomainNameUrlMatcher(),
@@ -59,6 +56,14 @@ fun fakeAutofillStore(
         coroutineScope,
     ),
     autofillFeature = autofillFeature,
+)
+
+fun fakeStorage(
+    canAccessSecureStorage: Boolean = true,
+    urlMatcher: AutofillUrlMatcher = autofillDomainNameUrlMatcher(),
+) = FakeSecureStore(
+    canAccessSecureStorage = canAccessSecureStorage,
+    urlMatcher = urlMatcher,
 )
 
 fun lastUpdatedTimeProvider() = object : LastUpdatedTimeProvider {
