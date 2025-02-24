@@ -221,16 +221,6 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onShareSelectedTabs() {
-        val selectedTabs = (selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.selectedTabs ?: emptyList()
-        if (selectedTabs.size == 1) {
-            command.value = Command.ShareLink(
-                link = tabs.value?.firstOrNull { it.tabId == selectedTabs.first() }?.url ?: "",
-                title = tabs.value?.firstOrNull { it.tabId == selectedTabs.first() }?.title ?: "",
-            )
-        } else if (selectedTabs.size > 1) {
-            val links = tabs.value?.filter { it.tabId in selectedTabs }?.mapNotNull { it.url }
-            command.value = Command.ShareLinks(links ?: emptyList())
-        }
     }
 
     fun onBookmarkSelectedTabs() {
