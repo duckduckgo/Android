@@ -125,7 +125,7 @@ class TabSwitcherAdapter(
         return View.OnClickListener {
             val position = bindingAdapterPosition()
             if (position != RecyclerView.NO_POSITION) {
-                tabSwitcherListener.onTabDeleted(position, false)
+                tabSwitcherListener.onTabDeleted(position = position, deletedBySwipe = false)
             }
         }
     }
@@ -274,7 +274,10 @@ class TabSwitcherAdapter(
             }
         }
         tabViewHolder.close.setOnClickListener(
-            createCloseClickListener(bindingAdapterPosition, itemClickListener),
+            createCloseClickListener(
+                bindingAdapterPosition = bindingAdapterPosition,
+                tabSwitcherListener = itemClickListener,
+            ),
         )
     }
 

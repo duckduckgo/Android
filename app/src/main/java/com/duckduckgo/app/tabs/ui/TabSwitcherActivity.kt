@@ -404,7 +404,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
             when (tab) {
                 is TabSwitcherItem.Tab -> {
-                    launch { viewModel.onMarkTabAsDeletable(tab.tabEntity, deletedBySwipe) }
+                    launch {
+                        viewModel.onMarkTabAsDeletable(
+                            tab = tab.tabEntity,
+                            swipeGestureUsed = deletedBySwipe,
+                        )
+                    }
                 }
             }
         }
