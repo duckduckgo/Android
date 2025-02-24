@@ -1608,9 +1608,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain) || currentBrowserViewState().maliciousSiteBlocked
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled, url = site?.url ?: "")
+            loadingViewState.value =
+                currentLoadingViewState().copy(
+                    trackersAnimationEnabled = !(privacyProtectionDisabled || currentBrowserViewState().maliciousSiteBlocked),
+                    url = site?.url ?: "",
+                )
         }
     }
 
@@ -1947,7 +1951,7 @@ class BrowserTabViewModel @Inject constructor(
                 )
                 loadingViewState.value = currentLoadingViewState().copy(
                     isLoading = true,
-                    privacyOn = true,
+                    trackersAnimationEnabled = true,
                     progress = 0,
                     url = url.toString(),
                 )
@@ -3286,7 +3290,7 @@ class BrowserTabViewModel @Inject constructor(
                     isLoading = false,
                     progress = 100,
                     url = url.toString(),
-                    privacyOn = false,
+                    trackersAnimationEnabled = false,
                 ),
             )
             browserViewState.postValue(
