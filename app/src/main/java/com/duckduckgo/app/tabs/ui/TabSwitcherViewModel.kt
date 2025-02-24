@@ -91,6 +91,8 @@ class TabSwitcherViewModel @Inject constructor(
     sealed class Command {
         data object Close : Command()
         data object CloseAllTabsRequest : Command()
+        data class ShareLink(val link: String, val title: String) : Command()
+        data class ShareLinks(val links: List<String>) : Command()
     }
 
     suspend fun onNewTabRequested(fromOverflowMenu: Boolean) {
@@ -146,10 +148,24 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED)
         }
+
+        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+            if (tab.tabId in selectionMode.selectedTabs) {
+                _selectionViewState.update {
+                    it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs - tab.tabId))
+                }
+            }
+        }
     }
 
     suspend fun undoDeletableTab(tab: TabEntity) {
         tabRepository.undoDeletable(tab)
+
+        (_selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.let { selectionMode ->
+            _selectionViewState.update {
+                it.copy(mode = SelectionViewState.Mode.Selection(selectionMode.selectedTabs + tab.tabId))
+            }
+        }
     }
 
     suspend fun purgeDeletableTabs() {
@@ -169,6 +185,16 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onShareSelectedTabs() {
+        val selectedTabs = (selectionViewState.value.mode as? SelectionViewState.Mode.Selection)?.selectedTabs ?: emptyList()
+        if (selectedTabs.size == 1) {
+            command.value = Command.ShareLink(
+                link = tabs.value?.firstOrNull { it.tabId == selectedTabs.first() }?.url ?: "",
+                title = tabs.value?.firstOrNull { it.tabId == selectedTabs.first() }?.title ?: "",
+            )
+        } else if (selectedTabs.size > 1) {
+            val links = tabs.value?.filter { it.tabId in selectedTabs }?.mapNotNull { it.url }
+            command.value = Command.ShareLinks(links ?: emptyList())
+        }
     }
 
     fun onBookmarkSelectedTabs() {
