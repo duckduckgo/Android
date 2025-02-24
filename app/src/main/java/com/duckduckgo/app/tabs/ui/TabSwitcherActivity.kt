@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -83,6 +84,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -430,6 +432,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is Close -> finishAfterTransition()
             is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
+            is Command.ShareLinks -> {
+                launchShareMultipleLinkChooser(command.links)
+            }
+
+            is Command.ShareLink -> {
+                launchShareLinkChooser(command.link, command.title)
+            }
         }
     }
 
@@ -482,6 +491,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
+            R.id.shareLinkMenuItem -> viewModel.onShareSelectedTabs()
+            R.id.bookmarkMenuItem -> viewModel.onBookmarkSelectedTabs()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true
@@ -616,6 +627,40 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
             .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
             .show()
+    }
+
+    private fun launchShareLinkChooser(
+        url: String,
+        title: String,
+    ) {
+        val intent = Intent(Intent.ACTION_SEND).also {
+            it.type = "text/plain"
+            it.putExtra(Intent.EXTRA_TEXT, url)
+            it.putExtra(Intent.EXTRA_SUBJECT, title)
+            it.putExtra(Intent.EXTRA_TITLE, title)
+        }
+        try {
+            startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
+    }
+
+    private fun launchShareMultipleLinkChooser(
+        urls: List<String>,
+    ) {
+        val title = getString(R.string.shareMultipleLinksTitle, urls.size)
+        val intent = Intent(Intent.ACTION_SEND).also {
+            it.type = "text/plain"
+            it.putExtra(Intent.EXTRA_TEXT, urls.mapIndexed { index, url -> "${index + 1}. $url" }.joinToString("\n"))
+            it.putExtra(Intent.EXTRA_SUBJECT, title)
+            it.putExtra(Intent.EXTRA_TITLE, title)
+        }
+        try {
+            startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
     }
 
     private fun closeAllTabs() {
