@@ -102,7 +102,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = ViewMode.Browser(null),
+        val viewMode: ViewMode = Browser(null),
         val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
         val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
         val hasFocus: Boolean = false,
@@ -126,7 +126,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-    )
+    ) {
+        fun shouldUpdateOmnibarText(): Boolean {
+            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
+        }
+    }
 
     sealed class Command {
         data object CancelTrackersAnimation : Command()
@@ -179,7 +183,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.viewMode is Browser || it.viewMode is MaliciousSiteWarning
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText()
                 Timber.d("Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText")
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
