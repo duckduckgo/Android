@@ -17,6 +17,7 @@
 package com.duckduckgo.malicioussiteprotection.impl
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -24,6 +25,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
@@ -66,14 +68,30 @@ class MaliciousSiteProtectionFiltersUpdateWorker(
     scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class MaliciousSiteProtectionFiltersUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature,
 
-) : PrivacyConfigCallbackPlugin {
+) : PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
+
+    override fun onCreate(owner: LifecycleOwner) {
+        enqueuePeriodicWork()
+    }
 
     override fun onPrivacyConfigDownloaded() {
+        enqueuePeriodicWork()
+    }
+
+    private fun enqueuePeriodicWork() {
+        if (maliciousSiteProtectionFeature.isFeatureEnabled().not() || maliciousSiteProtectionFeature.canUpdateDatasets().not()) {
+            workManager.cancelUniqueWork(MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG)
+            return
+        }
         val workerRequest = PeriodicWorkRequestBuilder<MaliciousSiteProtectionFiltersUpdateWorker>(
             maliciousSiteProtectionFeature.getFilterSetUpdateFrequency(),
             TimeUnit.MINUTES,
@@ -83,7 +101,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerScheduler @Inject constructor(
             .build()
         workManager.enqueueUniquePeriodicWork(
             MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workerRequest,
         )
     }
