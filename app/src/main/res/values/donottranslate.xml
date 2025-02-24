@@ -81,10 +81,12 @@
     <string name="experimentalUITitle">Enable visual design updates from O-A</string>
     <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
 
+    <!-- Tab switcher -->
     <string name="tabSwitcherFabNewTab">New Tab</string>
     <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links from DuckDuckGo</string>
     <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Share Link</item>
