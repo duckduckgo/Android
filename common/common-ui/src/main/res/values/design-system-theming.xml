@@ -27,7 +27,6 @@
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="preferDarkNavigationBarIcons">false</item>
         <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
-        <item name="useExperimentalOmnibar">false</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,

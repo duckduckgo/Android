@@ -20,11 +20,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/newOmnibar"
+    <!--    <com.duckduckgo.app.browser.omnibar.OmnibarLayout-->
+    <!--        android:id="@+id/newOmnibar"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        app:omnibarPosition="top" />-->
+
+    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
+        android:id="@+id/fadeOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:experimentalLayout="?attr/useExperimentalOmnibar"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -49,12 +54,12 @@
 
     <com.duckduckgo.app.browser.newtab.FocusedView
         android:id="@+id/focusedView"
-        android:elevation="4dp"
-        android:background="?attr/daxColorSurface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_scrollFlags="noScroll"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:background="?attr/daxColorSurface"
+        android:elevation="4dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_scrollFlags="noScroll" />
 
     <include
         android:id="@+id/includeNewBrowserTab"
@@ -134,11 +139,17 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
-        android:id="@+id/newOmnibarBottom"
+    <!--    <com.duckduckgo.app.browser.omnibar.OmnibarLayout-->
+    <!--        android:id="@+id/newOmnibarBottom"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="?attr/actionBarSize"-->
+    <!--        android:layout_gravity="bottom"-->
+    <!--        app:omnibarPosition="bottom" />-->
+
+    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
+        android:id="@+id/fadeOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:experimentalLayout="?attr/useExperimentalOmnibar"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

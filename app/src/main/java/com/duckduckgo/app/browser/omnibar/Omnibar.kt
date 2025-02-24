@@ -16,16 +16,13 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnScrollChangeListener
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
@@ -43,6 +40,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
+import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -66,19 +64,18 @@ import timber.log.Timber
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
+    val fadeBehaviourEnabled: Boolean,
     private val binding: FragmentBrowserTabBinding,
-) {
-
-    private val scrollThreshold = 200
+) : OnScrollChangeListener {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.rootView.removeView(binding.newOmnibarBottom)
+                binding.rootView.removeView(binding.fadeOmnibarBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(binding.newOmnibar)
+                binding.rootView.removeView(binding.fadeOmnibar)
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
@@ -143,14 +140,14 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: OmnibarLayout by lazy {
+    private val newOmnibar: FadeOmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.newOmnibar
+                binding.fadeOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.newOmnibarBottom
+                binding.fadeOmnibarBottom
             }
         }
     }
@@ -365,57 +362,15 @@ class Omnibar(
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 
-    fun onScrollChanged(scrollY: Int) {
-        val scrollRatio = (scrollY.toFloat() / scrollThreshold).coerceIn(0f, 1f)
-        fadeToolbar(1f - scrollRatio)
-        fadeMinibar(scrollRatio)
-
-        // Calculate the new height for the AppBarLayout
-        val toolbarHeight = toolbar.height
-        val textHeight = newOmnibar.minibar.height
-        val newHeight = (toolbarHeight * (1f - scrollRatio) + textHeight * scrollRatio).toInt()
-
-        // Update the AppBarLayout's height
-        val layoutParams = newOmnibar.layoutParams
-        layoutParams.height = newHeight
-        newOmnibar.layoutParams = layoutParams
-    }
-
-    fun fadeToolbar(alpha: Float) {
-        newOmnibar.toolbarContainer.alpha = alpha
-        if (alpha == 0f) {
-            newOmnibar.toolbarContainer.isVisible = false
-        } else if (!newOmnibar.toolbarContainer.isVisible) {
-            newOmnibar.toolbarContainer.isVisible = true
+    override fun onScrollChange(
+        view: View?,
+        p1: Int,
+        scrollY: Int,
+        p3: Int,
+        p4: Int,
+    ) {
+        if (fadeBehaviourEnabled) {
+            newOmnibar.onScrollChanged(scrollY)
         }
-    }
-
-    fun fadeMinibar(alpha: Float) {
-        newOmnibar.minibar.alpha = alpha
-        if (alpha == 0f) {
-            newOmnibar.minibar.isVisible = false
-        } else if (!newOmnibar.minibar.isVisible) {
-            newOmnibar.minibar.isVisible = true
-        }
-    }
-
-    fun View.fadeIn(duration: Long = 350) {
-        visibility = View.VISIBLE
-        val fadeIn = ObjectAnimator.ofFloat(this, "alpha", 0f, 1f)
-        fadeIn.duration = duration
-        fadeIn.start()
-    }
-
-    fun View.fadeOut(duration: Long = 200) {
-        val fadeOut = ObjectAnimator.ofFloat(this, "alpha", 1f, 0f)
-        fadeOut.duration = duration // Duration in milliseconds
-        fadeOut.addListener(
-            object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    visibility = View.GONE
-                }
-            },
-        )
-        fadeOut.start()
     }
 }

@@ -16,8 +16,6 @@
 
 <resources>
 
-    <attr name="useExperimentalOmnibar" format="boolean" />
-
     <style name="Theme.DuckDuckGo.Dark.Experiment.Warm" parent="Theme.DuckDuckGo.Dark">
 
         <item name="daxColorBackground">@color/warm_gray90</item>
@@ -28,8 +26,6 @@
         <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Dark</item>
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
         <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
-
-        <item name="useExperimentalOmnibar">true</item>
 
     </style>
 
@@ -44,8 +40,6 @@
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Dark</item>
         <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Dark</item>
 
-        <item name="useExperimentalOmnibar">true</item>
-
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment.Warm" parent="Theme.DuckDuckGo.Light">
@@ -59,8 +53,6 @@
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
         <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
 
-        <item name="useExperimentalOmnibar">true</item>
-
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment.Cool" parent="Theme.DuckDuckGo.Light">
@@ -73,8 +65,6 @@
         <item name="daxColorFireButtonOne">@color/daxColorFireButtonOne_Light</item>
         <item name="daxColorFireButtonTwo">@color/daxColorFireButtonTwo_Light</item>
         <item name="daxColorFireButtonThree">@color/daxColorFireButtonThree_Light</item>
-
-        <item name="useExperimentalOmnibar">true</item>
 
     </style>
 

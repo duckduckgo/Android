@@ -24,26 +24,25 @@
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/newOmnibarDomain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?daxColorSurface"
-        android:padding="@dimen/keyline_1"
-        app:typography="body1"
-        android:gravity="center"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="domain.com"
-        tools:ignore="HardcodedText"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?daxColorSurface">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/newOmnibarDomain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/keyline_1"
+            app:typography="body1"
+            android:gravity="center"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="domain.com"
+            tools:ignore="HardcodedText"/>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"

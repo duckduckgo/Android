@@ -848,7 +848,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, true, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -2647,9 +2647,7 @@ class BrowserTabFragment :
                 false
             }
 
-            it.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-                omnibar.onScrollChanged(scrollY)
-            }
+            it.setOnScrollChangeListener(omnibar)
 
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
