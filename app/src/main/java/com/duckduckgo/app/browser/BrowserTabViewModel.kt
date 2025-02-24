@@ -3301,21 +3301,7 @@ class BrowserTabViewModel @Inject constructor(
                 ),
             )
             browserViewState.postValue(
-                currentBrowserViewState().copy(
-                    browserShowing = false,
-                    showPrivacyShield = HighlightableButton.Gone,
-                    fireButton = HighlightableButton.Gone,
-                    maliciousSiteBlocked = true,
-                    maliciousSiteStatus = maliciousSiteStatus,
-                    canChangePrivacyProtection = false,
-                    canFireproofSite = false,
-                    canReportSite = false,
-                    canSharePage = false,
-                    canSaveSite = false,
-                    canFindInPage = false,
-                    canChangeBrowsingMode = false,
-                    canPrintPage = false,
-                ),
+                browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus),
             )
             omnibarViewState.postValue(
                 currentOmnibarViewState().copy(
