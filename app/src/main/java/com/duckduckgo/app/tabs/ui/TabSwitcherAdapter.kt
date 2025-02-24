@@ -120,7 +120,7 @@ class TabSwitcherAdapter(
     @VisibleForTesting
     fun createCloseClickListener(
         bindingAdapterPosition: () -> Int,
-        tabSwitcherListener: TabSwitcherListener
+        tabSwitcherListener: TabSwitcherListener,
     ): View.OnClickListener {
         return View.OnClickListener {
             val position = bindingAdapterPosition()
@@ -274,7 +274,7 @@ class TabSwitcherAdapter(
             }
         }
         tabViewHolder.close.setOnClickListener(
-            createCloseClickListener(bindingAdapterPosition, itemClickListener)
+            createCloseClickListener(bindingAdapterPosition, itemClickListener),
         )
     }
 

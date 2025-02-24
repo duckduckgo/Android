@@ -52,7 +52,7 @@ class TabSwitcherAdapterTestAndroid {
     }
 
     fun createMockTabSwitcherAdapter(
-        listener: TabSwitcherListener
+        listener: TabSwitcherListener,
     ): TabSwitcherAdapter {
         return TabSwitcherAdapter(
             itemClickListener = listener,
