@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync
+package com.duckduckgo.autofill
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -29,11 +29,17 @@ import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
+import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.SyncCredentialsListener
+import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 
 fun fakeAutofillStore(
-    secureStorage: SecureStorage = FakeSecureStorage(),
+    secureStorage: SecureStorage = FakeSecureStore(
+        canAccessSecureStorage = true,
+        urlMatcher = autofillDomainNameUrlMatcher(),
+    ),
     lastUpdatedTimeProvider: LastUpdatedTimeProvider = lastUpdatedTimeProvider(),
     autofillPrefsStore: AutofillPrefsStore,
     autofillUrlMatcher: AutofillUrlMatcher = autofillDomainNameUrlMatcher(),
