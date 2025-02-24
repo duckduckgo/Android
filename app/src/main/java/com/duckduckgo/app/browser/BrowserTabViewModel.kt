@@ -3636,6 +3636,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun recoverFromWarningPage(showBrowser: Boolean) {
+        site?.maliciousSiteStatus = null
         if (showBrowser) {
             browserViewState.value = currentBrowserViewState().copy(
                 browserShowing = true,
