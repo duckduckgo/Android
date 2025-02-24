@@ -24,9 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
@@ -35,12 +37,12 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
-import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
-import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_URL
-import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_PREVIEW
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
@@ -115,6 +117,19 @@ class TabSwitcherAdapter(
         }
     }
 
+    @VisibleForTesting
+    fun createCloseClickListener(
+        bindingAdapterPosition: () -> Int,
+        tabSwitcherListener: TabSwitcherListener,
+    ): View.OnClickListener {
+        return View.OnClickListener {
+            val position = bindingAdapterPosition()
+            if (position != RecyclerView.NO_POSITION) {
+                tabSwitcherListener.onTabDeleted(position = position, deletedBySwipe = false)
+            }
+        }
+    }
+
     private fun bindListTab(holder: TabSwitcherViewHolder.ListTabViewHolder, tab: TabEntity) {
         val context = holder.binding.root.context
         holder.title.text = extractTabTitle(tab, context)
@@ -124,7 +139,7 @@ class TabSwitcherAdapter(
         loadFavicon(tab, holder.favicon)
         attachTabClickListeners(
             tabViewHolder = holder,
-            bindingAdapterPosition = holder.bindingAdapterPosition,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
             tab = tab,
         )
     }
@@ -138,7 +153,7 @@ class TabSwitcherAdapter(
         loadTabPreviewImage(tab, glide, holder)
         attachTabClickListeners(
             tabViewHolder = holder,
-            bindingAdapterPosition = holder.bindingAdapterPosition,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
             tab = tab,
         )
     }
@@ -252,15 +267,18 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: Int, tab: TabEntity) {
+    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tab: TabEntity) {
         tabViewHolder.rootView.setOnClickListener {
             if (!isDragging) {
                 itemClickListener.onTabSelected(tab)
             }
         }
-        tabViewHolder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(bindingAdapterPosition, false)
-        }
+        tabViewHolder.close.setOnClickListener(
+            createCloseClickListener(
+                bindingAdapterPosition = bindingAdapterPosition,
+                tabSwitcherListener = itemClickListener,
+            ),
+        )
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
