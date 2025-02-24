@@ -79,23 +79,29 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <!-- Tab switcher -->
     <string name="tabSwitcherFabNewTab">New Tab</string>
     <string name="tabSwitcherFabCloseTabs">Close Tabs</string>
+
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
     <string name="deselectAllTabsMenuItem">Deselect All</string>
     <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
+
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links from DuckDuckGo</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Share Link</item>
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %1$d Links</item>
     </plurals>
+
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Bookmark This Page</item>
         <item quantity="one">Bookmark This Page</item>
         <item quantity="other">Bookmark %1$d Tabs</item>
     </plurals>
     <string name="bookmarkAllTabsMenuItem">Bookmark All Tabs…</string>
+
     <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="zero">Close Tab</item>
         <item quantity="one">Close Tab</item>
