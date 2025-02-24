@@ -44,7 +44,7 @@ import org.junit.runner.RunWith
 internal class CredentialsSyncTest {
 
     private val db = inMemoryAutofillDatabase()
-    private val secureStorage = FakeSecureStorage()
+    private val secureStorage = SyncFakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
     private val credentialsSync = CredentialsSync(

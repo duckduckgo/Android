@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.FakeSecureStore
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
@@ -30,7 +31,6 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
-import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
@@ -44,10 +44,7 @@ import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -738,98 +735,6 @@ class SecureStoreBackedAutofillStoreTest {
         val details = WebsiteLoginDetails(domain = cleanedDomain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password, notes)
         return secureStore.addWebsiteLoginDetailsWithCredentials(credentials).toLoginCredentials()
-    }
-
-    private class FakeSecureStore(
-        private val canAccessSecureStorage: Boolean,
-        private val urlMatcher: AutofillUrlMatcher,
-    ) : SecureStorage {
-
-        private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
-
-        override suspend fun addWebsiteLoginDetailsWithCredentials(
-            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
-        ): WebsiteLoginDetailsWithCredentials {
-            val id = websiteLoginDetailsWithCredentials.details.id ?: (credentials.size.toLong() + 1)
-            val credentialWithId: WebsiteLoginDetailsWithCredentials = websiteLoginDetailsWithCredentials.copy(
-                details = websiteLoginDetailsWithCredentials.details.copy(id = id),
-            )
-            credentials.add(credentialWithId)
-            return credentialWithId
-        }
-
-        override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>): List<Long> {
-            credentials.forEach { addWebsiteLoginDetailsWithCredentials(it) }
-            return credentials.map { it.details.id!! }
-        }
-
-        override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
-            return flow {
-                emit(
-                    domainLookup(domain).map { it.details },
-                )
-            }
-        }
-
-        override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> {
-            return flow {
-                emit(credentials.map { it.details })
-            }
-        }
-
-        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? {
-            return credentials.firstOrNull() { it.details.id == id }
-        }
-
-        override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> {
-            return flow {
-                emit(
-                    domainLookup(domain),
-                )
-            }
-        }
-
-        private fun domainLookup(domain: String) = credentials
-            .filter { it.details.domain?.contains(domain) == true }
-            .filter {
-                val visitedSite = urlMatcher.extractUrlPartsForAutofill(domain)
-                val savedSite = urlMatcher.extractUrlPartsForAutofill(it.details.domain)
-                urlMatcher.matchingForAutofill(visitedSite, savedSite)
-            }
-
-        override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> {
-            return flow {
-                emit(credentials)
-            }
-        }
-
-        override suspend fun updateWebsiteLoginDetailsWithCredentials(
-            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
-        ): WebsiteLoginDetailsWithCredentials {
-            credentials.indexOfFirst { it.details.id == websiteLoginDetailsWithCredentials.details.id }.also {
-                credentials[it] = websiteLoginDetailsWithCredentials
-            }
-            return websiteLoginDetailsWithCredentials
-        }
-
-        override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
-            credentials.removeAll { it.details.id == id }
-        }
-
-        override suspend fun deleteWebSiteLoginDetailsWithCredentials(ids: List<Long>) {
-            credentials.removeAll { ids.contains(it.details.id) }
-        }
-
-        override suspend fun addToNeverSaveList(domain: String) {
-        }
-
-        override suspend fun clearNeverSaveList() {
-        }
-
-        override suspend fun neverSaveListCount(): Flow<Int> = emptyFlow()
-        override suspend fun isInNeverSaveList(domain: String): Boolean = false
-
-        override suspend fun canAccessSecureStorage(): Boolean = canAccessSecureStorage
     }
 
     companion object {

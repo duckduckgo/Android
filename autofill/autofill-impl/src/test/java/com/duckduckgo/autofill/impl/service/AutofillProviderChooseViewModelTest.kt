@@ -2,12 +2,16 @@ package com.duckduckgo.autofill.impl.service
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.fakeAutofillStore
+import com.duckduckgo.autofill.fakeStorage
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
-import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -25,12 +29,21 @@ class AutofillProviderChooseViewModelTest {
 
     private val autofillProviderDeviceAuth: AutofillProviderDeviceAuth = mock()
 
-    private val secureStorage: SecureStorage = FakeSecureStorage()
+    private val secureStorage: SecureStorage = fakeStorage()
+
+    val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     private val testee = AutofillProviderChooseViewModel(
         autofillProviderDeviceAuth = autofillProviderDeviceAuth,
         dispatchers = coroutineRule.testDispatcherProvider,
-        secureStorage = secureStorage,
+        autofillStore = fakeAutofillStore(
+            secureStorage = secureStorage,
+            autofillPrefsStore = mock(),
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            coroutineScope = coroutineRule.testScope,
+            autofillFeature = autofillFeature,
+        ),
+        appCoroutineScope = coroutineRule.testScope,
     )
 
     @Test
@@ -78,6 +91,20 @@ class AutofillProviderChooseViewModelTest {
             testee.continueAfterAuthentication(twitterCredentials.id!!)
             val awaitItem = awaitItem()
             assertEquals(AutofillProviderChooseViewModel.Command.AutofillLogin(twitterCredentials), awaitItem)
+        }
+    }
+
+    @Test
+    fun whenContinueAfterAuthenticationThenUpdateLastUsedTimestamp() = runTest {
+        givenLocalCredentials(twitterCredentials)
+        whenever(autofillProviderDeviceAuth.isAuthRequired()).thenReturn(true)
+
+        testee.commands().test {
+            awaitItem() // requires auth
+            testee.continueAfterAuthentication(twitterCredentials.id!!)
+            awaitItem()
+            val updatedCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials()
+            assertFalse(twitterCredentials.lastUsedMillis == updatedCredential.lastUsedMillis)
         }
     }
 

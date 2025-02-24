@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.common.utils.extractDomain
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.Collator
 import javax.inject.Inject
@@ -30,7 +30,7 @@ interface CredentialListSorter {
     fun comparator(): Collator
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,
 ) : CredentialListSorter {

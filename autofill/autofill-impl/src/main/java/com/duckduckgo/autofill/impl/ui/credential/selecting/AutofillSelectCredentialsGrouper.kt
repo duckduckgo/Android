@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorter
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper.Groups
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
@@ -40,7 +40,7 @@ interface AutofillSelectCredentialsGrouper {
     )
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class RealAutofillSelectCredentialsGrouper @Inject constructor(
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val sorter: CredentialListSorter,

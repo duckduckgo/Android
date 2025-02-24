@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.service
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -26,6 +27,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.searching.Credentia
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +42,7 @@ class AutofillProviderCredentialsListViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -68,6 +71,17 @@ class AutofillProviderCredentialsListViewModel @Inject constructor(
         Timber.v("Search query changed: %s", searchText)
         searchQueryFilter.value = searchText
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText)
+    }
+
+    fun onCredentialSelected(credentials: LoginCredentials) {
+        credentials.updateLastUsedTimestamp()
+    }
+
+    private fun LoginCredentials.updateLastUsedTimestamp() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val updated = this@updateLastUsedTimestamp.copy(lastUsedMillis = System.currentTimeMillis())
+            autofillStore.updateCredentials(updated, refreshLastUpdatedTimestamp = false)
+        }
     }
 
     data class ViewState(

@@ -241,6 +241,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
+        viewModel.onCredentialSelected(credentials)
         parentActivity()?.autofillLogin(credentials) ?: run {
             activity?.finish()
         }
