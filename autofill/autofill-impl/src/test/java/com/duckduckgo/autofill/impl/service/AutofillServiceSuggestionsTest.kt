@@ -7,11 +7,11 @@ import com.duckduckgo.autofill.impl.service.mapper.fakes.FakeAppCredentialsProvi
 import com.duckduckgo.autofill.impl.service.mapper.fakes.FakeAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper.Groups
+import com.duckduckgo.autofill.noopDeduplicator
+import com.duckduckgo.autofill.noopGroupBuilder
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
-import com.duckduckgo.autofill.sync.noopDeduplicator
-import com.duckduckgo.autofill.sync.noopGroupBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -46,6 +46,7 @@ class AutofillServiceSuggestionsTest {
             loginDeduplicator = noopDeduplicator(),
             grouper = noopGroupBuilder(),
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         val result = testee.getSiteSuggestions(twitterCredentials.domain!!)
@@ -60,6 +61,7 @@ class AutofillServiceSuggestionsTest {
             loginDeduplicator = noopDeduplicator(),
             grouper = noopGroupBuilder(),
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         val result = testee.getSiteSuggestions("random.com")
@@ -73,6 +75,7 @@ class AutofillServiceSuggestionsTest {
             loginDeduplicator = noopDeduplicator(),
             grouper = noopGroupBuilder(),
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         val result = testee.getAppSuggestions(twitterCredentials.domain!!)
@@ -87,6 +90,7 @@ class AutofillServiceSuggestionsTest {
             loginDeduplicator = noopDeduplicator(),
             grouper = noopGroupBuilder(),
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         val result = testee.getAppSuggestions("random.package")
@@ -113,6 +117,7 @@ class AutofillServiceSuggestionsTest {
             loginDeduplicator = noopDeduplicator(),
             grouper = grouper,
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         testee.getSiteSuggestions(twitterCredentials.domain!!).let {
@@ -143,6 +148,7 @@ class AutofillServiceSuggestionsTest {
             },
             grouper = noopGroupBuilder(),
             appCredentialProvider = fakeAppCredentialsProvider,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
 
         val result = testee.getSiteSuggestions(twitterCredentials.domain!!)
