@@ -124,7 +124,7 @@ class TabSwitcherAdapter(
         loadFavicon(tab, holder.favicon)
         attachTabClickListeners(
             tabViewHolder = holder,
-            bindingAdapterPosition = holder.bindingAdapterPosition,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
             tab = tab,
         )
     }
@@ -138,7 +138,7 @@ class TabSwitcherAdapter(
         loadTabPreviewImage(tab, glide, holder)
         attachTabClickListeners(
             tabViewHolder = holder,
-            bindingAdapterPosition = holder.bindingAdapterPosition,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
             tab = tab,
         )
     }
@@ -252,14 +252,14 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: Int, tab: TabEntity) {
+    private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tab: TabEntity) {
         tabViewHolder.rootView.setOnClickListener {
             if (!isDragging) {
                 itemClickListener.onTabSelected(tab)
             }
         }
         tabViewHolder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(bindingAdapterPosition, false)
+            itemClickListener.onTabDeleted(bindingAdapterPosition(), false)
         }
     }
 
