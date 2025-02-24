@@ -7,18 +7,17 @@ tags:
       commands:
             - launchApp:
                 clearState: true
-            - runFlow: ../shared/pre_onboarding.yaml
+            - runFlow: ../shared/skip_all_onboarding.yaml
             - doubleTapOn:
                 id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-rewrite.html"
             - pressKey: Enter
-            - tapOn: "Got It"
+
             - tapOn: "Start"
             # This test is expected to load "about:blank" then duckduckgo.com, not remain on the current page with spoofed content.
             - extendedWaitUntil:
                 notVisible: "Not DDG."  # Spoofed content not visible
                 timeout: 10000
-            - tapOn: "Got it!"
             - copyTextFrom:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText == "about:blank" || maestro.copiedText == "https://duckduckgo.com/"}
