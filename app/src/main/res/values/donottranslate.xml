@@ -79,6 +79,7 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <!-- Tab switcher -->
     <string name="selectTabsMenuItem">Select Tabs</string>
     <string name="selectAllTabsMenuItem">Select All</string>
     <string name="deselectAllTabsMenuItem">Deselect All</string>
@@ -86,6 +87,7 @@
     <string name="tabSelectedIndicator">Tab selected indicator</string>
     <string name="tabNotSelectedIndicator">Tab not selected indicator</string>
 
+    <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d Links from DuckDuckGo</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
         <item quantity="other">Share %1$d Links</item>
