@@ -31,6 +31,7 @@ import org.json.JSONObject
 
 interface MaliciousSiteProtectionRCFeature {
     fun isFeatureEnabled(): Boolean
+    fun canUpdateDatasets(): Boolean
     fun getHashPrefixUpdateFrequency(): Long
     fun getFilterSetUpdateFrequency(): Long
 }
@@ -45,6 +46,7 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MaliciousSiteProtectionRCFeature, PrivacyConfigCallbackPlugin {
     private var isFeatureEnabled = false
+    private var canUpdateDatasets = false
 
     private var hashPrefixUpdateFrequency = 20L
     private var filterSetUpdateFrequency = 720L
@@ -71,9 +73,15 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
         return isFeatureEnabled
     }
 
+    override fun canUpdateDatasets(): Boolean {
+        return canUpdateDatasets
+    }
+
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled()
+            isFeatureEnabled = maliciousSiteProtectionFeature.self().isEnabled() &&
+                maliciousSiteProtectionFeature.visibleAndOnByDefault().isEnabled()
+            canUpdateDatasets = maliciousSiteProtectionFeature.canUpdateDatasets().isEnabled()
             maliciousSiteProtectionFeature.self().getSettings()?.let {
                 JSONObject(it).let { settings ->
                     hashPrefixUpdateFrequency = settings.getLong("hashPrefixUpdateFrequency")

@@ -22,6 +22,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -41,6 +42,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerTest {
         worker.maliciousSiteRepository = maliciousSiteRepository
         worker.dispatcherProvider = dispatcherProvider
         worker.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
     }
 
     @Test
@@ -49,6 +51,17 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerTest {
 
         val result = worker.doWork()
 
+        verify(maliciousSiteRepository, never()).loadHashPrefixes()
+        assertEquals(success(), result)
+    }
+
+    @Test
+    fun doWork_returnsSuccessWhenUpdateDatasetsIsDisabled() = runTest {
+        whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(false)
+
+        val result = worker.doWork()
+
+        verify(maliciousSiteRepository, never()).loadHashPrefixes()
         assertEquals(success(), result)
     }
 
@@ -80,17 +93,17 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
     private val scheduler = MaliciousSiteProtectionHashPrefixesUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature)
 
     @Test
-    fun onCreate_schedulesWorkerWithUpdateFrequencyFromRCFlag() {
+    fun onPrivacyConfigDownloaded_schedulesWorkerWithUpdateFrequencyFromRCFlag() {
         val updateFrequencyMinutes = 15L
 
         whenever(maliciousSiteProtectionFeature.getHashPrefixUpdateFrequency()).thenReturn(updateFrequencyMinutes)
 
-        scheduler.onCreate(mock())
+        scheduler.onPrivacyConfigDownloaded()
 
         val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"),
-            eq(ExistingPeriodicWorkPolicy.UPDATE),
+            eq(ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE),
             capture(workRequestCaptor),
         )
 
