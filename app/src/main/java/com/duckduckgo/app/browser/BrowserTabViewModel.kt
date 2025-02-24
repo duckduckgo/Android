@@ -774,14 +774,14 @@ class BrowserTabViewModel @Inject constructor(
         stillExternal: Boolean? = false,
         maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
-        Timber.v("buildSiteFactory for url=$url")
+        Timber.v("buildSiteFactory for url=$url, maliciousSiteStatus=$maliciousSiteStatus")
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
         site = siteFactory.buildSite(url, tabId, title, httpsUpgraded, externalLaunch)
-        site?.maliciousSiteStatus = maliciousSiteStatus ?: currentBrowserViewState().maliciousSiteStatus
+        site?.maliciousSiteStatus = maliciousSiteStatus
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1540,6 +1540,8 @@ class BrowserTabViewModel @Inject constructor(
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
             canPrintPage = domain != null,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
