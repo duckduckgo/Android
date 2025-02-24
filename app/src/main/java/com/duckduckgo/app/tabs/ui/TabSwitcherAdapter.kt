@@ -24,9 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
@@ -111,6 +113,19 @@ class TabSwitcherAdapter(
             is TabSwitcherViewHolder.ListTabViewHolder -> {
                 val tab = (list[position] as TabSwitcherItem.Tab).tabEntity
                 bindListTab(holder, tab)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    fun createCloseClickListener(
+        bindingAdapterPosition: () -> Int,
+        tabSwitcherListener: TabSwitcherListener
+    ): View.OnClickListener {
+        return View.OnClickListener {
+            val position = bindingAdapterPosition()
+            if (position != RecyclerView.NO_POSITION) {
+                tabSwitcherListener.onTabDeleted(position, false)
             }
         }
     }
@@ -258,9 +273,9 @@ class TabSwitcherAdapter(
                 itemClickListener.onTabSelected(tab)
             }
         }
-        tabViewHolder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(bindingAdapterPosition(), false)
-        }
+        tabViewHolder.close.setOnClickListener(
+            createCloseClickListener(bindingAdapterPosition, itemClickListener)
+        )
     }
 
     fun updateData(updatedList: List<TabSwitcherItem>) {
