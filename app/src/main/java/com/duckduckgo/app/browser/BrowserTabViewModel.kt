@@ -1392,10 +1392,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     /*
-     * Calling this method when an error page is shown might cause unexpected issues
-     * Specifically, malicious site protection might prevent a page load from starting altogether, which
-     * means by stopping the WebView, we're effectively stopping the load for the previously loaded
-     * page. If we allow such onProgressChanged/onPageFinished/etc. to trigger an unfiltered navigationStateChanged,
+     * This method shouldn't be called from outside the ViewModel.
+     * Calling this method when an error page is shown might cause unexpected issues, if said error page is a consequence
+     * of an error that prevents the page load from starting altogether. This currently only happens with malicious site protection
+     * when the WebView is stopped before the page load starts (local blocks)
+     * In such cases, by stopping the WebView, we're effectively stopping the load for the previously loaded
+     * page, which then triggers onProgressChanged/onPageFinished/etc. If we allow those to trigger an unfiltered navigationStateChanged,
      * we will end up in a situation where we receive NewPage events for the previous page while the error is shown.
      */
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
