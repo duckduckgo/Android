@@ -96,6 +96,17 @@ internal class AboutDuckDuckGoViewModelTest {
     }
 
     @Test
+    fun whenOnPrivacyProtectionsLinkClickedThenCommandLaunchBrowserWithPrivacyProtectionsUrlIsSent() = runTest {
+        testee.commands().test {
+            testee.onPrivacyProtectionsLinkClicked()
+
+            assertEquals(Command.LaunchBrowserWithPrivacyProtectionsUrl, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenOnPrivacyPolicyClickedThenCommandLaunchWebViewWithPrivacyPolicyUrlIsSentAndPixelFired() = runTest {
         testee.commands().test {
             testee.onPrivacyPolicyClicked()
