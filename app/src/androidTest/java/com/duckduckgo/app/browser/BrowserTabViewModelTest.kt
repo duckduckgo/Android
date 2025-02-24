@@ -3647,7 +3647,7 @@ class BrowserTabViewModelTest {
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
-        assertFalse(loadingViewState().privacyOn)
+        assertFalse(loadingViewState().trackersAnimationEnabled)
     }
 
     @Test
@@ -6044,7 +6044,7 @@ class BrowserTabViewModelTest {
             loadingViewState(),
             loadingViewState().copy(
                 isLoading = true,
-                privacyOn = true,
+                trackersAnimationEnabled = true,
                 progress = 0,
                 url = "http://example.com",
             ),

@@ -3871,7 +3871,7 @@ class BrowserTabFragment :
                 }
                 omnibar.renderLoadingViewState(viewState)
 
-                if (viewState.privacyOn) {
+                if (viewState.trackersAnimationEnabled) {
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         omnibar.cancelTrackersAnimation()
                     }
