@@ -93,7 +93,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
     private val scheduler = MaliciousSiteProtectionFiltersUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature)
 
     @Test
-    fun onPrivacyConfigDownloaded_schedulesWorkerWithUpdateFrequencyFromRCFlagAndReenqueuePolicy() {
+    fun onPrivacyConfigDownloaded_schedulesWorkerWithUpdateFrequencyFromRCFlagAndUpdatePolicy() {
         val updateFrequencyMinutes = 15L
 
         whenever(maliciousSiteProtectionFeature.getFilterSetUpdateFrequency()).thenReturn(updateFrequencyMinutes)
@@ -103,7 +103,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
         val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
-            eq(ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE),
+            eq(ExistingPeriodicWorkPolicy.UPDATE),
             capture(workRequestCaptor),
         )
 

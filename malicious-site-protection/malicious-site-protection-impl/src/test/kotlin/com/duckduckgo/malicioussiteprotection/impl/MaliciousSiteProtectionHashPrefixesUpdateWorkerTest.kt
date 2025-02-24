@@ -103,7 +103,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
         val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"),
-            eq(ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE),
+            eq(ExistingPeriodicWorkPolicy.UPDATE),
             capture(workRequestCaptor),
         )
 
