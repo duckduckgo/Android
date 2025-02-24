@@ -3936,21 +3936,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
-    fun onStop(isVisible: Boolean) {
-        if (isVisible && !currentBrowserViewState().maliciousSiteBlocked) {
-            updateOrDeleteWebViewPreview()
-        }
-    }
-
-    private fun updateOrDeleteWebViewPreview() {
-        Timber.d("Updating or deleting WebView preview for $url")
-        if (url == null) {
-            deleteTabPreview(tabId)
-        } else {
-            command.value = GenerateWebViewPreviewImage
-        }
-    }
-
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             command.postValue(ShowAutoconsentAnimation(isCosmetic))
