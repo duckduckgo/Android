@@ -33,4 +33,12 @@ enum class DuckPlayerPixelName(override val pixelName: String) : Pixel.PixelName
     DUCK_PLAYER_SETTINGS_PRESSED("duckplayer_setting_pressed"),
     DUCK_PLAYER_NEWTAB_SETTING_ON("duckplayer_newtab_setting-on"),
     DUCK_PLAYER_NEWTAB_SETTING_OFF("duckplayer_newtab_setting-off"),
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION("duckplayer_youtube-signin-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION("duckplayer_youtube-age-restricted-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION("duckplayer_youtube-no-embed-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION("duckplayer_youtube-unknown-error_impression"),
+    DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE("duckplayer_youtube-signin-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE("duckplayer_youtube-age-restricted-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE("duckplayer_youtube-no-embed-error_daily-unique"),
+    DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE("duckplayer_youtube-unknown-error_daily-unique"),
 }

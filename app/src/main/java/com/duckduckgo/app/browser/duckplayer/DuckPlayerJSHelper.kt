@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_SERP
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_SERP
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -41,6 +42,15 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -127,6 +137,9 @@ class DuckPlayerJSHelper @Inject constructor(
                 jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
                 jsonObject.put("locale", java.util.Locale.getDefault().language)
                 jsonObject.put("env", if (appBuildConfig.isDebug) "development" else "production")
+
+                // Custom Error Settings
+                jsonObject.getJSONObject("settings").put("customError", getCustomErrorSettings())
             }
             DUCK_PLAYER_FEATURE_NAME -> {
                 jsonObject.put("platform", JSONObject("""{ name: "android" }"""))
@@ -140,6 +153,17 @@ class DuckPlayerJSHelper @Inject constructor(
             method,
             id,
         )
+    }
+
+    private fun getCustomErrorSettings(): JSONObject {
+        val customErrorObject = JSONObject()
+        customErrorObject.put("state", if (duckPlayer.shouldShowCustomError()) "enabled" else "disabled")
+
+        duckPlayer.customErrorSettings()?.let { settings ->
+            customErrorObject.put("signInRequiredSelector", settings.signInRequiredSelector.takeIf { it.isNotEmpty() } ?: "")
+        }
+
+        return customErrorObject
     }
 
     private suspend fun setUserPreferences(data: JSONObject) {
@@ -246,6 +270,24 @@ class DuckPlayerJSHelper @Inject constructor(
                     DUCK_PLAYER_PAGE_FEATURE_NAME -> OpenDuckPlayerPageInfo
                     else -> null
                 }
+            }
+            "reportYouTubeError" -> {
+                val impressionPixelName: DuckPlayerPixelName = when (data?.getString("error")) {
+                    "age-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_IMPRESSION
+                    "no-embed" -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_IMPRESSION
+                    "sign-in-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_IMPRESSION
+                    else -> DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_IMPRESSION
+                }
+
+                val dailyPixelName: DuckPlayerPixelName = when (data?.getString("error")) {
+                    "age-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE
+                    "no-embed" -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE
+                    "sign-in-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED_DAILY_UNIQUE
+                    else -> DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE
+                }
+
+                pixel.fire(impressionPixelName)
+                pixel.fire(dailyPixelName, emptyMap(), emptyMap(), Daily())
             }
             else -> {
                 return null
