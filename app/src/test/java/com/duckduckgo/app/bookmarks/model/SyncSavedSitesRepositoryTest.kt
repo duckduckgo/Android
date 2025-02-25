@@ -213,7 +213,7 @@ class SyncSavedSitesRepositoryTest {
         savedSitesRelationsDao.insertList(relation)
 
         val removedEntities = entities.toMutableList()
-        val removedEntity = removedEntities.removeFirst()
+        val removedEntity = removedEntities.removeAt(0)
 
         val removedEntitiesIds = removedEntities.map { it.entityId }
         val childrenJSON = stringListAdapter.toJson(removedEntitiesIds)
@@ -320,7 +320,7 @@ class SyncSavedSitesRepositoryTest {
         savedSitesRelationsDao.insertList(folderRelation)
 
         val updatedChildren = bookmarks.toMutableList()
-        val removedChildren = updatedChildren.removeFirst()
+        val removedChildren = updatedChildren.removeAt(0)
 
         repository.replaceBookmarkFolder(folder, updatedChildren.map { it.entityId })
 
