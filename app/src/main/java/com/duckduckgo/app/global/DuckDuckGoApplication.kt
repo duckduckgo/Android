@@ -39,6 +39,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
+private const val PIR_PROCESS_NAME = "pir"
 
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
@@ -109,6 +110,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     it.onVpnProcessCreated()
                 }
             }
+        }
+
+        runInSecondaryProcessNamed(PIR_PROCESS_NAME) {
+            configureLogging()
+            configureStrictMode()
+            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
+            configureDependencyInjection()
         }
     }
 
@@ -181,6 +189,17 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 }
             }
         }
+
+        runInSecondaryProcessNamed(PIR_PROCESS_NAME) {
+            if (name == "webview") {
+                return File("${dir.absolutePath}/pir").apply {
+                    Timber.d(":pir process getDir = $absolutePath")
+                    if (!exists()) {
+                        mkdirs()
+                    }
+                }
+            }
+        }
         return dir
     }
 
@@ -189,6 +208,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             return File("${dir.absolutePath}/vpn").apply {
                 Timber.d(":vpn process getCacheDir = $absolutePath")
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+        }
+
+        runInSecondaryProcessNamed(PIR_PROCESS_NAME) {
+            return File("${dir.absolutePath}/pir").apply {
+                Timber.d(":åir process getCacheDir = $absolutePath")
                 if (!exists()) {
                     mkdirs()
                 }
