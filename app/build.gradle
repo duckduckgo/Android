@@ -57,6 +57,11 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        if (project.hasProperty('skip-onboarding')) {
+            buildConfigField "boolean", "CAN_SKIP_ONBOARDING", "true"
+        } else {
+            buildConfigField "boolean", "CAN_SKIP_ONBOARDING", "false"
+        }
         if (project.hasProperty('build-date-time')) {
             buildConfigField "long", "BUILD_DATE_MILLIS", "${System.currentTimeMillis()}"
         } else {

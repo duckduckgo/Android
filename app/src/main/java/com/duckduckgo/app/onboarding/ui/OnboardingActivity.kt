@@ -19,12 +19,20 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
@@ -42,6 +50,8 @@ class OnboardingActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configurePager()
+        configureSkipButton()
+        observeViewModel()
     }
 
     fun onContinueClicked() {
@@ -76,6 +86,29 @@ class OnboardingActivity : DuckDuckGoActivity() {
         } else {
             viewPager.setCurrentItem(currentPage - 1, true)
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState.flowWithLifecycle(lifecycle, STARTED)
+            .onEach {
+                if (it.canShowSkipOnboardingButton) {
+                    binding.skipOnboardingButton.show()
+                } else {
+                    binding.skipOnboardingButton.gone()
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun configureSkipButton() {
+        binding.skipOnboardingButton.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.devOnlyFullyCompleteAllOnboarding()
+                startActivity(BrowserActivity.intent(this@OnboardingActivity))
+                finish()
+            }
+        }
+        viewModel.initializeOnboardingSkipper()
     }
 
     companion object {

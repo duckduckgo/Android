@@ -76,4 +76,7 @@
     <string name="newTabPageIndonesiaMessageBody">The government may be blocking access to duckduckgo.com on this network provider, which could affect this app\'s functionality. Other providers may not be affected.</string>
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
+    <!-- Skip Onboarding (not user-facing) -->
+    <string name="skipOnboarding">Skip Onboarding</string>"
+
 </resources>
