@@ -26,14 +26,19 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.fakes.FakePixel
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class LaunchViewModelTest {
@@ -152,5 +157,48 @@ class LaunchViewModelTest {
         testee.sendWelcomeScreenPixel()
 
         assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenLaunchSplashScreenFailToExitJobCalledThenItExecutesFallbackAfterDelay() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            fakePixel,
+        )
+
+        testee.command.observeForever(mockCommandObserver)
+        testee.launchSplashScreenFailToExitJob()
+
+        // Wait for fail to exit timeout and referrer timeout
+        advanceTimeBy(3.5.seconds)
+
+        assertEquals(AppPixelName.SPLASHSCREEN_SHOWN.pixelName, fakePixel.firedPixels.first())
+        verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenCancelSplashScreenFailToExitJobThenStopsFallback() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            fakePixel,
+        )
+
+        testee.command.observeForever(mockCommandObserver)
+        testee.launchSplashScreenFailToExitJob()
+        testee.cancelSplashScreenFailToExitJob()
+
+        // advance time to ensure that the code does not execute after the delay
+        advanceTimeBy(3.seconds)
+
+        assertTrue(fakePixel.firedPixels.isEmpty())
+        verifyNoInteractions(mockCommandObserver)
     }
 }
