@@ -94,7 +94,7 @@ class WebViewRequestInterceptor(
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
-        maliciousSiteBlockerWebViewIntegration.onPageLoadStarted()
+        maliciousSiteBlockerWebViewIntegration.onPageLoadStarted(url)
     }
 
     /**
