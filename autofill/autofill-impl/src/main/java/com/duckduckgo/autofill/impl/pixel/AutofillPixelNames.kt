@@ -168,6 +168,18 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISPLAYED("autofill_logins_report_confirmation_displayed"),
     AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_DISMISSED("autofill_logins_report_confirmation_dismissed"),
     AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED("autofill_logins_report_confirmation_confirmed"),
+
+    AUTOFILL_SERVICE_ENABLED("autofill_extension_enabled"),
+    AUTOFILL_SERVICE_ENABLED_DAU("autofill_extension_toggled_on"),
+    AUTOFILL_SERVICE_DISABLED("autofill_extension_disabled"),
+    AUTOFILL_SERVICE_DISABLED_DAU("autofill_extension_toggled_off"),
+    AUTOFILL_SERVICE_SUGGESTION_CONFIRMED("autofill_extension_quicktype_confirmed"),
+    AUTOFILL_SERVICE_PASSWORDS_OPEN("autofill_extension_passwords_opened"),
+    AUTOFILL_SERVICE_PASSWORDS_DISMISSED("autofill_extension_passwords_dismissed"),
+    AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH("autofill_extension_passwords_dismissed_auth"),
+    AUTOFILL_SERVICE_PASSWORD_SELECTED("autofill_extension_password_selected"),
+    AUTOFILL_SERVICE_PASSWORDS_SEARCH("autofill_extension_passwords_search"), // doesn't apply, we automatically focus the search bar
+    AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT("autofill_extension_passwords_search_input"), // when user types in the search bar first time
 }
 
 @ContributesMultibinding(

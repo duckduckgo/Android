@@ -20,7 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_OPEN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_SUGGESTION_CONFIRMED
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ContinueWithoutAuthentication
@@ -46,6 +49,7 @@ class AutofillProviderChooseViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val autofillStore: InternalAutofillStore,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -65,6 +69,10 @@ class AutofillProviderChooseViewModel @Inject constructor(
         data object ForceFinish : Command()
     }
 
+    fun onActivityCreated() {
+        pixel.fire(AUTOFILL_SERVICE_PASSWORDS_OPEN)
+    }
+
     fun onUserAuthenticatedSuccessfully() {
         viewModelScope.launch(dispatchers.io()) {
             autofillProviderDeviceAuth.recordSuccessfulAuthorization()
@@ -78,6 +86,7 @@ class AutofillProviderChooseViewModel @Inject constructor(
             autofillStore.getCredentialsWithId(credentialId)?.let { loginCredential ->
                 loginCredential.updateLastUsedTimestamp()
                 Timber.i("DDGAutofillService $credentialId found, autofilling")
+                pixel.fire(AUTOFILL_SERVICE_SUGGESTION_CONFIRMED)
                 command.send(AutofillLogin(loginCredential))
             } ?: run {
                 command.send(ForceFinish)
