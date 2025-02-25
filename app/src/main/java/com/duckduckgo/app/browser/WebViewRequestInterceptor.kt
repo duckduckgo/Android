@@ -24,6 +24,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Ignored
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.WaitForConfirmation
@@ -71,6 +72,7 @@ interface RequestInterceptor {
     fun shouldOverrideUrlLoading(
         webViewClientListener: WebViewClientListener?,
         url: Uri,
+        documentUrl: Uri?,
         isForMainFrame: Boolean,
     ): Boolean
 
@@ -116,9 +118,9 @@ class WebViewRequestInterceptor(
         val url: Uri? = request.url
 
         maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
-            handleConfirmationCallback(isMalicious, webViewClientListener, url)
+            handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
         }.let {
-            if (shouldBlock(it, webViewClientListener, url)) return WebResourceResponse(null, null, null)
+            if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
         }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
@@ -172,14 +174,19 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUri, webViewClientListener)
     }
 
-    override fun shouldOverrideUrlLoading(webViewClientListener: WebViewClientListener?, url: Uri, isForMainFrame: Boolean): Boolean {
+    override fun shouldOverrideUrlLoading(
+        webViewClientListener: WebViewClientListener?,
+        url: Uri,
+        documentUrl: Uri?,
+        isForMainFrame: Boolean,
+    ): Boolean {
         maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
             url,
             isForMainFrame,
         ) { isMalicious ->
-            handleConfirmationCallback(isMalicious, webViewClientListener, url)
+            handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUrl, isForMainFrame)
         }.let {
-            return shouldBlock(it, webViewClientListener, url)
+            return shouldBlock(it, webViewClientListener, url, documentUrl, isForMainFrame)
         }
     }
 
@@ -201,11 +208,25 @@ class WebViewRequestInterceptor(
         result: IsMaliciousViewData,
         webViewClientListener: WebViewClientListener?,
         url: Uri?,
+        documentUrl: Uri?,
+        isForMainFrame: Boolean,
     ): Boolean {
         when (result) {
-            WaitForConfirmation, Safe -> return false
+            WaitForConfirmation, Ignored -> return false
+            is Safe -> {
+                handleSiteSafe(webViewClientListener = webViewClientListener, uri = url, isForMainFrame = result.isForMainFrame)
+                return false
+            }
             is MaliciousSite -> {
-                handleSiteBlocked(webViewClientListener, url, result.feed, result.exempted, clientSideHit = true)
+                handleSiteBlocked(
+                    webViewClientListener = webViewClientListener,
+                    maliciousUri = url,
+                    documentUrl = documentUrl,
+                    feed = result.feed,
+                    exempted = result.exempted,
+                    clientSideHit = true,
+                    isForMainFrame = isForMainFrame,
+                )
                 return !result.exempted
             }
         }
@@ -215,17 +236,55 @@ class WebViewRequestInterceptor(
         isMalicious: MaliciousStatus,
         webViewClientListener: WebViewClientListener?,
         url: Uri?,
+        documentUrl: Uri?,
+        isForMainFrame: Boolean,
     ) {
-        if (isMalicious is Malicious) {
-            /*
-             * If the site is exempted, we'll never get here, as we won't call isMalicious
-             */
-            handleSiteBlocked(webViewClientListener, url, isMalicious.feed, exempted = false, clientSideHit = false)
+        when (isMalicious) {
+            is Malicious -> {
+                /* If the site is exempted, we'll never get here, as we won't call isMalicious */
+                handleSiteBlocked(
+                    webViewClientListener = webViewClientListener,
+                    maliciousUri = url,
+                    documentUrl = documentUrl,
+                    feed = isMalicious.feed,
+                    exempted = false,
+                    clientSideHit = false,
+                    isForMainFrame = isForMainFrame,
+                )
+            }
+            is MaliciousStatus.Safe -> {
+                handleSiteSafe(webViewClientListener = webViewClientListener, uri = url, isForMainFrame = isForMainFrame)
+            }
         }
     }
 
-    private fun handleSiteBlocked(webViewClientListener: WebViewClientListener?, url: Uri?, feed: Feed, exempted: Boolean, clientSideHit: Boolean) {
-        url?.let { webViewClientListener?.onReceivedMaliciousSiteWarning(it, feed, exempted, clientSideHit) }
+    private fun handleSiteBlocked(
+        webViewClientListener: WebViewClientListener?,
+        maliciousUri: Uri?,
+        documentUrl: Uri?,
+        feed: Feed,
+        exempted: Boolean,
+        clientSideHit: Boolean,
+        isForMainFrame: Boolean,
+    ) {
+        maliciousUri?.let {
+            webViewClientListener?.onReceivedMaliciousSiteWarning(
+                mainframeUri = documentUrl,
+                maliciousUri = it,
+                feed = feed,
+                exempted = exempted,
+                clientSideHit = clientSideHit,
+                isForMainFrame = isForMainFrame,
+            )
+        }
+    }
+
+    private fun handleSiteSafe(
+        webViewClientListener: WebViewClientListener?,
+        uri: Uri?,
+        isForMainFrame: Boolean,
+    ) {
+        uri?.let { webViewClientListener?.onReceivedMaliciousSiteSafe(url = it, isForMainFrame = isForMainFrame) }
     }
 
     override fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
