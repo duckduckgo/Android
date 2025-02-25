@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIA
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
 import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
 import com.duckduckgo.subscriptions.impl.freetrial.onPaywallImpression
 import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedMonthly
@@ -88,6 +89,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
     private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin,
+    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -368,6 +370,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun paywallShown() {
         pixelSender.reportOfferScreenShown()
         viewModelScope.launch {
+            freeTrialExperimentDataStore.increaseMetricForPaywallImpressions()
             freeTrialPrivacyProPixelsPlugin.onPaywallImpression()
         }
     }
