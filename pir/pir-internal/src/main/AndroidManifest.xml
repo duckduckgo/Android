@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+        <activity
+            android:name=".settings.PirDevSettings"
+            android:label="@string/pirDevSettings" />
         <service
             android:name=".scan.PirForegroundScanService"
             android:enabled="true"
