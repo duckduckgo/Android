@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -116,6 +117,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val authJwtValidator: AuthJwtValidator = mock()
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
+    private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -138,6 +140,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
     }
 
@@ -558,6 +561,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.subscriptionStatus.test {
@@ -586,6 +590,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.subscriptionStatus.test {
@@ -619,6 +624,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.currentPurchaseState.test {
@@ -666,6 +672,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.currentPurchaseState.test {
@@ -703,6 +710,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.currentPurchaseState.test {
@@ -1002,6 +1010,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1047,6 +1056,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         manager.subscriptionStatus.test {
@@ -1228,6 +1238,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            { freeTrialPrivacyProPixelsPlugin },
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())

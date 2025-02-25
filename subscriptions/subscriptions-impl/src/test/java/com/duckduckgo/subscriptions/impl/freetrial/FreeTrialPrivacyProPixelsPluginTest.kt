@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.freetrial
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -29,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 
+@SuppressLint("DenyListedApi")
 class FreeTrialPrivacyProPixelsPluginTest {
     @get:Rule
     @Suppress("unused")
@@ -47,7 +49,7 @@ class FreeTrialPrivacyProPixelsPluginTest {
             featureName = "testFeature",
         ).build().create(PrivacyProFeature::class.java)
 
-        testFeature.privacyProFreeTrialJan25().setRawStoredState(State(enable = true))
+        testFeature.privacyProFreeTrialJan25().setRawStoredState(state = State(enable = true))
 
         testee = FreeTrialPrivacyProPixelsPlugin(
             toggle = testFeature,

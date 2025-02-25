@@ -72,6 +72,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "Google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("google", "ios")))
@@ -91,6 +92,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "iOS",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
@@ -121,6 +123,7 @@ class RMFPProPurchasePlatformMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProPurchasePlatformMatchingAttribute(listOf("android")))
