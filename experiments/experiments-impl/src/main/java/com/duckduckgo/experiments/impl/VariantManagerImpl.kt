@@ -55,6 +55,8 @@ class VariantManagerImpl @Inject constructor(
         updateUserVariant(activeVariants, currentVariantKey)
     }
 
+    override fun isReinstallVariant(): Boolean = getVariantKey() == REINSTALL_VARIANT
+
     private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
         if (currentVariantKey == DEFAULT_VARIANT.key) {
             return
