@@ -85,6 +85,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute())
@@ -114,6 +115,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(value = 15, max = 13, min = 10))
@@ -133,6 +135,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(max = 15))
@@ -152,6 +155,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(max = 15))
@@ -171,6 +175,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(min = 5))
@@ -190,6 +195,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(min = 5))
@@ -209,6 +215,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(min = 5, max = 10))
@@ -228,6 +235,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
                 platform = "google",
+                activeOffers = listOf(),
             ),
         )
         val result = matcher.evaluate(PProDaysSinceSubscribedMatchingAttribute(min = 5, max = 10))

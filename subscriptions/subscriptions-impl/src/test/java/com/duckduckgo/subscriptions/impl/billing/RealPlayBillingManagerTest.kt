@@ -105,7 +105,7 @@ class RealPlayBillingManagerTest {
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId, null)
 
             assertEquals(InProgress, awaitItem())
         }
@@ -126,7 +126,7 @@ class RealPlayBillingManagerTest {
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId, null)
 
             assertEquals(Canceled, awaitItem())
         }
@@ -175,7 +175,27 @@ class RealPlayBillingManagerTest {
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), planId = offerDetails.basePlanId, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = offerDetails.basePlanId, externalId, null)
+
+            assertEquals(InProgress, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken = offerDetails.offerToken, externalId)
+    }
+
+    @Test
+    fun `when launch billing flow then retrieves ProductDetails for provided plan id and offer id`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        val productDetails: ProductDetails = subject.products.single()
+        val offerDetails = productDetails.subscriptionOfferDetails!!.first()
+        val externalId = "external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchBillingFlow(activity = mock(), planId = offerDetails.basePlanId, externalId = externalId, offerId = offerDetails.offerId)
 
             assertEquals(InProgress, awaitItem())
         }

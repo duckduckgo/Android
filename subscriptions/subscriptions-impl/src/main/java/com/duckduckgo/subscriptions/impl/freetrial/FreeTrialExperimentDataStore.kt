@@ -16,10 +16,10 @@
 
 package com.duckduckgo.subscriptions.impl.freetrial
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.squareup.anvil.annotations.ContributesBinding
@@ -45,10 +45,11 @@ interface FreeTrialExperimentDataStore {
 
 @ContributesBinding(AppScope::class)
 class FreeTrialExperimentDataStoreImpl @Inject constructor(
-    private val context: Context,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : FreeTrialExperimentDataStore {
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     override var paywallImpressions: Int
         get() = preferences.getInt(KEY_PAYWALL_IMPRESSIONS, 0)

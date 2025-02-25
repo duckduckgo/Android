@@ -30,6 +30,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
         expiresOrRenewsAt = 10000L,
         status = AUTO_RENEWABLE,
         platform = "Google",
+        activeOffers = listOf(),
     )
 
     @Before
