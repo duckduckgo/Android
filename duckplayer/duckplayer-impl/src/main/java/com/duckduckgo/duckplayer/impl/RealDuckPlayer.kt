@@ -65,6 +65,7 @@ import com.duckduckgo.duckplayer.impl.ui.DuckPlayerPrimeDialogFragment
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Moshi.Builder
 import dagger.SingleInstanceIn
 import java.io.InputStream
 import javax.inject.Inject
@@ -116,6 +117,7 @@ class RealDuckPlayer @Inject constructor(
     private var duckPlayerOrigin: DuckPlayerOrigin? = null
     private var isFeatureEnabled = false
     private var duckPlayerDisabledHelpLink = ""
+    private val moshi = Builder().add(JSONObjectAdapter()).build()
 
     init {
         if (isMainProcess) {
@@ -478,6 +480,24 @@ class RealDuckPlayer @Inject constructor(
     override fun shouldOpenDuckPlayerInNewTab(): OpenDuckPlayerInNewTab {
         if (!duckPlayerFeature.openInNewTab().isEnabled()) return Unavailable
         return if (duckPlayerFeatureRepository.shouldOpenInNewTab()) On else Off
+    }
+
+    override fun shouldShowCustomError(): Boolean {
+        return duckPlayerFeature.customError().isEnabled()
+    }
+
+    override fun customErrorSettings(): CustomErrorSettings? {
+        val settings = duckPlayerFeature.customError().getSettings()
+        return if (settings != null) {
+            try {
+                val adapter = moshi.adapter(CustomErrorSettings::class.java)
+                adapter.fromJson(settings)
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
     }
 
     override fun observeShouldOpenInNewTab(): Flow<OpenDuckPlayerInNewTab> {
