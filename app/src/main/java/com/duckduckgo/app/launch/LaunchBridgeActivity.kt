@@ -43,7 +43,11 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
+        viewModel.launchSplashScreenFailToExitJob()
+
         splashScreen.setOnExitAnimationListener { splashScreenView ->
+            viewModel.cancelSplashScreenFailToExitJob()
+
             val splashScreenAnimationEndTime =
                 Instant.ofEpochMilli(splashScreenView.iconAnimationStartMillis + splashScreenView.iconAnimationDurationMillis)
             val remainingAnimationTime = Instant.now().until(

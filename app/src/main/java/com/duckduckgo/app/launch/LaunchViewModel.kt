@@ -17,6 +17,7 @@
 package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
@@ -27,6 +28,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
@@ -37,6 +42,8 @@ class LaunchViewModel @Inject constructor(
     private val pixel: Pixel,
 ) :
     ViewModel() {
+
+    private var splashScreenFailToExitJob: Job? = null
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -57,6 +64,18 @@ class LaunchViewModel @Inject constructor(
         } else {
             command.value = Command.Home()
         }
+    }
+
+    fun launchSplashScreenFailToExitJob() {
+        splashScreenFailToExitJob = viewModelScope.launch {
+            delay(1.5.seconds)
+            sendWelcomeScreenPixel()
+            determineViewToShow()
+        }
+    }
+
+    fun cancelSplashScreenFailToExitJob() {
+        splashScreenFailToExitJob?.cancel()
     }
 
     private suspend fun waitForReferrerData() {
