@@ -1,22 +1,32 @@
 package com.duckduckgo.autofill.impl.deduper
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.impl.username.RealAutofillUsernameComparer
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RealAutofillLoginDeduplicatorTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val urlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
     private val matchTypeDetector = RealAutofillDeduplicationMatchTypeDetector(urlMatcher)
+    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+    private val usernameComparer = RealAutofillUsernameComparer(autofillFeature, coroutineTestRule.testDispatcherProvider)
     private val testee = RealAutofillLoginDeduplicator(
-        usernamePasswordMatcher = RealAutofillDeduplicationUsernameAndPasswordMatcher(),
+        usernamePasswordMatcher = RealAutofillDeduplicationUsernameAndPasswordMatcher(usernameComparer),
         bestMatchFinder = RealAutofillDeduplicationBestMatchFinder(
-            urlMatcher = urlMatcher,
             matchTypeDetector = matchTypeDetector,
         ),
     )
@@ -28,7 +38,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenSingleEntryInThenSingleEntryReturned() {
+    fun whenSingleEntryInThenSingleEntryReturned() = runTest {
         val inputList = listOf(
             aLogin("domain", "username", "password"),
         )
@@ -37,7 +47,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesCompletelyUnrelatedThenNoDeduplication() {
+    fun whenEntriesCompletelyUnrelatedThenNoDeduplication() = runTest {
         val inputList = listOf(
             aLogin("domain_A", "username_A", "password_A"),
             aLogin("domain_B", "username_B", "password_B"),
@@ -49,7 +59,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareUsernameAndPasswordButNotDomainThenDeduped() {
+    fun whenEntriesShareUsernameAndPasswordButNotDomainThenDeduped() = runTest {
         val inputList = listOf(
             aLogin("foo.com", "username", "password"),
             aLogin("bar.com", "username", "password"),
@@ -59,7 +69,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareDomainAndUsernameButNotPasswordThenNoDeduplication() {
+    fun whenEntriesShareDomainAndUsernameButNotPasswordThenNoDeduplication() = runTest {
         val inputList = listOf(
             aLogin("example.com", "username", "123"),
             aLogin("example.com", "username", "xyz"),
@@ -71,7 +81,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareDomainAndPasswordButNotUsernameThenNoDeduplication() {
+    fun whenEntriesShareDomainAndPasswordButNotUsernameThenNoDeduplication() = runTest {
         val inputList = listOf(
             aLogin("example.com", "user_A", "password"),
             aLogin("example.com", "user_B", "password"),
@@ -83,7 +93,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareMultipleCredentialsWhichArePerfectDomainMatchesThenDeduped() {
+    fun whenEntriesShareMultipleCredentialsWhichArePerfectDomainMatchesThenDeduped() = runTest {
         val inputList = listOf(
             aLogin("example.com", "username", "password"),
             aLogin("example.com", "username", "password"),
@@ -93,7 +103,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareMultipleCredentialsWhichArePartialDomainMatchesThenDeduped() {
+    fun whenEntriesShareMultipleCredentialsWhichArePartialDomainMatchesThenDeduped() = runTest {
         val inputList = listOf(
             aLogin("a.example.com", "username", "password"),
             aLogin("b.example.com", "username", "password"),
@@ -103,7 +113,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareMultipleCredentialsWhichAreNotDomainMatchesThenDeduped() {
+    fun whenEntriesShareMultipleCredentialsWhichAreNotDomainMatchesThenDeduped() = runTest {
         val inputList = listOf(
             aLogin("foo.com", "username", "password"),
             aLogin("bar.com", "username", "password"),
@@ -113,7 +123,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareCredentialsAcrossPerfectAndPartialMatchesThenDedupedToPerfectMatch() {
+    fun whenEntriesShareCredentialsAcrossPerfectAndPartialMatchesThenDedupedToPerfectMatch() = runTest {
         val inputList = listOf(
             aLogin("example.com", "username", "password"),
             aLogin("a.example.com", "username", "password"),
@@ -124,7 +134,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareCredentialsAcrossPerfectAndNonDomainMatchesThenDedupedToPerfectMatch() {
+    fun whenEntriesShareCredentialsAcrossPerfectAndNonDomainMatchesThenDedupedToPerfectMatch() = runTest {
         val inputList = listOf(
             aLogin("example.com", "username", "password"),
             aLogin("bar.com", "username", "password"),
@@ -135,7 +145,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareCredentialsAcrossPartialAndNonDomainMatchesThenDedupedToPerfectMatch() {
+    fun whenEntriesShareCredentialsAcrossPartialAndNonDomainMatchesThenDedupedToPerfectMatch() = runTest {
         val inputList = listOf(
             aLogin("a.example.com", "username", "password"),
             aLogin("bar.com", "username", "password"),
@@ -146,7 +156,7 @@ class RealAutofillLoginDeduplicatorTest {
     }
 
     @Test
-    fun whenEntriesShareCredentialsAcrossPerfectAndPartialAndNonDomainMatchesThenDedupedToPerfectMatch() {
+    fun whenEntriesShareCredentialsAcrossPerfectAndPartialAndNonDomainMatchesThenDedupedToPerfectMatch() = runTest {
         val inputList = listOf(
             aLogin("a.example.com", "username", "password"),
             aLogin("example.com", "username", "password"),

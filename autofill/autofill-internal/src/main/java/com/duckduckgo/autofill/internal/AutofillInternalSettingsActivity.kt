@@ -444,6 +444,16 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.addMixedCaseUsernameDuplicates.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                val credentials = mutableListOf<LoginCredentials>()
+                credentials.add(sampleCredentials("https://autofill.me", username = "username"))
+                credentials.add(sampleCredentials("https://autofill.me", username = "UseRNamE"))
+                credentials.add(sampleCredentials("https://autofill.me", username = "USERNAME"))
+                credentials.save()
+            }
+        }
+
         binding.clearAllSavedLoginsButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 val count = autofillStore.getCredentialCount().first()
