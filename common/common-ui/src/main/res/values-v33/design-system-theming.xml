@@ -16,7 +16,6 @@
 
 <resources>
     <style name="Theme.DuckDuckGo.Splash" parent="Theme.SplashScreen">
-        <item name="android:windowSplashScreenAnimationDuration">1435</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen_wink</item>
     </style>
 </resources>
