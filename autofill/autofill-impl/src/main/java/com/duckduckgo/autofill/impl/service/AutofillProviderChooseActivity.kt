@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
@@ -34,6 +35,8 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.AutofillLogin
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ContinueWithoutAuthentication
@@ -67,6 +70,9 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillServiceActivityHandler: AutofillServiceActivityHandler
 
+    @Inject
+    lateinit var pixel: Pixel
+
     private var assistStructure: AssistStructure? = null
 
     private val credentialId: Long?
@@ -88,6 +94,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
         setupToolbar(binding.toolbar)
         setTitle(R.string.autofill_service_select_password_activity)
         observeViewModel()
+        viewModel.onActivityCreated()
     }
 
     private fun observeViewModel() {
@@ -108,6 +115,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
                         }
 
                         UserCancelled -> {
+                            pixel.fire(AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH)
                             finish()
                         }
 
@@ -164,6 +172,7 @@ class AutofillProviderChooseActivity : DuckDuckGoActivity() {
         if (isSearchBarVisible()) {
             hideSearchBar()
         } else {
+            pixel.fire(AUTOFILL_SERVICE_PASSWORDS_DISMISSED)
             super.onBackPressed()
         }
     }
