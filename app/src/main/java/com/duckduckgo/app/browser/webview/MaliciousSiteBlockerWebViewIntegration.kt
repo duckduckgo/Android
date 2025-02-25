@@ -124,8 +124,9 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     }
 
     sealed class IsMaliciousViewData {
-        data object Safe : IsMaliciousViewData()
+        data class Safe(val isForMainFrame: Boolean) : IsMaliciousViewData()
         data object WaitForConfirmation : IsMaliciousViewData()
+        data object Ignored : IsMaliciousViewData()
         data class MaliciousSite(val url: Uri, val feed: Feed, val exempted: Boolean) : IsMaliciousViewData()
     }
 
@@ -135,7 +136,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
         if (!isEnabled()) {
-            return IsMaliciousViewData.Safe
+            return IsMaliciousViewData.Safe(request.isForMainFrame)
         }
         val url = request.url.let {
             if (it.fragment != null) {
@@ -150,7 +151,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         if (processedUrls.contains(decodedUrl)) {
             processedUrls.remove(decodedUrl)
             Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-            return IsMaliciousViewData.Safe
+            return IsMaliciousViewData.Safe(request.isForMainFrame)
         }
 
         val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
@@ -170,7 +171,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                         }
                         is Safe -> {
                             processedUrls.add(decodedUrl)
-                            return IsMaliciousViewData.Safe
+                            return IsMaliciousViewData.Safe(request.isForMainFrame)
                         }
                     }
                 }
@@ -180,7 +181,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                 }
             }
         }
-        return IsMaliciousViewData.Safe
+        return IsMaliciousViewData.Ignored
     }
 
     override fun shouldOverrideUrlLoading(
@@ -190,14 +191,14 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     ): IsMaliciousViewData {
         return runBlocking {
             if (!isEnabled()) {
-                return@runBlocking IsMaliciousViewData.Safe
+                return@runBlocking IsMaliciousViewData.Safe(isForMainFrame)
             }
             val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
 
             if (processedUrls.contains(decodedUrl)) {
                 processedUrls.remove(decodedUrl)
                 Timber.tag("PhishingAndMalwareDetector").d("Already intercepted, skipping $decodedUrl")
-                return@runBlocking IsMaliciousViewData.Safe
+                return@runBlocking IsMaliciousViewData.Safe(isForMainFrame)
             }
 
             val exemptedUrl = exemptedUrlsHolder.exemptedMaliciousUrls.firstOrNull { it.url.toString() == decodedUrl }
@@ -217,7 +218,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                             }
                             is Safe -> {
                                 processedUrls.add(decodedUrl)
-                                return@runBlocking IsMaliciousViewData.Safe
+                                return@runBlocking IsMaliciousViewData.Safe(true)
                             }
                         }
                     }
@@ -227,7 +228,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
                     }
                 }
             }
-            IsMaliciousViewData.Safe
+            IsMaliciousViewData.Ignored
         }
     }
 
