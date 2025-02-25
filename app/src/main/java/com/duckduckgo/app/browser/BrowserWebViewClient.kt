@@ -162,7 +162,7 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-            if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, isForMainFrame)) {
+            if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
             }
 
