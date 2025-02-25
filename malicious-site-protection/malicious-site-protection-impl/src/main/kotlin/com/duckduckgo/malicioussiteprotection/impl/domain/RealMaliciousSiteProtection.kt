@@ -29,6 +29,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.MessageDigest
 import java.util.regex.Pattern
@@ -42,6 +43,7 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val maliciousSiteRepository: MaliciousSiteRepository,
+    private val maliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository,
     private val messageDigest: MessageDigest,
     private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
 ) : MaliciousSiteProtection {
@@ -64,6 +66,12 @@ class RealMaliciousSiteProtection @Inject constructor(
         }
 
         val hostname = url.host ?: return ConfirmedResult(Safe)
+
+        if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
+            timber.d("should not block (exempted) $hostname")
+            return ConfirmedResult(Safe)
+        }
+
         val hash = messageDigest
             .digest(hostname.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }

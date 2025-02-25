@@ -29,6 +29,7 @@ import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
+import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import java.security.MessageDigest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -47,16 +48,18 @@ class RealMaliciousSiteProtectionTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var realMaliciousSiteProtection: RealMaliciousSiteProtection
-    private val maliciousSiteRepository: MaliciousSiteRepository = mock()
+    private val mockMaliciousSiteRepository: MaliciousSiteRepository = mock()
     private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
+    private val mockMaliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository = mock()
 
     @Before
     fun setup() {
         realMaliciousSiteProtection = RealMaliciousSiteProtection(
             coroutinesTestRule.testDispatcherProvider,
             coroutinesTestRule.testScope,
-            maliciousSiteRepository,
+            mockMaliciousSiteRepository,
+            mockMaliciousSiteProtectionRCRepository,
             messageDigest,
             mockMaliciousSiteProtectionRCFeature,
         )
@@ -70,7 +73,7 @@ class RealMaliciousSiteProtectionTest {
         val hash = messageDigest.digest(hostname.toByteArray()).joinToString("") { "%02x".format(it) }
         val hashPrefix = hash.substring(0, 8)
 
-        whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(false)
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(false)
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
@@ -85,8 +88,8 @@ class RealMaliciousSiteProtectionTest {
         val hashPrefix = hash.substring(0, 8)
         val filter = Filter(hash, ".*malicious.*")
 
-        whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
+        whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(
             listOf(
                 FilterSet(
                     listOf(filter),
@@ -108,9 +111,26 @@ class RealMaliciousSiteProtectionTest {
         val hashPrefix = hash.substring(0, 8)
         val filter = Filter(hash, ".*malicious.*")
 
-        whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
+        whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(false)
+
+        val result = realMaliciousSiteProtection.isMalicious(url) {}
+
+        assertEquals(ConfirmedResult(Safe), result)
+    }
+
+    @Test
+    fun isMalicious_returnsSafe_whenUrlIsMaliciousButDomainMatchesException() = runTest {
+        val url = Uri.parse("https://malicious.com")
+        val hostname = url.host!!
+        val hash = messageDigest.digest(hostname.toByteArray()).joinToString("") { "%02x".format(it) }
+        val hashPrefix = hash.substring(0, 8)
+        val filter = Filter(hash, ".*malicious.*")
+
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
+        whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
+        whenever(mockMaliciousSiteProtectionRCRepository.isExempted(hostname)).thenReturn(true)
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
@@ -125,8 +145,8 @@ class RealMaliciousSiteProtectionTest {
         val hashPrefix = hash.substring(0, 8)
         val filter = Filter(hash, ".*unsafe.*")
 
-        whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
+        whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 
@@ -142,9 +162,9 @@ class RealMaliciousSiteProtectionTest {
         val filter = Filter(hash, ".*whatever.*")
         var onSiteBlockedAsyncCalled = false
 
-        whenever(maliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
-        whenever(maliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
-        whenever(maliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
+        whenever(mockMaliciousSiteRepository.containsHashPrefix(hashPrefix)).thenReturn(true)
+        whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(listOf(FilterSet(listOf(filter), PHISHING)))
+        whenever(mockMaliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
             .thenReturn(listOf(Match(hostname, url.toString(), ".*malicious.*", hash, PHISHING)))
 
         realMaliciousSiteProtection.isMalicious(url) {

@@ -19,10 +19,12 @@ package com.duckduckgo.malicioussiteprotection.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionExceptionsStore
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "maliciousSiteProtection",
+    exceptionsStore = MaliciousSiteProtectionExceptionsStore::class,
 )
 /**
  * This is the class that represents the maliciousSiteProtection feature flags
