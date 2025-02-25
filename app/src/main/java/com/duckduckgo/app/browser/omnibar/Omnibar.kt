@@ -40,7 +40,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -71,11 +70,27 @@ class Omnibar(
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.rootView.removeView(binding.fadeOmnibarBottom)
+                if (fadeBehaviourEnabled) {
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                } else {
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(binding.fadeOmnibar)
+                if (fadeBehaviourEnabled) {
+                    binding.rootView.removeView(binding.newOmnibar)
+                    binding.rootView.removeView(binding.newOmnibarBottom)
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                } else {
+                    binding.rootView.removeView(binding.fadeOmnibar)
+                    binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    binding.rootView.removeView(binding.newOmnibar)
+                }
 
                 // remove the default top abb bar behavior
                 removeAppBarBehavior(binding.autoCompleteSuggestionsList)
@@ -140,14 +155,22 @@ class Omnibar(
         ) : ViewMode()
     }
 
-    private val newOmnibar: FadeOmnibarLayout by lazy {
+    private val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.fadeOmnibar
+                if (fadeBehaviourEnabled) {
+                    binding.fadeOmnibar
+                } else {
+                    binding.newOmnibar
+                }
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.fadeOmnibarBottom
+                if (fadeBehaviourEnabled) {
+                    binding.fadeOmnibarBottom
+                } else {
+                    binding.newOmnibarBottom
+                }
             }
         }
     }
@@ -370,7 +393,15 @@ class Omnibar(
         p4: Int,
     ) {
         if (fadeBehaviourEnabled) {
-            newOmnibar.onScrollChanged(scrollY)
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    binding.fadeOmnibar.onScrollChanged(scrollY)
+                }
+
+                OmnibarPosition.BOTTOM -> {
+                    binding.fadeOmnibarBottom.onScrollChanged(scrollY)
+                }
+            }
         }
     }
 }

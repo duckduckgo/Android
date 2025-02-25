@@ -28,7 +28,8 @@
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?daxColorSurface">
+        android:background="?daxColorSurface"
+        app:layout_scrollFlags="scroll|enterAlways|snap">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
