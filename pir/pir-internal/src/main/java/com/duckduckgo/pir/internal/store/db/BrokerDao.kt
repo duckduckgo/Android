@@ -67,4 +67,7 @@ interface BrokerDao {
         insertOptOutSteps(brokerOptOut)
         insertBrokerSchedulingConfig(schedulingConfig)
     }
+
+    @Query("SELECT brokerName from pir_broker_scan")
+    fun getAllBrokersNamesWithScanSteps(): List<String>
 }

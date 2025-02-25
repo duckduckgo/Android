@@ -28,6 +28,10 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
+import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
+import com.duckduckgo.pir.internal.store.db.ScanErrorResult
+import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
+import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -41,12 +45,16 @@ import com.squareup.moshi.Types
         BrokerOptOut::class,
         BrokerScan::class,
         BrokerSchedulingConfig::class,
+        ScanNavigateResult::class,
+        ScanErrorResult::class,
+        ExtractProfileResult::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
 abstract class PirDatabase : RoomDatabase() {
     abstract fun brokerJsonDao(): BrokerJsonDao
     abstract fun brokerDao(): BrokerDao
+    abstract fun scanResultsDao(): ScanResultsDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
