@@ -2502,6 +2502,10 @@ class BrowserTabFragment :
                 override fun onVoiceSearchPressed() {
                     onOmnibarVoiceSearchPressed()
                 }
+
+                override fun onDuckChatButtonPressed() {
+                    onOmnibarDuckChatPressed(omnibar.getText())
+                }
             },
         )
     }
@@ -4194,6 +4198,14 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+
+    private fun onOmnibarDuckChatPressed(text: String) {
+        if (text.isNotEmpty()) {
+            duckChat.openDuckChatWithAutoPrompt(text)
+        } else {
+            duckChat.openDuckChat()
+        }
     }
 }
 
