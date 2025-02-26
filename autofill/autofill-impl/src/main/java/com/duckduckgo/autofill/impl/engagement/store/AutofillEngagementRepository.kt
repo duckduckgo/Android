@@ -22,9 +22,12 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED_DAU
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_ENABLED_DAU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.impl.service.store.AutofillServiceStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDao
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
@@ -68,6 +71,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val secureStorage: SecureStorage,
     private val deviceAuthenticator: DeviceAuthenticator,
+    private val autofillServiceStore: AutofillServiceStore,
 ) : AutofillEngagementRepository {
 
     private val autofillEngagementDao: AutofillEngagementDao = engagementDb.autofillEngagementDao()
@@ -99,6 +103,13 @@ class DefaultAutofillEngagementRepository @Inject constructor(
         val togglePixel = if (autofillStore.autofillEnabled) AUTOFILL_TOGGLED_ON_SEARCH else AUTOFILL_TOGGLED_OFF_SEARCH
         val bucket = engagementBucketing.bucketNumberOfCredentials(numberStoredPasswords)
         pixel.fire(togglePixel, mapOf("count_bucket" to bucket), type = Daily())
+
+        val autofillServiceStatus = if (autofillServiceStore.isDefaultAutofillProvider()) {
+            AUTOFILL_SERVICE_ENABLED_DAU
+        } else {
+            AUTOFILL_SERVICE_DISABLED_DAU
+        }
+        pixel.fire(autofillServiceStatus, mapOf("count_bucket" to bucket), type = Daily())
     }
 
     private suspend fun DefaultAutofillEngagementRepository.processEvent(engagement: AutofillEngagementEntity) {
