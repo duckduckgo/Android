@@ -36,6 +36,18 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_CRASH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED_DAU
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_ENABLED_DAU
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_OPEN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORD_SELECTED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_SUGGESTION_CONFIRMED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
@@ -180,6 +192,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SERVICE_PASSWORD_SELECTED("autofill_extension_password_selected"),
     AUTOFILL_SERVICE_PASSWORDS_SEARCH("autofill_extension_passwords_search"), // doesn't apply, we automatically focus the search bar
     AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT("autofill_extension_passwords_search_input"), // when user types in the search bar first time
+    AUTOFILL_SERVICE_CRASH("autofill_service_crash"),
 }
 
 @ContributesMultibinding(
@@ -227,6 +240,19 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
 
             AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_SERVICE_ENABLED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_ENABLED_DAU.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_DISABLED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_DISABLED_DAU.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_SUGGESTION_CONFIRMED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORDS_OPEN.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORDS_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORDS_DISMISSED_AUTH.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORD_SELECTED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORDS_SEARCH.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SERVICE_CRASH.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
