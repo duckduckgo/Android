@@ -1925,7 +1925,12 @@ class BrowserTabViewModel @Inject constructor(
             Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
+                val previousPrivacyShieldState = currentPrivacyShieldState()
+                privacyShieldViewState.value = previousPrivacyShieldState.copy(
+                    privacyShield = privacyProtection,
+                    trackersBlocked = site?.trackerCount ?: 0,
+                    previousTrackesBlocked = previousPrivacyShieldState.trackersBlocked,
+                )
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
@@ -3249,7 +3254,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateTabTitle(tabId: String, newTitle: String) {
+    suspend fun updateTabTitle(
+        tabId: String,
+        newTitle: String,
+    ) {
         getSite()?.let { site ->
             site.title = newTitle
             tabRepository.update(tabId, site)

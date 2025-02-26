@@ -42,6 +42,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -137,6 +138,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
         val experimentalIconsEnabled: Boolean = false,
+        val trackersBlocked: Int = 0,
+        val previouslyTrackersBlocked: Int = 0,
     )
 
     sealed class Command {
@@ -342,11 +345,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
         Timber.d("Omnibar: onPrivacyShieldChanged $privacyShield")
-        _viewState.update {
-            it.copy(
-                privacyShield = privacyShield,
-            )
-        }
     }
 
     fun onOutlineEnabled(enabled: Boolean) {
@@ -489,6 +487,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         when (stateChange) {
             is OmnibarStateChange -> onExternalOmnibarStateChanged(stateChange.omnibarViewState)
             is StateChange.LoadingStateChange -> onExternalLoadingStateChanged(stateChange.loadingViewState)
+            is StateChange.PrivacyStateChange -> onExternalPrivacyStateChanged(stateChange.privacyShieldViewState)
         }
     }
 
@@ -538,6 +537,17 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasQueryChanged = false,
                     urlLoaded = loadingState.url,
                 ),
+            )
+        }
+    }
+
+    private fun onExternalPrivacyStateChanged(privacyState: PrivacyShieldViewState) {
+        Timber.d("Omnibar: onExternalPrivacyStateChanged $privacyState")
+        _viewState.update {
+            it.copy(
+                privacyShield = privacyState.privacyShield,
+                trackersBlocked = privacyState.trackersBlocked,
+                previouslyTrackersBlocked = privacyState.previousTrackesBlocked,
             )
         }
     }
