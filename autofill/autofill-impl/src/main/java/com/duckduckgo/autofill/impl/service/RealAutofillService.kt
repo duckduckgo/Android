@@ -23,9 +23,13 @@ import android.service.autofill.FillRequest
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveRequest
 import android.service.autofill.SavedDatasetsInfoCallback
+import android.util.Base64
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ServiceScope
@@ -51,6 +55,8 @@ class RealAutofillService : AutofillService() {
     @Inject lateinit var autofillParser: AutofillParser
 
     @Inject lateinit var autofillProviderSuggestions: AutofillProviderSuggestions
+
+    @Inject lateinit var pixel: Pixel
 
     private val autofillJob = ConflatedJob()
 
@@ -96,10 +102,17 @@ class RealAutofillService : AutofillService() {
 
                 callback.onSuccess(response)
             }.onFailure {
-                // TODO: to include a crash pixel here
+                pixel.fire(AutofillPixelNames.AUTOFILL_SERVICE_CRASH,  mapOf("message" to it.extractExceptionCause()))
                 callback.onSuccess(null)
             }
         }
+    }
+
+    private fun Throwable?.extractExceptionCause(): String {
+        if (this == null) {
+            return "Exception missing"
+        }
+        return "${this.javaClass.name} - ${this.stackTrace.firstOrNull()}"
     }
 
     private fun shouldSkipAutofillSuggestions(nodeToAutofill: AutofillRootNode): Boolean {
