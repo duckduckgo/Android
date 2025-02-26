@@ -24,12 +24,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.animations.ExperimentTrackersCountAnimationHelper
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DelightfulOmnibarLayout @JvmOverloads constructor(
@@ -40,8 +42,12 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
     private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
+    private val trackersText: DaxTextView by lazy { findViewById(R.id.trackersText) }
 
     private val scrollThreshold = 200
+
+    @Inject
+    lateinit var experimentTrackersCountAnimationHelper: ExperimentTrackersCountAnimationHelper
 
     init {
         val attr =
@@ -63,14 +69,7 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
     override fun render(viewState: ViewState) {
         super.render(viewState)
 
-        if (viewState.experimentalIconsEnabled) {
-            fireIconImageView.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_fire_button_experiment)
-            tabsMenu.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_tab_switcher_experiment)
-        } else {
-            fireIconImageView.setImageResource(R.drawable.ic_fire)
-            tabsMenu.setIcon(R.drawable.ic_tabs)
-        }
-
+        experimentTrackersCountAnimationHelper.animate(trackersText, viewState.trackersBlocked, viewState.previouslyTrackersBlocked)
         minibarText.text = viewState.url.extractDomain()
     }
 

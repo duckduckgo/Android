@@ -69,6 +69,7 @@ interface Site {
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun privacyProtection(): PrivacyShield
+    fun resetTrackingEvents()
 
     var urlParametersRemoved: Boolean
     var consentManaged: Boolean
