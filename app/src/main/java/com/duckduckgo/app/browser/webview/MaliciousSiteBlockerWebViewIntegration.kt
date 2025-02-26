@@ -145,7 +145,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             }
         }
 
-        val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        val decodedUrl = decodeUrl(url)
 
         if (processedUrls.contains(decodedUrl)) {
             processedUrls.remove(decodedUrl)
@@ -192,7 +192,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             if (!isEnabled()) {
                 return@runBlocking IsMaliciousViewData.Safe
             }
-            val decodedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+            val decodedUrl = decodeUrl(url)
 
             if (processedUrls.contains(decodedUrl)) {
                 processedUrls.remove(decodedUrl)
@@ -257,6 +257,15 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         return isFeatureEnabled && isSettingEnabled
     }
 
+    private fun decodeUrl(url: Uri): String {
+        return try {
+            URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        } catch (e: Exception) {
+            Timber.d("decode url failed: $url")
+            url.toString().lowercase()
+        }
+    }
+
     override fun onPageLoadStarted() {
         processedUrls.clear()
     }
@@ -265,7 +274,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         url: Uri,
         feed: Feed,
     ) {
-        val convertedUrl = URLDecoder.decode(url.toString(), "UTF-8").lowercase()
+        val convertedUrl = decodeUrl(url)
         exemptedUrlsHolder.addExemptedMaliciousUrl(ExemptedUrl(convertedUrl.toUri(), feed))
         Timber.tag("MaliciousSiteDetector").d(
             "Added $url to exemptedUrls, contents: ${exemptedUrlsHolder.exemptedMaliciousUrls}",
