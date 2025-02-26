@@ -6,13 +6,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.autofill.FakeAutofillServiceStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED_DAU
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_ENABLED_DAU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.impl.service.store.AutofillServiceStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -41,6 +45,7 @@ class DefaultAutofillEngagementRepositoryTest {
 
     private val pixel = FakePixel()
     private val autofillStore: InternalAutofillStore = mock()
+    private val autofillServiceStore: AutofillServiceStore = FakeAutofillServiceStore()
     private val secureStorage: SecureStorage = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
 
@@ -61,6 +66,7 @@ class DefaultAutofillEngagementRepositoryTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         secureStorage = secureStorage,
         deviceAuthenticator = deviceAuthenticator,
+        autofillServiceStore = autofillServiceStore
     )
 
     @Test
@@ -121,6 +127,20 @@ class DefaultAutofillEngagementRepositoryTest {
         givenUserHasAutofillEnabled(false)
         testee.recordSearchedToday()
         AUTOFILL_TOGGLED_OFF_SEARCH.verifySent()
+    }
+
+    @Test
+    fun whenSearchedAndAutofillServiceEnabledThenServiceEnabledPixelSent() = runTest {
+        autofillServiceStore.updateDefaultAutofillProvider(true)
+        testee.recordSearchedToday()
+        AUTOFILL_SERVICE_ENABLED_DAU.verifySent()
+    }
+
+    @Test
+    fun whenSearchedAndAutofillServiceDisabledThenServiceDisabledPixelSent() = runTest {
+        autofillServiceStore.updateDefaultAutofillProvider(false)
+        testee.recordSearchedToday()
+        AUTOFILL_SERVICE_DISABLED_DAU.verifySent()
     }
 
     @Test
