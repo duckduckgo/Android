@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_OPEN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_SUGGESTION_CONFIRMED
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.AutofillLogin

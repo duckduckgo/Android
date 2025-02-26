@@ -18,7 +18,7 @@ package com.duckduckgo.autofill
 
 import com.duckduckgo.autofill.impl.service.store.AutofillServiceStore
 
-class FakeAutofillServiceStore: AutofillServiceStore {
+class FakeAutofillServiceStore : AutofillServiceStore {
     private var isAutofillEnabled = false
 
     override suspend fun isDefaultAutofillProvider(): Boolean = isAutofillEnabled

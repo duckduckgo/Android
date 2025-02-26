@@ -48,7 +48,7 @@ class AutofillProviderChooseViewModelTest {
             autofillFeature = autofillFeature,
         ),
         appCoroutineScope = coroutineRule.testScope,
-        pixel = pixel
+        pixel = pixel,
     )
 
     @Test
@@ -112,7 +112,7 @@ class AutofillProviderChooseViewModelTest {
             assertFalse(twitterCredentials.lastUsedMillis == updatedCredential.lastUsedMillis)
         }
     }
-    
+
     @Test
     fun whenContinueAfterAuthenticationThenFireAutofillServiceSuggestionConfirmedPixel() = runTest {
         givenLocalCredentials(twitterCredentials)

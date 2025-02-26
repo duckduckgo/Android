@@ -23,11 +23,9 @@ import android.service.autofill.FillRequest
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveRequest
 import android.service.autofill.SavedDatasetsInfoCallback
-import android.util.Base64
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.ConflatedJob
@@ -102,7 +100,7 @@ class RealAutofillService : AutofillService() {
 
                 callback.onSuccess(response)
             }.onFailure {
-                pixel.fire(AutofillPixelNames.AUTOFILL_SERVICE_CRASH,  mapOf("message" to it.extractExceptionCause()))
+                pixel.fire(AutofillPixelNames.AUTOFILL_SERVICE_CRASH, mapOf("message" to it.extractExceptionCause()))
                 callback.onSuccess(null)
             }
         }
