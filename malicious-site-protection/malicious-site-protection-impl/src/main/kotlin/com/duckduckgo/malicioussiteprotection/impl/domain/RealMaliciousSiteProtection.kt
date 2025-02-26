@@ -94,12 +94,17 @@ class RealMaliciousSiteProtection @Inject constructor(
                 val result = matches(hashPrefix, url, hostname, hash)?.let { feed: Feed ->
                     Malicious(feed)
                 } ?: Safe
+                when (result) {
+                    is Malicious -> timber.d("should block (matches) $url")
+                    is Safe -> timber.d("should not block (no match) $url")
+                }
                 confirmationCallback(result)
             } catch (e: Exception) {
                 timber.e(e, "shouldBlock $url")
                 confirmationCallback(Safe)
             }
         }
+        timber.d("wait for confirmation $url")
         return IsMaliciousResult.WaitForConfirmation
     }
 
