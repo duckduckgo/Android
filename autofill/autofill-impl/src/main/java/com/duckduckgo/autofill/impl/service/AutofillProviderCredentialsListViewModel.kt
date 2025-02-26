@@ -22,6 +22,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORD_SELECTED
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -52,6 +54,8 @@ class AutofillProviderCredentialsListViewModel @Inject constructor(
 
     private var combineJob: Job? = null
 
+    private var hasPreviouslySearched = false
+
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
@@ -68,12 +72,17 @@ class AutofillProviderCredentialsListViewModel @Inject constructor(
     }
 
     fun onSearchQueryChanged(searchText: String) {
+        if (!hasPreviouslySearched) {
+            pixel.fire(AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT)
+            hasPreviouslySearched = true
+        }
         Timber.v("Search query changed: %s", searchText)
         searchQueryFilter.value = searchText
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText)
     }
 
     fun onCredentialSelected(credentials: LoginCredentials) {
+        pixel.fire(AUTOFILL_SERVICE_PASSWORD_SELECTED)
         credentials.updateLastUsedTimestamp()
     }
 
