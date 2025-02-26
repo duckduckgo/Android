@@ -29,7 +29,7 @@
         android:elevation="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface">
+        android:background="?attr/daxColorToolbarBackground">
 
         <LinearLayout
             android:id="@+id/minibar"
@@ -68,7 +68,7 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:background="?attr/daxColorSurface"
+            android:background="?attr/daxColorToolbarBackground"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             android:layout_marginEnd="@dimen/keyline_2"
@@ -92,7 +92,7 @@
                 android:id="@+id/omniBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/fading_omnibar_field_selector">
+                android:background="@drawable/fading_omnibar_field_background">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/trackersAnimation"
