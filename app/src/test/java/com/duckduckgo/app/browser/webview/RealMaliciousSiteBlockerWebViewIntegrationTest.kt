@@ -4,6 +4,7 @@ import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.webview.ExemptedUrlsHolder.ExemptedUrl
+import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Ignored
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
 import com.duckduckgo.app.pixels.AppPixelName
@@ -73,7 +74,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         updateFeatureEnabled(false)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
-        assertEquals(Safe, result)
+        assertEquals(Safe(true), result)
     }
 
     @Test
@@ -81,17 +82,18 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         whenever(mockSettingsDataStore.maliciousSiteProtectionEnabled).thenReturn(false)
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
-        assertEquals(Safe, result)
+        assertEquals(Safe(true), result)
     }
 
     @Test
     fun `shouldInterceptRequest returns safe when feature is disabled`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
+        whenever(request.isForMainFrame).thenReturn(false)
         updateFeatureEnabled(false)
 
         val result = testee.shouldIntercept(request, null) {}
-        assertEquals(Safe, result)
+        assertEquals(Safe(false), result)
     }
 
     @Test
@@ -99,9 +101,10 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(exampleUri)
         whenever(mockSettingsDataStore.maliciousSiteProtectionEnabled).thenReturn(false)
+        whenever(request.isForMainFrame).thenReturn(false)
 
         val result = testee.shouldIntercept(request, null) {}
-        assertEquals(Safe, result)
+        assertEquals(Safe(false), result)
     }
 
     @Test
@@ -109,7 +112,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         testee.processedUrls[exampleUri.toString()] = MaliciousStatus.Safe
 
         val result = testee.shouldOverrideUrlLoading(exampleUri, true) {}
-        assertEquals(Safe, result)
+        assertEquals(Safe(true), result)
     }
 
     @Test
@@ -171,26 +174,26 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldInterceptRequest returns safe when feature is enabled, setting is enabled, is malicious, and is not mainframe nor iframe`() = runTest {
+    fun `shouldInterceptRequest returns ignored when feature is enabled, setting is enabled, is malicious, & is not mainframe or iframe`() = runTest {
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(false)
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
-        assertEquals(Safe, result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldOverride returns safe when feature is enabled, setting is enabled, is malicious, and is not mainframe`() = runTest {
+    fun `shouldOverride returns ignored when feature is enabled, setting is enabled, is malicious, and is not mainframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, false) {}
-        assertEquals(Safe, result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldOverride returns malicious when feature is enabled,, setting is enabled, is malicious, and is mainframe`() = runTest {
+    fun `shouldOverride returns malicious when feature is enabled, setting is enabled, is malicious, and is mainframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, true) {}
@@ -198,22 +201,22 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
     }
 
     @Test
-    fun `shouldOverride returns safe when feature is enabled, setting is enabled, is malicious, and not mainframe nor iframe`() = runTest {
+    fun `shouldOverride returns ignored when feature is enabled, setting is enabled, is malicious, and not mainframe nor iframe`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
 
         val result = testee.shouldOverrideUrlLoading(maliciousUri, false) {}
-        assertEquals(Safe, result)
+        assertEquals(Ignored, result)
     }
 
     @Test
-    fun `shouldIntercept returns safe when feature and setting enabled, is malicious, and is mainframe but webView has different host`() = runTest {
+    fun `shouldIntercept returns safe when feature & setting enabled, is malicious, and is not mainframe but webView has different host`() = runTest {
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
         val request = mock(WebResourceRequest::class.java)
         whenever(request.url).thenReturn(maliciousUri)
         whenever(request.isForMainFrame).thenReturn(false)
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
-        assertEquals(Safe, result)
+        assertEquals(Ignored, result)
     }
 
     @Test
