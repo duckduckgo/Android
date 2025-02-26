@@ -941,6 +941,16 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.setAccessToken(null)
             authRepository.setAuthToken(null)
             pixelSender.reportAuthV2MigrationSuccess()
+        } catch (e: HttpException) {
+            if (e.code() == 400 && parseError(e)?.error == "invalid_token") {
+                // After the account is removed from the backend, the user is automatically signed out of the app.
+                // This is a rare edge case where migration is triggered between these two events.
+                pixelSender.reportAuthV2MigrationFailureInvalidToken()
+                signOut()
+            } else {
+                pixelSender.reportAuthV2MigrationFailureOther()
+            }
+            throw e
         } catch (e: Exception) {
             if (e is IOException) {
                 pixelSender.reportAuthV2MigrationFailureIo()
