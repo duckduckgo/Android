@@ -23,6 +23,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
@@ -60,6 +62,8 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin = mock()
+    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -73,6 +77,8 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
+            freeTrialPrivacyProPixelsPlugin,
+            freeTrialExperimentDataStore,
         )
         givenSubscriptionStatus(UNKNOWN)
     }

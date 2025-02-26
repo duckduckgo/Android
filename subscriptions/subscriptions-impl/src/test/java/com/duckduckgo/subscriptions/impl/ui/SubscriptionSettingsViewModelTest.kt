@@ -66,6 +66,7 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
+                activeOffers = listOf(),
             ),
         )
 
@@ -93,6 +94,7 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
+                activeOffers = listOf(),
             ),
         )
 
@@ -120,6 +122,7 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
+                activeOffers = listOf(),
             ),
         )
 
@@ -147,6 +150,7 @@ class SubscriptionSettingsViewModelTest {
                 expiresOrRenewsAt = 1701694623000,
                 status = AUTO_RENEWABLE,
                 platform = "android",
+                activeOffers = listOf(),
             ),
         )
 

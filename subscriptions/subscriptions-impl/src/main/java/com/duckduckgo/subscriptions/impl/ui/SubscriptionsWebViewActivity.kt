@@ -259,7 +259,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }.launchIn(lifecycleScope)
 
         if (savedInstanceState == null && params.url == BUY_URL) {
-            pixelSender.reportOfferScreenShown()
+            viewModel.paywallShown()
         }
     }
 
@@ -417,7 +417,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
-            is SubscriptionSelected -> selectSubscription(command.id)
+            is SubscriptionSelected -> selectSubscription(command.id, command.offerId)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -517,8 +517,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun selectSubscription(id: String) {
-        viewModel.purchaseSubscription(this, id)
+    private fun selectSubscription(id: String, offerId: String?) {
+        viewModel.purchaseSubscription(this, id, offerId)
     }
 
     private fun sendResponseToJs(data: JsCallbackData) {

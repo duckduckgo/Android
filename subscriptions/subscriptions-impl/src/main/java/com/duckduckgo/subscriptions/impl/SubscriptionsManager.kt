@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -55,6 +56,9 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
+import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedMonthly
+import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedYearly
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -110,7 +114,7 @@ interface SubscriptionsManager {
     suspend fun purchase(
         activity: Activity,
         planId: String,
-        offerId: String? = null,
+        offerId: String?,
     )
 
     /**
@@ -214,6 +218,13 @@ interface SubscriptionsManager {
     suspend fun getPortalUrl(): String?
 
     suspend fun canSupportEncryption(): Boolean
+
+    /**
+     * Checks whether the user has previously used a trial.
+     *
+     * @return [Boolean] indicating if the user has had a trial before.
+     */
+    suspend fun hadTrial(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -234,6 +245,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
+    private val freeTrialPrivacyProPixelsPlugin: Lazy<FreeTrialPrivacyProPixelsPlugin>,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -327,6 +339,14 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
+    override suspend fun hadTrial(): Boolean {
+        return try {
+            return subscriptionsService.offerStatus().hadTrial
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
     override suspend fun getPortalUrl(): String? {
@@ -406,11 +426,18 @@ class RealSubscriptionsManager @Inject constructor(
         packageName: String,
         purchaseToken: String,
     ): Boolean {
+        var experimentName: String? = null
+        val cohort: String? = privacyProFeature.get().privacyProFreeTrialJan25().getCohort()?.name
+        if (cohort != null) {
+            experimentName = "privacyProFreeTrialJan25"
+        }
         return try {
             val confirmationResponse = subscriptionsService.confirm(
                 ConfirmationBody(
                     packageName = packageName,
                     purchaseToken = purchaseToken,
+                    experimentName = experimentName,
+                    experimentCohort = cohort,
                 ),
             )
 
@@ -420,6 +447,7 @@ class RealSubscriptionsManager @Inject constructor(
                 expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
                 status = confirmationResponse.subscription.status.toStatus(),
                 platform = confirmationResponse.subscription.platform,
+                activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
             )
 
             authRepository.setSubscription(subscription)
@@ -437,6 +465,12 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             if (subscription.isActive()) {
+                // Free Trial experiment metrics
+                if (confirmationResponse.subscription.productId.contains("monthly-renews-us")) {
+                    freeTrialPrivacyProPixelsPlugin.get().onSubscriptionStartedMonthly()
+                } else if (confirmationResponse.subscription.productId.contains("yearly-renews-us")) {
+                    freeTrialPrivacyProPixelsPlugin.get().onSubscriptionStartedYearly()
+                }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
@@ -517,6 +551,7 @@ class RealSubscriptionsManager @Inject constructor(
                     expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                     status = subscription.status.toStatus(),
                     platform = subscription.platform,
+                    activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
                 ),
             )
             authRepository.setEntitlements(accountData.entitlements.toEntitlements())
@@ -582,6 +617,7 @@ class RealSubscriptionsManager @Inject constructor(
                 expiresOrRenewsAt = subscription.expiresOrRenewsAt,
                 status = subscription.status.toStatus(),
                 platform = subscription.platform,
+                activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
             ),
         )
 
@@ -814,6 +850,7 @@ class RealSubscriptionsManager @Inject constructor(
                 activity = activity,
                 planId = planId,
                 externalId = authRepository.getAccount()!!.externalId,
+                offerId = offerId,
             )
         } catch (e: Exception) {
             val error = extractError(e)
@@ -1006,6 +1043,13 @@ fun String.toStatus(): SubscriptionStatus {
         "Expired" -> EXPIRED
         "Waiting" -> WAITING
         else -> UNKNOWN
+    }
+}
+
+fun String.toActiveOfferType(): ActiveOfferType {
+    return when (this) {
+        "Trial" -> ActiveOfferType.TRIAL
+        else -> ActiveOfferType.UNKNOWN
     }
 }
 

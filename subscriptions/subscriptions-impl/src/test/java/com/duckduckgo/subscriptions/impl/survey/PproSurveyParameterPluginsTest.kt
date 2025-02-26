@@ -29,6 +29,7 @@ class PproSurveyParameterPluginTest {
         expiresOrRenewsAt = 1719525600000, // June 27 UTC
         status = AUTO_RENEWABLE,
         platform = "android",
+        activeOffers = listOf(),
     )
 
     @Before
