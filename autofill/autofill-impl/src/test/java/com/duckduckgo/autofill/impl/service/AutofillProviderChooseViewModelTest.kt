@@ -2,10 +2,12 @@ package com.duckduckgo.autofill.impl.service
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.fakeAutofillStore
 import com.duckduckgo.autofill.fakeStorage
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_SUGGESTION_CONFIRMED
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
@@ -31,6 +33,8 @@ class AutofillProviderChooseViewModelTest {
 
     private val secureStorage: SecureStorage = fakeStorage()
 
+    private val pixel: Pixel = mock()
+
     val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     private val testee = AutofillProviderChooseViewModel(
@@ -44,6 +48,7 @@ class AutofillProviderChooseViewModelTest {
             autofillFeature = autofillFeature,
         ),
         appCoroutineScope = coroutineRule.testScope,
+        pixel = pixel
     )
 
     @Test
@@ -105,6 +110,19 @@ class AutofillProviderChooseViewModelTest {
             awaitItem()
             val updatedCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials()
             assertFalse(twitterCredentials.lastUsedMillis == updatedCredential.lastUsedMillis)
+        }
+    }
+    
+    @Test
+    fun whenContinueAfterAuthenticationThenFireAutofillServiceSuggestionConfirmedPixel() = runTest {
+        givenLocalCredentials(twitterCredentials)
+        whenever(autofillProviderDeviceAuth.isAuthRequired()).thenReturn(true)
+
+        testee.commands().test {
+            awaitItem() // requires auth
+            testee.continueAfterAuthentication(twitterCredentials.id!!)
+            awaitItem()
+            verify(pixel).fire(AUTOFILL_SERVICE_SUGGESTION_CONFIRMED)
         }
     }
 

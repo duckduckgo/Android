@@ -69,10 +69,6 @@ class AutofillProviderChooseViewModel @Inject constructor(
         data object ForceFinish : Command()
     }
 
-    fun onActivityCreated() {
-        pixel.fire(AUTOFILL_SERVICE_PASSWORDS_OPEN)
-    }
-
     fun onUserAuthenticatedSuccessfully() {
         viewModelScope.launch(dispatchers.io()) {
             autofillProviderDeviceAuth.recordSuccessfulAuthorization()
