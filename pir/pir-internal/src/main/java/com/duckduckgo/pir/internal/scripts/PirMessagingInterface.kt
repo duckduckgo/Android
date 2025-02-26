@@ -121,7 +121,6 @@ class PirMessagingInterface @Inject constructor(
             jsMessageCallback: JsMessageCallback?,
         ) {
             logcat { "PIR-CSS: BrokerProtectionMessageHandler: process $jsMessage" }
-            logcat { "PIR-CSS: BrokerProtectionMessageHandler: jsMessageCallback $jsMessageCallback" }
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 

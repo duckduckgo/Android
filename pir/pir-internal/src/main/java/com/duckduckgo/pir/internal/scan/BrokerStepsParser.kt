@@ -27,9 +27,15 @@ import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.logcat
 
 interface BrokerStepsParser {
+    /**
+     * This method parses the given json into BrokerStep that contains the actions needed to execute whatever step type.
+     *
+     * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
+     */
     suspend fun parseStep(stepsJson: String): BrokerStep?
 
     data class BrokerStep(
@@ -62,7 +68,7 @@ class RealBrokerStepsParser @Inject constructor(
         return@withContext runCatching {
             adapter.fromJson(stepsJson)
         }.onFailure {
-            logcat { "PIR-SCAN: RealPirScan parseStep $it" }
+            logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
         }.getOrNull()
     }
 }

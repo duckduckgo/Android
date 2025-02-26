@@ -21,6 +21,7 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -54,6 +55,9 @@ class PirDevSettings : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -107,6 +111,7 @@ class PirDevSettings : DuckDuckGoActivity() {
 
     private fun setupViews() {
         binding.debugRunScan.setOnClickListener {
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
             startForegroundService(Intent(this, PirForegroundScanService::class.java))
         }
@@ -115,6 +120,7 @@ class PirDevSettings : DuckDuckGoActivity() {
             lifecycleScope.launch(dispatcherProvider.io()) {
                 repository.deleteAllResults()
             }
+            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
         }
 
         lifecycleScope.launch(dispatcherProvider.io()) {
@@ -143,6 +149,7 @@ class PirDevSettings : DuckDuckGoActivity() {
 
     companion object {
         const val NOTIF_CHANNEL_ID = "PirDevNotificationChannel"
+        const val NOTIF_ID_STATUS_COMPLETE = 987
     }
 }
 
