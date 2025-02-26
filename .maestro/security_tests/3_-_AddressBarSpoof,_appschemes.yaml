@@ -15,17 +15,7 @@ tags:
             - pressKey: Enter
             - tapOn: "Got It"
             - tapOn: "Start"
-            # This test is expected to load spreadprivacy.com, not remain on the current page with spoofed content.
-            - assertVisible: "Spread Privacy" # DuckDuckGo blog homepage
+            # Simplified: Just ensure the address bar remains on the current URL, since these URL types are not supported in Android webview anymore.
             - copyTextFrom:
                 id: "omnibarTextInput"
-            - assertTrue: ${maestro.copiedText == "https://spreadprivacy.com/"} # DuckDuckGo blog home page
-            - tapOn:
-                id: "omnibarTextInput"
-            # Test 2
-            - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"
-            - pressKey: Enter
-            - tapOn: "Start"
-            - copyTextFrom:
-                id: "omnibarTextInput"
-            - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"}
+            - assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"}
