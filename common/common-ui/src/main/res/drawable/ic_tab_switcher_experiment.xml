@@ -1,17 +1,20 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
   <path
-      android:pathData="M3.501,6.867C3.5,6.911 3.5,6.955 3.5,7V9.822C3.044,10.576 2.781,11.46 2.781,12.406V14.156C2.781,16.918 5.02,19.156 7.781,19.156H9.531C10.433,19.156 11.279,18.917 12.009,18.5H15C15.007,18.5 15.014,18.5 15.021,18.5C13.739,20.118 11.756,21.156 9.531,21.156H7.781C3.915,21.156 0.781,18.022 0.781,14.156V12.406C0.781,10.152 1.847,8.147 3.501,6.867Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillType="evenOdd"/>
-  <path
-      android:pathData="M10.531,1.781L15.219,1.781A5,5 0,0 1,20.219 6.781L20.219,11.469A5,5 0,0 1,15.219 16.469L10.531,16.469A5,5 0,0 1,5.531 11.469L5.531,6.781A5,5 0,0 1,10.531 1.781z"
+      android:pathData="M1,7V13C1,16.314 3.686,19 7,19H13"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
-      android:fillColor="?attr/daxColorSurface"
-      android:strokeColor="?attr/daxColorPrimaryIcon"
+      android:fillColor="#00000000"
+      android:strokeColor="?daxColorPrimaryIcon"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M8,1L15,1A4,4 0,0 1,19 5L19,12A4,4 0,0 1,15 16L8,16A4,4 0,0 1,4 12L4,5A4,4 0,0 1,8 1z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="?daxColorPrimaryIcon"
       android:strokeLineCap="round"/>
 </vector>
