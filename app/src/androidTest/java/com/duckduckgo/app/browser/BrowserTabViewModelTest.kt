@@ -942,6 +942,45 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadUrlDoNotUpdateSiteMaliciousSiteStatus() {
+        val maliciousUri = "https://www.malicious.com".toUri()
+        testee.onReceivedMaliciousSiteWarning(
+            maliciousUri,
+            maliciousUri,
+            Feed.PHISHING,
+            exempted = false,
+            clientSideHit = false,
+            isForMainFrame = true,
+        )
+
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
+        )
+
+        assertEquals(PHISHING, testee.getSite()?.maliciousSiteStatus)
+    }
+
+    @Test
+    fun whenOnReceivedSafeSiteUpdateSiteMaliciousSiteStatus() {
+        val maliciousUri = "https://www.malicious.com".toUri()
+        testee.onReceivedMaliciousSiteWarning(
+            maliciousUri,
+            maliciousUri,
+            Feed.PHISHING,
+            exempted = false,
+            clientSideHit = false,
+            isForMainFrame = true,
+        )
+        testee.navigationStateChanged(
+            buildWebNavigation(originalUrl = "https://www.example.com", currentUrl = "https://www.example.com", title = "title"),
+        )
+
+        testee.onReceivedMaliciousSiteSafe("https://www.example.com".toUri(), true)
+
+        assertNull(testee.getSite()?.maliciousSiteStatus)
+    }
+
+    @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
         val folderId = "folder1"
         val bookmark =
@@ -5157,7 +5196,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabThenClose() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, url, MALWARE, true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
     }
@@ -5165,7 +5204,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
         val url = "http://example.com".toUri()
-        testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, url, url, MALWARE, false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.EscapeMaliciousSite })
     }
@@ -5261,13 +5300,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
+    fun whenTrackersBlockedCtaShownWithBrowserShowingThenPrivacyShieldIsHighlighted() = runTest {
         val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
 
         testee.onOnboardingDaxTypingAnimationFinished()
 
         assertTrue(browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
+    fun whenTrackersBlockedCtaShownWithMaliciousSiteBlockedThenPrivacyShieldIsNotHighlighted() = runTest {
+        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+        testee.onOnboardingDaxTypingAnimationFinished()
+
+        assertFalse(browserViewState().showPrivacyShield.isHighlighted())
     }
 
     @Test
@@ -5951,7 +6002,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenVisitSiteThenUpdateBrowserViewStateLoadingViewStateAndOmnibarViewState() {
+    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value = browserViewState().copy(
             browserShowing = false,
             maliciousSiteBlocked = true,
@@ -5961,17 +6012,8 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
 
-        assertEquals(
-            browserViewState(),
-            browserViewState().copy(
-                browserShowing = true,
-                showPrivacyShield = HighlightableButton.Visible(enabled = true),
-                fireButton = HighlightableButton.Visible(enabled = true),
-                maliciousSiteBlocked = false,
-            ),
-        )
         assertEquals(
             loadingViewState(),
             loadingViewState().copy(
@@ -5993,7 +6035,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLeaveSiteAndCustomTabThenEmitCloseCustomTab() {
-        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, true)
         assertCommandIssued<CloseCustomTab>()
     }
 
@@ -6003,7 +6045,7 @@ class BrowserTabViewModelTest {
         whenever(mockLiveSelectedTab.value).thenReturn(TabEntity("ID"))
         whenever(mockTabRepository.liveSelectedTab).thenReturn(mockLiveSelectedTab)
 
-        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
 
         assertCommandIssued<EscapeMaliciousSite>()
         assertCommandIssued<LaunchNewTab>()
@@ -6012,13 +6054,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLearnMoreThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(LearnMore, "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LearnMore, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
         assertCommandIssued<OpenBrokenSiteLearnMore>()
     }
 
     @Test
     fun whenReportErrorThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(ReportError, "http://example.com".toUri(), "http://example.com".toUri(), Feed.PHISHING, false)
         assertCommandIssued<ReportBrokenSiteError>()
     }
 

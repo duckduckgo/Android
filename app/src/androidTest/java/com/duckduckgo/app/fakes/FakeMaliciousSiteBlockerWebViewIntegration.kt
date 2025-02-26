@@ -30,7 +30,7 @@ class FakeMaliciousSiteBlockerWebViewIntegration : MaliciousSiteBlockerWebViewIn
         documentUri: Uri?,
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
-        return Safe
+        return Safe(request.isForMainFrame)
     }
 
     override fun shouldOverrideUrlLoading(
@@ -38,7 +38,7 @@ class FakeMaliciousSiteBlockerWebViewIntegration : MaliciousSiteBlockerWebViewIn
         isForMainFrame: Boolean,
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousViewData {
-        return Safe
+        return Safe(isForMainFrame)
     }
 
     override fun onPageLoadStarted(url: String) {
