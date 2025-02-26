@@ -41,6 +41,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
@@ -106,6 +111,10 @@ class DuckPlayerJSHelper @Inject constructor(
                     "settings": {
                         "pip": {
                             "state": "disabled"
+                        },
+                        "customError": {
+                            "state": "enabled",
+                            "signInRequiredSelector": "[href*=\"//support.google.com/youtube/answer/3037019\"]"
                         }
                     },
                     "userValues": {
@@ -246,6 +255,16 @@ class DuckPlayerJSHelper @Inject constructor(
                     DUCK_PLAYER_PAGE_FEATURE_NAME -> OpenDuckPlayerPageInfo
                     else -> null
                 }
+            }
+            "reportYouTubeError" -> {
+                val pixelName: DuckPlayerPixelName = when (data?.getString("error")) {
+                    "age-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED
+                    "no-embed" -> DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED
+                    "sign-in-restricted" -> DUCK_PLAYER_YOUTUBE_ERROR_SIGN_IN_REQUIRED
+                    else -> DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN
+                }
+
+                pixel.fire(pixelName)
             }
             else -> {
                 return null
