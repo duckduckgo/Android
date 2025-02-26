@@ -66,7 +66,7 @@ class DefaultAutofillEngagementRepositoryTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         secureStorage = secureStorage,
         deviceAuthenticator = deviceAuthenticator,
-        autofillServiceStore = autofillServiceStore
+        autofillServiceStore = autofillServiceStore,
     )
 
     @Test
