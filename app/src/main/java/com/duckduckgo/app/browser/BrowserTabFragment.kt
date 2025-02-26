@@ -647,14 +647,7 @@ class BrowserTabFragment :
         override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
-            launch {
-                if (isCosmetic) {
-                    delay(COOKIES_ANIMATION_DELAY)
-                }
-                context?.let {
-                    omnibar.createCookiesAnimation(isCosmetic)
-                }
-            }
+            viewModel.onAutoConsentPopUpHandled(isCosmetic)
         }
 
         override fun onResultReceived(
@@ -875,7 +868,7 @@ class BrowserTabFragment :
             object : DefaultLifecycleObserver {
                 override fun onStop(owner: LifecycleOwner) {
                     if (isVisible) {
-                        if (viewModel.browserViewState.value?.maliciousSiteDetected != true) {
+                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
                             updateOrDeleteWebViewPreview()
                         }
                     }
@@ -890,6 +883,16 @@ class BrowserTabFragment :
 
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview() {
+        val url = viewModel.url
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            viewModel.deleteTabPreview(tabId)
+        } else {
+            generateWebViewPreviewImage()
         }
     }
 
@@ -1143,16 +1146,6 @@ class BrowserTabFragment :
         viewModel.onMessageProcessed()
     }
 
-    private fun updateOrDeleteWebViewPreview() {
-        val url = viewModel.url
-        Timber.d("Updating or deleting WebView preview for $url")
-        if (url == null) {
-            viewModel.deleteTabPreview(tabId)
-        } else {
-            generateWebViewPreviewImage()
-        }
-    }
-
     private fun launchTabSwitcher() {
         val activity = activity ?: return
         startActivity(TabSwitcherActivity.intent(activity, tabId))
@@ -1390,7 +1383,12 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showMaliciousWarning(url: Uri, feed: Feed) {
+    private fun showMaliciousWarning(
+        maliciousUri: Uri,
+        documentUri: Uri?,
+        feed: Feed,
+        onMaliciousWarningShown: (errorNavigationState: ErrorNavigationState) -> Unit,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
@@ -1402,7 +1400,13 @@ class BrowserTabFragment :
         webView?.hide()
         webView?.stopLoading()
         maliciousWarningView.bind(feed) { action ->
-            viewModel.onMaliciousSiteUserAction(action, url, feed, isActiveCustomTab())
+            viewModel.onMaliciousSiteUserAction(
+                action = action,
+                maliciousUrl = maliciousUri,
+                documentUrl = documentUri,
+                feed = feed,
+                activeCustomTab = isActiveCustomTab(),
+            )
         }
         viewModel.deleteTabPreview(tabId)
         lifecycleScope.launch(dispatchers.main()) {
@@ -1410,6 +1414,8 @@ class BrowserTabFragment :
         }
         maliciousWarningView.show()
         binding.focusDummy.requestFocus()
+        val navigationList = webView?.safeCopyBackForwardList() ?: return
+        onMaliciousWarningShown(ErrorNavigationState(navigationList, maliciousSiteUrl = maliciousUri, SITE_SECURITY_WARNING))
     }
 
     private fun hideMaliciousWarning() {
@@ -1417,7 +1423,6 @@ class BrowserTabFragment :
         val currentIndex = navList?.currentIndex ?: 0
 
         if (currentIndex >= 0) {
-            Timber.d("MaliciousSite: hiding warning page and triggering a reload of the previous")
             viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
@@ -1811,11 +1816,15 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(it.url, it.feed)
+            is Command.ShowWarningMaliciousSite -> showMaliciousWarning(
+                maliciousUri = it.maliciousUri,
+                documentUri = it.documentUri,
+                feed = it.feed,
+                onMaliciousWarningShown = it.onMaliciousWarningShown,
+            )
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning()
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
-            is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
@@ -1867,9 +1876,21 @@ class BrowserTabFragment :
 
                 browserActivity?.openExistingTab(it.tabId)
             }
+            is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             else -> {
                 // NO OP
+            }
+        }
+    }
+
+    private fun showAutoconsentAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.createCookiesAnimation(isCosmetic)
             }
         }
     }
@@ -3779,10 +3800,9 @@ class BrowserTabFragment :
                     }
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
-
                 omnibar.renderLoadingViewState(viewState)
 
-                if (viewState.privacyOn) {
+                if (viewState.trackersAnimationEnabled) {
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         omnibar.cancelTrackersAnimation()
                     }
