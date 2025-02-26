@@ -409,6 +409,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         )
                     }
                 }
+                TabSwitcherItem.TrackerAnimationTile -> Unit // TODO delete from list
             }
         }
     }
