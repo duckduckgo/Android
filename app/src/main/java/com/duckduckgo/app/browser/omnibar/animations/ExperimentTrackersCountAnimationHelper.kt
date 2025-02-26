@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import android.widget.TextView
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.MainScope
@@ -34,7 +34,7 @@ interface ExperimentTrackersCountAnimationHelper {
     fun cancelAnimations()
 }
 
-@ContributesBinding(ViewScope::class)
+@ContributesBinding(FragmentScope::class)
 class ExperimentTrackersCountAnimationHelperImpl @Inject constructor() : ExperimentTrackersCountAnimationHelper {
 
     private val conflatedJob = ConflatedJob()
