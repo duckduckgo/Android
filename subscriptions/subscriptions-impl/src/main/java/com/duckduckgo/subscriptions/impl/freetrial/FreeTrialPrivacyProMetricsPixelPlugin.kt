@@ -111,7 +111,10 @@ class FreeTrialPrivacyProPixelsPlugin @Inject constructor(
         metricsPixel?.let { metric ->
             metric.getPixelDefinitions().forEach { definition ->
                 if (definition.isInConversionWindow()) {
-                    freeTrialExperimentDataStore.getMetricForPixelDefinition(definition).takeIf { it < metric.value.toInt() }?.let {
+                    freeTrialExperimentDataStore.getMetricForPixelDefinition(definition).takeIf {
+                        it < freeTrialExperimentDataStore.paywallImpressions
+                    }?.let {
+                        freeTrialExperimentDataStore.increaseMetricForPixelDefinition(definition)
                         pixel.fire(definition.pixelName, definition.params)
                     }
                 }

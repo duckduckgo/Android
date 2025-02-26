@@ -41,6 +41,11 @@ interface FreeTrialExperimentDataStore {
      * Returns the number [Int] of paywall impressions for the given [definition]
      */
     suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int
+
+    /**
+     * Increases the count of paywall impressions for the given [definition]
+     */
+    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,6 +72,17 @@ class FreeTrialExperimentDataStoreImpl @Inject constructor(
             preferences.getInt(tag, 0)
         }
     }
+
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int =
+        withContext(dispatcherProvider.io()) {
+            val tag = "$definition"
+            val count = preferences.getInt(tag, 0)
+            preferences.edit {
+                putInt(tag, count + 1)
+                apply()
+            }
+            preferences.getInt(tag, 0)
+        }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.subscriptions.freetrial.store"
