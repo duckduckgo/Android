@@ -41,7 +41,7 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 ) : OmnibarLayout(context, attrs, defStyle) {
 
     private val minibar: View by lazy { findViewById(R.id.minibar) }
-    private val minibarText: DaxTextView by lazy { findViewById(R.id.minibarText) }
+    private val minibarText: DaxTextView by lazy { findViewById(R.id.domainText) }
     private val trackersText: DaxTextView by lazy { findViewById(R.id.trackersText) }
 
     private val scrollThreshold = 200
@@ -51,14 +51,14 @@ class DelightfulOmnibarLayout @JvmOverloads constructor(
 
     init {
         val attr =
-            context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
+            context.theme.obtainStyledAttributes(attrs, R.styleable.DelightfulOmnibarLayout, defStyle, 0)
         omnibarPosition =
-            OmnibarPosition.entries[attr.getInt(R.styleable.FadeOmnibarLayout_omnibarPosition, 0)]
+            OmnibarPosition.entries[attr.getInt(R.styleable.DelightfulOmnibarLayout_omnibarPosition, 0)]
 
         val layout = if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            R.layout.view_new_omnibar_bottom
+            R.layout.view_delightful_omnibar_bottom
         } else {
-            R.layout.view_new_omnibar
+            R.layout.view_delightful_omnibar
         }
 
         inflate(context, layout, this)

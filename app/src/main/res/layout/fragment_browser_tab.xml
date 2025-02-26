@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
         android:id="@+id/fadeOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.experiments.DelightfulOmnibarLayout
         android:id="@+id/fadeOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
