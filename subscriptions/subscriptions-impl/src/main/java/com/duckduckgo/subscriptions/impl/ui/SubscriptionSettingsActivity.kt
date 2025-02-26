@@ -186,7 +186,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                         getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.monthly))
                     viewState.status == AUTO_RENEWABLE && viewState.duration == Yearly ->
                         getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.yearly))
-                    else -> getString(string.freeTrialCancelledSubscriptionsData)
+                    else -> getString(string.freeTrialCancelledSubscriptionsData, viewState.date)
                 }
                 binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
 
