@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.service
 
+import android.annotation.SuppressLint
 import android.view.autofill.AutofillManager
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -46,6 +47,7 @@ class AutofillServiceStatusLifecycleObserver@Inject constructor(
     private val pixel: Pixel,
 ) : MainProcessLifecycleObserver {
 
+    @SuppressLint("NewApi")
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         appCoroutineScope.launch(dispatcherProvider.io()) {
