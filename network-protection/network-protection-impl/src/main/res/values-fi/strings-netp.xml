@@ -225,7 +225,7 @@
     <string name="netpCustomDnsSettingText">DNS-palvelin</string>
     <string name="netpPrivateDns">Yksityinen DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Estä haittaohjelmat)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Estä riskialttiit verkkotunnukset)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Suositeltu)</string>
     <string name="netpCustomDnsCustom">Kustomoitu</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-osoite</string>
@@ -236,8 +236,10 @@
     <string name="netpDdgDnsByLine">DuckDuckGo reitittää DNS-kyselyt DNS-palvelimiemme kautta, jotta internetpalveluntarjoajasi ei näe, millä verkkosivustoilla vierailet.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Estä haittaohjelmat</string>
-    <string name="netpDnsBlockMalwareByline">Estä haittaohjelmat DNS-tason estolistan avulla. Jos verkkosivusto ei lataudu, kokeile ottaa esto pois päältä.</string>
+    <string name="netpDnsBlockMalwareHeader">Sisällön estäminen ja suodattaminen</string>
+    <string name="netpDnsBlockMalwarePrimary">Estä vaaralliset verkkotunnukset</string>
+    <string name="netpDnsBlockMalwareByline">Estä yli 150 000 verkkotunnusta, jotka on lisätty DNS-tason estolistalle haittaohjelmien, tietojenkalasteluhyökkäysten ja verkkohuijausten vuoksi. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">DNS-estolistat</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Haluatko sulkea pois sovellukset, jotka eivät ole yhteensopivia VPN-verkkojen kanssa?</string>

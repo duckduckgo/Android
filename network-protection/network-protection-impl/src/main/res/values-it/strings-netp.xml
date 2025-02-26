@@ -225,7 +225,7 @@
     <string name="netpCustomDnsSettingText">Server DNS</string>
     <string name="netpPrivateDns">DNS privato</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blocca malware)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blocca i domini rischiosi)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (consigliato)</string>
     <string name="netpCustomDnsCustom">Personalizzato</string>
     <string name="netpCustomDnsInputAddressHint">Indirizzo IPv4</string>
@@ -236,8 +236,10 @@
     <string name="netpDdgDnsByLine">DuckDuckGo instrada le query DNS tramite i nostri server DNS in modo che il tuo provider internet non possa vedere quali siti web visiti.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwarePrimary">Blocca malware</string>
-    <string name="netpDnsBlockMalwareByline">Blocca il malware con una lista di blocco a livello DNS. Se un sito web non si carica, prova a disattivare il blocco.</string>
+    <string name="netpDnsBlockMalwareHeader">Blocco e filtraggio dei contenuti</string>
+    <string name="netpDnsBlockMalwarePrimary">Blocca i domini rischiosi</string>
+    <string name="netpDnsBlockMalwareByline">Blocca oltre 150.000 domini segnalati per ospitare malware, attacchi di phishing e truffe online con una lista di blocco a livello DNS.\n <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="netpDnsBlockMalwareFaqsTitle">Liste di blocco DNS</string>
 
     <!-- Auto-exclude -->
     <string name="netpAutoExcludePromptTitle">Vuoi escludere le app che non sono compatibili con le VPN?</string>

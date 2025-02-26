@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
@@ -52,6 +53,7 @@ class VpnCustomDnsViewModel @Inject constructor(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
+    private val vpnRemoteFeatures: VpnRemoteFeatures,
     dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -103,7 +105,11 @@ class VpnCustomDnsViewModel @Inject constructor(
 
     private fun handleDefaultDnsSelected() = flow {
         currentState = DefaultDns
-        emit(State.DefaultDns(true, blockMalware.await()))
+        if (vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
+            emit(State.DefaultDns(true, blockMalware.await()))
+        } else {
+            emit(State.DefaultDnsNoBlockMalware(true))
+        }
     }
 
     private fun handleCustomDnsSelected() = flow {
@@ -126,7 +132,11 @@ class VpnCustomDnsViewModel @Inject constructor(
         }
         customDns?.let {
             emit(State.CustomDns(it, !isPrivateDnsActive, applyEnabled = false))
-        } ?: emit(State.DefaultDns(!isPrivateDnsActive, blockMalware.await()))
+        } ?: if (vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
+            emit(State.DefaultDns(!isPrivateDnsActive, blockMalware.await()))
+        } else {
+            emit(State.DefaultDnsNoBlockMalware(!isPrivateDnsActive))
+        }
     }
 
     private fun String.isValidAddress(): Boolean {
