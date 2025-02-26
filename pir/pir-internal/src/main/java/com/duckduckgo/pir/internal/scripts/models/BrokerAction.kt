@@ -124,9 +124,11 @@ data class ElementSelector(
 )
 
 enum class DataSource {
+    // Uses the profile obtained from the user
     @Json(name = "userProfile")
     USER_PROFILE,
 
+    // Uses the profile scraped via the extract action
     @Json(name = "extractedProfile")
     EXTRACTED_PROFILE,
 }

@@ -26,6 +26,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface PirCssScriptLoader {
+    /**
+     * Loads and returns a valid pir script ready to be loaded into a webview.
+     */
     suspend fun getScript(): String
 }
 

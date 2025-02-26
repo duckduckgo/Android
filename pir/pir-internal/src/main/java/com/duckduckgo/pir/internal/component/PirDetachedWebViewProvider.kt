@@ -21,6 +21,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Message
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -30,13 +31,29 @@ import javax.inject.Inject
 import logcat.logcat
 
 interface PirDetachedWebViewProvider {
-    fun getInstance(context: Context, scriptToLoad: String, onPageLoaded: (String?) -> Unit): WebView
+    /**
+     * This method returns an instance of webview created using the given [context] with every necessary
+     * configuration setup for pir to run.
+     *
+     * @param context in which the webview should run - could be service/activity
+     * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param onPageLoaded callback to receive whenever a url has finished loading.
+     */
+    fun getInstance(
+        context: Context,
+        scriptToLoad: String,
+        onPageLoaded: (String?) -> Unit,
+    ): WebView
 }
 
 @ContributesBinding(ServiceScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
-    override fun getInstance(context: Context, scriptToLoad: String, onPageLoaded: (String?) -> Unit): WebView {
+    override fun getInstance(
+        context: Context,
+        scriptToLoad: String,
+        onPageLoaded: (String?) -> Unit,
+    ): WebView {
         return WebView(context).apply {
             webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -53,10 +70,12 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
             }
             webViewClient = object : WebViewClient() {
                 @SuppressLint("RequiresFeature")
-                /** override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                 logcat {"PIR-SCAN: webview Redirect detected: ${request?.url}"}
-                 return false // Allow WebView to load the URL
-                 }**/
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                ): Boolean {
+                    return false
+                }
 
                 override fun onPageStarted(
                     view: WebView?,
@@ -66,9 +85,6 @@ class RealPirDetachedWebViewProvider @Inject constructor() : PirDetachedWebViewP
                     super.onPageStarted(view, url, favicon)
                     logcat { "PIR-SCAN: webview loading $url" }
                     view?.evaluateJavascript("javascript:$scriptToLoad", null)
-                    /**if (view != null) {
-                     WebViewCompat.addDocumentStartJavaScript(view, scriptToLoad, setOf("*"))
-                     }**/
                 }
 
                 override fun onPageFinished(

@@ -22,5 +22,8 @@
     <string name="pirDevHeader">Test Actions</string>
     <string name="pirStatsTotalHeader">Total to process: </string>
     <string name="pirStatsStatusHeader">Completion status: </string>
-    <string name="pirStatsStatus"><b>Found:</b> %1$d    <b>Error:</b> %2$d </string>
+    <string name="pirStatsStatus" instruction="Placeholder are both integers"><b>Found:</b> %1$d    <b>Error:</b> %2$d </string>
+    <string name="pirNotificationTitle">Pir Manual Scan</string>
+    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress...</string>
+    <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
 </resources>
