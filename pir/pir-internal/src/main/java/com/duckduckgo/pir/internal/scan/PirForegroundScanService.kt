@@ -23,10 +23,14 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.Process
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.settings.PirDevSettings
 import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_CHANNEL_ID
+import com.duckduckgo.pir.internal.settings.PirDevSettings.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import logcat.AndroidLogcatLogger
@@ -39,9 +43,13 @@ class PirForegroundScanService : Service() {
     @Inject
     lateinit var pirScan: PirScan
 
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
+        // TODO find correct place.
         LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
     }
 
@@ -54,13 +62,16 @@ class PirForegroundScanService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
-        logcat { "PIR-SCAN: PirForegroundScanService onStartCommand" }
-        logcat { "PIR-SCAN: Process ${Process.myPid()} thread: ${Thread.currentThread().name}" }
-        val notification: Notification = createNotification()
+        logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
+        val notification: Notification = createNotification(getString(R.string.pirNotificationMessageInProgress))
         startForeground(1, notification)
 
-        // pirScan.execute(listOf("Clubset", "PeopleFinders", "backgroundcheck.run", "FastBackgroundCheck.com", "Verecor"), this) {
         pirScan.executeAllBrokers(this) {
+            notificationManagerCompat.checkPermissionAndNotify(
+                applicationContext,
+                NOTIF_ID_STATUS_COMPLETE,
+                createNotification(getString(R.string.pirNotificationMessageComplete)),
+            )
             stopSelf()
         }
 
@@ -68,11 +79,11 @@ class PirForegroundScanService : Service() {
     }
 
     override fun onDestroy() {
-        logcat { "PIR-SCAN: PirForegroundScanService onDestroy" }
+        logcat { "PIR-SCAN: PIR service destroyed" }
         pirScan.stop()
     }
 
-    private fun createNotification(): Notification {
+    private fun createNotification(message: String): Notification {
         val notificationIntent = Intent(
             this,
             PirDevSettings::class.java,
@@ -85,8 +96,8 @@ class PirForegroundScanService : Service() {
         )
 
         return NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-            .setContentTitle("Pir Manual Scan")
-            .setContentText("Manual scan is currently in progress")
+            .setContentTitle(getString(R.string.pirNotificationTitle))
+            .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(pendingIntent)
             .build()

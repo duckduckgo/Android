@@ -26,10 +26,12 @@ import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Navigate
 import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,17 +40,33 @@ import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 interface PirScan {
+    /**
+     * This method can be used to execute pir scan for a given list of [brokers] names.
+     *
+     * @param brokers List of broker names
+     * @param context Context in which we want to create the detached WebView from
+     * @param onScanComplete callback method called when the scan is completed.
+     */
     fun execute(
         brokers: List<String>,
         context: Context,
         onScanComplete: () -> Unit,
     )
 
+    /**
+     * This method can be used to execute pir scan for all active brokers (from json).
+     *
+     * @param context Context in which we want to create the detached WebView from
+     * @param onScanComplete callback method called when the scan is completed.
+     */
     fun executeAllBrokers(
         context: Context,
         onScanComplete: () -> Unit,
     )
 
+    /**
+     * This method takes care of stopping the scan and cleaning up resources used.
+     */
     fun stop()
 }
 
@@ -68,7 +86,18 @@ class RealPirScan @Inject constructor(
     private val brokerActionProcessor: BrokerActionProcessor,
     private val pirCssScriptLoader: PirCssScriptLoader,
 ) : PirScan, ActionResultListener {
-    private val pirUserProfile = PirUserProfile(firstName = "")
+    // TODO: Allow to input profile
+    private val profileQuery: ProfileQuery = ProfileQuery(
+        firstName = "William",
+        lastName = "Smith",
+        city = "Chicago",
+        state = "IL",
+        addresses = listOf(),
+        birthYear = 1993,
+        fullName = "William Smith",
+        age = 34,
+        deprecated = false,
+    )
     private var detachedWebView: WebView? = null
     private var currentAction: BrokerAction? = null
     private var currentActionIndex: Int = 0
@@ -76,6 +105,7 @@ class RealPirScan @Inject constructor(
     private var currentBrokerActions: List<BrokerAction> = emptyList()
     private var currentBroker: String? = null
     private var mainUrlLoaded: String? = null
+    private var brokerUrlCompletedLoading: Boolean = false
     private var _onScanComplete: () -> Unit = {}
     private var _brokers: List<String> = emptyList()
 
@@ -87,30 +117,25 @@ class RealPirScan @Inject constructor(
     ) {
         /**
          * 1. Create detached webview
-         * 2. Get all info for broker
-         * 3. Get all scan steps for broker
-         * 4. Execute steps
-         * 5. Complete!
+         * 2. Prepare the detached webview - load script and load the dbp url
+         * 3. For every broker:
+         *      - Get all info for broker
+         *      - Get all scan steps for broker
+         *      - Execute steps
+         * 4. Complete!
          */
         runBlocking {
             repository.deleteAllResults()
         }
 
         _onScanComplete = onScanComplete
-        logcat { "PIR-SCAN: RealPirScan initiate webview" }
         val script = runBlocking {
             pirCssScriptLoader.getScript()
         }
+
         _brokers = brokers
-        detachedWebView = pirDetachedWebViewProvider.getInstance(context, script) {
-            logcat { "PIR-SCAN: finished loading $it and mainUrlLoaded: $mainUrlLoaded" }
-            if (it == DBP_INITIAL_URL) {
-                logcat { "PIR-SCAN: Run scan for these brokers: $brokers" }
-                initiateBrokerScan(brokers[0])
-            } else {
-                mainUrlLoaded = null
-                proceedToNext()
-            }
+        detachedWebView = pirDetachedWebViewProvider.getInstance(context, script) { url ->
+            handleLoadingFinished(url)
         }.apply {
             brokerActionProcessor.register(this@apply, this@RealPirScan)
         }
@@ -118,6 +143,23 @@ class RealPirScan @Inject constructor(
         // Initial load needed to load script
         mainUrlLoaded = DBP_INITIAL_URL
         detachedWebView!!.loadUrl(DBP_INITIAL_URL)
+    }
+
+    private fun handleLoadingFinished(url: String?) {
+        logcat { "PIR-SCAN: finished loading $url and mainUrlLoaded: $mainUrlLoaded" }
+        // A completed initial scan means we are ready to run the scan for the brokers
+        if (url == DBP_INITIAL_URL) {
+            logcat { "PIR-SCAN: Run scan for these brokers: $_brokers" }
+            initiateBrokerScan(_brokers[0])
+        } else if (currentAction is Navigate) {
+            // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
+            // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
+            logcat { "PIR-SCAN: Completed loading for $mainUrlLoaded" }
+            brokerUrlCompletedLoading = true
+            proceedToNext()
+        } else {
+            logcat { "PIR-SCAN: Ignoring $url as extraction action has been pushed for the navigate action's loaded url." }
+        }
     }
 
     private fun resetValues() {
@@ -131,26 +173,26 @@ class RealPirScan @Inject constructor(
     }
 
     private fun proceedToNext() {
-        logcat { "PIR-SCAN: proceedToNext" }
         currentActionIndex += 1
+        // Actions for the current broker is completed! Proceed to next.
         if (currentBrokerActions.size == currentActionIndex) {
             executeNextBroker()
         } else {
+            // Else execute next action
             currentAction = currentBrokerActions[currentActionIndex]
             logcat { "PIR-SCAN: do next action: $currentAction" }
-            // runBlocking(dispatcherProvider.main()) {
-            detachedWebView?.let { brokerActionProcessor.pushAction(pirUserProfile, currentAction!!, it) }
-            // }
+            detachedWebView?.let { brokerActionProcessor.pushAction(profileQuery, currentAction!!, it) }
         }
     }
 
     private fun executeNextBroker() {
-        if (currentBrokerIndex >= _brokers.size - 1) {
+        currentBrokerIndex += 1
+        // All brokers have been executed!
+        if (currentBrokerIndex >= _brokers.size) {
             resetValues()
             _onScanComplete()
         } else {
-            logcat { "PIR-SCAN: do next action: $currentAction" }
-            currentBrokerIndex += 1
+            logcat { "PIR-SCAN: Execute next broker." }
             initiateBrokerScan(_brokers[currentBrokerIndex])
         }
     }
@@ -162,6 +204,9 @@ class RealPirScan @Inject constructor(
                 is NavigateResponse -> {
                     repository.saveNavigateResult(currentBroker ?: "", pirSuccessResponse)
                     mainUrlLoaded = pirSuccessResponse.response.url
+
+                    logcat { "PIR-SCAN: Loading real url: $mainUrlLoaded" }
+                    brokerUrlCompletedLoading = false
                     detachedWebView?.loadUrl(mainUrlLoaded!!)
                 }
 
@@ -202,9 +247,7 @@ class RealPirScan @Inject constructor(
                 logcat { "PIR-SCAN: Broker steps ${it.actions}" }
                 detachedWebView?.let { webview ->
                     if (currentAction != null) {
-                        // runBlocking(dispatcherProvider.main()) {
-                        brokerActionProcessor.pushAction(pirUserProfile, currentAction!!, webview)
-                        // }
+                        brokerActionProcessor.pushAction(profileQuery, currentAction!!, webview)
                     }
                 }
             }
@@ -215,11 +258,8 @@ class RealPirScan @Inject constructor(
         context: Context,
         onScanComplete: () -> Unit,
     ) {
-        val problematic = listOf("AdvancedBackgroundChecks")
         val brokers = runBlocking {
-            repository.getAllBrokersForScan().filter {
-                !problematic.contains(it)
-            }
+            repository.getAllBrokersForScan()
         }
         execute(brokers, context, onScanComplete)
     }
