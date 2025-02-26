@@ -3791,7 +3791,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOnboardingDaxTypingAnimationFinished() {
-        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+        if (currentBrowserViewState().browserShowing && currentBrowserViewState().maliciousSiteBlocked.not()) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+        }
     }
 
     override fun onShouldOverride() {
